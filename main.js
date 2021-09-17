@@ -221,11 +221,11 @@ function addPointsToPrint(points) {
 };
 
 function printPoints() {
-    vertices = vertices.flat();
+    vertices = flatten(vertices);
     let vBuffer = getBuffer2(vertices);
     shaderVariableToBuffer("vPosition", dimension);
 
-    colors = colors.flat();
+    colors = flatten(colors);
     getBuffer2(colors);
     shaderVariableToBuffer("vColor", 4);
 
