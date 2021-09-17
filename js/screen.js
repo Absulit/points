@@ -4,59 +4,85 @@ import MathUtil from './mathutil.js';
 import Coordinate from './coordinate.js';
 
 class Screen {
-    constructor(canvas, numColumns = 10, numRows = 10, numMargin = 2) {
+    constructor(canvas, numColumns = 10, numRows = 10, numMargin = 2, numLayers = 1) {
         this._canvas = canvas;
         this._numColumns = numColumns;
         this._numRows = numRows;
         this._numMargin = numMargin;
-        this._pointSizeFull = 0;
+        this._numLayers = numLayers;
+        this._pointSizeFull = 1;
 
         this._center = new Coordinate(Math.round(numColumns / 2), Math.round(numRows / 2));
 
-        this._columns = [];
-        this._rows = [];
-        this._points = [];
+        //this._columns = [];
+        //this._rows = [];
+        //this._points = [];
+
+        this._layers = [];
+        this._mainLayer = null;
+        this._layerIndex = 0;
+
         this._pointSize = 1;
         this._init();
     }
 
     _init() {
-        let pixelSize = 1;
         if (this._numColumns > this._numRows) {
-            pixelSize = this._canvas.width / this._numColumns;
+            this._pointSizeFull = this._canvas.width / this._numColumns;
         } else {
-            pixelSize = this._canvas.height / this._numRows;
+            this._pointSizeFull = this._canvas.height / this._numRows;
         }
 
-        let halfSize = pixelSize / 2;
+        this._mainLayer = this._createLayer();
+        this._createLayers();
+
+        this._pointSize = this._pointSizeFull - this._numMargin;
+    }
+
+    _createLayer() {
+        // TODO: layer class maybe?
+        let layer = {
+            columns: [],
+            rows: [],
+            points: []
+        };
+
+        let halfSize = this._pointSizeFull / 2; // TODO: make private property
         let row;
         let point;
         for (let yCoordinate = 0; yCoordinate < this._numRows; yCoordinate++) {
             row = [];
             for (let xCoordinate = 0; xCoordinate < this._numColumns; xCoordinate++) {
                 point = new Point();
-                point.position.set((xCoordinate * pixelSize) + halfSize, (yCoordinate * pixelSize) + halfSize, 0);
+                point.position.set((xCoordinate * this._pointSizeFull) + halfSize, (yCoordinate * this._pointSizeFull) + halfSize, 0);
                 point.setColor(Math.random(), 1, Math.random(), 1);
 
-                this._points.push(point);
+                layer.points.push(point);
                 row.push(point);
             }
-            this._rows.push(row);
+            layer.rows.push(row);
         }
 
         // pre fill with the amount of columns
         for (let index = 0; index < this._numColumns; index++) {
-            this._columns.push([]);
+            layer.columns.push([]);
         }
 
-        this._rows.forEach(row => {
+        layer.rows.forEach(row => {
             row.forEach((point, index) => {
-                this._columns[index].push(point);
+                layer.columns[index].push(point);
             });
         });
 
-        this._pointSizeFull = pixelSize;
-        this._pointSize = pixelSize - this._numMargin;
+        return layer;
+    }
+
+    _createLayers() {
+        let layer = this._createLayer();
+        for (let layerIndex = 0; layerIndex < this._numLayers; layerIndex++) {
+            this._layers.push(layer);
+        }
+        this._currentLayer = this._layers[this._layerIndex];
     }
 
     get numColumns() {
@@ -67,15 +93,11 @@ class Screen {
     }
 
     get rows() {
-        return this._rows;
+        return this._currentLayer.rows;
     }
 
     get points() {
-        return this._points;
-    }
-
-    set points(value) {
-        this._points = value;
+        return this._currentLayer.points;
     }
 
     get pointSize() {
@@ -86,8 +108,24 @@ class Screen {
         return this._center;
     }
 
+    get mainLayer() {
+        return this._mainLayer;
+    }
+
+    get layerIndex() {
+        return this._layerIndex;
+    }
+    set layerIndex(value) {
+        this._layerIndex = value;
+        this._currentLayer = this._layers[value];
+    }
+
+    get currentLayer(){
+        return this._currentLayer;
+    }
+
     getPointAt(columnIndex, rowIndex) {
-        let row = this._rows[rowIndex];
+        let row = this._currentLayer.rows[rowIndex];
         let point = null;
         if (row) {
             point = row[columnIndex];
@@ -108,14 +146,14 @@ class Screen {
     getRandomPoint() {
         let columnIndex = Math.floor(Math.random() * this._numColumns);
         let rowIndex = Math.floor(Math.random() * this._numRows);
-        let row = this._rows[rowIndex];
+        let row = this._currentLayer.rows[rowIndex];
         let point = row[columnIndex];
         point.setCoordinates(columnIndex, rowIndex, 0);
         return point;
     }
 
     clear(color = null) {
-        this._rows.forEach(row => {
+        this._currentLayer.rows.forEach(row => {
             row.forEach(point => {
                 if (color) {
                     // TODO: check why point.color = color does not work
@@ -129,9 +167,9 @@ class Screen {
 
     clearMix(color, level = 2, layer = 0) {
         let pointColor = null;
-        this._rows.forEach(row => {
+        this._currentLayer.rows.forEach(row => {
             row.forEach(point => {
-                if(point.layer === layer){
+                if (point.layer === layer) {
                     pointColor = point.color;
                     point.setColor(
                         (pointColor.r + color.r) / level,

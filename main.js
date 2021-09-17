@@ -128,7 +128,7 @@ function update() {
     screen.drawCircleWithPoints(point1, point2);*/
 
 
-    
+
     //wavenoise.update(u_time);
     //wavenoise.update2(u_time, usin);
     //wavenoise.scanLine();
@@ -143,7 +143,7 @@ function update() {
     //star.update(u_time, usin);
     imageNoise.update(usin);
 
-    if(printCircle){
+    /*if(printCircle){
         screen.drawCircle(printCirclePoint.coordinates.x, printCirclePoint.coordinates.y,
             printCircleDistance,
             1, 0, 0, 1,
@@ -154,7 +154,7 @@ function update() {
             printCircleDistance = 0;
         }
     }
-    screen.clearMix(clearMixColor, 1.1, 1);
+    screen.clearMix(clearMixColor, 1.1, 1);*/
 
     addPointsToPrint(screen.points);
 
@@ -217,14 +217,12 @@ function addPointsToPrint(points) {
         if (point.modified) {
             addToPrint(point);
         }
-
     }
 };
 
 function printPoints() {
     vertices = vertices.flat();
     let vBuffer = getBuffer2(vertices);
-    //debugger
     shaderVariableToBuffer("vPosition", dimension);
 
     colors = colors.flat();
@@ -270,7 +268,7 @@ function getCursorPosition(canvas, event) {
 }
 
 
-function loadCircle(canvas, event){
+function loadCircle(canvas, event) {
     const rect = canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
