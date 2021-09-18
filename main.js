@@ -75,7 +75,7 @@ function init() {
     dimension = 3;
 
     //-----------
-    screen = new Screen(canvas, numColumns, numRows, numMargin);
+    screen = new Screen(canvas, numColumns, numRows, numMargin, 3);
     centerColumns = numColumns / 2;
     centerRows = numRows / 2;
 
@@ -141,9 +141,11 @@ function update() {
     //flag.update(u_time);
     //matrix.update();
     //star.update(u_time, usin);
-    imageNoise.update(usin);
+    //screen.layerIndex = 0;
+    //imageNoise.update(usin);
 
-    /*if(printCircle){
+    /*screen.layerIndex = 0;
+    if(printCircle){
         screen.drawCircle(printCirclePoint.coordinates.x, printCirclePoint.coordinates.y,
             printCircleDistance,
             1, 0, 0, 1,
@@ -154,9 +156,34 @@ function update() {
             printCircleDistance = 0;
         }
     }
-    screen.clearMix(clearMixColor, 1.1, 1);*/
+    screen.clearMix(clearMixColor, 1.1);*/
 
-    addPointsToPrint(screen.points);
+    //screen.clearMix(clearMixColor, 1.1);
+
+    screen.layerIndex = 1;
+    screen.drawLineRotation(screen.center.x, screen.center.y,20, 3.14, new RGBAColor(1,0,0) );
+    screen.clearMix(clearMixColor, 1.1);
+
+    screen.layerIndex = 2;
+    screen.drawLineRotation(screen.center.x, screen.center.y,20, 1, new RGBAColor(1,.3,1) );
+
+
+    screen.layerIndex = 1;
+    let amountNoise = Math.abs(1000 * usin) + 5000;
+    for (let index = 0; index < amountNoise; index++) {
+        let point = screen.getRandomPoint();
+        //let point = screen.getPointAt(50,50);
+
+        //let point2 = this._screen.getRandomPoint();
+        screen.movePointTo(point, point.coordinates.x, point.coordinates.y - 1);
+        //this._screen.movePointTo(point, point.coordinates.x+1, point.coordinates.y-2);
+        //this._screen.movePointTo(point, point.coordinates.x+2, point.coordinates.y-3);
+    }
+
+    screen.mergeLayers();
+
+    addPointsToPrint(screen.mainLayer.points);
+    //addPointsToPrint(screen.layers[2].points);
 
     /*************/
     /*let icon = document.getElementById('icon');  // get the <img> tag

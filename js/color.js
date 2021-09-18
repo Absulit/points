@@ -42,6 +42,15 @@ class RGBAColor {
     set(r, g, b, a) {
         this._value = [r, g, b, a]
     }
+
+    setColor(color) {
+        this._value = [color.r, color.g, color.b, color.a];
+    }
+
+    add(color) {
+        let [r, g, b, a] = this._value;
+        this._value = [r + color.r, g + color.g, b + color.b, a + color.a];
+    }
 }
 
 export default RGBAColor;

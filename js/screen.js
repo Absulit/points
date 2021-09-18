@@ -55,7 +55,7 @@ class Screen {
             for (let xCoordinate = 0; xCoordinate < this._numColumns; xCoordinate++) {
                 point = new Point();
                 point.position.set((xCoordinate * this._pointSizeFull) + halfSize, (yCoordinate * this._pointSizeFull) + halfSize, 0);
-                point.setColor(Math.random(), 1, Math.random(), 1);
+                //point.setColor(Math.random(), 1, Math.random(), 1);
 
                 layer.points.push(point);
                 row.push(point);
@@ -78,11 +78,22 @@ class Screen {
     }
 
     _createLayers() {
-        let layer = this._createLayer();
         for (let layerIndex = 0; layerIndex < this._numLayers; layerIndex++) {
-            this._layers.push(layer);
+            this._layers.push(this._createLayer());
         }
         this._currentLayer = this._layers[this._layerIndex];
+    }
+
+    mergeLayers() {
+        let finalPoints = this._mainLayer.points;
+
+        this._layers.forEach(layer => {
+            layer.points.forEach((layerPoint, layerPointIndex) => {
+                if (layerPoint.modified) {
+                    finalPoints[layerPointIndex].color = layerPoint.color;
+                }
+            });
+        });
     }
 
     get numColumns() {
@@ -112,6 +123,10 @@ class Screen {
         return this._mainLayer;
     }
 
+    get layers() {
+        return this._layers;
+    }
+
     get layerIndex() {
         return this._layerIndex;
     }
@@ -120,7 +135,7 @@ class Screen {
         this._currentLayer = this._layers[value];
     }
 
-    get currentLayer(){
+    get currentLayer() {
         return this._currentLayer;
     }
 
@@ -165,18 +180,16 @@ class Screen {
         });
     }
 
-    clearMix(color, level = 2, layer = 0) {
+    clearMix(color, level = 2) {
         let pointColor = null;
         this._currentLayer.rows.forEach(row => {
             row.forEach(point => {
-                if (point.layer === layer) {
-                    pointColor = point.color;
-                    point.setColor(
-                        (pointColor.r + color.r) / level,
-                        (pointColor.g + color.g) / level,
-                        (pointColor.b + color.b) / level,
-                        (pointColor.a + color.a));
-                }
+                pointColor = point.color;
+                point.setColor(
+                    (pointColor.r + color.r) / level,
+                    (pointColor.g + color.g) / level,
+                    (pointColor.b + color.b) / level,
+                    (pointColor.a + color.a));
             });
         });
     }
@@ -216,11 +229,10 @@ class Screen {
      * @param {Number} columnIndex
      * @param {Number} rowIndex
      */
-    movePointTo(point, columnIndex, rowIndex, layer = 0) {
+    movePointTo(point, columnIndex, rowIndex) {
         let pointToReplace = this.getPointAt(columnIndex, rowIndex);
         let { r, g, b } = point.color;
         if (pointToReplace) {
-            pointToReplace.layer = layer;
             pointToReplace.setColor(r, g, b);
             //pointToReplace.color = new RGBAColor(1,0,0);
         }
@@ -233,7 +245,7 @@ class Screen {
      * @param {Point} pointA
      * @param {Point} pointB
      */
-    drawLineWithPoints(pointA, pointB, layer = 0) {
+    drawLineWithPoints(pointA, pointB) {
         let x0 = pointA.coordinates.x;
         let y0 = pointA.coordinates.y;
 
@@ -243,43 +255,43 @@ class Screen {
 
         if (Math.abs(y1 - y0) < Math.abs(x1 - x0)) {
             if (x0 > x1) {
-                this._plotLineLow(x1, y1, x0, y0, color, layer);
+                this._plotLineLow(x1, y1, x0, y0, color);
             } else {
-                this._plotLineLow(x0, y0, x1, y1, color, layer);
+                this._plotLineLow(x0, y0, x1, y1, color);
             }
         } else {
             if (y0 > y1) {
-                this._plotLineHigh(x1, y1, x0, y0, color, layer);
+                this._plotLineHigh(x1, y1, x0, y0, color);
             } else {
-                this._plotLineHigh(x0, y0, x1, y1, color, layer);
+                this._plotLineHigh(x0, y0, x1, y1, color);
             }
         }
     }
 
-    drawLine(x0, y0, x1, y1, color, layer = 0) {
+    drawLine(x0, y0, x1, y1, color) {
         if (Math.abs(y1 - y0) < Math.abs(x1 - x0)) {
             if (x0 > x1) {
-                this._plotLineLow(x1, y1, x0, y0, color, layer);
+                this._plotLineLow(x1, y1, x0, y0, color);
             } else {
-                this._plotLineLow(x0, y0, x1, y1, color, layer);
+                this._plotLineLow(x0, y0, x1, y1, color);
             }
         } else {
             if (y0 > y1) {
-                this._plotLineHigh(x1, y1, x0, y0, color, layer);
+                this._plotLineHigh(x1, y1, x0, y0, color);
             } else {
-                this._plotLineHigh(x0, y0, x1, y1, color, layer);
+                this._plotLineHigh(x0, y0, x1, y1, color);
             }
         }
     }
 
-    drawLineRotation(x0, y0, distance, radians, color, layer = 0) {
+    drawLineRotation(x0, y0, distance, radians, color) {
         let pointFromCenter = MathUtil.vector(distance, radians);
         let finalPoint = { x: Math.round(x0 + pointFromCenter.x), y: Math.round(y0 + pointFromCenter.y) };
-        this.drawLine(x0, y0, finalPoint.x, finalPoint.y, color, layer);
+        this.drawLine(x0, y0, finalPoint.x, finalPoint.y, color);
         return finalPoint;
     }
 
-    _plotLineLow(x0, y0, x1, y1, color, layer) {
+    _plotLineLow(x0, y0, x1, y1, color) {
         let dx = x1 - x0
         let dy = y1 - y0
         let yi = 1
@@ -293,7 +305,6 @@ class Screen {
         for (let x = x0; x < x1; x++) {
             let point = this.getPointAt(x, y);
             if (point) {
-                point.layer = layer;
                 point.setColor(color.r, color.g, color.b, color.a);
             }
             if (D > 0) {
@@ -305,7 +316,7 @@ class Screen {
         }
     }
 
-    _plotLineHigh(x0, y0, x1, y1, color, layer) {
+    _plotLineHigh(x0, y0, x1, y1, color) {
         let dx = x1 - x0;
         let dy = y1 - y0;
         let xi = 1;
@@ -319,7 +330,6 @@ class Screen {
         for (let y = y0; y < y1; y++) {
             let point = this.getPointAt(x, y);
             if (point) {
-                point.layer = layer;
                 point.setColor(color.r, color.g, color.b, color.a);
             }
             if (D > 0) {
@@ -331,14 +341,13 @@ class Screen {
         }
     }
 
-    drawCircle(x, y, radius, r, g, b, a = 1, layer = 0) {
+    drawCircle(x, y, radius, r, g, b, a = 1) {
         let pointFromCenter, point, radians, angle, lastModifiedPoint;
         for (angle = 0; angle < 360; angle += .1) {
             radians = MathUtil.radians(angle);
             pointFromCenter = MathUtil.vector(radius, radians);
             point = this.getPointAt(Math.round(pointFromCenter.x + x), Math.round(pointFromCenter.y + y));
             if (point && (point != lastModifiedPoint)) {
-                point.layer = layer;
                 point.setColor(r, g, b, a);
                 lastModifiedPoint = point;
             }
@@ -353,21 +362,20 @@ class Screen {
      * @param {Function} callback
      * @param {Number} layer
      */
-    drawCircleOnAngle(x, y, radius, callback, layer = 0) {
+    drawCircleOnAngle(x, y, radius, callback) {
         let pointFromCenter, point, radians, angle, lastModifiedPoint;
         for (angle = 0; angle < 360; angle += .1) {
             radians = MathUtil.radians(angle);
             pointFromCenter = MathUtil.vector(radius, radians);
             point = this.getPointAt(Math.round(pointFromCenter.x + x), Math.round(pointFromCenter.y + y));
             if (point && (point != lastModifiedPoint)) {
-                point.layer = layer;
                 callback(point);
                 lastModifiedPoint = point;
             }
         }
     }
 
-    drawCircleWithPoints(pointA, pointB, layer = 0) {
+    drawCircleWithPoints(pointA, pointB) {
         console.log({ pointA, pointB })
         let radius = MathUtil.distance(pointA.coordinates, pointB.coordinates);
         let pointFromCenter, point;
@@ -375,13 +383,12 @@ class Screen {
             pointFromCenter = MathUtil.vector(radius, radians);
             point = this.getPointAt(Math.round(pointFromCenter.x + pointA.coordinates.x), Math.round(pointFromCenter.y + pointA.coordinates.y));
             if (point) {
-                point.layer = layer;
                 point.color = pointA.color;
             }
         }
     }
 
-    drawPolygon(x, y, radius, sides, color, layer = 0) {
+    drawPolygon(x, y, radius, sides, color) {
         let pointFromCenter, radians, angle;
 
         let firstVertexX, firstVertexY;
@@ -394,7 +401,7 @@ class Screen {
             let vertexY = Math.ceil(pointFromCenter.y + y);
 
             if (lastVertexX) {
-                this.drawLine(lastVertexX, lastVertexY, vertexX, vertexY, color, layer);
+                this.drawLine(lastVertexX, lastVertexY, vertexX, vertexY, color);
             }
             if (angle === 0) {
                 firstVertexX = vertexX;
@@ -403,7 +410,7 @@ class Screen {
             lastVertexX = vertexX;
             lastVertexY = vertexY;
         }
-        this.drawLine(lastVertexX, lastVertexY, firstVertexX, firstVertexY, color, layer);
+        this.drawLine(lastVertexX, lastVertexY, firstVertexX, firstVertexY, color);
     }
 
 
