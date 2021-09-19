@@ -45,6 +45,12 @@ function assignShaders(vertexName, fragmentName) {
     gl.useProgram(program);
 }
 
+/**
+ * Float Array to buffer
+ * @param {string} name Name shared in Javascript and the Shader
+ * @param {Array} vectorLen dimension required e.g, color is 4, pointsize is 1
+ * @returns shader variable pointer reference
+ */
 function shaderVariableToBuffer(name, vectorLen) {
     var shaderVar = gl.getAttribLocation( program, name);
     gl.vertexAttribPointer(shaderVar, vectorLen, gl.FLOAT, false, 0, 0);

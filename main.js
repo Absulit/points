@@ -290,7 +290,7 @@ function printPoints() {
     getBuffer2(colors);
     shaderVariableToBuffer("vColor", 4);
 
-    pointsizes = flatten(pointsizes);
+    pointsizes = pointsizes;
     getBuffer2(pointsizes);
     shaderVariableToBuffer("vPointSize", 1);
 
