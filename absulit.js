@@ -8,7 +8,7 @@ const Z = [0.0, 0.0, 1.0];
 
 function initWebGL(canvasId, depth) {
     canvas = document.getElementById(canvasId);
-    gl = WebGLUtils.setupWebGL(canvas, {preserveDrawingBuffer:true});
+    gl = WebGLUtils.setupWebGL(canvas, {preserveDrawingBuffer:true, premultipliedAlpha: false });
     if (!gl) { alert("WebGL isn't available"); }
     gl.viewport(0, 0, canvas.width, canvas.height);
     if(depth){

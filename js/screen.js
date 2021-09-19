@@ -56,6 +56,7 @@ class Screen {
                 point = new Point();
                 point.position.set((xCoordinate * this._pointSizeFull) + halfSize, (yCoordinate * this._pointSizeFull) + halfSize, 0);
                 //point.setColor(Math.random(), 1, Math.random(), 1);
+                point.color.a = 0;
 
                 layer.points.push(point);
                 row.push(point);
@@ -64,9 +65,11 @@ class Screen {
         }
 
         // pre fill with the amount of columns
-        for (let index = 0; index < this._numColumns; index++) {
+        /*for (let index = 0; index < this._numColumns; index++) {
             layer.columns.push([]);
-        }
+        }*/
+
+        layer.columns = Array(this._numColumns).fill([]);
 
         layer.rows.forEach(row => {
             row.forEach((point, index) => {
@@ -87,13 +90,37 @@ class Screen {
     mergeLayers() {
         let finalPoints = this._mainLayer.points;
 
-        this._layers.forEach(layer => {
-            layer.points.forEach((layerPoint, layerPointIndex) => {
-                if (layerPoint.modified) {
-                    finalPoints[layerPointIndex].color = layerPoint.color;
+        let r = Array(finalPoints.length);
+
+        finalPoints.forEach((finalPoint, finalPointIndex) => {
+            let tempColor = new RGBAColor(0,0,0,0);
+            tempColor.counter = 0;
+            this._layers.forEach(layer => {
+                let point = layer.points[finalPointIndex];
+                if (point.modified) {
+                    /*if (tempColor) {
+                        tempColor.add(point.color);
+                    } else {
+                        tempColor = point.color;
+                    }*/
+                    if(point.color.a === 1){
+                        tempColor.counter = 0;
+                        tempColor = point.color;
+                    }else{
+                        ++tempColor.counter;
+                        tempColor.add(point.color);
+                    }
                 }
             });
+            /*if(tempColor.counter){
+                tempColor.r /= tempColor.counter;
+                tempColor.g /= tempColor.counter;
+                tempColor.b /= tempColor.counter;
+                //tempColor.a /= tempColor.counter;
+            }*/
+            finalPoint.color = tempColor;
         });
+
     }
 
     get numColumns() {
@@ -184,12 +211,14 @@ class Screen {
         let pointColor = null;
         this._currentLayer.rows.forEach(row => {
             row.forEach(point => {
-                pointColor = point.color;
-                point.setColor(
-                    (pointColor.r + color.r) / level,
-                    (pointColor.g + color.g) / level,
-                    (pointColor.b + color.b) / level,
-                    (pointColor.a + color.a));
+                if(point.modified){
+                    pointColor = point.color;
+                    point.setColor(
+                        (pointColor.r + color.r) / level,
+                        (pointColor.g + color.g) / level,
+                        (pointColor.b + color.b) / level,
+                        (pointColor.a + color.a));
+                }
             });
         });
     }

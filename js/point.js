@@ -24,6 +24,11 @@ class Point {
         this._modified = true;
     }
 
+    addColor(color){
+        this._color.add(color);
+        this._modified = true;
+    }
+
     get position() {
         return this._position;
     }
@@ -34,7 +39,7 @@ class Point {
      */
     set position(value) {
         this._position = value;
-        this._modified = true;
+        //this._modified = true;
     }
 
     /**

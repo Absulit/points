@@ -75,7 +75,7 @@ function init() {
     dimension = 3;
 
     //-----------
-    screen = new Screen(canvas, numColumns, numRows, numMargin, 3);
+    screen = new Screen(canvas, numColumns, numRows, numMargin, 5);
     centerColumns = numColumns / 2;
     centerRows = numRows / 2;
 
@@ -141,49 +141,90 @@ function update() {
     //flag.update(u_time);
     //matrix.update();
     //star.update(u_time, usin);
-    //screen.layerIndex = 0;
-    //imageNoise.update(usin);
 
-    /*screen.layerIndex = 0;
-    if(printCircle){
+    screen.layerIndex = 0;
+    imageNoise.update(usin);
+
+    screen.layerIndex = 1;
+    
+    //screen.clear(new RGBAColor(1,1,0));
+    screen.clear();
+
+    if (printCircle) {
         screen.drawCircle(printCirclePoint.coordinates.x, printCirclePoint.coordinates.y,
             printCircleDistance,
             1, 0, 0, 1,
             1);
 
-        if(++printCircleDistance >= 100){
-            printCircle  = false;
+        if (++printCircleDistance >= 100) {
+            printCircle = false;
             printCircleDistance = 0;
         }
     }
-    screen.clearMix(clearMixColor, 1.1);*/
+    screen.clearMix(clearMixColor, 1.1);
+
+
+
+    //screen.clear();
 
     //screen.clearMix(clearMixColor, 1.1);
 
-    screen.layerIndex = 1;
-    screen.drawLineRotation(screen.center.x, screen.center.y,20, 3.14, new RGBAColor(1,0,0) );
-    screen.clearMix(clearMixColor, 1.1);
-
     screen.layerIndex = 2;
-    screen.drawLineRotation(screen.center.x, screen.center.y,20, 1, new RGBAColor(1,.3,1) );
+    screen.drawLineRotation(screen.center.x, screen.center.y, 20, 3.14, new RGBAColor(1, 0, 0));
 
+    screen.layerIndex = 3;
+    screen.drawLineRotation(screen.center.x, screen.center.y, screen.numColumns * .8, 1, new RGBAColor(1, .1, 0, .5));
 
-    screen.layerIndex = 1;
     let amountNoise = Math.abs(1000 * usin) + 5000;
     for (let index = 0; index < amountNoise; index++) {
         let point = screen.getRandomPoint();
         //let point = screen.getPointAt(50,50);
-
         //let point2 = this._screen.getRandomPoint();
-        screen.movePointTo(point, point.coordinates.x, point.coordinates.y - 1);
-        //this._screen.movePointTo(point, point.coordinates.x+1, point.coordinates.y-2);
-        //this._screen.movePointTo(point, point.coordinates.x+2, point.coordinates.y-3);
+        //if(point.color.a > 0){
+        if(point.modified){
+            screen.movePointTo(point, point.coordinates.x, point.coordinates.y - 1);
+            screen.movePointTo(point, point.coordinates.x+1, point.coordinates.y-2);
+            //screen.movePointTo(point, point.coordinates.x+2, point.coordinates.y-3);
+        }
     }
+    screen.clearMix(clearMixColor, 1.1);
+
+
+    screen.layerIndex = 4;
+    screen.drawLineRotation(0, screen.center.y + 10, screen.numColumns * .8, MathUtil.radians(-15), new RGBAColor(1, 1, .1, .5));
+
+    /*screen.layerIndex = 0;
+    let point0 = screen.getPointAt(screen.center.x, screen.center.y);
+    point0.setColor(1,0,0, .5);
+
+    screen.layerIndex = 1;
+    let point1 = screen.getPointAt(screen.center.x, screen.center.y);
+    point1.setColor(0,1,0, 0.5);
+
+    let point2 = screen.getPointAt(screen.center.x+1, screen.center.y-1);
+    point2.setColor(0,1,0, 1);*/
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     screen.mergeLayers();
 
     addPointsToPrint(screen.mainLayer.points);
-    //addPointsToPrint(screen.layers[2].points);
+
+    //screen.layers.forEach(layer => {
+    /*screen.layers.reverse().forEach(layer => {
+        addPointsToPrint(layer.points);
+    });*/
 
     /*************/
     /*let icon = document.getElementById('icon');  // get the <img> tag
