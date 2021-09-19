@@ -41,6 +41,7 @@ let screen;
 
 let vertices = [];
 let colors = [];
+let pointsizes = [];
 let uround;
 let urounddec;
 let usin;
@@ -141,14 +142,16 @@ function update() {
     //flag.update(u_time);
     //matrix.update();
     //star.update(u_time, usin);
+    //imageNoise.update(usin);
 
     screen.layerIndex = 0;
-    imageNoise.update(usin);
+    //imageNoise.update(usin);
+    //sinewave.update(u_time);
 
-    screen.layerIndex = 1;
-    
+    //screen.layerIndex = 1;
+
     //screen.clear(new RGBAColor(1,1,0));
-    screen.clear();
+    /*screen.clear();
 
     if (printCircle) {
         screen.drawCircle(printCirclePoint.coordinates.x, printCirclePoint.coordinates.y,
@@ -161,7 +164,7 @@ function update() {
             printCircleDistance = 0;
         }
     }
-    screen.clearMix(clearMixColor, 1.1);
+    screen.clearMix(clearMixColor, 1.1);*/
 
 
 
@@ -169,11 +172,12 @@ function update() {
 
     //screen.clearMix(clearMixColor, 1.1);
 
-    screen.layerIndex = 2;
-    screen.drawLineRotation(screen.center.x, screen.center.y, 20, 3.14, new RGBAColor(1, 0, 0));
+    //screen.layerIndex = 2;
+    //screen.drawLineRotation(screen.center.x, screen.center.y, 20, 3.14, new RGBAColor(1, 0, 0));
 
-    screen.layerIndex = 3;
-    screen.drawLineRotation(screen.center.x, screen.center.y, screen.numColumns * .8, 1, new RGBAColor(1, .1, 0, .5));
+    //screen.layerIndex = 3;
+    //screen.drawLineRotation(screen.center.x, screen.center.y, screen.numColumns * .8, 1, new RGBAColor(1, .1, 0, .5));
+    polygonChange.update(u_time, usin);
 
     let amountNoise = Math.abs(1000 * usin) + 5000;
     for (let index = 0; index < amountNoise; index++) {
@@ -181,17 +185,19 @@ function update() {
         //let point = screen.getPointAt(50,50);
         //let point2 = this._screen.getRandomPoint();
         //if(point.color.a > 0){
-        if(point.modified){
+        if (point.modified) {
+            //point.size = 10;
+            point.size = screen.pointSize * point.color.r;
             screen.movePointTo(point, point.coordinates.x, point.coordinates.y - 1);
-            screen.movePointTo(point, point.coordinates.x+1, point.coordinates.y-2);
+            screen.movePointTo(point, point.coordinates.x + 1, point.coordinates.y - 2);
             //screen.movePointTo(point, point.coordinates.x+2, point.coordinates.y-3);
         }
     }
-    screen.clearMix(clearMixColor, 1.1);
+    //screen.clearMix(clearMixColor, 1.1);
 
 
-    screen.layerIndex = 4;
-    screen.drawLineRotation(0, screen.center.y + 10, screen.numColumns * .8, MathUtil.radians(-15), new RGBAColor(1, 1, .1, .5));
+    //screen.layerIndex = 4;
+    //screen.drawLineRotation(0, screen.center.y + 10, screen.numColumns * .8, MathUtil.radians(-15), new RGBAColor(1, 1, .1, .5));
 
     /*screen.layerIndex = 0;
     let point0 = screen.getPointAt(screen.center.x, screen.center.y);
@@ -203,18 +209,6 @@ function update() {
 
     let point2 = screen.getPointAt(screen.center.x+1, screen.center.y-1);
     point2.setColor(0,1,0, 1);*/
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     screen.mergeLayers();
@@ -277,15 +271,14 @@ function printPoint(point) {
 function addToPrint(point) {
     vertices.push(point.position.value);
     colors.push(point.color.value);
+    pointsizes.push(point.size);
 }
 
 function addPointsToPrint(points) {
-    for (let index = 0; index < points.length; index++) {
-        const point = points[index];
-        if (point.modified) {
-            addToPrint(point);
-        }
-    }
+    points
+        .filter(point => point.modified)
+        .forEach(point => addToPrint(point));
+
 };
 
 function printPoints() {
@@ -297,9 +290,14 @@ function printPoints() {
     getBuffer2(colors);
     shaderVariableToBuffer("vColor", 4);
 
+    pointsizes = flatten(pointsizes);
+    getBuffer2(pointsizes);
+    shaderVariableToBuffer("vPointSize", 1);
+
     drawPoints2(vBuffer, vertices, dimension);
     vertices = [];
     colors = [];
+    pointsizes = [];
 }
 
 init();

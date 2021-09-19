@@ -33,10 +33,10 @@ class Screen {
             this._pointSizeFull = this._canvas.height / this._numRows;
         }
 
+        this._pointSize = this._pointSizeFull - this._numMargin;
         this._mainLayer = this._createLayer();
         this._createLayers();
 
-        this._pointSize = this._pointSizeFull - this._numMargin;
     }
 
     _createLayer() {
@@ -57,6 +57,7 @@ class Screen {
                 point.position.set((xCoordinate * this._pointSizeFull) + halfSize, (yCoordinate * this._pointSizeFull) + halfSize, 0);
                 //point.setColor(Math.random(), 1, Math.random(), 1);
                 point.color.a = 0;
+                point.size = this._pointSize;
 
                 layer.points.push(point);
                 row.push(point);
@@ -94,6 +95,7 @@ class Screen {
 
         finalPoints.forEach((finalPoint, finalPointIndex) => {
             let tempColor = new RGBAColor(0,0,0,0);
+            let tempSize = 0
             tempColor.counter = 0;
             this._layers.forEach(layer => {
                 let point = layer.points[finalPointIndex];
@@ -110,6 +112,11 @@ class Screen {
                         ++tempColor.counter;
                         tempColor.add(point.color);
                     }
+                    if(tempSize === 0){
+                        tempSize = point.size;
+                    }else{
+                        tempSize = point.size / 2;
+                    }
                 }
             });
             /*if(tempColor.counter){
@@ -119,6 +126,7 @@ class Screen {
                 //tempColor.a /= tempColor.counter;
             }*/
             finalPoint.color = tempColor;
+            finalPoint.size = tempSize;
         });
 
     }

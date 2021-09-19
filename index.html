@@ -5,6 +5,7 @@
 
         <script id="vertex-shader" type="x-shader/x-vertex">
             attribute vec4 vPosition;
+            attribute float vPointSize;
             //uniform mat4 uRotation;
             uniform float u_pointsize;
 
@@ -13,12 +14,14 @@
 
 
 
-            void
-            main() {
+            void main() {
                 fColor = vColor;
                 //gl_Position = uRotation * vPosition;
                 gl_Position = vPosition;
-                gl_PointSize = u_pointsize;
+
+                //gl_PointSize = u_pointsize;
+                //gl_PointSize = vColor.r * u_pointsize; // cool!
+                gl_PointSize = vPointSize;
             }
         </script>
         <script id="fragment-shader" type="x-shader/x-fragment">
