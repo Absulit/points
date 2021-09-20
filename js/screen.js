@@ -94,9 +94,10 @@ class Screen {
         let r = Array(finalPoints.length);
 
         finalPoints.forEach((finalPoint, finalPointIndex) => {
-            let tempColor = new RGBAColor(0,0,0,0);
-            let tempSize = 0
+            let tempColor = new RGBAColor(0, 0, 0, 0);
             tempColor.counter = 0;
+            let tempSize = { counter: 0, value: 0 };
+
             this._layers.forEach(layer => {
                 let point = layer.points[finalPointIndex];
                 if (point.modified) {
@@ -105,28 +106,34 @@ class Screen {
                     } else {
                         tempColor = point.color;
                     }*/
-                    if(point.color.a === 1){
+                    if (point.color.a === 1) {
                         tempColor.counter = 0;
                         tempColor = point.color;
-                    }else{
+                    } else {
                         ++tempColor.counter;
                         tempColor.add(point.color);
                     }
-                    if(tempSize === 0){
-                        tempSize = point.size;
-                    }else{
-                        tempSize = point.size / 2;
+                    if ((tempSize.counter === 0)) {
+                        tempSize.counter = 0;
+                        tempSize.value = point.size;
+                    } else {
+                        ++tempSize.counter;
+                        tempSize.value += point.size;
                     }
                 }
+
             });
-            /*if(tempColor.counter){
+            if (tempColor.counter) {
                 tempColor.r /= tempColor.counter;
                 tempColor.g /= tempColor.counter;
                 tempColor.b /= tempColor.counter;
                 //tempColor.a /= tempColor.counter;
-            }*/
+            }
+            if (tempSize.counter) {
+                tempSize.value /= tempSize.counter;
+            }
             finalPoint.color = tempColor;
-            finalPoint.size = tempSize;
+            finalPoint.size = tempSize.value;
         });
 
     }
@@ -148,6 +155,10 @@ class Screen {
 
     get pointSize() {
         return this._pointSize;
+    }
+
+    get pointSizeFull() {
+        return this._pointSizeFull;
     }
 
     get center() {
@@ -219,14 +230,20 @@ class Screen {
         let pointColor = null;
         this._currentLayer.rows.forEach(row => {
             row.forEach(point => {
-                if(point.modified){
+                if (point.modified) {
                     pointColor = point.color;
                     point.setColor(
                         (pointColor.r + color.r) / level,
                         (pointColor.g + color.g) / level,
                         (pointColor.b + color.b) / level,
                         (pointColor.a + color.a));
+
+                    //if (point.size < this._pointSize) {
+                    //point.size += 1;
+                    //}
                 }
+
+
             });
         });
     }

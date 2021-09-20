@@ -16,6 +16,7 @@ import DrawCircle from './js/examples/drawcircle.js';
 import WaveNoise from './js/examples/wavenoise.js';
 import Point from './js/point.js';
 import ImageNoise from './js/examples/imagenoise.js';
+import Effects from './js/effects.js';
 
 
 const stats = new Stats();
@@ -34,9 +35,10 @@ var aspect,
     u_time = 0;
 
 
-let numColumns = 100;
-let numRows = 100;
-let numMargin = 0;
+let side = 100;
+let numColumns = side;
+let numRows = side;
+let numMargin = 2;
 let screen;
 
 let vertices = [];
@@ -48,9 +50,6 @@ let usin;
 
 let clearMixColor = new RGBAColor(0, 0, 0);
 
-let centerColumns = numColumns / 2, centerRows = numRows / 2;
-
-
 let clock;
 let star;
 let matrix;
@@ -60,11 +59,7 @@ let polygonChange;
 let drawCircle;
 let wavenoise;
 let imageNoise;
-
-let printCircle = false;
-let printCircleDistance = 0;
-let printCirclePoint;
-
+let effects;
 
 function init() {
     initWebGL("gl-canvas", true);
@@ -76,9 +71,7 @@ function init() {
     dimension = 3;
 
     //-----------
-    screen = new Screen(canvas, numColumns, numRows, numMargin, 5);
-    centerColumns = numColumns / 2;
-    centerRows = numRows / 2;
+    screen = new Screen(canvas, numColumns, numRows, numMargin, 2);
 
     star = new Star(screen);
     clock = new Clock(screen);
@@ -89,14 +82,7 @@ function init() {
     drawCircle = new DrawCircle(screen);
     wavenoise = new WaveNoise(screen);
     imageNoise = new ImageNoise(screen);
-
-
-
-    //capturer.start();
-
-    /*point = new Point()
-    point.coordinate.set(0, 0, 0);
-    point.color.set(1, 1, 0, 1);*/
+    effects = new Effects(screen);
 
     //-----------
 
@@ -123,13 +109,6 @@ function update() {
     // does it need it?
     //gl.uniform1f(gl.getUniformLocation(program, "u_time"), u_time);
 
-    /*screen.clearMix(clearMixColor, 1.1);
-    let point1 = screen.getPointAt(centerColumns, centerRows);
-    let point2 = screen.getPointAt(centerColumns + 10, centerRows + 10);
-    screen.drawCircleWithPoints(point1, point2);*/
-
-
-
     //wavenoise.update(u_time);
     //wavenoise.update2(u_time, usin);
     //wavenoise.scanLine();
@@ -145,75 +124,23 @@ function update() {
     //imageNoise.update(usin);
 
     screen.layerIndex = 0;
-    //imageNoise.update(usin);
-    //sinewave.update(u_time);
 
-    //screen.layerIndex = 1;
+    drawCircle.click();
+    screen.clearMix(clearMixColor, 1.1);
 
-    //screen.clear(new RGBAColor(1,1,0));
-    /*screen.clear();
-
-    if (printCircle) {
-        screen.drawCircle(printCirclePoint.coordinates.x, printCirclePoint.coordinates.y,
-            printCircleDistance,
-            1, 0, 0, 1,
-            1);
-
-        if (++printCircleDistance >= 100) {
-            printCircle = false;
-            printCircleDistance = 0;
-        }
-    }
-    screen.clearMix(clearMixColor, 1.1);*/
-
-
-
-    //screen.clear();
-
-    //screen.clearMix(clearMixColor, 1.1);
-
-    //screen.layerIndex = 2;
-    //screen.drawLineRotation(screen.center.x, screen.center.y, 20, 3.14, new RGBAColor(1, 0, 0));
-
-    //screen.layerIndex = 3;
-    //screen.drawLineRotation(screen.center.x, screen.center.y, screen.numColumns * .8, 1, new RGBAColor(1, .1, 0, .5));
-    polygonChange.update(u_time, usin);
-
-    let amountNoise = Math.abs(1000 * usin) + 5000;
-    for (let index = 0; index < amountNoise; index++) {
-        let point = screen.getRandomPoint();
-        //let point = screen.getPointAt(50,50);
-        //let point2 = this._screen.getRandomPoint();
-        //if(point.color.a > 0){
-        if (point.modified) {
-            //point.size = 10;
-            point.size = screen.pointSize * point.color.r;
-            screen.movePointTo(point, point.coordinates.x, point.coordinates.y - 1);
-            screen.movePointTo(point, point.coordinates.x + 1, point.coordinates.y - 2);
-            //screen.movePointTo(point, point.coordinates.x+2, point.coordinates.y-3);
-        }
-    }
-    //screen.clearMix(clearMixColor, 1.1);
-
-
-    //screen.layerIndex = 4;
-    //screen.drawLineRotation(0, screen.center.y + 10, screen.numColumns * .8, MathUtil.radians(-15), new RGBAColor(1, 1, .1, .5));
-
-    /*screen.layerIndex = 0;
-    let point0 = screen.getPointAt(screen.center.x, screen.center.y);
-    point0.setColor(1,0,0, .5);
 
     screen.layerIndex = 1;
-    let point1 = screen.getPointAt(screen.center.x, screen.center.y);
-    point1.setColor(0,1,0, 0.5);
 
-    let point2 = screen.getPointAt(screen.center.x+1, screen.center.y-1);
-    point2.setColor(0,1,0, 1);*/
+    polygonChange.update(u_time, usin);
+    effects.scanLine(Math.round(screen.numRows * .03));
+    effects.fire(Math.round(screen.numRows * .01));
+
 
 
     screen.mergeLayers();
 
     addPointsToPrint(screen.mainLayer.points);
+    //printLayers(screen.layers);
 
     //screen.layers.forEach(layer => {
     /*screen.layers.reverse().forEach(layer => {
@@ -300,6 +227,28 @@ function printPoints() {
     pointsizes = [];
 }
 
+function printLayers(layers) {
+    let vBuffer
+    layers.forEach((layer, indexLayer) => {
+        addPointsToPrint(layer.points);
+        vertices = flatten(vertices);
+        vBuffer = getBuffer2(vertices);
+        shaderVariableToBuffer(`layer${indexLayer}_vPosition`, dimension);
+
+        colors = flatten(colors);
+        getBuffer2(colors);
+        shaderVariableToBuffer(`layer${indexLayer}_vColor`, 4);
+
+        pointsizes = pointsizes;
+        getBuffer2(pointsizes);
+        shaderVariableToBuffer(`layer${indexLayer}_vPointSize`, 1);
+    });
+    drawPoints2(vBuffer, vertices, dimension);
+    vertices = [];
+    colors = [];
+    pointsizes = [];
+}
+
 init();
 update();
 
@@ -321,33 +270,6 @@ function onClickDownloadButton(e) {
         capturer.save();
     }
 }
-
-function getCursorPosition(canvas, event) {
-    const rect = canvas.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-    console.log("x: " + x + " y: " + y);
-    let point = screen.getPointAtCoordinate(x, y);
-    if (point) {
-        point.setColor(1, 0, 0);
-    }
-}
-
-
-function loadCircle(canvas, event) {
-    const rect = canvas.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-    printCirclePoint = screen.getPointAtCoordinate(x, y);
-    printCircle = true;
-    printCircleDistance = 0;
-}
-
-canvas.addEventListener('mousedown', function (e) {
-    //getCursorPosition(canvas, e);
-    loadCircle(canvas, e);
-})
-
 
 /*
 
