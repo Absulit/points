@@ -8,7 +8,7 @@ const Z = [0.0, 0.0, 1.0];
 
 function initWebGL(canvasId, depth) {
     canvas = document.getElementById(canvasId);
-    gl = WebGLUtils.setupWebGL(canvas, {preserveDrawingBuffer:true});
+    gl = WebGLUtils.setupWebGL(canvas, {preserveDrawingBuffer:true, premultipliedAlpha: false });
     if (!gl) { alert("WebGL isn't available"); }
     gl.viewport(0, 0, canvas.width, canvas.height);
     if(depth){
@@ -45,6 +45,12 @@ function assignShaders(vertexName, fragmentName) {
     gl.useProgram(program);
 }
 
+/**
+ * Float Array to buffer
+ * @param {string} name Name shared in Javascript and the Shader
+ * @param {Array} vectorLen dimension required e.g, color is 4, pointsize is 1
+ * @returns shader variable pointer reference
+ */
 function shaderVariableToBuffer(name, vectorLen) {
     var shaderVar = gl.getAttribLocation( program, name);
     gl.vertexAttribPointer(shaderVar, vectorLen, gl.FLOAT, false, 0, 0);

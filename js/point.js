@@ -8,6 +8,7 @@ class Point {
         this._coordinates = new Coordinate(0, 0, 0);
         this._modified = false;
         this._layer = 0;
+        this._size = 1.0;
     }
 
     get color() {
@@ -24,6 +25,11 @@ class Point {
         this._modified = true;
     }
 
+    addColor(color){
+        this._color.add(color);
+        this._modified = true;
+    }
+
     get position() {
         return this._position;
     }
@@ -34,7 +40,7 @@ class Point {
      */
     set position(value) {
         this._position = value;
-        this._modified = true;
+        //this._modified = true;
     }
 
     /**
@@ -88,6 +94,14 @@ class Point {
 
     set layer(value) {
         this._layer = value;
+    }
+
+    get size(){
+        return this._size;
+    }
+
+    set size(value){
+        this._size = value;
     }
 }
 
