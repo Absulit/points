@@ -17,6 +17,7 @@ import WaveNoise from './js/examples/wavenoise.js';
 import Point from './js/point.js';
 import ImageNoise from './js/examples/imagenoise.js';
 import Effects from './js/effects.js';
+import ImageLoader from './js/imageloader.js';
 
 
 const stats = new Stats();
@@ -61,6 +62,8 @@ let wavenoise;
 let imageNoise;
 let effects;
 
+let imageLoader;
+
 function init() {
     initWebGL("gl-canvas", true);
     aspect = canvas.width / canvas.height;
@@ -71,7 +74,7 @@ function init() {
     dimension = 3;
 
     //-----------
-    screen = new Screen(canvas, numColumns, numRows, numMargin, 2);
+    screen = new Screen(canvas, numColumns, numRows, numMargin, 3);
 
     star = new Star(screen);
     clock = new Clock(screen);
@@ -81,8 +84,11 @@ function init() {
     polygonChange = new PolygonChange(screen);
     drawCircle = new DrawCircle(screen);
     wavenoise = new WaveNoise(screen);
-    imageNoise = new ImageNoise(screen);
+    //imageNoise = new ImageNoise(screen);
     effects = new Effects(screen);
+
+    imageLoader = new ImageLoader(screen);
+    imageLoader.load('/img/old_king_100x100.jpg');
 
     //-----------
 
@@ -134,6 +140,9 @@ function update() {
     polygonChange.update(u_time, usin);
     effects.scanLine(Math.round(screen.numRows * .03));
     effects.fire(Math.round(screen.numRows * .01));
+
+    screen.layerIndex = 2;
+    imageLoader.loadToLayer();
 
 
 

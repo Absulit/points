@@ -177,6 +177,9 @@ class Screen {
         return this._layerIndex;
     }
     set layerIndex(value) {
+        if(value > this._layers.length-1){
+            throw new Error(`The Screen.layerIndex is greater than the number of layers available (${this._layers.length}).`);
+        }
         this._layerIndex = value;
         this._currentLayer = this._layers[value];
     }
