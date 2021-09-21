@@ -88,7 +88,10 @@ function init() {
     effects = new Effects(screen);
 
     imageLoader = new ImageLoader(screen);
-    imageLoader.load('/img/old_king_100x100.jpg');
+    //imageLoader.load('/img/old_king_100x100.jpg');
+    //imageLoader.load('/img/old_king_200x200.jpg');
+    imageLoader.load('/img/old_king_600x600.jpg');
+    //imageLoader.load('/img/unnamed_horror_1920x1080.jpg');
 
     //-----------
 
@@ -131,7 +134,7 @@ function update() {
 
     screen.layerIndex = 0;
 
-    drawCircle.click();
+    /*drawCircle.click();
     screen.clearMix(clearMixColor, 1.1);
 
 
@@ -141,10 +144,14 @@ function update() {
     effects.scanLine(Math.round(screen.numRows * .03));
     effects.fire(Math.round(screen.numRows * .01));
 
-    screen.layerIndex = 2;
+    screen.layerIndex = 2;*/
     imageLoader.loadToLayer();
 
-
+    effects.scanLine(3);
+    screen.currentLayer.points.forEach( p => {
+        p.size = (p.color.r + p.color.b + p.color.g) / 3 * screen.pointSize;
+        p.setColor(1,1,1);
+    });
 
     screen.mergeLayers();
 

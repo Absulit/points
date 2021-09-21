@@ -56,6 +56,7 @@ class Screen {
                 point = new Point();
                 point.position.set((xCoordinate * this._pointSizeFull) + halfSize, (yCoordinate * this._pointSizeFull) + halfSize, 0);
                 //point.setColor(Math.random(), 1, Math.random(), 1);
+                point.setCoordinates(xCoordinate, yCoordinate, 0);
                 point.color.a = 0;
                 point.size = this._pointSize;
 
@@ -177,7 +178,7 @@ class Screen {
         return this._layerIndex;
     }
     set layerIndex(value) {
-        if(value > this._layers.length-1){
+        if (value > this._layers.length - 1) {
             throw new Error(`The Screen.layerIndex is greater than the number of layers available (${this._layers.length}).`);
         }
         this._layerIndex = value;
@@ -190,13 +191,7 @@ class Screen {
 
     getPointAt(columnIndex, rowIndex) {
         let row = this._currentLayer.rows[rowIndex];
-        let point = null;
-        if (row) {
-            point = row[columnIndex];
-        }
-        if (point) {
-            point.setCoordinates(columnIndex, rowIndex, 0);
-        }
+        let point = row && row[columnIndex] || null;
         return point;
     }
 
