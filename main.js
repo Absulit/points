@@ -91,7 +91,6 @@ function init() {
     //imageLoader.load('/img/old_king_100x100.jpg');
     //imageLoader.load('/img/old_king_200x200.jpg');
     imageLoader.load('/img/old_king_600x600.jpg');
-    //imageLoader.load('/img/unnamed_horror_1920x1080.jpg');
 
     //-----------
 
@@ -102,7 +101,6 @@ function init() {
 
 
 
-let k = 0;
 
 function update() {
     clearScreen();
@@ -145,12 +143,15 @@ function update() {
     effects.fire(Math.round(screen.numRows * .01));
 
     screen.layerIndex = 2;*/
-    imageLoader.loadToLayer();
+    //let scale = .25 - (.2 * usin);
+    let scale = 1;
+    imageLoader.type = imageLoader.FIT;
+    imageLoader.loadToLayer(0, 0, scale, scale);
 
     effects.scanLine(3);
-    screen.currentLayer.points.forEach( p => {
+    screen.currentLayer.points.forEach(p => {
         p.size = (p.color.r + p.color.b + p.color.g) / 3 * screen.pointSize;
-        p.setColor(1,1,1);
+        p.setColor(1, 1, 1);
     });
 
     screen.mergeLayers();
