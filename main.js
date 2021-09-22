@@ -18,6 +18,7 @@ import Point from './js/point.js';
 import ImageNoise from './js/examples/imagenoise.js';
 import Effects from './js/effects.js';
 import ImageLoader from './js/imageloader.js';
+import VideoLoader from './js/videoloader.js';
 
 
 const stats = new Stats();
@@ -36,9 +37,9 @@ var aspect,
     u_time = 0;
 
 
-let side = 100;
+let side = 50;
 let numColumns = side;
-let numRows = side;
+let numRows = side*2;
 let numMargin = 2;
 let screen;
 
@@ -63,6 +64,7 @@ let imageNoise;
 let effects;
 
 let imageLoader;
+let videoLoader;
 
 function init() {
     initWebGL("gl-canvas", true);
@@ -90,7 +92,11 @@ function init() {
     imageLoader = new ImageLoader(screen);
     //imageLoader.load('/img/old_king_100x100.jpg');
     //imageLoader.load('/img/old_king_200x200.jpg');
-    imageLoader.load('/img/old_king_600x600.jpg');
+    //imageLoader.load('/img/old_king_600x600.jpg');
+
+    videoLoader = new VideoLoader(screen);
+    //videoLoader.load('/video/bars.mp4');
+    videoLoader.load('/video/VID_350400608_093537_138.mp4');
 
     //-----------
 
@@ -144,9 +150,13 @@ function update() {
 
     screen.layerIndex = 2;*/
     //let scale = .25 - (.2 * usin);
+    //let scale = 1;
+    //imageLoader.type = imageLoader.FIT;
+    //imageLoader.loadToLayer(0, 0, scale, scale);
+
     let scale = 1;
-    imageLoader.type = imageLoader.FIT;
-    imageLoader.loadToLayer(0, 0, scale, scale);
+    videoLoader.type = videoLoader.FIT;
+    videoLoader.loadToLayer(0, 0, scale, scale);
 
     effects.scanLine(3);
     screen.currentLayer.points.forEach(p => {
