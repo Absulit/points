@@ -5,7 +5,7 @@ class VideoLoader {
         this._screen = screen;
         this._image = document.createElement('video');
         this._imageData;
-        //this._image.onload = this._onLoadImage;
+
         this._image.addEventListener('loadeddata', this._onLoadImage);
         this._imageLoaded = false;
 
@@ -18,17 +18,11 @@ class VideoLoader {
 
         this._type = this.ONE_TO_ONE;
 
-
-
         // video
         this._fps = 60; // as param?
         this._interval = 1 / this._fps;
         this._currentTime = 0;
         this._duration = 0;
-
-
-
-
     }
 
     /**
@@ -131,31 +125,24 @@ class VideoLoader {
      * @param {Number} scaleY scales the image in y
      */
     loadToLayer = (x = 0, y = 0, scaleX = 1, scaleY = 1) => {
-        
-        
-        
-        
-        
         if (this._imageLoaded) {
-
-            if(this._currentTime < this._duration){
-                this._image.currentTime = this._currentTime;
-            
-                this._context.drawImage(this._img, 0, 0);
-                let imageData = this._context.getImageData(0, 0, this._img.videoWidth, this._img.videoHeight);
-                //let imageData = canvas.toDataURL('image/jpeg');
-                //console.log(imageData);
-                this._imageData = imageData.data;
-                this._currentTime += this._interval;
-            }else{
-                this._currentTime = 0;
-            }
-
+            this._getFrame();
 
             for (let index = 0; index < this._screen.points.length; index++) {
                 const point = this._screen.points[index];
                 this._typesToFunction[this._type](point, x, y, scaleX, scaleY);
             }
+        }
+    }
+
+    _getFrame(){
+        if(this._currentTime < this._duration){
+            this._image.currentTime = this._currentTime;
+            this._context.drawImage(this._img, 0, 0);
+            this._imageData = this._context.getImageData(0, 0, this._img.videoWidth, this._img.videoHeight).data;
+            this._currentTime += this._interval;
+        }else{
+            this._currentTime = 0;
         }
     }
 

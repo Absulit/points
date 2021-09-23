@@ -37,9 +37,9 @@ var aspect,
     u_time = 0;
 
 
-let side = 50;
+let side = 100;
 let numColumns = side;
-let numRows = side*2;
+let numRows = side;
 let numMargin = 2;
 let screen;
 
@@ -92,11 +92,10 @@ function init() {
     imageLoader = new ImageLoader(screen);
     //imageLoader.load('/img/old_king_100x100.jpg');
     //imageLoader.load('/img/old_king_200x200.jpg');
-    //imageLoader.load('/img/old_king_600x600.jpg');
+    imageLoader.load('/img/old_king_600x600.jpg');
 
-    videoLoader = new VideoLoader(screen);
-    //videoLoader.load('/video/bars.mp4');
-    videoLoader.load('/video/VID_350400608_093537_138.mp4');
+    //videoLoader = new VideoLoader(screen);
+    //videoLoader.load('/video/video.mp4');
 
     //-----------
 
@@ -150,18 +149,18 @@ function update() {
 
     screen.layerIndex = 2;*/
     //let scale = .25 - (.2 * usin);
-    //let scale = 1;
-    //imageLoader.type = imageLoader.FIT;
-    //imageLoader.loadToLayer(0, 0, scale, scale);
-
     let scale = 1;
-    videoLoader.type = videoLoader.FIT;
-    videoLoader.loadToLayer(0, 0, scale, scale);
+    imageLoader.type = imageLoader.FIT;
+    imageLoader.loadToLayer(0, 0, scale, scale);
+
+    //let scale = .1;
+    //videoLoader.type = videoLoader.FIT;
+    //videoLoader.loadToLayer(0, 0, scale, scale);
 
     effects.scanLine(3);
     screen.currentLayer.points.forEach(p => {
-        p.size = (p.color.r + p.color.b + p.color.g) / 3 * screen.pointSize;
-        p.setColor(1, 1, 1);
+        //p.size = (p.color.r + p.color.b + p.color.g) / 3 * screen.pointSize;
+        //p.setColor(1, 1, 1);
     });
 
     screen.mergeLayers();
