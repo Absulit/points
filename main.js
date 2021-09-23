@@ -37,7 +37,7 @@ var aspect,
     u_time = 0;
 
 
-let side = 100;
+let side = 40;
 let numColumns = side;
 let numRows = side;
 let numMargin = 2;
@@ -46,6 +46,7 @@ let screen;
 let vertices = [];
 let colors = [];
 let pointsizes = [];
+let atlasids = [];
 let uround;
 let urounddec;
 let usin;
@@ -161,6 +162,8 @@ function update() {
     screen.currentLayer.points.forEach(p => {
         //p.size = (p.color.r + p.color.b + p.color.g) / 3 * screen.pointSize;
         //p.setColor(1, 1, 1);
+        p.modified = true;
+        p.atlasId = Math.round(p.color.r  * 10);
     });
 
     screen.mergeLayers();
@@ -174,7 +177,7 @@ function update() {
     });*/
 
     /*************/
-    /*let icon = document.getElementById('icon');  // get the <img> tag
+    let icon = document.getElementById('icon');  // get the <img> tag
 
     let glTexture = gl.createTexture();
     gl.activeTexture(gl.TEXTURE0);  // this is the 0th texture
@@ -184,7 +187,11 @@ function update() {
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, icon);
 
     // generates a version for different resolutions, needed to draw
-    gl.generateMipmap(gl.TEXTURE_2D);*/
+    gl.generateMipmap(gl.TEXTURE_2D);
+
+    ////
+    gl.uniform2fv(gl.getUniformLocation(program, "textureAtlasSize"), [1024,1024]);
+    gl.uniform2fv(gl.getUniformLocation(program, "imageSize"), [64,64]);
 
     /*************/
 
@@ -225,6 +232,7 @@ function addToPrint(point) {
     vertices.push(point.position.value);
     colors.push(point.color.value);
     pointsizes.push(point.size);
+    atlasids.push(point.atlasId);
 }
 
 function addPointsToPrint(points) {
@@ -243,14 +251,19 @@ function printPoints() {
     getBuffer2(colors);
     shaderVariableToBuffer("vColor", 4);
 
-    pointsizes = pointsizes;
+    //pointsizes = pointsizes;
     getBuffer2(pointsizes);
     shaderVariableToBuffer("vPointSize", 1);
+
+    //atlasids = atlasids;
+    getBuffer2(atlasids);
+    shaderVariableToBuffer("vAtlasId", 1);
 
     drawPoints2(vBuffer, vertices, dimension);
     vertices = [];
     colors = [];
     pointsizes = [];
+    atlasids = []
 }
 
 function printLayers(layers) {

@@ -99,6 +99,8 @@ class Screen {
             tempColor.counter = 0;
             let tempSize = { counter: 0, value: 0 };
 
+            let tempAtlas = { counter: 0, value: 0 };
+
             this._layers.forEach(layer => {
                 let point = layer.points[finalPointIndex];
                 if (point.modified) {
@@ -114,12 +116,21 @@ class Screen {
                         ++tempColor.counter;
                         tempColor.add(point.color);
                     }
+                    
                     if ((tempSize.counter === 0)) {
                         tempSize.counter = 0;
                         tempSize.value = point.size;
                     } else {
                         ++tempSize.counter;
                         tempSize.value += point.size;
+                    }
+
+                    if ((tempAtlas.counter === 0)) {
+                        tempAtlas.counter = 0;
+                        tempAtlas.value = point.atlasId;
+                    } else {
+                        ++tempAtlas.counter;
+                        tempAtlas.value = point.atlasId;
                     }
                 }
 
@@ -135,6 +146,7 @@ class Screen {
             }
             finalPoint.color = tempColor;
             finalPoint.size = tempSize.value;
+            finalPoint.atlasId = tempAtlas.value;
         });
 
     }
