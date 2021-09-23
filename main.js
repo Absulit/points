@@ -17,6 +17,8 @@ import WaveNoise from './js/examples/wavenoise.js';
 import Point from './js/point.js';
 import ImageNoise from './js/examples/imagenoise.js';
 import Effects from './js/effects.js';
+import ImageLoader from './js/imageloader.js';
+import VideoLoader from './js/videoloader.js';
 
 
 const stats = new Stats();
@@ -61,6 +63,9 @@ let wavenoise;
 let imageNoise;
 let effects;
 
+let imageLoader;
+let videoLoader;
+
 function init() {
     initWebGL("gl-canvas", true);
     aspect = canvas.width / canvas.height;
@@ -71,7 +76,7 @@ function init() {
     dimension = 3;
 
     //-----------
-    screen = new Screen(canvas, numColumns, numRows, numMargin, 2);
+    screen = new Screen(canvas, numColumns, numRows, numMargin, 3);
 
     star = new Star(screen);
     clock = new Clock(screen);
@@ -81,8 +86,16 @@ function init() {
     polygonChange = new PolygonChange(screen);
     drawCircle = new DrawCircle(screen);
     wavenoise = new WaveNoise(screen);
-    imageNoise = new ImageNoise(screen);
+    //imageNoise = new ImageNoise(screen);
     effects = new Effects(screen);
+
+    imageLoader = new ImageLoader(screen);
+    //imageLoader.load('/img/old_king_100x100.jpg');
+    //imageLoader.load('/img/old_king_200x200.jpg');
+    imageLoader.load('/img/old_king_600x600.jpg');
+
+    //videoLoader = new VideoLoader(screen);
+    //videoLoader.load('/video/video.mp4');
 
     //-----------
 
@@ -93,7 +106,6 @@ function init() {
 
 
 
-let k = 0;
 
 function update() {
     clearScreen();
@@ -125,7 +137,7 @@ function update() {
 
     screen.layerIndex = 0;
 
-    drawCircle.click();
+    /*drawCircle.click();
     screen.clearMix(clearMixColor, 1.1);
 
 
@@ -135,7 +147,21 @@ function update() {
     effects.scanLine(Math.round(screen.numRows * .03));
     effects.fire(Math.round(screen.numRows * .01));
 
+    screen.layerIndex = 2;*/
+    //let scale = .25 - (.2 * usin);
+    let scale = 1;
+    imageLoader.type = imageLoader.FIT;
+    imageLoader.loadToLayer(0, 0, scale, scale);
 
+    //let scale = .1;
+    //videoLoader.type = videoLoader.FIT;
+    //videoLoader.loadToLayer(0, 0, scale, scale);
+
+    effects.scanLine(3);
+    screen.currentLayer.points.forEach(p => {
+        //p.size = (p.color.r + p.color.b + p.color.g) / 3 * screen.pointSize;
+        //p.setColor(1, 1, 1);
+    });
 
     screen.mergeLayers();
 
