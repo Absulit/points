@@ -103,12 +103,8 @@ class Screen {
 
             this._layers.forEach(layer => {
                 let point = layer.points[finalPointIndex];
-                if (point.modified) {
-                    /*if (tempColor) {
-                        tempColor.add(point.color);
-                    } else {
-                        tempColor = point.color;
-                    }*/
+                    // if top color is alpha 1 just replace it because
+                    // it will block the ones below
                     if (point.color.a === 1) {
                         tempColor.counter = 0;
                         tempColor = point.color;
@@ -116,7 +112,7 @@ class Screen {
                         ++tempColor.counter;
                         tempColor.add(point.color);
                     }
-                    
+
                     if ((tempSize.counter === 0)) {
                         tempSize.counter = 0;
                         tempSize.value = point.size;
@@ -132,7 +128,7 @@ class Screen {
                         ++tempAtlas.counter;
                         tempAtlas.value = point.atlasId;
                     }
-                }
+
 
             });
             if (tempColor.counter) {
@@ -246,7 +242,8 @@ class Screen {
                         (pointColor.r + color.r) / level,
                         (pointColor.g + color.g) / level,
                         (pointColor.b + color.b) / level,
-                        (pointColor.a + color.a));
+                        (pointColor.a + color.a) / level
+                        );
 
                     //if (point.size < this._pointSize) {
                     //point.size += 1;
@@ -281,7 +278,7 @@ class Screen {
             point.setColor(
                 (pointColor.r + color.r) / level,
                 (pointColor.g + color.g) / level,
-                (pointColor.b + color.b) / level,
+                //(pointColor.b + color.b) / level,
                 (pointColor.a + color.a));
         });
 
@@ -295,9 +292,9 @@ class Screen {
      */
     movePointTo(point, columnIndex, rowIndex) {
         let pointToReplace = this.getPointAt(columnIndex, rowIndex);
-        let { r, g, b } = point.color;
+        let { r, g, b, a } = point.color;
         if (pointToReplace) {
-            pointToReplace.setColor(r, g, b);
+            pointToReplace.setColor(r, g, b, a);
             //pointToReplace.color = new RGBAColor(1,0,0);
         }
         return pointToReplace;
