@@ -75,7 +75,11 @@
                 vec2 imageCoord = vec2(imageId,0);
                 vec2 uv = (imageCoord + imageSize * gl_PointCoord) / textureAtlasSize;
                 
-                gl_FragColor = texture2D(textureAtlas, uv);
+                if(fAtlasId > -1.0){
+                    gl_FragColor = texture2D(textureAtlas, uv);
+                }else{
+                    gl_FragColor = fColor;
+                }
 
 
 

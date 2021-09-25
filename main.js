@@ -37,7 +37,7 @@ var aspect,
     u_time = 0;
 
 
-let side = 40;
+let side = 80;
 let numColumns = side;
 let numRows = side;
 let numMargin = 2;
@@ -157,13 +157,18 @@ function update() {
     //let scale = .1;
     //videoLoader.type = videoLoader.FIT;
     //videoLoader.loadToLayer(0, 0, scale, scale);
-
-    effects.scanLine(3);
+    //matrix.update();
+    //effects.scanLine(3);
     screen.currentLayer.points.forEach(p => {
         //p.size = (p.color.r + p.color.b + p.color.g) / 3 * screen.pointSize;
         //p.setColor(1, 1, 1);
-        p.modified = true;
-        p.atlasId = Math.round(p.color.r  * 10);
+        //p.modified = true;
+
+        p.atlasId = -1;
+        if(.01 > p.color.g  < .8){
+            p.atlasId = Math.round(p.color.g * 10)
+        }
+
     });
 
     screen.mergeLayers();

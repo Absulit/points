@@ -10,7 +10,7 @@ class Point {
         this._layer = 0;
         this._size = 1.0;
 
-        this._atlastId = 0;
+        this._atlastId = -1;
     }
 
     get color() {
