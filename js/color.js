@@ -50,8 +50,8 @@ class RGBAColor {
     add(color) {
         let [r, g, b, a] = this._value;
         //this._value = [(r + color.r)/2, (g + color.g)/2, (b + color.b)/2, (a + color.a)/2];
-        this._value = [(r*a + color.r*color.a), (g*a + color.g*color.a), (b*a + color.b*color.a), 1];
-        //this._value = [(r + color.r), (g + color.g), (b + color.b), (a + color.a)];
+        //this._value = [(r*a + color.r*color.a), (g*a + color.g*color.a), (b*a + color.b*color.a), 1];
+        this._value = [(r + color.r), (g + color.g), (b + color.b), (a + color.a)];
 
 
     }

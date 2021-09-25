@@ -103,8 +103,10 @@ class Screen {
 
             this._layers.forEach(layer => {
                 let point = layer.points[finalPointIndex];
-                    // if top color is alpha 1 just replace it because
-                    // it will block the ones below
+                // if top color is alpha 1 just replace it because
+                // it will block the ones below
+                if (point.modified) {
+
                     if (point.color.a === 1) {
                         tempColor.counter = 0;
                         tempColor = point.color;
@@ -113,7 +115,7 @@ class Screen {
                         tempColor.add(point.color);
                     }
 
-                    if ((tempSize.counter === 0)) {
+                    if (point.size >= this.pointSize) {
                         tempSize.counter = 0;
                         tempSize.value = point.size;
                     } else {
@@ -128,15 +130,16 @@ class Screen {
                         ++tempAtlas.counter;
                         tempAtlas.value = point.atlasId;
                     }
+                }
 
 
             });
-            if (tempColor.counter) {
+            /*if (tempColor.counter) {
                 tempColor.r /= tempColor.counter;
                 tempColor.g /= tempColor.counter;
                 tempColor.b /= tempColor.counter;
-                //tempColor.a /= tempColor.counter;
-            }
+                tempColor.a /= tempColor.counter;
+            }*/
             if (tempSize.counter) {
                 tempSize.value /= tempSize.counter;
             }
@@ -242,12 +245,12 @@ class Screen {
                         (pointColor.r + color.r) / level,
                         (pointColor.g + color.g) / level,
                         (pointColor.b + color.b) / level,
-                        (pointColor.a + color.a) / level
-                        );
+                        (pointColor.a + color.a)
+                    );
 
-                    //if (point.size < this._pointSize) {
-                    //point.size += 1;
-                    //}
+                }
+                if (point.size < this._pointSize) {
+                    point.size = this._pointSize;
                 }
 
 
