@@ -37,11 +37,12 @@ var aspect,
     u_time = 0;
 
 
-let side = 80;
+let side = 100;
 let numColumns = side;
 let numRows = side;
-let numMargin = 2;
+let numMargin = 0;
 let screen;
+let numLayers = 3;
 
 let vertices = [];
 let colors = [];
@@ -77,7 +78,7 @@ function init() {
     dimension = 3;
 
     //-----------
-    screen = new Screen(canvas, numColumns, numRows, numMargin, 3);
+    screen = new Screen(canvas, numColumns, numRows, numMargin, numLayers);
 
     star = new Star(screen);
     clock = new Clock(screen);
@@ -106,7 +107,9 @@ function init() {
 
 
 
-
+function isPowerOf2(value) {
+    return (value & (value - 1)) == 0;
+  }
 
 function update() {
     clearScreen();
@@ -138,26 +141,28 @@ function update() {
 
     screen.layerIndex = 0;
 
-    /*drawCircle.click();
+    drawCircle.click();
     screen.clearMix(clearMixColor, 1.1);
 
 
     screen.layerIndex = 1;
 
-    polygonChange.update(u_time, usin);
-    effects.scanLine(Math.round(screen.numRows * .03));
-    effects.fire(Math.round(screen.numRows * .01));
+    //polygonChange.update(u_time, usin);
+    //effects.scanLine(Math.round(screen.numRows * .03));
+    //effects.fire(Math.round(screen.numRows * .01));
+    //screen.clearMix(clearMixColor, 1.1);
 
-    screen.layerIndex = 2;*/
+    //screen.layerIndex = 2;
+    //sinewave.update(u_time);
     //let scale = .25 - (.2 * usin);
-    let scale = 1;
-    imageLoader.type = imageLoader.FIT;
-    imageLoader.loadToLayer(0, 0, scale, scale);
+    //let scale = 1;
+    //imageLoader.type = imageLoader.FIT;
+    //imageLoader.loadToLayer(0, 0, scale, scale);
 
     //let scale = .1;
     //videoLoader.type = videoLoader.FIT;
     //videoLoader.loadToLayer(0, 0, scale, scale);
-    //matrix.update();
+    matrix.update();
     //effects.scanLine(3);
     screen.currentLayer.points.forEach(p => {
         //p.size = (p.color.r + p.color.b + p.color.g) / 3 * screen.pointSize;
@@ -165,8 +170,8 @@ function update() {
         //p.modified = true;
 
         p.atlasId = -1;
-        if(.01 > p.color.g  < .8){
-            p.atlasId = Math.round(p.color.g * 10)
+        if(.1 > p.color.g  < .6){
+            p.atlasId = Math.round(p.color.g * 5)
         }
 
     });
@@ -182,21 +187,37 @@ function update() {
     });*/
 
     /*************/
-    let icon = document.getElementById('icon');  // get the <img> tag
+    let sprite = document.getElementById('pixelfont');  // get the <img> tag
 
     let glTexture = gl.createTexture();
     gl.activeTexture(gl.TEXTURE0);  // this is the 0th texture
     gl.bindTexture(gl.TEXTURE_2D, glTexture);
 
     // actually upload bytes
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, icon);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, sprite);
 
-    // generates a version for different resolutions, needed to draw
-    gl.generateMipmap(gl.TEXTURE_2D);
+    // WebGL1 has different requirements for power of 2 images
+    // vs non power of 2 images so check if the image is a
+    // power of 2 in both dimensions.
+    if (isPowerOf2(sprite.width) && isPowerOf2(sprite.height)) {
+        // Yes, it's a power of 2. Generate mips.
+        gl.generateMipmap(gl.TEXTURE_2D);
+     } else {
+        // No, it's not a power of 2. Turn off mips and set
+        // wrapping to clamp to edge
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+     }
+
+
+
+
+
 
     ////
-    gl.uniform2fv(gl.getUniformLocation(program, "textureAtlasSize"), [1024,1024]);
-    gl.uniform2fv(gl.getUniformLocation(program, "imageSize"), [64,64]);
+    gl.uniform2fv(gl.getUniformLocation(program, "textureAtlasSize"), [160,416]);
+    gl.uniform2fv(gl.getUniformLocation(program, "imageSize"), [32,32]);
 
     /*************/
 
