@@ -27,6 +27,11 @@ class Point {
         this._modified = true;
     }
 
+    setBrightness(value){
+        this._color.set(value, value, value, 1);
+        this._modified = true;
+    }
+
     addColor(color) {
         this._color.add(color);
         this._modified = true;

@@ -23,6 +23,8 @@ class VideoLoader {
         this._interval = 1 / this._fps;
         this._currentTime = 0;
         this._duration = 0;
+
+        this._cache = {};
     }
 
     /**
@@ -137,9 +139,15 @@ class VideoLoader {
 
     _getFrame(){
         if(this._currentTime < this._duration){
-            this._image.currentTime = this._currentTime;
-            this._context.drawImage(this._img, 0, 0);
-            this._imageData = this._context.getImageData(0, 0, this._img.videoWidth, this._img.videoHeight).data;
+            if(this._cache[this._currentTime]){
+                this._imageData =  this._cache[this._currentTime]
+            }else{
+                this._image.currentTime = this._currentTime;
+                this._context.drawImage(this._img, 0, 0);
+                this._imageData = this._context.getImageData(0, 0, this._img.videoWidth, this._img.videoHeight).data;
+                this._cache[this._currentTime] = this._imageData;
+            }
+
             this._currentTime += this._interval;
         }else{
             this._currentTime = 0;

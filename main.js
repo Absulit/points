@@ -19,6 +19,7 @@ import ImageNoise from './js/examples/imagenoise.js';
 import Effects from './js/effects.js';
 import ImageLoader from './js/imageloader.js';
 import VideoLoader from './js/videoloader.js';
+import SpriteLoader from './js/spriteloader.js';
 
 
 const stats = new Stats();
@@ -37,7 +38,7 @@ var aspect,
     u_time = 0;
 
 
-let side = 100;
+let side = 128;
 let numColumns = side;
 let numRows = side;
 let numMargin = 0;
@@ -67,6 +68,10 @@ let effects;
 
 let imageLoader;
 let videoLoader;
+let spriteLoader;
+let spriteLoader2;
+
+let idsOfChars;
 
 function init() {
     initWebGL("gl-canvas", true);
@@ -96,20 +101,26 @@ function init() {
     //imageLoader.load('/img/old_king_200x200.jpg');
     imageLoader.load('/img/old_king_600x600.jpg');
 
-    //videoLoader = new VideoLoader(screen);
-    //videoLoader.load('/video/video.mp4');
+    videoLoader = new VideoLoader(screen);
+    //videoLoader.load('/assets_ignore/VID_350400608_093537_138.mp4');
+    videoLoader.load('/assets_ignore/20210925_183936.mp4');
+
+
+    spriteLoader = new SpriteLoader(screen, 32, 32);
+    //spriteLoader.load('/assets_ignore/pixelspritefont 32.png', 32,32);
+    spriteLoader.load('/assets_ignore/pixelspritefont 32_green.png', 32, 32);
+
+    //idsOfChars = [-1, 31, 51, 37, 40, 47, 61, 30, 62, 63]
+    idsOfChars = [-1,60,36,51,48,57,38,61,45,64,63]
+
+    //spriteLoader2 = new SpriteLoader(screen, 64,64);
+    //spriteLoader2.load('/img/sprite_nums_1024x1024.png');
 
     //-----------
 
     // point size
     gl.uniform1f(gl.getUniformLocation(program, "u_pointsize"), screen.pointSize);
 }
-
-
-
-function isPowerOf2(value) {
-    return (value & (value - 1)) == 0;
-  }
 
 function update() {
     clearScreen();
@@ -141,9 +152,20 @@ function update() {
 
     screen.layerIndex = 0;
 
+    //spriteLoader2.loadToLayer();
     drawCircle.click();
     screen.clearMix(clearMixColor, 1.1);
+    screen.currentLayer.points.forEach(p => {
+        //p.size = (p.color.r + p.color.b + p.color.g) / 3 * screen.pointSize;
+        //p.setColor(1, 1, 1);
+        //p.modified = true;
 
+        p.atlasId = -1;
+        if (.1 > p.color.r < .9) {
+            p.atlasId = 1
+        }
+
+    });
 
     screen.layerIndex = 1;
 
@@ -159,20 +181,29 @@ function update() {
     //imageLoader.type = imageLoader.FIT;
     //imageLoader.loadToLayer(0, 0, scale, scale);
 
-    //let scale = .1;
+    //let scale = .05;
+    let scale = .05/(80/side);
     //videoLoader.type = videoLoader.FIT;
-    //videoLoader.loadToLayer(0, 0, scale, scale);
-    matrix.update();
+    videoLoader.loadToLayer(0, 0, scale, scale);
+    //matrix.update();
+
+    //spriteLoader.loadToLayer();
+    //star.update(u_time, usin);
     //effects.scanLine(3);
     screen.currentLayer.points.forEach(p => {
-        //p.size = (p.color.r + p.color.b + p.color.g) / 3 * screen.pointSize;
+        let brightness = (p.color.r + p.color.b + p.color.g) / 3;
+        //p.size = brightness * screen.pointSize;
         //p.setColor(1, 1, 1);
-        //p.modified = true;
 
-        p.atlasId = -1;
-        if(.1 > p.color.g  < .6){
-            p.atlasId = Math.round(p.color.g * 5)
-        }
+        //p.modified = false;
+        //p.atlasId = -1;
+
+        /*if (brightness > 0) {
+            p.atlasId = idsOfChars[Math.round(10 * brightness)-1 ];
+            //p.atlasId = p.color.g * 65;
+        }*/
+        p.atlasId = idsOfChars[Math.round(idsOfChars.length * brightness)-1 ];
+        p.setBrightness(0);
 
     });
 
@@ -187,52 +218,6 @@ function update() {
     });*/
 
     /*************/
-    let sprite = document.getElementById('pixelfont');  // get the <img> tag
-
-    let glTexture = gl.createTexture();
-    gl.activeTexture(gl.TEXTURE0);  // this is the 0th texture
-    gl.bindTexture(gl.TEXTURE_2D, glTexture);
-
-    // actually upload bytes
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, sprite);
-
-    // WebGL1 has different requirements for power of 2 images
-    // vs non power of 2 images so check if the image is a
-    // power of 2 in both dimensions.
-    if (isPowerOf2(sprite.width) && isPowerOf2(sprite.height)) {
-        // Yes, it's a power of 2. Generate mips.
-        gl.generateMipmap(gl.TEXTURE_2D);
-     } else {
-        // No, it's not a power of 2. Turn off mips and set
-        // wrapping to clamp to edge
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-     }
-
-
-
-
-
-
-    ////
-    gl.uniform2fv(gl.getUniformLocation(program, "textureAtlasSize"), [160,416]);
-    gl.uniform2fv(gl.getUniformLocation(program, "imageSize"), [32,32]);
-
-    /*************/
-
-    /*let icon2 = document.getElementById('icon2');  // get the <img> tag
-
-    let glTexture2 = gl.createTexture();
-    gl.activeTexture(gl.TEXTURE1);  // this is the 0th texture
-    gl.bindTexture(gl.TEXTURE_2D, glTexture2);
-
-    // actually upload bytes
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, icon2);
-
-    // generates a version for different resolutions, needed to draw
-    gl.generateMipmap(gl.TEXTURE_2D);*/
-
 
     // here we could merge all the vertices and colors
     // and call draw drawPoints2
