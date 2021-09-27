@@ -55,6 +55,21 @@ class Effects {
         });
     }
 
+    chromaticAberration(brightnessSensitivity = .5) {
+        this._screen.currentLayer.points.forEach(p => {
+            if (p.getBrightness() > brightnessSensitivity) {
+                let nextPoint = this._screen.getNextPoint(p);
+                if (nextPoint) {
+                    nextPoint.setColor((nextPoint.color.r + p.color.r) / 2, nextPoint.color.g, nextPoint.color.b);
+                }
+                let prevPoint = this._screen.getPrevPoint(p);
+                if (prevPoint) {
+                    prevPoint.setColor(prevPoint.color.r, prevPoint.color.g, (prevPoint.color.b + p.color.b) / 2);
+                }
+            }
+        });
+    }
+
     /**
      * A little color variation
      */

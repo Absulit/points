@@ -222,6 +222,19 @@ class Screen {
         return point;
     }
 
+    getPrevPoint(point) {
+        let columnIndex = point.coordinates.x;
+        let rowIndex = point.coordinates.y;
+
+        return this.getPointAt(columnIndex - 1, rowIndex);
+    }
+    getNextPoint(point) {
+        let columnIndex = point.coordinates.x;
+        let rowIndex = point.coordinates.y;
+
+        return this.getPointAt(columnIndex + 1, rowIndex);
+    }
+
     clear(color = null) {
         this._currentLayer.rows.forEach(row => {
             row.forEach(point => {
