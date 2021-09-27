@@ -161,6 +161,10 @@ class VideoLoader {
     set type(value) {
         this._type = value;
     }
+
+    restart(){
+        this._currentTime = 0;
+    }
 }
 
 export default VideoLoader;

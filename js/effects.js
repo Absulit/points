@@ -10,10 +10,9 @@ class Effects {
             let point = this._screen.getRandomPoint(); {
                 if (point.modified) {
                     let yDisplace;
-                    for (let indexLevel = 0; indexLevel <= level-1; indexLevel++) {
+                    for (let indexLevel = 0; indexLevel <= level - 1; indexLevel++) {
                         yDisplace = indexLevel + 1;
                         this._screen.movePointTo(point, point.coordinates.x + indexLevel, point.coordinates.y - yDisplace);
-                        
                     }
                 }
             }
@@ -33,6 +32,56 @@ class Effects {
         if (++this._rowCounter >= this._screen.numRows) {
             this._rowCounter = 0;
         }
+    }
+
+    blackAndWhite() {
+        let brightness;
+        this._screen.currentLayer.points.forEach(point => {
+            if (point.modified) {
+                brightness = point.getBrightness();
+                point.setBrightness(brightness);
+            }
+        });
+    }
+
+    blackAndWhitePointSize() {
+        let brightness;
+        this._screen.currentLayer.points.forEach(point => {
+            if (point.modified) {
+                brightness = point.getBrightness();
+                point.size = brightness * this._screen.pointSizeFull;
+                point.setBrightness(1);
+            }
+        });
+    }
+
+    /**
+     * A little color variation
+     */
+    tone1() {
+        let brightness;
+        this._screen.currentLayer.points.forEach(point => {
+            if (point.modified) {
+                brightness = point.getBrightness();
+                point.setColor(brightness, point.color.g, point.color.g);
+            } else {
+                point.setBrightness(0);
+            }
+        });
+
+    }
+
+    tone2() {
+        let brightness;
+        this._screen.currentLayer.points.forEach(point => {
+            if (point.modified) {
+                brightness = point.getBrightness();
+                point.setColor(brightness, point.color.b, point.color.b);
+            } else {
+                point.setBrightness(0);
+            }
+        });
+
     }
 }
 

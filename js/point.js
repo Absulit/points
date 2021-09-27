@@ -28,8 +28,12 @@ class Point {
     }
 
     setBrightness(value){
-        this._color.set(value, value, value, 1);
+        this._color.brightness = value;
         this._modified = true;
+    }
+
+    getBrightness(){
+        return this._color.brightness;
     }
 
     addColor(color) {

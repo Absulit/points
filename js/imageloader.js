@@ -136,6 +136,10 @@ class ImageLoader {
     set type(value) {
         this._type = value;
     }
+
+    get isLoaded(){
+        return this._imageLoaded;
+    }
 }
 
 export default ImageLoader;

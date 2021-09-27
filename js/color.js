@@ -39,6 +39,15 @@ class RGBAColor {
         return this._value;
     }
 
+    get brightness() {
+        let [r, g, b, a] = this._value;
+        return ((r + b + g) / 3);
+    }
+
+    set brightness(value) {
+        this._value = [value, value, value, 1];
+    }
+
     set(r, g, b, a) {
         this._value = [r, g, b, a]
     }
