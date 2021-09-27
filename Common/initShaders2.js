@@ -14,13 +14,13 @@
             var shader = gl.createShader(type),
                 shaderScript = loadFileAJAX(shaderName);
             if (!shaderScript) {
-                alert("Could not find shader source: "+shaderName);
+                console.error("Could not find shader source: "+shaderName);
             }
             gl.shaderSource(shader, shaderScript);
             gl.compileShader(shader);
 
             if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-                alert(gl.getShaderInfoLog(shader));
+                console.error(gl.getShaderInfoLog(shader));
                 return null;
             }
             return shader;
@@ -34,7 +34,7 @@
         gl.linkProgram(program);
 
         if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-            alert("Could not initialise shaders");
+            console.error("Could not initialise shaders");
             return null;
         }
 

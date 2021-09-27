@@ -9,7 +9,7 @@ function initShaders( gl, vertexShaderId, fragmentShaderId )
 
     var vertElem = document.getElementById( vertexShaderId );
     if ( !vertElem ) { 
-        alert( "Unable to load vertex shader " + vertexShaderId );
+        console.error( "Unable to load vertex shader " + vertexShaderId );
         return -1;
     }
     else {
@@ -19,14 +19,14 @@ function initShaders( gl, vertexShaderId, fragmentShaderId )
         if ( !gl.getShaderParameter(vertShdr, gl.COMPILE_STATUS) ) {
             var msg = "Vertex shader failed to compile.  The error log is:"
         	+ "<pre>" + gl.getShaderInfoLog( vertShdr ) + "</pre>";
-            alert( msg );
+            console.error( msg );
             return -1;
         }
     }
 
     var fragElem = document.getElementById( fragmentShaderId );
     if ( !fragElem ) { 
-        alert( "Unable to load vertex shader " + fragmentShaderId );
+        console.error( "Unable to load vertex shader " + fragmentShaderId );
         return -1;
     }
     else {
@@ -36,7 +36,7 @@ function initShaders( gl, vertexShaderId, fragmentShaderId )
         if ( !gl.getShaderParameter(fragShdr, gl.COMPILE_STATUS) ) {
             var msg = "Fragment shader failed to compile.  The error log is:"
         	+ "<pre>" + gl.getShaderInfoLog( fragShdr ) + "</pre>";
-            alert( msg );
+            console.error( msg );
             return -1;
         }
     }
@@ -49,7 +49,7 @@ function initShaders( gl, vertexShaderId, fragmentShaderId )
     if ( !gl.getProgramParameter(program, gl.LINK_STATUS) ) {
         var msg = "Shader program failed to link.  The error log is:"
             + "<pre>" + gl.getProgramInfoLog( program ) + "</pre>";
-        alert( msg );
+        console.error( msg );
         return -1;
     }
 
