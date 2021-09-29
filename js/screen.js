@@ -222,17 +222,59 @@ class Screen {
         return point;
     }
 
-    getPrevPoint(point) {
+    getPrevPoint(point, distance = 1) {
         let columnIndex = point.coordinates.x;
         let rowIndex = point.coordinates.y;
 
-        return this.getPointAt(columnIndex - 1, rowIndex);
+        return this.getPointAt(columnIndex - distance, rowIndex);
     }
-    getNextPoint(point) {
+    getNextPoint(point, distance = 1) {
         let columnIndex = point.coordinates.x;
         let rowIndex = point.coordinates.y;
 
-        return this.getPointAt(columnIndex + 1, rowIndex);
+        return this.getPointAt(columnIndex + distance, rowIndex);
+    }
+
+    getTopPoint(point, distance = 1) {
+        let columnIndex = point.coordinates.x;
+        let rowIndex = point.coordinates.y;
+
+        return this.getPointAt(columnIndex, rowIndex - distance);
+    }
+
+    getBottomPoint(point, distance = 1) {
+        let columnIndex = point.coordinates.x;
+        let rowIndex = point.coordinates.y;
+
+        return this.getPointAt(columnIndex, rowIndex + distance);
+    }
+
+    getTopLeftPoint(point, distance = 1) {
+        let columnIndex = point.coordinates.x;
+        let rowIndex = point.coordinates.y;
+
+        return this.getPointAt(columnIndex - distance, rowIndex - distance);
+    }
+
+    getBottomLeftPoint(point, distance = 1) {
+        let columnIndex = point.coordinates.x;
+        let rowIndex = point.coordinates.y;
+
+        return this.getPointAt(columnIndex - distance, rowIndex + distance);
+    }
+
+    getTopRightPoint(point, distance = 1) {
+        let columnIndex = point.coordinates.x;
+        let rowIndex = point.coordinates.y;
+
+        return this.getPointAt(columnIndex + distance, rowIndex - distance);
+    }
+
+    getBottomRightPoint(point, distance = 1) {
+        let columnIndex = point.coordinates.x;
+        let rowIndex = point.coordinates.y;
+
+        return this.getPointAt(columnIndex + distance, rowIndex + distance);
     }
 
     clear(color = null) {
