@@ -99,7 +99,7 @@ class Screen {
             tempColor.counter = 0;
             let tempSize = { counter: 0, value: 0 };
 
-            let tempAtlas = { counter: 0, value: 0 };
+            let tempAtlas = { counter: 0, value: -1 };
 
             this._layers.forEach(layer => {
                 let point = layer.points[finalPointIndex];
