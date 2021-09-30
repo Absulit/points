@@ -81,18 +81,7 @@ class Effects {
 
             if (point.modified) {
                 // TODO this can be done better in a circle, since the smalles circle is a square
-                const topLeftPoint = this._screen.getTopLeftPoint(point);
-                const topPoint = this._screen.getTopPoint(point);
-                const topRightPoint = this._screen.getTopRightPoint(point);
-
-                const leftPoint = this._screen.getLeftPoint(point);
-                const rightPoint = this._screen.getRightPoint(point);
-
-                const bottomLeftPoint = this._screen.getBottomLeftPoint(point);
-                const bottomPoint = this._screen.getBottomPoint(point);
-                const bottomRightPoint = this._screen.getBottomRightPoint(point);
-
-                const points = [topLeftPoint, topPoint, topRightPoint, leftPoint, rightPoint, bottomLeftPoint, bottomPoint, bottomRightPoint];
+                const points = this._screen.getPointsAround(point);
                 points.forEach(pointAround => {
                     if (pointAround) {
                         pointAround.setColor(

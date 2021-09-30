@@ -277,6 +277,21 @@ class Screen {
         return this.getPointAt(columnIndex + distance, rowIndex + distance);
     }
 
+    getPointsAround(point, distance = 1){
+        let columnIndex = point.coordinates.x;
+        let rowIndex = point.coordinates.y;
+        return [
+            this.getPointAt(columnIndex - distance, rowIndex - distance),   // top left
+            this.getPointAt(columnIndex, rowIndex - distance),              // top
+            this.getPointAt(columnIndex + distance, rowIndex - distance),   // top right
+            this.getPointAt(columnIndex - distance, rowIndex),              // left
+            this.getPointAt(columnIndex + distance, rowIndex),              // right
+            this.getPointAt(columnIndex - distance, rowIndex + distance),   // bottom left
+            this.getPointAt(columnIndex, rowIndex + distance),              // bottom
+            this.getPointAt(columnIndex + distance, rowIndex + distance),   // bottom right
+        ]
+    }
+
     clear(color = null) {
         this._currentLayer.rows.forEach(row => {
             row.forEach(point => {
