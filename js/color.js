@@ -39,6 +39,15 @@ class RGBAColor {
         return this._value;
     }
 
+    get brightness() {
+        let [r, g, b, a] = this._value;
+        return ((r + b + g) / 3);
+    }
+
+    set brightness(value) {
+        this._value = [value, value, value, 1];
+    }
+
     set(r, g, b, a) {
         this._value = [r, g, b, a]
     }
@@ -50,15 +59,15 @@ class RGBAColor {
     add(color) {
         let [r, g, b, a] = this._value;
         //this._value = [(r + color.r)/2, (g + color.g)/2, (b + color.b)/2, (a + color.a)/2];
-        this._value = [(r*a + color.r*color.a), (g*a + color.g*color.a), (b*a + color.b*color.a), 1];
-        //this._value = [(r + color.r), (g + color.g), (b + color.b), (a + color.a)];
+        //this._value = [(r*a + color.r*color.a), (g*a + color.g*color.a), (b*a + color.b*color.a), 1];
+        this._value = [(r + color.r), (g + color.g), (b + color.b), (a + color.a)];
 
 
     }
 
     blend(color) {
         let [r0, g0, b0, a0] = this._value;
-        let [r1,b1,g1,a1] = color.value;
+        let [r1, b1, g1, a1] = color.value;
 
         let a01 = (1 - a0) * a1 + a0
 
@@ -69,6 +78,21 @@ class RGBAColor {
         let b01 = ((1 - a0) * a1 * b1 + a0 * b0) / a01
 
         this._value = [r01, g01, b01, a01];
+    }
+
+
+    additive(color) {
+        // https://gist.github.com/JordanDelcros/518396da1c13f75ee057
+        let base = this._value;
+        let added = color.value;
+
+        let mix = [];
+        mix[3] = 1 - (1 - added[3]) * (1 - base[3]); // alpha
+        mix[0] = Math.round((added[0] * added[3] / mix[3]) + (base[0] * base[3] * (1 - added[3]) / mix[3])); // red
+        mix[1] = Math.round((added[1] * added[3] / mix[3]) + (base[1] * base[3] * (1 - added[3]) / mix[3])); // green
+        mix[2] = Math.round((added[2] * added[3] / mix[3]) + (base[2] * base[3] * (1 - added[3]) / mix[3])); // blue
+
+        this._value = mix;
     }
 }
 

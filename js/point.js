@@ -9,6 +9,8 @@ class Point {
         this._modified = false;
         this._layer = 0;
         this._size = 1.0;
+
+        this._atlastId = -1;
     }
 
     get color() {
@@ -25,7 +27,16 @@ class Point {
         this._modified = true;
     }
 
-    addColor(color){
+    setBrightness(value){
+        this._color.brightness = value;
+        this._modified = true;
+    }
+
+    getBrightness(){
+        return this._color.brightness;
+    }
+
+    addColor(color) {
         this._color.add(color);
         this._modified = true;
     }
@@ -96,12 +107,20 @@ class Point {
         this._layer = value;
     }
 
-    get size(){
+    get size() {
         return this._size;
     }
 
-    set size(value){
+    set size(value) {
         this._size = value;
+    }
+
+    get atlasId() {
+        return this._atlastId;
+    }
+
+    set atlasId(value) {
+        this._atlastId = value;
     }
 }
 

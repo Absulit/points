@@ -99,14 +99,14 @@ class Screen {
             tempColor.counter = 0;
             let tempSize = { counter: 0, value: 0 };
 
+            let tempAtlas = { counter: 0, value: -1 };
+
             this._layers.forEach(layer => {
                 let point = layer.points[finalPointIndex];
+                // if top color is alpha 1 just replace it because
+                // it will block the ones below
                 if (point.modified) {
-                    /*if (tempColor) {
-                        tempColor.add(point.color);
-                    } else {
-                        tempColor = point.color;
-                    }*/
+
                     if (point.color.a === 1) {
                         tempColor.counter = 0;
                         tempColor = point.color;
@@ -114,27 +114,38 @@ class Screen {
                         ++tempColor.counter;
                         tempColor.add(point.color);
                     }
-                    if ((tempSize.counter === 0)) {
+
+                    if (point.size >= this.pointSize) {
                         tempSize.counter = 0;
                         tempSize.value = point.size;
                     } else {
                         ++tempSize.counter;
                         tempSize.value += point.size;
                     }
+
+                    if ((tempAtlas.counter === 0)) {
+                        tempAtlas.counter = 0;
+                        tempAtlas.value = point.atlasId;
+                    } else {
+                        ++tempAtlas.counter;
+                        tempAtlas.value = point.atlasId;
+                    }
                 }
 
+
             });
-            if (tempColor.counter) {
+            /*if (tempColor.counter) {
                 tempColor.r /= tempColor.counter;
                 tempColor.g /= tempColor.counter;
                 tempColor.b /= tempColor.counter;
-                //tempColor.a /= tempColor.counter;
-            }
+                tempColor.a /= tempColor.counter;
+            }*/
             if (tempSize.counter) {
                 tempSize.value /= tempSize.counter;
             }
             finalPoint.color = tempColor;
             finalPoint.size = tempSize.value;
+            finalPoint.atlasId = tempAtlas.value;
         });
 
     }
@@ -211,6 +222,61 @@ class Screen {
         return point;
     }
 
+    getPrevPoint(point, distance = 1) {
+        let columnIndex = point.coordinates.x;
+        let rowIndex = point.coordinates.y;
+
+        return this.getPointAt(columnIndex - distance, rowIndex);
+    }
+    getNextPoint(point, distance = 1) {
+        let columnIndex = point.coordinates.x;
+        let rowIndex = point.coordinates.y;
+
+        return this.getPointAt(columnIndex + distance, rowIndex);
+    }
+
+    getTopPoint(point, distance = 1) {
+        let columnIndex = point.coordinates.x;
+        let rowIndex = point.coordinates.y;
+
+        return this.getPointAt(columnIndex, rowIndex - distance);
+    }
+
+    getBottomPoint(point, distance = 1) {
+        let columnIndex = point.coordinates.x;
+        let rowIndex = point.coordinates.y;
+
+        return this.getPointAt(columnIndex, rowIndex + distance);
+    }
+
+    getTopLeftPoint(point, distance = 1) {
+        let columnIndex = point.coordinates.x;
+        let rowIndex = point.coordinates.y;
+
+        return this.getPointAt(columnIndex - distance, rowIndex - distance);
+    }
+
+    getBottomLeftPoint(point, distance = 1) {
+        let columnIndex = point.coordinates.x;
+        let rowIndex = point.coordinates.y;
+
+        return this.getPointAt(columnIndex - distance, rowIndex + distance);
+    }
+
+    getTopRightPoint(point, distance = 1) {
+        let columnIndex = point.coordinates.x;
+        let rowIndex = point.coordinates.y;
+
+        return this.getPointAt(columnIndex + distance, rowIndex - distance);
+    }
+
+    getBottomRightPoint(point, distance = 1) {
+        let columnIndex = point.coordinates.x;
+        let rowIndex = point.coordinates.y;
+
+        return this.getPointAt(columnIndex + distance, rowIndex + distance);
+    }
+
     clear(color = null) {
         this._currentLayer.rows.forEach(row => {
             row.forEach(point => {
@@ -234,11 +300,12 @@ class Screen {
                         (pointColor.r + color.r) / level,
                         (pointColor.g + color.g) / level,
                         (pointColor.b + color.b) / level,
-                        (pointColor.a + color.a));
+                        (pointColor.a + color.a)
+                    );
 
-                    //if (point.size < this._pointSize) {
-                    //point.size += 1;
-                    //}
+                }
+                if (point.size < this._pointSize) {
+                    point.size = this._pointSize;
                 }
 
 
@@ -269,7 +336,7 @@ class Screen {
             point.setColor(
                 (pointColor.r + color.r) / level,
                 (pointColor.g + color.g) / level,
-                (pointColor.b + color.b) / level,
+                //(pointColor.b + color.b) / level,
                 (pointColor.a + color.a));
         });
 
@@ -283,9 +350,9 @@ class Screen {
      */
     movePointTo(point, columnIndex, rowIndex) {
         let pointToReplace = this.getPointAt(columnIndex, rowIndex);
-        let { r, g, b } = point.color;
+        let { r, g, b, a } = point.color;
         if (pointToReplace) {
-            pointToReplace.setColor(r, g, b);
+            pointToReplace.setColor(r, g, b, a);
             //pointToReplace.color = new RGBAColor(1,0,0);
         }
         return pointToReplace;
