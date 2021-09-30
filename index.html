@@ -6,7 +6,6 @@
         <script id="vertex-shader" type="x-shader/x-vertex">
             attribute vec4 vPosition;
             attribute float vPointSize;
-            //uniform mat4 uRotation;
             uniform float u_pointsize;
             
             attribute vec4 vColor;
@@ -56,11 +55,9 @@
             uniform vec2 textureAtlasSize;  // eg 64x32
             uniform vec2 imageSize;         // eg 16x16
 
-            void main() {
-                //gl_FragColor = vec4(abs(sin(u_time)),0.0,0.0,1.0);
-                //vec2 u_resolution = vec2( 1024.0* abs(sin(u_time))   ,  1024.0* abs(cos(u_time)) ) ;
-                //vec2 st = gl_FragCoord.xy/u_resolution;
 
+            void main() {
+                vec4 finalColor;
 
                 if(fAtlasId > -1.0){
                     float numColumns = floor(textureAtlasSize.x / imageSize.x); // 128/64 = 1 images horizontal
@@ -69,14 +66,12 @@
 
                     vec2 imageCoord = vec2(x*imageSize.x,y*imageSize.y);
                     vec2 uv = (imageCoord + imageSize * gl_PointCoord) / textureAtlasSize;
-                    gl_FragColor = texture2D(textureAtlas, uv);
+                    finalColor = texture2D(textureAtlas, uv);
                 }else{
-                    gl_FragColor = fColor;
+                    finalColor = fColor;
                 }
 
-
-
-
+                gl_FragColor = finalColor;
 
             }
         </script>
