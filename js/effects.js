@@ -58,11 +58,11 @@ class Effects {
     chromaticAberration(brightnessSensitivity = .5, distance = 1) {
         this._screen.currentLayer.points.forEach(p => {
             if (p.getBrightness() > brightnessSensitivity) {
-                let nextPoint = this._screen.getNextPoint(p, distance);
+                let nextPoint = this._screen.getRightPoint(p, distance);
                 if (nextPoint) {
                     nextPoint.setColor((nextPoint.color.r + p.color.r) / 2, nextPoint.color.g, nextPoint.color.b, (nextPoint.color.a + p.color.a) / 2);
                 }
-                let prevPoint = this._screen.getPrevPoint(p, distance);
+                let prevPoint = this._screen.getLeftPoint(p, distance);
                 if (prevPoint) {
                     prevPoint.setColor(prevPoint.color.r, prevPoint.color.g, (prevPoint.color.b + p.color.b) / 2, (prevPoint.color.a + p.color.a) / 2);
                 }
@@ -85,8 +85,8 @@ class Effects {
                 const topPoint = this._screen.getTopPoint(point);
                 const topRightPoint = this._screen.getTopRightPoint(point);
 
-                const leftPoint = this._screen.getPrevPoint(point);
-                const rightPoint = this._screen.getNextPoint(point);
+                const leftPoint = this._screen.getLeftPoint(point);
+                const rightPoint = this._screen.getRightPoint(point);
 
                 const bottomLeftPoint = this._screen.getBottomLeftPoint(point);
                 const bottomPoint = this._screen.getBottomPoint(point);

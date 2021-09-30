@@ -222,13 +222,13 @@ class Screen {
         return point;
     }
 
-    getPrevPoint(point, distance = 1) {
+    getLeftPoint(point, distance = 1) {
         let columnIndex = point.coordinates.x;
         let rowIndex = point.coordinates.y;
 
         return this.getPointAt(columnIndex - distance, rowIndex);
     }
-    getNextPoint(point, distance = 1) {
+    getRightPoint(point, distance = 1) {
         let columnIndex = point.coordinates.x;
         let rowIndex = point.coordinates.y;
 
