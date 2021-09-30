@@ -70,31 +70,35 @@ class Effects {
         });
     }
 
-    soften() {
+
+    /**
+     * Not a perfect soften, that's why its named soften1.
+     * I want to keep the effect, but it's not a good implementation of a soften
+     * @param {Number} colorPower colors could be a bit dim, so increasing this numbers enhances them.
+     */
+    soften1(colorPower = 2) {
         this._screen.currentLayer.points.forEach(point => {
 
-            if(point.modified){
+            if (point.modified) {
                 // TODO this can be done better in a circle, since the smalles circle is a square
                 const topLeftPoint = this._screen.getTopLeftPoint(point);
                 const topPoint = this._screen.getTopPoint(point);
                 const topRightPoint = this._screen.getTopRightPoint(point);
-    
+
                 const leftPoint = this._screen.getPrevPoint(point);
                 const rightPoint = this._screen.getNextPoint(point);
-    
+
                 const bottomLeftPoint = this._screen.getBottomLeftPoint(point);
                 const bottomPoint = this._screen.getBottomPoint(point);
                 const bottomRightPoint = this._screen.getBottomRightPoint(point);
-    
+
                 const points = [topLeftPoint, topPoint, topRightPoint, leftPoint, rightPoint, bottomLeftPoint, bottomPoint, bottomRightPoint];
                 points.forEach(pointAround => {
-                    if (pointAround ) {
-                        //pointAround.color = point.color;
-                        //pointAround.modified = true;
+                    if (pointAround) {
                         pointAround.setColor(
-                            (point.color.r + pointAround.color.r*2)/3,
-                            (point.color.g + pointAround.color.g*2)/3,
-                            (point.color.b + pointAround.color.b*2)/3
+                            (point.color.r + pointAround.color.r * colorPower) / (colorPower + 1),
+                            (point.color.g + pointAround.color.g * colorPower) / (colorPower + 1),
+                            (point.color.b + pointAround.color.b * colorPower) / (colorPower + 1)
                         );
                     }
                 })

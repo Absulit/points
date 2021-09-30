@@ -20,11 +20,13 @@ import Effects from './js/effects.js';
 import ImageLoader from './js/imageloader.js';
 import VideoLoader from './js/videoloader.js';
 import SpriteLoader from './js/spriteloader.js';
+import ChromaSpiral from './js/examples/chromaspiral.js';
+import VideoAtlas from './js/examples/videoatlas.js';
 
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
-document.body.appendChild(stats.dom);
+//document.body.appendChild(stats.dom);
 
 let capturer = new CCapture({
     format: 'jpg',
@@ -38,7 +40,7 @@ var aspect,
     u_time = 0;
 
 
-let side = 128;
+let side = 100;
 let numColumns = side;
 let numRows = side;
 let numMargin = 0;
@@ -52,6 +54,7 @@ let atlasids = [];
 let uround;
 let urounddec;
 let usin;
+let ucos;
 
 let clearMixColor = new RGBAColor(0, 0, 0);
 
@@ -64,6 +67,9 @@ let polygonChange;
 let drawCircle;
 let wavenoise;
 let imageNoise;
+let chromaSpiral;
+let videoatlas;
+
 let effects;
 
 let imageLoader;
@@ -72,6 +78,12 @@ let spriteLoader;
 let spriteLoader2;
 
 let idsOfChars;
+let idsOfChars2;
+
+let cache = {
+    maxFrames: 60 * 10,
+    currentFrame: 0
+};
 
 function init() {
     initWebGL("gl-canvas", true);
@@ -94,24 +106,28 @@ function init() {
     drawCircle = new DrawCircle(screen);
     wavenoise = new WaveNoise(screen);
     //imageNoise = new ImageNoise(screen);
+    chromaSpiral = new ChromaSpiral(screen);
+    videoatlas = new VideoAtlas(screen);
     effects = new Effects(screen);
 
     imageLoader = new ImageLoader(screen);
     //imageLoader.load('/img/old_king_100x100.jpg');
     //imageLoader.load('/img/old_king_200x200.jpg');
-    imageLoader.load('/img/old_king_600x600.jpg');
+    //imageLoader.load('/img/old_king_600x600.jpg');
 
     videoLoader = new VideoLoader(screen);
     //videoLoader.load('/assets_ignore/VID_350400608_093537_138.mp4');
     videoLoader.load('/assets_ignore/20210925_183936.mp4');
+    //videoLoader.load('/assets_ignore/Black and White Clouds - Time lapse (240p_30fps_H264-128kbit_AAC).mp4');
 
 
     spriteLoader = new SpriteLoader(screen, 32, 32);
     //spriteLoader.load('/assets_ignore/pixelspritefont 32.png', 32,32);
     spriteLoader.load('/assets_ignore/pixelspritefont 32_green.png', 32, 32);
+    //spriteLoader.load('/assets_ignore/katakana.png', 32, 32);
 
-    //idsOfChars = [-1, 31, 51, 37, 40, 47, 61, 30, 62, 63]
-    idsOfChars = [-1,60,36,51,48,57,38,61,45,64,63]
+    idsOfChars = [-1, 31, 51, 37, 40, 47, 61, 30, 62, 63];
+    idsOfChars2 = [-1, 60, 36, 51, 48, 57, 38, 61, 45, 64, 63];
 
     //spriteLoader2 = new SpriteLoader(screen, 64,64);
     //spriteLoader2.load('/img/sprite_nums_1024x1024.png');
@@ -124,18 +140,19 @@ function init() {
 
 function update() {
     clearScreen();
-    stats.begin();
+    //stats.begin();
     u_time += 1 / 60;//0.01;
     uround = Math.round(u_time);
     usin = Math.sin(u_time);
+    ucos = Math.cos(u_time);
     urounddec = u_time % 1;
-
-
-
 
     // does it need it?
     //gl.uniform1f(gl.getUniformLocation(program, "u_time"), u_time);
 
+    //
+    // EXAPLES: copy to a layer to test
+    //
     //wavenoise.update(u_time);
     //wavenoise.update2(u_time, usin);
     //wavenoise.scanLine();
@@ -149,67 +166,54 @@ function update() {
     //matrix.update();
     //star.update(u_time, usin);
     //imageNoise.update(usin);
+    //chromaSpiral.update(usin, ucos, side);
+    //videoatlas.update();
 
-    screen.layerIndex = 0;
 
-    //spriteLoader2.loadToLayer();
-    drawCircle.click();
-    screen.clearMix(clearMixColor, 1.1);
-    screen.currentLayer.points.forEach(p => {
-        //p.size = (p.color.r + p.color.b + p.color.g) / 3 * screen.pointSize;
-        //p.setColor(1, 1, 1);
-        //p.modified = true;
 
-        p.atlasId = -1;
-        if (.1 > p.color.r < .9) {
-            p.atlasId = 1
+
+
+    if (cache[cache.currentFrame]) {
+    //if (false) {
+        // retrieve from cache
+        vertices = cache[cache.currentFrame].vertices;
+        colors = cache[cache.currentFrame].colors;
+        pointsizes = cache[cache.currentFrame].pointsizes;
+        atlasids = cache[cache.currentFrame].atlasids;
+    } else {
+        screen.layerIndex = 0;
+
+        screen.currentLayer.points.forEach(p => {
+            // do something to every point
+            // or every p.modified point
+
+        });
+        chromaSpiral.update(usin, ucos, side);
+
+        //effects.soften1();
+        //effects.chromaticAberration(.5, 10);
+
+
+
+        screen.mergeLayers();
+
+        //store cache
+        addPointsToPrint(screen.mainLayer.points);
+        cache[cache.currentFrame] = {
+            vertices: vertices,
+            colors: colors,
+            pointsizes: pointsizes,
+            atlasids: atlasids
         }
+    }
 
-    });
 
-    screen.layerIndex = 1;
+    if (++cache.currentFrame > cache.maxFrames) {
+        cache.currentFrame = 0;
+        videoLoader.restart();
+    }
 
-    //polygonChange.update(u_time, usin);
-    //effects.scanLine(Math.round(screen.numRows * .03));
-    //effects.fire(Math.round(screen.numRows * .01));
-    //screen.clearMix(clearMixColor, 1.1);
 
-    //screen.layerIndex = 2;
-    //sinewave.update(u_time);
-    //let scale = .25 - (.2 * usin);
-    //let scale = 1;
-    //imageLoader.type = imageLoader.FIT;
-    //imageLoader.loadToLayer(0, 0, scale, scale);
-
-    //let scale = .05;
-    let scale = .05/(80/side);
-    //videoLoader.type = videoLoader.FIT;
-    videoLoader.loadToLayer(0, 0, scale, scale);
-    //matrix.update();
-
-    //spriteLoader.loadToLayer();
-    //star.update(u_time, usin);
-    //effects.scanLine(3);
-    screen.currentLayer.points.forEach(p => {
-        let brightness = (p.color.r + p.color.b + p.color.g) / 3;
-        //p.size = brightness * screen.pointSize;
-        //p.setColor(1, 1, 1);
-
-        //p.modified = false;
-        //p.atlasId = -1;
-
-        /*if (brightness > 0) {
-            p.atlasId = idsOfChars[Math.round(10 * brightness)-1 ];
-            //p.atlasId = p.color.g * 65;
-        }*/
-        p.atlasId = idsOfChars[Math.round(idsOfChars.length * brightness)-1 ];
-        p.setBrightness(0);
-
-    });
-
-    screen.mergeLayers();
-
-    addPointsToPrint(screen.mainLayer.points);
     //printLayers(screen.layers);
 
     //screen.layers.forEach(layer => {
@@ -219,13 +223,11 @@ function update() {
 
     /*************/
 
-    // here we could merge all the vertices and colors
-    // and call draw drawPoints2
-    //screen.render();
+    // TODO: screen.render();
     printPoints();
     capturer.capture(document.getElementById('gl-canvas'));
 
-    stats.end();
+    //stats.end();
     window.requestAnimFrame(update);
 }
 
