@@ -11,6 +11,10 @@ class Point {
         this._size = 1.0;
 
         this._atlastId = -1;
+
+        // minimum value the color is so dim
+        // it's no longer visible
+        this._minimunVisibleValue = 0.01;
     }
 
     get color() {
@@ -20,19 +24,22 @@ class Point {
     set color(value) {
         this._color = value;
         this._modified = true;
+        this._checkColors();
     }
 
     setColor(r, g, b, a = 1) {
         this._color.set(r, g, b, a);
         this._modified = true;
+        this._checkColors();
     }
 
-    setBrightness(value){
+    setBrightness(value) {
         this._color.brightness = value;
         this._modified = true;
+        this._checkColors();
     }
 
-    getBrightness(){
+    getBrightness() {
         return this._color.brightness;
     }
 
@@ -121,6 +128,28 @@ class Point {
 
     set atlasId(value) {
         this._atlastId = value;
+    }
+
+    /**
+     * Verifies if a color is so dimmed it's no longer visible
+     * so it contains a small fraction, and no longer necessary to store,
+     * and also no longer considered `modified` `true`. This to avoid
+     * taking the point into account in future processes.
+     */
+    _checkColors() {
+        if(this._color.value[3] < this._minimunVisibleValue){
+            this._color.set(0, 0, 0, 1);
+            this._modified = false;
+        }else{
+            const [r, g, b] = this._color.value;
+            const rBelow = r < this._minimunVisibleValue;
+            const gBelow = g < this._minimunVisibleValue;
+            const bBelow = b < this._minimunVisibleValue;
+            if (rBelow && gBelow && bBelow) {
+                this._color.set(0, 0, 0, 1);
+                this._modified = false;
+            }
+        }
     }
 }
 

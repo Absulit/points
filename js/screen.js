@@ -2,6 +2,7 @@ import RGBAColor from './color.js';
 import Point from './point.js';
 import MathUtil from './mathutil.js';
 import Coordinate from './coordinate.js';
+import Layer from './layer.js';
 
 class Screen {
     constructor(canvas, numColumns = 10, numRows = 10, numMargin = 2, numLayers = 1) {
@@ -40,12 +41,7 @@ class Screen {
     }
 
     _createLayer() {
-        // TODO: layer class maybe?
-        let layer = {
-            columns: [],
-            rows: [],
-            points: []
-        };
+        let layer = new Layer();
 
         let halfSize = this._pointSizeFull / 2; // TODO: make private property
         let row;
@@ -66,18 +62,8 @@ class Screen {
             layer.rows.push(row);
         }
 
-        // pre fill with the amount of columns
-        /*for (let index = 0; index < this._numColumns; index++) {
-            layer.columns.push([]);
-        }*/
-
-        layer.columns = Array(this._numColumns).fill([]);
-
-        layer.rows.forEach(row => {
-            row.forEach((point, index) => {
-                layer.columns[index].push(point);
-            });
-        });
+        layer.fillColumns();
+        layer.shufflePoints();
 
         return layer;
     }
@@ -551,14 +537,23 @@ class Screen {
         }
     }
 
-    drawPolygon(x, y, radius, sides, color) {
+    /**
+     * 
+     * @param {Number} x 
+     * @param {Number} y 
+     * @param {Number} radius 
+     * @param {Number} sides 
+     * @param {Color} color 
+     * @param {Number} startAngle 
+     */
+    drawPolygon(x, y, radius, sides, color, startAngle = 0) {
         let pointFromCenter, radians, angle;
 
         let firstVertexX, firstVertexY;
         let lastVertexX, lastVertexY;
         let anglePerSide = 360 / sides;
         for (angle = 0; angle <= 360; angle += anglePerSide) {
-            radians = MathUtil.radians(angle);
+            radians = MathUtil.radians(startAngle + angle);
             pointFromCenter = MathUtil.vector(radius, radians);
             let vertexX = Math.ceil(pointFromCenter.x + x);
             let vertexY = Math.ceil(pointFromCenter.y + y);

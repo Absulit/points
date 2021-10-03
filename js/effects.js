@@ -101,7 +101,25 @@ class Effects {
         this._screen.currentLayer.points.forEach(point => {
 
             if (point.modified) {
-                const points = Utils.shuffle(this._screen.getPointsInCircle(point, distance));
+                const points = this._screen.getPointsInCircle(point, distance);
+                points.forEach(pointAround => {
+                    if (pointAround) {
+                        pointAround.setColor(
+                            (point.color.r + pointAround.color.r * colorPower) / (colorPower + 1),
+                            (point.color.g + pointAround.color.g * colorPower) / (colorPower + 1),
+                            (point.color.b + pointAround.color.b * colorPower) / (colorPower + 1)
+                        );
+                    }
+                })
+            }
+        });
+    }
+
+    soften3(colorPower = 2, distance = 1){
+        this._screen.currentLayer.shuffledPoints.forEach(point => {
+
+            if (point.modified) {
+                const points = this._screen.getPointsInCircle(point, distance);
                 points.forEach(pointAround => {
                     if (pointAround) {
                         pointAround.setColor(
