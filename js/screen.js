@@ -277,7 +277,14 @@ class Screen {
         return this.getPointAt(columnIndex + distance, rowIndex + distance);
     }
 
-    getPointsAround(point, distance = 1){
+    /**
+     * Retrieves a list of `Point` around a point.
+     * Directly around, in a square, so just 8 Points.
+     * @param {*} point 
+     * @param {*} distance 
+     * @returns 
+     */
+    getPointsAround(point, distance = 1) {
         let columnIndex = point.coordinates.x;
         let rowIndex = point.coordinates.y;
         return [
@@ -290,6 +297,28 @@ class Screen {
             this.getPointAt(columnIndex, rowIndex + distance),              // bottom
             this.getPointAt(columnIndex + distance, rowIndex + distance),   // bottom right
         ]
+    }
+
+    /**
+     * Retrives a list of `Point` around a center point
+     * @param {Point} point Center point to retrieve points around.
+     * @param {Number} distance How far from the point should we get the points.
+     * @param {Number} numPoints How many points. Too many Points and the app slows down.
+     * @returns {Point[]} Point[]
+     */
+    getPointsInCircle(point, distance = 1, numPoints  = 8) {
+        let { x, y } = point.coordinates;
+        let pointFromCenter, radians, angle, pointAround;
+        let result = [];
+        for (angle = 0; angle < 360; angle += (360/numPoints)) {
+            radians = MathUtil.radians(angle);
+            pointFromCenter = MathUtil.vector(distance, radians);
+            pointAround = this.getPointAt(Math.round(pointFromCenter.x + x), Math.round(pointFromCenter.y + y));
+            if (pointAround) {
+                result.push(pointAround);
+            }
+        }
+        return result;
     }
 
     clear(color = null) {

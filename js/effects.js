@@ -1,3 +1,5 @@
+import Utils from './utils.js';
+
 class Effects {
     constructor(screen) {
         this._screen = screen;
@@ -82,6 +84,24 @@ class Effects {
             if (point.modified) {
                 // TODO this can be done better in a circle, since the smalles circle is a square
                 const points = this._screen.getPointsAround(point);
+                points.forEach(pointAround => {
+                    if (pointAround) {
+                        pointAround.setColor(
+                            (point.color.r + pointAround.color.r * colorPower) / (colorPower + 1),
+                            (point.color.g + pointAround.color.g * colorPower) / (colorPower + 1),
+                            (point.color.b + pointAround.color.b * colorPower) / (colorPower + 1)
+                        );
+                    }
+                })
+            }
+        });
+    }
+
+    soften2(colorPower = 2, distance = 1){
+        this._screen.currentLayer.points.forEach(point => {
+
+            if (point.modified) {
+                const points = Utils.shuffle(this._screen.getPointsInCircle(point, distance));
                 points.forEach(pointAround => {
                     if (pointAround) {
                         pointAround.setColor(
