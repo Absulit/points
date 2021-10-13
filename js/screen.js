@@ -286,6 +286,24 @@ class Screen {
     }
 
     /**
+     * Retrieves a list of `Point` around a point.
+     * Just NSEW, so just 4 Points.
+     * @param {*} point 
+     * @param {*} distance 
+     * @returns array with [N,S,E,W] `Point`s
+     */
+     getDirectPointsAround(point, distance = 1) {
+        const columnIndex = point.coordinates.x;
+        const rowIndex = point.coordinates.y;
+        return [
+            this.getPointAt(columnIndex, rowIndex - distance),              // N
+            this.getPointAt(columnIndex, rowIndex + distance),              // S
+            this.getPointAt(columnIndex + distance, rowIndex),              // E
+            this.getPointAt(columnIndex - distance, rowIndex),              // W
+        ]
+    }
+
+    /**
      * Retrives a list of `Point` around a center point
      * @param {Point} point Center point to retrieve points around.
      * @param {Number} distance How far from the point should we get the points.

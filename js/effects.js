@@ -97,7 +97,7 @@ class Effects {
         });
     }
 
-    soften2(colorPower = 2, distance = 1){
+    soften2(colorPower = 2, distance = 1) {
         this._screen.currentLayer.points.forEach(point => {
 
             if (point.modified) {
@@ -115,7 +115,7 @@ class Effects {
         });
     }
 
-    soften3(colorPower = 2, distance = 1){
+    soften3(colorPower = 2, distance = 1) {
         this._screen.currentLayer.shuffledPoints.forEach(point => {
 
             if (point.modified) {
@@ -129,6 +129,98 @@ class Effects {
                         );
                     }
                 })
+            }
+        });
+    }
+
+    antialias() {
+        let brightness;
+        let pointsAround = null;
+        const max = Math.max;
+        const min = Math.min;
+        // Trims the algorithm from processing darks.
+        //   0.0833 - upper limit (default, the start of visible unfiltered edges)
+        //   0.0625 - high quality (faster)
+        //   0.0312 - visible limit (slower)
+
+        // The minimum amount of local contrast required to apply algorithm.
+        //   0.333 - too little (faster)
+        //   0.250 - low quality
+        //   0.166 - default
+        //   0.125 - high quality 
+        //   0.063 - overkill (slower)
+
+
+
+
+        let l = { n: null, s: null, e: null, w: null, m: null, highest: null, lowest: null, contrast: null }
+        this._screen.currentLayer.points.forEach(point => {
+            if (point.modified) {
+                //brightness = point.getBrightness();
+                //point.setColor(brightness, point.color.g, point.color.g);
+                pointsAround = this._screen.getDirectPointsAround(point);
+
+                l.n = pointsAround[0] ? pointsAround[0].getBrightness() : 0;
+                l.s = pointsAround[1] ? pointsAround[1].getBrightness() : 0;
+                l.e = pointsAround[2] ? pointsAround[2].getBrightness() : 0;
+                l.w = pointsAround[3] ? pointsAround[3].getBrightness() : 0;
+                l.m = point.getBrightness();
+
+                l.highest = max(max(max(max(l.n, l.e), l.s), l.w), l.m);
+                l.lowest = min(min(min(min(l.n, l.e), l.s), l.w), l.m);
+                l.contrast = l.highest - l.lowest;
+                //point.setBrightness(l.contrast);
+                if (l.contrast < 0.0312) {
+                    //point.setColor(0, 0, 0, 1);
+                    return;
+                }
+                if (l.contrast < 0.166  * l.highest) {
+                    //point.setColor(0, 0, 0, 1);
+                    return;
+                }
+                //const distance = 3;
+                const points = this._screen.getPointsAround(point);
+                //const points = this._screen.getPointsInCircle(point, distance);
+                const colorPower = 2;
+                points.forEach(pointAround => {
+                    if (pointAround) {
+                        pointAround.setColor(
+                            (point.color.r + pointAround.color.r * colorPower) / (colorPower + 1),
+                            (point.color.g + pointAround.color.g * colorPower) / (colorPower + 1),
+                            (point.color.b + pointAround.color.b * colorPower) / (colorPower + 1)
+                        );
+                    }
+                })
+
+            }
+        });
+    }
+
+    contrast1() {
+        let brightness;
+        let pointsAround = null;
+        const max = Math.max;
+        const min = Math.min;
+
+        let l = { n: null, s: null, e: null, w: null, m: null, highest: null, lowest: null, contrast: null }
+        this._screen.currentLayer.points.forEach(point => {
+            if (point.modified) {
+                //brightness = point.getBrightness();
+                //point.setColor(brightness, point.color.g, point.color.g);
+                pointsAround = this._screen.getDirectPointsAround(point);
+
+                l.n = pointsAround[0] ? pointsAround[0].getBrightness() : 1;
+                l.s = pointsAround[1] ? pointsAround[1].getBrightness() : 1;
+                l.e = pointsAround[2] ? pointsAround[2].getBrightness() : 1;
+                l.w = pointsAround[3] ? pointsAround[3].getBrightness() : 1;
+                l.m = point.getBrightness();
+
+                l.highest = max(max(max(max(l.n, l.e), l.s), l.w), l.m);
+                l.lowest = min(min(min(min(l.n, l.e), l.s), l.w), l.m);
+                l.contrast = l.highest - l.lowest;
+
+
+                point.setBrightness(l.contrast);
             }
         });
     }
