@@ -274,14 +274,14 @@ class Screen {
         let columnIndex = point.coordinates.x;
         let rowIndex = point.coordinates.y;
         return [
-            this.getPointAt(columnIndex - distance, rowIndex - distance),   // top left
-            this.getPointAt(columnIndex, rowIndex - distance),              // top
-            this.getPointAt(columnIndex + distance, rowIndex - distance),   // top right
-            this.getPointAt(columnIndex - distance, rowIndex),              // left
-            this.getPointAt(columnIndex + distance, rowIndex),              // right
-            this.getPointAt(columnIndex - distance, rowIndex + distance),   // bottom left
-            this.getPointAt(columnIndex, rowIndex + distance),              // bottom
-            this.getPointAt(columnIndex + distance, rowIndex + distance),   // bottom right
+            this.getPointAt(columnIndex - distance, rowIndex - distance),   // top left     NW  0
+            this.getPointAt(columnIndex, rowIndex - distance),              // top          N   1
+            this.getPointAt(columnIndex + distance, rowIndex - distance),   // top right    NE  2
+            this.getPointAt(columnIndex - distance, rowIndex),              // left         W   3
+            this.getPointAt(columnIndex + distance, rowIndex),              // right        E   4
+            this.getPointAt(columnIndex - distance, rowIndex + distance),   // bottom left  SW  5
+            this.getPointAt(columnIndex, rowIndex + distance),              // bottom       S   6
+            this.getPointAt(columnIndex + distance, rowIndex + distance),   // bottom right SE  7
         ]
     }
 
@@ -292,7 +292,7 @@ class Screen {
      * @param {*} distance 
      * @returns array with [N,S,E,W] `Point`s
      */
-     getDirectPointsAround(point, distance = 1) {
+     getNSEWPointsAround(point, distance = 1) {
         const columnIndex = point.coordinates.x;
         const rowIndex = point.coordinates.y;
         return [
