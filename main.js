@@ -22,6 +22,8 @@ import VideoLoader from './js/videoloader.js';
 import SpriteLoader from './js/spriteloader.js';
 import ChromaSpiral from './js/examples/chromaspiral.js';
 import VideoAtlas from './js/examples/videoatlas.js';
+import SquidGame from './js/examples/squidgame.js';
+import PMW from './js/examples/pmw.js';
 
 
 const stats = new Stats();
@@ -68,6 +70,9 @@ let drawCircle;
 let wavenoise;
 let imageNoise;
 let chromaSpiral;
+let squidGame;
+let pmw;
+
 let videoatlas;
 
 let effects;
@@ -108,6 +113,8 @@ function init() {
     //imageNoise = new ImageNoise(screen);
     chromaSpiral = new ChromaSpiral(screen);
     videoatlas = new VideoAtlas(screen);
+    squidGame = new SquidGame(screen);
+    pmw = new PMW(screen);
     effects = new Effects(screen);
 
     imageLoader = new ImageLoader(screen);
@@ -168,8 +175,9 @@ function update() {
     //imageNoise.update(usin);
     //chromaSpiral.update(usin, ucos, side);
     //videoatlas.update();
-
-
+    //chromaSpiral.update(usin, ucos, side, u_time);
+    //squidGame.update(u_time, usin, ucos);
+    //pmw.update(usin, ucos);
 
 
 
@@ -188,11 +196,9 @@ function update() {
             // or every p.modified point
 
         });
-        chromaSpiral.update(usin, ucos, side);
 
-        //effects.soften1();
-        //effects.chromaticAberration(.5, 10);
-
+        //screen.layerIndex = 1;
+        chromaSpiral.update(usin, ucos, side, u_time);
 
 
         screen.mergeLayers();
