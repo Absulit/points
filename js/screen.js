@@ -81,8 +81,7 @@ class Screen {
         let r = Array(finalPoints.length);
 
         finalPoints.forEach((finalPoint, finalPointIndex) => {
-            let tempColor = new RGBAColor(0, 0, 0, 0);
-            tempColor.counter = 0;
+            let tempColor = { counter: 0, value: new RGBAColor(0, 0, 0, 0)};
             let tempSize = { counter: 0, value: 0 };
 
             let tempAtlas = { counter: 0, value: -1 };
@@ -95,10 +94,10 @@ class Screen {
 
                     if (point.color.a === 1) {
                         tempColor.counter = 0;
-                        tempColor = point.color;
+                        tempColor.value = point.color;
                     } else {
                         ++tempColor.counter;
-                        tempColor.add(point.color);
+                        tempColor.value.add(point.color);
                     }
 
                     if (point.size >= this.pointSize) {
@@ -121,15 +120,15 @@ class Screen {
 
             });
             /*if (tempColor.counter) {
-                tempColor.r /= tempColor.counter;
-                tempColor.g /= tempColor.counter;
-                tempColor.b /= tempColor.counter;
-                tempColor.a /= tempColor.counter;
+                tempColor.value.r /= tempColor.counter;
+                tempColor.value.g /= tempColor.counter;
+                tempColor.value.b /= tempColor.counter;
+                //tempColor.value.a /= tempColor.counter;
             }*/
             if (tempSize.counter) {
                 tempSize.value /= tempSize.counter;
             }
-            finalPoint.color = tempColor;
+            finalPoint.color = tempColor.value;
             finalPoint.size = tempSize.value;
             finalPoint.atlasId = tempAtlas.value;
         });

@@ -94,6 +94,10 @@ class RGBAColor {
 
         this._value = mix;
     }
+
+    equal(color) {
+        return (this._value[0] == color.r) && (this._value[1] == color.g) && (this._value[2] == color.b) && (this._value[3] == color.a);
+    }
 }
 
 export default RGBAColor;

@@ -24,6 +24,9 @@ import ChromaSpiral from './js/examples/chromaspiral.js';
 import VideoAtlas from './js/examples/videoatlas.js';
 import SquidGame from './js/examples/squidgame.js';
 import PMW from './js/examples/pmw.js';
+import Fluid1 from './js/examples/fluid1.js';
+import Fibonacci from './js/examples/fibonacci.js';
+
 
 
 const stats = new Stats();
@@ -72,6 +75,8 @@ let imageNoise;
 let chromaSpiral;
 let squidGame;
 let pmw;
+let fluid1;
+let fibonacci;
 
 let videoatlas;
 
@@ -115,6 +120,7 @@ function init() {
     videoatlas = new VideoAtlas(screen);
     squidGame = new SquidGame(screen);
     pmw = new PMW(screen);
+    fluid1 = new Fluid1(screen);
     effects = new Effects(screen);
 
     imageLoader = new ImageLoader(screen);
@@ -138,6 +144,8 @@ function init() {
 
     //spriteLoader2 = new SpriteLoader(screen, 64,64);
     //spriteLoader2.load('/img/sprite_nums_1024x1024.png');
+
+    fibonacci = new Fibonacci(screen);
 
     //-----------
 
@@ -178,7 +186,7 @@ function update() {
     //chromaSpiral.update(usin, ucos, side, u_time);
     //squidGame.update(u_time, usin, ucos);
     //pmw.update(usin, ucos);
-
+    //imageLoader.loadToLayer();
 
 
     if (cache[cache.currentFrame]) {
@@ -198,7 +206,11 @@ function update() {
         });
 
         //screen.layerIndex = 1;
-        chromaSpiral.update(usin, ucos, side, u_time);
+
+        //fluid1.update(usin, ucos, side, u_time);
+
+        //chromaSpiral.update(usin, ucos, side, u_time);
+        fibonacci.update(usin, ucos, side, u_time);
 
 
         screen.mergeLayers();

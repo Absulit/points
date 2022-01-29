@@ -122,8 +122,8 @@ class ImageLoader {
      */
     loadToLayer = (x = 0, y = 0, scaleX = 1, scaleY = 1) => {
         if (this._imageLoaded) {
-            for (let index = 0; index < this._screen.points.length; index++) {
-                const point = this._screen.points[index];
+            for (let index = 0; index < this._screen.currentLayer.points.length; index++) {
+                const point = this._screen.currentLayer.points[index];
                 this._typesToFunction[this._type](point, x, y, scaleX, scaleY);
             }
         }
