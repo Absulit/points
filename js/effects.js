@@ -1,3 +1,5 @@
+import MathUtil from './mathutil.js';
+
 class Effects {
     constructor(screen) {
         this._screen = screen;
@@ -58,11 +60,11 @@ class Effects {
     chromaticAberration(brightnessSensitivity = .5, distance = 1) {
         this._screen.currentLayer.points.forEach(p => {
             if (p.getBrightness() > brightnessSensitivity) {
-                let nextPoint = this._screen.getNextPoint(p, distance);
+                let nextPoint = this._screen.getRightPoint(p, distance);
                 if (nextPoint) {
                     nextPoint.setColor((nextPoint.color.r + p.color.r) / 2, nextPoint.color.g, nextPoint.color.b, (nextPoint.color.a + p.color.a) / 2);
                 }
-                let prevPoint = this._screen.getPrevPoint(p, distance);
+                let prevPoint = this._screen.getLeftPoint(p, distance);
                 if (prevPoint) {
                     prevPoint.setColor(prevPoint.color.r, prevPoint.color.g, (prevPoint.color.b + p.color.b) / 2, (prevPoint.color.a + p.color.a) / 2);
                 }
@@ -81,18 +83,7 @@ class Effects {
 
             if (point.modified) {
                 // TODO this can be done better in a circle, since the smalles circle is a square
-                const topLeftPoint = this._screen.getTopLeftPoint(point);
-                const topPoint = this._screen.getTopPoint(point);
-                const topRightPoint = this._screen.getTopRightPoint(point);
-
-                const leftPoint = this._screen.getPrevPoint(point);
-                const rightPoint = this._screen.getNextPoint(point);
-
-                const bottomLeftPoint = this._screen.getBottomLeftPoint(point);
-                const bottomPoint = this._screen.getBottomPoint(point);
-                const bottomRightPoint = this._screen.getBottomRightPoint(point);
-
-                const points = [topLeftPoint, topPoint, topRightPoint, leftPoint, rightPoint, bottomLeftPoint, bottomPoint, bottomRightPoint];
+                const points = this._screen.getPointsAround(point);
                 points.forEach(pointAround => {
                     if (pointAround) {
                         pointAround.setColor(
@@ -102,6 +93,220 @@ class Effects {
                         );
                     }
                 })
+            }
+        });
+    }
+
+    soften2(colorPower = 2, distance = 1) {
+        this._screen.currentLayer.points.forEach(point => {
+
+            if (point.modified) {
+                const points = this._screen.getPointsInCircle(point, distance);
+                points.forEach(pointAround => {
+                    if (pointAround) {
+                        pointAround.setColor(
+                            (point.color.r + pointAround.color.r * colorPower) / (colorPower + 1),
+                            (point.color.g + pointAround.color.g * colorPower) / (colorPower + 1),
+                            (point.color.b + pointAround.color.b * colorPower) / (colorPower + 1)
+                        );
+                    }
+                })
+            }
+        });
+    }
+
+    soften3(colorPower = 2, distance = 1) {
+        this._screen.currentLayer.shuffledPoints.forEach(point => {
+
+            if (point.modified) {
+                const points = this._screen.getPointsInCircle(point, distance);
+                points.forEach(pointAround => {
+                    if (pointAround) {
+                        pointAround.setColor(
+                            (point.color.r + pointAround.color.r * colorPower) / (colorPower + 1),
+                            (point.color.g + pointAround.color.g * colorPower) / (colorPower + 1),
+                            (point.color.b + pointAround.color.b * colorPower) / (colorPower + 1)
+                        );
+                    }
+                })
+            }
+        });
+    }
+
+    antialias() {
+        // Trims the algorithm from processing darks.
+        //   0.0833 - upper limit (default, the start of visible unfiltered edges)
+        //   0.0625 - high quality (faster)
+        //   0.0312 - visible limit (slower)
+
+        // The Math.minimum amount of local contrast required to apply algorithm.
+        //   0.333 - too little (faster)
+        //   0.250 - low quality
+        //   0.166 - default
+        //   0.125 - high quality
+        //   0.063 - overkill (slower)
+
+        let pointsAround = null;
+        let l = { n: null, s: null, e: null, w: null, m: null, highest: null, lowest: null, contrast: null }
+        let points = null;
+        const colorPower = 4;
+        this._screen.currentLayer.points.forEach(point => {
+            if (point.modified) {
+
+                pointsAround = this._screen.getPointsAround(point);
+
+                l.n = pointsAround[1] ? pointsAround[1].getBrightness() : 0;
+                l.w = pointsAround[3] ? pointsAround[3].getBrightness() : 0;
+                l.e = pointsAround[4] ? pointsAround[4].getBrightness() : 0;
+                l.s = pointsAround[6] ? pointsAround[6].getBrightness() : 0;
+                l.m = point.getBrightness();
+
+
+                l.highest = Math.max(Math.max(Math.max(Math.max(l.n, l.e), l.s), l.w), l.m);
+                l.lowest = Math.min(Math.min(Math.min(Math.min(l.n, l.e), l.s), l.w), l.m);
+                l.contrast = l.highest - l.lowest;
+
+                if (l.contrast < 0.0312) {
+                    return;
+                }
+                if (l.contrast < 0.166 * l.highest) {
+                    return;
+                }
+
+                points = this._screen.getPointsAround(point);
+                points.forEach(pointAround => {
+                    if (pointAround) {
+                        pointAround.setColor(
+                            (point.color.r + pointAround.color.r * colorPower) / (colorPower + 1),
+                            (point.color.g + pointAround.color.g * colorPower) / (colorPower + 1),
+                            (point.color.b + pointAround.color.b * colorPower) / (colorPower + 1)
+                        );
+                    }
+                });
+            }
+        });
+    }
+
+    antialias2() {
+        // Trims the algorithm from processing darks.
+        //   0.0833 - upper limit (default, the start of visible unfiltered edges)
+        //   0.0625 - high quality (faster)
+        //   0.0312 - visible limit (slower)
+
+        // The Math.minimum amount of local contrast required to apply algorithm.
+        //   0.333 - too little (faster)
+        //   0.250 - low quality
+        //   0.166 - default
+        //   0.125 - high quality
+        //   0.063 - overkill (slower)
+
+        let pointsAround = null;
+        let l = { n: null, s: null, e: null, w: null, nw: null, ne: null, sw: null, se: null, m: null, highest: null, lowest: null, contrast: null }
+        const colorPower = 4;
+        this._screen.currentLayer.points.forEach(point => {
+            if (point.modified) {
+                pointsAround = this._screen.getPointsAround(point);
+
+                l.nw = pointsAround[0] ? pointsAround[0].getBrightness() : 0;
+                l.n = pointsAround[1] ? pointsAround[1].getBrightness() : 0;
+                l.ne = pointsAround[2] ? pointsAround[2].getBrightness() : 0;
+                l.w = pointsAround[3] ? pointsAround[3].getBrightness() : 0;
+                l.e = pointsAround[4] ? pointsAround[4].getBrightness() : 0;
+                l.sw = pointsAround[5] ? pointsAround[5].getBrightness() : 0;
+                l.s = pointsAround[6] ? pointsAround[6].getBrightness() : 0;
+                l.se = pointsAround[7] ? pointsAround[7].getBrightness() : 0;
+                l.m = point.getBrightness();
+
+                l.highest = Math.max(Math.max(Math.max(Math.max(l.n, l.e), l.s), l.w), l.m);
+                l.lowest = Math.min(Math.min(Math.min(Math.min(l.n, l.e), l.s), l.w), l.m);
+                l.contrast = l.highest - l.lowest;
+
+                if (l.contrast < 0.0312) {
+                    return;
+                }
+                if (l.contrast < 0.166 * l.highest) {
+                    return;
+                }
+
+                let blendFactor = 2 * (l.n + l.e + l.s + l.w);
+                blendFactor += l.ne + l.nw + l.se + l.sw;
+                blendFactor *= 1.0 / 12;
+                blendFactor = Math.abs(blendFactor - l.m);
+                blendFactor = MathUtil.saturate(blendFactor / l.contrast);
+                blendFactor = MathUtil.smoothstep(0, 1, blendFactor);
+                blendFactor = blendFactor * blendFactor;
+
+                let horizontal =
+                    Math.abs(l.n + l.s - 2 * l.m) * 2 +
+                    Math.abs(l.ne + l.se - 2 * l.e) +
+                    Math.abs(l.nw + l.sw - 2 * l.w);
+                let vertical =
+                    Math.abs(l.e + l.w - 2 * l.m) * 2 +
+                    Math.abs(l.ne + l.nw - 2 * l.n) +
+                    Math.abs(l.se + l.sw - 2 * l.s);
+                let isHorizontal = horizontal >= vertical;
+
+                let pLuminance = isHorizontal ? l.n : l.e;
+                let nLuminance = isHorizontal ? l.s : l.w;
+
+                let pGradient = Math.abs(pLuminance - l.m);
+                let nGradient = Math.abs(nLuminance - l.m);
+
+                let pixelStep = isHorizontal ? 1 : 1;
+                if (pGradient < nGradient) {
+                    pixelStep = -pixelStep;
+                }
+
+                let points = this._screen.getPointsAround(point);
+                
+                let subPoints = null;
+                if (isHorizontal) {
+                    if (pixelStep >= 0) {
+                        subPoints = [points[5], points[6], points[7]]; // bottom
+                    } else {
+                        subPoints = [points[0], points[1], points[2]]; // top
+                    }
+                }
+                else {
+                    if (pixelStep >= 0) {
+                        subPoints = [points[0], points[3], points[5]]; // left
+                    } else {
+                        subPoints = [points[2], points[4], points[7]]; // right
+                    }
+                }
+
+                subPoints.forEach(pointAround => {
+                    if (pointAround) {
+                        pointAround.setColor(
+                            (point.color.r + pointAround.color.r * colorPower) / (colorPower + 1),
+                            (point.color.g + pointAround.color.g * colorPower) / (colorPower + 1),
+                            (point.color.b + pointAround.color.b * colorPower) / (colorPower + 1)
+                        );
+                    }
+                });
+            }
+        });
+    }
+
+    contrast1() {
+        let pointsAround = null;
+
+        let l = { n: null, s: null, e: null, w: null, m: null, highest: null, lowest: null, contrast: null }
+        this._screen.currentLayer.points.forEach(point => {
+            if (point.modified) {
+                pointsAround = this._screen.getDirectPointsAround(point);
+
+                l.n = pointsAround[0] ? pointsAround[0].getBrightness() : 1;
+                l.s = pointsAround[1] ? pointsAround[1].getBrightness() : 1;
+                l.e = pointsAround[2] ? pointsAround[2].getBrightness() : 1;
+                l.w = pointsAround[3] ? pointsAround[3].getBrightness() : 1;
+                l.m = point.getBrightness();
+
+                l.highest = Math.max(Math.max(Math.max(Math.max(l.n, l.e), l.s), l.w), l.m);
+                l.lowest = Math.min(Math.min(Math.min(Math.min(l.n, l.e), l.s), l.w), l.m);
+                l.contrast = l.highest - l.lowest;
+
+                point.setBrightness(l.contrast);
             }
         });
     }

@@ -2,6 +2,7 @@ import RGBAColor from './color.js';
 import Point from './point.js';
 import MathUtil from './mathutil.js';
 import Coordinate from './coordinate.js';
+import Layer from './layer.js';
 
 class Screen {
     constructor(canvas, numColumns = 10, numRows = 10, numMargin = 2, numLayers = 1) {
@@ -40,12 +41,7 @@ class Screen {
     }
 
     _createLayer() {
-        // TODO: layer class maybe?
-        let layer = {
-            columns: [],
-            rows: [],
-            points: []
-        };
+        let layer = new Layer();
 
         let halfSize = this._pointSizeFull / 2; // TODO: make private property
         let row;
@@ -66,18 +62,8 @@ class Screen {
             layer.rows.push(row);
         }
 
-        // pre fill with the amount of columns
-        /*for (let index = 0; index < this._numColumns; index++) {
-            layer.columns.push([]);
-        }*/
-
-        layer.columns = Array(this._numColumns).fill([]);
-
-        layer.rows.forEach(row => {
-            row.forEach((point, index) => {
-                layer.columns[index].push(point);
-            });
-        });
+        layer.fillColumns();
+        layer.shufflePoints();
 
         return layer;
     }
@@ -95,8 +81,7 @@ class Screen {
         let r = Array(finalPoints.length);
 
         finalPoints.forEach((finalPoint, finalPointIndex) => {
-            let tempColor = new RGBAColor(0, 0, 0, 0);
-            tempColor.counter = 0;
+            let tempColor = { counter: 0, value: new RGBAColor(0, 0, 0, 0)};
             let tempSize = { counter: 0, value: 0 };
 
             let tempAtlas = { counter: 0, value: -1 };
@@ -109,10 +94,10 @@ class Screen {
 
                     if (point.color.a === 1) {
                         tempColor.counter = 0;
-                        tempColor = point.color;
+                        tempColor.value = point.color;
                     } else {
                         ++tempColor.counter;
-                        tempColor.add(point.color);
+                        tempColor.value.add(point.color);
                     }
 
                     if (point.size >= this.pointSize) {
@@ -135,15 +120,15 @@ class Screen {
 
             });
             /*if (tempColor.counter) {
-                tempColor.r /= tempColor.counter;
-                tempColor.g /= tempColor.counter;
-                tempColor.b /= tempColor.counter;
-                tempColor.a /= tempColor.counter;
+                tempColor.value.r /= tempColor.counter;
+                tempColor.value.g /= tempColor.counter;
+                tempColor.value.b /= tempColor.counter;
+                //tempColor.value.a /= tempColor.counter;
             }*/
             if (tempSize.counter) {
                 tempSize.value /= tempSize.counter;
             }
-            finalPoint.color = tempColor;
+            finalPoint.color = tempColor.value;
             finalPoint.size = tempSize.value;
             finalPoint.atlasId = tempAtlas.value;
         });
@@ -222,13 +207,13 @@ class Screen {
         return point;
     }
 
-    getPrevPoint(point, distance = 1) {
+    getLeftPoint(point, distance = 1) {
         let columnIndex = point.coordinates.x;
         let rowIndex = point.coordinates.y;
 
         return this.getPointAt(columnIndex - distance, rowIndex);
     }
-    getNextPoint(point, distance = 1) {
+    getRightPoint(point, distance = 1) {
         let columnIndex = point.coordinates.x;
         let rowIndex = point.coordinates.y;
 
@@ -275,6 +260,68 @@ class Screen {
         let rowIndex = point.coordinates.y;
 
         return this.getPointAt(columnIndex + distance, rowIndex + distance);
+    }
+
+    /**
+     * Retrieves a list of `Point` around a point.
+     * Directly around, in a square, so just 8 Points.
+     * @param {*} point 
+     * @param {*} distance 
+     * @returns 
+     */
+    getPointsAround(point, distance = 1) {
+        let columnIndex = point.coordinates.x;
+        let rowIndex = point.coordinates.y;
+        return [
+            this.getPointAt(columnIndex - distance, rowIndex - distance),   // top left     NW  0
+            this.getPointAt(columnIndex, rowIndex - distance),              // top          N   1
+            this.getPointAt(columnIndex + distance, rowIndex - distance),   // top right    NE  2
+            this.getPointAt(columnIndex - distance, rowIndex),              // left         W   3
+            this.getPointAt(columnIndex + distance, rowIndex),              // right        E   4
+            this.getPointAt(columnIndex - distance, rowIndex + distance),   // bottom left  SW  5
+            this.getPointAt(columnIndex, rowIndex + distance),              // bottom       S   6
+            this.getPointAt(columnIndex + distance, rowIndex + distance),   // bottom right SE  7
+        ]
+    }
+
+    /**
+     * Retrieves a list of `Point` around a point.
+     * Just NSEW, so just 4 Points.
+     * @param {*} point 
+     * @param {*} distance 
+     * @returns array with [N,S,E,W] `Point`s
+     */
+     getNSEWPointsAround(point, distance = 1) {
+        const columnIndex = point.coordinates.x;
+        const rowIndex = point.coordinates.y;
+        return [
+            this.getPointAt(columnIndex, rowIndex - distance),              // N
+            this.getPointAt(columnIndex, rowIndex + distance),              // S
+            this.getPointAt(columnIndex + distance, rowIndex),              // E
+            this.getPointAt(columnIndex - distance, rowIndex),              // W
+        ]
+    }
+
+    /**
+     * Retrives a list of `Point` around a center point
+     * @param {Point} point Center point to retrieve points around.
+     * @param {Number} distance How far from the point should we get the points.
+     * @param {Number} numPoints How many points. Too many Points and the app slows down.
+     * @returns {Point[]} Point[]
+     */
+    getPointsInCircle(point, distance = 1, numPoints  = 8) {
+        let { x, y } = point.coordinates;
+        let pointFromCenter, radians, angle, pointAround;
+        let result = [];
+        for (angle = 0; angle < 360; angle += (360/numPoints)) {
+            radians = MathUtil.radians(angle);
+            pointFromCenter = MathUtil.vector(distance, radians);
+            pointAround = this.getPointAt(Math.round(pointFromCenter.x + x), Math.round(pointFromCenter.y + y));
+            if (pointAround) {
+                result.push(pointAround);
+            }
+        }
+        return result;
     }
 
     clear(color = null) {
@@ -507,14 +554,23 @@ class Screen {
         }
     }
 
-    drawPolygon(x, y, radius, sides, color) {
+    /**
+     * 
+     * @param {Number} x 
+     * @param {Number} y 
+     * @param {Number} radius 
+     * @param {Number} sides 
+     * @param {Color} color 
+     * @param {Number} startAngle 
+     */
+    drawPolygon(x, y, radius, sides, color, startAngle = 0) {
         let pointFromCenter, radians, angle;
 
         let firstVertexX, firstVertexY;
         let lastVertexX, lastVertexY;
         let anglePerSide = 360 / sides;
         for (angle = 0; angle <= 360; angle += anglePerSide) {
-            radians = MathUtil.radians(angle);
+            radians = MathUtil.radians(startAngle + angle);
             pointFromCenter = MathUtil.vector(radius, radians);
             let vertexX = Math.ceil(pointFromCenter.x + x);
             let vertexY = Math.ceil(pointFromCenter.y + y);

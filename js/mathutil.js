@@ -40,6 +40,15 @@ class MathUtil {
             y: distance * Math.sin(radians)
         }
     }
+
+    static saturate(x) {
+        return Math.max(0, Math.min(1, x));
+    }
+
+    static smoothstep(a, b, x) {
+        let t = MathUtil.saturate((x - a) / (b - a));
+        return t * t * (3.0 - (2.0 * t));
+    }
 }
 
 export default MathUtil;
