@@ -26,12 +26,13 @@ import SquidGame from './js/examples/squidgame.js';
 import PMW from './js/examples/pmw.js';
 import Fluid1 from './js/examples/fluid1.js';
 import Fibonacci from './js/examples/fibonacci.js';
+import GameOfLife from './js/examples/gameoflife.js';
 
 
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
-//document.body.appendChild(stats.dom);
+document.body.appendChild(stats.dom);
 
 let capturer = new CCapture({
     format: 'jpg',
@@ -42,10 +43,10 @@ let capturer = new CCapture({
 
 var aspect,
     dimension = 3,
-    u_time = 0;
+    utime = 0;
 
 
-let side = 100;
+let side = 40;
 let numColumns = side;
 let numRows = side;
 let numMargin = 0;
@@ -77,6 +78,7 @@ let squidGame;
 let pmw;
 let fluid1;
 let fibonacci;
+let gameOfLife;
 
 let videoatlas;
 
@@ -145,8 +147,9 @@ function init() {
     //spriteLoader2 = new SpriteLoader(screen, 64,64);
     //spriteLoader2.load('/img/sprite_nums_1024x1024.png');
 
-    fibonacci = new Fibonacci(screen);
+    //fibonacci = new Fibonacci(screen);
 
+    gameOfLife = new GameOfLife(screen);
     //-----------
 
     // point size
@@ -155,42 +158,42 @@ function init() {
 
 function update() {
     clearScreen();
-    //stats.begin();
-    u_time += 1 / 60;//0.01;
-    uround = Math.round(u_time);
-    usin = Math.sin(u_time);
-    ucos = Math.cos(u_time);
-    urounddec = u_time % 1;
+    stats.begin();
+    utime += 1 / 60;//0.01;
+    uround = Math.round(utime);
+    usin = Math.sin(utime);
+    ucos = Math.cos(utime);
+    urounddec = utime % 1;
 
     // does it need it?
-    //gl.uniform1f(gl.getUniformLocation(program, "u_time"), u_time);
+    //gl.uniform1f(gl.getUniformLocation(program, "utime"), utime);
 
     //
     // EXAPLES: copy to a layer to test
     //
-    //wavenoise.update(u_time);
-    //wavenoise.update2(u_time, usin);
+    //wavenoise.update(utime);
+    //wavenoise.update2(utime, usin);
     //wavenoise.scanLine();
     //wavenoise.scanLine2();
-    //drawCircle.update(u_time);
-    //drawCircle.update2(u_time);
-    //polygonChange.update(u_time, usin);
+    //drawCircle.update(utime);
+    //drawCircle.update2(utime);
+    //polygonChange.update(utime, usin);
     //clock.update();
-    //sinewave.update(u_time);
-    //flag.update(u_time);
+    //sinewave.update(utime);
+    //flag.update(utime);
     //matrix.update();
-    //star.update(u_time, usin);
+    //star.update(utime, usin);
     //imageNoise.update(usin);
     //chromaSpiral.update(usin, ucos, side);
     //videoatlas.update();
-    //chromaSpiral.update(usin, ucos, side, u_time);
-    //squidGame.update(u_time, usin, ucos);
+    //chromaSpiral.update(usin, ucos, side, utime);
+    //squidGame.update(utime, usin, ucos);
     //pmw.update(usin, ucos);
     //imageLoader.loadToLayer();
 
 
-    if (cache[cache.currentFrame]) {
-    //if (false) {
+    //if (cache[cache.currentFrame]) {
+    if (false) {
         // retrieve from cache
         vertices = cache[cache.currentFrame].vertices;
         colors = cache[cache.currentFrame].colors;
@@ -199,18 +202,24 @@ function update() {
     } else {
         screen.layerIndex = 0;
 
-        screen.currentLayer.points.forEach(p => {
+        screen.clearMix(new RGBAColor(0, 0, 0), 1.5);
+        screen.currentLayer.points.forEach((point, index) => {
             // do something to every point
             // or every p.modified point
+            
+
 
         });
 
+
         //screen.layerIndex = 1;
 
-        //fluid1.update(usin, ucos, side, u_time);
+        //fluid1.update(usin, ucos, side, utime);
 
-        //chromaSpiral.update(usin, ucos, side, u_time);
-        fibonacci.update(usin, ucos, side, u_time);
+        //chromaSpiral.update(usin, ucos, side, utime);
+        //fibonacci.update(usin, ucos, side, utime);
+
+        gameOfLife.update(usin, ucos, side, utime);
 
 
         screen.mergeLayers();
@@ -245,7 +254,7 @@ function update() {
     printPoints();
     capturer.capture(document.getElementById('gl-canvas'));
 
-    //stats.end();
+    stats.end();
     window.requestAnimFrame(update);
 }
 
@@ -259,7 +268,21 @@ function printPoint(point) {
     drawPoints2(vBuffer, point.position.value);
 }
 
+function getWebGLCoordinate(value, side, invert = false) {
+    let direction = invert ? -1 : 1;
+    let p = value / side;
+    return ((p * 2) - 1) * direction;
+};
+
 function addToPrint(point) {
+    if (!point.position.value.calculated) {
+        const value = point.position.value;
+
+        value[0] = getWebGLCoordinate(value[0], canvas.width);
+        value[1] = getWebGLCoordinate(value[1], canvas.height, true);
+        point.position.value.calculated = true;
+    }
+
     vertices.push(point.position.value);
     colors.push(point.color.value);
     pointsizes.push(point.size);

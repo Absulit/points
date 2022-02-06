@@ -77,14 +77,13 @@ class Screen {
 
     mergeLayers() {
         let finalPoints = this._mainLayer.points;
-
-        let r = Array(finalPoints.length);
+        //let r = Array(finalPoints.length);
+        let tempColor, tempSize, tempAtlas;
 
         finalPoints.forEach((finalPoint, finalPointIndex) => {
-            let tempColor = { counter: 0, value: new RGBAColor(0, 0, 0, 0)};
-            let tempSize = { counter: 0, value: 0 };
-
-            let tempAtlas = { counter: 0, value: -1 };
+            tempColor = { counter: 0, value: new RGBAColor(0, 0, 0, 0) };
+            tempSize = { counter: 0, value: 0 };
+            tempAtlas = { counter: 0, value: -1 };
 
             this._layers.forEach(layer => {
                 let point = layer.points[finalPointIndex];
@@ -92,32 +91,26 @@ class Screen {
                 // it will block the ones below
                 if (point.modified) {
 
+                    ++tempColor.counter;
+                    tempColor.value.add(point.color);
                     if (point.color.a === 1) {
                         tempColor.counter = 0;
                         tempColor.value = point.color;
-                    } else {
-                        ++tempColor.counter;
-                        tempColor.value.add(point.color);
                     }
 
+                    ++tempSize.counter;
+                    tempSize.value += point.size;
                     if (point.size >= this.pointSize) {
                         tempSize.counter = 0;
                         tempSize.value = point.size;
-                    } else {
-                        ++tempSize.counter;
-                        tempSize.value += point.size;
                     }
 
-                    if ((tempAtlas.counter === 0)) {
+                    ++tempAtlas.counter;
+                    if (tempAtlas.counter === 0) {
                         tempAtlas.counter = 0;
-                        tempAtlas.value = point.atlasId;
-                    } else {
-                        ++tempAtlas.counter;
-                        tempAtlas.value = point.atlasId;
                     }
+                    tempAtlas.value = point.atlasId;
                 }
-
-
             });
             /*if (tempColor.counter) {
                 tempColor.value.r /= tempColor.counter;
@@ -132,7 +125,6 @@ class Screen {
             finalPoint.size = tempSize.value;
             finalPoint.atlasId = tempAtlas.value;
         });
-
     }
 
     get numColumns() {
@@ -291,7 +283,7 @@ class Screen {
      * @param {*} distance 
      * @returns array with [N,S,E,W] `Point`s
      */
-     getNSEWPointsAround(point, distance = 1) {
+    getNSEWPointsAround(point, distance = 1) {
         const columnIndex = point.coordinates.x;
         const rowIndex = point.coordinates.y;
         return [
@@ -309,11 +301,11 @@ class Screen {
      * @param {Number} numPoints How many points. Too many Points and the app slows down.
      * @returns {Point[]} Point[]
      */
-    getPointsInCircle(point, distance = 1, numPoints  = 8) {
+    getPointsInCircle(point, distance = 1, numPoints = 8) {
         let { x, y } = point.coordinates;
         let pointFromCenter, radians, angle, pointAround;
         let result = [];
-        for (angle = 0; angle < 360; angle += (360/numPoints)) {
+        for (angle = 0; angle < 360; angle += (360 / numPoints)) {
             radians = MathUtil.radians(angle);
             pointFromCenter = MathUtil.vector(distance, radians);
             pointAround = this.getPointAt(Math.round(pointFromCenter.x + x), Math.round(pointFromCenter.y + y));

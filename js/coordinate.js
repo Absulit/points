@@ -6,20 +6,14 @@ class Coordinate {
         this._value = [x, y, z];
     }
 
-    getWebGLCoordinate(value, side, invert = false){
-        let direction = invert? -1:1;
-        let p = value / side;
-        return ((p * 2) - 1) * direction;
-    };
-
     set x(value) {
         this._x = value;
-        this._value[0] = this.getWebGLCoordinate(value, canvas.width);
+        this._value[0] = value;
     }
 
     set y(value) {
         this._y = value;
-        this._value[1] = this.getWebGLCoordinate(value, canvas.height, true);
+        this._value[1] = value;
     }
 
     set z(value) {
@@ -47,8 +41,8 @@ class Coordinate {
         this._x = x;
         this._y = y;
         this._z = z;
-        this._value[0] = this.getWebGLCoordinate(x, canvas.width);
-        this._value[1] = this.getWebGLCoordinate(y, canvas.height, true);
+        this._value[0] = x;
+        this._value[1] = y;
         this._value[2] = z;
     }
 }
