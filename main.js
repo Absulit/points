@@ -27,6 +27,7 @@ import PMW from './js/examples/pmw.js';
 import Fluid1 from './js/examples/fluid1.js';
 import Fibonacci from './js/examples/fibonacci.js';
 import GameOfLife from './js/examples/gameoflife.js';
+import Math1 from './js/examples/math1.js';
 
 
 
@@ -46,7 +47,7 @@ var aspect,
     utime = 0;
 
 
-let side = 40;
+let side = 64;
 let numColumns = side;
 let numRows = side;
 let numMargin = 0;
@@ -79,6 +80,7 @@ let pmw;
 let fluid1;
 let fibonacci;
 let gameOfLife;
+let math1;
 
 let videoatlas;
 
@@ -149,12 +151,15 @@ function init() {
 
     //fibonacci = new Fibonacci(screen);
 
-    gameOfLife = new GameOfLife(screen);
+    //gameOfLife = new GameOfLife(screen);
+    math1 = new Math1(screen);
     //-----------
 
     // point size
     gl.uniform1f(gl.getUniformLocation(program, "u_pointsize"), screen.pointSize);
 }
+
+let cacheMessageFlag = false;
 
 function update() {
     clearScreen();
@@ -192,9 +197,13 @@ function update() {
     //imageLoader.loadToLayer();
 
 
-    //if (cache[cache.currentFrame]) {
-    if (false) {
+    if (cache[cache.currentFrame]) {
+    //if (false) {
         // retrieve from cache
+        if(!cacheMessageFlag){
+            console.log('RUNNING FROM CACHE');
+            cacheMessageFlag = true;
+        }
         vertices = cache[cache.currentFrame].vertices;
         colors = cache[cache.currentFrame].colors;
         pointsizes = cache[cache.currentFrame].pointsizes;
@@ -202,14 +211,14 @@ function update() {
     } else {
         screen.layerIndex = 0;
 
-        screen.clearMix(new RGBAColor(0, 0, 0), 1.5);
-        screen.currentLayer.points.forEach((point, index) => {
+        //screen.clearMix(new RGBAColor(0, 0, 0), 1.5);
+        /*screen.currentLayer.points.forEach((point, index) => {
             // do something to every point
             // or every p.modified point
             
 
 
-        });
+        });*/
 
 
         //screen.layerIndex = 1;
@@ -219,7 +228,7 @@ function update() {
         //chromaSpiral.update(usin, ucos, side, utime);
         //fibonacci.update(usin, ucos, side, utime);
 
-        gameOfLife.update(usin, ucos, side, utime);
+        math1.update3(usin, ucos, side, utime);
 
 
         screen.mergeLayers();
