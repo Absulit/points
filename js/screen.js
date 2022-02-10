@@ -112,12 +112,12 @@ class Screen {
                     tempAtlas.value = point.atlasId;
                 }
             });
-            /*if (tempColor.counter) {
+            if (tempColor.counter) {
                 tempColor.value.r /= tempColor.counter;
                 tempColor.value.g /= tempColor.counter;
                 tempColor.value.b /= tempColor.counter;
                 //tempColor.value.a /= tempColor.counter;
-            }*/
+            }
             if (tempSize.counter) {
                 tempSize.value /= tempSize.counter;
             }
@@ -181,6 +181,13 @@ class Screen {
         let row = this._currentLayer.rows[rowIndex];
         let point = row && row[columnIndex] || null;
         return point;
+    }
+
+    getPointFromLayerAt(columnIndex, rowIndex, layerIndex){
+        const layer = this._layers[layerIndex];
+        let row = layer.rows[rowIndex];
+        let point = row && row[columnIndex] || null;
+        return point;        
     }
 
     getPointAtCoordinate(x, y) {

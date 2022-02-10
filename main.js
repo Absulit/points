@@ -47,7 +47,7 @@ var aspect,
     utime = 0;
 
 
-let side = 64;
+let side = 200;
 let numColumns = side;
 let numRows = side;
 let numMargin = 0;
@@ -95,7 +95,7 @@ let idsOfChars;
 let idsOfChars2;
 
 let cache = {
-    maxFrames: 60 * 10,
+    maxFrames: 60 * 30,
     currentFrame: 0
 };
 
@@ -151,7 +151,7 @@ function init() {
 
     //fibonacci = new Fibonacci(screen);
 
-    //gameOfLife = new GameOfLife(screen);
+    gameOfLife = new GameOfLife(screen);
     math1 = new Math1(screen);
     //-----------
 
@@ -209,7 +209,7 @@ function update() {
         pointsizes = cache[cache.currentFrame].pointsizes;
         atlasids = cache[cache.currentFrame].atlasids;
     } else {
-        screen.layerIndex = 0;
+        //screen.layerIndex = 0;
 
         //screen.clearMix(new RGBAColor(0, 0, 0), 1.5);
         /*screen.currentLayer.points.forEach((point, index) => {
@@ -228,8 +228,14 @@ function update() {
         //chromaSpiral.update(usin, ucos, side, utime);
         //fibonacci.update(usin, ucos, side, utime);
 
-        math1.update3(usin, ucos, side, utime);
+        //math1.update3(usin, ucos, side, utime);
+        gameOfLife.update(usin, ucos, side, utime);
 
+        /*screen.layerIndex = 0;
+        screen.getRandomPoint().setColor(1,0,0, .5);;
+        
+        screen.layerIndex = 1;
+        screen.getRandomPoint().setColor(1,1,1, .9);*/
 
         screen.mergeLayers();
 
