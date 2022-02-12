@@ -10,7 +10,7 @@ export default class Math1 {
 
 
         this._MAX_ITER = 1000;
-
+        this._constant = screen.numColumns / 200;
     };
 
     update(usin, ucos, side, utime) {
@@ -97,9 +97,9 @@ export default class Math1 {
             // if (nPoint) {
             //     nPoint.setBrightness(1);
             // }
-            let r = (x*y**ucos % 10 == 0) || ( Math.round(y*x**usin/10) % 7 == 0);
-            if(r){
-                point.setBrightness(y*usin);
+            let r = (x * y ** ucos % 10 == 0) || (Math.round(y * x ** usin / 10) % 7 == 0);
+            if (r) {
+                point.setBrightness(y * usin);
             }
 
 
@@ -109,5 +109,33 @@ export default class Math1 {
         //this._effects.chromaticAberration(.05, 2);
         //this._effects.soften3();
         //this._effects.antialias();
+    }
+
+    update4(usin, ucos, side, utime) {
+        const screen = this._screen;
+        
+        //screen.clear();
+        let finalPoint;
+        const fusin = (0.0366 * usin) + (0.0366*2);
+        let lastPoint  = null;
+        for (let index = 0; index < 100; index += .1) {
+            //finalPoint = screen.getFinalPointFromPolar(screen.center.x, screen.center.y, Math.round(index / usin), (index * usin));
+            //finalPoint = screen.getFinalPointFromPolar(screen.center.x, screen.center.y,  Math.sin(index / fusin / 50) + (this._constant * 50), (index * fusin));
+            finalPoint = screen.getFinalPointFromPolar(screen.center.x, screen.center.y, Math.tan(index / usin / 50), (index * usin));
+
+            if (finalPoint) {
+                //finalPoint.setColor(1, usin, 0);
+                finalPoint.setColor(1, 1, 1);
+                if(lastPoint){
+                    screen.drawLineWithPoints(lastPoint, finalPoint);
+                }
+            }
+
+            lastPoint = finalPoint;
+        }
+        this._effects.chromaticAberration(.05, 2);
+        //this._effects.soften3();
+        this._effects.antialias();
+        screen.clearMix(new RGBAColor(0, 0, 0), 1.1);
     }
 }

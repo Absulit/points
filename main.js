@@ -95,7 +95,7 @@ let idsOfChars;
 let idsOfChars2;
 
 let cache = {
-    maxFrames: 60 * 30,
+    maxFrames: 60 * 10,
     currentFrame: 0
 };
 
@@ -198,9 +198,9 @@ function update() {
 
 
     if (cache[cache.currentFrame]) {
-    //if (false) {
+        //if (false) {
         // retrieve from cache
-        if(!cacheMessageFlag){
+        if (!cacheMessageFlag) {
             console.log('RUNNING FROM CACHE');
             cacheMessageFlag = true;
         }
@@ -215,7 +215,6 @@ function update() {
         /*screen.currentLayer.points.forEach((point, index) => {
             // do something to every point
             // or every p.modified point
-            
 
 
         });*/
@@ -228,12 +227,12 @@ function update() {
         //chromaSpiral.update(usin, ucos, side, utime);
         //fibonacci.update(usin, ucos, side, utime);
 
-        //math1.update3(usin, ucos, side, utime);
-        gameOfLife.update(usin, ucos, side, utime);
+        math1.update4(usin, ucos, side, utime);
+        //gameOfLife.update(usin, ucos, side, utime);
 
         /*screen.layerIndex = 0;
-        screen.getRandomPoint().setColor(1,0,0, .5);;
-        
+        screen.getRandomPoint().setColor(1,0,0, .5);
+
         screen.layerIndex = 1;
         screen.getRandomPoint().setColor(1,1,1, .9);*/
 

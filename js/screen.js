@@ -12,6 +12,7 @@ class Screen {
         this._numMargin = numMargin;
         this._numLayers = numLayers;
         this._pointSizeFull = 1;
+        this._pointSizeHalf = this._pointSizeFull / 2;
 
         this._center = new Coordinate(Math.round(numColumns / 2), Math.round(numRows / 2));
 
@@ -43,14 +44,13 @@ class Screen {
     _createLayer() {
         let layer = new Layer();
 
-        let halfSize = this._pointSizeFull / 2; // TODO: make private property
         let row;
         let point;
         for (let yCoordinate = 0; yCoordinate < this._numRows; yCoordinate++) {
             row = [];
             for (let xCoordinate = 0; xCoordinate < this._numColumns; xCoordinate++) {
                 point = new Point();
-                point.position.set((xCoordinate * this._pointSizeFull) + halfSize, (yCoordinate * this._pointSizeFull) + halfSize, 0);
+                point.position.set((xCoordinate * this._pointSizeFull) + this._pointSizeHalf, (yCoordinate * this._pointSizeFull) + this._pointSizeHalf, 0);
                 //point.setColor(Math.random(), 1, Math.random(), 1);
                 point.setCoordinates(xCoordinate, yCoordinate, 0);
                 point.color.a = 0;
@@ -183,11 +183,11 @@ class Screen {
         return point;
     }
 
-    getPointFromLayerAt(columnIndex, rowIndex, layerIndex){
+    getPointFromLayerAt(columnIndex, rowIndex, layerIndex) {
         const layer = this._layers[layerIndex];
         let row = layer.rows[rowIndex];
         let point = row && row[columnIndex] || null;
-        return point;        
+        return point;
     }
 
     getPointAtCoordinate(x, y) {
@@ -264,9 +264,9 @@ class Screen {
     /**
      * Retrieves a list of `Point` around a point.
      * Directly around, in a square, so just 8 Points.
-     * @param {*} point 
-     * @param {*} distance 
-     * @returns 
+     * @param {*} point
+     * @param {*} distance
+     * @returns
      */
     getPointsAround(point, distance = 1) {
         let columnIndex = point.coordinates.x;
@@ -286,8 +286,8 @@ class Screen {
     /**
      * Retrieves a list of `Point` around a point.
      * Just NSEW, so just 4 Points.
-     * @param {*} point 
-     * @param {*} distance 
+     * @param {*} point
+     * @param {*} distance
      * @returns array with [N,S,E,W] `Point`s
      */
     getNSEWPointsAround(point, distance = 1) {
@@ -449,9 +449,15 @@ class Screen {
         }
     }
 
+    getFinalPointFromPolar(x0, y0, distance, radians) {
+        const pointFromCenter = MathUtil.vector(distance, radians);
+        const finalPoint = { x: Math.round(x0 + pointFromCenter.x), y: Math.round(y0 + pointFromCenter.y) };
+        return this.getPointAt(finalPoint.x, finalPoint.y);
+    }
+
     drawLineRotation(x0, y0, distance, radians, color) {
-        let pointFromCenter = MathUtil.vector(distance, radians);
-        let finalPoint = { x: Math.round(x0 + pointFromCenter.x), y: Math.round(y0 + pointFromCenter.y) };
+        const pointFromCenter = MathUtil.vector(distance, radians);
+        const finalPoint = { x: Math.round(x0 + pointFromCenter.x), y: Math.round(y0 + pointFromCenter.y) };
         this.drawLine(x0, y0, finalPoint.x, finalPoint.y, color);
         return finalPoint;
     }
@@ -554,13 +560,13 @@ class Screen {
     }
 
     /**
-     * 
-     * @param {Number} x 
-     * @param {Number} y 
-     * @param {Number} radius 
-     * @param {Number} sides 
-     * @param {Color} color 
-     * @param {Number} startAngle 
+     *
+     * @param {Number} x
+     * @param {Number} y
+     * @param {Number} radius
+     * @param {Number} sides
+     * @param {Color} color
+     * @param {Number} startAngle
      */
     drawPolygon(x, y, radius, sides, color, startAngle = 0) {
         let pointFromCenter, radians, angle;

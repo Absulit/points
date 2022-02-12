@@ -137,10 +137,10 @@ class Point {
      * taking the point into account in future processes.
      */
     _checkColors() {
-        if(this._color.value[3] < this._minimunVisibleValue){
+        if (this._color.value[3] < this._minimunVisibleValue) {
             this._color.set(0, 0, 0, 1);
             this._modified = false;
-        }else{
+        } else {
             const [r, g, b] = this._color.value;
             const rBelow = r < this._minimunVisibleValue;
             const gBelow = g < this._minimunVisibleValue;
