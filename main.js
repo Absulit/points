@@ -47,7 +47,7 @@ var aspect,
     utime = 0;
 
 
-let side = 200;
+let side = 160;
 let numColumns = side;
 let numRows = side;
 let numMargin = 0;
@@ -90,11 +90,6 @@ let spriteLoader2;
 
 let idsOfChars;
 let idsOfChars2;
-
-let cache = {
-    maxFrames: 60 * 10,
-    currentFrame: 0
-};
 
 function init() {
     initWebGL("gl-canvas", true);
@@ -156,8 +151,6 @@ function init() {
     gl.uniform1f(gl.getUniformLocation(program, "u_pointsize"), screen.pointSize);
 }
 
-let cacheMessageFlag = false;
-
 function update() {
     clearScreen();
     stats.begin();
@@ -194,28 +187,14 @@ function update() {
     //imageLoader.loadToLayer();
 
 
-    //if (cache[cache.currentFrame]) {
-    if (false) {
-        // retrieve from cache
-        if (!cacheMessageFlag) {
-            console.log('RUNNING FROM CACHE');
-            cacheMessageFlag = true;
-        }
-        vertices = cache[cache.currentFrame].vertices;
-        colors = cache[cache.currentFrame].colors;
-        pointsizes = cache[cache.currentFrame].pointsizes;
-        atlasids = cache[cache.currentFrame].atlasids;
-    } else {
+    if (!screen.runningFromCache) {
         //screen.layerIndex = 0;
 
         //screen.clearMix(new RGBAColor(0, 0, 0), 1.5);
         /*screen.currentLayer.points.forEach((point, index) => {
             // do something to every point
             // or every p.modified point
-
-
         });*/
-
 
         //screen.layerIndex = 1;
 
@@ -232,24 +211,8 @@ function update() {
 
         screen.layerIndex = 1;
         screen.getRandomPoint().setColor(1,1,1, .9);*/
-
-        //screen.mergeLayers();
-
-        //store cache
-        //screen.addPointsToPrint(screen.mainLayer.points);
-        /*cache[cache.currentFrame] = {
-            vertices: vertices,
-            colors: colors,
-            pointsizes: pointsizes,
-            atlasids: atlasids
-        }*/
     }
 
-
-    /*if (++cache.currentFrame > cache.maxFrames) {
-        cache.currentFrame = 0;
-        videoLoader.restart();
-    }*/
 
     /*************/
 

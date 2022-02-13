@@ -33,7 +33,12 @@ class Screen {
         this._pointsizes = [];
         this._atlasids = [];
 
-
+        this._runningFromCache = null;
+        this._cache = {
+            maxFrames: 60 * 10,
+            currentFrame: 0,
+            cacheMessageFlag: false
+        };
     }
 
     _init() {
@@ -186,6 +191,10 @@ class Screen {
 
     get currentLayer() {
         return this._currentLayer;
+    }
+
+    get runningFromCache() {
+        return this._runningFromCache;
     }
 
     getPointAt(columnIndex, rowIndex) {
@@ -370,9 +379,9 @@ class Screen {
                 if (point.size < this._pointSize) {
                     point.size = this._pointSize;
                 }
-            //});
+                //});
             }
-        //});
+            //});
         }
     }
 
@@ -619,12 +628,12 @@ class Screen {
     _addToPrint(point) {
         if (!point.position.value.calculated) {
             const value = point.position.value;
-    
+
             value[0] = this._getWebGLCoordinate(value[0], canvas.width);
             value[1] = this._getWebGLCoordinate(value[1], canvas.height, true);
             point.position.value.calculated = true;
         }
-    
+
         this._vertices.push(point.position.value);
         this._colors.push(point.color.value);
         this._pointsizes.push(point.size);
@@ -637,14 +646,38 @@ class Screen {
             .forEach(point => this._addToPrint(point));
     };
 
-    render(){
-        this._mergeLayers();
-        this._addPointsToPrint();
+    render() {
+        this._runningFromCache = this._cache[this._cache.currentFrame];
+        if (this._runningFromCache) {
+            //if (false) {
+            // retrieve from cache
+            if (!this._cache.cacheMessageFlag) {
+                console.log('RUNNING FROM CACHE');
+                this._cache.cacheMessageFlag = true;
+            }
+            this._vertices = this._cache[this._cache.currentFrame].vertices;
+            this._colors = this._cache[this._cache.currentFrame].colors;
+            this._pointsizes = this._cache[this._cache.currentFrame].pointsizes;
+            this._atlasids = this._cache[this._cache.currentFrame].atlasids;
+        } else {
+            this._mergeLayers();
+            this._addPointsToPrint();
 
+            this._cache[this._cache.currentFrame] = {
+                vertices: this._vertices,
+                colors: this._colors,
+                pointsizes: this._pointsizes,
+                atlasids: this._atlasids
+            }
+        }
+        if (++this._cache.currentFrame > this._cache.maxFrames) {
+            this._cache.currentFrame = 0;
+            // TODO: dispatch event for videoLoader.restart();
+        }
 
         this._vertices = flatten(this._vertices);
         let vBuffer = getBuffer2(this._vertices);
-        shaderVariableToBuffer("vPosition", this._dimension );
+        shaderVariableToBuffer("vPosition", this._dimension);
 
         this._colors = flatten(this._colors);
         getBuffer2(this._colors);
