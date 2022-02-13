@@ -83,7 +83,7 @@ class Screen {
         this._currentLayer = this._layers[this._layerIndex];
     }
 
-    mergeLayers() {
+    _mergeLayers() {
         let tempColor, tempSize, tempAtlas;
 
         let pointsLength = this._mainLayer.points.length
@@ -631,17 +631,17 @@ class Screen {
         this._atlasids.push(point.atlasId);
     }
 
-    /**
-     * TODO: remove because the method has the points to print
-     * @param {*} points 
-     */
-    addPointsToPrint(points) {
-        points
+    _addPointsToPrint() {
+        this._mainLayer.points
             .filter(point => point.modified)
             .forEach(point => this._addToPrint(point));
     };
 
     render(){
+        this._mergeLayers();
+        this._addPointsToPrint();
+
+
         this._vertices = flatten(this._vertices);
         let vBuffer = getBuffer2(this._vertices);
         shaderVariableToBuffer("vPosition", this._dimension );

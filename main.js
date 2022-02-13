@@ -233,10 +233,10 @@ function update() {
         screen.layerIndex = 1;
         screen.getRandomPoint().setColor(1,1,1, .9);*/
 
-        screen.mergeLayers();
+        //screen.mergeLayers();
 
         //store cache
-        screen.addPointsToPrint(screen.mainLayer.points);
+        //screen.addPointsToPrint(screen.mainLayer.points);
         /*cache[cache.currentFrame] = {
             vertices: vertices,
             colors: colors,
