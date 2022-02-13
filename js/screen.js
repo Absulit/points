@@ -26,6 +26,14 @@ class Screen {
 
         this._pointSize = 1;
         this._init();
+
+        this._dimension = 3;
+        this._vertices = [];
+        this._colors = [];
+        this._pointsizes = [];
+        this._atlasids = [];
+
+
     }
 
     _init() {
@@ -600,6 +608,61 @@ class Screen {
             lastVertexY = vertexY;
         }
         this.drawLine(lastVertexX, lastVertexY, firstVertexX, firstVertexY, color);
+    }
+
+    _getWebGLCoordinate(value, side, invert = false) {
+        let direction = invert ? -1 : 1;
+        let p = value / side;
+        return ((p * 2) - 1) * direction;
+    };
+
+    _addToPrint(point) {
+        if (!point.position.value.calculated) {
+            const value = point.position.value;
+    
+            value[0] = this._getWebGLCoordinate(value[0], canvas.width);
+            value[1] = this._getWebGLCoordinate(value[1], canvas.height, true);
+            point.position.value.calculated = true;
+        }
+    
+        this._vertices.push(point.position.value);
+        this._colors.push(point.color.value);
+        this._pointsizes.push(point.size);
+        this._atlasids.push(point.atlasId);
+    }
+
+    /**
+     * TODO: remove because the method has the points to print
+     * @param {*} points 
+     */
+    addPointsToPrint(points) {
+        points
+            .filter(point => point.modified)
+            .forEach(point => this._addToPrint(point));
+    };
+
+    render(){
+        this._vertices = flatten(this._vertices);
+        let vBuffer = getBuffer2(this._vertices);
+        shaderVariableToBuffer("vPosition", this._dimension );
+
+        this._colors = flatten(this._colors);
+        getBuffer2(this._colors);
+        shaderVariableToBuffer("vColor", 4);
+
+        //pointsizes = pointsizes;
+        getBuffer2(this._pointsizes);
+        shaderVariableToBuffer("vPointSize", 1);
+
+        //atlasids = atlasids;
+        getBuffer2(this._atlasids);
+        shaderVariableToBuffer("vAtlasId", 1);
+
+        drawPoints2(vBuffer, this._vertices, this._dimension);
+        this._vertices = [];
+        this._colors = [];
+        this._pointsizes = [];
+        this._atlasids = []
     }
 
 

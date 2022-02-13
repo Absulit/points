@@ -54,10 +54,7 @@ let numMargin = 0;
 let screen;
 let numLayers = 3;
 
-let vertices = [];
-let colors = [];
-let pointsizes = [];
-let atlasids = [];
+
 let uround;
 let urounddec;
 let usin;
@@ -239,33 +236,24 @@ function update() {
         screen.mergeLayers();
 
         //store cache
-        addPointsToPrint(screen.mainLayer.points);
-        cache[cache.currentFrame] = {
+        screen.addPointsToPrint(screen.mainLayer.points);
+        /*cache[cache.currentFrame] = {
             vertices: vertices,
             colors: colors,
             pointsizes: pointsizes,
             atlasids: atlasids
-        }
+        }*/
     }
 
 
-    if (++cache.currentFrame > cache.maxFrames) {
+    /*if (++cache.currentFrame > cache.maxFrames) {
         cache.currentFrame = 0;
         videoLoader.restart();
-    }
-
-
-    //printLayers(screen.layers);
-
-    //screen.layers.forEach(layer => {
-    /*screen.layers.reverse().forEach(layer => {
-        addPointsToPrint(layer.points);
-    });*/
+    }*/
 
     /*************/
 
-    // TODO: screen.render();
-    printPoints();
+    screen.render();
     capturer.capture(document.getElementById('gl-canvas'));
 
     stats.end();
@@ -282,57 +270,6 @@ function printPoint(point) {
     drawPoints2(vBuffer, point.position.value);
 }
 
-function getWebGLCoordinate(value, side, invert = false) {
-    let direction = invert ? -1 : 1;
-    let p = value / side;
-    return ((p * 2) - 1) * direction;
-};
-
-function addToPrint(point) {
-    if (!point.position.value.calculated) {
-        const value = point.position.value;
-
-        value[0] = getWebGLCoordinate(value[0], canvas.width);
-        value[1] = getWebGLCoordinate(value[1], canvas.height, true);
-        point.position.value.calculated = true;
-    }
-
-    vertices.push(point.position.value);
-    colors.push(point.color.value);
-    pointsizes.push(point.size);
-    atlasids.push(point.atlasId);
-}
-
-function addPointsToPrint(points) {
-    points
-        .filter(point => point.modified)
-        .forEach(point => addToPrint(point));
-
-};
-
-function printPoints() {
-    vertices = flatten(vertices);
-    let vBuffer = getBuffer2(vertices);
-    shaderVariableToBuffer("vPosition", dimension);
-
-    colors = flatten(colors);
-    getBuffer2(colors);
-    shaderVariableToBuffer("vColor", 4);
-
-    //pointsizes = pointsizes;
-    getBuffer2(pointsizes);
-    shaderVariableToBuffer("vPointSize", 1);
-
-    //atlasids = atlasids;
-    getBuffer2(atlasids);
-    shaderVariableToBuffer("vAtlasId", 1);
-
-    drawPoints2(vBuffer, vertices, dimension);
-    vertices = [];
-    colors = [];
-    pointsizes = [];
-    atlasids = []
-}
 
 function printLayers(layers) {
     let vBuffer
