@@ -661,6 +661,9 @@ class Screen {
             this._atlasids = this._cache[this._cache.currentFrame].atlasids;
         } else {
             this._mergeLayers();
+            // TODO: everything beyond this point
+            // should be decoupled in case I want to use it
+            // with threejs or another framework
             this._addPointsToPrint();
 
             this._cache[this._cache.currentFrame] = {
