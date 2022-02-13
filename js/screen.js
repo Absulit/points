@@ -76,17 +76,20 @@ class Screen {
     }
 
     mergeLayers() {
-        let finalPoints = this._mainLayer.points;
-        //let r = Array(finalPoints.length);
         let tempColor, tempSize, tempAtlas;
 
-        finalPoints.forEach((finalPoint, finalPointIndex) => {
+        let pointsLength = this._mainLayer.points.length
+        let finalPoint;
+        for (let finalPointIndex = 0; finalPointIndex < pointsLength; finalPointIndex++) {
+            finalPoint = this._mainLayer.points[finalPointIndex];
+
             tempColor = { counter: 0, value: new RGBAColor(0, 0, 0, 0) };
             tempSize = { counter: 0, value: 0 };
             tempAtlas = { counter: 0, value: -1 };
 
+            let point;
             this._layers.forEach(layer => {
-                let point = layer.points[finalPointIndex];
+                point = layer.points[finalPointIndex];
                 // if top color is alpha 1 just replace it because
                 // it will block the ones below
                 if (point.modified) {
@@ -124,7 +127,7 @@ class Screen {
             finalPoint.color = tempColor.value;
             finalPoint.size = tempSize.value;
             finalPoint.atlasId = tempAtlas.value;
-        });
+        }
     }
 
     get numColumns() {
@@ -338,8 +341,15 @@ class Screen {
 
     clearMix(color, level = 2) {
         let pointColor = null;
-        this._currentLayer.rows.forEach(row => {
-            row.forEach(point => {
+        //this._currentLayer.rows.forEach(row => {
+        const rowsLength = this._currentLayer.rows.length;
+        let rowLength;
+        for (let index = 0; index < rowsLength; index++) {
+            const row = this._currentLayer.rows[index];
+            rowLength = row.length
+            for (let i = 0; i < rowLength; i++) {
+                //row.forEach(point => {
+                const point = row[i];
                 if (point.modified) {
                     pointColor = point.color;
                     point.setColor(
@@ -348,15 +358,14 @@ class Screen {
                         (pointColor.b + color.b) / level,
                         (pointColor.a + color.a)
                     );
-
                 }
                 if (point.size < this._pointSize) {
                     point.size = this._pointSize;
                 }
-
-
-            });
-        });
+            //});
+            }
+        //});
+        }
     }
 
     /*fade(level = 2, layer = 0) {

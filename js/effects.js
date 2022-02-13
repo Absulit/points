@@ -58,7 +58,12 @@ class Effects {
     }
 
     chromaticAberration(brightnessSensitivity = .5, distance = 1) {
-        this._screen.currentLayer.points.forEach(p => {
+        //this._screen.currentLayer.points.forEach(p => {
+        let pointsLength = this._screen.currentLayer.points.length;
+        let p;
+        for (let index = 0; index < pointsLength; index++) {
+            p = this._screen.currentLayer.points[index];
+
             if (p.getBrightness() > brightnessSensitivity) {
                 let nextPoint = this._screen.getRightPoint(p, distance);
                 if (nextPoint) {
@@ -69,7 +74,8 @@ class Effects {
                     prevPoint.setColor(prevPoint.color.r, prevPoint.color.g, (prevPoint.color.b + p.color.b) / 2, (prevPoint.color.a + p.color.a) / 2);
                 }
             }
-        });
+        }
+        //});
     }
 
 
@@ -98,7 +104,11 @@ class Effects {
     }
 
     soften2(colorPower = 2, distance = 1) {
-        this._screen.currentLayer.points.forEach(point => {
+        //this._screen.currentLayer.points.forEach(point => {
+        const pointsLength = this._screen.currentLayer.points.length;
+        let point;
+        for (let index = 0; index < pointsLength; index++) {
+            point = this._screen.currentLayer.points[index];
 
             if (point.modified) {
                 const points = this._screen.getPointsInCircle(point, distance);
@@ -112,7 +122,8 @@ class Effects {
                     }
                 })
             }
-        });
+        //});
+        }
     }
 
     soften3(colorPower = 2, distance = 1) {

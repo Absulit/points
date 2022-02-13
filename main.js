@@ -197,8 +197,8 @@ function update() {
     //imageLoader.loadToLayer();
 
 
-    if (cache[cache.currentFrame]) {
-        //if (false) {
+    //if (cache[cache.currentFrame]) {
+    if (false) {
         // retrieve from cache
         if (!cacheMessageFlag) {
             console.log('RUNNING FROM CACHE');
@@ -224,10 +224,10 @@ function update() {
 
         //fluid1.update(usin, ucos, side, utime);
 
-        //chromaSpiral.update(usin, ucos, side, utime);
+        chromaSpiral.update2(usin, ucos, side, utime);
         //fibonacci.update(usin, ucos, side, utime);
 
-        math1.update4(usin, ucos, side, utime);
+        //math1.update4(usin, ucos, side, utime);
         //gameOfLife.update(usin, ucos, side, utime);
 
         /*screen.layerIndex = 0;

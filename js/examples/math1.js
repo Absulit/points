@@ -11,6 +11,8 @@ export default class Math1 {
 
         this._MAX_ITER = 1000;
         this._constant = screen.numColumns / 200;
+
+        this._lastPoint = null;
     };
 
     update(usin, ucos, side, utime) {
@@ -113,29 +115,32 @@ export default class Math1 {
 
     update4(usin, ucos, side, utime) {
         const screen = this._screen;
-        
+
         //screen.clear();
         let finalPoint;
         const fusin = (0.0366 * usin) + (0.0366*2);
-        let lastPoint  = null;
-        for (let index = 0; index < 100; index += .1) {
+       // let lastPoint  = null;
+        //for (let index = 0; index < 100; index += .1) {
+            // if they have index use the FOR
             //finalPoint = screen.getFinalPointFromPolar(screen.center.x, screen.center.y, Math.round(index / usin), (index * usin));
             //finalPoint = screen.getFinalPointFromPolar(screen.center.x, screen.center.y,  Math.sin(index / fusin / 50) + (this._constant * 50), (index * fusin));
-            finalPoint = screen.getFinalPointFromPolar(screen.center.x, screen.center.y, Math.tan(index / usin / 50), (index * usin));
+            //finalPoint = screen.getFinalPointFromPolar(screen.center.x, screen.center.y, Math.tan(index / usin / 50), (index * usin));
+            //finalPoint = screen.getFinalPointFromPolar(screen.center.x, screen.center.y, Math.round(utime / usin * Math.sin(utime) * 5), (utime * usin));
+            finalPoint = screen.getFinalPointFromPolar(screen.center.x * usin, screen.center.y * usin, Math.round(utime / usin / Math.sin(utime) * 5), (utime * usin));
 
             if (finalPoint) {
                 //finalPoint.setColor(1, usin, 0);
                 finalPoint.setColor(1, 1, 1);
-                if(lastPoint){
-                    screen.drawLineWithPoints(lastPoint, finalPoint);
+                if(this._lastPoint){
+                    screen.drawLineWithPoints(this._lastPoint, finalPoint);
                 }
             }
 
-            lastPoint = finalPoint;
-        }
-        this._effects.chromaticAberration(.05, 2);
+            this._lastPoint = finalPoint;
+        //}
+        //this._effects.chromaticAberration(.05, 2);
         //this._effects.soften3();
-        this._effects.antialias();
-        screen.clearMix(new RGBAColor(0, 0, 0), 1.1);
+        //this._effects.antialias();
+        //screen.clearMix(new RGBAColor(0, 0, 0), 1.1);
     }
 }
