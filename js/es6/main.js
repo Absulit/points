@@ -105,6 +105,14 @@ let ucos;
 let utime = 0;
 
 let r, g, b;
+
+let runningFromCache = null;
+let cache = {
+    maxFrames: 60 * 10,
+    currentFrame: 0,
+    cacheMessageFlag: false
+};
+
 function update() {
     stats.begin();
     utime += 1 / 60;//0.01;
@@ -117,30 +125,48 @@ function update() {
         My code
     */
 
-    chromaSpiral.update(usin, ucos, side, utime);
+    
 
 
+    runningFromCache = cache[cache.currentFrame];
+    if (runningFromCache) {
+        if (!cache.cacheMessageFlag) {
+            console.log('RUNNING FROM CACHE');
+            cache.cacheMessageFlag = true;
+        }
+        /*screen._vertices = cache[cache.currentFrame].vertices;
+        screen._colors = cache[cache.currentFrame].colors;
+        screen._pointsizes = cache[cache.currentFrame].pointsizes;
+        screen._atlasids = cache[cache.currentFrame].atlasids;*/
+        colors = cache[cache.currentFrame].colors;
+    } else {
+        chromaSpiral.update(usin, ucos, side, utime);
+        screen.render(true);
 
-    screen.render(true);
 
+        colors = [];
+        for (let index = 0; index < screen.mainLayer.points.length; index++) {
+            const point = screen.mainLayer.points[index];
+            const [r, g, b] = point.color.value;
+            colors.push(r, g, b);
+        }
 
-    colors = [];
-    /*screen.mainLayer.points.forEach(point => {
-        //r = point.color.r;
-        //g = point.color.g;
-        //b = point.color.b;
-        const [ r, g, b ] = point.color.value;
-        //console.log(r, g, b , point.color)
-        colors.push(r, g, b);
-    });*/
+        /*cache[cache.currentFrame] = {
+            vertices: screen._vertices,
+            colors: screen._colors,
+            pointsizes: screen._pointsizes,
+            atlasids: screen._atlasids,
+        }*/
 
-    for (let index = 0; index < screen.mainLayer.points.length; index++) {
-        const point = screen.mainLayer.points[index];
-        const [r, g, b] = point.color.value;
-        colors.push(r, g, b);
+        cache[cache.currentFrame] = {
+            colors: colors
+        }
     }
-
     geometry.setAttribute('color', new Float32BufferAttribute(colors, 3));
+    if (++cache.currentFrame > cache.maxFrames) {
+        cache.currentFrame = 0;
+        // TODO: dispatch event for videoLoader.restart();
+    }
     /*
         - My code ends
     */

@@ -34,12 +34,7 @@ class Screen {
         this._pointsizes = [];
         this._atlasids = [];
 
-        this._runningFromCache = null;
-        this._cache = {
-            maxFrames: 60 * 10,
-            currentFrame: 0,
-            cacheMessageFlag: false
-        };
+
     }
 
     _init() {
@@ -648,37 +643,13 @@ class Screen {
     };
 
     render(decoupled = false) {
-        this._runningFromCache = this._cache[this._cache.currentFrame];
-        if (this._runningFromCache) {
-            //if (false) {
-            // retrieve from cache
-            if (!this._cache.cacheMessageFlag) {
-                console.log('RUNNING FROM CACHE');
-                this._cache.cacheMessageFlag = true;
-            }
-            this._vertices = this._cache[this._cache.currentFrame].vertices;
-            this._colors = this._cache[this._cache.currentFrame].colors;
-            this._pointsizes = this._cache[this._cache.currentFrame].pointsizes;
-            this._atlasids = this._cache[this._cache.currentFrame].atlasids;
-        } else {
-            this._mergeLayers();
-            // TODO: everything beyond this point
-            // should be decoupled in case I want to use it
-            // with threejs or another framework
-            if (!decoupled) {
-                this._addPointsToPrint();
-            }
 
-            this._cache[this._cache.currentFrame] = {
-                vertices: this._vertices,
-                colors: this._colors,
-                pointsizes: this._pointsizes,
-                atlasids: this._atlasids
-            }
-        }
-        if (++this._cache.currentFrame > this._cache.maxFrames) {
-            this._cache.currentFrame = 0;
-            // TODO: dispatch event for videoLoader.restart();
+        this._mergeLayers();
+        // TODO: everything beyond this point
+        // should be decoupled in case I want to use it
+        // with threejs or another framework
+        if (!decoupled) {
+            this._addPointsToPrint();
         }
 
         if (!decoupled) {
