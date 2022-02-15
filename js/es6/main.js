@@ -121,7 +121,7 @@ function update() {
 
 
 
-    screen.render();
+    screen.render(true);
 
 
     colors = [];

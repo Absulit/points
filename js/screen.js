@@ -647,7 +647,7 @@ class Screen {
             .forEach(point => this._addToPrint(point));
     };
 
-    render() {
+    render(decoupled = false) {
         this._runningFromCache = this._cache[this._cache.currentFrame];
         if (this._runningFromCache) {
             //if (false) {
@@ -665,7 +665,9 @@ class Screen {
             // TODO: everything beyond this point
             // should be decoupled in case I want to use it
             // with threejs or another framework
-            this._addPointsToPrint();
+            if (!decoupled) {
+                this._addPointsToPrint();
+            }
 
             this._cache[this._cache.currentFrame] = {
                 vertices: this._vertices,
@@ -679,23 +681,25 @@ class Screen {
             // TODO: dispatch event for videoLoader.restart();
         }
 
-        this._vertices = flatten(this._vertices);
-        let vBuffer = getBuffer2(this._vertices);
-        shaderVariableToBuffer("vPosition", this._dimension);
+        if (!decoupled) {
+            this._vertices = flatten(this._vertices);
+            let vBuffer = getBuffer2(this._vertices);
+            shaderVariableToBuffer("vPosition", this._dimension);
 
-        this._colors = flatten(this._colors);
-        getBuffer2(this._colors);
-        shaderVariableToBuffer("vColor", 4);
+            this._colors = flatten(this._colors);
+            getBuffer2(this._colors);
+            shaderVariableToBuffer("vColor", 4);
 
-        //pointsizes = pointsizes;
-        getBuffer2(this._pointsizes);
-        shaderVariableToBuffer("vPointSize", 1);
+            //pointsizes = pointsizes;
+            getBuffer2(this._pointsizes);
+            shaderVariableToBuffer("vPointSize", 1);
 
-        //atlasids = atlasids;
-        getBuffer2(this._atlasids);
-        shaderVariableToBuffer("vAtlasId", 1);
+            //atlasids = atlasids;
+            getBuffer2(this._atlasids);
+            shaderVariableToBuffer("vAtlasId", 1);
 
-        drawPoints2(vBuffer, this._vertices, this._dimension);
+            drawPoints2(vBuffer, this._vertices, this._dimension);
+        }
         this._vertices = [];
         this._colors = [];
         this._pointsizes = [];
