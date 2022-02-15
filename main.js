@@ -28,6 +28,7 @@ import Fluid1 from './js/examples/fluid1.js';
 import Fibonacci from './js/examples/fibonacci.js';
 import GameOfLife from './js/examples/gameoflife.js';
 import Math1 from './js/examples/math1.js';
+import { assignShaders, canvas, clearScreen, gl, initWebGL, program, setClearColor } from './absulit.module.js';
 
 
 

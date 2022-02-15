@@ -3,6 +3,7 @@ import Point from './point.js';
 import MathUtil from './mathutil.js';
 import Coordinate from './coordinate.js';
 import Layer from './layer.js';
+import { drawPoints2, getBuffer2, shaderVariableToBuffer } from '../absulit.module.js';
 
 class Screen {
     constructor(canvas, numColumns = 10, numRows = 10, numMargin = 2, numLayers = 1) {
@@ -629,8 +630,8 @@ class Screen {
         if (!point.position.value.calculated) {
             const value = point.position.value;
 
-            value[0] = this._getWebGLCoordinate(value[0], canvas.width);
-            value[1] = this._getWebGLCoordinate(value[1], canvas.height, true);
+            value[0] = this._getWebGLCoordinate(value[0], this._canvas.width);
+            value[1] = this._getWebGLCoordinate(value[1], this._canvas.height, true);
             point.position.value.calculated = true;
         }
 

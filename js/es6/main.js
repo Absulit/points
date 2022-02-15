@@ -121,7 +121,7 @@ function update() {
 
 
 
-    screen.mergeLayers();
+    screen.render();
 
 
     colors = [];
