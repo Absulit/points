@@ -76,17 +76,13 @@ let atlasids = [];
 function update() {
     clearScreen();
     stats.begin();
-    utime += 1 / 60;//0.01;
-    uround = Math.round(utime);
-    usin = Math.sin(utime);
-    ucos = Math.cos(utime);
-    urounddec = utime % 1;
+
 
     // does it need it?
     //gl.uniform1f(gl.getUniformLocation(program, "utime"), utime);
 
     runningFromCache = cache[cache.currentFrame];
-    if (runningFromCache) {
+    if (!!runningFromCache) {
         if (!cache.cacheMessageFlag) {
             console.log('RUNNING FROM CACHE');
             cache.cacheMessageFlag = true;
@@ -95,7 +91,13 @@ function update() {
         colors = runningFromCache.colors;
         pointsizes = runningFromCache.pointsizes;
         atlasids = runningFromCache.atlasids;
+        printPoints();
     } else {
+        utime += 1 / 60;//0.01;
+        uround = Math.round(utime);
+        usin = Math.sin(utime);
+        ucos = Math.cos(utime);
+        urounddec = utime % 1;
         chromaSpiral.update2(usin, ucos, side, utime);
 
         screen._mergeLayers();
@@ -112,13 +114,13 @@ function update() {
             pointsizes: pointsizes,
             atlasids: atlasids,
         }
-    }
-    printPoints();
+        printPoints();
 
-    screen._vertices = [];
-    screen._colors = [];
-    screen._pointsizes = [];
-    screen._atlasids = [];
+        screen._vertices = [];
+        screen._colors = [];
+        screen._pointsizes = [];
+        screen._atlasids = [];
+    }
 
     if (++cache.currentFrame > cache.maxFrames) {
         cache.currentFrame = 0;
@@ -140,7 +142,7 @@ function printPoints() {
     let vBuffer = getBuffer2(vertices);
     shaderVariableToBuffer("vPosition", dimension);
 
-    colors = flatten(colors);
+    //colors = flatten(colors); // TODO: test if call is required
     getBuffer2(colors);
     shaderVariableToBuffer("vColor", 4);
 
