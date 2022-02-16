@@ -641,44 +641,6 @@ class Screen {
             .filter(point => point.modified)
             .forEach(point => this._addToPrint(point));
     };
-
-    render(decoupled = false) {
-
-        this._mergeLayers();
-        // TODO: everything beyond this point
-        // should be decoupled in case I want to use it
-        // with threejs or another framework
-        if (!decoupled) {
-            this._addPointsToPrint();
-        }
-
-        if (!decoupled) {
-            this._vertices = flatten(this._vertices);
-            let vBuffer = getBuffer2(this._vertices);
-            shaderVariableToBuffer("vPosition", this._dimension);
-
-            this._colors = flatten(this._colors);
-            getBuffer2(this._colors);
-            shaderVariableToBuffer("vColor", 4);
-
-            //pointsizes = pointsizes;
-            getBuffer2(this._pointsizes);
-            shaderVariableToBuffer("vPointSize", 1);
-
-            //atlasids = atlasids;
-            getBuffer2(this._atlasids);
-            shaderVariableToBuffer("vAtlasId", 1);
-
-            drawPoints2(vBuffer, this._vertices, this._dimension);
-        }
-        this._vertices = [];
-        this._colors = [];
-        this._pointsizes = [];
-        this._atlasids = []
-    }
-
-
-
 }
 
 export default Screen;

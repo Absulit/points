@@ -140,8 +140,8 @@ function update() {
         screen._atlasids = cache[cache.currentFrame].atlasids;*/
         colors = cache[cache.currentFrame].colors;
     } else {
-        chromaSpiral.update(usin, ucos, side, utime);
-        screen.render(true);
+        chromaSpiral.update2(usin, ucos, side, utime);
+        screen._mergeLayers();
 
 
         colors = [];
