@@ -31,7 +31,7 @@ let aspect,
     dimension = 3,
     utime = 0;
 
-let side = 160;
+let side = 100;
 let numColumns = side;
 let numRows = side;
 let numMargin = 0;
@@ -91,10 +91,10 @@ function update() {
             console.log('RUNNING FROM CACHE');
             cache.cacheMessageFlag = true;
         }
-        vertices = cache[cache.currentFrame].vertices;
-        colors = cache[cache.currentFrame].colors;
-        pointsizes = cache[cache.currentFrame].pointsizes;
-        atlasids = cache[cache.currentFrame].atlasids;
+        vertices = runningFromCache.vertices;
+        colors = runningFromCache.colors;
+        pointsizes = runningFromCache.pointsizes;
+        atlasids = runningFromCache.atlasids;
     } else {
         chromaSpiral.update2(usin, ucos, side, utime);
 
@@ -153,10 +153,6 @@ function printPoints() {
     shaderVariableToBuffer("vAtlasId", 1);
 
     drawPoints2(vBuffer, vertices, dimension);
-    vertices = [];
-    colors = [];
-    pointsizes = [];
-    atlasids = []
 }
 
 function printPoint(point) {
