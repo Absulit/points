@@ -16,6 +16,7 @@ import {
     shaderVariableToBuffer,
     drawPoints2
 } from './absulit.module.js';
+import Cache from './js/cache.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -45,6 +46,14 @@ let ucos;
 
 let chromaSpiral;
 
+let cache;
+
+let vertices = [];
+let colors = [];
+let pointsizes = [];
+let atlasids = [];
+
+
 function init() {
     initWebGL("gl-canvas", true);
     aspect = canvas.width / canvas.height;
@@ -55,23 +64,13 @@ function init() {
     //-----------
     screen = new Screen(canvas, numColumns, numRows, numMargin, numLayers);
 
+    cache = new Cache();
+
     chromaSpiral = new ChromaSpiral(screen);
 
     // point size
     gl.uniform1f(gl.getUniformLocation(program, "u_pointsize"), screen.pointSize);
 }
-
-let runningFromCache = null;
-let cache = {
-    maxFrames: 60 * 10,
-    currentFrame: 0,
-    cacheMessageFlag: false
-};
-
-let vertices = [];
-let colors = [];
-let pointsizes = [];
-let atlasids = [];
 
 function update() {
     clearScreen();
@@ -81,51 +80,43 @@ function update() {
     // does it need it?
     //gl.uniform1f(gl.getUniformLocation(program, "utime"), utime);
 
-    runningFromCache = cache[cache.currentFrame];
-    if (!!runningFromCache) {
-        if (!cache.cacheMessageFlag) {
-            console.log('RUNNING FROM CACHE');
-            cache.cacheMessageFlag = true;
+    cache.update((runningFromCache, currentFrameData) => {
+        if (runningFromCache) {
+            vertices = currentFrameData.vertices;
+            colors = currentFrameData.colors;
+            pointsizes = currentFrameData.pointsizes;
+            atlasids = currentFrameData.atlasids;
+            printPoints();
+        } else {
+            utime += 1 / 60;//0.01;
+            uround = Math.round(utime);
+            usin = Math.sin(utime);
+            ucos = Math.cos(utime);
+            urounddec = utime % 1;
+            chromaSpiral.update2(usin, ucos, side, utime);
+
+            screen._mergeLayers();
+            screen._addPointsToPrint();
+
+            vertices = screen._vertices;
+            colors = screen._colors;
+            pointsizes = screen._pointsizes;
+            atlasids = screen._atlasids;
+
+            cache.data = {
+                vertices: vertices,
+                colors: colors,
+                pointsizes: pointsizes,
+                atlasids: atlasids,
+            }
+            printPoints();
+
+            screen._vertices = [];
+            screen._colors = [];
+            screen._pointsizes = [];
+            screen._atlasids = [];
         }
-        vertices = runningFromCache.vertices;
-        colors = runningFromCache.colors;
-        pointsizes = runningFromCache.pointsizes;
-        atlasids = runningFromCache.atlasids;
-        printPoints();
-    } else {
-        utime += 1 / 60;//0.01;
-        uround = Math.round(utime);
-        usin = Math.sin(utime);
-        ucos = Math.cos(utime);
-        urounddec = utime % 1;
-        chromaSpiral.update2(usin, ucos, side, utime);
-
-        screen._mergeLayers();
-        screen._addPointsToPrint();
-
-        vertices = screen._vertices;
-        colors = screen._colors;
-        pointsizes = screen._pointsizes;
-        atlasids = screen._atlasids;
-
-        cache[cache.currentFrame] = {
-            vertices: vertices,
-            colors: colors,
-            pointsizes: pointsizes,
-            atlasids: atlasids,
-        }
-        printPoints();
-
-        screen._vertices = [];
-        screen._colors = [];
-        screen._pointsizes = [];
-        screen._atlasids = [];
-    }
-
-    if (++cache.currentFrame > cache.maxFrames) {
-        cache.currentFrame = 0;
-        // TODO: dispatch event for videoLoader.restart();
-    }
+    });
 
     /*************/
 
