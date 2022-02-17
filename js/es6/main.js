@@ -26,6 +26,7 @@ import {
 } from './three.module.js';
 import Screen from '../screen.js';
 import ChromaSpiral from '../examples/chromaspiral.js';
+import Cache from '../cache.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -43,6 +44,9 @@ let scene, camera, renderer, light, points;
 let geometry, material;
 let chromaSpiral;
 var canvas;
+
+let cache;
+
 function init() {
     renderer = new WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -65,6 +69,8 @@ function init() {
     /*
         My code
     */
+    cache = new Cache();
+
     console.log(renderer.domElement);
     canvas = renderer.domElement;
     screen = new Screen(renderer.domElement, numColumns, numRows, numMargin, numLayers);
@@ -106,12 +112,12 @@ let utime = 0;
 
 let r, g, b;
 
-let runningFromCache = null;
+/*let runningFromCache = null;
 let cache = {
     maxFrames: 60 * 10,
     currentFrame: 0,
     cacheMessageFlag: false
-};
+};*/
 
 function update() {
     stats.begin();
@@ -125,48 +131,27 @@ function update() {
         My code
     */
 
-    
+    cache.update((runningFromCache, currentFrameData) => {
+        if (runningFromCache) {
+            colors = currentFrameData.colors;
+        } else {
+            chromaSpiral.update2(usin, ucos, side, utime);
+            screen._mergeLayers();
+            colors = [];
+            for (let index = 0; index < screen.mainLayer.points.length; index++) {
+                const point = screen.mainLayer.points[index];
+                const [r, g, b] = point.color.value;
+                colors.push(r, g, b);
+            }
 
-
-    runningFromCache = cache[cache.currentFrame];
-    if (runningFromCache) {
-        if (!cache.cacheMessageFlag) {
-            console.log('RUNNING FROM CACHE');
-            cache.cacheMessageFlag = true;
+            cache.data = {
+                colors: colors
+            }
         }
-        /*screen._vertices = cache[cache.currentFrame].vertices;
-        screen._colors = cache[cache.currentFrame].colors;
-        screen._pointsizes = cache[cache.currentFrame].pointsizes;
-        screen._atlasids = cache[cache.currentFrame].atlasids;*/
-        colors = cache[cache.currentFrame].colors;
-    } else {
-        chromaSpiral.update2(usin, ucos, side, utime);
-        screen._mergeLayers();
+    });
 
-
-        colors = [];
-        for (let index = 0; index < screen.mainLayer.points.length; index++) {
-            const point = screen.mainLayer.points[index];
-            const [r, g, b] = point.color.value;
-            colors.push(r, g, b);
-        }
-
-        /*cache[cache.currentFrame] = {
-            vertices: screen._vertices,
-            colors: screen._colors,
-            pointsizes: screen._pointsizes,
-            atlasids: screen._atlasids,
-        }*/
-
-        cache[cache.currentFrame] = {
-            colors: colors
-        }
-    }
     geometry.setAttribute('color', new Float32BufferAttribute(colors, 3));
-    if (++cache.currentFrame > cache.maxFrames) {
-        cache.currentFrame = 0;
-        // TODO: dispatch event for videoLoader.restart();
-    }
+
     /*
         - My code ends
     */
