@@ -193,3 +193,72 @@ export function generateBuffers(meshRes) {
     }
     return obj;
 }
+/************************************************************************/
+// MINI ENGINE for POINTS
+
+export function printPoints(vertices, colors, pointsizes, atlasids) {
+    const dimension = 3;
+    const dimension1 = 1;
+    vertices = flatten(vertices);
+    const vBuffer = getBuffer2(vertices);
+    shaderVariableToBuffer("vPosition", dimension);
+
+    //colors = flatten(colors); // TODO: test if call is required
+    getBuffer2(colors);
+    shaderVariableToBuffer("vColor", 4);
+
+    //pointsizes = pointsizes;
+    getBuffer2(pointsizes);
+    shaderVariableToBuffer("vPointSize", dimension1);
+
+    //atlasids = atlasids;
+    getBuffer2(atlasids);
+    shaderVariableToBuffer("vAtlasId", dimension1);
+
+    drawPoints2(vBuffer, vertices, dimension);
+}
+
+function printPoint(point) {
+    let vBuffer = getBuffer2(point.position.value);
+    shaderVariableToBuffer("vPosition", dimension);
+
+    getBuffer2(point.color.value);
+    shaderVariableToBuffer("vColor", 4);
+
+    drawPoints2(vBuffer, point.position.value);
+}
+
+
+function printLayers(layers) {
+    let vBuffer
+    layers.forEach((layer, indexLayer) => {
+        addPointsToPrint(layer.points);
+        vertices = flatten(vertices);
+        vBuffer = getBuffer2(vertices);
+        shaderVariableToBuffer(`layer${indexLayer}_vPosition`, dimension);
+
+        colors = flatten(colors);
+        getBuffer2(colors);
+        shaderVariableToBuffer(`layer${indexLayer}_vColor`, 4);
+
+        pointsizes = pointsizes;
+        getBuffer2(pointsizes);
+        shaderVariableToBuffer(`layer${indexLayer}_vPointSize`, 1);
+    });
+    drawPoints2(vBuffer, vertices, dimension);
+    vertices = [];
+    colors = [];
+    pointsizes = [];
+}
+
+
+/************************************************************************/
+/*
+
+// RotationAngle is in radians
+x = RotationAxis.x * sin(RotationAngle / 2)
+y = RotationAxis.y * sin(RotationAngle / 2)
+z = RotationAxis.z * sin(RotationAngle / 2)
+w = cos(RotationAngle / 2)
+
+*/

@@ -39,7 +39,7 @@ export default class Cache {
 
         if (++this._currentFrame > this._maxFrames) {
             this._currentFrame = 0;
-            whenReset();
+            whenReset? whenReset(): 0;
             // TODO: dispatch event for videoLoader.restart();
         }
     }
