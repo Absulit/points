@@ -12,7 +12,7 @@ export default class Cache {
         this._values = {};
     }
 
-    update(cb) {
+    update(whenRunning, whenRunningFromCache) {
         this._currentFrameData = this._values[this._currentFrame];
         this._runningFromCache = !!this._currentFrameData;
 
@@ -21,7 +21,11 @@ export default class Cache {
             this._cacheMessageFlag = true;
         }
 
-        cb(this._runningFromCache, this._currentFrameData);
+        if (this._runningFromCache) {
+            whenRunningFromCache(this._currentFrameData);
+        } else {
+            whenRunning();
+        }
 
         if (++this._currentFrame > this._maxFrames) {
             this._currentFrame = 0;

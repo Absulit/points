@@ -80,43 +80,41 @@ function update() {
     // does it need it?
     //gl.uniform1f(gl.getUniformLocation(program, "utime"), utime);
 
-    cache.update((runningFromCache, currentFrameData) => {
-        if (runningFromCache) {
-            vertices = currentFrameData.vertices;
-            colors = currentFrameData.colors;
-            pointsizes = currentFrameData.pointsizes;
-            atlasids = currentFrameData.atlasids;
-            printPoints();
-        } else {
-            utime += 1 / 60;//0.01;
-            uround = Math.round(utime);
-            usin = Math.sin(utime);
-            ucos = Math.cos(utime);
-            urounddec = utime % 1;
-            chromaSpiral.update2(usin, ucos, side, utime);
+    cache.update(() => {
+        utime += 1 / 60;//0.01;
+        uround = Math.round(utime);
+        usin = Math.sin(utime);
+        ucos = Math.cos(utime);
+        urounddec = utime % 1;
+        chromaSpiral.update2(usin, ucos, side, utime);
 
-            screen._mergeLayers();
-            screen._addPointsToPrint();
+        screen._mergeLayers();
+        screen._addPointsToPrint();
 
-            vertices = screen._vertices;
-            colors = screen._colors;
-            pointsizes = screen._pointsizes;
-            atlasids = screen._atlasids;
+        vertices = screen._vertices;
+        colors = screen._colors;
+        pointsizes = screen._pointsizes;
+        atlasids = screen._atlasids;
 
-            cache.data = {
-                vertices: vertices,
-                colors: colors,
-                pointsizes: pointsizes,
-                atlasids: atlasids,
-            }
-            printPoints();
-
-            screen._vertices = [];
-            screen._colors = [];
-            screen._pointsizes = [];
-            screen._atlasids = [];
+        cache.data = {
+            vertices: vertices,
+            colors: colors,
+            pointsizes: pointsizes,
+            atlasids: atlasids,
         }
+
+        screen._vertices = [];
+        screen._colors = [];
+        screen._pointsizes = [];
+        screen._atlasids = [];
+
+    }, currentFrameData => {
+        vertices = currentFrameData.vertices;
+        colors = currentFrameData.colors;
+        pointsizes = currentFrameData.pointsizes;
+        atlasids = currentFrameData.atlasids;
     });
+    printPoints();
 
     /*************/
 

@@ -131,23 +131,22 @@ function update() {
         My code
     */
 
-    cache.update((runningFromCache, currentFrameData) => {
-        if (runningFromCache) {
-            colors = currentFrameData.colors;
-        } else {
-            chromaSpiral.update2(usin, ucos, side, utime);
-            screen._mergeLayers();
-            colors = [];
-            for (let index = 0; index < screen.mainLayer.points.length; index++) {
-                const point = screen.mainLayer.points[index];
-                const [r, g, b] = point.color.value;
-                colors.push(r, g, b);
-            }
-
-            cache.data = {
-                colors: colors
-            }
+    cache.update(() => {
+        chromaSpiral.update2(usin, ucos, side, utime);
+        screen._mergeLayers();
+        colors = [];
+        for (let index = 0; index < screen.mainLayer.points.length; index++) {
+            const point = screen.mainLayer.points[index];
+            const [r, g, b] = point.color.value;
+            colors.push(r, g, b);
         }
+
+        cache.data = {
+            colors: colors
+        }
+
+    }, currentFrameData => {
+        colors = currentFrameData.colors;
     });
 
     geometry.setAttribute('color', new Float32BufferAttribute(colors, 3));
