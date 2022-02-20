@@ -3,7 +3,6 @@ import Point from './point.js';
 import MathUtil from './mathutil.js';
 import Coordinate from './coordinate.js';
 import Layer from './layer.js';
-import { drawPoints2, getBuffer2, shaderVariableToBuffer } from '../absulit.module.js';
 
 class Screen {
     constructor(canvas, numColumns = 10, numRows = 10, numMargin = 2, numLayers = 1) {
@@ -616,8 +615,8 @@ class Screen {
     }
 
     _getWebGLCoordinate(value, side, invert = false) {
-        let direction = invert ? -1 : 1;
-        let p = value / side;
+        const direction = invert ? -1 : 1;
+        const p = value / side;
         return ((p * 2) - 1) * direction;
     };
 
