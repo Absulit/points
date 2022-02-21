@@ -60,6 +60,15 @@ class Screen {
                 point = new Point();
                 point.position.set((xCoordinate * this._pointSizeFull) + this._pointSizeHalf, (yCoordinate * this._pointSizeFull) + this._pointSizeHalf, 0);
                 //point.setColor(Math.random(), 1, Math.random(), 1);
+
+                if (!point.position.value.calculated) {
+                    const value = point.position.value;
+
+                    value[0] = this._getWebGLCoordinate(value[0], this._canvas.width);
+                    value[1] = this._getWebGLCoordinate(value[1], this._canvas.height, true);
+                    point.position.value.calculated = true;
+                }
+
                 point.setCoordinates(xCoordinate, yCoordinate, 0);
                 point.color.a = 0;
                 point.size = this._pointSize;
@@ -186,10 +195,6 @@ class Screen {
 
     get currentLayer() {
         return this._currentLayer;
-    }
-
-    get runningFromCache() {
-        return this._runningFromCache;
     }
 
     getPointAt(columnIndex, rowIndex) {
@@ -539,7 +544,7 @@ class Screen {
             radians = MathUtil.radians(angle);
             pointFromCenter = MathUtil.vector(radius, radians);
             point = this.getPointAt(Math.round(pointFromCenter.x + x), Math.round(pointFromCenter.y + y));
-            if (point && (point != lastModifiedPoint)) {
+            if (point && (point !== lastModifiedPoint)) {
                 point.setColor(r, g, b, a);
                 lastModifiedPoint = point;
             }
@@ -560,7 +565,7 @@ class Screen {
             radians = MathUtil.radians(angle);
             pointFromCenter = MathUtil.vector(radius, radians);
             point = this.getPointAt(Math.round(pointFromCenter.x + x), Math.round(pointFromCenter.y + y));
-            if (point && (point != lastModifiedPoint)) {
+            if (point && (point !== lastModifiedPoint)) {
                 callback(point);
                 lastModifiedPoint = point;
             }
@@ -621,14 +626,6 @@ class Screen {
     };
 
     _addToPrint(point) {
-        if (!point.position.value.calculated) {
-            const value = point.position.value;
-
-            value[0] = this._getWebGLCoordinate(value[0], this._canvas.width);
-            value[1] = this._getWebGLCoordinate(value[1], this._canvas.height, true);
-            point.position.value.calculated = true;
-        }
-
         this._vertices.push(point.position.value);
         this._colors.push(point.color.value);
         this._pointsizes.push(point.size);
