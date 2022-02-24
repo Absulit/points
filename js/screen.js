@@ -626,8 +626,10 @@ class Screen {
     };
 
     _addToPrint(point) {
-        this._vertices.push(point.position.value);
-        this._colors.push(point.color.value);
+        //this._vertices.push(point.position.value);
+        point.position.value.forEach(p => this._vertices.push(p));
+        //this._colors.push(point.color.value);
+        point.color.value.forEach(c => this._colors.push(c));
         this._pointsizes.push(point.size);
         this._atlasids.push(point.atlasId);
     }

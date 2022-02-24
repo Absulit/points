@@ -75,6 +75,7 @@ export function drawPoints(len) {
 }
 
 export function drawPoints2(bufferId, vertices, dimension) {
+    //gl.enable(gl.GL_POINT_SMOOTH);
     gl.bindBuffer(gl.ARRAY_BUFFER, bufferId);
     gl.drawArrays(gl.POINTS, 0, vertices.length / dimension);
 }
@@ -199,7 +200,7 @@ export function generateBuffers(meshRes) {
 export function printPoints(vertices, colors, pointsizes, atlasids) {
     const dimension = 3;
     const dimension1 = 1;
-    vertices = flatten(vertices);
+    //vertices = flatten(vertices);
     const vBuffer = getBuffer2(vertices);
     shaderVariableToBuffer("vPosition", dimension);
 
@@ -233,11 +234,11 @@ function printLayers(layers) {
     let vBuffer
     layers.forEach((layer, indexLayer) => {
         addPointsToPrint(layer.points);
-        vertices = flatten(vertices);
+        //vertices = flatten(vertices);
         vBuffer = getBuffer2(vertices);
         shaderVariableToBuffer(`layer${indexLayer}_vPosition`, dimension);
 
-        colors = flatten(colors);
+        //colors = flatten(colors);
         getBuffer2(colors);
         shaderVariableToBuffer(`layer${indexLayer}_vColor`, 4);
 

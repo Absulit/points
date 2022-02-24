@@ -15,6 +15,7 @@ import {
     printPoints
 } from './absulit.module.js';
 import Cache from './js/cache.js';
+import ColorCoordinates from './js/examples/colorcoordinates.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -41,7 +42,7 @@ let urounddec;
 let usin;
 let ucos;
 
-let chromaSpiral;
+let demo;
 
 let cache;
 
@@ -63,7 +64,7 @@ function init() {
 
     cache = new Cache();
 
-    chromaSpiral = new ChromaSpiral(screen);
+    demo = new ColorCoordinates(screen);
 
     // point size
     gl.uniform1f(gl.getUniformLocation(program, "u_pointsize"), screen.pointSize);
@@ -83,7 +84,8 @@ function update() {
         usin = Math.sin(utime);
         ucos = Math.cos(utime);
         urounddec = utime % 1;
-        chromaSpiral.update2(usin, ucos, side, utime);
+        demo.update(usin, ucos, side, utime);
+
 
         screen._mergeLayers();
         screen._addPointsToPrint();
