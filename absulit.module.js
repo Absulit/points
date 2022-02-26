@@ -62,7 +62,7 @@ export function drawTriangles() {
     gl.drawArrays(gl.TRIANGLES, 0, vertices.length / dimension);
 }
 
-export function drawTriangles2(bufferId, vertices) {
+export function drawTriangles2(bufferId, vertices, dimension) {
     gl.bindBuffer(gl.ARRAY_BUFFER, bufferId);
     gl.drawArrays(gl.TRIANGLES, 0, vertices.length / dimension);
 }
@@ -70,6 +70,12 @@ export function drawTriangles2(bufferId, vertices) {
 export function drawTriangleStrip(len) {
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, len);
 }
+
+export function drawTriangleStrip2(bufferId, vertices, dimension) {
+    gl.bindBuffer(gl.ARRAY_BUFFER, bufferId);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, vertices.length / dimension);
+}
+
 export function drawPoints(len) {
     gl.drawArrays(gl.POINTS, 0, len);
 }
