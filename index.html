@@ -7,14 +7,14 @@
             attribute vec4 vPosition;
             attribute float vPointSize;
             uniform float u_pointsize;
-            
+
             attribute vec4 vColor;
             varying vec4 fColor;
-            
+
             attribute float vAtlasId;
             varying float fAtlasId;
 
-            /*attribute vec4 layer0_vPosition;
+            attribute vec4 layer0_vPosition;
             attribute vec4 layer1_vPosition;
             attribute vec4 layer2_vPosition;
             attribute vec4 layer3_vPosition;
@@ -26,11 +26,11 @@
             attribute float layer3_vPointSize;
             attribute float layer4_vPointSize;
 
-            attribute vec4 float layer0_vColor;
-            attribute vec4 float layer1_vColor;
-            attribute vec4 float layer2_vColor;
-            attribute vec4 float layer3_vColor;
-            attribute vec4 float layer4_vColor;*/
+            attribute vec4 layer0_vColor;
+            attribute vec4 layer1_vColor;
+            attribute vec4 layer2_vColor;
+            attribute vec4 layer3_vColor;
+            attribute vec4 layer4_vColor;
 
             float getWebGLCoordinate(float value, float side, bool invert){
                 float direction = invert ? -1.0 : 1.0;
@@ -65,6 +65,13 @@
             uniform vec2 textureAtlasSize;  // eg 64x32
             uniform vec2 imageSize;         // eg 16x16
 
+            vec4 clearMix(vec4 pointColor, vec4 color, float level){
+                float r = (pointColor.r + color.r) / level;
+                float g = (pointColor.g + color.g) / level;
+                float b = (pointColor.b + color.b) / level;
+                float a = (pointColor.a + color.a);
+                return vec4(r, g, b, a);
+            }
 
             void main() {
                 vec4 finalColor;
@@ -80,7 +87,7 @@
                 }else{
                     finalColor = fColor;
                 }
-
+                //finalColor = clearMix(finalColor, vec4(0,0,0, 1), 1.1 );
                 gl_FragColor = finalColor;
 
             }
