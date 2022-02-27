@@ -32,11 +32,21 @@
             attribute vec4 float layer3_vColor;
             attribute vec4 float layer4_vColor;*/
 
+            float getWebGLCoordinate(float value, float side, bool invert){
+                float direction = invert ? -1.0 : 1.0;
+                float p = value / side;
+                return ((p * 2.0) - 1.0) * direction;
+            }
 
             void main() {
                 fColor = vColor;
                 fAtlasId = vAtlasId;
                 //gl_Position = uRotation * vPosition;
+
+                /*float x = getWebGLCoordinate(vPosition.x, 800.0, false);
+                float y = getWebGLCoordinate(vPosition.y, 800.0, true);
+                vec4 newPosition = vec4(x, y, 0, 1);
+                gl_Position = newPosition;*/
                 gl_Position = vPosition;
 
                 //gl_PointSize = u_pointsize;
