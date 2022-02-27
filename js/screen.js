@@ -625,6 +625,10 @@ class Screen {
         return ((p * 2) - 1) * direction;
     };
 
+    /**
+     * @deprecated removed in favor of layer methods
+     * @param {*} point 
+     */
     _addToPrint(point) {
         //this._vertices.push(point.position.value);
         point.position.value.forEach(p => this._vertices.push(p));
@@ -635,9 +639,10 @@ class Screen {
     }
 
     _addPointsToPrint() {
-        this._mainLayer.points
-            .filter(point => point.modified)
-            .forEach(point => this._addToPrint(point));
+        this._vertices = this._mainLayer.vertices;
+        this._colors = this._mainLayer.colors;
+        this._pointsizes = this._mainLayer.pointsizes;
+        this._atlasids = this._mainLayer.atlasIds;
     };
 }
 

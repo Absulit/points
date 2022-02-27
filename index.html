@@ -20,17 +20,18 @@
             attribute vec4 layer3_vPosition;
             attribute vec4 layer4_vPosition;
 
+            attribute vec4 layer0_vColor;
+            attribute vec4 layer1_vColor;
+            attribute vec4 layer2_vColor;
+            attribute vec4 layer3_vColor;
+            attribute vec4 layer4_vColor;
+
             attribute float layer0_vPointSize;
             attribute float layer1_vPointSize;
             attribute float layer2_vPointSize;
             attribute float layer3_vPointSize;
             attribute float layer4_vPointSize;
 
-            attribute vec4 layer0_vColor;
-            attribute vec4 layer1_vColor;
-            attribute vec4 layer2_vColor;
-            attribute vec4 layer3_vColor;
-            attribute vec4 layer4_vColor;
 
             float getWebGLCoordinate(float value, float side, bool invert){
                 float direction = invert ? -1.0 : 1.0;
