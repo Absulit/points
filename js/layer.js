@@ -29,9 +29,9 @@ class Layer {
         let vertices = [];
         for (let index = 0; index < this._points.length; index++) {
             const point = this._points[index];
-            if (point.modified) {
+            //if (point.modified) {
                 point.position.value.forEach(p => vertices.push(p));
-            }
+            //}
         }
         return vertices;
     }
@@ -40,9 +40,9 @@ class Layer {
         let colors = [];
         for (let index = 0; index < this._points.length; index++) {
             const point = this._points[index];
-            if (point.modified) {
+            //if (point.modified) {
                 point.color.value.forEach(c => colors.push(c));
-            }
+            //}
         }
         return colors;
     }
@@ -51,9 +51,9 @@ class Layer {
         let pointsizes = [];
         for (let index = 0; index < this._points.length; index++) {
             const point = this._points[index];
-            if (point.modified) {
+            //if (point.modified) {
                 pointsizes.push(point.size);
-            }
+            //}
         }
         return pointsizes;
     }
@@ -62,9 +62,9 @@ class Layer {
         let atlasIds = [];
         for (let index = 0; index < this._points.length; index++) {
             const point = this._points[index];
-            if (point.modified) {
+            //if (point.modified) {
                 atlasIds.push(point.atlasId);
-            }
+            //}
         }
         return atlasIds;
     }

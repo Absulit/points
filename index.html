@@ -32,6 +32,12 @@
             attribute float layer3_vPointSize;
             attribute float layer4_vPointSize;
 
+            attribute float layer0_vAtlasId;
+            attribute float layer1_vAtlasId;
+            attribute float layer2_vAtlasId;
+            attribute float layer3_vAtlasId;
+            attribute float layer4_vAtlasId;
+
 
             float getWebGLCoordinate(float value, float side, bool invert){
                 float direction = invert ? -1.0 : 1.0;
@@ -39,20 +45,34 @@
                 return ((p * 2.0) - 1.0) * direction;
             }
 
+            vec4 calculateLayers(){
+                vec4 res;
+
+                res = layer0_vColor + layer1_vColor + layer2_vColor + layer3_vColor + layer4_vColor;
+
+                return res;
+            }
+
             void main() {
-                fColor = vColor;
-                fAtlasId = vAtlasId;
+                float usedLayers = 2.;
+                //fColor = vColor;
+                fColor = calculateLayers();
+                //fAtlasId = vAtlasId;
+                fAtlasId = layer0_vAtlasId;
+
                 //gl_Position = uRotation * vPosition;
 
                 /*float x = getWebGLCoordinate(vPosition.x, 800.0, false);
                 float y = getWebGLCoordinate(vPosition.y, 800.0, true);
                 vec4 newPosition = vec4(x, y, 0, 1);
                 gl_Position = newPosition;*/
-                gl_Position = vPosition;
+                //gl_Position = vPosition;
+                gl_Position = layer0_vPosition;
 
                 //gl_PointSize = u_pointsize;
                 //gl_PointSize = vColor.r * u_pointsize; // cool!
-                gl_PointSize = vPointSize;
+                //gl_PointSize = vPointSize;
+                gl_PointSize = layer0_vPointSize;
             }
         </script>
         <script id="fragment-shader" type="x-shader/x-fragment">

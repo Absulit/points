@@ -239,18 +239,18 @@ function printPoint(point) {
 export function printLayers(layers) {
     let vBuffer
     layers.forEach((layer, indexLayer) => {
-        //addPointsToPrint(layer.points);
-        //vertices = flatten(vertices);
         vBuffer = getBuffer2(layer.vertices);
         shaderVariableToBuffer(`layer${indexLayer}_vPosition`, 3);
 
-        //colors = flatten(colors);
         getBuffer2(layer.colors);
         shaderVariableToBuffer(`layer${indexLayer}_vColor`, 4);
 
-        //pointsizes = pointsizes;
         getBuffer2(layer.pointsizes);
         shaderVariableToBuffer(`layer${indexLayer}_vPointSize`, 1);
+
+        getBuffer2(layer.atlasIds);
+        shaderVariableToBuffer(`layer${indexLayer}_vAtlasId`, 1);
+
         drawPoints2(vBuffer, layer.vertices, 3);
     });
     /*vertices = [];

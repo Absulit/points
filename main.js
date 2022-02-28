@@ -12,10 +12,14 @@ import {
     gl, initWebGL,
     program,
     setClearColor,
-    printPoints
+    printPoints,
+    printLayers
 } from './absulit.module.js';
 import Cache from './js/cache.js';
 import ColorCoordinates from './js/examples/colorcoordinates.js';
+import RGBAColor from './js/color.js';
+import Effects from './js/effects.js';
+import PolygonChange from './js/examples/polygonchange.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -35,7 +39,7 @@ let numColumns = side;
 let numRows = side;
 let numMargin = 0;
 let screen;
-let numLayers = 3;
+let numLayers = 2;
 
 let uround;
 let urounddec;
@@ -50,7 +54,8 @@ let vertices = [];
 let colors = [];
 let pointsizes = [];
 let atlasids = [];
-
+let layers;
+let effects;
 
 function init() {
     initWebGL("gl-canvas", true);
@@ -64,7 +69,9 @@ function init() {
 
     cache = new Cache();
 
-    demo = new ColorCoordinates(screen);
+    demo = new PolygonChange(screen);
+
+    effects = new Effects(screen);
 
     // point size
     gl.uniform1f(gl.getUniformLocation(program, "u_pointsize"), screen.pointSize);
@@ -84,22 +91,32 @@ function update() {
         usin = Math.sin(utime);
         ucos = Math.cos(utime);
         urounddec = utime % 1;
-        demo.update(usin, ucos, side, utime);
+
+        screen.layerIndex = 0;
+            screen.drawCircle(10,10, 10, 1,0,0);
+            demo.update(usin, ucos, side, utime);
+
+        screen.layerIndex = 1;
+
+            screen.drawCircle(20,20, 10, 0,1,0);
+            //effects.soften2(3);
 
 
-        screen._mergeLayers();
-        screen._addPointsToPrint();
+        //screen._mergeLayers();
+        //screen._addPointsToPrint();
 
         vertices = screen._vertices;
         colors = screen._colors;
         pointsizes = screen._pointsizes;
         atlasids = screen._atlasids;
+        layers = screen.layers;
 
         cache.data = {
             vertices: vertices,
             colors: colors,
             pointsizes: pointsizes,
             atlasids: atlasids,
+            layers: layers,
         }
 
         screen._vertices = [];
@@ -112,8 +129,10 @@ function update() {
         colors = currentFrameData.colors;
         pointsizes = currentFrameData.pointsizes;
         atlasids = currentFrameData.atlasids;
+        layers = currentFrameData.layers;
     });
-    printPoints(vertices, colors, pointsizes, atlasids);
+    //printPoints(vertices, colors, pointsizes, atlasids);
+    printLayers(layers);
 
     /*************/
 
