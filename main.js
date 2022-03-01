@@ -113,7 +113,19 @@ function update() {
         colors = screen._colors;
         pointsizes = screen._pointsizes;
         atlasids = screen._atlasids;
-        layers = screen.layers;
+        layers = [];
+
+        screen.layers.forEach(layer => {
+            layers.push(
+                {
+                    vertices: layer.vertices,
+                    colors: layer.colors,
+                    pointsizes: layer.pointsizes,
+                    atlasIds: layer.atlasIds,
+                    modifieds: layer.modifieds
+                }
+            );
+        });
 
         cache.data = {
             vertices: vertices,
@@ -134,7 +146,6 @@ function update() {
         pointsizes = currentFrameData.pointsizes;
         atlasids = currentFrameData.atlasids;
         layers = currentFrameData.layers;
-        console.log(layers);
     });
     //printPoints(vertices, colors, pointsizes, atlasids);
     printLayers(layers);
