@@ -69,7 +69,7 @@ function init() {
 
     cache = new Cache();
 
-    demo = new PolygonChange(screen);
+    demo = new ChromaSpiral(screen);
 
     effects = new Effects(screen);
 
@@ -96,9 +96,13 @@ function update() {
             screen.drawCircle(10,10, 10, 1,0,0);
             demo.update(usin, ucos, side, utime);
 
-        screen.layerIndex = 1;
+            screen.layerIndex = 1;
 
             screen.drawCircle(20,20, 10, 0,1,0);
+            screen.points.forEach(point => {
+                point.size = point.getBrightness() * screen.pointSizeFull;
+            });
+            //effects.soften2(3);
             //effects.soften2(3);
 
 
@@ -130,6 +134,7 @@ function update() {
         pointsizes = currentFrameData.pointsizes;
         atlasids = currentFrameData.atlasids;
         layers = currentFrameData.layers;
+        console.log(layers);
     });
     //printPoints(vertices, colors, pointsizes, atlasids);
     printLayers(layers);

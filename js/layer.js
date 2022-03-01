@@ -69,6 +69,17 @@ class Layer {
         return atlasIds;
     }
 
+    get modifieds(){
+        let modifieds = [];
+        for (let index = 0; index < this._points.length; index++) {
+            const point = this._points[index];
+            //if (point.modified) {
+                modifieds.push(point.modified);
+            //}
+        }
+        return modifieds;
+    }
+
     fillColumns() {
         // pre fill with the amount of columns
         /*for (let index = 0; index < this._numColumns; index++) {
