@@ -12,6 +12,7 @@ class Screen {
         this._numMargin = numMargin;
         this._numLayers = numLayers;
         this._pointSizeFull = 1;
+        this._pointSizeHalf = this._pointSizeFull / 2;
 
         this._center = new Coordinate(Math.round(numColumns / 2), Math.round(numRows / 2));
 
@@ -25,6 +26,14 @@ class Screen {
 
         this._pointSize = 1;
         this._init();
+
+        this._dimension = 3;
+        this._vertices = [];
+        this._colors = [];
+        this._pointsizes = [];
+        this._atlasids = [];
+
+
     }
 
     _init() {
@@ -43,15 +52,23 @@ class Screen {
     _createLayer() {
         let layer = new Layer();
 
-        let halfSize = this._pointSizeFull / 2; // TODO: make private property
         let row;
         let point;
         for (let yCoordinate = 0; yCoordinate < this._numRows; yCoordinate++) {
             row = [];
             for (let xCoordinate = 0; xCoordinate < this._numColumns; xCoordinate++) {
                 point = new Point();
-                point.position.set((xCoordinate * this._pointSizeFull) + halfSize, (yCoordinate * this._pointSizeFull) + halfSize, 0);
+                point.position.set((xCoordinate * this._pointSizeFull) + this._pointSizeHalf, (yCoordinate * this._pointSizeFull) + this._pointSizeHalf, 0);
                 //point.setColor(Math.random(), 1, Math.random(), 1);
+
+                if (!point.position.value.calculated) {
+                    const value = point.position.value;
+
+                    value[0] = this._getWebGLCoordinate(value[0], this._canvas.width);
+                    value[1] = this._getWebGLCoordinate(value[1], this._canvas.height, true);
+                    point.position.value.calculated = true;
+                }
+
                 point.setCoordinates(xCoordinate, yCoordinate, 0);
                 point.color.a = 0;
                 point.size = this._pointSize;
@@ -75,64 +92,59 @@ class Screen {
         this._currentLayer = this._layers[this._layerIndex];
     }
 
-    mergeLayers() {
-        let finalPoints = this._mainLayer.points;
+    _mergeLayers() {
+        let tempColor, tempSize, tempAtlas;
 
-        let r = Array(finalPoints.length);
+        let pointsLength = this._mainLayer.points.length
+        let finalPoint;
+        for (let finalPointIndex = 0; finalPointIndex < pointsLength; finalPointIndex++) {
+            finalPoint = this._mainLayer.points[finalPointIndex];
 
-        finalPoints.forEach((finalPoint, finalPointIndex) => {
-            let tempColor = { counter: 0, value: new RGBAColor(0, 0, 0, 0)};
-            let tempSize = { counter: 0, value: 0 };
+            tempColor = { counter: 0, value: new RGBAColor(0, 0, 0, 0) };
+            tempSize = { counter: 0, value: 0 };
+            tempAtlas = { counter: 0, value: -1 };
 
-            let tempAtlas = { counter: 0, value: -1 };
-
+            let point;
             this._layers.forEach(layer => {
-                let point = layer.points[finalPointIndex];
+                point = layer.points[finalPointIndex];
                 // if top color is alpha 1 just replace it because
                 // it will block the ones below
                 if (point.modified) {
 
+                    ++tempColor.counter;
+                    tempColor.value.add(point.color);
                     if (point.color.a === 1) {
                         tempColor.counter = 0;
                         tempColor.value = point.color;
-                    } else {
-                        ++tempColor.counter;
-                        tempColor.value.add(point.color);
                     }
 
+                    ++tempSize.counter;
+                    tempSize.value += point.size;
                     if (point.size >= this.pointSize) {
                         tempSize.counter = 0;
                         tempSize.value = point.size;
-                    } else {
-                        ++tempSize.counter;
-                        tempSize.value += point.size;
                     }
 
-                    if ((tempAtlas.counter === 0)) {
+                    ++tempAtlas.counter;
+                    if (tempAtlas.counter === 0) {
                         tempAtlas.counter = 0;
-                        tempAtlas.value = point.atlasId;
-                    } else {
-                        ++tempAtlas.counter;
-                        tempAtlas.value = point.atlasId;
                     }
+                    tempAtlas.value = point.atlasId;
                 }
-
-
             });
-            /*if (tempColor.counter) {
+            if (tempColor.counter) {
                 tempColor.value.r /= tempColor.counter;
                 tempColor.value.g /= tempColor.counter;
                 tempColor.value.b /= tempColor.counter;
                 //tempColor.value.a /= tempColor.counter;
-            }*/
+            }
             if (tempSize.counter) {
                 tempSize.value /= tempSize.counter;
             }
             finalPoint.color = tempColor.value;
             finalPoint.size = tempSize.value;
             finalPoint.atlasId = tempAtlas.value;
-        });
-
+        }
     }
 
     get numColumns() {
@@ -187,6 +199,13 @@ class Screen {
 
     getPointAt(columnIndex, rowIndex) {
         let row = this._currentLayer.rows[rowIndex];
+        let point = row && row[columnIndex] || null;
+        return point;
+    }
+
+    getPointFromLayerAt(columnIndex, rowIndex, layerIndex) {
+        const layer = this._layers[layerIndex];
+        let row = layer.rows[rowIndex];
         let point = row && row[columnIndex] || null;
         return point;
     }
@@ -265,9 +284,9 @@ class Screen {
     /**
      * Retrieves a list of `Point` around a point.
      * Directly around, in a square, so just 8 Points.
-     * @param {*} point 
-     * @param {*} distance 
-     * @returns 
+     * @param {*} point
+     * @param {*} distance
+     * @returns
      */
     getPointsAround(point, distance = 1) {
         let columnIndex = point.coordinates.x;
@@ -287,11 +306,11 @@ class Screen {
     /**
      * Retrieves a list of `Point` around a point.
      * Just NSEW, so just 4 Points.
-     * @param {*} point 
-     * @param {*} distance 
+     * @param {*} point
+     * @param {*} distance
      * @returns array with [N,S,E,W] `Point`s
      */
-     getNSEWPointsAround(point, distance = 1) {
+    getNSEWPointsAround(point, distance = 1) {
         const columnIndex = point.coordinates.x;
         const rowIndex = point.coordinates.y;
         return [
@@ -309,11 +328,11 @@ class Screen {
      * @param {Number} numPoints How many points. Too many Points and the app slows down.
      * @returns {Point[]} Point[]
      */
-    getPointsInCircle(point, distance = 1, numPoints  = 8) {
+    getPointsInCircle(point, distance = 1, numPoints = 8) {
         let { x, y } = point.coordinates;
         let pointFromCenter, radians, angle, pointAround;
         let result = [];
-        for (angle = 0; angle < 360; angle += (360/numPoints)) {
+        for (angle = 0; angle < 360; angle += (360 / numPoints)) {
             radians = MathUtil.radians(angle);
             pointFromCenter = MathUtil.vector(distance, radians);
             pointAround = this.getPointAt(Math.round(pointFromCenter.x + x), Math.round(pointFromCenter.y + y));
@@ -339,8 +358,15 @@ class Screen {
 
     clearMix(color, level = 2) {
         let pointColor = null;
-        this._currentLayer.rows.forEach(row => {
-            row.forEach(point => {
+        //this._currentLayer.rows.forEach(row => {
+        const rowsLength = this._currentLayer.rows.length;
+        let rowLength;
+        for (let index = 0; index < rowsLength; index++) {
+            const row = this._currentLayer.rows[index];
+            rowLength = row.length
+            for (let i = 0; i < rowLength; i++) {
+                //row.forEach(point => {
+                const point = row[i];
                 if (point.modified) {
                     pointColor = point.color;
                     point.setColor(
@@ -349,15 +375,14 @@ class Screen {
                         (pointColor.b + color.b) / level,
                         (pointColor.a + color.a)
                     );
-
                 }
                 if (point.size < this._pointSize) {
                     point.size = this._pointSize;
                 }
-
-
-            });
-        });
+                //});
+            }
+            //});
+        }
     }
 
     /*fade(level = 2, layer = 0) {
@@ -450,9 +475,15 @@ class Screen {
         }
     }
 
+    getFinalPointFromPolar(x0, y0, distance, radians) {
+        const pointFromCenter = MathUtil.vector(distance, radians);
+        const finalPoint = { x: Math.round(x0 + pointFromCenter.x), y: Math.round(y0 + pointFromCenter.y) };
+        return this.getPointAt(finalPoint.x, finalPoint.y);
+    }
+
     drawLineRotation(x0, y0, distance, radians, color) {
-        let pointFromCenter = MathUtil.vector(distance, radians);
-        let finalPoint = { x: Math.round(x0 + pointFromCenter.x), y: Math.round(y0 + pointFromCenter.y) };
+        const pointFromCenter = MathUtil.vector(distance, radians);
+        const finalPoint = { x: Math.round(x0 + pointFromCenter.x), y: Math.round(y0 + pointFromCenter.y) };
         this.drawLine(x0, y0, finalPoint.x, finalPoint.y, color);
         return finalPoint;
     }
@@ -513,7 +544,7 @@ class Screen {
             radians = MathUtil.radians(angle);
             pointFromCenter = MathUtil.vector(radius, radians);
             point = this.getPointAt(Math.round(pointFromCenter.x + x), Math.round(pointFromCenter.y + y));
-            if (point && (point != lastModifiedPoint)) {
+            if (point && (point !== lastModifiedPoint)) {
                 point.setColor(r, g, b, a);
                 lastModifiedPoint = point;
             }
@@ -534,7 +565,7 @@ class Screen {
             radians = MathUtil.radians(angle);
             pointFromCenter = MathUtil.vector(radius, radians);
             point = this.getPointAt(Math.round(pointFromCenter.x + x), Math.round(pointFromCenter.y + y));
-            if (point && (point != lastModifiedPoint)) {
+            if (point && (point !== lastModifiedPoint)) {
                 callback(point);
                 lastModifiedPoint = point;
             }
@@ -555,13 +586,13 @@ class Screen {
     }
 
     /**
-     * 
-     * @param {Number} x 
-     * @param {Number} y 
-     * @param {Number} radius 
-     * @param {Number} sides 
-     * @param {Color} color 
-     * @param {Number} startAngle 
+     *
+     * @param {Number} x
+     * @param {Number} y
+     * @param {Number} radius
+     * @param {Number} sides
+     * @param {Color} color
+     * @param {Number} startAngle
      */
     drawPolygon(x, y, radius, sides, color, startAngle = 0) {
         let pointFromCenter, radians, angle;
@@ -588,8 +619,31 @@ class Screen {
         this.drawLine(lastVertexX, lastVertexY, firstVertexX, firstVertexY, color);
     }
 
+    _getWebGLCoordinate(value, side, invert = false) {
+        const direction = invert ? -1 : 1;
+        const p = value / side;
+        return ((p * 2) - 1) * direction;
+    };
 
+    /**
+     * @deprecated removed in favor of layer methods
+     * @param {*} point 
+     */
+    _addToPrint(point) {
+        //this._vertices.push(point.position.value);
+        point.position.value.forEach(p => this._vertices.push(p));
+        //this._colors.push(point.color.value);
+        point.color.value.forEach(c => this._colors.push(c));
+        this._pointsizes.push(point.size);
+        this._atlasids.push(point.atlasId);
+    }
 
+    _addPointsToPrint() {
+        this._vertices = this._mainLayer.vertices;
+        this._colors = this._mainLayer.colors;
+        this._pointsizes = this._mainLayer.pointsizes;
+        this._atlasids = this._mainLayer.atlasIds;
+    };
 }
 
 export default Screen;

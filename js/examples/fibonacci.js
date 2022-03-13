@@ -95,10 +95,10 @@ export default class Fibonacci {
 
         //this._counter = 0;
 
-        this._screen.clearMix(new RGBAColor(0, 0, 0), 1.001);
+        //this._screen.clearMix(new RGBAColor(0, 0, 0), 1.001);
         //this._effects.fire(2);
         //this._effects.chromaticAberration(.05, 2);
         //this._effects.soften3();
-        this._effects.antialias();
+        //this._effects.antialias();
     }
 }

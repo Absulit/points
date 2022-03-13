@@ -13,13 +13,15 @@ import {
     program,
     setClearColor,
     printPoints,
-    printLayers
+    getBuffer2,
+    shaderVariableToBuffer,
+    drawPoints2,
+    drawLines2,
+    drawTriangles2,
+    drawTriangleStrip2
 } from './absulit.module.js';
 import Cache from './js/cache.js';
 import ColorCoordinates from './js/examples/colorcoordinates.js';
-import RGBAColor from './js/color.js';
-import Effects from './js/effects.js';
-import PolygonChange from './js/examples/polygonchange.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -39,7 +41,7 @@ let numColumns = side;
 let numRows = side;
 let numMargin = 0;
 let screen;
-let numLayers = 2;
+let numLayers = 3;
 
 let uround;
 let urounddec;
@@ -54,8 +56,7 @@ let vertices = [];
 let colors = [];
 let pointsizes = [];
 let atlasids = [];
-let layers;
-let effects;
+
 
 function init() {
     initWebGL("gl-canvas", true);
@@ -69,9 +70,7 @@ function init() {
 
     cache = new Cache();
 
-    demo = new ChromaSpiral(screen);
-
-    effects = new Effects(screen);
+    demo = new ColorCoordinates(screen);
 
     // point size
     gl.uniform1f(gl.getUniformLocation(program, "u_pointsize"), screen.pointSize);
@@ -83,27 +82,17 @@ function update() {
 
 
     // does it need it?
-    //gl.uniform1f(gl.getUniformLocation(program, "utime"), utime);
-
+    
     cache.update(() => {
         utime += 1 / 60;//0.01;
         uround = Math.round(utime);
         usin = Math.sin(utime);
         ucos = Math.cos(utime);
         urounddec = utime % 1;
+        gl.uniform1f(gl.getUniformLocation(program, "u_time"), utime);
+        
 
-        screen.layerIndex = 0;
-            screen.drawCircle(10,10, 10, 1,0,0);
-            demo.update(usin, ucos, side, utime);
-
-        screen.layerIndex = 1;
-
-            screen.drawCircle(20,20, 10, 0,1,0);
-            screen.points.forEach(point => {
-                point.size = point.getBrightness() * screen.pointSizeFull;
-            });
-            //effects.soften2(3);
-            //effects.soften2(3);
+        /*demo.update(usin, ucos, side, utime);
 
 
         screen._mergeLayers();
@@ -113,43 +102,70 @@ function update() {
         colors = screen._colors;
         pointsizes = screen._pointsizes;
         atlasids = screen._atlasids;
-        layers = [];
-
-        /*for (let index = 0; index < screen.layers.length; index++) {
-            const layer = screen.layers[index];
-            layers.push(
-                {
-                    vertices: layer.vertices,
-                    colors: layer.colors,
-                    pointsizes: layer.pointsizes,
-                    atlasIds: layer.atlasIds,
-                    modifieds: layer.modifieds
-                }
-            );
-        }*/
 
         cache.data = {
             vertices: vertices,
             colors: colors,
             pointsizes: pointsizes,
             atlasids: atlasids,
-            //layers: layers,
         }
 
         screen._vertices = [];
         screen._colors = [];
         screen._pointsizes = [];
-        screen._atlasids = [];
+        screen._atlasids = [];*/
+
+
+        const dimension = 3;
+        const vertices = [
+            -1, -1, 0,
+            -1, 1, 0,
+            1, -1, 0,
+            1, 1, 0,
+        ];
+        const vBuffer = getBuffer2(vertices);
+        shaderVariableToBuffer("vPosition", dimension);
+
+        const colors = [
+            1, 0, 0, 1,
+            1, 1, 0, 1,
+            1, 0, 0, 1,
+            1, 0, 0, 1,
+        ]
+        getBuffer2(colors);
+        shaderVariableToBuffer("vColor", 4);
+
+        const pointsizes = [
+            10,
+            10,
+            10,
+            10
+        ];
+        getBuffer2(pointsizes);
+        shaderVariableToBuffer("vPointSize", 1);
+
+        const atlasids = [
+            -1,
+            -1,
+            -1,
+            -1
+        ];
+        getBuffer2(atlasids);
+        shaderVariableToBuffer("vAtlasId", 1);
+
+        //drawPoints2(vBuffer, vertices, dimension);
+        //drawLines2(vBuffer, vertices);
+        drawTriangleStrip2(vBuffer, vertices, 3);
+
+        //printPoints(vertices, colors, pointsizes, atlasids)
 
     }, currentFrameData => {
-        vertices = currentFrameData.vertices;
+        /*vertices = currentFrameData.vertices;
         colors = currentFrameData.colors;
         pointsizes = currentFrameData.pointsizes;
-        atlasids = currentFrameData.atlasids;
-        //layers = currentFrameData.layers;
+        atlasids = currentFrameData.atlasids;*/
     });
     printPoints(vertices, colors, pointsizes, atlasids);
-    //printLayers(layers);
 
     /*************/
 

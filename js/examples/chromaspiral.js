@@ -53,6 +53,28 @@ class ChromaSpiral {
 
 
     }
+
+    update2(usin, ucos, side, utime) {
+        let x = this._screen.center.x, y = this._screen.center.y, radius = 10;
+        let pointFromCenter, point, radians, angle, lastModifiedPoint;
+
+        for (angle = 0; angle < 360; angle += 5) {
+            radians = MathUtil.radians(angle);
+            pointFromCenter = MathUtil.vector(radius * usin * ucos * angle / (100 / side * 40), radians / usin);
+
+            point = this._screen.getPointAt(Math.round(pointFromCenter.x + x), Math.round(pointFromCenter.y + y));
+            if (point && (point != lastModifiedPoint)) {
+                if(lastModifiedPoint){
+                    this._screen.drawLineWithPoints(lastModifiedPoint, point);
+                }
+                point.setBrightness(1);
+                lastModifiedPoint = point;
+            }
+        }
+        this._effects.chromaticAberration(.05, 2);
+        this._effects.soften2(3);
+        this._screen.clearMix(new RGBAColor(0,0,0), 1.1);
+    }
 }
 
 export default ChromaSpiral;

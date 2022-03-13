@@ -1,3 +1,4 @@
+import { gl, program } from './../absulit.module.js';
 class SpriteLoader {
     static numInstances = 0;
     constructor(screen, tileWidth, tileHeight) {
@@ -17,7 +18,7 @@ class SpriteLoader {
     }
 
     load(path) {
-        this._image.src = path;
+        this._image.src = path;gl
     }
 
     _onLoadImage = () => {

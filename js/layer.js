@@ -25,7 +25,62 @@ class Layer {
         return this._shuffledPoints;
     }
 
-    fillColumns(){
+    get vertices() {
+        let vertices = [];
+        for (let index = 0; index < this._points.length; index++) {
+            const point = this._points[index];
+            //if (point.modified) {
+                point.position.value.forEach(p => vertices.push(p));
+            //}
+        }
+        return vertices;
+    }
+
+    get colors() {
+        let colors = [];
+        for (let index = 0; index < this._points.length; index++) {
+            const point = this._points[index];
+            //if (point.modified) {
+                point.color.value.forEach(c => colors.push(c));
+            //}
+        }
+        return colors;
+    }
+
+    get pointsizes() {
+        let pointsizes = [];
+        for (let index = 0; index < this._points.length; index++) {
+            const point = this._points[index];
+            //if (point.modified) {
+                pointsizes.push(point.size);
+            //}
+        }
+        return pointsizes;
+    }
+
+    get atlasIds() {
+        let atlasIds = [];
+        for (let index = 0; index < this._points.length; index++) {
+            const point = this._points[index];
+            //if (point.modified) {
+                atlasIds.push(point.atlasId);
+            //}
+        }
+        return atlasIds;
+    }
+
+    get modifieds(){
+        let modifieds = [];
+        for (let index = 0; index < this._points.length; index++) {
+            const point = this._points[index];
+            //if (point.modified) {
+                modifieds.push(point.modified);
+            //}
+        }
+        return modifieds;
+    }
+
+    fillColumns() {
         // pre fill with the amount of columns
         /*for (let index = 0; index < this._numColumns; index++) {
             layer.columns.push([]);

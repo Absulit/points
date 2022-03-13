@@ -1,0 +1,12 @@
+body {
+    background-color: #202124;
+    margin          : 0px;
+    font-family     : 'Open Sans', sans-serif;
+    overflow-x      : hidden;
+}
+
+canvas {
+    position: fixed;
+    z-index : -1;
+}
+
