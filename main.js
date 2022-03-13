@@ -96,7 +96,7 @@ function update() {
             screen.drawCircle(10,10, 10, 1,0,0);
             demo.update(usin, ucos, side, utime);
 
-            screen.layerIndex = 1;
+        screen.layerIndex = 1;
 
             screen.drawCircle(20,20, 10, 0,1,0);
             screen.points.forEach(point => {
@@ -106,8 +106,8 @@ function update() {
             //effects.soften2(3);
 
 
-        //screen._mergeLayers();
-        //screen._addPointsToPrint();
+        screen._mergeLayers();
+        screen._addPointsToPrint();
 
         vertices = screen._vertices;
         colors = screen._colors;
@@ -115,7 +115,8 @@ function update() {
         atlasids = screen._atlasids;
         layers = [];
 
-        screen.layers.forEach(layer => {
+        /*for (let index = 0; index < screen.layers.length; index++) {
+            const layer = screen.layers[index];
             layers.push(
                 {
                     vertices: layer.vertices,
@@ -125,14 +126,14 @@ function update() {
                     modifieds: layer.modifieds
                 }
             );
-        });
+        }*/
 
         cache.data = {
             vertices: vertices,
             colors: colors,
             pointsizes: pointsizes,
             atlasids: atlasids,
-            layers: layers,
+            //layers: layers,
         }
 
         screen._vertices = [];
@@ -145,10 +146,10 @@ function update() {
         colors = currentFrameData.colors;
         pointsizes = currentFrameData.pointsizes;
         atlasids = currentFrameData.atlasids;
-        layers = currentFrameData.layers;
+        //layers = currentFrameData.layers;
     });
-    //printPoints(vertices, colors, pointsizes, atlasids);
-    printLayers(layers);
+    printPoints(vertices, colors, pointsizes, atlasids);
+    //printLayers(layers);
 
     /*************/
 

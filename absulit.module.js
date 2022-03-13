@@ -235,27 +235,29 @@ function printPoint(point) {
     drawPoints2(vBuffer, point.position.value);
 }
 
-
+const dimension4 = 4;
+const dimension3 = 3;
+const dimension1 = 1;
 export function printLayers(layers) {
-    let vBuffer;
-    layers.forEach((layer, indexLayer) => {
-        vBuffer = getBuffer2(layer.vertices);
-        shaderVariableToBuffer(`layer${indexLayer}_vPosition`, 3);
+    for (let indexLayer = 0; indexLayer < layers.length; indexLayer++) {
+        const layer = layers[indexLayer];
+        const vBuffer = getBuffer2(layer.vertices);
+        shaderVariableToBuffer(`layer${indexLayer}_vPosition`, dimension3);
 
         getBuffer2(layer.colors);
-        shaderVariableToBuffer(`layer${indexLayer}_vColor`, 4);
+        shaderVariableToBuffer(`layer${indexLayer}_vColor`, dimension4);
 
         getBuffer2(layer.pointsizes);
-        shaderVariableToBuffer(`layer${indexLayer}_vPointSize`, 1);
+        shaderVariableToBuffer(`layer${indexLayer}_vPointSize`, dimension1);
 
         getBuffer2(layer.atlasIds);
-        shaderVariableToBuffer(`layer${indexLayer}_vAtlasId`, 1);
+        shaderVariableToBuffer(`layer${indexLayer}_vAtlasId`, dimension1);
 
         getBuffer2(layer.modifieds);
-        shaderVariableToBuffer(`layer${indexLayer}_vModified`, 1);
+        shaderVariableToBuffer(`layer${indexLayer}_vModified`, dimension1);
 
-        drawPoints2(vBuffer, layer.vertices, 3);
-    });
+        drawPoints2(vBuffer, layer.vertices, dimension3);
+    }
 }
 
 

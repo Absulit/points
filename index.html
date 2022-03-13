@@ -71,10 +71,10 @@
 
             void main() {
                 float usedLayers = 2.;
-                //fColor = vColor;
-                fColor = calculateColors();
-                //fAtlasId = vAtlasId;
-                fAtlasId = layer0_vAtlasId;
+                fColor = vColor;
+                //fColor = calculateColors();
+                fAtlasId = vAtlasId;
+                //fAtlasId = layer0_vAtlasId;
 
                 //gl_Position = uRotation * vPosition;
 
@@ -82,13 +82,13 @@
                 float y = getWebGLCoordinate(vPosition.y, 800.0, true);
                 vec4 newPosition = vec4(x, y, 0, 1);
                 gl_Position = newPosition;*/
-                //gl_Position = vPosition;
-                gl_Position = layer0_vPosition;
+                gl_Position = vPosition;
+                //gl_Position = layer0_vPosition;
 
                 //gl_PointSize = u_pointsize;
                 //gl_PointSize = vColor.r * u_pointsize; // cool!
-                //gl_PointSize = vPointSize;
-                gl_PointSize = calculatePointSizes();
+                gl_PointSize = vPointSize;
+                //gl_PointSize = calculatePointSizes();
             }
         </script>
         <script id="fragment-shader" type="x-shader/x-fragment">
