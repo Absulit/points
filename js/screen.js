@@ -44,12 +44,12 @@ class Screen {
         }
 
         this._pointSize = this._pointSizeFull - this._numMargin;
-        this._mainLayer = this._createLayer();
+        this._mainLayer = this._createLayer(-1);
         this._createLayers();
 
     }
 
-    _createLayer() {
+    _createLayer(zDepth) {
         let layer = new Layer();
 
         let row;
@@ -58,7 +58,7 @@ class Screen {
             row = [];
             for (let xCoordinate = 0; xCoordinate < this._numColumns; xCoordinate++) {
                 point = new Point();
-                point.position.set((xCoordinate * this._pointSizeFull) + this._pointSizeHalf, (yCoordinate * this._pointSizeFull) + this._pointSizeHalf, 0);
+                point.position.set((xCoordinate * this._pointSizeFull) + this._pointSizeHalf, (yCoordinate * this._pointSizeFull) + this._pointSizeHalf, zDepth);
                 //point.setColor(Math.random(), 1, Math.random(), 1);
 
                 if (!point.position.value.calculated) {
@@ -87,7 +87,7 @@ class Screen {
 
     _createLayers() {
         for (let layerIndex = 0; layerIndex < this._numLayers; layerIndex++) {
-            this._layers.push(this._createLayer());
+            this._layers.push(this._createLayer((layerIndex / this._numLayers)));
         }
         this._currentLayer = this._layers[this._layerIndex];
     }
@@ -627,7 +627,7 @@ class Screen {
 
     /**
      * @deprecated removed in favor of layer methods
-     * @param {*} point 
+     * @param {*} point
      */
     _addToPrint(point) {
         //this._vertices.push(point.position.value);
