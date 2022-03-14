@@ -44,7 +44,7 @@ class Screen {
         }
 
         this._pointSize = this._pointSizeFull - this._numMargin;
-        this._mainLayer = this._createLayer(-1);
+        //this._mainLayer = this._createLayer(-1);
         this._createLayers();
 
     }
@@ -87,7 +87,7 @@ class Screen {
 
     _createLayers() {
         for (let layerIndex = 0; layerIndex < this._numLayers; layerIndex++) {
-            this._layers.push(this._createLayer((layerIndex / this._numLayers)));
+            this._layers.push(this._createLayer(((layerIndex) / this._numLayers) * -1));
         }
         this._currentLayer = this._layers[this._layerIndex];
     }
@@ -144,6 +144,21 @@ class Screen {
             finalPoint.color = tempColor.value;
             finalPoint.size = tempSize.value;
             finalPoint.atlasId = tempAtlas.value;
+        }
+    }
+
+    _groupLayers() {
+        for (let layerIndex = 0; layerIndex < this._layers.length; layerIndex++) {
+            const layer = this._layers[layerIndex];
+            for (let index = 0; index < layer.points.length; index++) {
+                const point = layer.points[index];
+                if (point.modified) {
+                    point.position.value.forEach(v => this._vertices.push(v));
+                    point.color.value.forEach(c => this._colors.push(c));
+                    this._pointsizes.push(point.size);
+                    this._atlasids.push(point.atlasId);
+                }
+            }
         }
     }
 

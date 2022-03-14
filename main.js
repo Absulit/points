@@ -92,22 +92,24 @@ function update() {
         ucos = Math.cos(utime);
         urounddec = utime % 1;
 
-        screen.layerIndex = 0;
-            screen.drawCircle(10,10, 10, 1,0,0);
-            demo.update(usin, ucos, side, utime);
+        screen.layerIndex = 0;//--------------------------- LAYER 0
+        screen.drawCircle(10, 10, 10, 1, 0, 0);
+        demo.update(usin, ucos, side, utime);
 
-        screen.layerIndex = 1;
+        screen.layerIndex = 1;//--------------------------- LAYER 1
+        let c = screen.numColumns / 100;
+        screen.drawCircle(20 * c, 20 * c, 10 * c, 0, 1, 0);
+        screen.points.forEach(point => {
+            point.size = point.getBrightness() * screen.pointSizeFull;
+            //point.color.a = point.getBrightness() * screen.pointSizeFull
+        });
+        effects.antialias(3);
+        //effects.soften2(3);
 
-            screen.drawCircle(20,20, 10, 0,1,0);
-            screen.points.forEach(point => {
-                point.size = point.getBrightness() * screen.pointSizeFull;
-            });
-            //effects.soften2(3);
-            //effects.soften2(3);
 
-
-        screen._mergeLayers();
-        screen._addPointsToPrint();
+        //screen._mergeLayers();
+        //screen._addPointsToPrint();
+        screen._groupLayers();
 
         vertices = screen._vertices;
         colors = screen._colors;
@@ -135,6 +137,7 @@ function update() {
             atlasids: atlasids,
             //layers: layers,
         }
+        //console.log(cache.data)
 
         screen._vertices = [];
         screen._colors = [];

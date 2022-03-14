@@ -14,6 +14,8 @@ export function initWebGL(canvasId, depth) {
     if (depth) {
         gl.enable(gl.DEPTH_TEST);
     }
+    gl.enable(gl.BLEND)
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 }
 
 export function setClearColor(color) {
