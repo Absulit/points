@@ -400,6 +400,35 @@ class Screen {
         }
     }
 
+    clearAlpha(level = 2){
+        let pointColor = null;
+        //this._currentLayer.rows.forEach(row => {
+        const rowsLength = this._currentLayer.rows.length;
+        let rowLength;
+        for (let index = 0; index < rowsLength; index++) {
+            const row = this._currentLayer.rows[index];
+            rowLength = row.length
+            for (let i = 0; i < rowLength; i++) {
+                //row.forEach(point => {
+                const point = row[i];
+                if (point.modified) {
+                    pointColor = point.color;
+                    point.setColor(
+                        (pointColor.r),
+                        (pointColor.g),
+                        (pointColor.b),
+                        (pointColor.a) / level
+                    );
+                }
+                if (point.size < this._pointSize) {
+                    point.size = this._pointSize;
+                }
+                //});
+            }
+            //});
+        }
+    }
+
     /*fade(level = 2, layer = 0) {
         let pointColor = null;
         this._rows.forEach(row => {

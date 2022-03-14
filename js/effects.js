@@ -95,7 +95,8 @@ class Effects {
                         pointAround.setColor(
                             (point.color.r + pointAround.color.r * colorPower) / (colorPower + 1),
                             (point.color.g + pointAround.color.g * colorPower) / (colorPower + 1),
-                            (point.color.b + pointAround.color.b * colorPower) / (colorPower + 1)
+                            (point.color.b + pointAround.color.b * colorPower) / (colorPower + 1),
+                            (point.color.a + pointAround.color.a * colorPower) / (colorPower + 1)
                         );
                     }
                 })
@@ -117,12 +118,13 @@ class Effects {
                         pointAround.setColor(
                             (point.color.r + pointAround.color.r * colorPower) / (colorPower + 1),
                             (point.color.g + pointAround.color.g * colorPower) / (colorPower + 1),
-                            (point.color.b + pointAround.color.b * colorPower) / (colorPower + 1)
+                            (point.color.b + pointAround.color.b * colorPower) / (colorPower + 1),
+                            (point.color.a + pointAround.color.a * colorPower) / (colorPower + 1)
                         );
                     }
                 })
             }
-        //});
+            //});
         }
     }
 
@@ -190,7 +192,8 @@ class Effects {
                         pointAround.setColor(
                             (point.color.r + pointAround.color.r * colorPower) / (colorPower + 1),
                             (point.color.g + pointAround.color.g * colorPower) / (colorPower + 1),
-                            (point.color.b + pointAround.color.b * colorPower) / (colorPower + 1)
+                            (point.color.b + pointAround.color.b * colorPower) / (colorPower + 1),
+                            (point.color.a + pointAround.color.a * colorPower) / (colorPower + 1)
                         );
                     }
                 });
@@ -269,7 +272,7 @@ class Effects {
                 }
 
                 let points = this._screen.getPointsAround(point);
-                
+
                 let subPoints = null;
                 if (isHorizontal) {
                     if (pixelStep >= 0) {
@@ -291,7 +294,8 @@ class Effects {
                         pointAround.setColor(
                             (point.color.r + pointAround.color.r * colorPower) / (colorPower + 1),
                             (point.color.g + pointAround.color.g * colorPower) / (colorPower + 1),
-                            (point.color.b + pointAround.color.b * colorPower) / (colorPower + 1)
+                            (point.color.b + pointAround.color.b * colorPower) / (colorPower + 1),
+                            (point.color.a + pointAround.color.a * colorPower) / (colorPower + 1)
                         );
                     }
                 });
