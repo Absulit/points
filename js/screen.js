@@ -50,7 +50,7 @@ class Screen {
     }
 
     _createLayer(zDepth) {
-        let layer = new Layer();
+        let layer = new Layer(this._numRows, this._numColumns);
 
         let row;
         let point;
@@ -58,6 +58,7 @@ class Screen {
             row = [];
             for (let xCoordinate = 0; xCoordinate < this._numColumns; xCoordinate++) {
                 point = new Point();
+                point.layer = layer;
                 point.position.set((xCoordinate * this._pointSizeFull) + this._pointSizeHalf, (yCoordinate * this._pointSizeFull) + this._pointSizeHalf, zDepth);
                 //point.setColor(Math.random(), 1, Math.random(), 1);
 
@@ -150,15 +151,10 @@ class Screen {
     _groupLayers() {
         for (let layerIndex = 0; layerIndex < this._layers.length; layerIndex++) {
             const layer = this._layers[layerIndex];
-            for (let index = 0; index < layer.points.length; index++) {
-                const point = layer.points[index];
-                if (point.modified) {
-                    point.position.value.forEach(v => this._vertices.push(v));
-                    point.color.value.forEach(c => this._colors.push(c));
-                    this._pointsizes.push(point.size);
-                    this._atlasids.push(point.atlasId);
-                }
-            }
+            this._vertices = this._vertices.concat(layer.vertices);
+            this._colors = this._colors.concat(layer.colors);
+            this._pointsizes = this._pointsizes.concat(layer.pointsizes);
+            this._atlasids = this._atlasids.concat(layer.atlasIds);
         }
     }
 
