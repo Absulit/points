@@ -205,16 +205,17 @@ export function generateBuffers(meshRes) {
 /************************************************************************/
 // MINI ENGINE for POINTS
 
+const dimension4 = 4;
+const dimension3 = 3;
+const dimension1 = 1;
 export function printPoints(vertices, colors, pointsizes, atlasids) {
-    const dimension = 3;
-    const dimension1 = 1;
     //vertices = flatten(vertices);
     const vBuffer = getBuffer2(vertices);
-    shaderVariableToBuffer("vPosition", dimension);
+    shaderVariableToBuffer("vPosition", dimension3);
 
     //colors = flatten(colors); // TODO: test if call is required
     getBuffer2(colors);
-    shaderVariableToBuffer("vColor", 4);
+    shaderVariableToBuffer("vColor", dimension4);
 
     //pointsizes = pointsizes;
     getBuffer2(pointsizes);
@@ -224,7 +225,7 @@ export function printPoints(vertices, colors, pointsizes, atlasids) {
     getBuffer2(atlasids);
     shaderVariableToBuffer("vAtlasId", dimension1);
 
-    drawPoints2(vBuffer, vertices, dimension);
+    drawPoints2(vBuffer, vertices, dimension3);
 }
 
 function printPoint(point) {
@@ -237,9 +238,7 @@ function printPoint(point) {
     drawPoints2(vBuffer, point.position.value);
 }
 
-const dimension4 = 4;
-const dimension3 = 3;
-const dimension1 = 1;
+
 export function printLayers(layers) {
     for (let indexLayer = 0; indexLayer < layers.length; indexLayer++) {
         const layer = layers[indexLayer];
