@@ -1,12 +1,21 @@
 import Utils from './utils.js';
 
 class Layer {
-    constructor() {
+    constructor(numRows, numColumns) {
+        this._numRows = numRows;
+        this._numColumns = numColumns;
+
         this._columns = [];
         this._rows = [];
         this._points = [];
 
         this._shuffledPoints = null;
+
+        const numItems = numRows * numColumns;
+        this._vertices = Array(numItems * 3).fill(0);
+        this._colors = Array(numItems * 4).fill(0);
+        this._pointsizes = Array(numItems).fill(0);
+        this._atlasIds = Array(numItems).fill(-1);
     }
 
     get columns() {
@@ -26,55 +35,68 @@ class Layer {
     }
 
     get vertices() {
-        let vertices = [];
-        for (let index = 0; index < this._points.length; index++) {
-            const point = this._points[index];
-            //if (point.modified) {
-                point.position.value.forEach(p => vertices.push(p));
-            //}
-        }
-        return vertices;
+        return this._vertices;
+    }
+
+    set vertices(value) {
+        this._vertices = value;
+    }
+
+    setVertex(pointCoordinate, positionCoordinate) {
+        const startPosition = (pointCoordinate.x + (pointCoordinate.y * this._numColumns)) * 3;
+        this._vertices[startPosition] = positionCoordinate.value[0];
+        this._vertices[startPosition + 1] = positionCoordinate.value[1];
+        this._vertices[startPosition + 2] = positionCoordinate.value[2];
     }
 
     get colors() {
-        let colors = [];
-        for (let index = 0; index < this._points.length; index++) {
-            const point = this._points[index];
-            //if (point.modified) {
-                point.color.value.forEach(c => colors.push(c));
-            //}
-        }
-        return colors;
+        return this._colors;
+    }
+
+    set colors(value) {
+        this._colors = value;
+    }
+
+    setColor(pointCoordinate, value) {
+        const startPosition = (pointCoordinate.x + (pointCoordinate.y * this._numColumns)) * 4;
+        this._colors[startPosition] = value.r;
+        this._colors[startPosition + 1] = value.g
+        this._colors[startPosition + 2] = value.b;
+        this._colors[startPosition + 3] = value.a;
     }
 
     get pointsizes() {
-        let pointsizes = [];
-        for (let index = 0; index < this._points.length; index++) {
-            const point = this._points[index];
-            //if (point.modified) {
-                pointsizes.push(point.size);
-            //}
-        }
-        return pointsizes;
+        return this._pointsizes;
+    }
+
+    set pointsizes(value) {
+        this._pointsizes = value;
+    }
+
+    setPointSize(pointCoordinate, value) {
+        const startPosition = (pointCoordinate.x + (pointCoordinate.y * this._numColumns));
+        this._pointsizes[startPosition] = value;
     }
 
     get atlasIds() {
-        let atlasIds = [];
-        for (let index = 0; index < this._points.length; index++) {
-            const point = this._points[index];
-            //if (point.modified) {
-                atlasIds.push(point.atlasId);
-            //}
-        }
-        return atlasIds;
+        return this._atlasIds;
     }
 
-    get modifieds(){
+    set atlasIds(value) {
+        this._atlasIds = value;
+    }
+
+    setAtlasId(pointCoordinate, value) {
+        const startPosition = (pointCoordinate.x + (pointCoordinate.y * this._numColumns));
+        this._atlasIds[startPosition] = value;
+    }
+
+    get modifieds() {
         let modifieds = [];
         for (let index = 0; index < this._points.length; index++) {
             const point = this._points[index];
             //if (point.modified) {
-                modifieds.push(point.modified);
+            modifieds.push(point.modified);
             //}
         }
         return modifieds;

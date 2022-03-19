@@ -10,7 +10,7 @@ class Point {
         this._layer = 0;
         this._size = 1.0;
 
-        this._atlastId = -1;
+        this._atlasId = -1;
 
         // minimum value the color is so dim
         // it's no longer visible
@@ -24,19 +24,19 @@ class Point {
     set color(value) {
         this._color = value;
         this._modified = true;
-        this._checkColors();
+        this._layer.setColor(this._coordinates, this._color);
     }
 
     setColor(r, g, b, a = 1) {
         this._color.set(r, g, b, a);
         this._modified = true;
-        this._checkColors();
+        this._layer.setColor(this._coordinates, this._color);
     }
 
     setBrightness(value) {
         this._color.brightness = value;
         this._modified = true;
-        this._checkColors();
+        this._layer.setColor(this._coordinates, this._color);
     }
 
     getBrightness() {
@@ -46,6 +46,7 @@ class Point {
     addColor(color) {
         this._color.add(color);
         this._modified = true;
+        this._layer.setColor(this._coordinates, this._color);
     }
 
     get position() {
@@ -59,6 +60,7 @@ class Point {
     set position(value) {
         this._position = value;
         //this._modified = true;
+        this._layer.setVertex(this._coordinates, this._position);
     }
 
     /**
@@ -71,6 +73,7 @@ class Point {
     setPosition(x, y, z) {
         this._position.set(x, y, z);
         this._modified = true;
+        this._layer.setVertex(this._coordinates, this._position);
     }
 
     /**
@@ -100,10 +103,12 @@ class Point {
      */
     set coordinates(value) {
         this._coordinates = value;
+        this._layer.setVertex(this._coordinates, this._position);
     }
 
     setCoordinates(x, y, z) {
         this._coordinates.set(x, y, z);
+        this._layer.setVertex(this._coordinates, this._position);
     }
 
     get layer() {
@@ -120,14 +125,22 @@ class Point {
 
     set size(value) {
         this._size = value;
+
+        //const startPosition = this._coordinates.x * this._coordinates.y;
+        //this._layer.pointsizes[startPosition] = this._size;
+        this._layer.setPointSize(this._coordinates, this._size)
     }
 
     get atlasId() {
-        return this._atlastId;
+        return this._atlasId;
     }
 
     set atlasId(value) {
-        this._atlastId = value;
+        this._atlasId = value;
+
+        const startPosition = this._coordinates.x * this._coordinates.y;
+        this._layer.atlasIds[startPosition] = this._atlasId;
+        this._layer.setAtlasId(this._coordinates, this._atlasId)
     }
 
     /**
@@ -138,7 +151,7 @@ class Point {
      */
     _checkColors() {
         if (this._color.value[3] < this._minimunVisibleValue) {
-            this._color.set(0, 0, 0, 1);
+            this._color.set(0, 0, 0, 0);
             this._modified = false;
         } else {
             const [r, g, b] = this._color.value;
@@ -146,7 +159,7 @@ class Point {
             const gBelow = g < this._minimunVisibleValue;
             const bBelow = b < this._minimunVisibleValue;
             if (rBelow && gBelow && bBelow) {
-                this._color.set(0, 0, 0, 1);
+                this._color.set(0, 0, 0, 0);
                 this._modified = false;
             }
         }

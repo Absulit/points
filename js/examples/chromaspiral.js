@@ -50,6 +50,7 @@ class ChromaSpiral {
         this._effects.soften2(3);
         //this._effects.antialias();
         this._screen.clearMix(new RGBAColor(0,0,0), 1.1);
+        //this._screen.clearAlpha(1.1);
 
 
     }

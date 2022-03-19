@@ -44,13 +44,13 @@ class Screen {
         }
 
         this._pointSize = this._pointSizeFull - this._numMargin;
-        this._mainLayer = this._createLayer();
+        //this._mainLayer = this._createLayer(-1);
         this._createLayers();
 
     }
 
-    _createLayer() {
-        let layer = new Layer();
+    _createLayer(zDepth) {
+        let layer = new Layer(this._numRows, this._numColumns);
 
         let row;
         let point;
@@ -58,7 +58,8 @@ class Screen {
             row = [];
             for (let xCoordinate = 0; xCoordinate < this._numColumns; xCoordinate++) {
                 point = new Point();
-                point.position.set((xCoordinate * this._pointSizeFull) + this._pointSizeHalf, (yCoordinate * this._pointSizeFull) + this._pointSizeHalf, 0);
+                point.layer = layer;
+                point.position.set((xCoordinate * this._pointSizeFull) + this._pointSizeHalf, (yCoordinate * this._pointSizeFull) + this._pointSizeHalf, zDepth);
                 //point.setColor(Math.random(), 1, Math.random(), 1);
 
                 if (!point.position.value.calculated) {
@@ -87,7 +88,7 @@ class Screen {
 
     _createLayers() {
         for (let layerIndex = 0; layerIndex < this._numLayers; layerIndex++) {
-            this._layers.push(this._createLayer());
+            this._layers.push(this._createLayer(((layerIndex) / this._numLayers) * -1));
         }
         this._currentLayer = this._layers[this._layerIndex];
     }
@@ -144,6 +145,16 @@ class Screen {
             finalPoint.color = tempColor.value;
             finalPoint.size = tempSize.value;
             finalPoint.atlasId = tempAtlas.value;
+        }
+    }
+
+    _groupLayers() {
+        for (let layerIndex = 0; layerIndex < this._layers.length; layerIndex++) {
+            const layer = this._layers[layerIndex];
+            this._vertices = this._vertices.concat(layer.vertices);
+            this._colors = this._colors.concat(layer.colors);
+            this._pointsizes = this._pointsizes.concat(layer.pointsizes);
+            this._atlasids = this._atlasids.concat(layer.atlasIds);
         }
     }
 
@@ -374,6 +385,35 @@ class Screen {
                         (pointColor.g + color.g) / level,
                         (pointColor.b + color.b) / level,
                         (pointColor.a + color.a)
+                    );
+                }
+                if (point.size < this._pointSize) {
+                    point.size = this._pointSize;
+                }
+                //});
+            }
+            //});
+        }
+    }
+
+    clearAlpha(level = 2){
+        let pointColor = null;
+        //this._currentLayer.rows.forEach(row => {
+        const rowsLength = this._currentLayer.rows.length;
+        let rowLength;
+        for (let index = 0; index < rowsLength; index++) {
+            const row = this._currentLayer.rows[index];
+            rowLength = row.length
+            for (let i = 0; i < rowLength; i++) {
+                //row.forEach(point => {
+                const point = row[i];
+                if (point.modified) {
+                    pointColor = point.color;
+                    point.setColor(
+                        (pointColor.r),
+                        (pointColor.g),
+                        (pointColor.b),
+                        (pointColor.a) / level
                     );
                 }
                 if (point.size < this._pointSize) {
@@ -627,7 +667,7 @@ class Screen {
 
     /**
      * @deprecated removed in favor of layer methods
-     * @param {*} point 
+     * @param {*} point
      */
     _addToPrint(point) {
         //this._vertices.push(point.position.value);
