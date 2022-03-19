@@ -165,7 +165,7 @@ function update() {
         pointsizes = currentFrameData.pointsizes;
         atlasids = currentFrameData.atlasids;*/
     });
-    printPoints(vertices, colors, pointsizes, atlasids);
+    //printPoints(vertices, colors, pointsizes, atlasids);
 
     /*************/
 
