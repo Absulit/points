@@ -125,9 +125,6 @@ class Point {
 
     set size(value) {
         this._size = value;
-
-        //const startPosition = this._coordinates.x * this._coordinates.y;
-        //this._layer.pointsizes[startPosition] = this._size;
         this._layer.setPointSize(this._coordinates, this._size)
     }
 
@@ -137,9 +134,6 @@ class Point {
 
     set atlasId(value) {
         this._atlasId = value;
-
-        const startPosition = this._coordinates.x * this._coordinates.y;
-        this._layer.atlasIds[startPosition] = this._atlasId;
         this._layer.setAtlasId(this._coordinates, this._atlasId)
     }
 

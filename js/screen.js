@@ -42,6 +42,7 @@ class Screen {
         } else {
             this._pointSizeFull = this._canvas.height / this._numRows;
         }
+        this._pointSizeHalf = this._pointSizeFull / 2;
 
         this._pointSize = this._pointSizeFull - this._numMargin;
         //this._mainLayer = this._createLayer(-1);

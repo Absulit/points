@@ -20,10 +20,11 @@ import ColorCoordinates from './js/examples/colorcoordinates.js';
 import RGBAColor from './js/color.js';
 import Effects from './js/effects.js';
 import PolygonChange from './js/examples/polygonchange.js';
+import Gen1 from './js/genuary2022/01/gen1.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
-document.body.appendChild(stats.dom);
+//document.body.appendChild(stats.dom);
 
 let capturer = new CCapture({
     format: 'jpg',
@@ -37,7 +38,7 @@ let aspect,
 let side = 100;
 let numColumns = side;
 let numRows = side;
-let numMargin = 0;
+let numMargin = 1;
 let screen;
 let numLayers = 2;
 
@@ -67,9 +68,9 @@ function init() {
     //-----------
     screen = new Screen(canvas, numColumns, numRows, numMargin, numLayers);
 
-    cache = new Cache();
+    cache = new Cache(60*30);
 
-    demo = new ChromaSpiral(screen);
+    demo = new Gen1(screen);
 
     effects = new Effects(screen);
 
@@ -93,22 +94,8 @@ function update() {
         urounddec = utime % 1;
 
         screen.layerIndex = 0;//--------------------------- LAYER 0
-        screen.drawCircle(10, 10, 10, 1, 0, 0);
         demo.update(usin, ucos, side, utime);
 
-        screen.layerIndex = 1;//--------------------------- LAYER 1
-        let c = screen.numColumns / 100;
-        screen.drawCircle(20 * c, 20 * c, 10 * c, 0, 1, 0);
-        screen.points.forEach(point => {
-            point.size = point.getBrightness() * screen.pointSizeFull;
-            //point.color.a = point.getBrightness() * screen.pointSizeFull
-        });
-        effects.antialias(3);
-        //effects.soften2(3);
-
-
-        //screen._mergeLayers();
-        //screen._addPointsToPrint();
         screen._groupLayers();
 
         vertices = screen._vertices;
@@ -117,27 +104,12 @@ function update() {
         atlasids = screen._atlasids;
         layers = [];
 
-        /*for (let index = 0; index < screen.layers.length; index++) {
-            const layer = screen.layers[index];
-            layers.push(
-                {
-                    vertices: layer.vertices,
-                    colors: layer.colors,
-                    pointsizes: layer.pointsizes,
-                    atlasIds: layer.atlasIds,
-                    modifieds: layer.modifieds
-                }
-            );
-        }*/
-
         cache.data = {
             vertices: vertices,
             colors: colors,
             pointsizes: pointsizes,
             atlasids: atlasids,
-            //layers: layers,
         }
-        //console.log(cache.data)
 
         screen._vertices = [];
         screen._colors = [];
@@ -149,10 +121,8 @@ function update() {
         colors = currentFrameData.colors;
         pointsizes = currentFrameData.pointsizes;
         atlasids = currentFrameData.atlasids;
-        //layers = currentFrameData.layers;
     });
     printPoints(vertices, colors, pointsizes, atlasids);
-    //printLayers(layers);
 
     /*************/
 
