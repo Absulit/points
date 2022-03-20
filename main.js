@@ -21,6 +21,7 @@ import RGBAColor from './js/color.js';
 import Effects from './js/effects.js';
 import PolygonChange from './js/examples/polygonchange.js';
 import Gen1 from './js/genuary2022/01/gen1.js';
+import Gen2 from './js/genuary2022/02/gen2.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -35,10 +36,10 @@ let capturer = new CCapture({
 let aspect,
     utime = 0;
 
-let side = 100;
+let side = 600;
 let numColumns = side;
 let numRows = side;
-let numMargin = 1;
+let numMargin = 0;
 let screen;
 let numLayers = 2;
 
@@ -70,7 +71,7 @@ function init() {
 
     cache = new Cache(60*30);
 
-    demo = new Gen1(screen);
+    demo = new Gen2(screen);
 
     effects = new Effects(screen);
 
@@ -104,12 +105,12 @@ function update() {
         atlasids = screen._atlasids;
         layers = [];
 
-        cache.data = {
+        /*cache.data = {
             vertices: vertices,
             colors: colors,
             pointsizes: pointsizes,
             atlasids: atlasids,
-        }
+        }*/
 
         screen._vertices = [];
         screen._colors = [];
