@@ -17,7 +17,7 @@ export default class Gen4 {
             throw ('this demo needs 1px margin')
         }*/
 
-
+        const side = screen.numColumns;
         this._constant = screen.numColumns / 100;
         console.log('---- CONSTANT: ', this._constant);
 
@@ -27,7 +27,7 @@ export default class Gen4 {
             const y = Math.floor(screen.numColumns * Math.random());
             const startPosition = {
                 position: new Coordinate(x, y),
-                color: new RGBAColor(Math.random(), Math.random(), 0),
+                color: new RGBAColor(x/side, y/side, y/side),
                 prevPoint: null
             }
                 ;
