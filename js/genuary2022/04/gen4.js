@@ -71,7 +71,7 @@ export default class Gen4 {
         this._startPositions.forEach(startPosition => {
             this.drawCurve(startPosition, 10, 10);
         });
-        this._effects.antialias();
+        //this._effects.antialias();
         //this._effects.soften3(3);
     }
 
