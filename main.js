@@ -38,12 +38,12 @@ let capturer = new CCapture({
 let aspect,
     utime = 0;
 
-let side = 800;
+let side = 400;
 let numColumns = side;
 let numRows = side;
 let numMargin = 0;
 let screen;
-let numLayers = 2;
+let numLayers = 3;
 
 let uround;
 let urounddec;

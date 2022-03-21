@@ -1,10 +1,12 @@
 import RGBAColor from '../../color.js';
 import Coordinate from '../../coordinate.js';
+import Effects from '../../effects.js';
 import MathUtil from '../../mathutil.js';
 
 export default class Gen4 {
     constructor(screen) {
         this._screen = screen;
+        this._effects = new Effects(screen);
         this._clearMixColor = new RGBAColor(0, 0, 0);
 
         /*const is10K = (screen.numRows * screen.numColumns) == 10000
@@ -15,10 +17,12 @@ export default class Gen4 {
             throw ('this demo needs 1px margin')
         }*/
 
+
         this._constant = screen.numColumns / 100;
+        console.log('---- CONSTANT: ', this._constant);
 
         this._startPositions = []
-        for (let index = 0; index < 1000; index++) {
+        for (let index = 0; index < 4000; index++) {
             const x = Math.floor(screen.numColumns * Math.random());
             const y = Math.floor(screen.numColumns * Math.random());
             const startPosition = {
@@ -26,30 +30,49 @@ export default class Gen4 {
                 color: new RGBAColor(Math.random(), Math.random(), 0),
                 prevPoint: null
             }
-            ;
+                ;
             this._startPositions.push(startPosition);
         }
 
+        screen.layerIndex = 0;//--------------------------- LAYER 0
+        this._randomPoints = [];
+        for (let index = 0; index < (40 * this._constant); index++) {
+            this._randomPoints.push(screen.getRandomPoint());
+        }
+        //console.log('---- this._randomPoints: ', this._randomPoints);
+        this._randomPoints.forEach(randomPoint => {
+            //randomPoint.setBrightness(1);
+            const {x,y} = randomPoint.coordinates;
+            screen.drawFilledSquare(x,y, 10 * this._constant, 1,1,1);
+        });
 
-        this._left_x = screen.numColumns * -0.5;
-        this._right_x = screen.numColumns * 1.5;
-        this._top_y = screen.numRows * -0.5;
-        this._bottom_y = screen.numRows * 1.5;
+        for (let index = 0; index < 6; index++) {
+            this._effects.soften2(4, 2.5 * this._constant);
+            //this._effects.soften2(16/this._constant, 2.5 * this._constant);
+        }
 
-        this._resolution = Math.floor(screen.numColumns * 0.01)
+        screen.layerIndex = 2;//--------------------------- LAYER 1
+        screen.points.forEach((point, index) => {
+            point.setBrightness(0);
+        });
 
-        screen.points.forEach(point => {
-            point.angle = (point.position.x / screen.numColumns) * Math.PI ;
+
+        screen.layerIndex = 2;//--------------------------- LAYER 2
+        screen.points.forEach((point, index) => {
+            //point.angle = (point.position.x / screen.numColumns) * Math.PI;
+            point.angle = screen.layers[0].points[index].getBrightness() * Math.PI * 2;
         });
     }
 
     update(usin, ucos, side, utime) {
         const screen = this._screen
 
+        screen.layerIndex = 2;//--------------------------- LAYER 2
         this._startPositions.forEach(startPosition => {
-            this.drawCurve(startPosition, 1, 10);
+            this.drawCurve(startPosition, 10, 10);
         });
-
+        this._effects.antialias();
+        //this._effects.soften3(3);
     }
 
     drawCurve(startPosition, numSteps, stepLength = 10) {
@@ -57,20 +80,14 @@ export default class Gen4 {
         let point = null;
         for (let index = 0; index < numSteps; index++) {
 
-            // let x_offset = x - left_x
-            // let y_offset = y - top_y
-            // let column_index = int(x_offset / resolution)
-            // let row_index = int(y_offset / resolution)
-
             point = this._screen.getPointAt(x, y);
-            if(point){
-                //point.setBrightness(1);
+            if (point) {
                 point.color = startPosition.color;
                 const mathPoint = MathUtil.polar(stepLength, point.angle);
                 startPosition.position.x = Math.floor(mathPoint.x + x);
                 startPosition.position.y = Math.floor(mathPoint.y + y);
 
-                if(startPosition.prevPoint){
+                if (startPosition.prevPoint) {
                     this._screen.drawLineWithPoints(startPosition.prevPoint, point);
                 }
                 startPosition.prevPoint = point;

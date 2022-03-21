@@ -397,7 +397,7 @@ class Screen {
         }
     }
 
-    clearAlpha(level = 2){
+    clearAlpha(level = 2) {
         let pointColor = null;
         //this._currentLayer.rows.forEach(row => {
         const rowsLength = this._currentLayer.rows.length;
@@ -658,6 +658,25 @@ class Screen {
             lastVertexY = vertexY;
         }
         this.drawLine(lastVertexX, lastVertexY, firstVertexX, firstVertexY, color);
+    }
+
+    drawFilledSquare(x, y, sideLength, r, g, b) {
+        x -= sideLength * .5;
+        y -= sideLength * .5;
+        const finalX = x + sideLength;
+        const finalY = y + sideLength;
+        let point = null;
+        for (let currentX = x; currentX < finalX; currentX++) {
+
+            for (let currentY = y; currentY < finalY; currentY++) {
+                point = this.getPointAt(currentX, currentY);
+                if (point) {
+                    point.setColor(r, g, b);
+                }
+            }
+
+        }
+
     }
 
     _getWebGLCoordinate(value, side, invert = false) {
