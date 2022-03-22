@@ -16,13 +16,16 @@ export default class Gen4 {
         if(screen._numMargin != 1){
             throw ('this demo needs 1px margin')
         }*/
+        if (screen.layers.length != 3) {
+            throw new Error(`This demo needs 3 layers to work`);
+        }
 
         const side = screen.numColumns;
         this._constant = screen.numColumns / 100;
         console.log('---- CONSTANT: ', this._constant);
 
         this._startPositions = []
-        for (let index = 0; index < 4000; index++) {
+        for (let index = 0; index < (1000 * this._constant); index++) {
             const x = Math.floor(screen.numColumns * Math.random());
             const y = Math.floor(screen.numColumns * Math.random());
             const startPosition = {
