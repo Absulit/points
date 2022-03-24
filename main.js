@@ -27,6 +27,7 @@ import Gen4 from './js/genuary2022/04/gen4.js';
 import Gen5 from './js/genuary2022/05/gen5.js';
 import Gen6 from './js/genuary2022/06/gen6.js';
 import Gen7 from './js/genuary2022/07/gen7.js';
+import Gen8 from './js/genuary2022/08/gen8.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -41,7 +42,7 @@ let capturer = new CCapture({
 let aspect,
     utime = 0;
 
-let side = 100;
+let side = 800;
 let numColumns = side;
 let numRows = side;
 let numMargin = 0;
@@ -61,7 +62,6 @@ let vertices = [];
 let colors = [];
 let pointsizes = [];
 let atlasids = [];
-let layers;
 let effects;
 
 function init() {
@@ -76,7 +76,7 @@ function init() {
 
     cache = new Cache(60*30);
 
-    demo = new Gen7(screen);
+    demo = new Gen8(screen);
 
     effects = new Effects(screen);
 
@@ -108,7 +108,6 @@ function update() {
         colors = screen._colors;
         pointsizes = screen._pointsizes;
         atlasids = screen._atlasids;
-        layers = [];
 
         /*cache.data = {
             vertices: vertices,
