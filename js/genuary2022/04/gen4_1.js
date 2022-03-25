@@ -3,7 +3,7 @@ import Coordinate from '../../coordinate.js';
 import Effects from '../../effects.js';
 import MathUtil from '../../mathutil.js';
 
-export default class Gen4 {
+export default class Gen4_1 {
     constructor(screen) {
         this._screen = screen;
         this._effects = new Effects(screen);
@@ -62,7 +62,7 @@ export default class Gen4 {
         screen.layerIndex = 2;//--------------------------- LAYER 2
         screen.points.forEach((point, index) => {
             //point.angle = (point.position.x / screen.numColumns) * Math.PI;
-            point.angle = screen.layers[0].points[index].getBrightness() * Math.PI * 2;
+            point.angle = screen.layers[0].points[index].getBrightness() * Math.PI * 4;
         });
     }
 
@@ -75,6 +75,7 @@ export default class Gen4 {
         });
         //this._effects.antialias();
         //this._effects.soften3(3);
+        this._screen.clearMix(this._clearMixColor, 1.001);
     }
 
     drawCurve(startPosition, numSteps, stepLength = 10) {
@@ -96,4 +97,17 @@ export default class Gen4 {
             }
         }
     }
+
+    createPosition(){
+        const x = Math.floor(this._screen.numColumns * Math.random());
+        const y = Math.floor(this._screen.numColumns * Math.random());
+        const side = this._screen.numColumns;
+        const startPosition = {
+            position: new Coordinate(x, y),
+            color: new RGBAColor(x/side, y/side, y/side),
+            prevPoint: null
+        };
+        return startPosition;
+    }
+
 }
