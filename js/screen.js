@@ -660,6 +660,19 @@ class Screen {
         this.drawLine(lastVertexX, lastVertexY, firstVertexX, firstVertexY, color);
     }
 
+    drawRect(x, y, w, h, color) {
+        color = color || new RGBAColor(1,1,1);
+        this.drawLine(x, y, x + w, y, color);
+        this.drawLine(x, y + h, x + w, y + h, color);
+
+
+        this.drawLine(x, y, x, y + h, color);
+        this.drawLine(x + w, y, x + w, y + h, color);
+        
+
+    }
+
+
     drawFilledSquare(x, y, sideLength, r, g, b) {
         x -= sideLength * .5;
         y -= sideLength * .5;
