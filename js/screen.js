@@ -238,6 +238,16 @@ class Screen {
         return point;
     }
 
+
+    getRandomPointX(y) {
+        let columnIndex = Math.floor(Math.random() * this._numColumns);
+        let rowIndex = y;
+        let row = this._currentLayer.rows[rowIndex];
+        let point = row[columnIndex];
+        point.setCoordinates(columnIndex, rowIndex, 0);
+        return point;
+    }
+
     getLeftPoint(point, distance = 1) {
         let columnIndex = point.coordinates.x;
         let rowIndex = point.coordinates.y;

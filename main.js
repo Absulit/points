@@ -30,6 +30,7 @@ import Gen7 from './js/genuary2022/07/gen7.js';
 import Gen8 from './js/genuary2022/08/gen8.js';
 import Gen9 from './js/genuary2022/09/gen9.js';
 import Gen9_1 from './js/genuary2022/09/gen9_1.js';
+import Gen10 from './js/genuary2022/10/gen10.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -44,7 +45,7 @@ let capturer = new CCapture({
 let aspect,
     utime = 0;
 
-let side = 100;
+let side = 400;
 let numColumns = side;
 let numRows = side;
 let numMargin = 0;
@@ -78,7 +79,7 @@ function init() {
 
     cache = new Cache(60*30);
 
-    demo = new Gen9_1(screen);
+    demo = new Gen10(screen);
 
     effects = new Effects(screen);
 
