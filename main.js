@@ -31,6 +31,7 @@ import Gen8 from './js/genuary2022/08/gen8.js';
 import Gen9 from './js/genuary2022/09/gen9.js';
 import Gen9_1 from './js/genuary2022/09/gen9_1.js';
 import Gen10 from './js/genuary2022/10/gen10.js';
+import Gen12 from './js/genuary2022/12/gen12.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -79,7 +80,7 @@ function init() {
 
     cache = new Cache(60*30);
 
-    demo = new Gen10(screen);
+    demo = new Gen12(screen);
 
     effects = new Effects(screen);
 
