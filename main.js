@@ -32,6 +32,7 @@ import Gen9 from './js/genuary2022/09/gen9.js';
 import Gen9_1 from './js/genuary2022/09/gen9_1.js';
 import Gen10 from './js/genuary2022/10/gen10.js';
 import Gen12 from './js/genuary2022/12/gen12.js';
+import Gen13 from './js/genuary2022/13/gen13.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -47,8 +48,8 @@ let aspect,
     utime = 0;
 
 let side = 400;
-let numColumns = side;
-let numRows = side;
+let numColumns = 800 * 1;
+let numRows = 80 * 1;
 let numMargin = 0;
 let screen;
 let numLayers = 3;
@@ -80,7 +81,7 @@ function init() {
 
     cache = new Cache(60*30);
 
-    demo = new Gen12(screen);
+    demo = new Gen13(screen);
 
     effects = new Effects(screen);
 
