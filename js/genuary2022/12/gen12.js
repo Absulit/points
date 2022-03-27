@@ -37,10 +37,11 @@ export default class Gen12 {
         this._totalCircles = 125 * this._constant;
         this._createCircleAttempts = 125 * this._constant;
 
+        this._circleCounter = 0;
 
-        for (let i = 0; i < this._totalCircles; i++) {
+        /*for (let i = 0; i < this._totalCircles; i++) {
             this.createAndDrawCircle();
-        }
+        }*/
 
         //this._effects.antialias(3);
 
@@ -55,7 +56,8 @@ export default class Gen12 {
             circle = {
                 x: Math.floor(Math.random() * this._screen.numColumns),
                 y: Math.floor(Math.random() * this._screen.numRows),
-                radius: this._minRadius
+                radius: this._minRadius,
+                currentRadius: 0
             };
 
             if (this.doesCircleHaveACollision(circle)) {
@@ -74,6 +76,7 @@ export default class Gen12 {
 
         for (let radiusSize = this._minRadius; radiusSize < this._maxRadius; radiusSize++) {
             circle.radius = radiusSize;
+            //this._screen.drawCircle(circle.x, circle.y, circle.radius, 1, 1, 1);
             if (this.doesCircleHaveACollision(circle)) {
                 circle.radius--;
                 break;
@@ -81,7 +84,7 @@ export default class Gen12 {
         }
 
         this._circles.push(circle);
-        this._screen.drawCircle(circle.x, circle.y, circle.radius, 1, 1, 1);
+        //this._screen.drawCircle(circle.x, circle.y, circle.radius, 1, 1, 1);
     }
 
     doesCircleHaveACollision(circle) {
@@ -117,10 +120,26 @@ export default class Gen12 {
 
         //screen.layerIndex = 1;//--------------------------- LAYER 0
 
-        // this._effects.chromaticAberration(.05, 2);
+        //console.log('_circleCounter: ', this._circleCounter, ' _totalCircles: ',this._totalCircles)
+        if (this._circleCounter++ < this._totalCircles) {
+            this.createAndDrawCircle();
+            this._circles.forEach(circle => {
+                if(circle.currentRadius < circle.radius){
+                    this._screen.drawCircle(circle.x, circle.y, circle.currentRadius++, 1, 1, 1);
+                }else{
+                    this._screen.drawCircle(circle.x, circle.y, circle.radius, 1, 1, 1);
+                }
+            });
+        }else{
+            this._circleCounter = 0;
+            this._circles = [];
+            this._effects.soften2(3);
+        }
+
+        this._effects.chromaticAberration(.05, 2);
         // this._effects.fire(1);
-        // this._effects.soften2(3);
-        //this._effects.antialias(3);
-        // this._screen.clearMix(this._clearMixColor, 1.5);
+        //this._effects.soften2(3);
+        this._effects.antialias(3);
+        this._screen.clearMix(this._clearMixColor, 1.1);
     }
 }
