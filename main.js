@@ -33,6 +33,7 @@ import Gen9_1 from './js/genuary2022/09/gen9_1.js';
 import Gen10 from './js/genuary2022/10/gen10.js';
 import Gen12 from './js/genuary2022/12/gen12.js';
 import Gen13 from './js/genuary2022/13/gen13.js';
+import Gen14 from './js/genuary2022/14/gen14.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -47,9 +48,9 @@ let capturer = new CCapture({
 let aspect,
     utime = 0;
 
-let side = 400;
-let numColumns = 800 * 1;
-let numRows = 80 * 1;
+let side = 200;
+let numColumns = side;
+let numRows = side;
 let numMargin = 0;
 let screen;
 let numLayers = 3;
@@ -81,7 +82,7 @@ function init() {
 
     cache = new Cache(60*30);
 
-    demo = new Gen13(screen);
+    demo = new Gen14(screen);
 
     effects = new Effects(screen);
 

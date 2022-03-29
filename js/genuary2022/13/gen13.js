@@ -22,9 +22,9 @@ export default class Gen13 {
             throw new Error(`This demo needs 3 layers to work`);
         }
 
-        /*if (screen.numColumns != 800 && screen.numRows != 80) {
+        if (screen.numColumns != 800 && screen.numRows != 80) {
             throw new Error(`This demo needs 800x80`);
-        }*/
+        }
 
         this._constant = screen.numColumns / 100;
         this._constantY = screen.numRows / 100;
