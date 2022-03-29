@@ -33,7 +33,7 @@ export default class Gen14 {
         this._xIndex = 0
         this._centerRows = screen.numRows / 2;
 
-        this._DA = 1.5;
+        this._DA = 1;
         this._DB = .5;
         this._feed = .055;
         this._k = .062;
@@ -41,31 +41,19 @@ export default class Gen14 {
         screen.layerIndex = 0;//--------------------------- LAYER 0
 
         screen.points.forEach(point => {
-            point.chemicals = {
-                a: 1,
-                b: 0
-            }
-            point.setColor(0, 0, 0)
+            point.chemicals = { a: 1, b: 0 }
+            point.setColor(0, 0, 0, 0);
         });
-        for (let i = 0; i < 3 * this._constant; i++) {
-            for (let j = 0; j < 3 * this._constant; j++) {
+        for (let i = 0; i < 10 * this._constant; i++) {
+            for (let j = 0; j < 10 * this._constant; j++) {
                 const point = screen.getPointAt(i + this._screen.center.x, j + this._screen.center.y);
                 point.chemicals.b = 1;
             }
         }
 
-
         screen.layerIndex = 1;//--------------------------- LAYER 1
 
-        screen.points.forEach(point => {
-            point.chemicals = {
-                a: 1,
-                b: 0
-            }
-        });
-
-
-
+        screen.points.forEach(point => point.chemicals = { a: 1, b: 0 });
 
     }
 
@@ -91,33 +79,46 @@ export default class Gen14 {
 
         screen.layerIndex = 1;
         //screen.clear();
-        screen.currentLayer.points.forEach((point, index) => {
-            const pointBelow = screen.layers[0].points[index];
 
-            const chemicals = point.chemicals;
-            const { a, b } = chemicals;
+        //screen.currentLayer.points.forEach((point, index) => {
+        for (let ix = 1; ix < screen.numColumns - 1; ix++) {
+            for (let iy = 1; iy < screen.numRows - 1; iy++) {
 
 
-            //point.chemicals.a = chemicals.a * .9;
-            //point.chemicals.b = chemicals.b * .9;
+                const index = ix + iy * screen.numColumns;
+                const point = screen.currentLayer.points[index];
 
-            pointBelow.chemicals.a = a + (
-                (this._DA * this.laplace(pointBelow, 'a')) -
-                (a * b * b) +
-                (this._feed * (1 - a)));
+                const pointBelow = screen.layers[0].points[index];
+                //const pointBelow = screen.layers[0].points[ix + iy * screen.numColumns];
+                //console.log(ix + iy * screen.numColumns)
+                //console.log(pointBelow)
 
-            pointBelow.chemicals.b = b + (
-                (this._DB * this.laplace(pointBelow, 'b')) -
-                (a * b * b) -
-                ((this._k + this._feed) * b));
+                const chemicals = point.chemicals;
+                const { a, b } = chemicals;
 
-            pointBelow.chemicals.a = this.clamp(pointBelow.chemicals.a, 0, 1);
-            pointBelow.chemicals.b = this.clamp(pointBelow.chemicals.b, 0, 1);
 
-            const c = this.clamp(pointBelow.chemicals.a - pointBelow.chemicals.b, 0, 1);
-            point.setBrightness(c);
-            //point.setColor(point.chemicals.a, 0, point.chemicals.b);
-        });
+                //point.chemicals.a = chemicals.a * .9;
+                //point.chemicals.b = chemicals.b * .9;
+
+                pointBelow.chemicals.a = a +
+                    (this._DA * this.laplace(pointBelow, 'a')) -
+                    (a * b * b) +
+                    (this._feed * (1 - a));
+
+                pointBelow.chemicals.b = b +
+                    (this._DB * this.laplace(pointBelow, 'b')) +
+                    (a * b * b) -
+                    ((this._k + this._feed) * b);
+
+                pointBelow.chemicals.a = this.clamp(pointBelow.chemicals.a, 0, 1);
+                pointBelow.chemicals.b = this.clamp(pointBelow.chemicals.b, 0, 1);
+
+                const c = this.clamp(pointBelow.chemicals.a - pointBelow.chemicals.b, 0, 1);
+                point.setBrightness(c);
+                //point.setColor(point.chemicals.a, 0, point.chemicals.b);
+            }
+        }
+        //});
 
 
         //this._effects.chromaticAberration(.05, 2);
