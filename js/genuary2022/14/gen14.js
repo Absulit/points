@@ -44,9 +44,11 @@ export default class Gen14 {
             point.chemicals = { a: 1, b: 0 }
             point.setColor(0, 0, 0, 0);
         });
-        for (let i = 0; i < 10 * this._constant; i++) {
-            for (let j = 0; j < 10 * this._constant; j++) {
-                const point = screen.getPointAt(i + this._screen.center.x, j + this._screen.center.y);
+        const squareSide = 40;
+        //const constantSquareSide = squareSide * this._constant;
+        for (let i = 0; i < squareSide; i++) {
+            for (let j = 0; j < squareSide; j++) {
+                const point = screen.getPointAt(i + this._screen.center.x - squareSide * .5, j + this._screen.center.y - squareSide * .5);
                 point.chemicals.b = 1;
             }
         }
@@ -80,46 +82,32 @@ export default class Gen14 {
         screen.layerIndex = 1;
         //screen.clear();
 
-        //screen.currentLayer.points.forEach((point, index) => {
-        for (let ix = 1; ix < screen.numColumns - 1; ix++) {
-            for (let iy = 1; iy < screen.numRows - 1; iy++) {
+        screen.currentLayer.points.forEach((point, index) => {
+            const pointBelow = screen.layers[0].points[index];
 
+            const chemicals = point.chemicals;
+            const { a, b } = chemicals;
 
-                const index = ix + iy * screen.numColumns;
-                const point = screen.currentLayer.points[index];
+            //point.chemicals.a = chemicals.a * .9;
+            //point.chemicals.b = chemicals.b * .9;
 
-                const pointBelow = screen.layers[0].points[index];
-                //const pointBelow = screen.layers[0].points[ix + iy * screen.numColumns];
-                //console.log(ix + iy * screen.numColumns)
-                //console.log(pointBelow)
+            pointBelow.chemicals.a = a +
+                (this._DA * this.laplace(point, 'a')) -
+                (a * b * b) +
+                (this._feed * (1 - a));
 
-                const chemicals = point.chemicals;
-                const { a, b } = chemicals;
+            pointBelow.chemicals.b = b +
+                (this._DB * this.laplace(point, 'b')) +
+                (a * b * b) -
+                ((this._k + this._feed) * b);
 
+            pointBelow.chemicals.a = this.clamp(pointBelow.chemicals.a, 0, 1);
+            pointBelow.chemicals.b = this.clamp(pointBelow.chemicals.b, 0, 1);
 
-                //point.chemicals.a = chemicals.a * .9;
-                //point.chemicals.b = chemicals.b * .9;
-
-                pointBelow.chemicals.a = a +
-                    (this._DA * this.laplace(pointBelow, 'a')) -
-                    (a * b * b) +
-                    (this._feed * (1 - a));
-
-                pointBelow.chemicals.b = b +
-                    (this._DB * this.laplace(pointBelow, 'b')) +
-                    (a * b * b) -
-                    ((this._k + this._feed) * b);
-
-                pointBelow.chemicals.a = this.clamp(pointBelow.chemicals.a, 0, 1);
-                pointBelow.chemicals.b = this.clamp(pointBelow.chemicals.b, 0, 1);
-
-                const c = this.clamp(pointBelow.chemicals.a - pointBelow.chemicals.b, 0, 1);
-                point.setBrightness(c);
-                //point.setColor(point.chemicals.a, 0, point.chemicals.b);
-            }
-        }
-        //});
-
+            const c = this.clamp(pointBelow.chemicals.a - pointBelow.chemicals.b, 0, 1);
+            point.setBrightness(c);
+            //point.setColor(point.chemicals.a, 0, point.chemicals.b);
+        });
 
         //this._effects.chromaticAberration(.05, 2);
         //this._effects.fire(1);
@@ -135,19 +123,24 @@ export default class Gen14 {
 
     laplace(point, prop) {
         const pointsAround = this._screen.getPointsAround(point);
+        if (pointsAround.includes(null)) {
+            return 0;
+        }
+        const direct = .2;
+        const diagonal = .05;
         let sum = 0;
         sum += point.chemicals[prop] * -1;
 
-        sum += pointsAround[1] ? pointsAround[1].chemicals[prop] * .2 : 1;
-        sum += pointsAround[3] ? pointsAround[3].chemicals[prop] * .2 : 1;
-        sum += pointsAround[4] ? pointsAround[4].chemicals[prop] * .2 : 1;
-        sum += pointsAround[6] ? pointsAround[6].chemicals[prop] * .2 : 1;
+        sum += pointsAround[1].chemicals[prop] * direct;
+        sum += pointsAround[3].chemicals[prop] * direct;
+        sum += pointsAround[4].chemicals[prop] * direct;
+        sum += pointsAround[6].chemicals[prop] * direct;
 
-        sum += pointsAround[0] ? pointsAround[0].chemicals[prop] * .05 : 1;
-        sum += pointsAround[2] ? pointsAround[2].chemicals[prop] * .05 : 1;
-        sum += pointsAround[5] ? pointsAround[5].chemicals[prop] * .05 : 1;
-        sum += pointsAround[7] ? pointsAround[7].chemicals[prop] * .05 : 1;
-        //console.log(sum)
+        sum += pointsAround[0].chemicals[prop] * diagonal;
+        sum += pointsAround[2].chemicals[prop] * diagonal;
+        sum += pointsAround[5].chemicals[prop] * diagonal;
+        sum += pointsAround[7].chemicals[prop] * diagonal;
+
         return sum;
     }
 }

@@ -37,7 +37,7 @@ import Gen14 from './js/genuary2022/14/gen14.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
-//document.body.appendChild(stats.dom);
+document.body.appendChild(stats.dom);
 
 let capturer = new CCapture({
     format: 'jpg',
@@ -48,7 +48,7 @@ let capturer = new CCapture({
 let aspect,
     utime = 0;
 
-let side = 200;
+let side = 100;
 let numColumns = side;
 let numRows = side;
 let numMargin = 0;
