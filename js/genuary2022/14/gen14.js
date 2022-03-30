@@ -45,7 +45,7 @@ export default class Gen14 {
             point.setColor(0, 0, 0, 0);
         });
         const squareSide = 40;
-        //const constantSquareSide = squareSide * this._constant;
+
         for (let i = 0; i < squareSide; i++) {
             for (let j = 0; j < squareSide; j++) {
                 const point = screen.getPointAt(i + this._screen.center.x - squareSide * .5, j + this._screen.center.y - squareSide * .5);
