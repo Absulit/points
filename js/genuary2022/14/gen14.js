@@ -53,6 +53,12 @@ export default class Gen14 {
             }
         }
 
+        for (let i = 0; i < squareSide; i++) {
+            for (let j = 0; j < squareSide; j++) {
+                const point = screen.getPointAt(i + this._screen.center.x - squareSide * 1.3, j + this._screen.center.y - squareSide * 1.1);
+                point.chemicals.b = 1;
+            }
+        }
         screen.layerIndex = 1;//--------------------------- LAYER 1
 
         screen.points.forEach(point => point.chemicals = { a: 1, b: 0 });
