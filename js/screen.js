@@ -222,6 +222,19 @@ class Screen {
         return point;
     }
 
+    /**
+     * Same coordinates of the Point provided but in another layer
+     * @param {Point} point
+     * @param {Number} layerIndex
+     * @returns Point in `layerIndex` layer
+     */
+    getPointFromLayer(point, layerIndex) {
+        const layer = this._layers[layerIndex];
+        let row = layer.rows[point.coordinates.y];
+        let pointInLayer = row && row[point.coordinates.x] || null;
+        return pointInLayer;
+    }
+
     getPointAtCoordinate(x, y) {
         let pointWidth = this._pointSizeFull;
         let columnIndex = Math.floor(x / pointWidth);
@@ -671,14 +684,14 @@ class Screen {
     }
 
     drawRect(x, y, w, h, color) {
-        color = color || new RGBAColor(1,1,1);
+        color = color || new RGBAColor(1, 1, 1);
         this.drawLine(x, y, x + w, y, color);
         this.drawLine(x, y + h, x + w, y + h, color);
 
 
         this.drawLine(x, y, x, y + h, color);
         this.drawLine(x + w, y, x + w, y + h, color);
-        
+
 
     }
 
