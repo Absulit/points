@@ -1,5 +1,13 @@
 class RGBAColor {
     constructor(r = 0, g = 0, b = 0, a = 1) {
+        if (r > 1 && g > 1 && b > 1) {
+            r /= 255;
+            g /= 255;
+            b /= 255;
+            if (a > 1) {
+                a /= 255;
+            }
+        }
         this._value = [r, g, b, a];
     }
 
