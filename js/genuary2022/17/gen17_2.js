@@ -33,31 +33,12 @@ export default class Gen17_2 {
 
         this._imageLoader = new ImageLoader(screen);
         this._imageLoader.type = this._imageLoader.FIT;
-        this._imageLoader.load('../../img/old_king_600x600.jpg');
+        //this._imageLoader.load('../../img/old_king_600x600.jpg');
+        this._imageLoader.load('../../img/angel_600x600.jpg');
         //this._imageLoader.load('../../img/gratia_800x800.jpg');
 
         this._palette1 = [
-            new RGBAColor(255, 69, 0),
-            new RGBAColor(255, 168, 0),
-            new RGBAColor(255, 214, 53),
-            new RGBAColor(0, 204, 120),
-            new RGBAColor(126, 237, 86),
-            new RGBAColor(0, 117, 111),
-            new RGBAColor(0, 158, 170),
-            new RGBAColor(36, 80, 164),
-            new RGBAColor(54, 144, 234),
-            new RGBAColor(81, 233, 244),
-            new RGBAColor(73, 58, 193),
-            new RGBAColor(106, 92, 255),
-            new RGBAColor(129, 30, 159),
-            new RGBAColor(180, 74, 192),
-            new RGBAColor(255, 56, 129),
-            new RGBAColor(255, 153, 170),
-            new RGBAColor(109, 72, 48),
-            new RGBAColor(156, 105, 38),
             new RGBAColor(0, 0, 0),
-            new RGBAColor(137, 141, 144),
-            new RGBAColor(212, 215, 217),
             new RGBAColor(1, 1, 1),
         ];
 
@@ -72,13 +53,45 @@ export default class Gen17_2 {
 
         this._imageLoader.loadToLayer();
 
-        screen.points.forEach(point => {
-            if (point.color.r) {
-                const closestColor = this.getClosestColorInPalette(point.color);
-                point.setRGBAColor(closestColor);
-            }
+        const squareSide = 2;
 
-        });
+        // screen.points.forEach(point => {
+        //     if (point.color.r) {
+        //         const closestColor = this.getClosestColorInPalette(point.color);
+        //         point.setRGBAColor(closestColor);
+        //     }
+        //     //point.setBrightness(point.color.g)
+
+        // });
+
+        for (let cIndex = 0; cIndex < screen.numColumns; cIndex += squareSide) {
+
+
+            for (let rowIndex = 0; rowIndex < screen.numRows; rowIndex += squareSide) {
+                const point = screen.getPointAt(cIndex, rowIndex);
+                const rightPoint = screen.getRightPoint(point);
+                const bottomPoint = screen.getBottomPoint(point);
+                const bottomRightPoint = screen.getBottomRightPoint(point);
+
+                const points = [point, rightPoint, bottomPoint, bottomRightPoint];
+
+                try {
+                    
+                    const averageBrightness = (point.color.g + rightPoint.color.g + bottomPoint.color.g + bottomRightPoint.color.g) / 4;
+    
+                    const amountOfPixels = Math.floor(averageBrightness * 4);
+    
+                    points.forEach( point => point.setBrightness(0));
+    
+                    for (let pointIndex = 0; pointIndex < amountOfPixels; pointIndex++) {
+                        const point = points[pointIndex];
+                        point.setBrightness(1);
+                    }
+                } catch (error) {
+                    
+                }
+            }
+        }
 
 
         //screen.layerIndex = 1;//--------------------------- LAYER 1
