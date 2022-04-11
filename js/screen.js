@@ -500,8 +500,8 @@ class Screen {
      */
     movePointTo(point, columnIndex, rowIndex) {
         let pointToReplace = this.getPointAt(columnIndex, rowIndex);
-        let { r, g, b, a } = point.color;
         if (pointToReplace) {
+            const { r, g, b, a } = point.color;
             pointToReplace.setColor(r, g, b, a);
             //pointToReplace.color = new RGBAColor(1,0,0);
         }
