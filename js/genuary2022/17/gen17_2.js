@@ -40,6 +40,7 @@ export default class Gen17_2 {
         //this._imageLoader.load('../../img/grace_hopper_512x600.jpg');
         //this._imageLoader.load('../../img/astronaut_512x512.jpg');
         //this._imageLoader.load('../../img/house_512x512.jpg');
+        //this._imageLoader.load('../../img/carmen_lyra_423x643.jpg');
 
         this._palette1 = [
             new RGBAColor(0, 0, 0),
@@ -69,7 +70,7 @@ export default class Gen17_2 {
             new RGBAColor(0, 0, 0),
             new RGBAColor(137, 141, 144),
             new RGBAColor(212, 215, 217),
-            new RGBAColor(1, 1, 1),
+            //new RGBAColor(1, 1, 1),
         ];
 
         this._palette3 = [
@@ -86,7 +87,7 @@ export default class Gen17_2 {
             new RGBAColor(1, 1, 1),
         ];
 
-        this._palette = this._palette3;
+        this._palette = this._palette2;
 
         this._imageParsed = false;
 
@@ -203,7 +204,8 @@ export default class Gen17_2 {
             //------------------------------- CUSTOM DITHERING 4
             //https://stackoverflow.com/questions/15149290/ordered-dithering-to-256-colours
             // large threshold_map https://bisqwit.iki.fi/story/howto/dither/jy/
-            const depth = Math.abs(Math.ceil(128 * usin));
+            //const depth = Math.abs(Math.ceil(68 * usin));
+            const depth = 32;
             for (let cIndex = 0; cIndex < screen.numColumns; cIndex++) {
                 for (let rowIndex = 0; rowIndex < screen.numRows; rowIndex++) {
                     const point = screen.getPointAt(cIndex, rowIndex);
@@ -234,7 +236,7 @@ export default class Gen17_2 {
             });
 
 
-            //this._imageParsed = true;
+            this._imageParsed = true;
         }
 
 
