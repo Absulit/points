@@ -378,6 +378,20 @@ class Screen {
         return result;
     }
 
+    getPointsArea(x1, y1, x2, y2) {
+        let points = [];
+        for (let cIndex = x1; cIndex < x2; cIndex++) {
+            for (let rowIndex = y1; rowIndex < y2; rowIndex++) {
+                const point = this.getPointAt(cIndex, rowIndex);
+                if (point) {
+                    points.push(point);
+                }
+            }
+        }
+        return points;
+    }
+
+
     clear(color = null) {
         this._currentLayer.rows.forEach(row => {
             row.forEach(point => {

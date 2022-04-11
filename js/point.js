@@ -34,10 +34,12 @@ class Point {
     }
 
     setRGBAColor(value) {
-        const { r, g, b, a } = value;
-        this._color.set(r, g, b, a);
-        this._modified = true;
-        this._layer.setColor(this._coordinates, this._color);
+        if(value){
+            const { r, g, b, a } = value;
+            this._color.set(r, g, b, a);
+            this._modified = true;
+            this._layer.setColor(this._coordinates, this._color);
+        }
     }
 
     setBrightness(value) {
