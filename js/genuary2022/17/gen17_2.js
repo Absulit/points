@@ -87,7 +87,7 @@ export default class Gen17_2 {
             new RGBAColor(1, 1, 1),
         ];
 
-        this._palette = this._palette2;
+        this._palette = this._palette3;
 
         this._imageParsed = false;
 
@@ -124,7 +124,7 @@ export default class Gen17_2 {
 
 
         screen.layerIndex = 1;//--------------------------- LAYER 1
-        screen.points.forEach(point => point.setColor(0, 0, 0));
+        //screen.points.forEach(point => point.setColor(0, 0, 0));
     }
 
 
@@ -205,36 +205,13 @@ export default class Gen17_2 {
             //https://stackoverflow.com/questions/15149290/ordered-dithering-to-256-colours
             // large threshold_map https://bisqwit.iki.fi/story/howto/dither/jy/
             //const depth = Math.abs(Math.ceil(68 * usin));
-            const depth = 32;
-            for (let cIndex = 0; cIndex < screen.numColumns; cIndex++) {
-                for (let rowIndex = 0; rowIndex < screen.numRows; rowIndex++) {
-                    const point = screen.getPointAt(cIndex, rowIndex);
 
-                    let b = this._threshold_map[cIndex % 4][rowIndex % 4];
+            this._effects.orderedDithering();
 
-                    // TODO: usingnew RGBAColor in this case makes it look weird
-                    // using setRGBAColor makes it look good
-                    // const color = new RGBAColor(
-                    //     (point.color.r + b / depth | 0) * depth,
-                    //     (point.color.g + b / depth | 0) * depth,
-                    //     (point.color.b + b / depth | 0) * depth,
-                    // );
-                    // point.setRGBAColor(color);
-
-                    point.setColor(
-                        (point.color.r + b / depth | 0) * depth,
-                        (point.color.g + b / depth | 0) * depth,
-                        (point.color.b + b / depth | 0) * depth,
-                    );
-                }
-            }
-
-            screen.layerIndex = 2;//--------------------------- LAYER 0
+            //screen.layerIndex = 2;//--------------------------- LAYER 0
             screen.points.forEach(point => {
-                const point0 = screen.getPointFromLayer(point, 0);
-                point.setRGBAColor(this.getClosestColorInPalette(point0.color))
+                point.setRGBAColor(RGBAColor.getClosestColorInPalette(point.color, this._palette))
             });
-
 
             this._imageParsed = true;
         }

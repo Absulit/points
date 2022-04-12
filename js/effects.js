@@ -4,6 +4,13 @@ class Effects {
     constructor(screen) {
         this._screen = screen;
         this._rowCounter = 0;
+
+        this._threshold_map = [
+            [1, 9, 3, 11],
+            [13, 5, 15, 7],
+            [4, 12, 2, 10],
+            [16, 8, 14, 6]
+        ];
     }
 
     fire(level = 1) {
@@ -353,6 +360,33 @@ class Effects {
             }
         });
 
+    }
+
+    orderedDithering(depth = 32, threshold_map){
+        this._threshold_map = threshold_map || this._threshold_map;
+        const screen = this._screen;
+        for (let cIndex = 0; cIndex < screen.numColumns; cIndex++) {
+            for (let rowIndex = 0; rowIndex < screen.numRows; rowIndex++) {
+                const point = screen.getPointAt(cIndex, rowIndex);
+
+                let b = this._threshold_map[cIndex % 4][rowIndex % 4];
+
+                // TODO: using new RGBAColor in this case makes it look weird
+                // using setRGBAColor makes it look good
+                // const color = new RGBAColor(
+                //     (point.color.r + b / depth | 0) * depth,
+                //     (point.color.g + b / depth | 0) * depth,
+                //     (point.color.b + b / depth | 0) * depth,
+                // );
+                // point.setRGBAColor(color);
+
+                point.setColor(
+                    (point.color.r + b / depth | 0) * depth,
+                    (point.color.g + b / depth | 0) * depth,
+                    (point.color.b + b / depth | 0) * depth,
+                );
+            }
+        }
     }
 }
 

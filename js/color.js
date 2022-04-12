@@ -152,8 +152,42 @@ class RGBAColor {
     }
 
     isNull() {
-        let [r, g, b, a] = this._value;
+        const [r, g, b, a] = this._value;
         return !(isNaN(r) && isNaN(g) && isNaN(b) && isNaN(a))
+    }
+
+    static colorRGBEuclideanDistance(c1, c2) {
+        return Math.sqrt(Math.pow(c1.r - c2.r, 2) +
+            Math.pow(c1.g - c2.g, 2) +
+            Math.pow(c1.b - c2.b, 2));
+    }
+
+    /**
+     * Checks how close two colors are. Closest is `0`.
+     * @param {RGBAColor} color : Color to check distance;
+     * @returns Number distace up to `1.42` I think...
+     */
+    euclideanDistance(color) {
+        const [r, g, b] = this._value;
+        return Math.sqrt(Math.pow(r - color.r, 2) +
+            Math.pow(g - color.g, 2) +
+            Math.pow(b - color.b, 2));
+    }
+
+    static getClosestColorInPalette(color, palette) {
+        if(!palette){
+            throw('Palette should be an array of `RGBA`s')
+        }
+        let distance = 100;
+        let selectedColor = null;
+        palette.forEach(paletteColor => {
+            let currentDistance = color.euclideanDistance(paletteColor);
+            if (currentDistance < distance) {
+                selectedColor = paletteColor;
+                distance = currentDistance;
+            }
+        })
+        return selectedColor;
     }
 }
 
