@@ -399,7 +399,7 @@ class Screen {
                     // TODO: check why point.color = color does not work
                     point.setColor(color.r, color.g, color.b, color.a);
                 } else {
-                    point.setColor(0, 0, 0);
+                    point.setColor(0, 0, 0, 0);
                 }
             });
         });
