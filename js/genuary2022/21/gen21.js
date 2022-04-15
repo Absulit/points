@@ -33,9 +33,13 @@ export default class Gen21 {
 
 
         //screen.layerIndex = 0;//--------------------------- LAYER 0
-        // this._imageLoader = new ImageLoader(screen);
-        // this._imageLoader.type = ImageLoader.FIT;
-        // this._imageLoader.load('../../img/noiseTexture2.png');
+        this._imageLoader = new ImageLoader(screen);
+        this._imageLoader.type = ImageLoader.FIT;
+        this._imageLoader.load('../../img/noiseTexture2.png');
+        //this._imageLoader.load('../../img/carmen_lyra_800x800.jpg');
+        //this._imageLoader.load('../../img/carmen_lyra_2_800x800.jpg');
+        //this._imageLoader.load('../../img/carmen_lyra_2_blur_800x800.jpg');
+        //this._imageLoader.load('../../img/angel_600x600.jpg');
 
 
         screen.layerIndex = 0;//--------------------------- LAYER 0
@@ -46,8 +50,8 @@ export default class Gen21 {
         //console.log('---- this._randomPoints: ', this._randomPoints);
         this._randomPoints.forEach(randomPoint => {
             //randomPoint.setBrightness(1);
-            const {x,y} = randomPoint.coordinates;
-            screen.drawFilledSquare(x,y, 10 * this._constant, 1,1,1);
+            const { x, y } = randomPoint.coordinates;
+            screen.drawFilledSquare(x, y, 10 * this._constant, 1, 1, 1);
         });
 
         for (let index = 0; index < 6; index++) {
@@ -62,16 +66,10 @@ export default class Gen21 {
 
 
         screen.layerIndex = 2;//--------------------------- LAYER 2
-        // screen.points.forEach((point, index) => {
-        //     //point.angle = (point.position.x / screen.numColumns) * Math.PI;
-        //     point.angle = screen.layers[0].points[index].getBrightness() * Math.PI * 2;
-        // });
+
         this._flowFields = new FlowFields(screen);
         this._flowFields.init(screen.layers[0]);
-
-
-
-
+        screen.clear();
 
 
         this._loadImage = true;
@@ -81,25 +79,23 @@ export default class Gen21 {
     update(usin, ucos, side, utime) {
         const screen = this._screen;
 
-        //screen.layerIndex = 0;//--------------------------- LAYER 0
-/*         if(this._loadImage){
+        screen.layerIndex = 0;//--------------------------- LAYER 0
+        if (this._loadImage) {
             this._imageLoader.loadToLayer();
         }
-        if(this._imageLoader.isLoaded && this._loadImage ){
-            this._flowFields.init();
+
+        screen.layerIndex = 2;//--------------------------- LAYER 2
+
+        if (this._imageLoader.isLoaded && this._loadImage) {
+            this._flowFields.init(screen.layers[0]);
+            //screen.clear();
             this._loadImage = false;
-
-            const side = screen.numColumns;
-            this._screen.points.forEach((point, index) => {
-                const {x,y} = point.coordinates;
-                point.setColor(x/side, y/side, y/side)
-            });
-        } */
+        }
 
 
-        
-        screen.layerIndex = 2;//--------------------------- LAYER 1
-        this._flowFields.update();
+        if(!this._loadImage){
+            this._flowFields.update();
+        }
         screen.moveColorToLayer(3);
 
 

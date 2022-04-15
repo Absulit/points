@@ -20,26 +20,31 @@ export default class FlowFields {
             this._startPositions.push(startPosition);
         }
 
-
-        //this.init();
+        this._initCalled = false;
     }
 
+    /**
+     * Initializes the angles to be used when the curves are drawn.
+     * @param {Layer} screenLayer Layer to retrieve the brightness data from
+     */
     init(screenLayer){
         this._screen.currentLayer.points.forEach((point, index) => {
-            //point.angle = (point.position.x / this._screen.numColumns) * Math.PI;
-            //point.angle = this._screen.layers[0].points[index].getBrightness() * Math.PI * 2;
             point.angle = screenLayer.points[index].getBrightness() * Math.PI * 2;
         });
+        this._initCalled = true;
     }
 
     update(){
+        if(!this._initCalled){
+            throw('`init()` should be called prior the call of `update()`.')
+        }
         this._startPositions.forEach(startPosition => {
             this.drawCurve(startPosition, 10, 10);
         });
     }
 
     drawCurve(startPosition, numSteps, stepLength = 10) {
-        let { x, y } = startPosition.position;
+        const { x, y } = startPosition.position;
         let point = null;
         for (let index = 0; index < numSteps; index++) {
 
