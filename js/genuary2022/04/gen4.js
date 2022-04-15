@@ -53,7 +53,7 @@ export default class Gen4 {
             //this._effects.soften2(16/this._constant, 2.5 * this._constant);
         }
 
-        screen.layerIndex = 2;//--------------------------- LAYER 1
+        screen.layerIndex = 1;//--------------------------- LAYER 1
         screen.points.forEach((point, index) => {
             point.setBrightness(0);
         });

@@ -754,6 +754,13 @@ class Screen {
         this._pointsizes = this._mainLayer.pointsizes;
         this._atlasids = this._mainLayer.atlasIds;
     };
+
+    moveColorToLayer(layerIndex){
+        this._currentLayer.points.forEach((point, index) => {
+            const pointInLayer = this._layers[layerIndex].points[index];
+            pointInLayer.setRGBAColor(point.color);
+        });
+    }
 }
 
 export default Screen;

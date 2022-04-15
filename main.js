@@ -24,6 +24,7 @@ import Gen1 from './js/genuary2022/01/gen1.js';
 import Gen2 from './js/genuary2022/02/gen2.js';
 import Gen3 from './js/genuary2022/03/gen3.js';
 import Gen4 from './js/genuary2022/04/gen4.js';
+import Gen4_1 from './js/genuary2022/04/gen4_1.js';
 import Gen5 from './js/genuary2022/05/gen5.js';
 import Gen6 from './js/genuary2022/06/gen6.js';
 import Gen7 from './js/genuary2022/07/gen7.js';
@@ -41,6 +42,7 @@ import Gen17_2 from './js/genuary2022/17/gen17_2.js';
 import Gen18 from './js/genuary2022/18/gen18.js';
 import Gen19 from './js/genuary2022/19/gen19.js';
 import Gen20 from './js/genuary2022/20/gen20.js';
+import Gen21 from './js/genuary2022/21/gen21.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -55,12 +57,12 @@ let capturer = new CCapture({
 let aspect,
     utime = 0;
 
-let side = 80;
+let side = 400;
 let numColumns = side;
 let numRows = side;
 let numMargin = 0;
 let screen;
-let numLayers = 3;
+let numLayers = 4;
 
 let uround;
 let urounddec;
@@ -89,7 +91,7 @@ function init() {
 
     cache = new Cache(60*30);
 
-    demo = new Gen20(screen);
+    demo = new Gen21(screen);
 
     effects = new Effects(screen);
 
