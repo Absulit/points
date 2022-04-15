@@ -67,7 +67,7 @@ export default class Gen21 {
 
         screen.layerIndex = 2;//--------------------------- LAYER 2
 
-        this._flowFields = new FlowFields(screen);
+        this._flowFields = new FlowFields(screen, 1000 * this._constant);
         this._flowFields.init(screen.layers[0]);
         screen.clear();
 
@@ -93,11 +93,14 @@ export default class Gen21 {
         }
 
 
-        if(!this._loadImage){
-            this._flowFields.update( point => {
-                if(point){
-                    const {x,y} = point.coordinates;
-                    point.setRGBAColor(new RGBAColor(1- x/side * usin, 1-y/side, x/side));
+        if (!this._loadImage) {
+            this._flowFields.update(point => {
+                if (point) {
+                    const { x, y } = point.coordinates;
+                    //point.setRGBAColor(new RGBAColor(1 - x / side * usin, 1 - y / side, x / side));
+                    //this._flowFields.radians = x / side * Math.PI * 2;
+                    //this._flowFields.radians = usin * Math.PI * 2;
+                    point.setRGBAColor(new RGBAColor(1 - x / side, 1 - y / side, x / side));
                 }
             });
         }

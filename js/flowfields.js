@@ -3,13 +3,17 @@ import RGBAColor from './color.js';
 import MathUtil from './mathutil.js';
 
 export default class FlowFields {
-    constructor(screen) {
+    /**
+     *
+     * @param {Screen} screen
+     * @param {Number} lineAmount number of lines that will be created per update, usually connected to the previous iteration.
+     */
+    constructor(screen, lineAmount) {
         this._screen = screen;
-        this._constant = screen.numColumns / 100;
         const side = screen.numColumns;
 
         this._startPositions = []
-        for (let index = 0; index < (1000 * this._constant); index++) {
+        for (let index = 0; index < lineAmount; index++) {
             const x = Math.floor(screen.numColumns * Math.random());
             const y = Math.floor(screen.numColumns * Math.random());
             const startPosition = {
@@ -20,15 +24,43 @@ export default class FlowFields {
         }
 
         this._initCalled = false;
+
+        this._numSteps = 10;
+        this._stepLength = 10;
+        this._radians = Math.PI * 2;
+    }
+
+    get numSteps() {
+        return this._numSteps;
+    }
+
+    set numSteps(value) {
+        this._numSteps = value;
+    }
+
+    get stepLength() {
+        return this._stepLength;
+    }
+
+    set stepLength(value) {
+        this._stepLength = value;
+    }
+
+    get radians(){
+        return this._radians;
+    }
+
+    set radians(value){
+        this._radians = value;
     }
 
     /**
      * Initializes the angles to be used when the curves are drawn.
      * @param {Layer} screenLayer Layer to retrieve the brightness data from
      */
-    init(screenLayer){
+    init(screenLayer) {
         this._screen.currentLayer.points.forEach((point, index) => {
-            point.angle = screenLayer.points[index].getBrightness() * Math.PI * 2;
+            point.angle = screenLayer.points[index].getBrightness();
         });
         this._initCalled = true;
     }
@@ -37,13 +69,14 @@ export default class FlowFields {
      * Draws a bit of the flow field curve
      * @param {Function} callback Function called per flow field point
      */
-    update(callback){
-        if(!this._initCalled){
-            throw('`init()` should be called prior the call of `update()`.')
+    update(callback) {
+        if (!this._initCalled) {
+            throw ('`init()` should be called prior the call of `update()`.')
         }
 
         this._startPositions.forEach(startPosition => {
-            this.drawCurve(startPosition, 10, 10, callback);
+            this.drawCurve(startPosition, this._numSteps, this._stepLength, callback);
+            //this.drawCurve(startPosition, 10, 100, callback);
         });
     }
 
@@ -53,11 +86,11 @@ export default class FlowFields {
         for (let index = 0; index < numSteps; index++) {
 
             point = this._screen.getPointAt(x, y);
-            if(callback){
+            if (callback) {
                 callback(point);
             }
             if (point) {
-                const mathPoint = MathUtil.polar(stepLength, point.angle);
+                const mathPoint = MathUtil.polar(stepLength, point.angle * this._radians);
                 startPosition.position.x = Math.floor(mathPoint.x + x);
                 startPosition.position.y = Math.floor(mathPoint.y + y);
 
