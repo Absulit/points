@@ -397,7 +397,7 @@ class Screen {
             row.forEach(point => {
                 if (color) {
                     // TODO: check why point.color = color does not work
-                    point.setColor(color.r, color.g, color.b, color.a);
+                    point.setRGBAColor(color);
                 } else {
                     point.setColor(0, 0, 0, 0);
                 }

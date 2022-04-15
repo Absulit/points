@@ -94,7 +94,12 @@ export default class Gen21 {
 
 
         if(!this._loadImage){
-            this._flowFields.update();
+            this._flowFields.update( point => {
+                if(point){
+                    const {x,y} = point.coordinates;
+                    point.setRGBAColor(new RGBAColor(1- x/side * usin, 1-y/side, x/side));
+                }
+            });
         }
         screen.moveColorToLayer(3);
 

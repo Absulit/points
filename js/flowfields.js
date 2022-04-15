@@ -14,7 +14,6 @@ export default class FlowFields {
             const y = Math.floor(screen.numColumns * Math.random());
             const startPosition = {
                 position: new Coordinate(x, y),
-                color: new RGBAColor(x/side, y/side, y/side),
                 prevPoint: null
             };
             this._startPositions.push(startPosition);
@@ -34,23 +33,30 @@ export default class FlowFields {
         this._initCalled = true;
     }
 
-    update(){
+    /**
+     * Draws a bit of the flow field curve
+     * @param {Function} callback Function called per flow field point
+     */
+    update(callback){
         if(!this._initCalled){
             throw('`init()` should be called prior the call of `update()`.')
         }
+
         this._startPositions.forEach(startPosition => {
-            this.drawCurve(startPosition, 10, 10);
+            this.drawCurve(startPosition, 10, 10, callback);
         });
     }
 
-    drawCurve(startPosition, numSteps, stepLength = 10) {
+    drawCurve(startPosition, numSteps, stepLength = 10, callback = null) {
         const { x, y } = startPosition.position;
         let point = null;
         for (let index = 0; index < numSteps; index++) {
 
             point = this._screen.getPointAt(x, y);
+            if(callback){
+                callback(point);
+            }
             if (point) {
-                point.color = startPosition.color;
                 const mathPoint = MathUtil.polar(stepLength, point.angle);
                 startPosition.position.x = Math.floor(mathPoint.x + x);
                 startPosition.position.y = Math.floor(mathPoint.y + y);
