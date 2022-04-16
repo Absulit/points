@@ -43,13 +43,14 @@ import Gen18 from './js/genuary2022/18/gen18.js';
 import Gen19 from './js/genuary2022/19/gen19.js';
 import Gen20 from './js/genuary2022/20/gen20.js';
 import Gen21 from './js/genuary2022/21/gen21.js';
+import Gen22 from './js/genuary2022/22/gen22.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
 document.body.appendChild(stats.dom);
 
 let capturer = new CCapture({
-    format: 'jpg',
+    format: 'webm',
     //timeLimit: 10,
     verbose: true
 });
@@ -57,7 +58,7 @@ let capturer = new CCapture({
 let aspect,
     utime = 0;
 
-let side = 400;
+let side = 20;
 let numColumns = side;
 let numRows = side;
 let numMargin = 0;
@@ -91,7 +92,7 @@ function init() {
 
     cache = new Cache(60*30);
 
-    demo = new Gen21(screen);
+    demo = new Gen22(screen);
 
     effects = new Effects(screen);
 
