@@ -46,6 +46,7 @@ class Screen {
 
         this._pointSize = this._pointSizeFull - this._numMargin;
         //this._mainLayer = this._createLayer(-1);
+        Point.pointSizeFull = this._pointSize;
         this._createLayers();
 
     }
