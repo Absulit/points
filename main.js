@@ -48,6 +48,7 @@ import Gen23 from './js/genuary2022/23/gen23.js';
 import Gen24 from './js/genuary2022/24/gen24.js';
 import Mandelbrot from './js/examples/mandelbrot.js';
 import Gen25 from './js/genuary2022/25/gen25.js';
+import Gen26 from './js/genuary2022/26/gen26.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -62,7 +63,7 @@ let capturer = new CCapture({
 let aspect,
     utime = 0;
 
-let side = 200;
+let side = 100;
 let numColumns = side;
 let numRows = side;
 let numMargin = 0;
@@ -96,7 +97,7 @@ function init() {
 
     cache = new Cache(60*30);
 
-    demo = new Gen25(screen);
+    demo = new Gen26(screen);
 
     effects = new Effects(screen);
 
