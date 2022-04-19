@@ -36,6 +36,7 @@ export default class Gen25 {
         console.log('---- CONSTANT: ' + this._constant);
 
 
+        this._lineColor = new RGBAColor(1,1,1);
 
 
         //screen.layerIndex = 0;//--------------------------- LAYER 0
@@ -45,22 +46,41 @@ export default class Gen25 {
     update(usin, ucos, side, utime) {
         const screen = this._screen;
 
+        //screen.clear();
 
 
         //screen.layerIndex = 0;//--------------------------- LAYER 0
+        const amount = Math.floor(usin*10);
+
+        screen.drawLine(screen.center.x, 0, screen.center.x, screen.numRows, this._lineColor);
+        screen.drawLine(screen.numColumns * .25 + amount, 0, screen.numColumns * .25 - amount, screen.numRows, this._lineColor);
+        screen.drawLine(screen.numColumns * .75 - amount, 0, screen.numColumns * .75 + amount, screen.numRows,this._lineColor);
+
+
+
+        const pointLeft = screen.getPointAt(0, screen.center.y);
+        pointLeft.setRGBAColor(this._lineColor);
+        const pointTop = screen.getPointAt(screen.center.x, 10 + amount);
+        const pointRight = screen.getPointAt(screen.numColumns - 1, screen.center.y);
+        pointRight.setRGBAColor(this._lineColor);
+        const pointBottom = screen.getPointAt(screen.center.x, screen.numRows - 1 - 10 - amount);
+
+        screen.drawLineWithPoints(pointLeft, pointTop);
+        screen.drawLineWithPoints(pointLeft, pointBottom);
+        screen.drawLineWithPoints(pointRight, pointTop);
+        screen.drawLineWithPoints(pointRight, pointBottom);
 
 
         //screen.layerIndex = 1;//--------------------------- LAYER 1
-
         //screen.layerIndex = 2;//--------------------------- LAYER 2
         //screen.layerIndex = 3;//--------------------------- LAYER 3
 
-        //this._effects.chromaticAberration(.05, 2);
+        this._effects.chromaticAberration(.05, 2);
         //this._effects.fire(1);
         //this._effects.soften2(3);
-        //this._effects.antialias(3);
+        this._effects.antialias();
         //this._screen.clearMix(this._clearMixColor, 1.1);
-        //this._screen.clearAlpha(1.01);
+        this._screen.clearAlpha(1.01);
         //this._effects.orderedDithering();
     }
 
