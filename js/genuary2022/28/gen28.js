@@ -36,7 +36,12 @@ export default class Gen28 {
         console.log('---- CONSTANT: ' + this._constant);
 
 
+        this._imageLoader = new ImageLoader(screen);
+        this._imageLoader.type = ImageLoader.ONE_TO_ONE;
+        this._imageLoader.load('../../assets_ignore/absulit_800x800.jpg');
 
+        this._spriteLoader = new SpriteLoader(screen, 32, 32);
+        this._spriteLoader.load('../../assets_ignore/white_point_32.png', 32, 32);
 
         //screen.layerIndex = 0;//--------------------------- LAYER 0
 
@@ -47,7 +52,19 @@ export default class Gen28 {
 
 
 
-        //screen.layerIndex = 0;//--------------------------- LAYER 0
+        screen.layerIndex = 0;//--------------------------- LAYER 0
+        this._imageLoader.loadToLayer(305,400, .5,.5);
+
+        screen.points.forEach(point => {
+
+            //this._xCurve = this._centerRows + Math.round(Math.sin((this._xIndex  / 40) - u_time) * 5);
+
+            const a = (Math.sin(utime) + 1)/2;
+ 
+            point.setSize(point.getBrightness() * (.3 + (a * .7))  );
+            //point.setBrightness(1);
+            point.atlasId = 0;
+        });
 
 
         //screen.layerIndex = 1;//--------------------------- LAYER 1
