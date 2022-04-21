@@ -758,8 +758,10 @@ class Screen {
 
     moveColorToLayer(layerIndex){
         this._currentLayer.points.forEach((point, index) => {
-            const pointInLayer = this._layers[layerIndex].points[index];
-            pointInLayer.setRGBAColor(point.color);
+            if(point.color.a > 0){
+                const pointInLayer = this._layers[layerIndex].points[index];
+                pointInLayer.setRGBAColor(point.color);
+            }
         });
     }
 }

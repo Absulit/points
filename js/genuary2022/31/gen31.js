@@ -40,6 +40,10 @@ export default class Gen31 {
 
         //screen.layerIndex = 0;//--------------------------- LAYER 0
 
+        this._lineColor = new RGBAColor(1, 1, 1);
+
+        this._signed = false;
+
     }
 
     update(usin, ucos, side, utime) {
@@ -47,10 +51,30 @@ export default class Gen31 {
 
 
 
-        //screen.layerIndex = 0;//--------------------------- LAYER 0
+        screen.layerIndex = 1;//--------------------------- LAYER 0
+
+        screen.drawLine(0, 0, 0, screen.numRows - 1, this._lineColor);
+        screen.drawLine(0, 0, screen.numColumns-1, 0, this._lineColor);
 
 
-        //screen.layerIndex = 1;//--------------------------- LAYER 1
+
+        //this._effects.chromaticAberration(.05, 2);
+        this._effects.soften2(3);
+        this._screen.clearAlpha(1.01);
+
+
+        screen.layerIndex = 0;//--------------------------- LAYER 1
+
+        const a = (Math.sin(utime * 2) + 1)/2;
+
+        screen.clear();
+        screen.drawPolygon(screen.center.x + (screen.center.x *.25 * usin), screen.center.y, 40 * this._constant, 2+ Math.ceil(a * 5), this._clearMixColor, 2*Math.PI * a);
+        this._effects.antialias();
+        screen.moveColorToLayer(1);
+
+
+
+
 
         //screen.layerIndex = 2;//--------------------------- LAYER 2
         //screen.layerIndex = 3;//--------------------------- LAYER 3
@@ -58,7 +82,7 @@ export default class Gen31 {
         //this._effects.chromaticAberration(.05, 2);
         //this._effects.fire(1);
         //this._effects.soften2(3);
-        //this._effects.antialias(3);
+        //this._effects.antialias();
         //this._screen.clearMix(this._clearMixColor, 1.1);
         //this._screen.clearAlpha(1.01);
         //this._effects.orderedDithering();
