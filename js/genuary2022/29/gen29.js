@@ -39,15 +39,41 @@ export default class Gen29 {
 
 
         //screen.layerIndex = 0;//--------------------------- LAYER 0
-
+        this._amountItems = 8;
+        this._amountPerItem = screen.numColumns / this._amountItems;
+        this._lineColor = new RGBAColor(1, 1, 1);
     }
 
     update(usin, ucos, side, utime) {
         const screen = this._screen;
 
+        screen.clear();
+
+        screen.layerIndex = 0;//--------------------------- LAYER 0
+
+        const a = (Math.sin(utime) + 1)/2;
+
+        const length =  5 + Math.floor(5 * a);
 
 
-        //screen.layerIndex = 0;//--------------------------- LAYER 0
+
+
+        
+        
+        for (let xIndexAmountItems = 0; xIndexAmountItems < this._amountItems; xIndexAmountItems++) {
+            for (let yIndexAmountItems = 0; yIndexAmountItems < this._amountItems; yIndexAmountItems++) {
+                const startPosition = {
+                    x: Math.floor(this._amountPerItem * xIndexAmountItems + Math.sin(xIndexAmountItems)+ (a*5)),
+                    y: Math.floor(this._amountPerItem * yIndexAmountItems+ Math.sin(xIndexAmountItems)+ (a*5))
+                }
+
+                const moveToRight = yIndexAmountItems % 2?10:0;
+
+                this.drawIso(startPosition.x + moveToRight,startPosition.y, length);
+
+            }
+
+        }
 
 
         //screen.layerIndex = 1;//--------------------------- LAYER 1
@@ -55,14 +81,49 @@ export default class Gen29 {
         //screen.layerIndex = 2;//--------------------------- LAYER 2
         //screen.layerIndex = 3;//--------------------------- LAYER 3
 
-        //this._effects.chromaticAberration(.05, 2);
+        this._effects.chromaticAberration(.05, 2);
         //this._effects.fire(1);
         //this._effects.soften2(3);
         //this._effects.antialias(3);
         //this._screen.clearMix(this._clearMixColor, 1.1);
-        //this._screen.clearAlpha(1.01);
+        //this._screen.clearAlpha(1.1);
         //this._effects.orderedDithering();
     }
 
 
+    drawIso(x,y,length){
+        const screen = this._screen;
+        //     1
+        // 2		3
+        //     4
+        // 5		6
+        //     7
+
+
+        const point1 = new Coordinate(x + length, y);
+        const point2 = new Coordinate(x, y + length);
+        const point3 = new Coordinate(x + length * 2, y + length);
+        const point4 = new Coordinate(x + length, y + length * 2);
+        const point5 = new Coordinate(x, y + length * 2);
+        const point6 = new Coordinate(x + length * 2, y + length * 2);
+        const point7 = new Coordinate(x + length, y + length * 3);
+
+        screen.drawLine(point1.x, point1.y, point2.x, point2.y, this._lineColor);
+        screen.drawLine(point1.x, point1.y, point3.x, point3.y, this._lineColor);
+
+        screen.drawLine(point2.x, point2.y, point4.x, point4.y, this._lineColor);
+        screen.drawLine(point3.x, point3.y, point4.x, point4.y, this._lineColor);
+
+        screen.drawLine(point4.x, point4.y, point7.x, point7.y, this._lineColor);
+
+
+        screen.drawLine(point2.x, point2.y, point5.x, point5.y, this._lineColor);
+        screen.drawLine(point3.x, point3.y, point6.x, point6.y, this._lineColor);
+
+        screen.drawLine(point7.x, point7.y, point5.x, point5.y, this._lineColor);
+        screen.drawLine(point7.x, point7.y, point6.x, point6.y, this._lineColor);
+
+
+
+    }
 }
