@@ -39,7 +39,12 @@ export default class Gen30 {
 
 
         //screen.layerIndex = 0;//--------------------------- LAYER 0
+        this._startPoint = screen.center;
 
+        this._lineColor = new RGBAColor(1,1,1);
+
+        this._lastPoint = this._startPoint;
+        this._counter = 0;
     }
 
     update(usin, ucos, side, utime) {
@@ -47,17 +52,32 @@ export default class Gen30 {
 
 
 
-        //screen.layerIndex = 0;//--------------------------- LAYER 0
+        screen.layerIndex = 0;//--------------------------- LAYER 0
+
+        if(++this._counter == 600){
+            screen.clear();
+            this._lastPoint = this._startPoint;
+            this._counter = 0;
+        }
+
+        if(this._lastPoint){
+
+            this._lastPoint = screen.drawLineRotation(this._lastPoint.x, this._lastPoint.y, 1, 2*Math.PI * -1* Math.random(), this._lineColor);
+        }
 
 
-        //screen.layerIndex = 1;//--------------------------- LAYER 1
+        //this._lastPoint = screen.drawLineRotation(this._lastPoint.x, this._lastPoint.y, 10, 2*Math.PI * -1* Math.random(), new RGBAColor(1,0,0));
+
+        screen.moveColorToLayer(1);
+
+        screen.layerIndex = 1;//--------------------------- LAYER 1
 
         //screen.layerIndex = 2;//--------------------------- LAYER 2
         //screen.layerIndex = 3;//--------------------------- LAYER 3
 
-        //this._effects.chromaticAberration(.05, 2);
+        this._effects.chromaticAberration(.05, 2);
         //this._effects.fire(1);
-        //this._effects.soften2(3);
+        this._effects.soften2(3);
         //this._effects.antialias(3);
         //this._screen.clearMix(this._clearMixColor, 1.1);
         //this._screen.clearAlpha(1.01);
