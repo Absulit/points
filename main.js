@@ -68,7 +68,7 @@ let capturer = new CCapture({
 let aspect,
     utime = 0;
 
-let side = 200;
+let side = 128;
 let numColumns = side;
 let numRows = side;
 let numMargin = 0;
@@ -107,7 +107,8 @@ function init() {
     effects = new Effects(screen);
 
     // point size
-    gl.uniform1f(gl.getUniformLocation(program, "u_pointsize"), screen.pointSize);
+    // this is not used, just legacy:
+    //gl.uniform1f(gl.getUniformLocation(program, "u_pointsize"), screen.pointSize);
 }
 
 function update() {
