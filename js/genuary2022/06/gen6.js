@@ -27,27 +27,27 @@ export default class Gen6 {
         let center = screen.center;
 
         this._imageLoader0 = new ImageLoader(screen);
-        this._imageLoader0.type = this._imageLoader0.FIT;
+        this._imageLoader0.type = ImageLoader.FIT;
         this._imageLoader0.load('../../js/genuary2022/06/layer0.jpg');
 
         this._imageLoader0_1 = new ImageLoader(screen);
-        this._imageLoader0_1.type = this._imageLoader0_1.FIT;
+        this._imageLoader0_1.type = ImageLoader.FIT;
         this._imageLoader0_1.load('../../js/genuary2022/06/layer0.1.jpg');
 
         this._imageLoader1 = new ImageLoader(screen);
-        this._imageLoader1.type = this._imageLoader1.FIT;
+        this._imageLoader1.type = ImageLoader.FIT;
         this._imageLoader1.load('../../js/genuary2022/06/layer1.jpg');
 
         this._imageLoader1_1 = new ImageLoader(screen);
-        this._imageLoader1_1.type = this._imageLoader1_1.FIT;
+        this._imageLoader1_1.type = ImageLoader.FIT;
         this._imageLoader1_1.load('../../js/genuary2022/06/layer1.1.jpg');
 
         this._imageLoader2 = new ImageLoader(screen);
-        this._imageLoader2.type = this._imageLoader2.FIT;
+        this._imageLoader2.type = ImageLoader.FIT;
         this._imageLoader2.load('../../js/genuary2022/06/layer2.jpg');
 
         this._imageLoader3 = new ImageLoader(screen);
-        this._imageLoader3.type = this._imageLoader3.FIT;
+        this._imageLoader3.type = ImageLoader.FIT;
         this._imageLoader3.load('../../js/genuary2022/06/layer3.jpg');
     }
 
