@@ -1,6 +1,6 @@
 class VideoLoader {
-    ONE_TO_ONE = 0;
-    FIT = 1;
+    static ONE_TO_ONE = 0;
+    static FIT = 1;
     constructor(screen) {
         this._screen = screen;
         this._image = document.createElement('video');
@@ -13,10 +13,10 @@ class VideoLoader {
         this._height = 0;
 
         this._typesToFunction = {};
-        this._typesToFunction[this.ONE_TO_ONE] = this._mapOneToOne;
-        this._typesToFunction[this.FIT] = this._mapToFit;
+        this._typesToFunction[VideoLoader.ONE_TO_ONE] = this._mapOneToOne;
+        this._typesToFunction[VideoLoader.FIT] = this._mapToFit;
 
-        this._type = this.ONE_TO_ONE;
+        this._type = VideoLoader.ONE_TO_ONE;
 
         // video
         this._fps = 60; // as param?

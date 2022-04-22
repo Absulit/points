@@ -1,5 +1,13 @@
 class RGBAColor {
     constructor(r = 0, g = 0, b = 0, a = 1) {
+        if (r > 1 && g > 1 && b > 1) {
+            r /= 255;
+            g /= 255;
+            b /= 255;
+            if (a > 1) {
+                a /= 255;
+            }
+        }
         this._value = [r, g, b, a];
     }
 
@@ -40,8 +48,16 @@ class RGBAColor {
     }
 
     get brightness() {
+        // #Standard
+        // LuminanceA = (0.2126*R) + (0.7152*G) + (0.0722*B)
+        // #Percieved A
+        // LuminanceB = (0.299*R + 0.587*G + 0.114*B)
+        // #Perceived B, slower to calculate
+        // LuminanceC = sqrt(0.299*(R**2) + 0.587*(G**2) + 0.114*(B**2))
+
+
         let [r, g, b, a] = this._value;
-        return ((r + b + g) / 3);
+        return (0.2126 * r) + (0.7152 * g) + (0.0722 * b);
     }
 
     set brightness(value) {
@@ -97,6 +113,81 @@ class RGBAColor {
 
     equal(color) {
         return (this._value[0] == color.r) && (this._value[1] == color.g) && (this._value[2] == color.b) && (this._value[3] == color.a);
+    }
+
+
+    static average(colors) {
+        // https://sighack.com/post/averaging-rgb-colors-the-right-way
+        let r = 0, g = 0, b = 0, a = 0;
+        for (let index = 0; index < colors.length; index++) {
+            const color = colors[index];
+            //if (!color.isNull()) {
+                r += color.r * color.r;
+                g += color.g * color.g;
+                b += color.b * color.b;
+                //a += color.a * color.a;
+            //}
+        }
+        return new RGBAColor(
+            Math.sqrt(r / colors.length),
+            Math.sqrt(g / colors.length),
+            Math.sqrt(b / colors.length)
+            //Math.sqrt(a),
+        );
+    }
+
+    static difference(c1, c2) {
+        let r = 0;
+        let g = 0;
+        let b = 0;
+        if(c1 && !c1.isNull() && c2 && !c2.isNull()){
+            const { r: r1, g: g1, b: b1 } = c1;
+            const { r: r2, g: g2, b: b2 } = c2;
+            r = r1 - r2;
+            g = g1 - g2;
+            b = b1 - b2;
+        }
+
+        return new RGBAColor(r, g, b);
+    }
+
+    isNull() {
+        const [r, g, b, a] = this._value;
+        return !(isNaN(r) && isNaN(g) && isNaN(b) && isNaN(a))
+    }
+
+    static colorRGBEuclideanDistance(c1, c2) {
+        return Math.sqrt(Math.pow(c1.r - c2.r, 2) +
+            Math.pow(c1.g - c2.g, 2) +
+            Math.pow(c1.b - c2.b, 2));
+    }
+
+    /**
+     * Checks how close two colors are. Closest is `0`.
+     * @param {RGBAColor} color : Color to check distance;
+     * @returns Number distace up to `1.42` I think...
+     */
+    euclideanDistance(color) {
+        const [r, g, b] = this._value;
+        return Math.sqrt(Math.pow(r - color.r, 2) +
+            Math.pow(g - color.g, 2) +
+            Math.pow(b - color.b, 2));
+    }
+
+    static getClosestColorInPalette(color, palette) {
+        if(!palette){
+            throw('Palette should be an array of `RGBA`s')
+        }
+        let distance = 100;
+        let selectedColor = null;
+        palette.forEach(paletteColor => {
+            let currentDistance = color.euclideanDistance(paletteColor);
+            if (currentDistance < distance) {
+                selectedColor = paletteColor;
+                distance = currentDistance;
+            }
+        })
+        return selectedColor;
     }
 }
 

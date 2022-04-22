@@ -20,13 +20,47 @@ import ColorCoordinates from './js/examples/colorcoordinates.js';
 import RGBAColor from './js/color.js';
 import Effects from './js/effects.js';
 import PolygonChange from './js/examples/polygonchange.js';
+import Gen1 from './js/genuary2022/01/gen1.js';
+import Gen2 from './js/genuary2022/02/gen2.js';
+import Gen3 from './js/genuary2022/03/gen3.js';
+import Gen4 from './js/genuary2022/04/gen4.js';
+import Gen4_1 from './js/genuary2022/04/gen4_1.js';
+import Gen5 from './js/genuary2022/05/gen5.js';
+import Gen6 from './js/genuary2022/06/gen6.js';
+import Gen7 from './js/genuary2022/07/gen7.js';
+import Gen8 from './js/genuary2022/08/gen8.js';
+import Gen9 from './js/genuary2022/09/gen9.js';
+import Gen9_1 from './js/genuary2022/09/gen9_1.js';
+import Gen10 from './js/genuary2022/10/gen10.js';
+import Gen12 from './js/genuary2022/12/gen12.js';
+import Gen13 from './js/genuary2022/13/gen13.js';
+import Gen14 from './js/genuary2022/14/gen14.js';
+import Gen15 from './js/genuary2022/15/gen15.js';
+import Gen16 from './js/genuary2022/16/gen16.js';
+import Gen17 from './js/genuary2022/17/gen17.js';
+import Gen17_2 from './js/genuary2022/17/gen17_2.js';
+import Gen18 from './js/genuary2022/18/gen18.js';
+import Gen19 from './js/genuary2022/19/gen19.js';
+import Gen20 from './js/genuary2022/20/gen20.js';
+import Gen21 from './js/genuary2022/21/gen21.js';
+import Gen22 from './js/genuary2022/22/gen22.js';
+import Gen23 from './js/genuary2022/23/gen23.js';
+import Gen24 from './js/genuary2022/24/gen24.js';
+import Mandelbrot from './js/examples/mandelbrot.js';
+import Gen25 from './js/genuary2022/25/gen25.js';
+import Gen26 from './js/genuary2022/26/gen26.js';
+import Gen27 from './js/genuary2022/27/gen27.js';
+import Gen28 from './js/genuary2022/28/gen28.js';
+import Gen29 from './js/genuary2022/29/gen29.js';
+import Gen30 from './js/genuary2022/30/gen30.js';
+import Gen31 from './js/genuary2022/31/gen31.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
 document.body.appendChild(stats.dom);
 
 let capturer = new CCapture({
-    format: 'jpg',
+    format: 'webm',
     //timeLimit: 10,
     verbose: true
 });
@@ -34,12 +68,12 @@ let capturer = new CCapture({
 let aspect,
     utime = 0;
 
-let side = 100;
+let side = 128;
 let numColumns = side;
 let numRows = side;
 let numMargin = 0;
 let screen;
-let numLayers = 2;
+let numLayers = 4;
 
 let uround;
 let urounddec;
@@ -54,7 +88,6 @@ let vertices = [];
 let colors = [];
 let pointsizes = [];
 let atlasids = [];
-let layers;
 let effects;
 
 function init() {
@@ -67,14 +100,15 @@ function init() {
     //-----------
     screen = new Screen(canvas, numColumns, numRows, numMargin, numLayers);
 
-    cache = new Cache();
+    cache = new Cache(60*30);
 
-    demo = new ChromaSpiral(screen);
+    demo = new Gen31(screen);
 
     effects = new Effects(screen);
 
     // point size
-    gl.uniform1f(gl.getUniformLocation(program, "u_pointsize"), screen.pointSize);
+    // this is not used, just legacy:
+    //gl.uniform1f(gl.getUniformLocation(program, "u_pointsize"), screen.pointSize);
 }
 
 function update() {
@@ -93,51 +127,21 @@ function update() {
         urounddec = utime % 1;
 
         screen.layerIndex = 0;//--------------------------- LAYER 0
-        screen.drawCircle(10, 10, 10, 1, 0, 0);
         demo.update(usin, ucos, side, utime);
 
-        screen.layerIndex = 1;//--------------------------- LAYER 1
-        let c = screen.numColumns / 100;
-        screen.drawCircle(20 * c, 20 * c, 10 * c, 0, 1, 0);
-        screen.points.forEach(point => {
-            point.size = point.getBrightness() * screen.pointSizeFull;
-            //point.color.a = point.getBrightness() * screen.pointSizeFull
-        });
-        effects.antialias(3);
-        //effects.soften2(3);
-
-
-        //screen._mergeLayers();
-        //screen._addPointsToPrint();
         screen._groupLayers();
 
         vertices = screen._vertices;
         colors = screen._colors;
         pointsizes = screen._pointsizes;
         atlasids = screen._atlasids;
-        layers = [];
 
-        /*for (let index = 0; index < screen.layers.length; index++) {
-            const layer = screen.layers[index];
-            layers.push(
-                {
-                    vertices: layer.vertices,
-                    colors: layer.colors,
-                    pointsizes: layer.pointsizes,
-                    atlasIds: layer.atlasIds,
-                    modifieds: layer.modifieds
-                }
-            );
-        }*/
-
-        cache.data = {
+        /*cache.data = {
             vertices: vertices,
             colors: colors,
             pointsizes: pointsizes,
             atlasids: atlasids,
-            //layers: layers,
-        }
-        //console.log(cache.data)
+        }*/
 
         screen._vertices = [];
         screen._colors = [];
@@ -149,10 +153,8 @@ function update() {
         colors = currentFrameData.colors;
         pointsizes = currentFrameData.pointsizes;
         atlasids = currentFrameData.atlasids;
-        //layers = currentFrameData.layers;
     });
     printPoints(vertices, colors, pointsizes, atlasids);
-    //printLayers(layers);
 
     /*************/
 

@@ -2,6 +2,7 @@ import RGBColor from './color.js';
 import Coordinate from './coordinate.js';
 
 class Point {
+    static pointSizeFull = 1.0;
     constructor() {
         this._color = new RGBColor(0, 0, 0);
         this._position = new Coordinate(0, 0, 0);
@@ -31,6 +32,15 @@ class Point {
         this._color.set(r, g, b, a);
         this._modified = true;
         this._layer.setColor(this._coordinates, this._color);
+    }
+
+    setRGBAColor(value) {
+        if(value){
+            const { r, g, b, a } = value;
+            this._color.set(r, g, b, a);
+            this._modified = true;
+            this._layer.setColor(this._coordinates, this._color);
+        }
     }
 
     setBrightness(value) {
@@ -125,9 +135,16 @@ class Point {
 
     set size(value) {
         this._size = value;
+        this._layer.setPointSize(this._coordinates, this._size)
+    }
 
-        //const startPosition = this._coordinates.x * this._coordinates.y;
-        //this._layer.pointsizes[startPosition] = this._size;
+    /**
+     * Sets the size not in a scalar way, but in a relative way to the full size of what a `Point` can have.
+     * @param {Number} percentage percentage of the point from 0..1
+     */
+    setSize(percentage){
+        const size = Point.pointSizeFull * percentage;
+        this._size = size;
         this._layer.setPointSize(this._coordinates, this._size)
     }
 
@@ -137,9 +154,6 @@ class Point {
 
     set atlasId(value) {
         this._atlasId = value;
-
-        const startPosition = this._coordinates.x * this._coordinates.y;
-        this._layer.atlasIds[startPosition] = this._atlasId;
         this._layer.setAtlasId(this._coordinates, this._atlasId)
     }
 

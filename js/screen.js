@@ -42,9 +42,11 @@ class Screen {
         } else {
             this._pointSizeFull = this._canvas.height / this._numRows;
         }
+        this._pointSizeHalf = this._pointSizeFull / 2;
 
         this._pointSize = this._pointSizeFull - this._numMargin;
         //this._mainLayer = this._createLayer(-1);
+        Point.pointSizeFull = this._pointSize;
         this._createLayers();
 
     }
@@ -221,6 +223,19 @@ class Screen {
         return point;
     }
 
+    /**
+     * Same coordinates of the Point provided but in another layer
+     * @param {Point} point
+     * @param {Number} layerIndex
+     * @returns Point in `layerIndex` layer
+     */
+    getPointFromLayer(point, layerIndex) {
+        const layer = this._layers[layerIndex];
+        let row = layer.rows[point.coordinates.y];
+        let pointInLayer = row && row[point.coordinates.x] || null;
+        return pointInLayer;
+    }
+
     getPointAtCoordinate(x, y) {
         let pointWidth = this._pointSizeFull;
         let columnIndex = Math.floor(x / pointWidth);
@@ -231,6 +246,16 @@ class Screen {
     getRandomPoint() {
         let columnIndex = Math.floor(Math.random() * this._numColumns);
         let rowIndex = Math.floor(Math.random() * this._numRows);
+        let row = this._currentLayer.rows[rowIndex];
+        let point = row[columnIndex];
+        point.setCoordinates(columnIndex, rowIndex, 0);
+        return point;
+    }
+
+
+    getRandomPointX(y) {
+        let columnIndex = Math.floor(Math.random() * this._numColumns);
+        let rowIndex = y;
         let row = this._currentLayer.rows[rowIndex];
         let point = row[columnIndex];
         point.setCoordinates(columnIndex, rowIndex, 0);
@@ -354,14 +379,28 @@ class Screen {
         return result;
     }
 
+    getPointsArea(x1, y1, x2, y2) {
+        let points = [];
+        for (let cIndex = x1; cIndex < x2; cIndex++) {
+            for (let rowIndex = y1; rowIndex < y2; rowIndex++) {
+                const point = this.getPointAt(cIndex, rowIndex);
+                if (point) {
+                    points.push(point);
+                }
+            }
+        }
+        return points;
+    }
+
+
     clear(color = null) {
         this._currentLayer.rows.forEach(row => {
             row.forEach(point => {
                 if (color) {
                     // TODO: check why point.color = color does not work
-                    point.setColor(color.r, color.g, color.b, color.a);
+                    point.setRGBAColor(color);
                 } else {
-                    point.setColor(0, 0, 0);
+                    point.setColor(0, 0, 0, 0);
                 }
             });
         });
@@ -396,7 +435,7 @@ class Screen {
         }
     }
 
-    clearAlpha(level = 2){
+    clearAlpha(level = 2) {
         let pointColor = null;
         //this._currentLayer.rows.forEach(row => {
         const rowsLength = this._currentLayer.rows.length;
@@ -462,8 +501,8 @@ class Screen {
      */
     movePointTo(point, columnIndex, rowIndex) {
         let pointToReplace = this.getPointAt(columnIndex, rowIndex);
-        let { r, g, b, a } = point.color;
         if (pointToReplace) {
+            const { r, g, b, a } = point.color;
             pointToReplace.setColor(r, g, b, a);
             //pointToReplace.color = new RGBAColor(1,0,0);
         }
@@ -659,6 +698,38 @@ class Screen {
         this.drawLine(lastVertexX, lastVertexY, firstVertexX, firstVertexY, color);
     }
 
+    drawRect(x, y, w, h, color) {
+        color = color || new RGBAColor(1, 1, 1);
+        this.drawLine(x, y, x + w, y, color);
+        this.drawLine(x, y + h, x + w, y + h, color);
+
+
+        this.drawLine(x, y, x, y + h, color);
+        this.drawLine(x + w, y, x + w, y + h, color);
+
+
+    }
+
+
+    drawFilledSquare(x, y, sideLength, r, g, b) {
+        x -= sideLength * .5;
+        y -= sideLength * .5;
+        const finalX = x + sideLength;
+        const finalY = y + sideLength;
+        let point = null;
+        for (let currentX = x; currentX < finalX; currentX++) {
+
+            for (let currentY = y; currentY < finalY; currentY++) {
+                point = this.getPointAt(currentX, currentY);
+                if (point) {
+                    point.setColor(r, g, b);
+                }
+            }
+
+        }
+
+    }
+
     _getWebGLCoordinate(value, side, invert = false) {
         const direction = invert ? -1 : 1;
         const p = value / side;
@@ -684,6 +755,15 @@ class Screen {
         this._pointsizes = this._mainLayer.pointsizes;
         this._atlasids = this._mainLayer.atlasIds;
     };
+
+    moveColorToLayer(layerIndex){
+        this._currentLayer.points.forEach((point, index) => {
+            if(point.color.a > 0){
+                const pointInLayer = this._layers[layerIndex].points[index];
+                pointInLayer.setRGBAColor(point.color);
+            }
+        });
+    }
 }
 
 export default Screen;
