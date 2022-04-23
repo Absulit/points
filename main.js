@@ -13,7 +13,6 @@ import {
     program,
     setClearColor,
     printPoints,
-    printLayers
     printLayers,
     shaderUniformToBuffer
 } from './absulit.module.js';
