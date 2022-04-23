@@ -15,7 +15,7 @@ export default class Gen2 {
         }*/
 
         this._imageLoader = new ImageLoader(screen);
-        this._imageLoader.type = this._imageLoader.FIT;
+        this._imageLoader.type = ImageLoader.FIT;
         this._imageLoader.load('../../img/angel_600x600.jpg');
     }
 
