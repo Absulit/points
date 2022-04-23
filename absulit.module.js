@@ -60,6 +60,10 @@ export function shaderVariableToBuffer(name, vectorLen) {
     return shaderVar;
 }
 
+export function shaderUniformToBuffer(name, value){
+    return gl.uniform1f(gl.getUniformLocation(program, name), value);
+}
+
 export function drawTriangles() {
     gl.drawArrays(gl.TRIANGLES, 0, vertices.length / dimension);
 }

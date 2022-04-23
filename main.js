@@ -14,6 +14,8 @@ import {
     setClearColor,
     printPoints,
     printLayers
+    printLayers,
+    shaderUniformToBuffer
 } from './absulit.module.js';
 import Cache from './js/cache.js';
 import ColorCoordinates from './js/examples/colorcoordinates.js';
@@ -118,6 +120,7 @@ function update() {
 
     // does it need it?
     //gl.uniform1f(gl.getUniformLocation(program, "utime"), utime);
+    shaderUniformToBuffer('u_time', utime);
 
     cache.update(() => {
         utime += 1 / 60;//0.01;
