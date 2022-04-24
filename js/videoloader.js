@@ -165,6 +165,10 @@ class VideoLoader {
     restart(){
         this._currentTime = 0;
     }
+
+    get isLoaded(){
+        return this._imageLoaded;
+    }
 }
 
 export default VideoLoader;

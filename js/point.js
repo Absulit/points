@@ -7,6 +7,7 @@ class Point {
         this._color = new RGBColor(0, 0, 0);
         this._position = new Coordinate(0, 0, 0);
         this._coordinates = new Coordinate(0, 0, 0);
+        this._normalPosition = new Coordinate(0, 0, 0);
         this._modified = false;
         this._layer = 0;
         this._size = 1.0;
@@ -35,7 +36,7 @@ class Point {
     }
 
     setRGBAColor(value) {
-        if(value){
+        if (value) {
             const { r, g, b, a } = value;
             this._color.set(r, g, b, a);
             this._modified = true;
@@ -121,6 +122,20 @@ class Point {
         this._layer.setVertex(this._coordinates, this._position);
     }
 
+    get normalPosition() {
+        return this._normalPosition;
+    }
+
+    set normalPosition(value) {
+        this._normalPosition = value;
+    }
+
+    setNormalPosition(x, y, z) {
+        this._normalPosition.x = x;
+        this._normalPosition.y = y;
+        this._normalPosition.z = z;
+    }
+
     get layer() {
         return this._layer;
     }
@@ -142,7 +157,7 @@ class Point {
      * Sets the size not in a scalar way, but in a relative way to the full size of what a `Point` can have.
      * @param {Number} percentage percentage of the point from 0..1
      */
-    setSize(percentage){
+    setSize(percentage) {
         const size = Point.pointSizeFull * percentage;
         this._size = size;
         this._layer.setPointSize(this._coordinates, this._size)

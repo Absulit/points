@@ -73,6 +73,7 @@ class Screen {
                 }
 
                 point.setCoordinates(xCoordinate, yCoordinate, 0);
+                point.setNormalPosition(xCoordinate / this._numColumns, yCoordinate / this._numRows, 0)
                 point.color.a = 0;
                 point.size = this._pointSize;
 
@@ -157,6 +158,11 @@ class Screen {
             this._colors = this._colors.concat(layer.colors);
             this._pointsizes = this._pointsizes.concat(layer.pointsizes);
             this._atlasids = this._atlasids.concat(layer.atlasIds);
+
+            // layer.vertices.forEach(i => this._vertices.push(i));
+            // layer.colors.forEach(i => this._colors.push(i));
+            // layer.pointsizes.forEach(i => this._pointsizes.push(i));
+            // layer.atlasIds.forEach(i => this._atlasids.push(i));
         }
     }
 

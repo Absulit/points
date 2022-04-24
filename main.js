@@ -55,10 +55,18 @@ import Gen28 from './js/genuary2022/28/gen28.js';
 import Gen29 from './js/genuary2022/29/gen29.js';
 import Gen30 from './js/genuary2022/30/gen30.js';
 import Gen31 from './js/genuary2022/31/gen31.js';
+import EffectsTester from './js/examples/effects_tester.js';
+import CostaRicanFlag from './js/examples/costaricanflag.js';
+import GameOfLife from './js/examples/gameoflife.js';
+import CenterDistance from './js/examples/centerdistance.js';
+import CenterAngle from './js/examples/centerangle.js';
+import FlowFieldsAnimated from './js/examples/flowfieldsanimated.js';
+import FlowFieldsAnimated2 from './js/examples/flowfieldsanimated2.js';
+import VideoAtlas from './js/examples/videoatlas.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
-document.body.appendChild(stats.dom);
+//document.body.appendChild(stats.dom);
 
 let capturer = new CCapture({
     format: 'webm',
@@ -69,16 +77,17 @@ let capturer = new CCapture({
 let aspect,
     utime = 0;
 
-let side = 128;
+let side = 100;
 let numColumns = side;
 let numRows = side;
 let numMargin = 0;
 let screen;
-let numLayers = 4;
+let numLayers = 3;
 
 let uround;
 let urounddec;
 let usin;
+let nusin;
 let ucos;
 
 let demo;
@@ -94,16 +103,16 @@ let effects;
 function init() {
     initWebGL("gl-canvas", true);
     aspect = canvas.width / canvas.height;
-    setClearColor([0, 0, 0, 0.5]);
+    setClearColor([0, 0, 0, 0]);
 
     assignShaders("vertex-shader", "fragment-shader");
 
     //-----------
     screen = new Screen(canvas, numColumns, numRows, numMargin, numLayers);
 
-    cache = new Cache(60*30);
+    cache = new Cache(60 * 10);
 
-    demo = new Gen31(screen);
+    demo = new FlowFieldsAnimated(screen);
 
     effects = new Effects(screen);
 
@@ -127,9 +136,10 @@ function update() {
         usin = Math.sin(utime);
         ucos = Math.cos(utime);
         urounddec = utime % 1;
+        nusin = (Math.sin(utime) + 1) / 2;
 
         screen.layerIndex = 0;//--------------------------- LAYER 0
-        demo.update(usin, ucos, side, utime);
+        demo.update(usin, ucos, side, utime, nusin);
 
         screen._groupLayers();
 
@@ -138,12 +148,12 @@ function update() {
         pointsizes = screen._pointsizes;
         atlasids = screen._atlasids;
 
-        /*cache.data = {
-            vertices: vertices,
-            colors: colors,
-            pointsizes: pointsizes,
-            atlasids: atlasids,
-        }*/
+        // cache.data = {
+        //     vertices: vertices,
+        //     colors: colors,
+        //     pointsizes: pointsizes,
+        //     atlasids: atlasids,
+        // }
 
         screen._vertices = [];
         screen._colors = [];

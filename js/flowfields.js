@@ -46,11 +46,11 @@ export default class FlowFields {
         this._stepLength = value;
     }
 
-    get radians(){
+    get radians() {
         return this._radians;
     }
 
-    set radians(value){
+    set radians(value) {
         this._radians = value;
     }
 
@@ -99,6 +99,33 @@ export default class FlowFields {
                 }
                 startPosition.prevPoint = point;
             }
+        }
+    }
+
+    addLines(lineAmount = 1) {
+        const screen = this._screen;
+        for (let index = 0; index < lineAmount; index++) {
+            const x = Math.floor(screen.numColumns * Math.random());
+            const y = Math.floor(screen.numColumns * Math.random());
+            const startPosition = {
+                position: new Coordinate(x, y),
+                prevPoint: null
+            };
+            this._startPositions.push(startPosition);
+        }
+    }
+
+    reset(lineAmount){
+        const screen = this._screen;
+        this._startPositions = []
+        for (let index = 0; index < lineAmount; index++) {
+            const x = Math.floor(screen.numColumns * Math.random());
+            const y = Math.floor(screen.numColumns * Math.random());
+            const startPosition = {
+                position: new Coordinate(x, y),
+                prevPoint: null
+            };
+            this._startPositions.push(startPosition);
         }
     }
 
