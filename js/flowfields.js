@@ -103,6 +103,7 @@ export default class FlowFields {
     }
 
     addLines(lineAmount = 1) {
+        // TODO: optimize to remove items out of sight (out of the canvas limits)
         const screen = this._screen;
         for (let index = 0; index < lineAmount; index++) {
             const x = Math.floor(screen.numColumns * Math.random());
@@ -115,7 +116,7 @@ export default class FlowFields {
         }
     }
 
-    reset(lineAmount){
+    reset(lineAmount) {
         const screen = this._screen;
         this._startPositions = []
         for (let index = 0; index < lineAmount; index++) {
