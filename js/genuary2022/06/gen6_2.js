@@ -1,14 +1,14 @@
-import RGBAColor from '../color.js';
-import Coordinate from '../coordinate.js';
-import Effects from '../effects.js';
-import FlowFields from '../flowfields.js';
-import ImageLoader from '../imageloader.js';
-import MathUtil from '../mathutil.js';
-import SpriteLoader from '../spriteloader.js';
-import Particle from './Particle.js';
+import RGBAColor from '../../color.js';
+import Coordinate from '../../coordinate.js';
+import Effects from '../../effects.js';
+import Particle from '../../examples/Particle.js';
+import FlowFields from '../../flowfields.js';
+import ImageLoader from '../../imageloader.js';
+import MathUtil from '../../mathutil.js';
+import SpriteLoader from '../../spriteloader.js';
 
 
-export default class EffectsTester {
+export default class Gen6_2 {
     /**
      *
      * @param {Screen} screen
