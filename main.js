@@ -78,7 +78,7 @@ let capturer = new CCapture({
 let aspect,
     utime = 0;
 
-let side = 100;
+let side = 400;
 let numColumns = side;
 let numRows = side;
 let numMargin = 0;
@@ -113,7 +113,7 @@ function init() {
 
     cache = new Cache(60 * 10);
 
-    demo = new Gen6_2(screen);
+    demo = new EffectsTester(screen);
 
     effects = new Effects(screen);
 

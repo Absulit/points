@@ -46,8 +46,13 @@ export default class EffectsTester {
 
         this._particles = [];
 
-        for (let index = 0; index < 10; index++) {
-            const particle = new Particle(screen.center.x, screen.center.y);
+        for (let index = 0; index < 2000 ; index++) {
+            const particle = {
+                x: screen.center.x,
+                y: screen.center.y,
+                angle: Math.random() * Math.PI * 2,
+                distance: 1
+            };
             this._particles.push(particle);
         }
     }
@@ -61,21 +66,46 @@ export default class EffectsTester {
         //screen.clear();
 
         for (const particle of this._particles) {
-            particle.update();
+            const p = MathUtil.polar(particle.distance, particle.angle);
+            particle.x += p.x;
+            particle.y += p.y;
+
             const point = screen.getPointAt(Math.floor(particle.x), Math.floor(particle.y));
+
+
+            // https://youtu.be/X-iSQQgOd1A?t=814
             if (point) {
-                //point.setBrightness(1);
+                const turnSpeed = .1;
+                const distance = 3;
+                let p = MathUtil.polar(distance, particle.angle);
+                const pointForward = screen.getPointAt(Math.floor(particle.x + p.x), Math.floor(particle.y + p.y));
+                p = MathUtil.polar(distance, particle.angle + MathUtil.radians(15));
+                const pointRight = screen.getPointAt(Math.floor(particle.x + p.x), Math.floor(particle.y + p.y));
+                p = MathUtil.polar(distance, particle.angle - MathUtil.radians(15));
+                const pointLeft = screen.getPointAt(Math.floor(particle.x + p.x), Math.floor(particle.y + p.y));
+
+                if (pointForward && pointRight && pointLeft && pointForward.getBrightness() > pointLeft.getBrightness() && pointForward.getBrightness() > pointRight.getBrightness()) {
+                    // do nothing, continue
+                } else if (pointForward && pointRight && pointLeft && pointForward.getBrightness() < pointLeft.getBrightness() && pointForward.getBrightness() < pointRight.getBrightness()) {
+                    // turn randomly
+                    particle.angle += (Math.random() - .5) * 2 * turnSpeed * utime
+                } else if (pointRight && pointLeft && pointRight.getBrightness() > pointLeft.getBrightness()) {
+                    // turn right
+                    particle.angle += Math.random() * turnSpeed * utime;
+                } else if (pointLeft && pointRight && pointLeft.getBrightness() > pointRight.getBrightness()) {
+                    // turn left
+                    particle.angle -= Math.random() * turnSpeed * utime;
+                }
+
                 const { x, y } = point.normalPosition;
-                point.setColor(1 - x, 1 - y, x * nusin);
+                point.setBrightness(1);
+                //point.setColor(1 - x, 1 - y * nusin, x * nusin);
                 //point.color.a = particle.a;
+            } else {
+                particle.angle = Math.random() * Math.PI * 2
             }
         }
 
-        this._particles = this._particles.filter(particle => (particle.x < screen.numColumns && particle.x >= 0 && particle.y < screen.numRows && particle.y >= 0))
-
-        for (let index = 0; index < 5; index++) {
-            this._particles.push(new Particle(screen.center.x, screen.numRows - 1, this._constant));
-        }
 
 
         //debugger;
@@ -84,10 +114,10 @@ export default class EffectsTester {
 
         //this._effects.chromaticAberration(.05, 2);
         //this._effects.fire(1);
-        //this._effects.soften2(30);
+        this._effects.soften2(30);
         //this._effects.antialias();
         //this._screen.clearMix(this._clearMixColor, 1.1);
-        this._screen.clearAlpha(1.01);
+        this._screen.clearAlpha(1.1);
         //this._effects.orderedDithering();
     }
 
