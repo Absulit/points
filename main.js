@@ -78,7 +78,7 @@ let capturer = new CCapture({
 let aspect,
     utime = 0;
 
-let side = 400;
+let side = 100;
 let numColumns = side;
 let numRows = side;
 let numMargin = 0;

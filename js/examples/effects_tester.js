@@ -40,13 +40,15 @@ export default class EffectsTester {
 
 
         //screen.layerIndex = 0;//--------------------------- LAYER 0
+        screen.layerIndex = 1;//--------------------------- LAYER 1
+        screen.clear(this._clearMixColor);
 
         this._lineColor = new RGBAColor(1, 1, 1);
 
 
         this._particles = [];
 
-        for (let index = 0; index < 2000 ; index++) {
+        for (let index = 0; index < 2000; index++) {
             const particle = {
                 x: screen.center.x,
                 y: screen.center.y,
@@ -99,17 +101,32 @@ export default class EffectsTester {
 
                 const { x, y } = point.normalPosition;
                 point.setBrightness(1);
-                //point.setColor(1 - x, 1 - y * nusin, x * nusin);
-                //point.color.a = particle.a;
+                const pointAbove = screen.getPointFromLayer(point, 2);
+                pointAbove.setColor(1 - x, 1 - y, x * nusin);
+
             } else {
                 particle.angle = Math.random() * Math.PI * 2
             }
         }
 
+        this._effects.soften2(30);
+        this._screen.clearAlpha(1.1);
 
+        //screen.moveColorToLayer(2);
 
         //debugger;
-        //screen.layerIndex = 2;//--------------------------- LAYER 2
+        //screen.layerIndex = 1;//--------------------------- LAYER 1
+
+
+        screen.layerIndex = 2;//--------------------------- LAYER 2
+        // for (const particle of this._particles) {
+        //     const point = screen.getPointAt(Math.floor(particle.x), Math.floor(particle.y));
+        //     if(point){
+        //         const { x, y } = point.normalPosition;
+        //         point.setColor(1 - x, 1 - y, x * nusin);
+        //     }
+        // }
+
         //screen.layerIndex = 3;//--------------------------- LAYER 3
 
         //this._effects.chromaticAberration(.05, 2);
@@ -117,7 +134,7 @@ export default class EffectsTester {
         this._effects.soften2(30);
         //this._effects.antialias();
         //this._screen.clearMix(this._clearMixColor, 1.1);
-        this._screen.clearAlpha(1.1);
+        this._screen.clearAlpha(1.01);
         //this._effects.orderedDithering();
     }
 
