@@ -64,6 +64,7 @@ import FlowFieldsAnimated from './js/examples/flowfieldsanimated.js';
 import FlowFieldsAnimated2 from './js/examples/flowfieldsanimated2.js';
 import VideoAtlas from './js/examples/videoatlas.js';
 import Gen6_2 from './js/genuary2022/06/gen6_2.js';
+import SlimeImage from './js/examples/slimeimage.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -113,7 +114,7 @@ function init() {
 
     cache = new Cache(60 * 10);
 
-    demo = new EffectsTester(screen);
+    demo = new SlimeImage(screen);
 
     effects = new Effects(screen);
 
