@@ -40,6 +40,17 @@ export default class SlimeImage {
         this._imageLoader = new ImageLoader(screen);
         this._imageLoader.type = ImageLoader.FIT;
         this._imageLoader.load('../../assets_ignore/absulit_800x800.jpg');
+        //this._imageLoader.load('../../assets_ignore/pmw_800x800.jpg');
+        //this._imageLoader.load('../../assets_ignore/tucan_jcvp_800x800.jpg');
+        //this._imageLoader.load('../../img/noiseTexture.png');
+        //this._imageLoader.load('../../img/noiseTexture2.png');
+        //this._imageLoader.load('../../img/angel_600x600.jpg');
+        //this._imageLoader.load('../../img/carmen_lyra_800x800.jpg');
+        //this._imageLoader.load('../../img/carmen_lyra_2_blur_800x800.jpg');
+        //this._imageLoader.load('../../img/old_king_600x600.jpg');
+        //this._imageLoader.load('../../img/gratia_800x800.jpg');
+        //this._imageLoader.load('../../img/gioconda_300x300.jpg');
+        //this._imageLoader.load('../../img/house_512x512.jpg');
 
         //screen.layerIndex = 0;//--------------------------- LAYER 0
         screen.layerIndex = 1;//--------------------------- LAYER 1
@@ -93,7 +104,7 @@ export default class SlimeImage {
                     // do nothing, continue
                 } else if (pointForward && pointRight && pointLeft && pointForward.getBrightness() < pointLeft.getBrightness() && pointForward.getBrightness() < pointRight.getBrightness()) {
                     // turn randomly
-                    particle.angle += (Math.random() - .5) * 2 * turnSpeed * utime
+                    particle.angle += (Math.random() - .5) * 2 * turnSpeed * utime;
                 } else if (pointRight && pointLeft && pointRight.getBrightness() > pointLeft.getBrightness()) {
                     // turn right
                     particle.angle += Math.random() * turnSpeed * utime;
