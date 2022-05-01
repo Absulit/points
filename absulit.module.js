@@ -19,7 +19,7 @@ export function initWebGL(canvasId, depth) {
 }
 
 export function setClearColor(color) {
-    gl.clearColor(color[0], color[1], color[2], 1);
+    gl.clearColor(color[0], color[1], color[2], color[3]);
 }
 
 export function clearScreen() {

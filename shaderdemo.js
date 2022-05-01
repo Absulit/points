@@ -22,10 +22,11 @@ import {
 } from './absulit.module.js';
 import Cache from './js/cache.js';
 import ColorCoordinates from './js/examples/colorcoordinates.js';
+import MathUtil from './js/mathutil.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
-document.body.appendChild(stats.dom);
+//document.body.appendChild(stats.dom);
 
 let capturer = new CCapture({
     format: 'jpg',
@@ -57,11 +58,14 @@ let colors = [];
 let pointsizes = [];
 let atlasids = [];
 
+let constant = 10;
+let planets = null;
+let center = null;
 
 function init() {
     initWebGL("gl-canvas", true);
     aspect = canvas.width / canvas.height;
-    setClearColor([0, 0, 0, 0.5]);
+    setClearColor([0, 0, 0, .1]);
 
     assignShaders("vertex-shader", "fragment-shader");
 
@@ -74,10 +78,20 @@ function init() {
 
     // point size
     gl.uniform1f(gl.getUniformLocation(program, "u_pointsize"), screen.pointSize);
+
+
+    constant = 1;
+    planets = [
+        { radius: 40 * constant, speed: 13, angle: 360 },
+        { radius: 30 * constant, speed: 8 , angle: 360 },
+    ];
+    center = screen.center;
 }
 
 function update() {
-    clearScreen();
+    //clearScreen();
+    // gl.clearColor(0, 0, 0, .0001);
+    // gl.clear(gl.COLOR_BUFFER_BIT);
     stats.begin();
 
 
@@ -92,72 +106,82 @@ function update() {
         gl.uniform1f(gl.getUniformLocation(program, "u_time"), utime);
         
 
-        /*demo.update(usin, ucos, side, utime);
 
+        let cx = center.x, cy = center.y;
 
-        screen._mergeLayers();
-        screen._addPointsToPrint();
+        const pointList = [];
+        //console.log(screen);
+        //console.log(planets);
+        planets.forEach(planet => {
+            let pointFromCenter, radians;
+            radians = MathUtil.radians(planet.angle);
+            pointFromCenter = MathUtil.vector(planet.radius, radians);
+            //console.log(pointFromCenter);
+            const point = screen.getPointAt(Math.floor(pointFromCenter.x + cx), Math.floor(pointFromCenter.y + cy));
+            pointList.push(point);
+            if (point) {
+                const { x, y } = point.normalPosition;
+                point.setColor(1-x, 1-y, x);
+                //point.setBrightness(1);
+            }
 
-        vertices = screen._vertices;
-        colors = screen._colors;
-        pointsizes = screen._pointsizes;
-        atlasids = screen._atlasids;
+            // if greater than 360 set back to zero, also increment
+            planet.angle = (planet.angle * (planet.angle < 360) || 0) + (planet.speed * .3);
 
-        cache.data = {
-            vertices: vertices,
-            colors: colors,
-            pointsizes: pointsizes,
-            atlasids: atlasids,
-        }
-
-        screen._vertices = [];
-        screen._colors = [];
-        screen._pointsizes = [];
-        screen._atlasids = [];*/
+        });
 
 
         const dimension = 3;
-        const vertices = [
-            -1, -1, 0,
-            -1, 1, 0,
-            1, -1, 0,
-            1, 1, 0,
-        ];
+        let vertices = [];
+        pointList.forEach(point => {
+            //console.log('point: ', point);
+            if(point){
+                vertices.push(point.position.value);
+            }
+        });
+        vertices = flatten(vertices);
+
+
         const vBuffer = getBuffer2(vertices);
         shaderVariableToBuffer("vPosition", dimension);
 
-        const colors = [
-            1, 0, 0, 1,
-            1, 1, 0, 1,
-            1, 0, 0, 1,
-            1, 0, 0, 1,
-        ]
+        let colors = [];
+        pointList.forEach(point => {
+            if(point){
+                colors.push(point.color.value);
+            }
+        });
+        colors = flatten(colors);
+
+
         getBuffer2(colors);
         shaderVariableToBuffer("vColor", 4);
 
-        const pointsizes = [
-            10,
-            10,
-            10,
-            10
-        ];
+        const pointsizes = [];
+        pointList.forEach(point => {
+            pointsizes.push(10);
+        });
+
         getBuffer2(pointsizes);
         shaderVariableToBuffer("vPointSize", 1);
 
-        const atlasids = [
-            -1,
-            -1,
-            -1,
-            -1
-        ];
+        const atlasids = [];
+        pointList.forEach(point => {
+            atlasids.push(-1);
+        });
+
         getBuffer2(atlasids);
         shaderVariableToBuffer("vAtlasId", 1);
 
+       // console.log(vertices, colors, pointsizes, atlasids);debugger
+
         //drawPoints2(vBuffer, vertices, dimension);
-        //drawLines2(vBuffer, vertices);
-        drawTriangleStrip2(vBuffer, vertices, 3);
+        drawLines2(vBuffer, vertices);
+        //drawTriangleStrip2(vBuffer, vertices, 3);
 
         //printPoints(vertices, colors, pointsizes, atlasids)
+
+        //console.log(planets);
 
     }, currentFrameData => {
         /*vertices = currentFrameData.vertices;
