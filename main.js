@@ -65,6 +65,9 @@ import FlowFieldsAnimated2 from './js/examples/flowfieldsanimated2.js';
 import VideoAtlas from './js/examples/videoatlas.js';
 import Gen6_2 from './js/genuary2022/06/gen6_2.js';
 import SlimeImage from './js/examples/slimeimage.js';
+import PlanetaryLines from './js/examples/planetarylines.js';
+import PlanetaryLines2 from './js/examples/planetarylines2.js';
+import PlanetaryLines3 from './js/examples/planetarylines3.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -79,7 +82,7 @@ let capturer = new CCapture({
 let aspect,
     utime = 0;
 
-let side = 100;
+let side = 200;
 let numColumns = side;
 let numRows = side;
 let numMargin = 0;
@@ -114,7 +117,7 @@ function init() {
 
     cache = new Cache(60 * 10);
 
-    demo = new SlimeImage(screen);
+    demo = new PlanetaryLines3(screen);
 
     effects = new Effects(screen);
 
