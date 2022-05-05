@@ -34,11 +34,13 @@ async function init() {
     ];
     const presentationFormat = context.getPreferredFormat(adapter);
 
+    presentationFormat
+
     context.configure({
         device,
         format: presentationFormat,
         size: presentationSize,
-        compositingAlphaMode: "opaque",
+        compositingAlphaMode: 'premultiplied',
     });
 
     pipeline = device.createRenderPipeline({
@@ -56,6 +58,21 @@ async function init() {
             targets: [
                 {
                     format: presentationFormat,
+
+                    blend: {
+                        alpha: {
+                            srcFactor: 'src-alpha',
+                            dstFactor: 'one-minus-src-alpha',
+                            operation: 'add'
+                        },
+                        color: {
+                            srcFactor: 'src-alpha',
+                            dstFactor: 'one-minus-src-alpha',
+                            operation: 'add'
+                        },
+                    },
+                    writeMask: GPUColorWrite.ALL,
+
                 },
             ],
         },
