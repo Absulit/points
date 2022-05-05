@@ -7,15 +7,30 @@ const triangleVertWGSL = await getShaderSource('./shaders/triangle3_1.vert.wgsl'
 const redFragWGSL = await getShaderSource('./shaders/red3_1.frag.wgsl');
 
 const canvas = document.getElementById('gl-canvas');
-let device = null
-let context = null
-let pipeline = null
+let device = null;
+let context = null;
+let pipeline = null;
+let verticesBuffer = null;
+
+const vertexSize = 4 * 8; // Byte size of one triangle vertex.
+const positionOffset = 0;
+const colorOffset = 4 * 4; // Byte offset of triangle vertex color attribute.
+const vertexCount = 3;
+const UVOffset = 4 * 8;
 
 /***************/
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
 document.body.appendChild(stats.dom);
 /***************/
+
+
+const vertexArray = new Float32Array([
+    // float4 position, float4 color,
+    0.0, 0.5, 0.0, 1, 1, 0, 0, 1, // there are 10 items in this row, that's why vertexSize is 4*8
+    -0.5, -0.5, 0.0, 1, 0, 1, 0, 1,
+    0.5, -0.5, 0.0, 1, 0, 0, 1, 1,
+]);
 
 
 async function init() {
@@ -43,12 +58,48 @@ async function init() {
         compositingAlphaMode: 'premultiplied',
     });
 
+    // Create a vertex buffer from the triangle data.
+    verticesBuffer = device.createBuffer({
+        size: vertexArray.byteLength,
+        usage: GPUBufferUsage.VERTEX,
+        mappedAtCreation: true,
+    });
+    new Float32Array(verticesBuffer.getMappedRange()).set(vertexArray);
+    verticesBuffer.unmap();
+
+
     pipeline = device.createRenderPipeline({
         vertex: {
             module: device.createShaderModule({
                 code: triangleVertWGSL,
             }),
             entryPoint: 'main', // shader function name
+
+            buffers: [
+                {
+                    arrayStride: vertexSize,
+                    attributes: [
+                        {
+                            // position
+                            shaderLocation: 0,
+                            offset: positionOffset,
+                            format: 'float32x4',
+                        },
+                        {
+                            // colors
+                            shaderLocation: 1,
+                            offset: colorOffset,
+                            format: 'float32x4',
+                        },
+                        // {
+                        //     // uv
+                        //     shaderLocation: 2,
+                        //     offset: UVOffset,
+                        //     format: 'float32x2',
+                        // },
+                    ],
+                },
+            ],
         },
         fragment: {
             module: device.createShaderModule({
@@ -107,6 +158,9 @@ function update() {
 
     const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
     passEncoder.setPipeline(pipeline);
+
+    passEncoder.setVertexBuffer(0, verticesBuffer);
+
     /**
      * vertexCount: number The number of vertices to draw
      * instanceCount?: number | undefined The number of instances to draw
@@ -114,7 +168,7 @@ function update() {
      * firstInstance?: number | undefined First instance to draw
      */
     //passEncoder.draw(3, 1, 0, 0);
-    passEncoder.draw(3);
+    passEncoder.draw(vertexCount);
     passEncoder.end();
 
     device.queue.submit([commandEncoder.finish()]);
