@@ -48,13 +48,13 @@ async function init() {
             module: device.createShaderModule({
                 code: triangleVertWGSL,
             }),
-            entryPoint: 'main',
+            entryPoint: 'main', // shader function name
         },
         fragment: {
             module: device.createShaderModule({
                 code: redFragWGSL,
             }),
-            entryPoint: 'main',
+            entryPoint: 'main', // shader function name
             targets: [
                 {
                     format: presentationFormat,
