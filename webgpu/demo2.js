@@ -9,7 +9,10 @@ async function init() {
     const adapter = await navigator.gpu.requestAdapter();
     if (!adapter) { return; }
     const device = await adapter.requestDevice();
-
+    device.lost.then((info) => {
+        console.log(info);
+    });
+    console.log(device);
 
     // First Matrix
 
