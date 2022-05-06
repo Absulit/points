@@ -27,7 +27,7 @@ document.body.appendChild(stats.dom);
 
 const vertexArray = new Float32Array([
     // float4 position, float4 color,
-    0.0, 0.5, 0.0, 1, 1, 0, 0, 1, // there are 10 items in this row, that's why vertexSize is 4*8
+    0.0, 0.5, 0.0, 1, 1, 0, 0, 1, // there are 8 items in this row, that's why vertexSize is 4*8
     -0.5, -0.5, 0.0, 1, 0, 1, 0, 1,
     0.5, -0.5, 0.0, 1, 0, 0, 1, 1,
 ]);
