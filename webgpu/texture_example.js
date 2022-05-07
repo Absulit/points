@@ -46,17 +46,12 @@ async function init() {
     });
 
     /////
-    // prepare image
-
-    const response = await fetch('./assets/old_king_600x600.jpg');
-    const blob = await response.blob();
-    const bitmap = await createImageBitmap(blob);
 
 
-    const max = Math.max(bitmap.width, bitmap.height);
-    const [w, h] = [bitmap.width / max, bitmap.height / max];
 
     // triangle-strip square: 4-(x,y, u, v); top-left: (u,v)=(0,0)
+    const w = 1;
+    const h = 1;
     const square = new Float32Array([
         -w, -h, 0, 1,
         -w, +h, 0, 0,
@@ -66,26 +61,8 @@ async function init() {
     verticesBuffer = device.createBuffer({ size: square.byteLength, usage: GPUBufferUsage.VERTEX, mappedAtCreation: true });
     new Float32Array(verticesBuffer.getMappedRange()).set(square);
     verticesBuffer.unmap();
-    const stride = {
-        arrayStride: 4 * square.BYTES_PER_ELEMENT,
-        attributes: [
-            { shaderLocation: 0, offset: 0, format: "float32x2" },
-            { shaderLocation: 1, offset: 2 * square.BYTES_PER_ELEMENT, format: "float32x2" },
-        ]
-    };
 
 
-    // texture and sampler
-    const samp = device.createSampler({ minFilter: "linear", magFilter: "linear" });
-    const tex = device.createTexture({
-        format: "rgba8unorm", size: [bitmap.width, bitmap.height],
-        usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT,
-    });
-    device.queue.copyExternalImageToTexture(
-        { source: bitmap },
-        { texture: tex },
-        [bitmap.width, bitmap.height]
-    );
 
     // pipeline
     pipeline = device.createRenderPipeline({
@@ -94,7 +71,15 @@ async function init() {
         vertex: {
             module: device.createShaderModule({ code: triangleVertWGSL }),
             entryPoint: "main",
-            buffers: [stride]
+            buffers: [
+                {
+                    arrayStride: vertexCount * square.BYTES_PER_ELEMENT,
+                    attributes: [
+                        { shaderLocation: 0, offset: 0, format: "float32x2" },
+                        { shaderLocation: 1, offset: 2 * square.BYTES_PER_ELEMENT, format: "float32x2" },
+                    ]
+                }
+            ]
         },
         fragment: {
             module: device.createShaderModule({ code: redFragWGSL }),
@@ -103,10 +88,32 @@ async function init() {
         },
     });
 
+    // texture and sampler
+    // prepare image
+
+    const response = await fetch('./assets/old_king_600x600.jpg');
+    const blob = await response.blob();
+    const bitmap = await createImageBitmap(blob);
+
+
+    const samp = device.createSampler({ minFilter: "linear", magFilter: "linear" });
+    const tex = device.createTexture({
+        size: [bitmap.width, bitmap.height, 1],
+        format: "rgba8unorm",
+        usage:
+            GPUTextureUsage.TEXTURE_BINDING |
+            GPUTextureUsage.COPY_DST |
+            GPUTextureUsage.RENDER_ATTACHMENT,
+    });
+    device.queue.copyExternalImageToTexture(
+        { source: bitmap },
+        { texture: tex },
+        [bitmap.width, bitmap.height]
+    );
+
     // bind group
-    const bindGroupLayout = pipeline.getBindGroupLayout(0);
     uniformBindGroup = device.createBindGroup({
-        layout: bindGroupLayout,
+        layout: pipeline.getBindGroupLayout(0),
         entries: [
             { binding: 0, resource: samp },
             { binding: 1, resource: tex.createView() },

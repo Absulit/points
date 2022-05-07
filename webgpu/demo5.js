@@ -13,11 +13,12 @@ let pipeline = null;
 let verticesBuffer = null;
 let uniformBindGroup = null;
 
-const vertexSize = 4 * 8; // Byte size of one triangle vertex.
+const vertexSize = 4 * 10; // Byte size of one triangle vertex.
 const positionOffset = 0;
 const colorOffset = 4 * 4; // Byte offset of triangle vertex color attribute.
 const vertexCount = 6;
 const UVOffset = 4 * 8;
+
 
 /***************/
 const stats = new Stats();
@@ -28,15 +29,15 @@ document.body.appendChild(stats.dom);
 
 const vertexArray = new Float32Array([
     // float4 position, float4 color,
-    1, 1, 0.0, 1, 1, 0, 0, 1,   // there are 8 items in this row, that's why vertexSize is 4*8
-    1, -1, 0.0, 1, 0, 1, 0, 1,
-    -1, -1, 0.0, 1, 0, 0, 1, 1,
+    // there are itemsPerRow items in this row, that's why vertexSize is 4*itemsPerRow
+    1, 1, 0.0, 1, 1, 0, 0, 1, 1, 0,
+    1, -1, 0.0, 1, 0, 1, 0, 1, 1, 1,
+    -1, -1, 0.0, 1, 0, 0, 1, 1, 0, 1,
 
-    1, 1, 0.0, 1, 1, 0, 0, 1,
-    -1, -1, 0.0, 1, 0, 0, 1, 1,
-    -1, 1, 0.0, 1, 1, 1, 0, 1,
+    1, 1, 0.0, 1, 1, 0, 0, 1, 1, 0,
+    -1, -1, 0.0, 1, 0, 0, 1, 1, 0, 1,
+    -1, 1, 0.0, 1, 1, 1, 0, 1, 0, 0,
 ]);
-
 
 
 
@@ -45,7 +46,7 @@ async function init() {
     const adapter = await navigator.gpu.requestAdapter();
     if (!adapter) { return; }
     device = await adapter.requestDevice();
-    device.lost.then((info) => {
+    device.lost.then(info => {
         console.log(info);
     });
 
@@ -77,7 +78,7 @@ async function init() {
 
 
     pipeline = device.createRenderPipeline({
-        //layout: 'auto',
+        layout: 'auto',
         vertex: {
             module: device.createShaderModule({
                 code: triangleVertWGSL,
@@ -87,6 +88,7 @@ async function init() {
             buffers: [
                 {
                     arrayStride: vertexSize,
+                    //arrayStride: vertexCount * vertexArray.BYTES_PER_ELEMENT,//vertexSize,
                     attributes: [
                         {
                             // position
@@ -100,12 +102,12 @@ async function init() {
                             offset: colorOffset,
                             format: 'float32x4',
                         },
-                        // {
-                        //     // uv
-                        //     shaderLocation: 2,
-                        //     offset: UVOffset,
-                        //     format: 'float32x2',
-                        // },
+                        {
+                            // uv
+                            shaderLocation: 2,
+                            offset: UVOffset,
+                            format: 'float32x2',
+                        },
                     ],
                 },
             ],
@@ -143,6 +145,7 @@ async function init() {
 
     // -- create texture
 
+    const samp = device.createSampler({ minFilter: "linear", magFilter: "linear" });
     // Fetch the image and upload it into a GPUTexture.
     //let cubeTexture: GPUTexture;
     let cubeTexture;
@@ -176,12 +179,16 @@ async function init() {
     uniformBindGroup = device.createBindGroup({
         layout: pipeline.getBindGroupLayout(0),
         entries: [
-          {
-            binding: 0,
-            resource: cubeTexture.createView(),
-          }
+            {
+                binding: 0,
+                resource: cubeTexture.createView(),
+            },
+            {
+                binding: 1,
+                resource: samp,
+            }
         ],
-      });
+    });
 
 
     // create texture --
@@ -212,7 +219,7 @@ function update() {
 
     const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
     passEncoder.setPipeline(pipeline);
-    //passEncoder.setBindGroup(0, uniformBindGroup);
+    passEncoder.setBindGroup(0, uniformBindGroup);
     passEncoder.setVertexBuffer(0, verticesBuffer);
 
     /**
