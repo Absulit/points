@@ -11,6 +11,7 @@ let device = null;
 let context = null;
 let pipeline = null;
 let verticesBuffer = null;
+let uniformBindGroup = null;
 
 const vertexSize = 4 * 8; // Byte size of one triangle vertex.
 const positionOffset = 0;
@@ -58,8 +59,6 @@ async function init() {
     ];
     const presentationFormat = context.getPreferredFormat(adapter);
 
-    presentationFormat
-
     context.configure({
         device,
         format: presentationFormat,
@@ -78,6 +77,7 @@ async function init() {
 
 
     pipeline = device.createRenderPipeline({
+        //layout: 'auto',
         vertex: {
             module: device.createShaderModule({
                 code: triangleVertWGSL,
@@ -141,7 +141,50 @@ async function init() {
         },
     });
 
+    // -- create texture
 
+    // Fetch the image and upload it into a GPUTexture.
+    //let cubeTexture: GPUTexture;
+    let cubeTexture;
+    {
+        // const img = document.createElement('img');
+        // img.src = './assets/old_king_600x600.jpg';
+        // await img.decode();
+        // const imageBitmap = await createImageBitmap(img);
+
+        const response = await fetch('./assets/old_king_600x600.jpg');
+        const blob = await response.blob();
+        const imageBitmap = await createImageBitmap(blob);
+
+
+        cubeTexture = device.createTexture({
+            size: [imageBitmap.width, imageBitmap.height, 1],
+            format: 'rgba8unorm',
+            usage:
+                GPUTextureUsage.TEXTURE_BINDING |
+                GPUTextureUsage.COPY_DST |
+                GPUTextureUsage.RENDER_ATTACHMENT,
+        });
+        device.queue.copyExternalImageToTexture(
+            { source: imageBitmap },
+            { texture: cubeTexture },
+            [imageBitmap.width, imageBitmap.height]
+        );
+    }
+    console.log(cubeTexture)
+
+    uniformBindGroup = device.createBindGroup({
+        layout: pipeline.getBindGroupLayout(0),
+        entries: [
+          {
+            binding: 0,
+            resource: cubeTexture.createView(),
+          }
+        ],
+      });
+
+
+    // create texture --
 
     update();
 }
@@ -169,7 +212,7 @@ function update() {
 
     const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
     passEncoder.setPipeline(pipeline);
-
+    //passEncoder.setBindGroup(0, uniformBindGroup);
     passEncoder.setVertexBuffer(0, verticesBuffer);
 
     /**
