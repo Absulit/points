@@ -1,4 +1,5 @@
 'use strict';
+import WebGPU from './js/absulit.webgpu.module.js';
 // import triangleVertWGSL from './shaders/triangle.vert.wgsl';
 // import redFragWGSL from './shaders/red.frag.wgsl';
 import { getShaderSource } from './shader_loader.js';
@@ -21,7 +22,7 @@ const shaders = {
     }
 }
 
-const canvas = document.getElementById('gl-canvas');
+
 let device = null;
 let context = null;
 let pipeline = null;
@@ -82,40 +83,22 @@ console.log('vertexCount  = vertexArray.byteLength / vertexSize:', vertexArray.b
 
 console.log({ vertexSize, positionOffset, colorOffset, vertexCount, UVOffset });
 
+const webGPU = new WebGPU('gl-canvas');
+
 async function init() {
 
-    const adapter = await navigator.gpu.requestAdapter();
-    if (!adapter) { return; }
-    device = await adapter.requestDevice();
-    device.lost.then(info => {
-        console.log(info);
-    });
-
-    if (canvas === null) return;
-    context = canvas.getContext('webgpu');
-
-    const devicePixelRatio = window.devicePixelRatio || 1;
-    const presentationSize = [
-        canvas.clientWidth * devicePixelRatio,
-        canvas.clientHeight * devicePixelRatio,
-    ];
-    const presentationFormat = context.getPreferredFormat(adapter);
-
-    context.configure({
-        device,
-        format: presentationFormat,
-        size: presentationSize,
-        compositingAlphaMode: 'premultiplied',
-    });
+    //initWebGPU('gl-canvas');
+    await webGPU.init();
 
     // Create a vertex buffer from the triangle data.
-    verticesBuffer = device.createBuffer({
-        size: vertexArray.byteLength,
-        usage: GPUBufferUsage.VERTEX,
-        mappedAtCreation: true,
-    });
-    new Float32Array(verticesBuffer.getMappedRange()).set(vertexArray);
-    verticesBuffer.unmap();
+    // verticesBuffer = device.createBuffer({
+    //     size: vertexArray.byteLength,
+    //     usage: GPUBufferUsage.VERTEX,
+    //     mappedAtCreation: true,
+    // });
+    // new Float32Array(verticesBuffer.getMappedRange()).set(vertexArray);
+    // verticesBuffer.unmap();
+    verticesBuffer = webGPU.createVertexBuffer(vertexArray);
 
 
     // enum GPUPrimitiveTopology {
