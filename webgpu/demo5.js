@@ -3,8 +3,23 @@
 // import redFragWGSL from './shaders/red.frag.wgsl';
 import { getShaderSource } from './shader_loader.js';
 
-const triangleVertWGSL = await getShaderSource('./shaders/triangle5.vert.wgsl');
-const redFragWGSL = await getShaderSource('./shaders/red5.frag.wgsl');
+const colorsVertWGSL = await getShaderSource('./shaders/triangle5_colors.vert.wgsl');
+const colorsFragWGSL = await getShaderSource('./shaders/red5_colors.frag.wgsl');
+
+const textureVertWGSL = await getShaderSource('./shaders/triangle5.vert.wgsl');
+const textureFragWGSL = await getShaderSource('./shaders/red5.frag.wgsl');
+
+const useTexture = true;
+const shaders = {
+    false: {
+        vertex: colorsVertWGSL,
+        fragment: colorsFragWGSL
+    },
+    true: {
+        vertex: textureVertWGSL,
+        fragment: textureFragWGSL
+    }
+}
 
 const canvas = document.getElementById('gl-canvas');
 let device = null;
@@ -21,6 +36,7 @@ const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
 document.body.appendChild(stats.dom);
 /***************/
+
 
 
 const vertexArray = new Float32Array([
@@ -40,7 +56,6 @@ const positionOffset = vertexArray.BYTES_PER_ELEMENT * 0;
 const colorOffset = vertexArray.BYTES_PER_ELEMENT * 4; // Byte offset of triangle vertex color attribute.
 const vertexCount = vertexArray.byteLength / vertexSize;
 const UVOffset = vertexArray.BYTES_PER_ELEMENT * 8;
-
 
 
 
@@ -65,7 +80,7 @@ console.log('vertexArray.BYTES_PER_ELEMENT:', vertexArray.BYTES_PER_ELEMENT);
 console.log('vertexArray.byteLength:', vertexArray.byteLength);
 console.log('vertexCount  = vertexArray.byteLength / vertexSize:', vertexArray.byteLength / vertexSize);
 
-console.log({vertexSize,positionOffset, colorOffset, vertexCount, UVOffset});
+console.log({ vertexSize, positionOffset, colorOffset, vertexCount, UVOffset });
 
 async function init() {
 
@@ -116,7 +131,7 @@ async function init() {
         primitive: { topology: 'triangle-strip' },
         vertex: {
             module: device.createShaderModule({
-                code: triangleVertWGSL,
+                code: shaders[useTexture].vertex,
             }),
             entryPoint: 'main', // shader function name
 
@@ -150,7 +165,7 @@ async function init() {
         },
         fragment: {
             module: device.createShaderModule({
-                code: redFragWGSL,
+                code: shaders[useTexture].fragment,
             }),
             entryPoint: 'main', // shader function name
             targets: [
@@ -181,50 +196,48 @@ async function init() {
 
     // -- create texture
 
-    const samp = device.createSampler({ minFilter: "linear", magFilter: "linear" });
-    // Fetch the image and upload it into a GPUTexture.
-    //let cubeTexture: GPUTexture;
-    let cubeTexture;
-    {
-        // const img = document.createElement('img');
-        // img.src = './assets/old_king_600x600.jpg';
-        // await img.decode();
-        // const imageBitmap = await createImageBitmap(img);
 
-        const response = await fetch('./assets/old_king_600x600.jpg');
-        const blob = await response.blob();
-        const imageBitmap = await createImageBitmap(blob);
+    if (useTexture) {
+        const samp = device.createSampler({ minFilter: "linear", magFilter: "linear" });
+        // Fetch the image and upload it into a GPUTexture.
+        //let cubeTexture: GPUTexture;
+        let cubeTexture;
+        {
+            const response = await fetch('./assets/old_king_600x600.jpg');
+            const blob = await response.blob();
+            const imageBitmap = await createImageBitmap(blob);
 
+            cubeTexture = device.createTexture({
+                size: [imageBitmap.width, imageBitmap.height, 1],
+                format: 'rgba8unorm',
+                usage:
+                    GPUTextureUsage.TEXTURE_BINDING |
+                    GPUTextureUsage.COPY_DST |
+                    GPUTextureUsage.RENDER_ATTACHMENT,
+            });
+            device.queue.copyExternalImageToTexture(
+                { source: imageBitmap },
+                { texture: cubeTexture },
+                [imageBitmap.width, imageBitmap.height]
+            );
+        }
 
-        cubeTexture = device.createTexture({
-            size: [imageBitmap.width, imageBitmap.height, 1],
-            format: 'rgba8unorm',
-            usage:
-                GPUTextureUsage.TEXTURE_BINDING |
-                GPUTextureUsage.COPY_DST |
-                GPUTextureUsage.RENDER_ATTACHMENT,
+        console.log(cubeTexture);
+
+        uniformBindGroup = device.createBindGroup({
+            layout: pipeline.getBindGroupLayout(0),
+            entries: [
+                {
+                    binding: 0,
+                    resource: cubeTexture.createView(),
+                },
+                {
+                    binding: 1,
+                    resource: samp,
+                }
+            ],
         });
-        device.queue.copyExternalImageToTexture(
-            { source: imageBitmap },
-            { texture: cubeTexture },
-            [imageBitmap.width, imageBitmap.height]
-        );
     }
-    console.log(cubeTexture)
-
-    uniformBindGroup = device.createBindGroup({
-        layout: pipeline.getBindGroupLayout(0),
-        entries: [
-            {
-                binding: 0,
-                resource: cubeTexture.createView(),
-            },
-            {
-                binding: 1,
-                resource: samp,
-            }
-        ],
-    });
 
 
     // create texture --
@@ -255,7 +268,9 @@ function update() {
 
     const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
     passEncoder.setPipeline(pipeline);
-    passEncoder.setBindGroup(0, uniformBindGroup);
+    if (useTexture) {
+        passEncoder.setBindGroup(0, uniformBindGroup);
+    }
     passEncoder.setVertexBuffer(0, verticesBuffer);
 
     /**
@@ -267,7 +282,6 @@ function update() {
     //passEncoder.draw(3, 1, 0, 0);
     passEncoder.draw(vertexCount);
     passEncoder.end();
-    //passEncoder.endPass();
 
     device.queue.submit([commandEncoder.finish()]);
 
