@@ -13,11 +13,7 @@ let pipeline = null;
 let verticesBuffer = null;
 let uniformBindGroup = null;
 
-const vertexSize = 4 * 10; // Byte size of one triangle vertex.
-const positionOffset = 0;
-const colorOffset = 4 * 4; // Byte offset of triangle vertex color attribute.
-const vertexCount = 6;
-const UVOffset = 4 * 8;
+
 
 
 /***************/
@@ -30,16 +26,46 @@ document.body.appendChild(stats.dom);
 const vertexArray = new Float32Array([
     // float4 position, float4 color,
     // there are itemsPerRow items in this row, that's why vertexSize is 4*itemsPerRow
-    1, 1, 0.0, 1, 1, 0, 0, 1, 1, 0,
-    1, -1, 0.0, 1, 0, 1, 0, 1, 1, 1,
-    -1, -1, 0.0, 1, 0, 0, 1, 1, 0, 1,
+    +1, +1, 0, 1, 1, 0, 0, 1, 1, 0,
+    +1, -1, 0, 1, 0, 1, 0, 1, 1, 1,
+    -1, -1, 0, 1, 0, 0, 1, 1, 0, 1,
 
-    1, 1, 0.0, 1, 1, 0, 0, 1, 1, 0,
-    -1, -1, 0.0, 1, 0, 0, 1, 1, 0, 1,
-    -1, 1, 0.0, 1, 1, 1, 0, 1, 0, 0,
+    +1, +1, 0, 1, 1, 0, 0, 1, 1, 0,
+    -1, -1, 0, 1, 0, 0, 1, 1, 0, 1,
+    -1, +1, 0, 1, 1, 1, 0, 1, 0, 0,
 ]);
 
+const vertexSize = vertexArray.BYTES_PER_ELEMENT * 10; // Byte size of ONE triangle data (vertex, color, uv). (one row)
+const positionOffset = vertexArray.BYTES_PER_ELEMENT * 0;
+const colorOffset = vertexArray.BYTES_PER_ELEMENT * 4; // Byte offset of triangle vertex color attribute.
+const vertexCount = vertexArray.byteLength / vertexSize;
+const UVOffset = vertexArray.BYTES_PER_ELEMENT * 8;
 
+
+
+
+// const w = 1;
+// const h = 1;
+// const vertexArray = new Float32Array([
+//     -w, -h, 0, 1, 1, 0, 0, 1,
+//     -w, +h, 0, 0, 1, 0, 0, 1,
+//     +w, -h, 1, 1, 1, 0, 0, 1,
+//     +w, +h, 1, 0, 1, 0, 0, 1,
+// ]);
+
+
+// const vertexSize = vertexArray.BYTES_PER_ELEMENT * 8; // Byte size of ONE triangle data (vertex, color, uv). (one row)
+// const positionOffset = vertexArray.BYTES_PER_ELEMENT * 0;
+// const colorOffset = vertexArray.BYTES_PER_ELEMENT * 4; // Byte offset of triangle vertex color attribute.
+// const vertexCount = vertexArray.byteLength / vertexSize;
+// const UVOffset = vertexArray.BYTES_PER_ELEMENT * 2;
+
+
+console.log('vertexArray.BYTES_PER_ELEMENT:', vertexArray.BYTES_PER_ELEMENT);
+console.log('vertexArray.byteLength:', vertexArray.byteLength);
+console.log('vertexCount  = vertexArray.byteLength / vertexSize:', vertexArray.byteLength / vertexSize);
+
+console.log({vertexSize,positionOffset, colorOffset, vertexCount, UVOffset});
 
 async function init() {
 
@@ -77,8 +103,17 @@ async function init() {
     verticesBuffer.unmap();
 
 
+    // enum GPUPrimitiveTopology {
+    //     "point-list",
+    //     "line-list",
+    //     "line-strip",
+    //     "triangle-list",
+    //     "triangle-strip",
+    // };
+
     pipeline = device.createRenderPipeline({
         layout: 'auto',
+        primitive: { topology: 'triangle-strip' },
         vertex: {
             module: device.createShaderModule({
                 code: triangleVertWGSL,
@@ -88,6 +123,7 @@ async function init() {
             buffers: [
                 {
                     arrayStride: vertexSize,
+                    //arrayStride: vertexArray.BYTES_PER_ELEMENT,
                     //arrayStride: vertexCount * vertexArray.BYTES_PER_ELEMENT,//vertexSize,
                     attributes: [
                         {
