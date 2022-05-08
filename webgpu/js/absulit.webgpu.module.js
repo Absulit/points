@@ -58,6 +58,7 @@ export default class WebGPU {
         this._buffer = null;
         this._uniformBindGroup = null;
 
+        this._vertexArray = [];
     }
 
     async init() {
@@ -125,6 +126,7 @@ export default class WebGPU {
     }
 
     async createPipeline() {
+        this.createVertexBuffer(new Float32Array(this._vertexArray));
         // enum GPUPrimitiveTopology {
         //     'point-list',
         //     'line-list',
@@ -281,6 +283,44 @@ export default class WebGPU {
 
         this._device.queue.submit([commandEncoder.finish()]);
 
+        //
+        this._vertexArray = [];
+    }
+
+    _getWGSLCoordinate(value, side, invert = false) {
+        const direction = invert ? -1 : 1;
+        const p = value / side;
+        return (p * 2 - 1) * direction;
+    };
+
+    /**
+     * 
+     * @param {Number} x 
+     * @param {Number} y 
+     * @param {Number} width 
+     * @param {Number} height 
+     * @param {Boolean} useTexture 
+     * @param {Number} r Red
+     * @param {Number} g Green
+     * @param {Number} b Blue
+     * @param {Number} a Alpha
+     */
+    addPoint(x, y, width, height, r, g, b, a, useTexture) {
+        const nx = this._getWGSLCoordinate(x, this._canvas.width);
+        const ny = this._getWGSLCoordinate(y, this._canvas.height, true);
+
+        const nw = this._getWGSLCoordinate(x+width, this._canvas.width);
+        const nh = this._getWGSLCoordinate(y+height, this._canvas.height);
+
+        this._vertexArray.push(
+            +nx, +ny, 0, 1,  1, 0, 0, 1,  1, 0,// top left
+            +nw, +ny, 0, 1,  1, 1, 0, 1,  0, 0,// top right
+            +nw, -nh, 0, 1,  0, 0, 1, 1,  0, 1,// bottom right
+
+            +nx, +ny, 0, 1,  1, 0, 0, 1,  1, 0,// top left
+            +nx, -nh, 0, 1,  0, 1, 0, 1,  1, 1,// bottom left
+            +nw, -nh, 0, 1,  0, 0, 1, 1,  0, 1,// bottom right
+        );
     }
 
     get canvas() {
