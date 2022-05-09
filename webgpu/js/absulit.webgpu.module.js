@@ -329,7 +329,7 @@ export default class WebGPU {
     addPoint(x, y, z, width, height, color, useTexture) {
         const nx = this._getWGSLCoordinate(x, this._canvas.width);
         const ny = this._getWGSLCoordinate(y, this._canvas.height, true);
-        const nz = z//this._getWGSLCoordinate(z, this._canvas.height);
+        const nz = z;
 
         const nw = this._getWGSLCoordinate(x + width, this._canvas.width);
         const nh = this._getWGSLCoordinate(y + height, this._canvas.height);

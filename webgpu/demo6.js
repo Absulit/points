@@ -40,7 +40,7 @@ webGPU.useTexture = false;
 async function init() {
     const initialized = await webGPU.init();
     if (initialized) {
-        webGPU.createVertexBuffer(vertexArray);
+        //webGPU.createVertexBuffer(vertexArray);
 
         let color = {r:1,g:1,b:1,a:1};
         webGPU.addPoint(50,50,.3, 100,100, color);
