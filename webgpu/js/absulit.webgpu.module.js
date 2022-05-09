@@ -57,6 +57,7 @@ export default class WebGPU {
         this._vertexBufferInfo = null;
         this._buffer = null;
         this._uniformBindGroup = null;
+        this._presentationSize = null;
 
         this._vertexArray = [];
     }
@@ -91,7 +92,7 @@ export default class WebGPU {
         this._context = this._canvas.getContext('webgpu');
 
         const devicePixelRatio = window.devicePixelRatio || 1;
-        const presentationSize = [
+        this._presentationSize = [
             this._canvas.clientWidth * devicePixelRatio,
             this._canvas.clientHeight * devicePixelRatio,
         ];
@@ -100,7 +101,7 @@ export default class WebGPU {
         this._context.configure({
             device: this._device,
             format: this._presentationFormat,
-            size: presentationSize,
+            size: this._presentationSize,
             compositingAlphaMode: 'premultiplied',
         });
 
@@ -137,8 +138,13 @@ export default class WebGPU {
         console.log({ _vertexBufferInfo: this._vertexBufferInfo });
         this._pipeline = this._device.createRenderPipeline({
             layout: 'auto',
-            primitive: { topology: 'triangle-strip' },
+            //primitive: { topology: 'triangle-strip' },
             primitive: { topology: 'triangle-list' },
+            depthStencil: {
+                depthWriteEnabled: true,
+                depthCompare: 'less',
+                format: 'depth24plus',
+              },
             vertex: {
                 module: this._device.createShaderModule({
                     code: this._shaders[this._useTexture].vertex,
@@ -252,6 +258,12 @@ export default class WebGPU {
         const commandEncoder = this._device.createCommandEncoder();
         const textureView = this._context.getCurrentTexture().createView();
 
+        const depthTexture = this._device.createTexture({
+            size: this._presentationSize,
+            format: 'depth24plus',
+            usage: GPUTextureUsage.RENDER_ATTACHMENT,
+          });
+
         //const renderPassDescriptor: GPURenderPassDescriptor = {
         const renderPassDescriptor = {
             colorAttachments: [
@@ -261,7 +273,15 @@ export default class WebGPU {
                     loadOp: 'clear',
                     storeOp: 'store',
                 },
+                
             ],
+            depthStencilAttachment: {
+                view: depthTexture.createView(),
+          
+                depthClearValue: 1.0,
+                depthLoadOp: 'clear',
+                depthStoreOp: 'store',
+              },
         };
 
         const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
@@ -295,31 +315,34 @@ export default class WebGPU {
 
     /**
      * 
-     * @param {Number} x 
-     * @param {Number} y 
-     * @param {Number} width 
-     * @param {Number} height 
+     * @param {Number} x from 0 to canvas.width
+     * @param {Number} y from 0 to canvas.height
+     * @param {Number} z it goes from 0.0 to 1.0 and forward
+     * @param {Number} width point width
+     * @param {Number} height point height
      * @param {Boolean} useTexture 
      * @param {Number} r Red
      * @param {Number} g Green
      * @param {Number} b Blue
      * @param {Number} a Alpha
      */
-    addPoint(x, y, width, height, r, g, b, a, useTexture) {
+    addPoint(x, y, z, width, height, color, useTexture) {
         const nx = this._getWGSLCoordinate(x, this._canvas.width);
         const ny = this._getWGSLCoordinate(y, this._canvas.height, true);
+        const nz = z//this._getWGSLCoordinate(z, this._canvas.height);
 
-        const nw = this._getWGSLCoordinate(x+width, this._canvas.width);
-        const nh = this._getWGSLCoordinate(y+height, this._canvas.height);
+        const nw = this._getWGSLCoordinate(x + width, this._canvas.width);
+        const nh = this._getWGSLCoordinate(y + height, this._canvas.height);
 
+        const { r, g, b, a } = color;
         this._vertexArray.push(
-            +nx, +ny, 0, 1,  1, 0, 0, 1,  1, 0,// top left
-            +nw, +ny, 0, 1,  1, 1, 0, 1,  0, 0,// top right
-            +nw, -nh, 0, 1,  0, 0, 1, 1,  0, 1,// bottom right
+            +nx, +ny, nz, 1, r, g, b, a, 1, 0,// top left
+            +nw, +ny, nz, 1, r, g, b, a, 0, 0,// top right
+            +nw, -nh, nz, 1, r, g, b, a, 0, 1,// bottom right
 
-            +nx, +ny, 0, 1,  1, 0, 0, 1,  1, 0,// top left
-            +nx, -nh, 0, 1,  0, 1, 0, 1,  1, 1,// bottom left
-            +nw, -nh, 0, 1,  0, 0, 1, 1,  0, 1,// bottom right
+            +nx, +ny, nz, 1, r, g, b, a, 1, 0,// top left
+            +nx, -nh, nz, 1, r, g, b, a, 1, 1,// bottom left
+            +nw, -nh, nz, 1, r, g, b, a, 0, 1,// bottom right
         );
     }
 

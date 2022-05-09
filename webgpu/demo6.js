@@ -41,9 +41,12 @@ async function init() {
     const initialized = await webGPU.init();
     if (initialized) {
         webGPU.createVertexBuffer(vertexArray);
-        webGPU.addPoint(10,10, 10,10, false);
 
-        webGPU.addPoint(100,100, 20,20, true);
+        let color = {r:1,g:1,b:1,a:1};
+        webGPU.addPoint(50,50,.3, 100,100, color);
+
+        color = {r:1,g:0,b:1,a:.5};
+        webGPU.addPoint(100,100,.2, 100,100, color);
 
         await webGPU.createPipeline();
     }
