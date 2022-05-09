@@ -1,4 +1,6 @@
+import Coordinate from './coordinate.js';
 import { getShaderSource } from '../shader_loader.js';
+import RGBAColor from './color.js';
 
 export class VertexBufferInfo {
     /**
@@ -315,18 +317,14 @@ export default class WebGPU {
 
     /**
      * 
-     * @param {Number} x from 0 to canvas.width
-     * @param {Number} y from 0 to canvas.height
-     * @param {Number} z it goes from 0.0 to 1.0 and forward
+     * @param {Coordinate} coordinate `x` from 0 to canvas.width, `y` from 0 to canvas.height, `z` it goes from 0.0 to 1.0 and forward
      * @param {Number} width point width
      * @param {Number} height point height
+     * @param {RGBAColor} color Red
      * @param {Boolean} useTexture 
-     * @param {Number} r Red
-     * @param {Number} g Green
-     * @param {Number} b Blue
-     * @param {Number} a Alpha
      */
-    addPoint(x, y, z, width, height, color, useTexture) {
+    addPoint(coordinate, width, height, color, useTexture = false) {
+        const {x,y,z} = coordinate;
         const nx = this._getWGSLCoordinate(x, this._canvas.width);
         const ny = this._getWGSLCoordinate(y, this._canvas.height, true);
         const nz = z;
