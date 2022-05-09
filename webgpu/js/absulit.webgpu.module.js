@@ -18,11 +18,7 @@ export class VertexBufferInfo {
         this._uvOffset = vertexArray.BYTES_PER_ELEMENT * uvOffset;
         this._vertexCount = vertexArray.byteLength / this._vertexSize;
 
-        console.log('vertexArray.BYTES_PER_ELEMENT:', vertexArray.BYTES_PER_ELEMENT);
-        console.log('vertexArray.byteLength:', vertexArray.byteLength);
-        console.log('vertexCount  = vertexArray.byteLength / vertexSize:', vertexArray.byteLength / this._vertexSize);
 
-        console.log({ vertexSize: this._vertexSize, vertexOffset: this._vertexOffset, colorOffset: this._colorOffset, vertexCount: this._vertexCount, uvOffset: this._uvOffset });
     }
 
     get vertexSize() {
@@ -99,7 +95,7 @@ export default class WebGPU {
             this._canvas.clientHeight * devicePixelRatio,
         ];
         this._presentationFormat = this._context.getPreferredFormat(adapter);
-        console.log({ _presentationFormat: this._presentationFormat });
+
         this._context.configure({
             device: this._device,
             format: this._presentationFormat,
@@ -137,7 +133,6 @@ export default class WebGPU {
         //     'triangle-list',
         //     'triangle-strip',
         // };
-        console.log({ _vertexBufferInfo: this._vertexBufferInfo });
         this._pipeline = this._device.createRenderPipeline({
             layout: 'auto',
             //primitive: { topology: 'triangle-strip' },
@@ -146,7 +141,7 @@ export default class WebGPU {
                 depthWriteEnabled: true,
                 depthCompare: 'less',
                 format: 'depth24plus',
-              },
+            },
             vertex: {
                 module: this._device.createShaderModule({
                     code: this._shaders[this._useTexture].vertex,
@@ -264,7 +259,7 @@ export default class WebGPU {
             size: this._presentationSize,
             format: 'depth24plus',
             usage: GPUTextureUsage.RENDER_ATTACHMENT,
-          });
+        });
 
         //const renderPassDescriptor: GPURenderPassDescriptor = {
         const renderPassDescriptor = {
@@ -275,15 +270,15 @@ export default class WebGPU {
                     loadOp: 'clear',
                     storeOp: 'store',
                 },
-                
+
             ],
             depthStencilAttachment: {
                 view: depthTexture.createView(),
-          
+
                 depthClearValue: 1.0,
                 depthLoadOp: 'clear',
                 depthStoreOp: 'store',
-              },
+            },
         };
 
         const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
@@ -320,11 +315,11 @@ export default class WebGPU {
      * @param {Coordinate} coordinate `x` from 0 to canvas.width, `y` from 0 to canvas.height, `z` it goes from 0.0 to 1.0 and forward
      * @param {Number} width point width
      * @param {Number} height point height
-     * @param {RGBAColor} color Red
+     * @param {Array<RGBAColor>} colors one color per corner
      * @param {Boolean} useTexture 
      */
-    addPoint(coordinate, width, height, color, useTexture = false) {
-        const {x,y,z} = coordinate;
+    addPoint(coordinate, width, height, colors, useTexture = false) {
+        const { x, y, z } = coordinate;
         const nx = this._getWGSLCoordinate(x, this._canvas.width);
         const ny = this._getWGSLCoordinate(y, this._canvas.height, true);
         const nz = z;
@@ -332,15 +327,18 @@ export default class WebGPU {
         const nw = this._getWGSLCoordinate(x + width, this._canvas.width);
         const nh = this._getWGSLCoordinate(y + height, this._canvas.height);
 
-        const { r, g, b, a } = color;
+        const { r:r0, g:g0, b:b0, a:a0 } = colors[0];
+        const { r:r1, g:g1, b:b1, a:a1 } = colors[1];
+        const { r:r2, g:g2, b:b2, a:a2 } = colors[2];
+        const { r:r3, g:g3, b:b3, a:a3 } = colors[3];
         this._vertexArray.push(
-            +nx, +ny, nz, 1, r, g, b, a, 1, 0,// top left
-            +nw, +ny, nz, 1, r, g, b, a, 0, 0,// top right
-            +nw, -nh, nz, 1, r, g, b, a, 0, 1,// bottom right
+            +nx, +ny, nz, 1, r0, g0, b0, a0, 1, 0,// top left
+            +nw, +ny, nz, 1, r1, g1, b1, a1, 0, 0,// top right
+            +nw, -nh, nz, 1, r3, g3, b3, a3, 0, 1,// bottom right
 
-            +nx, +ny, nz, 1, r, g, b, a, 1, 0,// top left
-            +nx, -nh, nz, 1, r, g, b, a, 1, 1,// bottom left
-            +nw, -nh, nz, 1, r, g, b, a, 0, 1,// bottom right
+            +nx, +ny, nz, 1, r0, g0, b0, a0, 1, 0,// top left
+            +nx, -nh, nz, 1, r2, g2, b2, a2, 1, 1,// bottom left
+            +nw, -nh, nz, 1, r3, g3, b3, a3, 0, 1,// bottom right
         );
     }
 
