@@ -117,7 +117,7 @@ function init() {
 
     cache = new Cache(60 * 10);
 
-    demo = new PlanetaryLines3(screen);
+    demo = new EffectsTester(screen);
 
     effects = new Effects(screen);
 
