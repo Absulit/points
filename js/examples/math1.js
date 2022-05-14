@@ -15,7 +15,7 @@ export default class Math1 {
         this._lastPoint = null;
     };
 
-    update(usin, ucos, side, utime) {
+    update(usin, ucos, side, utime, nusin, nucos) {
         const screen = this._screen;
 
         screen.layerIndex = 0;
@@ -24,26 +24,27 @@ export default class Math1 {
         screen.currentLayer.points.forEach((point, index) => {
             // do something to every point
             // or every p.modified point
-            const { x, y } = point.coordinates;
-            const r = Math.tan(Math.pow(x, 2) + Math.pow(y, 2));
+            const { x:cx, y:cy } = point.coordinates;
+            const { x:nx, y:ny } = point.normalPosition;
+            const r = Math.tan(cx*cx + cy*cy);
             //console.log(r);
             let val;
             if (r > 0) {
-                val = r / 15 * utime * usin;
-                point.setColor(0, 0, val);
+                val = r / 15 * utime * nusin;
+                point.setColor(val, nx, nx);
             } else {
-                val = Math.abs(r) / 45 * ucos;
-                point.setColor(val, 0, 0)
+                val = Math.abs(r) / 45 * nucos;
+                point.setColor(1-val, nx, ny)
             }
             //point.setBrightness(Math.floor(r * usin));
             //point.setBrightness(r * usin);
             //debugger;
 
         });
-        //this._screen.clearMix(new RGBAColor(0, 0, 0), 1.001);
+        //this._screen.clearMix(new RGBAColor(0, 0, 0), 1.1);
         //this._effects.fire(2);
         //this._effects.chromaticAberration(.05, 2);
-        //this._effects.soften3();
+        //this._effects.soften2(3);
         //this._effects.antialias();
     }
 
