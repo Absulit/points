@@ -68,6 +68,7 @@ import SlimeImage from './js/examples/slimeimage.js';
 import PlanetaryLines from './js/examples/planetarylines.js';
 import PlanetaryLines2 from './js/examples/planetarylines2.js';
 import PlanetaryLines3 from './js/examples/planetarylines3.js';
+import Math1 from './js/examples/math1.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -93,6 +94,7 @@ let uround;
 let urounddec;
 let usin;
 let nusin;
+let nucos;
 let ucos;
 
 let demo;
@@ -142,9 +144,10 @@ function update() {
         ucos = Math.cos(utime);
         urounddec = utime % 1;
         nusin = (Math.sin(utime) + 1) / 2;
+        nucos = (Math.cos(utime) + 1) / 2;
 
         screen.layerIndex = 0;//--------------------------- LAYER 0
-        demo.update(usin, ucos, side, utime, nusin);
+        demo.update(usin, ucos, side, utime, nusin, nucos);
 
         screen._groupLayers();
 
