@@ -128,6 +128,7 @@ async function init() {
         /*layout: device.createPipelineLayout({
             bindGroupLayouts: [bindGroupLayout]
         }),*/
+        layout: 'auto',
         compute: {
             module: shaderModule,
             entryPoint: "main"

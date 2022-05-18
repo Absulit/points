@@ -51,7 +51,7 @@ async function init() {
             new RGBAColor(1, 1, 0),
         ];
 
-        let side = 800;
+        let side = 200;
         let numColumns = side;
         let numRows = side;
 
