@@ -29,7 +29,7 @@ async function init() {
 
     console.log(arrayBuffer);
 
-    //At this point, the GPU buffer is mapped, meaning it is owned by the CPU, 
+    //At this point, the GPU buffer is mapped, meaning it is owned by the CPU,
     //and it's accessible in read/write from JavaScript. So that the GPU can access it,
     //it has to be unmapped which is as simple as calling `gpuBuffer.unmap()`.
 

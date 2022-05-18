@@ -56,6 +56,7 @@ export default class WebGPU {
         this._buffer = null;
         this._uniformBindGroup = null;
         this._presentationSize = null;
+        this._depthTexture = null;
 
         this._vertexArray = [];
     }
@@ -94,13 +95,21 @@ export default class WebGPU {
             this._canvas.clientWidth * devicePixelRatio,
             this._canvas.clientHeight * devicePixelRatio,
         ];
-        this._presentationFormat = this._context.getPreferredFormat(adapter);
+        //this._presentationFormat = this._context.getPreferredFormat(adapter);
+        this._presentationFormat = navigator.gpu.getPreferredCanvasFormat();
+
 
         this._context.configure({
             device: this._device,
             format: this._presentationFormat,
             size: this._presentationSize,
             compositingAlphaMode: 'premultiplied',
+        });
+
+        this._depthTexture = this._device.createTexture({
+            size: this._presentationSize,
+            format: 'depth24plus',
+            usage: GPUTextureUsage.RENDER_ATTACHMENT,
         });
 
         return true;
@@ -124,6 +133,11 @@ export default class WebGPU {
         return this._buffer;
     }
 
+    // TODO: lo que tengo que hacer es modificar el buffer
+
+
+    
+
     async createPipeline() {
         this.createVertexBuffer(new Float32Array(this._vertexArray));
         // enum GPUPrimitiveTopology {
@@ -135,6 +149,7 @@ export default class WebGPU {
         // };
         this._pipeline = this._device.createRenderPipeline({
             layout: 'auto',
+            //layout: bindGroupLayout,
             //primitive: { topology: 'triangle-strip' },
             primitive: { topology: 'triangle-list' },
             depthStencil: {
@@ -251,15 +266,10 @@ export default class WebGPU {
 
     update() {
         if (!this._canvas) return;
+        if (!this._device) return;
 
         const commandEncoder = this._device.createCommandEncoder();
         const textureView = this._context.getCurrentTexture().createView();
-
-        const depthTexture = this._device.createTexture({
-            size: this._presentationSize,
-            format: 'depth24plus',
-            usage: GPUTextureUsage.RENDER_ATTACHMENT,
-        });
 
         //const renderPassDescriptor: GPURenderPassDescriptor = {
         const renderPassDescriptor = {
@@ -273,7 +283,7 @@ export default class WebGPU {
 
             ],
             depthStencilAttachment: {
-                view: depthTexture.createView(),
+                view: this._depthTexture.createView(),
 
                 depthClearValue: 1.0,
                 depthLoadOp: 'clear',
@@ -301,7 +311,7 @@ export default class WebGPU {
         this._device.queue.submit([commandEncoder.finish()]);
 
         //
-        this._vertexArray = [];
+        //this._vertexArray = [];
     }
 
     _getWGSLCoordinate(value, side, invert = false) {
@@ -356,6 +366,10 @@ export default class WebGPU {
 
     get presentationFormat() {
         return this._presentationFormat;
+    }
+
+    get buffer(){
+        return this._buffer;
     }
 
     /**

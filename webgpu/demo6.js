@@ -19,13 +19,13 @@ let capturer = new CCapture({
 const vertexArray = new Float32Array([
     // float4 position, float4 color,
     // there are itemsPerRow items in this row, that's why vertexSize is 4*itemsPerRow
-    -1, +1, 0, 1,  1, 1, 0, 1,  0, 0,// top left
-    +1, +1, 0, 1,  1, 0, 0, 1,  1, 0,// top right
-    -1, -1, 0, 1,  0, 0, 1, 1,  0, 1,// bottom left
+    -1, +1, 0, 1, 1, 1, 0, 1, 0, 0,// top left
+    +1, +1, 0, 1, 1, 0, 0, 1, 1, 0,// top right
+    -1, -1, 0, 1, 0, 0, 1, 1, 0, 1,// bottom left
 
-    +1, +1, 0, 1,  1, 0, 0, 1,  1, 0,// top right
-    +1, -1, 0, 1,  0, 1, 0, 1,  1, 1,// bottom right
-    -1, -1, 0, 1,  0, 0, 1, 1,  0, 1,// bottom left
+    +1, +1, 0, 1, 1, 0, 0, 1, 1, 0,// top right
+    +1, -1, 0, 1, 0, 1, 0, 1, 1, 1,// bottom right
+    -1, -1, 0, 1, 0, 0, 1, 1, 0, 1,// bottom left
 
 ]);
 
@@ -44,7 +44,29 @@ async function init() {
     const initialized = await webGPU.init();
     if (initialized) {
         //webGPU.createVertexBuffer(vertexArray);
+        let colors = [
+            new RGBAColor(1, 0, 0, .5),
+            new RGBAColor(0, 1, 0),
+            new RGBAColor(0, 0, 1),
+            new RGBAColor(1, 1, 0),
+        ];
 
+        let side = 800;
+        let numColumns = side;
+        let numRows = side;
+
+
+
+        for (let xIndex = 0; xIndex < numRows; xIndex++) {
+            for (let yIndex = 0; yIndex < numColumns; yIndex++) {
+                const coordinate = new Coordinate(xIndex * 800 / side, yIndex * 800 / side, .3);
+                webGPU.addPoint(coordinate, 800 / side, 800 / side, colors);
+
+            }
+
+        }
+
+        await webGPU.createPipeline();
 
     }
     await update();
@@ -59,31 +81,17 @@ async function update() {
     urounddec = utime % 1;
     nusin = (Math.sin(utime) + 1) / 2;
 
-    let colors = [
-        new RGBAColor(1,0,0, .5),
-        new RGBAColor(0,1,0),
-        new RGBAColor(0,0,1),
-        new RGBAColor(1,1,0),
-    ];
-
-    let side = 80;
-    let numColumns = side;
-    let numRows = side;
-
+    // TODO: modificar buffer?
+    // let bufferTest = webGPU.device.createBuffer({
+    //     size: vertexArray.byteLength,
+    //     usage: GPUBufferUsage.STORAGE,
+    //     mappedAtCreation: true,
+    // });
+    // new Float32Array(bufferTest.getMappedRange()).set(vertexArray);
+    // bufferTest.unmap();
+    //
 
 
-    for (let xIndex = 0; xIndex < numRows; xIndex++) {
-        for (let yIndex = 0; yIndex < numColumns; yIndex++) {
-            const coordinate = new Coordinate(xIndex * 800/side, yIndex * 800/side,.3);
-            webGPU.addPoint(coordinate, 800/side,800/side, colors);
-            
-        }
-        
-    }
-
-
-
-    await webGPU.createPipeline();
     webGPU.update();
 
     stats.end();
