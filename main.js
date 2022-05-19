@@ -71,6 +71,7 @@ import PlanetaryLines3 from './js/examples/planetarylines3.js';
 import Math1 from './js/examples/math1.js';
 import ChromaSpiral_2 from './js/examples/chromaspiral_2.js';
 import ChromaSpiral_3 from './js/examples/chromaspiral_3.js';
+import DistancePoints from './js/examples/distancepoints.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -85,7 +86,7 @@ let capturer = new CCapture({
 let aspect,
     utime = 0;
 
-let side = 100;
+let side = 50;
 let numColumns = side;
 let numRows = side;
 let numMargin = 0;
@@ -121,7 +122,7 @@ function init() {
 
     cache = new Cache(60 * 10);
 
-    demo = new ChromaSpiral_3(screen);
+    demo = new DistancePoints(screen);
 
     effects = new Effects(screen);
 

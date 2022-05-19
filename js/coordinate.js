@@ -45,6 +45,10 @@ class Coordinate {
         this._value[1] = y;
         this._value[2] = z;
     }
+
+    clone() {
+        return new Coordinate(this._x, this._y, this._z);
+    }
 }
 
 export default Coordinate;

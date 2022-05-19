@@ -35,6 +35,16 @@ class Point {
         this._layer.setColor(this._coordinates, this._color);
     }
 
+    /**
+     * To modify directly each color
+     * @param {Function} lambda with `Color` parameter
+     */
+    modifyColor(lambda) {
+        lambda(this._color);
+        this._modified = true;
+        this._layer.setColor(this._coordinates, this._color);
+    }
+
     setRGBAColor(value) {
         if (value) {
             const { r, g, b, a } = value;

@@ -116,6 +116,11 @@ class RGBAColor {
     }
 
 
+    /**
+     * Averages `RGBAColor` into one
+     * @param {Array<RGBAColor>} colors 
+     * @returns RGBAColor
+     */
     static average(colors) {
         // https://sighack.com/post/averaging-rgb-colors-the-right-way
         let r = 0, g = 0, b = 0, a = 0;
