@@ -72,6 +72,11 @@ class RGBAColor {
         this._value = [color.r, color.g, color.b, color.a];
     }
 
+    clone() {
+        let [r, g, b, a] = this._value;
+        return new RGBAColor(r, g, b, a);
+    }
+
     add(color) {
         let [r, g, b, a] = this._value;
         //this._value = [(r + color.r)/2, (g + color.g)/2, (b + color.b)/2, (a + color.a)/2];
@@ -145,7 +150,7 @@ class RGBAColor {
         let r = 0;
         let g = 0;
         let b = 0;
-        if(c1 && !c1.isNull() && c2 && !c2.isNull()){
+        if (c1 && !c1.isNull() && c2 && !c2.isNull()) {
             const { r: r1, g: g1, b: b1 } = c1;
             const { r: r2, g: g2, b: b2 } = c2;
             r = r1 - r2;
@@ -180,8 +185,8 @@ class RGBAColor {
     }
 
     static getClosestColorInPalette(color, palette) {
-        if(!palette){
-            throw('Palette should be an array of `RGBA`s')
+        if (!palette) {
+            throw ('Palette should be an array of `RGBA`s')
         }
         let distance = 100;
         let selectedColor = null;

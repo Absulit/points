@@ -11,15 +11,15 @@ export default class DistancePoints {
         this._constant = screen.numColumns / 100;
 
         this._colorPoints = [
-            { coordinate: new Coordinate(10 * this._constant, 30 * this._constant), color: new RGBAColor(1, 0, 0) },
-            { coordinate: new Coordinate(60 * this._constant, 10 * this._constant), color: new RGBAColor(0, 1, 0) },
-            { coordinate: new Coordinate(80 * this._constant, 70 * this._constant), color: new RGBAColor(0, 0, 1) },
+            { coordinate: new Coordinate(10 * this._constant, 30 * this._constant), color: new RGBAColor(1, 0, 0), displace: { x: 60, y: 30 }, speed: { x: 10, y: 7 } },
+            { coordinate: new Coordinate(60 * this._constant, 10 * this._constant), color: new RGBAColor(0, 1, 0), displace: { x: 30, y: 70 }, speed: { x: 7, y: 5 } },
+            { coordinate: new Coordinate(80 * this._constant, 70 * this._constant), color: new RGBAColor(0, 0, 1), displace: { x: -30, y: -20 }, speed: { x: 5, y: 3.7 } },
 
-            { coordinate: new Coordinate(10 * this._constant, 90 * this._constant), color: new RGBAColor(1, 1, 0) },
+            { coordinate: new Coordinate(10 * this._constant, 70 * this._constant), color: new RGBAColor(1, 1, 0), displace: { x: 13, y: 30 }, speed: { x: 3, y: 10 } },
         ]
     }
 
-    update(usin, ucos, side, utime, nusin, nucos) {
+    update({ side, fnusin, fnucos }) {
 
         const screen = this._screen;
         screen.clear();
@@ -28,8 +28,8 @@ export default class DistancePoints {
             this._colorPoints.forEach(cp => {
 
                 const cpCoordianteClone = cp.coordinate.clone();
-                cpCoordianteClone.x += (usin * 10 * this._constant);
-                cpCoordianteClone.y += (nucos * 10 * this._constant);
+                cpCoordianteClone.x += fnusin(cp.speed.x) * cp.displace.x * this._constant;
+                cpCoordianteClone.y += fnucos(cp.speed.y) * cp.displace.y * this._constant;
 
                 const distance = MathUtil.distance(point.coordinates, cpCoordianteClone);
                 const normalDistance = 1 - (distance / side);

@@ -86,7 +86,7 @@ let capturer = new CCapture({
 let aspect,
     utime = 0;
 
-let side = 50;
+let side = 100;
 let numColumns = side;
 let numRows = side;
 let numMargin = 0;
@@ -99,6 +99,10 @@ let usin;
 let nusin;
 let nucos;
 let ucos;
+let fnusin;
+let fnucos;
+let fusin;
+let fucos;
 
 let demo;
 
@@ -149,8 +153,15 @@ function update() {
         nusin = (Math.sin(utime) + 1) / 2;
         nucos = (Math.cos(utime) + 1) / 2;
 
+        fusin = speed => Math.sin(utime * speed);
+        fucos = speed => Math.cos(utime * speed);
+
+        fnusin = speed => (Math.sin(utime * speed) + 1) / 2;
+        fnucos = speed => (Math.cos(utime * speed) + 1) / 2;
+
+
         screen.layerIndex = 0;//--------------------------- LAYER 0
-        demo.update(usin, ucos, side, utime, nusin, nucos);
+        demo.update({usin, ucos, side, utime, nusin, nucos, fusin, fucos, fnusin, fnucos});
 
         screen._groupLayers();
 
