@@ -45,13 +45,13 @@ async function init() {
     if (initialized) {
         //webGPU.createVertexBuffer(vertexArray);
         let colors = [
-            new RGBAColor(1, 0, 0, .5),
+            new RGBAColor(1, 0, 0),
             new RGBAColor(0, 1, 0),
             new RGBAColor(0, 0, 1),
             new RGBAColor(1, 1, 0),
         ];
 
-        let side = 200;
+        let side = 100;
         let numColumns = side;
         let numRows = side;
 
@@ -66,7 +66,8 @@ async function init() {
 
         }
 
-        await webGPU.createPipeline();
+        //webGPU.createVertexBuffer(new Float32Array(webGPU._vertexArray));
+        //await webGPU.createPipeline();
 
     }
     await update();
@@ -91,7 +92,14 @@ async function update() {
     // bufferTest.unmap();
     //
 
+    for (let index = 0; index < 1000; index++) {
+        const x = Math.floor(Math.random() * 100);
+        const y = Math.floor(Math.random() * 100);
+        webGPU.modifyPointColor(new Coordinate(x,y,0), new RGBAColor(nusin,0,0));
+    }
 
+
+    await webGPU.createPipeline();
     webGPU.update();
 
     stats.end();

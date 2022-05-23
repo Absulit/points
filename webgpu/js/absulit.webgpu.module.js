@@ -68,6 +68,8 @@ export default class WebGPU {
         const textureVertWGSL = await getShaderSource('./shaders/demo6_texture.vert.wgsl');
         const textureFragWGSL = await getShaderSource('./shaders/demo6_texture.frag.wgsl');
 
+        const updatePointsWGSL = await getShaderSource('./shaders/demo6_update.points.wgsl');
+
         this._shaders = {
             false: {
                 vertex: colorsVertWGSL,
@@ -76,6 +78,9 @@ export default class WebGPU {
             true: {
                 vertex: textureVertWGSL,
                 fragment: textureFragWGSL
+            },
+            points:{
+                update: updatePointsWGSL
             }
         }
 
@@ -136,7 +141,7 @@ export default class WebGPU {
     // TODO: lo que tengo que hacer es modificar el buffer
 
 
-    
+
 
     async createPipeline() {
         this.createVertexBuffer(new Float32Array(this._vertexArray));
@@ -217,6 +222,19 @@ export default class WebGPU {
             },
 
         });
+
+        const computePipeline = this._device.createComputePipeline({
+            layout: 'auto',
+            compute: {
+              module: this._device.createShaderModule({
+                code: this._shaders['points'].update,
+              }),
+              entryPoint: 'main',
+            },
+          });
+        
+
+
         if (this._useTexture) {
             await this._createTexture();
         }
@@ -337,10 +355,10 @@ export default class WebGPU {
         const nw = this._getWGSLCoordinate(x + width, this._canvas.width);
         const nh = this._getWGSLCoordinate(y + height, this._canvas.height);
 
-        const { r:r0, g:g0, b:b0, a:a0 } = colors[0];
-        const { r:r1, g:g1, b:b1, a:a1 } = colors[1];
-        const { r:r2, g:g2, b:b2, a:a2 } = colors[2];
-        const { r:r3, g:g3, b:b3, a:a3 } = colors[3];
+        const { r: r0, g: g0, b: b0, a: a0 } = colors[0];
+        const { r: r1, g: g1, b: b1, a: a1 } = colors[1];
+        const { r: r2, g: g2, b: b2, a: a2 } = colors[2];
+        const { r: r3, g: g3, b: b3, a: a3 } = colors[3];
         this._vertexArray.push(
             +nx, +ny, nz, 1, r0, g0, b0, a0, 1, 0,// top left
             +nw, +ny, nz, 1, r1, g1, b1, a1, 0, 0,// top right
@@ -350,6 +368,24 @@ export default class WebGPU {
             +nx, -nh, nz, 1, r2, g2, b2, a2, 1, 1,// bottom left
             +nw, -nh, nz, 1, r3, g3, b3, a3, 0, 1,// bottom right
         );
+    }
+
+    modifyPointColor(coordinate, color) {
+        const { x, y, z } = coordinate;
+        const { r, g, b, a } = color;
+
+        const numColumns = 100;
+        const index = y + (x * numColumns);
+
+        for (let row = 0; row < 6; row++) {
+            //const rowIndex = row * this._vertexBufferInfo.vertexSize;
+            const rowIndex = row * 10;
+            this._vertexArray[rowIndex + index*60 + 4] = r;
+            this._vertexArray[rowIndex + index*60 + 5] = g;
+            this._vertexArray[rowIndex + index*60 + 6] = b;
+            this._vertexArray[rowIndex + index*60 + 7] = a;
+        }
+
     }
 
     get canvas() {
@@ -368,7 +404,7 @@ export default class WebGPU {
         return this._presentationFormat;
     }
 
-    get buffer(){
+    get buffer() {
         return this._buffer;
     }
 
