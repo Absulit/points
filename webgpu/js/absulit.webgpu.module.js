@@ -52,9 +52,11 @@ export default class WebGPU {
         this._useTexture = false;
         this._shaders = null;
         this._pipeline = null;
+        this._computePipeline = null;
         this._vertexBufferInfo = null;
         this._buffer = null;
         this._uniformBindGroup = null;
+        this._computeBindGroups = null;
         this._presentationSize = null;
         this._depthTexture = null;
 
@@ -79,7 +81,7 @@ export default class WebGPU {
                 vertex: textureVertWGSL,
                 fragment: textureFragWGSL
             },
-            points:{
+            points: {
                 update: updatePointsWGSL
             }
         }
@@ -107,7 +109,7 @@ export default class WebGPU {
         this._context.configure({
             device: this._device,
             format: this._presentationFormat,
-            size: this._presentationSize,
+            //size: this._presentationSize,
             compositingAlphaMode: 'premultiplied',
         });
 
@@ -223,16 +225,23 @@ export default class WebGPU {
 
         });
 
-        const computePipeline = this._device.createComputePipeline({
+        this._computePipeline = this._device.createComputePipeline({
             layout: 'auto',
             compute: {
-              module: this._device.createShaderModule({
-                code: this._shaders['points'].update,
-              }),
-              entryPoint: 'main',
+                module: this._device.createShaderModule({
+                    code: this._shaders['points'].update,
+                }),
+                entryPoint: 'main',
             },
-          });
-        
+        });
+
+        this._computeBindGroups = this._device.createBindGroup({
+            layout: this._computePipeline.getBindGroupLayout(0),
+            entries: [
+
+            ],
+        });
+
 
 
         if (this._useTexture) {
@@ -286,7 +295,7 @@ export default class WebGPU {
         if (!this._canvas) return;
         if (!this._device) return;
 
-        const commandEncoder = this._device.createCommandEncoder();
+
         const textureView = this._context.getCurrentTexture().createView();
 
         //const renderPassDescriptor: GPURenderPassDescriptor = {
@@ -309,23 +318,32 @@ export default class WebGPU {
             },
         };
 
-        const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
-        passEncoder.setPipeline(this._pipeline);
-        if (this._useTexture) {
-            passEncoder.setBindGroup(0, this._uniformBindGroup);
+        const commandEncoder = this._device.createCommandEncoder();
+        {
+            const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
+            passEncoder.setPipeline(this._pipeline);
+            if (this._useTexture) {
+                passEncoder.setBindGroup(0, this._uniformBindGroup);
+            }
+            passEncoder.setVertexBuffer(0, this._buffer);
+
+            /**
+             * vertexCount: number The number of vertices to draw
+             * instanceCount?: number | undefined The number of instances to draw
+             * firstVertex?: number | undefined Offset into the vertex buffers, in vertices, to begin drawing from
+             * firstInstance?: number | undefined First instance to draw
+             */
+            //passEncoder.draw(3, 1, 0, 0);
+            passEncoder.draw(this._vertexBufferInfo.vertexCount);
+            passEncoder.end();
         }
-        passEncoder.setVertexBuffer(0, this._buffer);
-
-        /**
-         * vertexCount: number The number of vertices to draw
-         * instanceCount?: number | undefined The number of instances to draw
-         * firstVertex?: number | undefined Offset into the vertex buffers, in vertices, to begin drawing from
-         * firstInstance?: number | undefined First instance to draw
-         */
-        //passEncoder.draw(3, 1, 0, 0);
-        passEncoder.draw(this._vertexBufferInfo.vertexCount);
-        passEncoder.end();
-
+        {
+            const passEncoder = commandEncoder.beginComputePass();
+            passEncoder.setPipeline(this._computePipeline);
+            passEncoder.setBindGroup(0, this._computeBindGroups);
+            passEncoder.dispatchWorkgroups(0);
+            passEncoder.end();
+        }
         this._device.queue.submit([commandEncoder.finish()]);
 
         //
@@ -380,10 +398,10 @@ export default class WebGPU {
         for (let row = 0; row < 6; row++) {
             //const rowIndex = row * this._vertexBufferInfo.vertexSize;
             const rowIndex = row * 10;
-            this._vertexArray[rowIndex + index*60 + 4] = r;
-            this._vertexArray[rowIndex + index*60 + 5] = g;
-            this._vertexArray[rowIndex + index*60 + 6] = b;
-            this._vertexArray[rowIndex + index*60 + 7] = a;
+            this._vertexArray[rowIndex + index * 60 + 4] = r;
+            this._vertexArray[rowIndex + index * 60 + 5] = g;
+            this._vertexArray[rowIndex + index * 60 + 6] = b;
+            this._vertexArray[rowIndex + index * 60 + 7] = a;
         }
 
     }
