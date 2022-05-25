@@ -74,6 +74,7 @@ import ChromaSpiral_3 from './js/examples/chromaspiral_3.js';
 import DistancePoints from './js/examples/distancepoints.js';
 import SineWave2 from './js/examples/sinewave2.js';
 import SpeedPoints from './js/examples/speedpoints.js';
+import SpeedPoints2 from './js/examples/speedpoints2.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -128,7 +129,7 @@ function init() {
 
     cache = new Cache(60 * 10);
 
-    demo = new SpeedPoints(screen);
+    demo = new SpeedPoints2(screen);
 
     effects = new Effects(screen);
 
