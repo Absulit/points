@@ -12,18 +12,27 @@ export default class SpeedPoints3 {
         this._constant = screen.numColumns / 100;
     }
 
-    update({ fnucos, fnusin, fusin, fucos }) {
+    update({ fnucos, fnusin, fusin, side }) {
 
         const screen = this._screen;
         //screen.clear();
 
         screen.points.forEach((point, index) => {
             const { x: nx, y: ny } = point.normalPosition;
-            //const b = Math.cos(nx * nx * nx * ny * ny * 3000 + 50* fucos(.23)) ;
-            const c = Math.cos(nx * ny * (2048 + 1000 * fusin(2.1)) + fnusin(.5) * 10);
 
-            point.setColor((1 - c) * (1 - ny), c * nx, nx * c);
-            //point.setBrightness(b);
+            //const normalIndex = index / screen.points.length;
+
+            const centerClone = screen.center.clone();
+            centerClone.x = side * fnusin(1.1556);
+            const d = Math.sin(MathUtil.distance(centerClone, point.coordinates) / side * 40 * this._constant* fnucos(.764) * ny + 10 * this._constant * fnusin(.1));
+
+            const c = Math.cos(nx * ny * (1890*this._constant + 10*this._constant * fusin(.1)) + fnusin(.5) * 10*this._constant) * d;
+
+            point.setColor(
+                (1 - d) * ((1-c)*.4) * nx,
+                (c) * .4 * ny,
+                d * ny * nx * (1-c));
+            //point.setBrightness(c);
         });
 
         //this._effects.chromaticAberration(.05, 2);
