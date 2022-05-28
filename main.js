@@ -77,6 +77,7 @@ import SpeedPoints from './js/examples/speedpoints.js';
 import SpeedPoints2 from './js/examples/speedpoints2.js';
 import SpeedPoints3 from './js/examples/speedpoints3.js';
 import SpeedPoints4 from './js/examples/speedpoints4.js';
+import SpeedPoints5 from './js/examples/speedpoints5.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -91,9 +92,7 @@ let capturer = new CCapture({
 let aspect,
     utime = 0;
 
-let side = 400;
-let numColumns = side;
-let numRows = side;
+
 let numMargin = 0;
 let screen;
 let numLayers = 3;
@@ -119,6 +118,10 @@ let pointsizes = [];
 let atlasids = [];
 let effects;
 
+let side = 100;
+let numColumns = side;
+let numRows = side;
+
 function init() {
     initWebGL("gl-canvas", true);
     aspect = canvas.width / canvas.height;
@@ -131,7 +134,7 @@ function init() {
 
     cache = new Cache(60 * 10);
 
-    demo = new SpeedPoints4(screen);
+    demo = new SpeedPoints5(screen);
 
     effects = new Effects(screen);
 
