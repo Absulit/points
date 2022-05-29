@@ -128,7 +128,7 @@ export default class Gen17_2 {
     }
 
 
-    update(usin, ucos, side, utime) {
+    update({usin, ucos, side, utime}) {
         const screen = this._screen;
 
         screen.layerIndex = 0;//--------------------------- LAYER 0

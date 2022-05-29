@@ -32,7 +32,7 @@ export default class Gen17 {
         screen.layerIndex = 0;//--------------------------- LAYER 0
 
         this._imageLoader = new ImageLoader(screen);
-        this._imageLoader.type = this._imageLoader.FIT;
+        this._imageLoader.type = ImageLoader.FIT;
         //this._imageLoader.load('../../img/old_king_600x600.jpg');
         this._imageLoader.load('../../img/gratia_800x800.jpg');
 
@@ -65,7 +65,7 @@ export default class Gen17 {
     }
 
 
-    update(usin, ucos, side, utime) {
+    update({usin, ucos, side, utime}) {
         const screen = this._screen;
 
         screen.layerIndex = 0;//--------------------------- LAYER 0
