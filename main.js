@@ -79,6 +79,8 @@ import SpeedPoints3 from './js/examples/speedpoints3.js';
 import SpeedPoints4 from './js/examples/speedpoints4.js';
 import SpeedPoints5 from './js/examples/speedpoints5.js';
 import SpeedPoints6 from './js/examples/speedpoints6.js';
+import SpeedPoints7 from './js/examples/speedpoints7.js';
+import SpeedPoints2_1 from './js/examples/speedpoints2_1.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -135,7 +137,7 @@ function init() {
 
     cache = new Cache(60 * 10);
 
-    demo = new SpeedPoints6(screen);
+    demo = new SpeedPoints7(screen);
 
     effects = new Effects(screen);
 
