@@ -14,9 +14,10 @@ export default class SpeedPoints2_1 {
         console.log('---- CONSTANT: ' + this._constant);
 
         this._imageLoader = new ImageLoader(screen);
-        this._imageLoader.type = ImageLoader.ONE_TO_ONE;
-        //this._imageLoader.type = ImageLoader.FIT;
+        //this._imageLoader.type = ImageLoader.ONE_TO_ONE;
+        this._imageLoader.type = ImageLoader.FIT;
         this._imageLoader.load('../../assets_ignore/absulit_800x800.jpg');
+        //this._imageLoader.load('../../img/carmen_lyra_2_800x800.jpg');
     }
 
     update({ fusin, fnusin, fnucos, side }) {
@@ -26,9 +27,15 @@ export default class SpeedPoints2_1 {
 
         screen.layerIndex = 0;//--------------------------- LAYER 0
         if (this._imageLoader.isLoaded) {
-            this._imageLoader.loadToLayer(205, 300, .25 * this._constant, .25 * this._constant,);
+            this._imageLoader.loadToLayer();
+            //this._imageLoader.loadToLayer(205, 300, .25 * this._constant, .25 * this._constant);
         }
-        //this._imageLoader.loadToLayer();
+        
+
+        // screen.points.forEach((point, index) => {
+        //     const {r,g,b} = point.color;
+        //     point.setColor(1-r,1-g,1-b);
+        // })
 
         screen.layerIndex = 1;//--------------------------- LAYER 0
         screen.points.forEach((point, index) => {
@@ -45,11 +52,11 @@ export default class SpeedPoints2_1 {
             const zi = 1 - z;
 
             const d = MathUtil.distance(centerClone, point.coordinates) / side * z;
-            const b = Math.sin(200 * nx * ny * d * z * (1 - nx) + fnusin(5) * 10 * zi);
+            const b = Math.sin(10 * nx * ny * d * z * (1 - nx) + fnusin(.5) * 10 * zi);
 
 
 
-            point.setColor(1 - nx * b, (ny * -b), 0);
+            point.setColor(1 - nx * b, (ny * -b), z);
             //point.setBrightness(Math.cos(d * fnucos(5)));
             //point.setBrightness(b);
         });

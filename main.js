@@ -137,7 +137,7 @@ function init() {
 
     cache = new Cache(60 * 10);
 
-    demo = new SpeedPoints7(screen);
+    demo = new SpeedPoints2_1(screen);
 
     effects = new Effects(screen);
 
