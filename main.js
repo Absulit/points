@@ -81,6 +81,7 @@ import SpeedPoints5 from './js/examples/speedpoints5.js';
 import SpeedPoints6 from './js/examples/speedpoints6.js';
 import SpeedPoints7 from './js/examples/speedpoints7.js';
 import SpeedPoints2_1 from './js/examples/speedpoints2_1.js';
+import SpeedPoints8 from './js/examples/speedpoints8.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -108,6 +109,8 @@ let nucos;
 let ucos;
 let fnusin;
 let fnucos;
+let fnsin;
+let fncos;
 let fusin;
 let fucos;
 
@@ -137,7 +140,7 @@ function init() {
 
     cache = new Cache(60 * 10);
 
-    demo = new SpeedPoints2_1(screen);
+    demo = new SpeedPoints8(screen);
 
     effects = new Effects(screen);
 
@@ -170,9 +173,12 @@ function update() {
         fnusin = speed => (Math.sin(utime * speed) + 1) / 2;
         fnucos = speed => (Math.cos(utime * speed) + 1) / 2;
 
+        fnsin = speed => (Math.sin(speed) + 1) / 2;
+        fncos = speed => (Math.cos(speed) + 1) / 2;
+
 
         screen.layerIndex = 0;//--------------------------- LAYER 0
-        demo.update({usin, ucos, side, utime, nusin, nucos, fusin, fucos, fnusin, fnucos});
+        demo.update({usin, ucos, side, utime, nusin, nucos, fusin, fucos, fnusin, fnucos, fnsin, fncos});
 
         screen._groupLayers();
 
