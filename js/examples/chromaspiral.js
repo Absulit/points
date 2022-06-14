@@ -10,7 +10,7 @@ class ChromaSpiral {
         this._constant = screen.numColumns / 200;
     }
 
-    update(usin, ucos, side, utime) {
+    update({usin, ucos, side}) {
         let x = this._screen.center.x, y = this._screen.center.y, radius = 10;
         let pointFromCenter, point, radians, angle, lastModifiedPoint;
 
@@ -55,7 +55,7 @@ class ChromaSpiral {
 
     }
 
-    update2(usin, ucos, side, utime) {
+    update2({usin, ucos, side}) {
         let x = this._screen.center.x, y = this._screen.center.y, radius = 10;
         let pointFromCenter, point, radians, angle, lastModifiedPoint;
 

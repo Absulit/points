@@ -76,7 +76,7 @@ export default class Gen21 {
     }
 
 
-    update(usin, ucos, side, utime) {
+    update({usin, ucos, side, utime}) {
         const screen = this._screen;
 
         screen.layerIndex = 0;//--------------------------- LAYER 0
