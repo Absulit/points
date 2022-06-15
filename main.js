@@ -127,7 +127,7 @@ let pointsizes = [];
 let atlasids = [];
 let effects;
 
-let side = 100;
+let side = 400;
 let numLayers = 4;
 let numColumns = side;
 let numRows = side;
