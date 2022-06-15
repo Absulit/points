@@ -85,6 +85,7 @@ import SpeedPoints8 from './js/examples/speedpoints8.js';
 import Julio1 from './js/examples/julio1.js';
 import SpeedPoints9 from './js/examples/speedpoints9.js';
 import Noise1 from './js/examples/noise1.js';
+import Noise2 from './js/examples/noise2.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -143,7 +144,7 @@ function init() {
 
     cache = new Cache(60 * 10);
 
-    demo = new Noise1(screen);
+    demo = new Noise2(screen);
 
     effects = new Effects(screen);
 
