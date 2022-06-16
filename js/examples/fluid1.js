@@ -12,7 +12,7 @@ export default class Fluid1 {
         this._effects = new Effects(screen);
     };
 
-    update(u_time) {
+    update({utime}) {
         const screen = this._screen;
         screen.layerIndex = 0;
 

@@ -403,7 +403,6 @@ class Screen {
         this._currentLayer.rows.forEach(row => {
             row.forEach(point => {
                 if (color) {
-                    // TODO: check why point.color = color does not work
                     point.setRGBAColor(color);
                 } else {
                     point.setColor(0, 0, 0, 0);

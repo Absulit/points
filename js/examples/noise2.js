@@ -31,8 +31,7 @@ export default class Noise2 {
         this._imageLoader2.load('../../assets_ignore/sunset_800x800_20220604_173907.jpg');
 
         screen.layerIndex = 2;//--------------------------- LAYER 2
-        //screen.clear();
-        screen.points.forEach(point => point.setColor(0, 0, 0, 1));
+        screen.clear(this._clearMixColor);
 
 
         this._coordinates = Array(10000).fill(screen.getRandomPoint().coordinates);

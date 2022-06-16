@@ -59,7 +59,7 @@ export default class Slime {
         }
     }
 
-    update(usin, ucos, side, utime, nusin) {
+    update({usin, ucos, side, utime, nusin}) {
         const screen = this._screen;
 
 
