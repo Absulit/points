@@ -89,6 +89,7 @@ import Noise2 from './js/examples/noise2.js';
 import Fluid1 from './js/examples/fluid1.js';
 import Slime from './js/examples/slime.js';
 import Slime2 from './js/examples/slime2.js';
+import SineLines from './js/examples/sinelines.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -130,7 +131,7 @@ let pointsizes = [];
 let atlasids = [];
 let effects;
 
-let side = 400;
+let side = 100;
 let numLayers = 4;
 let numColumns = side;
 let numRows = side;
@@ -147,7 +148,7 @@ function init() {
 
     cache = new Cache(60 * 10);
 
-    demo = new EffectsTester(screen);
+    demo = new SineLines(screen);
 
     effects = new Effects(screen);
 
