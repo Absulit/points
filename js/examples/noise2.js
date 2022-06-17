@@ -34,7 +34,7 @@ export default class Noise2 {
         screen.clear(this._clearMixColor);
 
 
-        this._coordinates = Array(10000).fill(screen.getRandomPoint().coordinates);
+        this._coordinates = Array(2500 * this._constant).fill(screen.getRandomPoint().coordinates);
         this._coordinateIndex = 0;
     }
 
