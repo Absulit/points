@@ -94,6 +94,7 @@ import Noise1_2 from './js/examples/noise1_2.js';
 import Noise1_3 from './js/examples/noise1_3.js';
 import Noise2_1 from './js/examples/noise2_1.js';
 import Noise2_2 from './js/examples/noise2_2.js';
+import Noise2_3 from './js/examples/noise2_3.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -135,6 +136,12 @@ let pointsizes = [];
 let atlasids = [];
 let effects;
 
+const sliders = {
+    'a': 0,
+    'b': 0,
+    'c': 0,
+}
+
 let side = 100;
 let numLayers = 4;
 let numColumns = side;
@@ -152,7 +159,7 @@ function init() {
 
     cache = new Cache(60 * 10);
 
-    demo = new Noise2_2(screen);
+    demo = new Noise2_3(screen);
 
     effects = new Effects(screen);
 
@@ -190,7 +197,7 @@ function update() {
 
 
         screen.layerIndex = 0;//--------------------------- LAYER 0
-        demo.update({usin, ucos, side, utime, nusin, nucos, fusin, fucos, fnusin, fnucos, fnsin, fncos});
+        demo.update({sliders, usin, ucos, side, utime, nusin, nucos, fusin, fucos, fnusin, fnucos, fnsin, fncos});
 
         screen._groupLayers();
 
@@ -231,7 +238,7 @@ function update() {
 init();
 update();
 
-let downloadBtn = document.getElementById('downloadBtn');
+const downloadBtn = document.getElementById('downloadBtn');
 let started = false;
 downloadBtn.addEventListener('click', onClickDownloadButton);
 let buttonTitle = downloadBtn.textContent;
@@ -249,3 +256,11 @@ function onClickDownloadButton(e) {
         capturer.save();
     }
 }
+
+const sliderA = document.getElementById('slider-a');
+const sliderB = document.getElementById('slider-b');
+const sliderC = document.getElementById('slider-c');
+
+sliderA.addEventListener('input', e =>  sliders.a = e.target.value);
+sliderB.addEventListener('input', e =>  sliders.b = e.target.value);
+sliderC.addEventListener('input', e =>  sliders.c = e.target.value);
