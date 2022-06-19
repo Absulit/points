@@ -4,7 +4,7 @@ import Effects from '../effects.js';
 import ImageLoader from '../imageloader.js';
 import MathUtil from '../mathutil.js';
 
-export default class Noise2_3 {
+export default class Noise2_4 {
     constructor(screen) {
         this._screen = screen;
         this._effects = new Effects(screen);
@@ -55,10 +55,10 @@ export default class Noise2_3 {
 
         screen.layerIndex = 1;//--------------------------- LAYER 1
 
-        // screen.points.forEach(point => {
-        //     const { x: nx, y: ny } = point.normalPosition;
-        //     point.setColor(nx, ny, 1 - nx);
-        // });
+        screen.points.forEach(point => {
+            const { x: nx, y: ny } = point.normalPosition;
+            point.setColor(nx, ny, 1 - nx);
+        });
 
         //this._imageLoader2.loadToLayer();
 
@@ -68,18 +68,19 @@ export default class Noise2_3 {
         //screen.clear();
 
         this._coordinates.forEach(c => {
-        //if(this._coordinateIndex < this._coordinates.length){
+            //if(this._coordinateIndex < this._coordinates.length){
 
-        
+
             //let c = this._coordinates[this._coordinateIndex];
             const p = screen.getPointAt(c.x, c.y);
             if (p) {
                 //p.setBrightness(1);
 
                 const point0 = screen.getPointFromLayer(p, 0);
+                
                 const angle = point0.getBrightness() * Math.PI * 2 * sliders.b /*+ Math.PI * fnusin(.5);*/
 
-                const newCoordinate = MathUtil.polar(1 * this._constant+ 20 * this._constant * sliders.a /* + 4 * fnusin(.3)*/, angle);
+                const newCoordinate = MathUtil.polar(1 * this._constant + 20 * this._constant * sliders.a /* + 4 * fnusin(.3)*/, angle);
 
                 const newPoint = screen.getPointAt(Math.floor(p.coordinates.x + newCoordinate.x), Math.floor(p.coordinates.y + newCoordinate.y));
 
@@ -87,7 +88,16 @@ export default class Noise2_3 {
                     const { x: nx, y: ny } = newPoint.normalPosition;
                     c.x = newPoint.coordinates.x;
                     c.y = newPoint.coordinates.y;
-                    p.setColor(ny , nx, 1-ny);
+
+                    // if (c.color) {
+                    //     p.setRGBAColor(c.color);
+                    // } else {
+                    //     //p.setColor(ny, nx, 1 - ny);
+                    //     //c.color = p.color.clone();
+                    //     const point1 = screen.getPointFromLayer(p, 1);
+                    //     c.color = point1.color.clone();
+                    // }
+                    p.setColor(ny, nx, 1 - ny);
 
                     screen.drawLineWithPoints(p, newPoint, color => {
                         //color.setColor(p.color);
@@ -97,7 +107,7 @@ export default class Noise2_3 {
                         //color.blend(p.color);
                         //color.additive(p.color);
                         //color.setColor(RGBAColor.average([color, p.color]));
-                    } );
+                    });
                 } else {
 
                     // this._coordinates = this._coordinates.filter(item => {
@@ -112,9 +122,9 @@ export default class Noise2_3 {
             }
             ++this._coordinateIndex;
             //debugger
-        // }else{
-        //     this._coordinateIndex = 0;
-        // }
+            // }else{
+            //     this._coordinateIndex = 0;
+            // }
         });
 
 

@@ -95,6 +95,7 @@ import Noise1_3 from './js/examples/noise1_3.js';
 import Noise2_1 from './js/examples/noise2_1.js';
 import Noise2_2 from './js/examples/noise2_2.js';
 import Noise2_3 from './js/examples/noise2_3.js';
+import Noise2_4 from './js/examples/noise2_4.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -110,7 +111,6 @@ let aspect,
     utime = 0;
 
 
-let numMargin = 0;
 let screen;
 
 let uround;
@@ -136,16 +136,13 @@ let pointsizes = [];
 let atlasids = [];
 let effects;
 
-const sliders = {
-    'a': 0,
-    'b': 0,
-    'c': 0,
-}
+const sliders = { 'a': 0, 'b': 0, 'c': 0 }
 
 let side = 100;
 let numLayers = 4;
 let numColumns = side;
 let numRows = side;
+let numMargin = 0;
 
 function init() {
     initWebGL("gl-canvas", true);
@@ -159,7 +156,7 @@ function init() {
 
     cache = new Cache(60 * 10);
 
-    demo = new Noise2_3(screen);
+    demo = new Noise2_4(screen);
 
     effects = new Effects(screen);
 
@@ -197,7 +194,7 @@ function update() {
 
 
         screen.layerIndex = 0;//--------------------------- LAYER 0
-        demo.update({sliders, usin, ucos, side, utime, nusin, nucos, fusin, fucos, fnusin, fnucos, fnsin, fncos});
+        demo.update({ sliders, usin, ucos, side, utime, nusin, nucos, fusin, fucos, fnusin, fnucos, fnsin, fncos });
 
         screen._groupLayers();
 
@@ -261,6 +258,14 @@ const sliderA = document.getElementById('slider-a');
 const sliderB = document.getElementById('slider-b');
 const sliderC = document.getElementById('slider-c');
 
-sliderA.addEventListener('input', e =>  sliders.a = e.target.value);
-sliderB.addEventListener('input', e =>  sliders.b = e.target.value);
-sliderC.addEventListener('input', e =>  sliders.c = e.target.value);
+sliders.a = sliderA.value = localStorage.getItem('slider-a') || 0;
+sliders.b = sliderB.value = localStorage.getItem('slider-b') || 0;
+sliders.c = sliderC.value = localStorage.getItem('slider-c') || 0;
+
+sliderA.addEventListener('input', e => sliders.a = e.target.value);
+sliderB.addEventListener('input', e => sliders.b = e.target.value);
+sliderC.addEventListener('input', e => sliders.c = e.target.value);
+
+sliderA.addEventListener('change', e => localStorage.setItem('slider-a', e.target.value));
+sliderB.addEventListener('change', e => localStorage.setItem('slider-b', e.target.value));
+sliderC.addEventListener('change', e => localStorage.setItem('slider-c', e.target.value));

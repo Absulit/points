@@ -519,8 +519,9 @@ class Screen {
      * and uses the first point color to color the line.
      * @param {Point} pointA
      * @param {Point} pointB
+     * @param {Function} modifyColorFunction works as Point.modifyColor
      */
-    drawLineWithPoints(pointA, pointB) {
+    drawLineWithPoints(pointA, pointB, modifyColorFunction = null) {
         let x0 = pointA.coordinates.x;
         let y0 = pointA.coordinates.y;
 
@@ -530,15 +531,15 @@ class Screen {
 
         if (Math.abs(y1 - y0) < Math.abs(x1 - x0)) {
             if (x0 > x1) {
-                this._plotLineLow(x1, y1, x0, y0, color);
+                this._plotLineLow(x1, y1, x0, y0, color, modifyColorFunction);
             } else {
-                this._plotLineLow(x0, y0, x1, y1, color);
+                this._plotLineLow(x0, y0, x1, y1, color, modifyColorFunction);
             }
         } else {
             if (y0 > y1) {
-                this._plotLineHigh(x1, y1, x0, y0, color);
+                this._plotLineHigh(x1, y1, x0, y0, color, modifyColorFunction);
             } else {
-                this._plotLineHigh(x0, y0, x1, y1, color);
+                this._plotLineHigh(x0, y0, x1, y1, color, modifyColorFunction);
             }
         }
     }
@@ -572,7 +573,7 @@ class Screen {
         return finalPoint;
     }
 
-    _plotLineLow(x0, y0, x1, y1, color) {
+    _plotLineLow(x0, y0, x1, y1, color, modifyColorFunction = null) {
         let dx = x1 - x0
         let dy = y1 - y0
         let yi = 1
@@ -586,7 +587,11 @@ class Screen {
         for (let x = x0; x < x1; x++) {
             let point = this.getPointAt(x, y);
             if (point) {
-                point.setColor(color.r, color.g, color.b, color.a);
+                if(modifyColorFunction){
+                    point.modifyColor(modifyColorFunction);
+                }else{
+                    point.setRGBAColor(color);
+                }
             }
             if (D > 0) {
                 y = y + yi
@@ -597,7 +602,7 @@ class Screen {
         }
     }
 
-    _plotLineHigh(x0, y0, x1, y1, color) {
+    _plotLineHigh(x0, y0, x1, y1, color, modifyColorFunction = null) {
         let dx = x1 - x0;
         let dy = y1 - y0;
         let xi = 1;
@@ -611,7 +616,11 @@ class Screen {
         for (let y = y0; y < y1; y++) {
             let point = this.getPointAt(x, y);
             if (point) {
-                point.setColor(color.r, color.g, color.b, color.a);
+                if(modifyColorFunction){
+                    point.modifyColor(modifyColorFunction);
+                }else{
+                    point.setRGBAColor(color);
+                }
             }
             if (D > 0) {
                 x = x + xi;
