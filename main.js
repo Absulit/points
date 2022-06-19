@@ -96,6 +96,7 @@ import Noise2_1 from './js/examples/noise2_1.js';
 import Noise2_2 from './js/examples/noise2_2.js';
 import Noise2_3 from './js/examples/noise2_3.js';
 import Noise2_4 from './js/examples/noise2_4.js';
+import Slime3 from './js/examples/slime3.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -156,7 +157,7 @@ function init() {
 
     cache = new Cache(60 * 10);
 
-    demo = new Noise2_4(screen);
+    demo = new Slime3(screen);
 
     effects = new Effects(screen);
 

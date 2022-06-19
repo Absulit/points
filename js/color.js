@@ -64,7 +64,7 @@ class RGBAColor {
         this._value = [value, value, value, 1];
     }
 
-    set(r, g, b, a) {
+    set(r, g, b, a = 1) {
         this._value = [r, g, b, a]
     }
 
