@@ -49,6 +49,19 @@ class MathUtil {
         let t = MathUtil.saturate((x - a) / (b - a));
         return t * t * (3.0 - (2.0 * t));
     }
+
+    /**
+     * Linear Interpolation
+     * @param {Number} a Initial value
+     * @param {Number} b Final value
+     * @param {Number} n % between A and B
+     * @returns a value between A and B
+     */
+    static lerp(a, b, n) {
+        return (1 - n) * a + n * b;
+    }
+
+
 }
 
 export default MathUtil;

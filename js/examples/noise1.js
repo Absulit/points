@@ -35,10 +35,10 @@ export default class Noise1 {
         screen.points.forEach(point => point.setColor(0, 0, 0, 1));
     }
 
-    update({ fnucos, fnusin, fusin, side, fnsin }) {
+    update({ fnucos, fnusin, fusin, side, fnsin, sliders }) {
 
         const screen = this._screen;
-        screen.clear();
+        //screen.clear();
 
         screen.layerIndex = 0;//--------------------------- LAYER 0
         this._imageLoader.loadToLayer();
@@ -51,12 +51,12 @@ export default class Noise1 {
 
         screen.layerIndex = 1;//--------------------------- LAYER 1
 
-        screen.points.forEach(point => {
-            const { x: nx, y: ny } = point.normalPosition;
-            point.setColor(nx, ny, 1 - nx);
-        });
+        // screen.points.forEach(point => {
+        //     const { x: nx, y: ny } = point.normalPosition;
+        //     point.setColor(nx, ny, 1 - nx);
+        // });
 
-        //this._imageLoader2.loadToLayer();
+        this._imageLoader2.loadToLayer();
 
         screen.layerIndex = 2;//--------------------------- LAYER 2
         //screen.points.forEach(point => point.setColor(0, 0, 0, 1));
@@ -68,9 +68,9 @@ export default class Noise1 {
             const point0 = screen.getPointFromLayer(point, 0);
             const point1 = screen.getPointFromLayer(point, 1);
 
-            const angle = point0.getBrightness() * Math.PI * 2 + 2 * fusin(.98);
+            const angle = point0.getBrightness() * Math.PI * 2 + 2 *sliders.a//* fusin(.98);
 
-            const newCoordinate = MathUtil.polar(5 * this._constant + 5 * fnusin(.56) * this._constant, angle);
+            const newCoordinate = MathUtil.polar(5 * this._constant + 5 * sliders.b /*fnusin(.56)*/ * this._constant, angle);
             const newPoint = screen.getPointAt(Math.floor(point.coordinates.x + newCoordinate.x), Math.floor(point.coordinates.y + newCoordinate.y));
 
             if (newPoint) {

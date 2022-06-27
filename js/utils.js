@@ -12,6 +12,10 @@ class Utils {
             .sort((a, b) => a.sort - b.sort)
             .map(({ value }) => value);
     }
+
+
 }
 
 export default Utils;
+
+export const print = (...s) => console.log(s);

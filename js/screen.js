@@ -326,8 +326,8 @@ class Screen {
     /**
      * Retrieves a list of `Point` around a point.
      * Directly around, in a square, so just 8 Points.
-     * @param {*} point
-     * @param {*} distance
+     * @param {Point} point
+     * @param {Int} distance int
      * @returns
      */
     getPointsAround(point, distance = 1) {
