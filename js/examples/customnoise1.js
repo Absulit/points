@@ -12,7 +12,7 @@ export default class CustomNoise1 {
         this._constant = screen.numColumns / 100;
 
 
-        const cellSize = 9;
+        const cellSize = 9 * 2;
 
         const rows = {};
         const corners = [];
@@ -32,38 +32,6 @@ export default class CustomNoise1 {
                 point.setColor(1, 0, 0);
             }
         });
-
-        // screen.points.forEach(point => {
-        //     if (!corners.includes(point)) {
-        //         const topLeftX = Math.floor(point.coordinates.x / cellSize) * cellSize;
-        //         const topLeftY = Math.floor(point.coordinates.y / cellSize) * cellSize;
-        //         const topLeft = screen.getPointAt(topLeftX, topLeftY);
-        //         const topRight = screen.getPointAt(topLeftX + cellSize, topLeftY);
-        //         const bottomLeft = screen.getPointAt(topLeftX, topLeftY + cellSize);
-        //         const bottomRight = screen.getPointAt(topLeftX + cellSize, topLeftY + cellSize);
-
-        //         if (topLeft && topRight && bottomLeft && bottomRight) {
-
-        //             const dTopLeft = MathUtil.distance(point.coordinates, topLeft.coordinates) / cellSize;
-        //             const dTopRight = MathUtil.distance(point.coordinates, topRight.coordinates) / cellSize;
-        //             const dBottomLeft = MathUtil.distance(point.coordinates, bottomLeft.coordinates) / cellSize;
-        //             const dBottomRight = MathUtil.distance(point.coordinates, bottomRight.coordinates) / cellSize;
-
-
-        //             const ddTopLeft = (1 - dTopLeft) * topLeft.getBrightness();
-        //             const ddTopRight = (1 - dTopRight) * topRight.getBrightness();
-        //             const ddBottomLeft = (1 - dBottomLeft) * bottomLeft.getBrightness();
-        //             const ddBottomRight = (1 - dBottomRight) * bottomRight.getBrightness();
-
-        //             //const larpTopLeft = MathUtil.lerp()
-
-        //             const d = ddTopLeft + ddTopRight + ddBottomLeft + ddBottomRight;
-        //             //console.log(ddTopLeft, ddTopRight, ddBottomLeft, ddBottomRight);
-        //             point.setBrightness(d);
-        //         }
-        //     }
-        // });
-
 
 
         for (const rowIndex in rows) {
@@ -85,7 +53,8 @@ export default class CustomNoise1 {
                     const a = point.getBrightness();
                     const b = nextRowPoint.getBrightness();
                     middlePoints.forEach((middlePoint, index) => {
-                        const lerpBrightness = MathUtil.lerp(a, b, (index + 1) / cellSize)
+                        const n = MathUtil.smoothstep(0,1,(index + 1) / cellSize);
+                        const lerpBrightness = MathUtil.lerp(a, b, n);
                         middlePoint.setBrightness(lerpBrightness);
                         //middlePoint.setBrightness(index / middlePoints.length);
                     });
@@ -115,7 +84,8 @@ export default class CustomNoise1 {
                     const a = point.getBrightness();
                     const b = nextRowPoint.getBrightness();
                     middlePoints.forEach((middlePoint, index) => {
-                        const lerpBrightness = MathUtil.lerp(a, b, (index + 1) / cellSize)
+                        const n = MathUtil.smoothstep(0,1,(index + 1) / cellSize);
+                        const lerpBrightness = MathUtil.lerp(a, b, n);
                         middlePoint.setBrightness(lerpBrightness);
                     });
                 }

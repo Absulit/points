@@ -99,6 +99,7 @@ import Noise2_4 from './js/examples/noise2_4.js';
 import Slime3 from './js/examples/slime3.js';
 import CustomNoise1 from './js/examples/customnoise1.js';
 import CustomNoise2 from './js/examples/customnoise2.js';
+import CustomNoise3 from './js/examples/customnoise3.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -141,7 +142,7 @@ let effects;
 
 const sliders = { 'a': 0, 'b': 0, 'c': 0 }
 
-let side = 512;
+let side = 100;
 let numLayers = 2;
 let numColumns = side;
 let numRows = side;
@@ -159,7 +160,7 @@ function init() {
 
     cache = new Cache(60 * 10);
 
-    demo = new CustomNoise2(screen);
+    demo = new CustomNoise1(screen);
 
     effects = new Effects(screen);
 
