@@ -141,7 +141,7 @@ let effects;
 
 const sliders = { 'a': 0, 'b': 0, 'c': 0 }
 
-let side = 64;
+let side = 100;
 let numLayers = 2;
 let numColumns = side;
 let numRows = side;
@@ -159,7 +159,7 @@ function init() {
 
     cache = new Cache(60 * 10);
 
-    demo = new CustomNoise2(screen);
+    demo = new CustomNoise1(screen);
 
     effects = new Effects(screen);
 

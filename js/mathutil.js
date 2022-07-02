@@ -61,6 +61,15 @@ class MathUtil {
         return (1 - n) * a + n * b;
     }
 
+    static lerp2(a, b, t) {
+        return a + t * (b - a);
+    }
+
+    static xlerp(mMin, mMax, mFactor) {
+        const a = mMax - mMin;
+        return a * mFactor * mFactor + mMin;
+    }
+
 
 }
 

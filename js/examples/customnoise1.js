@@ -87,6 +87,7 @@ export default class CustomNoise1 {
                     middlePoints.forEach((middlePoint, index) => {
                         const lerpBrightness = MathUtil.lerp(a, b, (index + 1) / cellSize)
                         middlePoint.setBrightness(lerpBrightness);
+                        //middlePoint.setBrightness(index / middlePoints.length);
                     });
                 }
             });
@@ -115,7 +116,7 @@ export default class CustomNoise1 {
                     const b = nextRowPoint.getBrightness();
                     middlePoints.forEach((middlePoint, index) => {
                         const lerpBrightness = MathUtil.lerp(a, b, (index + 1) / cellSize)
-                        middlePoint.setBrightness(lerpBrightness);
+                        //middlePoint.setBrightness(lerpBrightness);
                     });
                 }
 
@@ -124,7 +125,7 @@ export default class CustomNoise1 {
             }
         });
 
-        this._effects.soften2(1);
+        // this._effects.soften2(1);
         // this._effects.soften2(1);
         // this._effects.soften2(1);
 

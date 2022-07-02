@@ -46,10 +46,18 @@ export default class CustomNoise2 {
         }
         print(result);
 
-        screen.points.forEach((point, index) => {
+        // screen.points.forEach((point, index) => {
+        //     const b = result[index % result.length];
+        //     point.setBrightness(b / scaleSum);
+        // });
+
+        result.forEach((r, index) => {
             const b = result[index % result.length];
-            point.setBrightness(b / scaleSum);
-        });
+            const point = screen.getPointAt(index, Math.floor(b / scaleSum * screen.numRows));
+            if (point) {
+                point.setBrightness(1);
+            }
+        })
 
         // https://www.youtube.com/watch?v=6-0UaeJBumA
     }
