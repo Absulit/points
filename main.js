@@ -142,7 +142,7 @@ let effects;
 
 const sliders = { 'a': 0, 'b': 0, 'c': 0 }
 
-let side = 100;
+let side = 128;
 let numLayers = 2;
 let numColumns = side;
 let numRows = side;
