@@ -1,5 +1,4 @@
 import MathUtil from "./mathutil.js";
-import { print } from "./utils.js";
 
 export default class ValueNoise {
     constructor(width, height) {
@@ -20,7 +19,7 @@ export default class ValueNoise {
      * It creates `point.x` and `point.y` based on the same dimensions.
      * Also fills other lists with data that will be used to calculate the value noise.
      */
-    _fillWithRandomData(){
+    _fillWithRandomData() {
         this._data.forEach((point, index) => {
             const x = index % this._width
             const y = Math.floor(index / this._width)
@@ -40,12 +39,11 @@ export default class ValueNoise {
         });
     }
 
-    generate() {
-
-
-
-        this._fillWithRandomData();
-
+    /**
+     * Firts creates points based on `_cellSize` and
+     * then interpolates color between them.
+     */
+    _createdSpacedPointsAndHorizontalInterpolation() {
         for (const rowIndex in this._rows) {
             const row = this._rows[rowIndex];
 
@@ -73,7 +71,13 @@ export default class ValueNoise {
             // get first of each row
             this._firstPointOfRows.push(row[0]);
         }
-;
+    }
+
+    /**
+     * Interpolates vertically between the horizontal interpolated lines previously created.
+     *
+     */
+    _verticalInterpolation() {
         for (let index in this._firstPointOfRows) {
             if (Object.hasOwnProperty.call(this._firstPointOfRows, index)) {
                 index = Number(index);
@@ -109,6 +113,12 @@ export default class ValueNoise {
 
             }
         }
+    }
+
+    generate() {
+        this._fillWithRandomData();
+        this._createdSpacedPointsAndHorizontalInterpolation();
+        this._verticalInterpolation();
     }
 
     _getRightPoint(point) {
