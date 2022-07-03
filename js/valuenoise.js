@@ -6,7 +6,7 @@ export default class ValueNoise {
         this._width = width;
         this._height = height;
 
-        this._cellSize = 9;
+        this._cellSize = 64;
 
         this._data = Array(width * height).fill(0).map(() => ({}));
 
@@ -15,13 +15,16 @@ export default class ValueNoise {
         this._firstPointOfRows = [];
     }
 
-    generate() {
-
+    /**
+     * Creates the random data for the array based on `_width` and `_height`.
+     * It creates `point.x` and `point.y` based on the same dimensions.
+     * Also fills other lists with data that will be used to calculate the value noise.
+     */
+    _fillWithRandomData(){
         this._data.forEach((point, index) => {
             const x = index % this._width
             const y = Math.floor(index / this._width)
 
-            //print(x,y)
             point.index = index;
             point.x = x;
             point.y = y;
@@ -32,12 +35,16 @@ export default class ValueNoise {
                 this._rows[y].push(point);
 
                 point.value = Math.random();
-                //print(point)
                 this._corners.push(point);
             }
         });
-        //print(this._data);
-        //debugger;
+    }
+
+    generate() {
+
+
+
+        this._fillWithRandomData();
 
         for (const rowIndex in this._rows) {
             const row = this._rows[rowIndex];
@@ -66,58 +73,42 @@ export default class ValueNoise {
             // get first of each row
             this._firstPointOfRows.push(row[0]);
         }
-
-        print(this._firstPointOfRows);
-        //debugger;
-
-        //this._firstPointOfRows.forEach((point, index) => {
+;
         for (let index in this._firstPointOfRows) {
             if (Object.hasOwnProperty.call(this._firstPointOfRows, index)) {
-                print(index)
                 index = Number(index);
                 let point = this._firstPointOfRows[index];
 
                 let nextRowPoint = this._firstPointOfRows[index + 1];
-                print(1 + index)
+                let k = 0;
                 while (point && nextRowPoint) {
-
-                    if (nextRowPoint) {
-                        // get points in the middle
-                        const middlePoints = [];
-                        //let rightPoint = screen.getBottomPoint(point);
-                        let rightPoint = this._getBottomPoint(point);
-                        //print((rightPoint != nextRowPoint))
-                        while (rightPoint && rightPoint != nextRowPoint) {
-                            middlePoints.push(rightPoint);
-                            //rightPoint = screen.getBottomPoint(rightPoint);
-                            rightPoint = this._getBottomPoint(rightPoint);
-                            //console.log(0);
-                        }
-                        //console.log(middlePoints);
-
-
-                        const a = point.value;
-                        const b = nextRowPoint.value;
-
-                        middlePoints.forEach((middlePoint, index) => {
-                            const n = MathUtil.smoothstep(0, 1, (index + 1) / this._cellSize);
-                            const lerpBrightness = MathUtil.lerp(a, b, n);
-                            middlePoint.value = lerpBrightness;
-                            //print(middlePoint.value, a, b, n);
-                        });
-
+                    // get points in the middle
+                    const middlePoints = [];
+                    let rightPoint = this._getBottomPoint(point);
+                    while (rightPoint && rightPoint != nextRowPoint) {
+                        middlePoints.push(rightPoint);
+                        rightPoint = this._getBottomPoint(rightPoint);
                     }
+
+                    const a = point.value;
+                    const b = nextRowPoint.value;
+
+                    middlePoints.forEach((middlePoint, index) => {
+                        const n = MathUtil.smoothstep(0, 1, (index + 1) / this._cellSize);
+                        const lerpBrightness = MathUtil.lerp(a, b, n);
+                        middlePoint.value = lerpBrightness;
+                    });
 
                     point = this._getRightPoint(point);
                     nextRowPoint = this._getRightPoint(nextRowPoint);
+
+                    if (k++ == this._width - 1) {
+                        break;
+                    }
                 }
 
-                // if (index == 1) {
-                //     break;
-                // }
             }
         }
-        //});
     }
 
     _getRightPoint(point) {
