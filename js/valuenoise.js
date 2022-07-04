@@ -12,6 +12,20 @@ export default class ValueNoise {
         this._rows = {};
         this._corners = [];
         this._firstPointOfRows = [];
+
+        this._randomData = [];
+    }
+
+    get data() {
+        return this._data;
+    }
+
+    get cellSize() {
+        return this._cellSize;
+    }
+
+    set cellSize(value) {
+        this._cellSize = value;
     }
 
     /**
@@ -20,6 +34,9 @@ export default class ValueNoise {
      * Also fills other lists with data that will be used to calculate the value noise.
      */
     _fillWithRandomData() {
+        this._rows = {};
+        this._corners = [];
+        let randomDataIndex = 0;
         this._data.forEach((point, index) => {
             const x = index % this._width
             const y = Math.floor(index / this._width)
@@ -28,13 +45,24 @@ export default class ValueNoise {
             point.x = x;
             point.y = y;
             point.value = 0;
+
             if (x % this._cellSize == 0 && y % this._cellSize == 0) {
 
                 this._rows[y] = this._rows[y] || [];
                 this._rows[y].push(point);
 
-                point.value = Math.random();
+                const rx = x / this._cellSize;
+                const ry = y / this._cellSize;
+
+                randomDataIndex = rx + (ry * this._width);
+                let randomDatum = this._randomData[randomDataIndex];
+                if (!randomDatum) {
+                    randomDatum = this._randomData[randomDataIndex] = Math.random();
+                }
+                point.value = randomDatum;
                 this._corners.push(point);
+
+                ++randomDataIndex;
             }
         });
     }
@@ -44,6 +72,7 @@ export default class ValueNoise {
      * then interpolates color between them.
      */
     _createdSpacedPointsAndHorizontalInterpolation() {
+        this._firstPointOfRows = [];
         for (const rowIndex in this._rows) {
             const row = this._rows[rowIndex];
 

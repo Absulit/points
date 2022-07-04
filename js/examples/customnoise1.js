@@ -13,21 +13,33 @@ export default class CustomNoise1 {
 
         this._constant = screen.numColumns / 100;
 
-        const v = new ValueNoise(400, 400);
-        v.generate();
-        v._data.forEach(d => {
-            screen.getPointAt(d.x, d.y).setBrightness(d.value);
+        this._v = new ValueNoise(400, 400);
+        this._v.generate();
+        this._v.data.forEach(d => {
+            const point = screen.getPointAt(d.x, d.y);
+            if (point) {
+                point.setBrightness(d.value);
+            }
         });
     }
 
 
 
-    update({ fnucos, sliders }) {
+    update({ fnucos, sliders, fnusin }) {
 
         const screen = this._screen;
         //screen.clear();
 
+        //this._v.cellSize = 9 + Math.floor(sliders.a * 128) //Math.floor(9 * fnusin(1))
+        this._v.cellSize = 9 + Math.floor(128 * fnusin(1))
 
+        this._v.generate();
+        this._v.data.forEach(d => {
+            const point = screen.getPointAt(d.x, d.y);
+            if (point) {
+                point.setBrightness(d.value);
+            }
+        });
 
         //this._effects.chromaticAberration(.05, 2);
         //this._effects.fire(1);
