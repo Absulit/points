@@ -21,6 +21,15 @@ export default class CustomNoise1 {
                 point.setBrightness(d.value);
             }
         });
+
+        this._v2 = new ValueNoise(400, 400);
+        this._v2.generate();
+        this._v2.data.forEach(d => {
+            const point = screen.getPointAt(d.x, d.y);
+            if (point) {
+                point.setBrightness(d.value);
+            }
+        });
     }
 
 
@@ -30,14 +39,16 @@ export default class CustomNoise1 {
         const screen = this._screen;
         //screen.clear();
 
-        //this._v.cellSize = 9 + Math.floor(sliders.a * 128) //Math.floor(9 * fnusin(1))
-        this._v.cellSize = 9 + Math.floor(128 * fnusin(1))
+        this._v.cellSize = 9 + Math.floor(sliders.a * 128) //Math.floor(9 * fnusin(1))
+        this._v2.cellSize = 9 + Math.floor( .2 * 128) //Math.floor(9 * fnusin(1))
+        //this._v.cellSize = 9 + Math.floor(128 * fnusin(1))
 
         this._v.generate();
-        this._v.data.forEach(d => {
+        this._v.data.forEach( (d, index) => {
+            const d2 = this._v.data[index];
             const point = screen.getPointAt(d.x, d.y);
             if (point) {
-                point.setBrightness(d.value);
+                point.setBrightness(d.value * d2.value);
             }
         });
 

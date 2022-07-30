@@ -93,6 +93,7 @@ export default class ValueNoise {
                     middlePoints.forEach((middlePoint, index) => {
                         const n = MathUtil.smoothstep(0, 1, (index + 1) / this._cellSize);
                         const lerpBrightness = MathUtil.lerp(a, b, n);
+                        //const lerpBrightness = MathUtil.lerp(a, b, (index + 1) / this._cellSize);
                         middlePoint.value = lerpBrightness;
                     });
                 }

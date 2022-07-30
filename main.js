@@ -142,8 +142,8 @@ let effects;
 
 const sliders = { 'a': 0, 'b': 0, 'c': 0 }
 
-let side = 128;
-let numLayers = 2;
+let side = 100;
+let numLayers = 4;
 let numColumns = side;
 let numRows = side;
 let numMargin = 0;
@@ -179,22 +179,22 @@ function update() {
     shaderUniformToBuffer('u_time', utime);
 
     cache.update(() => {
-        utime += 1 / 60;//0.01;
+        utime += 0.01666;//1 / 60;//0.01666;
         uround = Math.round(utime);
         usin = Math.sin(utime);
         ucos = Math.cos(utime);
         urounddec = utime % 1;
-        nusin = (Math.sin(utime) + 1) / 2;
-        nucos = (Math.cos(utime) + 1) / 2;
+        nusin = (Math.sin(utime) + 1) * .5;
+        nucos = (Math.cos(utime) + 1) * .5;
 
         fusin = speed => Math.sin(utime * speed);
         fucos = speed => Math.cos(utime * speed);
 
-        fnusin = speed => (Math.sin(utime * speed) + 1) / 2;
-        fnucos = speed => (Math.cos(utime * speed) + 1) / 2;
+        fnusin = speed => (Math.sin(utime * speed) + 1) * .5;
+        fnucos = speed => (Math.cos(utime * speed) + 1) * .5;
 
-        fnsin = speed => (Math.sin(speed) + 1) / 2;
-        fncos = speed => (Math.cos(speed) + 1) / 2;
+        fnsin = speed => (Math.sin(speed) + 1) * .5;
+        fncos = speed => (Math.cos(speed) + 1) * .5;
 
 
         screen.layerIndex = 0;//--------------------------- LAYER 0
