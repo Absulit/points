@@ -19,3 +19,23 @@ class Utils {
 export default Utils;
 
 export const print = (...s) => console.log(s);
+
+/**
+ * Creating a deprecated / obsolete behavior for methods in a library.
+ * [Credits]{@link: https://stackoverflow.com/q/21726472/1333836}
+ * 
+ * @param  {function} replacementFunction
+ * @param  {string} oldFnName
+ * @param  {string} newFnName
+ * @return {function}
+ */
+export const obsolete = function (replacementFunction, oldFnName, newFnName) {
+    const wrapper = function () {
+        console.warn("WARNING! Obsolete function called. Function '" + oldFnName + "' has been deprecated, please use the new '" + newFnName + "' function instead!");
+
+        replacementFunction.apply(this, arguments);
+    }
+    wrapper.prototype = replacementFunction.prototype;
+
+    return wrapper;
+}

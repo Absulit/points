@@ -100,7 +100,8 @@ import Slime3 from './js/examples/slime3.js';
 import CustomNoise1 from './js/examples/customnoise1.js';
 import CustomNoise2 from './js/examples/customnoise2.js';
 import CustomNoise3 from './js/examples/customnoise3.js';
-import ColorHSV_HSL from './js/examples/ColorHSV_HSL.js';
+import ColorHSV_HSL_1 from './js/examples/ColorHSV_HSL_1.js';
+import ColorHSV_HSL_2 from './js/examples/ColorHSV_HSL_2.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -161,7 +162,7 @@ function init() {
 
     cache = new Cache(60 * 10);
 
-    demo = new ColorHSV_HSL(screen);
+    demo = new ColorHSV_HSL_2(screen);
 
     effects = new Effects(screen);
 

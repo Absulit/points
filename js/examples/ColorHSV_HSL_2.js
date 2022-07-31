@@ -6,7 +6,7 @@ import MathUtil from '../mathutil.js';
 import Screen from '../screen.js';
 import { print } from '../utils.js';
 
-export default class ColorHSV_HSL {
+export default class ColorHSV_HSL_2 {
     /**
      * 
      * @param {Screen} screen 
@@ -20,8 +20,8 @@ export default class ColorHSV_HSL {
 
 
         this._imageLoader = new ImageLoader(screen);
-        //this._imageLoader.load('/assets_ignore/absulit_800x800.jpg');
-        this._imageLoader.load('/assets_ignore/tucan_jcvp_800x800.jpg');
+        this._imageLoader.load('/assets_ignore/absulit_800x800.jpg');
+        //this._imageLoader.load('/assets_ignore/tucan_jcvp_800x800.jpg');
         this._imageLoader.type = ImageLoader.FIT;
 
         screen.layerIndex = 0;
@@ -79,10 +79,12 @@ export default class ColorHSV_HSL {
 
         screen.points.forEach(point => {
             const { x: nx, y: ny } = point.normalPosition;
-            const { h, s, v } = point.color.toHSV();
-            const { r, g, b } = RGBAColor.fromHSV(nx * .1 + h * fnusin(2), s, v);
-            //const { r, g, b } = RGBAColor.fromHSV(nx * .1 + h * sliders.a, s, v);
-            point.setColor(r, g, b)
+
+            point.modifyColor(color => {
+                const { h, s, v } = color.toHSV();
+                const { r, g, b } = RGBAColor.fromHSV(nx * .5 + h * fnusin(2), s, v);
+                color.set(r, g, b);
+            });
         });
 
         //this._effects.chromaticAberration(.05, 2);

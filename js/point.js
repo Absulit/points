@@ -23,12 +23,24 @@ class Point {
         return this._color;
     }
 
+    /**
+     * @deprecated to be deprecated in favor of `modifyColor`
+     * @param {*} value 
+     */
     set color(value) {
+        
         this._color = value;
         this._modified = true;
         this._layer.setColor(this._coordinates, this._color);
     }
 
+    /**
+     * @deprecated to be deprecated in favor of `modifyColor`
+     * @param {*} r 
+     * @param {*} g 
+     * @param {*} b 
+     * @param {*} a 
+     */
     setColor(r, g, b, a = 1) {
         this._color.set(r, g, b, a);
         this._modified = true;
@@ -45,6 +57,10 @@ class Point {
         this._layer.setColor(this._coordinates, this._color);
     }
 
+    /**
+     * @deprecated to be deprecated in favor of `modifyColor`
+     * @param {*} value 
+     */
     setRGBAColor(value) {
         if (value) {
             const { r, g, b, a } = value;
@@ -54,16 +70,28 @@ class Point {
         }
     }
 
+    /**
+     * @deprecated to be deprecated in favor of `modifyColor`
+     * @param {*} value 
+     */
     setBrightness(value) {
         this._color.brightness = value;
         this._modified = true;
         this._layer.setColor(this._coordinates, this._color);
     }
 
+    /**
+     * @deprecated to be deprecated in favor of `modifyColor`
+     * @param {*} value 
+     */
     getBrightness() {
         return this._color.brightness;
     }
 
+    /**
+     * @deprecated to be deprecated in favor of `modifyColor`
+     * @param {*} value 
+     */
     addColor(color) {
         this._color.add(color);
         this._modified = true;
