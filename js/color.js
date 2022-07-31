@@ -132,10 +132,10 @@ class RGBAColor {
         for (let index = 0; index < colors.length; index++) {
             const color = colors[index];
             //if (!color.isNull()) {
-                r += color.r * color.r;
-                g += color.g * color.g;
-                b += color.b * color.b;
-                //a += color.a * color.a;
+            r += color.r * color.r;
+            g += color.g * color.g;
+            b += color.b * color.b;
+            //a += color.a * color.a;
             //}
         }
         return new RGBAColor(
@@ -199,6 +199,34 @@ class RGBAColor {
         })
         return selectedColor;
     }
+
+    // made from this answer: https://stackoverflow.com/questions/2348597/why-doesnt-this-javascript-rgb-to-hsl-code-work
+    /**
+     * Create RGBAColor from hsv values
+     * @param {Number} h Hue
+     * @param {Number} s Saturation
+     * @param {Number} v Value
+     * @returns {RGBAColor} `RGBAColor`
+     */
+    static fromHSV(h, s, v) {
+        return new RGBAColor(hsvAux(h, s, v, 5), hsvAux(h, s, v, 3), hsvAux(h, s, v, 1), 1);
+    }
+
+    toHSV() {
+        const [r, g, b, a] = this._value
+        const v = Math.max(r, g, b), c = v - Math.min(r, g, b);
+        const h = c && ((v == r) ? (g - b) / c : ((v == g) ? 2 + (b - r) / c : 4 + (r - g) / c));
+        return { h: 60 * (h < 0 ? h + 6 : h)/360, s: v && c / v, v: v };
+    }
+}
+
+const hsvAux = (h, s, v, n) => {
+    const k = (n + h * 6) % 6
+    return v - v * s * Math.max(Math.min(k, 4 - k, 1), 0)
+};
+
+export function RGBFromHSV(h, s, v) {
+    return {r: hsvAux(h, s, v, 5), g: hsvAux(h, s, v, 3), b: hsvAux(h, s, v, 1)};
 }
 
 export default RGBAColor;
