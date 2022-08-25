@@ -92,6 +92,14 @@ class MathUtil {
         return x * x * (3 - 2 * x);
     }
 
+    /**
+     * Fraction of a Float number
+     * @param {Number} value number with a decimal fraction
+     * @returns the value beyond the point `.`
+     */
+    static fraction(value) {
+        return value % 1
+    }
 }
 
 export default MathUtil;
