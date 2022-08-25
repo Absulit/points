@@ -25,10 +25,10 @@ class Point {
 
     /**
      * @deprecated to be deprecated in favor of `modifyColor`
-     * @param {*} value 
+     * @param {*} value
      */
     set color(value) {
-        
+
         this._color = value;
         this._modified = true;
         this._layer.setColor(this._coordinates, this._color);
@@ -36,10 +36,10 @@ class Point {
 
     /**
      * @deprecated to be deprecated in favor of `modifyColor`
-     * @param {*} r 
-     * @param {*} g 
-     * @param {*} b 
-     * @param {*} a 
+     * @param {*} r
+     * @param {*} g
+     * @param {*} b
+     * @param {*} a
      */
     setColor(r, g, b, a = 1) {
         this._color.set(r, g, b, a);
@@ -49,7 +49,7 @@ class Point {
 
     /**
      * To modify directly each color
-     * @param {Function} lambda with `Color` parameter
+     * @param {function(RGBAColor):void} lambda with `Color` parameter
      */
     modifyColor(lambda) {
         lambda(this._color);
@@ -59,7 +59,7 @@ class Point {
 
     /**
      * @deprecated to be deprecated in favor of `modifyColor`
-     * @param {*} value 
+     * @param {*} value
      */
     setRGBAColor(value) {
         if (value) {
@@ -72,7 +72,7 @@ class Point {
 
     /**
      * @deprecated to be deprecated in favor of `modifyColor`
-     * @param {*} value 
+     * @param {*} value
      */
     setBrightness(value) {
         this._color.brightness = value;
@@ -82,7 +82,7 @@ class Point {
 
     /**
      * @deprecated to be deprecated in favor of `modifyColor`
-     * @param {*} value 
+     * @param {*} value
      */
     getBrightness() {
         return this._color.brightness;
@@ -90,7 +90,7 @@ class Point {
 
     /**
      * @deprecated to be deprecated in favor of `modifyColor`
-     * @param {*} value 
+     * @param {*} value
      */
     addColor(color) {
         this._color.add(color);

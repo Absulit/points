@@ -177,6 +177,9 @@ class Screen {
         return this._currentLayer.rows;
     }
 
+    /**
+     * @return {Array<Point>}
+     */
     get points() {
         return this._currentLayer.points;
     }
