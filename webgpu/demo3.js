@@ -32,16 +32,19 @@ async function init() {
         canvas.clientWidth * devicePixelRatio,
         canvas.clientHeight * devicePixelRatio,
     ];
-    const presentationFormat = context.getPreferredFormat(adapter);
+
+    const presentationFormat = navigator.gpu.getPreferredCanvasFormat()
 
     context.configure({
         device,
         format: presentationFormat,
-        size: presentationSize,
-        compositingAlphaMode: "opaque",
+        width: canvas.clientWidth,
+        height: canvas.clientHeight,
+        alphaMode: "opaque",
     });
 
     pipeline = device.createRenderPipeline({
+        layout: 'auto',
         vertex: {
             module: device.createShaderModule({
                 code: triangleVertWGSL,
