@@ -7,7 +7,7 @@ import Screen from '../screen.js';
 import { print } from '../utils.js';
 import ValueNoise from '../valuenoise.js';
 
-export default class ContinuosCircles {
+export default class ContinuosCircles2 {
     /**
      * 
      * @param {Screen} screen 
@@ -20,6 +20,9 @@ export default class ContinuosCircles {
         this._constant = screen.numColumns / 100;
 
 
+        this._noiseMin = 0.157
+        this._noiseMax = 1.0;
+        this._noiseDiff = this._noiseMax = this._noiseMin;
 
         screen.layerIndex = 0;//--------------------------- LAYER 0
         this._v = new ValueNoise(200, 200);
@@ -39,21 +42,21 @@ export default class ContinuosCircles {
 
         const screen = this._screen;
 
-        // screen.layerIndex = 0;//--------------------------- LAYER 0
-        // //this._v.cellSize = 9 + Math.floor(sliders.a * 128) //Math.floor(9 * fnusin(1))
-        // this._v.cellSize = 14 + Math.floor(fnusin(8) * 5) //Math.floor(9 * fnusin(1))
-        // this._v.generate();
-        // this._v.data.forEach( (d, index) => {
-        //     const d2 = this._v.data[index];
-        //     const point = screen.getPointAt(d.x, d.y);
-        //     if (point) {
-        //         point.setBrightness(d.value * d2.value);
-        //     }
-        // });
+        screen.layerIndex = 0;//--------------------------- LAYER 0
+        //this._v.cellSize = Math.floor(sliders.a * 128)
+        this._v.cellSize = Math.floor((this._noiseMin + fnusin(6) * this._noiseDiff) * 128) //Math.floor(9 * fnusin(1))
+        this._v.generate();
+        this._v.data.forEach((d, index) => {
+            const d2 = this._v.data[index];
+            const point = screen.getPointAt(d.x, d.y);
+            if (point) {
+                point.setBrightness(d.value * d2.value);
+            }
+        });
 
         screen.layerIndex = 1;//--------------------------- LAYER 1
         screen.points.forEach(point => {
-            const {x:nx, y:ny} = point.normalPosition;
+            const { x: nx, y: ny } = point.normalPosition;
             const coordinatesClone = point.coordinates.clone();
             // coordinatesClone.x *= 2;
             // coordinatesClone.y *= 2;
@@ -68,7 +71,7 @@ export default class ContinuosCircles {
                 //color.brightness =  point0.getBrightness() * distance;
                 //color.brightness = distance
 
-                color.set(distance * nx, distance * ny, );
+                color.set(noise + distance * distance * nx * (1 - ny), noise * noise - distance * distance * ny * ny, 0);
             });
         });
 
@@ -79,6 +82,6 @@ export default class ContinuosCircles {
         //this._effects.antialias();
         //this._screen.clearMix(this._clearMixColor, 1.001);
         //this._screen.clearAlpha(1.001);
-        //this._effects.orderedDithering();
+        //this._effects.orderedDithering(32);
     }
 }
