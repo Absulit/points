@@ -94,18 +94,14 @@ async function init() {
     if (canvas === null) return;
     context = canvas.getContext('webgpu');
 
-    const devicePixelRatio = window.devicePixelRatio || 1;
-    const presentationSize = [
-        canvas.clientWidth * devicePixelRatio,
-        canvas.clientHeight * devicePixelRatio,
-    ];
-    const presentationFormat = context.getPreferredFormat(adapter);
+    const presentationFormat = navigator.gpu.getPreferredCanvasFormat()
 
     context.configure({
         device,
         format: presentationFormat,
-        size: presentationSize,
-        compositingAlphaMode: 'premultiplied',
+        width: canvas.clientWidth,
+        height: canvas.clientHeight,
+        alphaMode: 'premultiplied',
     });
 
     // Create a vertex buffer from the triangle data.
