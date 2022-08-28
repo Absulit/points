@@ -110,7 +110,7 @@ export default class WebGPU {
             device: this._device,
             format: this._presentationFormat,
             //size: this._presentationSize,
-            compositingAlphaMode: 'premultiplied',
+            alphaMode: 'premultiplied',
         });
 
         this._depthTexture = this._device.createTexture({
@@ -225,7 +225,7 @@ export default class WebGPU {
 
         });
 
-        this._computePipeline = this._device.createComputePipeline({
+        /*this._computePipeline = this._device.createComputePipeline({
             layout: 'auto',
             compute: {
                 module: this._device.createShaderModule({
@@ -240,7 +240,7 @@ export default class WebGPU {
             entries: [
 
             ],
-        });
+        });*/
 
 
 
@@ -337,13 +337,13 @@ export default class WebGPU {
             passEncoder.draw(this._vertexBufferInfo.vertexCount);
             passEncoder.end();
         }
-        {
+        /*{
             const passEncoder = commandEncoder.beginComputePass();
             passEncoder.setPipeline(this._computePipeline);
             passEncoder.setBindGroup(0, this._computeBindGroups);
             passEncoder.dispatchWorkgroups(0);
             passEncoder.end();
-        }
+        }*/
         this._device.queue.submit([commandEncoder.finish()]);
 
         //
