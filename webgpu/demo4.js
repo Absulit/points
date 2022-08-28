@@ -27,13 +27,13 @@ document.body.appendChild(stats.dom);
 
 const vertexArray = new Float32Array([
     // float4 position, float4 color,
-    1,1,0.0, 1,     1, 0, 0, 1,   // there are 8 items in this row, that's why vertexSize is 4*8
-    1,-1,0.0, 1,    0, 1, 0, 1,
-    -1,-1,0.0, 1,   0, 0, 1, 1,
+    1, 1, 0.0, 1, 1, 0, 0, 1,   // there are 8 items in this row, that's why vertexSize is 4*8
+    1, -1, 0.0, 1, 0, 1, 0, 1,
+    -1, -1, 0.0, 1, 0, 0, 1, 1,
 
-    1,1,0.0,1,    1, 0, 0, 1,
-    -1,-1,0.0,1,  0, 0, 1, 1,
-    -1,1,0.0,1,   1, 1, 0, 1,
+    1, 1, 0.0, 1, 1, 0, 0, 1,
+    -1, -1, 0.0, 1, 0, 0, 1, 1,
+    -1, 1, 0.0, 1, 1, 1, 0, 1,
 ]);
 
 
@@ -56,15 +56,18 @@ async function init() {
         canvas.clientWidth * devicePixelRatio,
         canvas.clientHeight * devicePixelRatio,
     ];
-    const presentationFormat = context.getPreferredFormat(adapter);
+
+    const presentationFormat = navigator.gpu.getPreferredCanvasFormat()
 
     presentationFormat
 
     context.configure({
         device,
         format: presentationFormat,
-        size: presentationSize,
-        compositingAlphaMode: 'premultiplied',
+        //size: presentationSize,
+        width:canvas.clientWidth,
+        height:canvas.clientHeight,
+        alphaMode: 'premultiplied',
     });
 
     // Create a vertex buffer from the triangle data.
@@ -78,6 +81,7 @@ async function init() {
 
 
     pipeline = device.createRenderPipeline({
+        layout: 'auto',
         vertex: {
             module: device.createShaderModule({
                 code: triangleVertWGSL,
