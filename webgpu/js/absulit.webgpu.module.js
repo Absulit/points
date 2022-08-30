@@ -140,6 +140,14 @@ export default class WebGPU {
         return this._buffer;
     }
 
+    createUnmappedBuffer(vertexArray){
+        const gpuReadBuffer = this._device.createBuffer({
+            size: vertexArray.byteLength,
+            usage: GPUBufferUsage.MAP_WRITE | GPUBufferUsage.COPY_SRC,
+            label: 'gpuWriteBuffer'
+        });
+    }
+
     // TODO: lo que tengo que hacer es modificar el buffer
 
 
