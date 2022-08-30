@@ -26,7 +26,7 @@ export default class ContinuosCircles2 {
 
         screen.layerIndex = 0;//--------------------------- LAYER 0
         this._v = new ValueNoise(200, 200);
-        this._v.cellSize = 19;
+        this._v.cellSize = Math.floor(this._noiseMax * 128);
         this._v.generate();
         this._v.data.forEach(d => {
             const point = screen.getPointAt(d.x, d.y);
@@ -42,17 +42,17 @@ export default class ContinuosCircles2 {
 
         const screen = this._screen;
 
-        screen.layerIndex = 0;//--------------------------- LAYER 0
-        //this._v.cellSize = Math.floor(sliders.a * 128)
-        this._v.cellSize = Math.floor((this._noiseMin + fnusin(6) * this._noiseDiff) * 128) //Math.floor(9 * fnusin(1))
-        this._v.generate();
-        this._v.data.forEach((d, index) => {
-            const d2 = this._v.data[index];
-            const point = screen.getPointAt(d.x, d.y);
-            if (point) {
-                point.setBrightness(d.value * d2.value);
-            }
-        });
+        //screen.layerIndex = 0;//--------------------------- LAYER 0
+        //this._v.cellSize = Math.floor(this._noiseMax * 128)
+        //this._v.cellSize = Math.floor((this._noiseMin + fnusin(6) * this._noiseDiff) * 128) //Math.floor(9 * fnusin(1))
+        // this._v.generate();
+        // this._v.data.forEach((d, index) => {
+        //     const d2 = this._v.data[index];
+        //     const point = screen.getPointAt(d.x, d.y);
+        //     if (point) {
+        //         point.setBrightness(d.value * d2.value);
+        //     }
+        // });
 
         screen.layerIndex = 1;//--------------------------- LAYER 1
         screen.points.forEach(point => {
