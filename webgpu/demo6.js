@@ -57,28 +57,8 @@ async function init() {
     const initialized = await webGPU.init();
     if (initialized) {
         //webGPU.createVertexBuffer(vertexArray);
-        let colors = [
-            new RGBAColor(1, 0, 0),
-            new RGBAColor(0, 1, 0),
-            new RGBAColor(0, 0, 1),
-            new RGBAColor(1, 1, 0),
-        ];
+        await webGPU.createScreen(numColumns, numRows);
 
-
-        for (let xIndex = 0; xIndex < numRows; xIndex++) {
-            for (let yIndex = 0; yIndex < numColumns; yIndex++) {
-                const coordinate = new Coordinate(xIndex * webGPU._canvas.clientWidth / side, yIndex * webGPU._canvas.clientHeight / side, .3);
-                webGPU.addPoint(coordinate, webGPU._canvas.clientWidth / side, webGPU._canvas.clientHeight / side, colors);
-
-            }
-
-        }
-        webGPU.createVertexBuffer(new Float32Array(webGPU._vertexArray));
-        print(webGPU._vertexArray)
-        await webGPU.createPipeline();
-
-
-        const dataArray = [1, 0, 1, 1];
         // va = new Float32Array(dataArray)
         // gpuWriteBuffer = webGPU._device.createBuffer({
         //     mappedAtCreation: true,
@@ -99,10 +79,6 @@ async function init() {
         buffers = [gpuWriteBuffer1, gpuWriteBuffer2, gpuWriteBuffer3];
     }
     await update();
-}
-
-function changePointColor(){
-
 }
 
 async function update() {
@@ -134,7 +110,7 @@ async function update() {
     for (let indexColumn = 0; indexColumn < numColumns; indexColumn++) {
         for (let indexRow = 0; indexRow < numRows; indexRow++) {
 
-            webGPU.modifyPointColor2(new Coordinate(indexColumn, indexRow), buffers[ Math.floor( Math.random() * 3 ) ], numColumns)
+            webGPU.modifyPointColor2(new Coordinate(indexColumn, indexRow), buffers[ Math.floor( Math.random() * 3 ) ])
         }
     }
 
@@ -143,7 +119,7 @@ async function update() {
 
     webGPU.update();
 
-
+    
     stats.end();
 
     capturer.capture(document.getElementById('gl-canvas'));

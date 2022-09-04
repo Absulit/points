@@ -1,6 +1,7 @@
 import Coordinate from './coordinate.js';
 import { getShaderSource } from '../shader_loader.js';
 import RGBAColor from './color.js';
+import { print } from '../../js/utils.js';
 
 export class VertexBufferInfo {
     /**
@@ -59,8 +60,14 @@ export default class WebGPU {
         this._computeBindGroups = null;
         this._presentationSize = null;
         this._depthTexture = null;
+        this._commandEncoder = null;
 
         this._vertexArray = [];
+
+        this._numColumns = null;
+        this._numRows = null;
+
+        this._commandsFinished = [];
     }
 
     async init() {
@@ -120,6 +127,35 @@ export default class WebGPU {
         });
 
         return true;
+    }
+
+    /**
+     * 
+     * @param {Number} numColumns 
+     * @param {Number} numRows 
+     */
+    async createScreen(numColumns = 10, numRows = 10){
+        let colors = [
+            new RGBAColor(1, 0, 0),
+            new RGBAColor(0, 1, 0),
+            new RGBAColor(0, 0, 1),
+            new RGBAColor(1, 1, 0),
+        ];
+
+        this._numColumns = numColumns;
+        this._numRows = numRows;
+
+        for (let xIndex = 0; xIndex < numRows; xIndex++) {
+            for (let yIndex = 0; yIndex < numColumns; yIndex++) {
+                const coordinate = new Coordinate(xIndex * this._canvas.clientWidth / this._numColumns, yIndex * this._canvas.clientHeight / this._numRows, .3);
+                this.addPoint(coordinate, this._canvas.clientWidth / this._numColumns, this._canvas.clientHeight / this._numRows, colors);
+
+            }
+
+        }
+        this.createVertexBuffer(new Float32Array(this._vertexArray));
+        print(this._vertexArray);
+        await this.createPipeline();
     }
 
     /**
@@ -361,7 +397,9 @@ export default class WebGPU {
             passEncoder.dispatchWorkgroups(0);
             passEncoder.end();
         }*/
-        this._device.queue.submit([commandEncoder.finish()]);
+        this._commandsFinished.push(commandEncoder.finish());
+        this._device.queue.submit(this._commandsFinished);
+        this._commandsFinished = [];
 
         //
         //this._vertexArray = [];
@@ -427,12 +465,12 @@ export default class WebGPU {
      * @param {Coordinate} coordinate 
      * @param {*} buffer 
      */
-    modifyPointColor2(coordinate, gpuWriteBuffer, numColumns){
+    modifyPointColor2(coordinate, gpuWriteBuffer){
         const { x, y, z } = coordinate;
-        const coordinateValue = coordinate.value;
+        //const coordinateValue = coordinate.value;
         //const colorValue = color.value;
 
-        const index = y + (x * numColumns);
+        const index = y + (x * this._numColumns);
 
         const commandEncoder = this._device.createCommandEncoder();
         for (let vertexIndex = 0; vertexIndex < 6; vertexIndex++) {
@@ -446,7 +484,8 @@ export default class WebGPU {
         }
     
         const copyCommands = commandEncoder.finish();
-        this._device.queue.submit([copyCommands]);
+        this._commandsFinished.push(copyCommands);
+        //this._device.queue.submit([copyCommands]);
     }
 
     get canvas() {
