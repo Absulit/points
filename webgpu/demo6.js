@@ -41,7 +41,16 @@ let ucos;
 let urounddec;
 let nusin;
 
-let gpuWriteBuffer;
+let side = 100;
+let numColumns = side;
+let numRows = side;
+
+let gpuWriteBuffer1;
+let gpuWriteBuffer2;
+let gpuWriteBuffer3;
+
+let buffers;
+
 let va;
 
 async function init() {
@@ -54,11 +63,6 @@ async function init() {
             new RGBAColor(0, 0, 1),
             new RGBAColor(1, 1, 0),
         ];
-
-        let side = 1;
-        let numColumns = side;
-        let numRows = side;
-
 
 
         for (let xIndex = 0; xIndex < numRows; xIndex++) {
@@ -74,23 +78,31 @@ async function init() {
         await webGPU.createPipeline();
 
 
-        const dataArray = [0, 1, 1, 1];
-        va = new Float32Array(dataArray)
-        gpuWriteBuffer = webGPU._device.createBuffer({
-            mappedAtCreation: true,
-            size: va.byteLength,
-            usage: GPUBufferUsage.MAP_WRITE | GPUBufferUsage.COPY_SRC
-        });
-        const arrayBuffer = gpuWriteBuffer.getMappedRange();
+        const dataArray = [1, 0, 1, 1];
+        // va = new Float32Array(dataArray)
+        // gpuWriteBuffer = webGPU._device.createBuffer({
+        //     mappedAtCreation: true,
+        //     size: va.byteLength,
+        //     usage: GPUBufferUsage.MAP_WRITE | GPUBufferUsage.COPY_SRC
+        // });
+        // const arrayBuffer = gpuWriteBuffer.getMappedRange();
 
-        // Write bytes to buffer.
-        new Float32Array(arrayBuffer).set(va);
+        // // Write bytes to buffer.
+        // new Float32Array(arrayBuffer).set(va);
 
-        // Unmap buffer so that it can be used later for copy.
-        gpuWriteBuffer.unmap();
+        // // Unmap buffer so that it can be used later for copy.
+        // gpuWriteBuffer.unmap();
 
+        gpuWriteBuffer1 = webGPU.createWriteCopyBuffer([1, 0, 0, 1]);
+        gpuWriteBuffer2 = webGPU.createWriteCopyBuffer([0, 1, 0, 1]);
+        gpuWriteBuffer3 = webGPU.createWriteCopyBuffer([0, 0, 1, 1]);
+        buffers = [gpuWriteBuffer1, gpuWriteBuffer2, gpuWriteBuffer3];
     }
     await update();
+}
+
+function changePointColor(){
+
 }
 
 async function update() {
@@ -102,60 +114,32 @@ async function update() {
     urounddec = utime % 1;
     nusin = (Math.sin(utime) + 1) * .5;
 
-    // TODO: modificar buffer?
-    // let bufferTest = webGPU.device.createBuffer({
-    //     size: vertexArray.byteLength,
-    //     usage: GPUBufferUsage.STORAGE,
-    //     mappedAtCreation: true,
-    // });
-    // new Float32Array(bufferTest.getMappedRange()).set(vertexArray);
-    // bufferTest.unmap();
-    //
-
-    // for (let index = 0; index < 1000; index++) {
-    //     const x = Math.floor(Math.random() * 100);
-    //     const y = Math.floor(Math.random() * 100);
-    //     webGPU.modifyPointColor(new Coordinate(x,y,0), new RGBAColor(nusin,0,0));
+    // const commandEncoder = webGPU._device.createCommandEncoder();
+    // const x = 1;
+    // const y = 1;
+    // const numColumns = 2;
+    // const index = y + (x * numColumns);
+    // for (let vertexIndex = 0; vertexIndex < 6; vertexIndex++) {
+    //     commandEncoder.copyBufferToBuffer(
+    //         gpuWriteBuffer /* source buffer */,
+    //         0 /* source offset */,
+    //         webGPU._buffer /* destination buffer */,
+    //         4*(vertexIndex * 10 + index*60 + 4)/* destination offset */, //4 * (index * 10 + 4)
+    //         gpuWriteBuffer.size/* size */
+    //     );
     // }
+    // const copyCommands = commandEncoder.finish();
+    // webGPU._device.queue.submit([copyCommands]);
 
+    for (let indexColumn = 0; indexColumn < numColumns; indexColumn++) {
+        for (let indexRow = 0; indexRow < numRows; indexRow++) {
 
-    // webGPU.modifyPointColor(new Coordinate(50, 50), new RGBAColor(1,0,0));
-    // webGPU.modifyPointColor(new Coordinate(11,9), new RGBAColor(1,0,0));
-
-
-    // webGPU.createVertexBuffer(new Float32Array(webGPU._vertexArray));
-    // webGPU.createUnmappedBuffer(new Float32Array(webGPU._vertexArray));
-
-    //let t = webGPU._buffer.getMappedRange();
-    // new Float32Array(webGPU._buffer.getMappedRange()).set(new Float32Array(webGPU._vertexArray));
-    // webGPU._buffer.unmap();
-
-
-    //await webGPU.createPipeline();
-
-    const commandEncoder = webGPU._device.createCommandEncoder();
-
-    commandEncoder.copyBufferToBuffer(
-        gpuWriteBuffer /* source buffer */,
-        0 /* source offset */,
-        webGPU._buffer /* destination buffer */,
-        4*(4 * 10 + 4)/* destination offset */, //4 * (index * 10 + 4)
-        va.byteLength /* size */
-    );
-
-    commandEncoder.copyBufferToBuffer(
-        gpuWriteBuffer /* source buffer */,
-        0 /* source offset */,
-        webGPU._buffer /* destination buffer */,
-        4*(0 * 10 + 4)/* destination offset */, //4 * (index * 10 + 4)
-        va.byteLength /* size */
-    );
+            webGPU.modifyPointColor2(new Coordinate(indexColumn, indexRow), buffers[ Math.floor( Math.random() * 3 ) ], numColumns)
+        }
+    }
 
 
 
-
-    const copyCommands = commandEncoder.finish();
-    webGPU._device.queue.submit([copyCommands]);
 
     webGPU.update();
 

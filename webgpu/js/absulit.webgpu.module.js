@@ -140,17 +140,26 @@ export default class WebGPU {
         return this._buffer;
     }
 
-    createUnmappedBuffer(vertexArray){
-        const gpuReadBuffer = this._device.createBuffer({
-            size: vertexArray.byteLength,
-            usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
-            label: 'gpuReadBuffer'
+    /**
+     * 
+     * @param {Array} data 
+     */
+    createWriteCopyBuffer(data){
+        const va = new Float32Array(data)
+        const gpuWriteBuffer = this._device.createBuffer({
+            mappedAtCreation: true,
+            size: va.byteLength,
+            usage: GPUBufferUsage.MAP_WRITE | GPUBufferUsage.COPY_SRC
         });
+        const arrayBuffer = gpuWriteBuffer.getMappedRange();
+
+        // Write bytes to buffer.
+        new Float32Array(arrayBuffer).set(va);
+
+        // Unmap buffer so that it can be used later for copy.
+        gpuWriteBuffer.unmap();
+        return gpuWriteBuffer;
     }
-
-    // TODO: lo que tengo que hacer es modificar el buffer
-
-
 
 
     async createPipeline() {
@@ -412,6 +421,32 @@ export default class WebGPU {
             this._vertexArray[rowIndex + index * 60 + 7] = a;
         }
 
+    }
+    /**
+     * 
+     * @param {Coordinate} coordinate 
+     * @param {*} buffer 
+     */
+    modifyPointColor2(coordinate, gpuWriteBuffer, numColumns){
+        const { x, y, z } = coordinate;
+        const coordinateValue = coordinate.value;
+        //const colorValue = color.value;
+
+        const index = y + (x * numColumns);
+
+        const commandEncoder = this._device.createCommandEncoder();
+        for (let vertexIndex = 0; vertexIndex < 6; vertexIndex++) {
+            commandEncoder.copyBufferToBuffer(
+                gpuWriteBuffer /* source buffer */,
+                0 /* source offset */,
+                this._buffer /* destination buffer */,
+                4*(vertexIndex * 10 + index*60 + 4)/* destination offset */, //4 * (index * 10 + 4)
+                gpuWriteBuffer.size /* size */
+            );
+        }
+    
+        const copyCommands = commandEncoder.finish();
+        this._device.queue.submit([copyCommands]);
     }
 
     get canvas() {
