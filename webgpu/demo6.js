@@ -6,7 +6,7 @@ import Coordinate from './js/coordinate.js';
 /***************/
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
-document.body.appendChild(stats.dom);
+//document.body.appendChild(stats.dom);
 
 let capturer = new CCapture({
     format: 'webm',
@@ -95,6 +95,7 @@ async function init() {
         const arrayBufferFirstMatrix = gpuBufferFirstMatrix.getMappedRange();
         new Float32Array(arrayBufferFirstMatrix).set(firstMatrix);
         gpuBufferFirstMatrix.unmap();
+
         // Second Matrix
 
         const secondMatrix = new Float32Array([
@@ -129,9 +130,13 @@ async function init() {
             numbers: array<f32>,
           }
 
+          struct  N{
+            numbers: array<f32>
+          }
+
           @group(0) @binding(0) var<storage, read> firstMatrix : Matrix;
           @group(0) @binding(1) var<storage, read> secondMatrix : Matrix;
-          @group(0) @binding(2) var<storage, read_write> resultMatrix : Matrix;
+          @group(0) @binding(2) var<storage, read_write> resultMatrix : array<f32>;
 
           @compute @workgroup_size(8, 8)
           fn main(@builtin(global_invocation_id) global_id : vec3<u32>) {
@@ -140,19 +145,36 @@ async function init() {
               return;
             }
 
-            resultMatrix.size = vec2(firstMatrix.size.x, secondMatrix.size.y);
+            // -1,
+            // 1,
+            // 0.3,
+            // 1,
+            // 1,
+            // 0,
+            // 0,
+            // 1,
+            // 1,
+            // 0,
 
-            let resultCell = vec2(global_id.x, global_id.y);
-            var result = 0.0;
-            for (var i = 0u; i < u32(firstMatrix.size.y); i = i + 1u) {
-              let a = i + resultCell.x * u32(firstMatrix.size.y);
-              let b = resultCell.y + i * u32(secondMatrix.size.y);
-              result = result + firstMatrix.numbers[a] * secondMatrix.numbers[b];
-            }
+            //for(var j: i32 = 0; j < 10; j++) {
+                for(var vertexIndex: i32 = 0; vertexIndex < 6; vertexIndex++) {
+    
+                    resultMatrix[vertexIndex + 0] = -1;
+                    resultMatrix[vertexIndex + 1] = 1;
+                    resultMatrix[vertexIndex + 2] = 0.3;
+                    resultMatrix[vertexIndex + 3] = 1.0;
+        
+                    resultMatrix[vertexIndex + 4] = 0.0;
+                    resultMatrix[vertexIndex + 5] = 0.0;
+                    resultMatrix[vertexIndex + 6] = 0.0;
+                    resultMatrix[vertexIndex + 7] = 1.0;
+        
+                    resultMatrix[vertexIndex + 8] = 1.0;
+                    resultMatrix[vertexIndex + 9] = 0.0;
+                }
 
-            let index = resultCell.y + resultCell.x * u32(secondMatrix.size.y);
-            resultMatrix.numbers[index] = result;
-          }
+            //}
+        }
         `
         });
 
@@ -219,7 +241,7 @@ async function init() {
         commandEncoder.copyBufferToBuffer(
             resultMatrixBuffer /* source buffer */,
             0 /* source offset */,
-            gpuReadBuffer /* destination buffer */,
+            webGPU._buffer /* destination buffer */,
             0 /* destination offset */,
             resultMatrixBufferSize /* size */
         );
