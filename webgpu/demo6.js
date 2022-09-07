@@ -41,7 +41,7 @@ let ucos;
 let urounddec;
 let nusin;
 
-let side = 2;
+let side = 100;
 let numColumns = side;
 let numRows = side;
 
@@ -50,6 +50,12 @@ let gpuWriteBuffer2;
 let gpuWriteBuffer3;
 
 let buffers;
+let shaderModule;
+let gpuBufferFirstMatrix;
+let resultMatrixBufferSize;
+let resultMatrixBuffer;
+let computePipeline;
+let bindGroup;
 
 let va;
 
@@ -82,8 +88,8 @@ async function init() {
         // First Matrix
 
         const firstMatrix = new Float32Array(webGPU._vertexArray);
-        
-        const gpuBufferFirstMatrix = webGPU._device.createBuffer({
+
+        gpuBufferFirstMatrix = webGPU._device.createBuffer({
             mappedAtCreation: true,
             size: firstMatrix.byteLength,
             usage: GPUBufferUsage.STORAGE,
@@ -94,8 +100,8 @@ async function init() {
 
         // Result Matrix
 
-        const resultMatrixBufferSize = firstMatrix.byteLength;
-        const resultMatrixBuffer = webGPU._device.createBuffer({
+        resultMatrixBufferSize = firstMatrix.byteLength;
+        resultMatrixBuffer = webGPU._device.createBuffer({
             size: firstMatrix.byteLength,
             usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
             mappedAtCreation: true,
@@ -106,7 +112,7 @@ async function init() {
         resultMatrixBuffer.unmap();
 
         // COMPUTE SHADER WGSL
-        const shaderModule = webGPU._device.createShaderModule({
+        shaderModule = webGPU._device.createShaderModule({
             code: /* wgsl */`
 
             struct Matrix {
@@ -132,9 +138,9 @@ async function init() {
             let x = 1;
             let y = 0;
             let index = y + (x * 2);
-            //for(var j: i32 = 0; j < 10; j++) {
+            for(var j: i32 = 0; j < 1; j++) {
                 for(var vertexIndex: i32 = 0; vertexIndex < 6; vertexIndex++) {
-    
+
                     //let resultIndex = 4*(vertexIndex * 10 + index*60 + 4);
                     // resultMatrix.numbers[0] = 1.0;
                     // resultMatrix.numbers[1] = 0.0;
@@ -142,17 +148,17 @@ async function init() {
                     // resultMatrix.numbers[3] = 1.0;
 
                     //resultMatrix.color = vec4(1,1,0,1);
-        
+
                     resultMatrix[4 + vertexIndex * 10 + index*60] = 1.0;
                     resultMatrix[5 + vertexIndex * 10 + index*60] = 1.0;
                     resultMatrix[6 + vertexIndex * 10 + index*60] = 1.0;
                     resultMatrix[7 + vertexIndex * 10 + index*60] = 1.0;
-        
+
                     // resultMatrix.numbers[8] = 1.0;
                     // resultMatrix.numbers[9] = 0.0;
                 }
 
-            //}
+            }
 
             //let b = resultMatrix[130];
         }
@@ -162,7 +168,7 @@ async function init() {
 
         // Describe the compute operation
         // takes bind group layout and the compute shader `shaderModule`
-        const computePipeline = webGPU._device.createComputePipeline({
+        computePipeline = webGPU._device.createComputePipeline({
             /*layout: device.createPipelineLayout({
                 bindGroupLayouts: [bindGroupLayout]
             }),*/
@@ -174,7 +180,7 @@ async function init() {
         });
 
 
-        const bindGroup = webGPU._device.createBindGroup({
+        bindGroup = webGPU._device.createBindGroup({
             //layout: bindGroupLayout,
             layout: computePipeline.getBindGroupLayout(0 /* index */),
             entries: [
@@ -192,41 +198,6 @@ async function init() {
                 }
             ]
         });
-
-        // Dispatch to GPU
-        const commandEncoder = webGPU._device.createCommandEncoder();
-
-        const passEncoder = commandEncoder.beginComputePass();
-        passEncoder.setPipeline(computePipeline);
-        passEncoder.setBindGroup(0, bindGroup);
-        //const workgroupCountX = Math.ceil(firstMatrix[0] / 8);
-        //const workgroupCountY = Math.ceil(resultMatrix[1] / 8);
-        //passEncoder.dispatchWorkgroups(workgroupCountX, workgroupCountY);
-        //passEncoder.dispatchWorkgroups(workgroupCountX);
-        //passEncoder.dispatchWorkgroups(webGPU._vertexBufferInfo._vertexCount);
-        passEncoder.dispatchWorkgroups(64);
-        passEncoder.end();
-
-        // ------------
-        // Get a GPU buffer for reading in an unmapped state.
-        // (unmapped because this is happening on the GPU side, not Javascript)
-        const gpuReadBuffer = webGPU._device.createBuffer({
-            size: resultMatrixBufferSize,
-            usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
-        });
-
-        // Encode commands for copying buffer to buffer.
-        commandEncoder.copyBufferToBuffer(
-            resultMatrixBuffer /* source buffer */,
-            0 /* source offset */,
-            webGPU._buffer /* destination buffer */,
-            0 /* destination offset */,
-            resultMatrixBufferSize /* size */
-        );
-
-        // Submit GPU commands.
-        const gpuCommands = commandEncoder.finish();
-        webGPU._device.queue.submit([gpuCommands]);
 
 
 
@@ -258,6 +229,41 @@ async function update() {
 
 
 
+
+    // Dispatch to GPU
+    const commandEncoder = webGPU._device.createCommandEncoder();
+
+    const passEncoder = commandEncoder.beginComputePass();
+    passEncoder.setPipeline(computePipeline);
+    passEncoder.setBindGroup(0, bindGroup);
+    //const workgroupCountX = Math.ceil(firstMatrix[0] / 8);
+    //const workgroupCountY = Math.ceil(resultMatrix[1] / 8);
+    //passEncoder.dispatchWorkgroups(workgroupCountX, workgroupCountY);
+    //passEncoder.dispatchWorkgroups(workgroupCountX);
+    //passEncoder.dispatchWorkgroups(webGPU._vertexBufferInfo._vertexCount);
+    passEncoder.dispatchWorkgroups(64);
+    passEncoder.end();
+
+    // ------------
+    // Get a GPU buffer for reading in an unmapped state.
+    // (unmapped because this is happening on the GPU side, not Javascript)
+    const gpuReadBuffer = webGPU._device.createBuffer({
+        size: resultMatrixBufferSize,
+        usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
+    });
+
+    // Encode commands for copying buffer to buffer.
+    commandEncoder.copyBufferToBuffer(
+        resultMatrixBuffer /* source buffer */,
+        0 /* source offset */,
+        webGPU._buffer /* destination buffer */,
+        0 /* destination offset */,
+        resultMatrixBufferSize /* size */
+    );
+
+    // Submit GPU commands.
+    const gpuCommands = commandEncoder.finish();
+    webGPU._device.queue.submit([gpuCommands]);
 
     webGPU.update();
 
