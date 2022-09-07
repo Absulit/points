@@ -6,7 +6,7 @@ import Coordinate from './js/coordinate.js';
 /***************/
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
-//document.body.appendChild(stats.dom);
+document.body.appendChild(stats.dom);
 
 let capturer = new CCapture({
     format: 'webm',
@@ -81,86 +81,8 @@ async function init() {
         //--------------------------------------------
         // First Matrix
 
-        const firstMatrix = new Float32Array([
-            -1,
-            1,
-            0.3,
-            1,
-
-            1,
-            0,
-            0,
-            1,
-
-            1,
-            0,
-
-            -0.96,
-            1,
-            0.3,
-            1,
-
-            1,
-            0,
-            0,
-            1,
-
-            0,
-            0,
-
-            -0.96,
-            0.96,
-            0.3,
-            1,
-
-            1,
-            0,
-            0,
-            1,
-
-            0,
-            1,
-
-            -1,
-            1,
-            0.3,
-            1,
-
-            1,
-            0,
-            0,
-            1,
-
-            1,
-            0,
-
-            -1,
-            0.96,
-            0.3,
-            1,
-
-            1,
-            0,
-            0,
-            1,
-
-            1,
-            1,
-
-            -0.96,
-            0.96,
-            0.3,
-            1,
-
-            1,
-            0,
-            0,
-            1,
-
-            0,
-            1,
-        ]);
-
+        const firstMatrix = new Float32Array(webGPU._vertexArray);
+        
         const gpuBufferFirstMatrix = webGPU._device.createBuffer({
             mappedAtCreation: true,
             size: firstMatrix.byteLength,
@@ -194,7 +116,7 @@ async function init() {
               }
 
           @group(0) @binding(0) var<storage, read> firstMatrix : array<f32>;
-          @group(0) @binding(1) var<storage, read_write> resultMatrix : Matrix;
+          @group(0) @binding(1) var<storage, read_write> resultMatrix : array<f32>;
 
           @compute @workgroup_size(64)
           fn main(@builtin(global_invocation_id) global_id : vec3<u32>) {
@@ -207,27 +129,30 @@ async function init() {
             //resultMatrix[0] = -1;
             // let b = secondMatrix.size.x;
 
-            // for(var j: i32 = 0; j < 10; j++) {
-                for(var vertexIndex: i32 = 0; vertexIndex < 1; vertexIndex++) {
+            let x = 1;
+            let y = 0;
+            let index = y + (x * 2);
+            //for(var j: i32 = 0; j < 10; j++) {
+                for(var vertexIndex: i32 = 0; vertexIndex < 6; vertexIndex++) {
     
                     //let resultIndex = 4*(vertexIndex * 10 + index*60 + 4);
-                    //  resultMatrix.color.r = 1;
-                    //  resultMatrix.color.g = 0;
-                    //  resultMatrix.color.b = 0;
-                    //  resultMatrix.color.a = 1;
+                    // resultMatrix.numbers[0] = 1.0;
+                    // resultMatrix.numbers[1] = 0.0;
+                    // resultMatrix.numbers[2] = 0.0;
+                    // resultMatrix.numbers[3] = 1.0;
 
-                    resultMatrix.color = vec4(1,1,0,1);
+                    //resultMatrix.color = vec4(1,1,0,1);
         
-                    // resultMatrix.numbers[4] = 1.0;
-                    // resultMatrix.numbers[5] = 0.0;
-                    // resultMatrix.numbers[6] = 0.0;
-                    // resultMatrix.numbers[7] = 1.0;
+                    resultMatrix[4 + vertexIndex * 10 + index*60] = 1.0;
+                    resultMatrix[5 + vertexIndex * 10 + index*60] = 1.0;
+                    resultMatrix[6 + vertexIndex * 10 + index*60] = 1.0;
+                    resultMatrix[7 + vertexIndex * 10 + index*60] = 1.0;
         
                     // resultMatrix.numbers[8] = 1.0;
                     // resultMatrix.numbers[9] = 0.0;
                 }
 
-            // }
+            //}
 
             //let b = resultMatrix[130];
         }
