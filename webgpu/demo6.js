@@ -41,7 +41,7 @@ let ucos;
 let urounddec;
 let nusin;
 
-let side = 50;
+let side = 2;
 let numColumns = side;
 let numRows = side;
 
@@ -82,9 +82,83 @@ async function init() {
         // First Matrix
 
         const firstMatrix = new Float32Array([
-            2 /* rows */, 4 /* columns */,
-            1, 2, 3, 4,
-            5, 6, 7, 8
+            -1,
+            1,
+            0.3,
+            1,
+
+            1,
+            0,
+            0,
+            1,
+
+            1,
+            0,
+
+            -0.96,
+            1,
+            0.3,
+            1,
+
+            1,
+            0,
+            0,
+            1,
+
+            0,
+            0,
+
+            -0.96,
+            0.96,
+            0.3,
+            1,
+
+            1,
+            0,
+            0,
+            1,
+
+            0,
+            1,
+
+            -1,
+            1,
+            0.3,
+            1,
+
+            1,
+            0,
+            0,
+            1,
+
+            1,
+            0,
+
+            -1,
+            0.96,
+            0.3,
+            1,
+
+            1,
+            0,
+            0,
+            1,
+
+            1,
+            1,
+
+            -0.96,
+            0.96,
+            0.3,
+            1,
+
+            1,
+            0,
+            0,
+            1,
+
+            0,
+            1,
         ]);
 
         const gpuBufferFirstMatrix = webGPU._device.createBuffer({
@@ -96,84 +170,66 @@ async function init() {
         new Float32Array(arrayBufferFirstMatrix).set(firstMatrix);
         gpuBufferFirstMatrix.unmap();
 
-        // Second Matrix
-
-        const secondMatrix = new Float32Array([
-            4 /* rows */, 2 /* columns */,
-            1, 2,
-            3, 4,
-            5, 6,
-            7, 8
-        ]);
-
-        const gpuBufferSecondMatrix = webGPU._device.createBuffer({
-            mappedAtCreation: true,
-            size: secondMatrix.byteLength,
-            usage: GPUBufferUsage.STORAGE,
-        });
-        const arrayBufferSecondMatrix = gpuBufferSecondMatrix.getMappedRange();
-        new Float32Array(arrayBufferSecondMatrix).set(secondMatrix);
-        gpuBufferSecondMatrix.unmap();
         // Result Matrix
 
-        const resultMatrixBufferSize = Float32Array.BYTES_PER_ELEMENT * (2 + firstMatrix[0] * secondMatrix[1]);
+        const resultMatrixBufferSize = firstMatrix.byteLength;
         const resultMatrixBuffer = webGPU._device.createBuffer({
-            size: resultMatrixBufferSize,
-            usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC
+            size: firstMatrix.byteLength,
+            usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
+            mappedAtCreation: true,
         });
+
+        const b = resultMatrixBuffer.getMappedRange();
+        new Float32Array(b).set(firstMatrix);
+        resultMatrixBuffer.unmap();
 
         // COMPUTE SHADER WGSL
         const shaderModule = webGPU._device.createShaderModule({
             code: /* wgsl */`
-          struct Matrix {
-            size : vec2<f32>,
-            numbers: array<f32>,
-          }
 
-          struct  N{
-            numbers: array<f32>
-          }
+            struct Matrix {
+                position: vec4<f32>,
+                color: vec4<f32>,
+                uv: vec2<f32>,
+              }
 
-          @group(0) @binding(0) var<storage, read> firstMatrix : Matrix;
-          @group(0) @binding(1) var<storage, read> secondMatrix : Matrix;
-          @group(0) @binding(2) var<storage, read_write> resultMatrix : array<f32>;
+          @group(0) @binding(0) var<storage, read> firstMatrix : array<f32>;
+          @group(0) @binding(1) var<storage, read_write> resultMatrix : Matrix;
 
-          @compute @workgroup_size(8, 8)
+          @compute @workgroup_size(128)
           fn main(@builtin(global_invocation_id) global_id : vec3<u32>) {
             // Guard against out-of-bounds work group sizes
-            if (global_id.x >= u32(firstMatrix.size.x) || global_id.y >= u32(secondMatrix.size.y)) {
-              return;
-            }
+            // if (global_id.x >= u32(firstMatrix.size.x) || global_id.y >= u32(secondMatrix.size.y)) {
+            //   return;
+            // }
 
-            // -1,
-            // 1,
-            // 0.3,
-            // 1,
-            // 1,
-            // 0,
-            // 0,
-            // 1,
-            // 1,
-            // 0,
+            let longvarname  = firstMatrix[0];
+            //resultMatrix[0] = -1;
+            // let b = secondMatrix.size.x;
 
-            //for(var j: i32 = 0; j < 10; j++) {
-                for(var vertexIndex: i32 = 0; vertexIndex < 6; vertexIndex++) {
+            // for(var j: i32 = 0; j < 10; j++) {
+                for(var vertexIndex: i32 = 0; vertexIndex < 1; vertexIndex++) {
     
-                    resultMatrix[vertexIndex + 0] = -1;
-                    resultMatrix[vertexIndex + 1] = 1;
-                    resultMatrix[vertexIndex + 2] = 0.3;
-                    resultMatrix[vertexIndex + 3] = 1.0;
+                    //let resultIndex = 4*(vertexIndex * 10 + index*60 + 4);
+                     resultMatrix.color.r = 1;
+                     resultMatrix.color.g = 0;
+                     resultMatrix.color.b = 0;
+                     resultMatrix.color.a = 1;
+
+                    //resultMatrix.color = vec4(1,0,0,1);
         
-                    resultMatrix[vertexIndex + 4] = 0.0;
-                    resultMatrix[vertexIndex + 5] = 0.0;
-                    resultMatrix[vertexIndex + 6] = 0.0;
-                    resultMatrix[vertexIndex + 7] = 1.0;
+                    // resultMatrix.numbers[4] = 1.0;
+                    // resultMatrix.numbers[5] = 0.0;
+                    // resultMatrix.numbers[6] = 0.0;
+                    // resultMatrix.numbers[7] = 1.0;
         
-                    resultMatrix[vertexIndex + 8] = 1.0;
-                    resultMatrix[vertexIndex + 9] = 0.0;
+                    // resultMatrix.numbers[8] = 1.0;
+                    // resultMatrix.numbers[9] = 0.0;
                 }
 
-            //}
+            // }
+
+            //let b = resultMatrix[130];
         }
         `
         });
@@ -206,12 +262,6 @@ async function init() {
                 {
                     binding: 1,
                     resource: {
-                        buffer: gpuBufferSecondMatrix
-                    }
-                },
-                {
-                    binding: 2,
-                    resource: {
                         buffer: resultMatrixBuffer
                     }
                 }
@@ -224,9 +274,12 @@ async function init() {
         const passEncoder = commandEncoder.beginComputePass();
         passEncoder.setPipeline(computePipeline);
         passEncoder.setBindGroup(0, bindGroup);
-        const workgroupCountX = Math.ceil(firstMatrix[0] / 8);
-        const workgroupCountY = Math.ceil(secondMatrix[1] / 8);
-        passEncoder.dispatchWorkgroups(workgroupCountX, workgroupCountY);
+        //const workgroupCountX = Math.ceil(firstMatrix[0] / 8);
+        //const workgroupCountY = Math.ceil(resultMatrix[1] / 8);
+        //passEncoder.dispatchWorkgroups(workgroupCountX, workgroupCountY);
+        //passEncoder.dispatchWorkgroups(workgroupCountX);
+        //passEncoder.dispatchWorkgroups(webGPU._vertexBufferInfo._vertexCount);
+        passEncoder.dispatchWorkgroups(128);
         passEncoder.end();
 
         // ------------
@@ -248,7 +301,7 @@ async function init() {
 
         // Submit GPU commands.
         const gpuCommands = commandEncoder.finish();
-        webGPU._device.queue.submit([gpuCommands]);
+        //webGPU._device.queue.submit([gpuCommands]);
 
 
 
