@@ -301,7 +301,7 @@ async function init() {
 
         // Submit GPU commands.
         const gpuCommands = commandEncoder.finish();
-        //webGPU._device.queue.submit([gpuCommands]);
+        webGPU._device.queue.submit([gpuCommands]);
 
 
 
