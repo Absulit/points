@@ -196,7 +196,7 @@ async function init() {
           @group(0) @binding(0) var<storage, read> firstMatrix : array<f32>;
           @group(0) @binding(1) var<storage, read_write> resultMatrix : Matrix;
 
-          @compute @workgroup_size(128)
+          @compute @workgroup_size(64)
           fn main(@builtin(global_invocation_id) global_id : vec3<u32>) {
             // Guard against out-of-bounds work group sizes
             // if (global_id.x >= u32(firstMatrix.size.x) || global_id.y >= u32(secondMatrix.size.y)) {
@@ -211,12 +211,12 @@ async function init() {
                 for(var vertexIndex: i32 = 0; vertexIndex < 1; vertexIndex++) {
     
                     //let resultIndex = 4*(vertexIndex * 10 + index*60 + 4);
-                     resultMatrix.color.r = 1;
-                     resultMatrix.color.g = 0;
-                     resultMatrix.color.b = 0;
-                     resultMatrix.color.a = 1;
+                    //  resultMatrix.color.r = 1;
+                    //  resultMatrix.color.g = 0;
+                    //  resultMatrix.color.b = 0;
+                    //  resultMatrix.color.a = 1;
 
-                    //resultMatrix.color = vec4(1,0,0,1);
+                    resultMatrix.color = vec4(1,1,0,1);
         
                     // resultMatrix.numbers[4] = 1.0;
                     // resultMatrix.numbers[5] = 0.0;
@@ -279,7 +279,7 @@ async function init() {
         //passEncoder.dispatchWorkgroups(workgroupCountX, workgroupCountY);
         //passEncoder.dispatchWorkgroups(workgroupCountX);
         //passEncoder.dispatchWorkgroups(webGPU._vertexBufferInfo._vertexCount);
-        passEncoder.dispatchWorkgroups(128);
+        passEncoder.dispatchWorkgroups(64);
         passEncoder.end();
 
         // ------------

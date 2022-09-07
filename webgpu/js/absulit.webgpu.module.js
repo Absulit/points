@@ -117,6 +117,8 @@ export default class WebGPU {
             device: this._device,
             format: this._presentationFormat,
             //size: this._presentationSize,
+            width: this._canvas.clientWidth,
+            height: this._canvas.clientHeight,
             alphaMode: 'premultiplied',
         });
 
