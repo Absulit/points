@@ -6,7 +6,7 @@ import Coordinate from './js/coordinate.js';
 /***************/
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
-//document.body.appendChild(stats.dom);
+document.body.appendChild(stats.dom);
 
 let capturer = new CCapture({
     format: 'webm',
@@ -58,6 +58,8 @@ let screenSizeArrayBuffer;
 let computePipeline;
 let bindGroup;
 
+let screenSizeArray;
+
 let va;
 
 async function init() {
@@ -86,7 +88,7 @@ async function init() {
         buffers = [gpuWriteBuffer1, gpuWriteBuffer2, gpuWriteBuffer3];
 
         //--------------------------------------------
-        const screenSizeArray = new Float32Array([numColumns,numRows]);
+        screenSizeArray = new Float32Array([numColumns, numRows, 0]);
 
         screenSizeArrayBuffer = webGPU._device.createBuffer({
             mappedAtCreation: true,
@@ -166,28 +168,41 @@ async function init() {
             //resultMatrix[0] = -1;
             // let b = secondMatrix.size.x;
 
-            let x:f32 = 1;
-            let y:f32 = 0;
-            let index:f32 = y + (x * screenSize[1]);
-            //for(var j: i32 = 0; j < 1; j++) {
-                for(var vertexIndex: i32 = 0; vertexIndex < 6; vertexIndex++) {
-                    let indexC:i32 = i32(index);
-                    //let resultIndex = 4*(vertexIndex * 10 + index*60 + 4);
-                    //resultMatrix.color = vec4(1,1,0,1);
+            let numColumns:f32 = screenSize[0];
+            let numRows:f32 = screenSize[1];
 
-                    resultMatrix[4 + vertexIndex * 10 + indexC*60] = 1.0;
-                    resultMatrix[5 + vertexIndex * 10 + indexC*60] = 1.0;
-                    resultMatrix[6 + vertexIndex * 10 + indexC*60] = 1.0;
-                    resultMatrix[7 + vertexIndex * 10 + indexC*60] = 1.0;
 
-                    //resultMatrix.points[vertexIndex * 10 + indexC*60].color = vec4(1,1,0,1);
+            var indexC:i32 = 0;
+            for(var indexColumns: i32 = 0; indexColumns < i32(numColumns); indexColumns++) {
+                for(var indexRows: i32 = 0; indexRows < i32(numRows); indexRows++) {
 
+                    let x:f32 = f32(indexColumns);
+                    let y:f32 = f32(indexRows);
+                    let index:f32 = y + (x * numColumns);
+                    indexC = i32(index);
+
+
+                    for(var vertexIndex: i32 = 0; vertexIndex < 6; vertexIndex++) {
+                        //let resultIndex = 4*(vertexIndex * 10 + index*60 + 4);
+                        //resultMatrix.color = vec4(1,1,0,1);
+
+                        resultMatrix[4 + vertexIndex * 10 + indexC*60] = sin(index);
+                        resultMatrix[5 + vertexIndex * 10 + indexC*60] = cos(index);
+                        resultMatrix[6 + vertexIndex * 10 + indexC*60] = tan(index);
+                        resultMatrix[7 + vertexIndex * 10 + indexC*60] = 1.0;
+
+                        //resultMatrix.points[vertexIndex * 10 + indexC*60].color = vec4(1,1,0,1);
+
+                    }
                 }
+            }
 
-            //}
 
-            //let b = resultMatrix[130];
         }
+
+
+
+
         `
         });
 
@@ -245,6 +260,10 @@ async function update() {
     urounddec = utime % 1;
     nusin = (Math.sin(utime) + 1) * .5;
 
+    // screenSizeArray[2] = utime;
+    // const screenSizeArrayMappedRange = screenSizeArrayBuffer.getMappedRange();
+    // new Float32Array(screenSizeArrayMappedRange).set(screenSizeArray);
+    // screenSizeArrayBuffer.unmap();
 
     // for (let indexColumn = 0; indexColumn < numColumns; indexColumn++) {
     //     for (let indexRow = 0; indexRow < numRows; indexRow++) {
