@@ -6,7 +6,7 @@ import Coordinate from './js/coordinate.js';
 /***************/
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
-document.body.appendChild(stats.dom);
+//document.body.appendChild(stats.dom);
 
 let capturer = new CCapture({
     format: 'webm',
@@ -54,6 +54,7 @@ let shaderModule;
 let gpuBufferFirstMatrix;
 let resultMatrixBufferSize;
 let resultMatrixBuffer;
+let screenSizeArrayBuffer;
 let computePipeline;
 let bindGroup;
 
@@ -85,6 +86,20 @@ async function init() {
         buffers = [gpuWriteBuffer1, gpuWriteBuffer2, gpuWriteBuffer3];
 
         //--------------------------------------------
+        const screenSizeArray = new Float32Array([numColumns,numRows]);
+
+        screenSizeArrayBuffer = webGPU._device.createBuffer({
+            mappedAtCreation: true,
+            size: screenSizeArray.byteLength,
+            usage: GPUBufferUsage.STORAGE,
+        });
+        const screenSizeArrayMappedRange = screenSizeArrayBuffer.getMappedRange();
+        new Float32Array(screenSizeArrayMappedRange).set(screenSizeArray);
+        screenSizeArrayBuffer.unmap();
+        //--------------------------------------------
+
+
+
         // First Matrix
 
         const firstMatrix = new Float32Array(webGPU._vertexArray);
@@ -115,14 +130,30 @@ async function init() {
         shaderModule = webGPU._device.createShaderModule({
             code: /* wgsl */`
 
-            struct Matrix {
+            struct Point {
                 position: vec4<f32>,
                 color: vec4<f32>,
                 uv: vec2<f32>,
-              }
+            }
+
+            struct Screen{
+                size: vec2<f32>,
+                points: array<f32>
+            }
+
+            struct ScreenSize{
+                numRows: i32,
+                numColumns: i32
+            }
+
+            struct Points{
+                points: array<Point>
+            }
+
 
           @group(0) @binding(0) var<storage, read> firstMatrix : array<f32>;
           @group(0) @binding(1) var<storage, read_write> resultMatrix : array<f32>;
+          @group(0) @binding(2) var<storage, read> screenSize : array<f32>;
 
           @compute @workgroup_size(64)
           fn main(@builtin(global_invocation_id) global_id : vec3<u32>) {
@@ -135,30 +166,25 @@ async function init() {
             //resultMatrix[0] = -1;
             // let b = secondMatrix.size.x;
 
-            let x = 1;
-            let y = 0;
-            let index = y + (x * 2);
-            for(var j: i32 = 0; j < 1; j++) {
+            let x:f32 = 1;
+            let y:f32 = 0;
+            let index:f32 = y + (x * screenSize[1]);
+            //for(var j: i32 = 0; j < 1; j++) {
                 for(var vertexIndex: i32 = 0; vertexIndex < 6; vertexIndex++) {
-
+                    let indexC:i32 = i32(index);
                     //let resultIndex = 4*(vertexIndex * 10 + index*60 + 4);
-                    // resultMatrix.numbers[0] = 1.0;
-                    // resultMatrix.numbers[1] = 0.0;
-                    // resultMatrix.numbers[2] = 0.0;
-                    // resultMatrix.numbers[3] = 1.0;
-
                     //resultMatrix.color = vec4(1,1,0,1);
 
-                    resultMatrix[4 + vertexIndex * 10 + index*60] = 1.0;
-                    resultMatrix[5 + vertexIndex * 10 + index*60] = 1.0;
-                    resultMatrix[6 + vertexIndex * 10 + index*60] = 1.0;
-                    resultMatrix[7 + vertexIndex * 10 + index*60] = 1.0;
+                    resultMatrix[4 + vertexIndex * 10 + indexC*60] = 1.0;
+                    resultMatrix[5 + vertexIndex * 10 + indexC*60] = 1.0;
+                    resultMatrix[6 + vertexIndex * 10 + indexC*60] = 1.0;
+                    resultMatrix[7 + vertexIndex * 10 + indexC*60] = 1.0;
 
-                    // resultMatrix.numbers[8] = 1.0;
-                    // resultMatrix.numbers[9] = 0.0;
+                    //resultMatrix.points[vertexIndex * 10 + indexC*60].color = vec4(1,1,0,1);
+
                 }
 
-            }
+            //}
 
             //let b = resultMatrix[130];
         }
@@ -195,15 +221,15 @@ async function init() {
                     resource: {
                         buffer: resultMatrixBuffer
                     }
+                },
+                {
+                    binding: 2,
+                    resource: {
+                        buffer: screenSizeArrayBuffer
+                    }
                 }
             ]
         });
-
-
-
-
-
-
 
 
     }
@@ -247,10 +273,10 @@ async function update() {
     // ------------
     // Get a GPU buffer for reading in an unmapped state.
     // (unmapped because this is happening on the GPU side, not Javascript)
-    const gpuReadBuffer = webGPU._device.createBuffer({
-        size: resultMatrixBufferSize,
-        usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
-    });
+    // const gpuReadBuffer = webGPU._device.createBuffer({
+    //     size: resultMatrixBufferSize,
+    //     usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
+    // });
 
     // Encode commands for copying buffer to buffer.
     commandEncoder.copyBufferToBuffer(
