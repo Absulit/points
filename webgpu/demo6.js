@@ -145,7 +145,8 @@ async function init() {
 
             struct ScreenSize {
                 numRows: f32,
-                numColumns: f32
+                numColumns: f32,
+                uTime: f32
             }
 
             struct Point {
@@ -163,7 +164,7 @@ async function init() {
 
 
           @group(0) @binding(0) var<storage, read> firstMatrix : array<f32>;
-          @group(0) @binding(1) var<storage, read_write> resultMatrix : array<Vertex>;
+          @group(0) @binding(1) var<storage, read_write> resultMatrix : Points;
           @group(0) @binding(2) var<storage, read> screenSize : ScreenSize;
 
           @compute @workgroup_size(64)
@@ -188,22 +189,39 @@ async function init() {
 
                     let x:f32 = f32(indexColumns);
                     let y:f32 = f32(indexRows);
+                    // let x:f32 = f32(global_id.x);
+                    // let y:f32 = f32(global_id.y);
                     //let x:f32 = 0;
                     //let y:f32 = 0;
                     let index:f32 = y + (x * screenSize.numColumns);
                     indexC = i32(index);
 
-                    let indexSin = sin(index);
-                    let indexCos = cos(index);
-                    let indexTan = tan(index);
+                    let indexSin = sin( f32(indexRows) * f32(indexColumns)  * screenSize.uTime * .1);
+                    let indexCos = 1 - cos( f32(indexRows) * f32(indexColumns)  * screenSize.uTime * .2);
+                    let indexTan = tan(index * screenSize.uTime * .003);
 
-                    for(var vertexIndex: i32 = 0; vertexIndex < 6; vertexIndex++) {
 
-                        resultMatrix[indexC * 6 + vertexIndex].color = array<f32,4>(indexSin,indexCos,indexTan,1);
+                    let color = array<f32,4>(indexSin,indexCos,0,1);
+                    resultMatrix.points[indexC].vertex0.color = color;
+                    resultMatrix.points[indexC].vertex1.color = color;
+                    resultMatrix.points[indexC].vertex2.color = color;
+                    resultMatrix.points[indexC].vertex3.color = color;
+                    resultMatrix.points[indexC].vertex4.color = color;
+                    resultMatrix.points[indexC].vertex5.color = color;
 
-                    }
-                }
+               }
             }
+
+            // let gidf32 = f32(gid);
+            // let indexSin = sin(gidf32);
+            // let indexCos = cos(gidf32);
+            // let indexTan = tan(gidf32);
+            // resultMatrix.points[gid].vertex0.color = array<f32,4>(indexSin,indexCos,indexTan,1);
+            // resultMatrix.points[gid].vertex1.color = array<f32,4>(indexSin,indexCos,indexTan,1);
+            // resultMatrix.points[gid].vertex2.color = array<f32,4>(indexSin,indexCos,indexTan,1);
+            // resultMatrix.points[gid].vertex3.color = array<f32,4>(indexSin,indexCos,indexTan,1);
+            // resultMatrix.points[gid].vertex4.color = array<f32,4>(indexSin,indexCos,indexTan,1);
+            // resultMatrix.points[gid].vertex5.color = array<f32,4>(indexSin,indexCos,indexTan,1);
 
             // let indexSin = sin(index);
             // let indexCos = cos(index);
@@ -267,16 +285,52 @@ async function init() {
 async function update() {
     stats.begin();
     utime += 1 / 60;
-    uround = Math.round(utime);
-    usin = Math.sin(utime);
-    ucos = Math.cos(utime);
-    urounddec = utime % 1;
-    nusin = (Math.sin(utime) + 1) * .5;
+    // uround = Math.round(utime);
+    // usin = Math.sin(utime);
+    // ucos = Math.cos(utime);
+    // urounddec = utime % 1;
+    // nusin = (Math.sin(utime) + 1) * .5;
 
-    // screenSizeArray[2] = utime;
+    screenSizeArray[2] = utime;
     // const screenSizeArrayMappedRange = screenSizeArrayBuffer.getMappedRange();
     // new Float32Array(screenSizeArrayMappedRange).set(screenSizeArray);
     // screenSizeArrayBuffer.unmap();
+
+    screenSizeArrayBuffer = webGPU._device.createBuffer({
+        mappedAtCreation: true,
+        size: screenSizeArray.byteLength,
+        usage: GPUBufferUsage.STORAGE,
+    });
+    const screenSizeArrayMappedRange = screenSizeArrayBuffer.getMappedRange();
+    new Float32Array(screenSizeArrayMappedRange).set(screenSizeArray);
+    screenSizeArrayBuffer.unmap();
+
+
+    bindGroup = webGPU._device.createBindGroup({
+        //layout: bindGroupLayout,
+        layout: computePipeline.getBindGroupLayout(0 /* index */),
+        entries: [
+            {
+                binding: 0,
+                resource: {
+                    buffer: gpuBufferFirstMatrix
+                }
+            },
+            {
+                binding: 1,
+                resource: {
+                    buffer: resultMatrixBuffer
+                }
+            },
+            {
+                binding: 2,
+                resource: {
+                    buffer: screenSizeArrayBuffer
+                }
+            }
+        ]
+    });
+
 
     // for (let indexColumn = 0; indexColumn < numColumns; indexColumn++) {
     //     for (let indexRow = 0; indexRow < numRows; indexRow++) {
