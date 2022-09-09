@@ -41,7 +41,7 @@ let ucos;
 let urounddec;
 let nusin;
 
-let side = 100;
+let side = 200;
 let numColumns = side;
 let numRows = side;
 
@@ -132,10 +132,10 @@ async function init() {
         shaderModule = webGPU._device.createShaderModule({
             code: /* wgsl */`
 
-            struct Point {
-                position: vec4<f32>,
-                color: vec4<f32>,
-                uv: vec2<f32>,
+            struct Vertex {
+                position: array<f32,4>,
+                color: array<f32,4>,
+                uv: array<f32,2>,
             }
 
             struct Screen{
@@ -143,9 +143,18 @@ async function init() {
                 points: array<f32>
             }
 
-            struct ScreenSize{
-                numRows: i32,
-                numColumns: i32
+            struct ScreenSize {
+                numRows: f32,
+                numColumns: f32
+            }
+
+            struct Point {
+                vertex0: Vertex,
+                vertex1: Vertex,
+                vertex2: Vertex,
+                vertex3: Vertex,
+                vertex4: Vertex,
+                vertex5: Vertex,
             }
 
             struct Points{
@@ -154,11 +163,12 @@ async function init() {
 
 
           @group(0) @binding(0) var<storage, read> firstMatrix : array<f32>;
-          @group(0) @binding(1) var<storage, read_write> resultMatrix : array<f32>;
-          @group(0) @binding(2) var<storage, read> screenSize : array<f32>;
+          @group(0) @binding(1) var<storage, read_write> resultMatrix : array<Vertex>;
+          @group(0) @binding(2) var<storage, read> screenSize : ScreenSize;
 
           @compute @workgroup_size(64)
           fn main(@builtin(global_invocation_id) global_id : vec3<u32>) {
+            var gid : u32 = global_id.x;
             // Guard against out-of-bounds work group sizes
             // if (global_id.x >= u32(firstMatrix.size.x) || global_id.y >= u32(secondMatrix.size.y)) {
             //   return;
@@ -168,34 +178,37 @@ async function init() {
             //resultMatrix[0] = -1;
             // let b = secondMatrix.size.x;
 
-            let numColumns:f32 = screenSize[0];
-            let numRows:f32 = screenSize[1];
+            let numColumns:f32 = screenSize.numColumns;
+            let numRows:f32 = screenSize.numRows;
 
 
             var indexC:i32 = 0;
-            for(var indexColumns: i32 = 0; indexColumns < i32(numColumns); indexColumns++) {
-                for(var indexRows: i32 = 0; indexRows < i32(numRows); indexRows++) {
+            for(var indexColumns: i32 = 0; indexColumns < i32(screenSize.numColumns); indexColumns++) {
+                for(var indexRows: i32 = 0; indexRows < i32(screenSize.numRows); indexRows++) {
 
                     let x:f32 = f32(indexColumns);
                     let y:f32 = f32(indexRows);
-                    let index:f32 = y + (x * numColumns);
+                    //let x:f32 = 0;
+                    //let y:f32 = 0;
+                    let index:f32 = y + (x * screenSize.numColumns);
                     indexC = i32(index);
 
+                    let indexSin = sin(index);
+                    let indexCos = cos(index);
+                    let indexTan = tan(index);
 
                     for(var vertexIndex: i32 = 0; vertexIndex < 6; vertexIndex++) {
-                        //let resultIndex = 4*(vertexIndex * 10 + index*60 + 4);
-                        //resultMatrix.color = vec4(1,1,0,1);
 
-                        resultMatrix[4 + vertexIndex * 10 + indexC*60] = sin(index);
-                        resultMatrix[5 + vertexIndex * 10 + indexC*60] = cos(index);
-                        resultMatrix[6 + vertexIndex * 10 + indexC*60] = tan(index);
-                        resultMatrix[7 + vertexIndex * 10 + indexC*60] = 1.0;
-
-                        //resultMatrix.points[vertexIndex * 10 + indexC*60].color = vec4(1,1,0,1);
+                        resultMatrix[indexC * 6 + vertexIndex].color = array<f32,4>(indexSin,indexCos,indexTan,1);
 
                     }
                 }
             }
+
+            // let indexSin = sin(index);
+            // let indexCos = cos(index);
+            // let indexTan = tan(index);
+            //resultMatrix[gid].color = array<f32,4>(1,0,0,1);
 
 
         }
@@ -281,11 +294,6 @@ async function update() {
     const passEncoder = commandEncoder.beginComputePass();
     passEncoder.setPipeline(computePipeline);
     passEncoder.setBindGroup(0, bindGroup);
-    //const workgroupCountX = Math.ceil(firstMatrix[0] / 8);
-    //const workgroupCountY = Math.ceil(resultMatrix[1] / 8);
-    //passEncoder.dispatchWorkgroups(workgroupCountX, workgroupCountY);
-    //passEncoder.dispatchWorkgroups(workgroupCountX);
-    //passEncoder.dispatchWorkgroups(webGPU._vertexBufferInfo._vertexCount);
     passEncoder.dispatchWorkgroups(64);
     passEncoder.end();
 
@@ -308,7 +316,7 @@ async function update() {
 
     // Submit GPU commands.
     const gpuCommands = commandEncoder.finish();
-    webGPU._device.queue.submit([gpuCommands]);
+    webGPU._commandsFinished.push(gpuCommands);
 
     webGPU.update();
 
