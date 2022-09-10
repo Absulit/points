@@ -56,6 +56,7 @@ export default class WebGPU {
         this._computePipeline = null;
         this._vertexBufferInfo = null;
         this._buffer = null;
+        this._screenSizeArrayBuffer = null;
         this._uniformBindGroup = null;
         this._computeBindGroups = null;
         this._presentationSize = null;
@@ -63,11 +64,17 @@ export default class WebGPU {
         this._commandEncoder = null;
 
         this._vertexArray = [];
+        this._screenSizeArray = [];
+        this._gpuBufferFirstMatrix = [];
+        this._resultMatrixBuffer = [];
+        this._resultMatrixBufferSize = null;
 
         this._numColumns = null;
         this._numRows = null;
 
         this._commandsFinished = [];
+
+        this._shaderModule = null;
     }
 
     async init() {
@@ -136,7 +143,7 @@ export default class WebGPU {
      * @param {Number} numColumns 
      * @param {Number} numRows 
      */
-    async createScreen(numColumns = 10, numRows = 10){
+    async createScreen(numColumns = 10, numRows = 10) {
         let colors = [
             new RGBAColor(1, 0, 0),
             new RGBAColor(0, 1, 0),
@@ -156,6 +163,9 @@ export default class WebGPU {
 
         }
         this.createVertexBuffer(new Float32Array(this._vertexArray));
+        this.createComputeBuffers();
+
+
         print(this._vertexArray);
         await this.createPipeline();
     }
@@ -178,11 +188,53 @@ export default class WebGPU {
         return this._buffer;
     }
 
+    createComputeBuffers() {
+        this._screenSizeArray = new Float32Array([this._numColumns, this._numRows, 0]);
+
+        this._screenSizeArrayBuffer = this._device.createBuffer({
+            mappedAtCreation: true,
+            size: this._screenSizeArray.byteLength,
+            usage: GPUBufferUsage.STORAGE,
+        });
+        const screenSizeArrayMappedRange = this._screenSizeArrayBuffer.getMappedRange();
+        new Float32Array(screenSizeArrayMappedRange).set(this._screenSizeArray);
+        this._screenSizeArrayBuffer.unmap();
+        //--------------------------------------------
+
+
+
+        // First Matrix
+
+        const firstMatrix = new Float32Array(this._vertexArray);
+
+        this._gpuBufferFirstMatrix = this._device.createBuffer({
+            mappedAtCreation: true,
+            size: firstMatrix.byteLength,
+            usage: GPUBufferUsage.STORAGE,
+        });
+        const arrayBufferFirstMatrix = this._gpuBufferFirstMatrix.getMappedRange();
+        new Float32Array(arrayBufferFirstMatrix).set(firstMatrix);
+        this._gpuBufferFirstMatrix.unmap();
+
+        // Result Matrix
+
+        this._resultMatrixBufferSize = firstMatrix.byteLength;
+        this._resultMatrixBuffer = this._device.createBuffer({
+            size: firstMatrix.byteLength,
+            usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
+            mappedAtCreation: true,
+        });
+
+        const b = this._resultMatrixBuffer.getMappedRange();
+        new Float32Array(b).set(firstMatrix);
+        this._resultMatrixBuffer.unmap();
+    }
+
     /**
      * 
      * @param {Array} data 
      */
-    createWriteCopyBuffer(data){
+    createWriteCopyBuffer(data) {
         const va = new Float32Array(data)
         const gpuWriteBuffer = this._device.createBuffer({
             mappedAtCreation: true,
@@ -201,6 +253,55 @@ export default class WebGPU {
 
 
     async createPipeline() {
+
+        this._computePipeline = this._device.createComputePipeline({
+            /*layout: device.createPipelineLayout({
+                bindGroupLayouts: [bindGroupLayout]
+            }),*/
+            layout: 'auto',
+            compute: {
+                module: this._shaderModule,
+                entryPoint: "main"
+            }
+        });
+
+
+
+
+
+        this._computeBindGroups = this._device.createBindGroup({
+            //layout: bindGroupLayout,
+            layout: this._computePipeline.getBindGroupLayout(0 /* index */),
+            entries: [
+                {
+                    binding: 0,
+                    resource: {
+                        buffer: this._gpuBufferFirstMatrix
+                    }
+                },
+                {
+                    binding: 1,
+                    resource: {
+                        buffer: this._resultMatrixBuffer
+                    }
+                },
+                {
+                    binding: 2,
+                    resource: {
+                        buffer: this._screenSizeArrayBuffer
+                    }
+                }
+            ]
+        });
+
+
+
+
+
+
+        //--------------------------------------
+
+
         this.createVertexBuffer(new Float32Array(this._vertexArray));
         // enum GPUPrimitiveTopology {
         //     'point-list',
@@ -280,22 +381,7 @@ export default class WebGPU {
 
         });
 
-        /*this._computePipeline = this._device.createComputePipeline({
-            layout: 'auto',
-            compute: {
-                module: this._device.createShaderModule({
-                    code: this._shaders['points'].update,
-                }),
-                entryPoint: 'main',
-            },
-        });
 
-        this._computeBindGroups = this._device.createBindGroup({
-            layout: this._computePipeline.getBindGroupLayout(0),
-            entries: [
-
-            ],
-        });*/
 
 
 
@@ -350,6 +436,61 @@ export default class WebGPU {
         if (!this._canvas) return;
         if (!this._device) return;
 
+        this._screenSizeArrayBuffer = this._device.createBuffer({
+            mappedAtCreation: true,
+            size: this._screenSizeArray.byteLength,
+            usage: GPUBufferUsage.STORAGE,
+        });
+        const screenSizeArrayMappedRange = this._screenSizeArrayBuffer.getMappedRange();
+        new Float32Array(screenSizeArrayMappedRange).set(this._screenSizeArray);
+        this._screenSizeArrayBuffer.unmap();
+        ///----------------
+
+        this._computeBindGroups = this._device.createBindGroup({
+            //layout: bindGroupLayout,
+            layout: this._computePipeline.getBindGroupLayout(0 /* index */),
+            entries: [
+                {
+                    binding: 0,
+                    resource: {
+                        buffer: this._gpuBufferFirstMatrix
+                    }
+                },
+                {
+                    binding: 1,
+                    resource: {
+                        buffer: this._resultMatrixBuffer
+                    }
+                },
+                {
+                    binding: 2,
+                    resource: {
+                        buffer: this._screenSizeArrayBuffer
+                    }
+                }
+            ]
+        });
+
+        let commandEncoder = this._device.createCommandEncoder();
+
+
+
+        const passEncoder = commandEncoder.beginComputePass();
+        passEncoder.setPipeline(this._computePipeline);
+        passEncoder.setBindGroup(0, this._computeBindGroups);
+        passEncoder.dispatchWorkgroups(64);
+        passEncoder.end();
+
+
+        commandEncoder.copyBufferToBuffer(
+            this._resultMatrixBuffer /* source buffer */,
+            0 /* source offset */,
+            this._buffer /* destination buffer */,
+            0 /* destination offset */,
+            this._resultMatrixBufferSize /* size */
+        );
+
+        // ---------------------
 
         const textureView = this._context.getCurrentTexture().createView();
 
@@ -373,8 +514,9 @@ export default class WebGPU {
             },
         };
 
-        const commandEncoder = this._device.createCommandEncoder();
+        //commandEncoder = this._device.createCommandEncoder();
         {
+            //---------------------------------------
             const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
             passEncoder.setPipeline(this._pipeline);
             if (this._useTexture) {
@@ -392,13 +534,7 @@ export default class WebGPU {
             passEncoder.draw(this._vertexBufferInfo.vertexCount);
             passEncoder.end();
         }
-        /*{
-            const passEncoder = commandEncoder.beginComputePass();
-            passEncoder.setPipeline(this._computePipeline);
-            passEncoder.setBindGroup(0, this._computeBindGroups);
-            passEncoder.dispatchWorkgroups(0);
-            passEncoder.end();
-        }*/
+
         this._commandsFinished.push(commandEncoder.finish());
         this._device.queue.submit(this._commandsFinished);
         this._commandsFinished = [];
@@ -467,7 +603,7 @@ export default class WebGPU {
      * @param {Coordinate} coordinate 
      * @param {*} buffer 
      */
-    modifyPointColor2(coordinate, gpuWriteBuffer){
+    modifyPointColor2(coordinate, gpuWriteBuffer) {
         const { x, y, z } = coordinate;
         //const coordinateValue = coordinate.value;
         //const colorValue = color.value;
@@ -480,11 +616,11 @@ export default class WebGPU {
                 gpuWriteBuffer /* source buffer */,
                 0 /* source offset */,
                 this._buffer /* destination buffer */,
-                4*(vertexIndex * 10 + index*60 + 4)/* destination offset */, //4 * (index * 10 + 4)
+                4 * (vertexIndex * 10 + index * 60 + 4)/* destination offset */, //4 * (index * 10 + 4)
                 gpuWriteBuffer.size /* size */
             );
         }
-    
+
         const copyCommands = commandEncoder.finish();
         this._commandsFinished.push(copyCommands);
         //this._device.queue.submit([copyCommands]);

@@ -35,99 +35,18 @@ const webGPU = new WebGPU('gl-canvas');
 webGPU.useTexture = false;
 
 let utime = 0;
-let uround;
-let usin;
-let ucos;
-let urounddec;
-let nusin;
 
-let side = 400;
+let side = 200;
 let numColumns = side;
 let numRows = side;
 
-let gpuWriteBuffer1;
-let gpuWriteBuffer2;
-let gpuWriteBuffer3;
-
-let buffers;
 let shaderModule;
-let gpuBufferFirstMatrix;
-let resultMatrixBufferSize;
-let resultMatrixBuffer;
-let screenSizeArrayBuffer;
-let computePipeline;
-let bindGroup;
 
-let screenSizeArray;
-
-let va;
 
 async function init() {
     const initialized = await webGPU.init();
     if (initialized) {
         //webGPU.createVertexBuffer(vertexArray);
-        await webGPU.createScreen(numColumns, numRows);
-
-        // va = new Float32Array(dataArray)
-        // gpuWriteBuffer = webGPU._device.createBuffer({
-        //     mappedAtCreation: true,
-        //     size: va.byteLength,
-        //     usage: GPUBufferUsage.MAP_WRITE | GPUBufferUsage.COPY_SRC
-        // });
-        // const arrayBuffer = gpuWriteBuffer.getMappedRange();
-
-        // // Write bytes to buffer.
-        // new Float32Array(arrayBuffer).set(va);
-
-        // // Unmap buffer so that it can be used later for copy.
-        // gpuWriteBuffer.unmap();
-
-        gpuWriteBuffer1 = webGPU.createWriteCopyBuffer([1, 0, 0, 1]);
-        gpuWriteBuffer2 = webGPU.createWriteCopyBuffer([0, 1, 0, 1]);
-        gpuWriteBuffer3 = webGPU.createWriteCopyBuffer([0, 0, 1, 1]);
-        buffers = [gpuWriteBuffer1, gpuWriteBuffer2, gpuWriteBuffer3];
-
-        //--------------------------------------------
-        screenSizeArray = new Float32Array([numColumns, numRows, 0]);
-
-        screenSizeArrayBuffer = webGPU._device.createBuffer({
-            mappedAtCreation: true,
-            size: screenSizeArray.byteLength,
-            usage: GPUBufferUsage.STORAGE,
-        });
-        const screenSizeArrayMappedRange = screenSizeArrayBuffer.getMappedRange();
-        new Float32Array(screenSizeArrayMappedRange).set(screenSizeArray);
-        screenSizeArrayBuffer.unmap();
-        //--------------------------------------------
-
-
-
-        // First Matrix
-
-        const firstMatrix = new Float32Array(webGPU._vertexArray);
-
-        gpuBufferFirstMatrix = webGPU._device.createBuffer({
-            mappedAtCreation: true,
-            size: firstMatrix.byteLength,
-            usage: GPUBufferUsage.STORAGE,
-        });
-        const arrayBufferFirstMatrix = gpuBufferFirstMatrix.getMappedRange();
-        new Float32Array(arrayBufferFirstMatrix).set(firstMatrix);
-        gpuBufferFirstMatrix.unmap();
-
-        // Result Matrix
-
-        resultMatrixBufferSize = firstMatrix.byteLength;
-        resultMatrixBuffer = webGPU._device.createBuffer({
-            size: firstMatrix.byteLength,
-            usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
-            mappedAtCreation: true,
-        });
-
-        const b = resultMatrixBuffer.getMappedRange();
-        new Float32Array(b).set(firstMatrix);
-        resultMatrixBuffer.unmap();
-
         // COMPUTE SHADER WGSL
         shaderModule = webGPU._device.createShaderModule({
             code: /* wgsl */`
@@ -198,8 +117,9 @@ async function init() {
                     let indexSin = sin( f32(indexRows) * f32(indexColumns)  * screenSize.uTime * .1);
                     let indexCos = 1 - cos( f32(indexRows) * f32(indexColumns)  * screenSize.uTime * .2);
                     let indexTan = tan(index * screenSize.uTime * .003);
+                    let z = fusin(1, screenSize.uTime * .1 * f32(indexColumns)) * fusin(1, screenSize.uTime*.1* f32(indexRows));
 
-                    let color = array<f32,4>(indexSin,indexCos,0,1);
+                    let color = array<f32,4>(z,z,z,1);
                     resultMatrix.points[indexC].vertex0.color = color;
                     resultMatrix.points[indexC].vertex1.color = color;
                     resultMatrix.points[indexC].vertex2.color = color;
@@ -208,53 +128,13 @@ async function init() {
                     resultMatrix.points[indexC].vertex5.color = color;
                }
             }
-
         }
 
         `
         });
 
-
-        // Describe the compute operation
-        // takes bind group layout and the compute shader `shaderModule`
-        computePipeline = webGPU._device.createComputePipeline({
-            /*layout: device.createPipelineLayout({
-                bindGroupLayouts: [bindGroupLayout]
-            }),*/
-            layout: 'auto',
-            compute: {
-                module: shaderModule,
-                entryPoint: "main"
-            }
-        });
-
-
-        bindGroup = webGPU._device.createBindGroup({
-            //layout: bindGroupLayout,
-            layout: computePipeline.getBindGroupLayout(0 /* index */),
-            entries: [
-                {
-                    binding: 0,
-                    resource: {
-                        buffer: gpuBufferFirstMatrix
-                    }
-                },
-                {
-                    binding: 1,
-                    resource: {
-                        buffer: resultMatrixBuffer
-                    }
-                },
-                {
-                    binding: 2,
-                    resource: {
-                        buffer: screenSizeArrayBuffer
-                    }
-                }
-            ]
-        });
-
-
+        webGPU._shaderModule = shaderModule;
+        await webGPU.createScreen(numColumns, numRows);
     }
     await update();
 }
@@ -263,75 +143,8 @@ async function update() {
     stats.begin();
     utime += 1 / 60;
 
-    screenSizeArray[2] = utime;
-    screenSizeArrayBuffer = webGPU._device.createBuffer({
-        mappedAtCreation: true,
-        size: screenSizeArray.byteLength,
-        usage: GPUBufferUsage.STORAGE,
-    });
-    const screenSizeArrayMappedRange = screenSizeArrayBuffer.getMappedRange();
-    new Float32Array(screenSizeArrayMappedRange).set(screenSizeArray);
-    screenSizeArrayBuffer.unmap();
-    ///----------------
-
-    bindGroup = webGPU._device.createBindGroup({
-        //layout: bindGroupLayout,
-        layout: computePipeline.getBindGroupLayout(0 /* index */),
-        entries: [
-            {
-                binding: 0,
-                resource: {
-                    buffer: gpuBufferFirstMatrix
-                }
-            },
-            {
-                binding: 1,
-                resource: {
-                    buffer: resultMatrixBuffer
-                }
-            },
-            {
-                binding: 2,
-                resource: {
-                    buffer: screenSizeArrayBuffer
-                }
-            }
-        ]
-    });
-
-
-    // Dispatch to GPU
-    const commandEncoder = webGPU._device.createCommandEncoder();
-
-    const passEncoder = commandEncoder.beginComputePass();
-    passEncoder.setPipeline(computePipeline);
-    passEncoder.setBindGroup(0, bindGroup);
-    passEncoder.dispatchWorkgroups(64);
-    passEncoder.end();
-
-    // ------------
-    // Get a GPU buffer for reading in an unmapped state.
-    // (unmapped because this is happening on the GPU side, not Javascript)
-    // const gpuReadBuffer = webGPU._device.createBuffer({
-    //     size: resultMatrixBufferSize,
-    //     usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
-    // });
-
-    // Encode commands for copying buffer to buffer.
-    commandEncoder.copyBufferToBuffer(
-        resultMatrixBuffer /* source buffer */,
-        0 /* source offset */,
-        webGPU._buffer /* destination buffer */,
-        0 /* destination offset */,
-        resultMatrixBufferSize /* size */
-    );
-
-    // Submit GPU commands.
-    const gpuCommands = commandEncoder.finish();
-    webGPU._commandsFinished.push(gpuCommands);
-
+    webGPU._screenSizeArray[2] = utime;
     webGPU.update();
-
 
     stats.end();
 
@@ -360,4 +173,3 @@ function onClickDownloadButton(e) {
         capturer.save();
     }
 }
-
