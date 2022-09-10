@@ -192,17 +192,12 @@ async function init() {
 
                     let x:f32 = f32(indexColumns);
                     let y:f32 = f32(indexRows);
-                    // let x:f32 = f32(global_id.x);
-                    // let y:f32 = f32(global_id.y);
-                    //let x:f32 = 0;
-                    //let y:f32 = 0;
                     let index:f32 = y + (x * screenSize.numColumns);
                     indexC = i32(index);
 
                     let indexSin = sin( f32(indexRows) * f32(indexColumns)  * screenSize.uTime * .1);
                     let indexCos = 1 - cos( f32(indexRows) * f32(indexColumns)  * screenSize.uTime * .2);
                     let indexTan = tan(index * screenSize.uTime * .003);
-
 
                     let color = array<f32,4>(indexSin,indexCos,0,1);
                     resultMatrix.points[indexC].vertex0.color = color;
@@ -211,7 +206,6 @@ async function init() {
                     resultMatrix.points[indexC].vertex3.color = color;
                     resultMatrix.points[indexC].vertex4.color = color;
                     resultMatrix.points[indexC].vertex5.color = color;
-
                }
             }
 
