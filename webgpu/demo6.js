@@ -85,50 +85,50 @@ async function init() {
                 return (sin(utime * speed) + 1) * .5;
             }
 
-          @group(0) @binding(0) var<storage, read> firstMatrix : array<f32>;
-          @group(0) @binding(1) var<storage, read_write> resultMatrix : Points;
-          @group(0) @binding(2) var<storage, read> screenSize : ScreenSize;
+            @group(0) @binding(0) var<storage, read> firstMatrix : array<f32>;
+            @group(0) @binding(1) var<storage, read_write> resultMatrix : Points;
+            @group(0) @binding(2) var<storage, read> screenSize : ScreenSize;
 
-          @compute @workgroup_size(64)
-          fn main(@builtin(global_invocation_id) global_id : vec3<u32>) {
-            var gid : u32 = global_id.x;
-            // Guard against out-of-bounds work group sizes
-            // if (global_id.x >= u32(firstMatrix.size.x) || global_id.y >= u32(secondMatrix.size.y)) {
-            //   return;
-            // }
+            @compute @workgroup_size(64)
+            fn main(@builtin(global_invocation_id) global_id : vec3<u32>) {
+                var gid : u32 = global_id.x;
+                // Guard against out-of-bounds work group sizes
+                // if (global_id.x >= u32(firstMatrix.size.x) || global_id.y >= u32(secondMatrix.size.y)) {
+                //   return;
+                // }
 
-            let longvarname  = firstMatrix[0];
-            //resultMatrix[0] = -1;
-            // let b = secondMatrix.size.x;
+                let longvarname  = firstMatrix[0];
+                //resultMatrix[0] = -1;
+                // let b = secondMatrix.size.x;
 
-            let numColumns:f32 = screenSize.numColumns;
-            let numRows:f32 = screenSize.numRows;
+                let numColumns:f32 = screenSize.numColumns;
+                let numRows:f32 = screenSize.numRows;
 
 
-            var indexC:i32 = 0;
-            for(var indexColumns: i32 = 0; indexColumns < i32(screenSize.numColumns); indexColumns++) {
-                for(var indexRows: i32 = 0; indexRows < i32(screenSize.numRows); indexRows++) {
+                var indexC:i32 = 0;
+                for(var indexColumns: i32 = 0; indexColumns < i32(screenSize.numColumns); indexColumns++) {
+                    for(var indexRows: i32 = 0; indexRows < i32(screenSize.numRows); indexRows++) {
 
-                    let x:f32 = f32(indexColumns);
-                    let y:f32 = f32(indexRows);
-                    let index:f32 = y + (x * screenSize.numColumns);
-                    indexC = i32(index);
+                        let x:f32 = f32(indexColumns);
+                        let y:f32 = f32(indexRows);
+                        let index:f32 = y + (x * screenSize.numColumns);
+                        indexC = i32(index);
 
-                    let indexSin = sin( f32(indexRows) * f32(indexColumns)  * screenSize.uTime * .1);
-                    let indexCos = 1 - cos( f32(indexRows) * f32(indexColumns)  * screenSize.uTime * .2);
-                    let indexTan = tan(index * screenSize.uTime * .003);
-                    let z = fusin(1, screenSize.uTime * .1 * f32(indexColumns)) * fusin(1, screenSize.uTime*.1* f32(indexRows));
+                        let indexSin = sin( f32(indexRows) * f32(indexColumns)  * screenSize.uTime * .1);
+                        let indexCos = 1 - cos( f32(indexRows) * f32(indexColumns)  * screenSize.uTime * .2);
+                        let indexTan = tan(index * screenSize.uTime * .003);
+                        let z = fusin(1, screenSize.uTime * .1 * f32(indexColumns)) * fusin(1, screenSize.uTime*.1* f32(indexRows));
 
-                    let color = array<f32,4>(z,z,z,1);
-                    resultMatrix.points[indexC].vertex0.color = color;
-                    resultMatrix.points[indexC].vertex1.color = color;
-                    resultMatrix.points[indexC].vertex2.color = color;
-                    resultMatrix.points[indexC].vertex3.color = color;
-                    resultMatrix.points[indexC].vertex4.color = color;
-                    resultMatrix.points[indexC].vertex5.color = color;
-               }
+                        let color = array<f32,4>(z,z,z,1);
+                        resultMatrix.points[indexC].vertex0.color = color;
+                        resultMatrix.points[indexC].vertex1.color = color;
+                        resultMatrix.points[indexC].vertex2.color = color;
+                        resultMatrix.points[indexC].vertex3.color = color;
+                        resultMatrix.points[indexC].vertex4.color = color;
+                        resultMatrix.points[indexC].vertex5.color = color;
+                    }
+                }
             }
-        }
 
         `
         });
