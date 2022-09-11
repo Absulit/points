@@ -75,6 +75,8 @@ export default class WebGPU {
         this._commandsFinished = [];
 
         this._shaderModule = null;
+
+        this._renderPassDescriptor = null;
     }
 
     async init() {
@@ -134,6 +136,25 @@ export default class WebGPU {
             format: 'depth24plus',
             usage: GPUTextureUsage.RENDER_ATTACHMENT,
         });
+
+        this._renderPassDescriptor = {
+            colorAttachments: [
+                {
+                    //view: textureView,
+                    clearValue: { r: 0.0, g: 0.0, b: 0.0, a: 1.0 },
+                    loadOp: 'clear',
+                    storeOp: 'store',
+                },
+
+            ],
+            depthStencilAttachment: {
+                //view: this._depthTexture.createView(),
+
+                depthClearValue: 1.0,
+                depthLoadOp: 'clear',
+                depthStoreOp: 'store',
+            },
+        };
 
         return true;
     }
@@ -441,8 +462,8 @@ export default class WebGPU {
             size: this._screenSizeArray.byteLength,
             usage: GPUBufferUsage.STORAGE,
         });
-        const screenSizeArrayMappedRange = this._screenSizeArrayBuffer.getMappedRange();
-        new Float32Array(screenSizeArrayMappedRange).set(this._screenSizeArray);
+
+        new Float32Array(this._screenSizeArrayBuffer.getMappedRange()).set(this._screenSizeArray);
         this._screenSizeArrayBuffer.unmap();
         ///----------------
 
@@ -492,32 +513,13 @@ export default class WebGPU {
 
         // ---------------------
 
-        const textureView = this._context.getCurrentTexture().createView();
-
-        //const renderPassDescriptor: GPURenderPassDescriptor = {
-        const renderPassDescriptor = {
-            colorAttachments: [
-                {
-                    view: textureView,
-                    clearValue: { r: 0.0, g: 0.0, b: 0.0, a: 1.0 },
-                    loadOp: 'clear',
-                    storeOp: 'store',
-                },
-
-            ],
-            depthStencilAttachment: {
-                view: this._depthTexture.createView(),
-
-                depthClearValue: 1.0,
-                depthLoadOp: 'clear',
-                depthStoreOp: 'store',
-            },
-        };
+        this._renderPassDescriptor.colorAttachments[0].view = this._context.getCurrentTexture().createView();
+        this._renderPassDescriptor.depthStencilAttachment.view = this._depthTexture.createView();
 
         //commandEncoder = this._device.createCommandEncoder();
         {
             //---------------------------------------
-            const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
+            const passEncoder = commandEncoder.beginRenderPass(this._renderPassDescriptor);
             passEncoder.setPipeline(this._pipeline);
             if (this._useTexture) {
                 passEncoder.setBindGroup(0, this._uniformBindGroup);
