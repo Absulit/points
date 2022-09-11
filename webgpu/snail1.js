@@ -6,88 +6,110 @@ const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
 document.body.appendChild(stats.dom);
 
-/**
- * Ed Angel's flatten method
- * @param {Array} v
- * @returns
- */
-function flatten(v) {
-    if (v.matrix === true) {
-        v = transpose(v);
-    }
 
-    var n = v.length;
-    var elemsAreArrays = false;
+const adapter = await navigator.gpu.requestAdapter();
+const device = await adapter.requestDevice();
 
-    if (Array.isArray(v[0])) {
-        elemsAreArrays = true;
-        n *= v[0].length;
-    }
 
-    var floats = new Float32Array(n);
 
-    if (elemsAreArrays) {
-        var idx = 0;
-        for (var i = 0; i < v.length; ++i) {
-            for (var j = 0; j < v[i].length; ++j) {
-                floats[idx++] = v[i][j];
+// COMPUTE SHADER WGSL
+const shaderModule = device.createShaderModule({
+    code: /* wgsl */`
+          struct Matrix {
+            size : vec2<f32>,
+            numbers: array<f32>,
+          }
+
+          struct ScreenSize{
+            numColumns: f32,
+            numRows: f32
+          }
+
+          struct Direction{
+            x:i32,
+            y:i32
+          }
+
+          fn rotate(d:Direction)->Direction{
+            var dR:Direction = Direction(0,0);
+            if(d.x == 1){
+                dR.y = 1;
+            } else if(d.y == 1){
+                dR.x = -1;
+            } else if (d.x == -1){
+                dR.y = -1;
+            } else if (d.y == -1){
+                dR.x = 1;
             }
-        }
+            return dR;
+          }
+
+          @group(0) @binding(0) var<storage, read> firstMatrix : array<f32>;
+          @group(0) @binding(1) var<storage, read> secondMatrix : ScreenSize;
+          @group(0) @binding(2) var<storage, read_write> resultMatrix : array<f32>;
+          @group(0) @binding(3) var<storage, read_write> visited : array<f32>;
+
+          @compute @workgroup_size(8,8)
+          fn main(@builtin(global_invocation_id) global_id : vec3<u32>) {
+
+            var x = 0;
+            var y = 0;
+            var d:Direction = Direction(1,0);
+
+            var numPoints:i32 = i32(secondMatrix.numColumns * secondMatrix.numRows);
+            var firstMatrixIndex:i32 = 0;
+
+            for(var numPointsIndex:i32 = 0; numPointsIndex < numPoints ;  ){
+                if(numPointsIndex != numPoints){
+                    firstMatrixIndex = x + (y * i32(secondMatrix.numColumns));
+                    if((0 <= x) && (0 <= y) && (y < i32(secondMatrix.numRows)) && (x < i32(secondMatrix.numColumns)) && (visited[firstMatrixIndex] == 0) ){
+                            let pointValue:f32 = firstMatrix[firstMatrixIndex];
+                            resultMatrix[numPointsIndex] = pointValue;
+                            visited[firstMatrixIndex] = 1;
+                            numPointsIndex++;
+                    }else{
+                        // out of bounds in X or Y
+                        x -= d.x;
+                        y -= d.y;
+                        d = rotate(d);
+                    }
+                    x += d.x;
+                    y += d.y;
+                }
+
+            }
+
+
+          }
+        `
+});
+
+// Describe the compute operation
+// takes bind group layout and the compute shader `shaderModule`
+const computePipeline = device.createComputePipeline({
+    /*layout: device.createPipelineLayout({
+        bindGroupLayouts: [bindGroupLayout]
+    }),*/
+    layout: 'auto',
+    compute: {
+        module: shaderModule,
+        entryPoint: "main"
     }
-    else {
-        for (var i = 0; i < v.length; ++i) {
-            floats[i] = v[i];
-        }
+});
+
+
+
+async function snail(array) {
+    // empty, nothing to return
+    if (array.length == 0) {
+        return [];
     }
-
-    return floats;
-}
-
-function transpose(m) {
-    if (!m.matrix) {
-        return "transpose(): trying to transpose a non-matrix";
-    }
-
-    var result = [];
-    for (var i = 0; i < m.length; ++i) {
-        result.push([]);
-        for (var j = 0; j < m[i].length; ++j) {
-            result[i].push(m[j][i]);
-        }
-    }
-
-    result.matrix = true;
-
-    return result;
-}
-
-
-async function init() {
-
-    let array = [
-        [1, 2, 3],
-        [4, 5, 6],
-        [7, 8, 9]
-    ];
-
-    // array = [[]];
-    // array = [
-    //     [996,821,450,669,76,353,952,16],
-    //     [344,523,196,484,426,682,433,228]
-    // ];
 
     let numColumns = array[0].length;
     let numRows = array.length;
-    print({ numColumns, numRows })
 
-    let arrayFlatten = flatten(array);
-    print(arrayFlatten)
-
-    const adapter = await navigator.gpu.requestAdapter();
-    if (!adapter) { return; }
-    const device = await adapter.requestDevice();
-
-
+    //let arrayFlatten = flatten(array);
+    let arrayFlatten = new Float32Array(array.flat(2));
 
 
     // First Matrix
@@ -126,127 +148,12 @@ async function init() {
         usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC
     });
 
-        // visited array
+    // visited array
 
-        const visitedBufferSize = firstMatrix.byteLength;
-        const visitedBuffer = device.createBuffer({
-            size: visitedBufferSize,
-            usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC
-        });
-
-    // bind group layout means the interface with the GPU
-    // we tell to the GPU what to expect
-    // This is Group 0
-    /*const bindGroupLayout = device.createBindGroupLayout({
-        entries: [
-            {
-                binding: 0,
-                visibility: GPUShaderStage.COMPUTE,
-                buffer: {
-                    type: "read-only-storage"
-                }
-            },
-            {
-                binding: 1,
-                visibility: GPUShaderStage.COMPUTE,
-                buffer: {
-                    type: "read-only-storage"
-                }
-            },
-            {
-                binding: 2,
-                visibility: GPUShaderStage.COMPUTE,
-                buffer: {
-                    type: "storage"
-                }
-            }
-        ]
-    });*/
-
-    // COMPUTE SHADER WGSL
-    const shaderModule = device.createShaderModule({
-        code: /* wgsl */`
-          struct Matrix {
-            size : vec2<f32>,
-            numbers: array<f32>,
-          }
-
-          struct ScreenSize{
-            numColumns: f32,
-            numRows: f32
-          }
-
-          struct Direction{
-            x:i32,
-            y:i32
-          }
-
-          fn rotate(d:Direction)->Direction{
-            var dR:Direction = Direction(0,0);
-            if(d.x == 1){
-                dR.y = 1;
-            } else if(d.y == 1){
-                dR.x = -1;
-            } else if (d.x == -1){
-                dR.y = -1;
-            } else if (d.y == -1){
-                dR.x = 1;
-            }
-            return dR;
-          }
-
-          @group(0) @binding(0) var<storage, read> firstMatrix : array<f32>;
-          @group(0) @binding(1) var<storage, read> secondMatrix : ScreenSize;
-          @group(0) @binding(2) var<storage, read_write> resultMatrix : array<f32>;
-          @group(0) @binding(3) var<storage, read_write> visited : array<f32>;
-
-          @compute @workgroup_size(8, 8)
-          fn main(@builtin(global_invocation_id) global_id : vec3<u32>) {
-
-            var x = 0;
-            var y = 0;
-            var d:Direction = Direction(1,0);
-
-            var numPoints:i32 = i32(secondMatrix.numColumns * secondMatrix.numRows);
-            var firstMatrixIndex:i32 = 0;
-
-            for(var numPointsIndex:i32 = 0; numPointsIndex < numPoints ;  ){
-                if(numPointsIndex != numPoints){
-                    firstMatrixIndex = x + (y * i32(secondMatrix.numColumns));
-                    if((0 <= x) && (0 <= y) && (y < i32(secondMatrix.numRows)) && (x < i32(secondMatrix.numColumns)) && (visited[firstMatrixIndex] == 0) ){
-                            let pointValue:f32 = firstMatrix[firstMatrixIndex];
-                            resultMatrix[numPointsIndex] = pointValue;
-                            visited[firstMatrixIndex] = 1;
-                            numPointsIndex++;
-                    }else{
-                        // out of bounds in X or Y
-                        x -= d.x;
-                        y -= d.y;
-                        d = rotate(d);
-                    }
-                    x += d.x;
-                    y += d.y;
-                }
-
-            }
-
-
-          }
-        `
-    });
-
-
-    // Describe the compute operation
-    // takes bind group layout and the compute shader `shaderModule`
-    const computePipeline = device.createComputePipeline({
-        /*layout: device.createPipelineLayout({
-            bindGroupLayouts: [bindGroupLayout]
-        }),*/
-        layout: 'auto',
-        compute: {
-            module: shaderModule,
-            entryPoint: "main"
-        }
+    const visitedBufferSize = firstMatrix.byteLength;
+    const visitedBuffer = device.createBuffer({
+        size: visitedBufferSize,
+        usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC
     });
 
 
@@ -284,24 +191,16 @@ async function init() {
     });
 
 
-
-
-
-
-
     // Dispatch to GPU
     const commandEncoder = device.createCommandEncoder();
 
     const passEncoder = commandEncoder.beginComputePass();
     passEncoder.setPipeline(computePipeline);
     passEncoder.setBindGroup(0, bindGroup);
-    const workgroupCountX = Math.ceil(firstMatrix[0] / 8);
-    const workgroupCountY = Math.ceil(secondMatrix[1] / 8);
+    const workgroupCountX = Math.ceil(numColumns / 8);
+    const workgroupCountY = Math.ceil(numRows / 8);
     passEncoder.dispatchWorkgroups(workgroupCountX, workgroupCountY);
     passEncoder.end();
-
-
-
 
     // ------------
     // Get a GPU buffer for reading in an unmapped state.
@@ -324,11 +223,25 @@ async function init() {
     const gpuCommands = commandEncoder.finish();
     device.queue.submit([gpuCommands]);
 
-
-
     await gpuReadBuffer.mapAsync(GPUMapMode.READ);
     const arrayBuffer = gpuReadBuffer.getMappedRange();
-    console.log(new Float32Array(arrayBuffer));
+    return Array.from(new Float32Array(arrayBuffer));
+}
+
+
+async function init() {
+
+    let array = [
+        [1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9]
+    ];
+
+    // array = [[]];
+    array = [[312, 845, 869, 494, 667], [716, 660, 255, 130, 767], [121, 506, 480, 792, 334], [218, 639, 57, 434, 13], [14, 572, 501, 965, 729], [760, 359, 572, 123, 824], [275, 935, 466, 485, 721], [369, 892, 860, 334, 498], [968, 351, 177, 264, 542], [308, 574, 624, 823, 85], [246, 462, 960, 878, 954], [424, 829, 331, 50, 293], [504, 562, 668, 623, 508], [578, 20, 761, 773, 678], [959, 933, 995, 998, 837], [99, 741, 501, 841, 352], [965, 157, 114, 261, 118], [432, 221, 847, 713, 719], [664, 1, 737, 364, 702], [323, 310, 166, 280, 501]]
+
+    const r = await snail(array)
+    console.log(r);
 
 
 
