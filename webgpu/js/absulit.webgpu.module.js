@@ -499,7 +499,7 @@ export default class WebGPU {
         const passEncoder = commandEncoder.beginComputePass();
         passEncoder.setPipeline(this._computePipeline);
         passEncoder.setBindGroup(0, this._computeBindGroups);
-        passEncoder.dispatchWorkgroups(64);
+        passEncoder.dispatchWorkgroups(8,8);
         passEncoder.end();
 
 

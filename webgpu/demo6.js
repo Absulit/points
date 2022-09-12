@@ -36,7 +36,7 @@ webGPU.useTexture = false;
 
 let utime = 0;
 
-let side = 200;
+let side = 744;
 let numColumns = side;
 let numRows = side;
 
@@ -50,6 +50,16 @@ async function init() {
         // COMPUTE SHADER WGSL
         shaderModule = webGPU._device.createShaderModule({
             code: /* wgsl */`
+
+            var<private> rand_seed : vec2<f32>;
+
+            fn rand() -> f32 {
+              rand_seed.x = fract(cos(dot(rand_seed, vec2<f32>(23.14077926, 232.61690225))) * 136.8168);
+              rand_seed.y = fract(cos(dot(rand_seed, vec2<f32>(54.47856553, 345.84153136))) * 534.7645);
+              return rand_seed.y;
+            }
+
+            
 
             struct Vertex {
                 position: array<f32,4>,
@@ -89,13 +99,12 @@ async function init() {
             @group(0) @binding(1) var<storage, read_write> resultMatrix : Points;
             @group(0) @binding(2) var<storage, read> screenSize : ScreenSize;
 
-            @compute @workgroup_size(64)
-            fn main(@builtin(global_invocation_id) global_id : vec3<u32>) {
-                var gid : u32 = global_id.x;
-                // Guard against out-of-bounds work group sizes
-                // if (global_id.x >= u32(firstMatrix.size.x) || global_id.y >= u32(secondMatrix.size.y)) {
-                //   return;
-                // }
+            @compute @workgroup_size(8,8)
+            fn main(
+                    @builtin(global_invocation_id) GlobalId : vec3<u32>,
+                    @builtin(workgroup_id) WorkGroupID : vec3<u32>,
+                    @builtin(local_invocation_id) LocalInvocationID : vec3<u32>
+                ) {
 
                 let longvarname  = firstMatrix[0];
                 //resultMatrix[0] = -1;
@@ -105,21 +114,26 @@ async function init() {
                 let numRows:f32 = screenSize.numRows;
 
 
+
                 var indexC:i32 = 0;
-                for(var indexColumns: i32 = 0; indexColumns < i32(screenSize.numColumns); indexColumns++) {
-                    for(var indexRows: i32 = 0; indexRows < i32(screenSize.numRows); indexRows++) {
+                for(var indexColumns: i32 = 0; indexColumns < i32(screenSize.numColumns/8); indexColumns++) {
+                    for(var indexRows: i32 = 0; indexRows < i32(screenSize.numRows/8); indexRows++) {
 
-                        let x:f32 = f32(indexColumns);
-                        let y:f32 = f32(indexRows);
-                        let index:f32 = y + (x * screenSize.numColumns);
+                        let x:f32 = f32(WorkGroupID.x) * screenSize.numColumns/8 + f32(indexColumns);
+                        let y:f32 = f32(WorkGroupID.y) * screenSize.numRows/8 + f32(indexRows);
+
+                        let index:f32 = y  + (x * screenSize.numColumns);
+                        //let index:f32 = (x + f32(LocalInvocationID.x) * 2);
                         indexC = i32(index);
+                        //indexC = i32(WorkGroupID.x + WorkGroupID.y);
 
-                        let indexSin = sin( f32(indexRows) * f32(indexColumns)  * screenSize.uTime * .1);
-                        let indexCos = 1 - cos( f32(indexRows) * f32(indexColumns)  * screenSize.uTime * .2);
+                        let indexSin = sin( y * x  * screenSize.uTime * .00001);
+                        let indexCos = 1 - cos( y * x  * screenSize.uTime * .00002);
                         let indexTan = tan(index * screenSize.uTime * .003);
-                        let z = fusin(1, screenSize.uTime * .1 * f32(indexColumns)) * fusin(1, screenSize.uTime*.1* f32(indexRows));
+                        let z = fusin(1, screenSize.uTime * .1 * x) * fusin(1, screenSize.uTime*.1* y);
 
-                        let color = array<f32,4>(z,z,z,1);
+                        //let color = array<f32,4>(z,0,0,1);
+                        let color = array<f32,4>(indexSin,indexCos,0,1);
                         resultMatrix.points[indexC].vertex0.color = color;
                         resultMatrix.points[indexC].vertex1.color = color;
                         resultMatrix.points[indexC].vertex2.color = color;
