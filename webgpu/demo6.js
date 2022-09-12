@@ -36,7 +36,7 @@ webGPU.useTexture = false;
 
 let utime = 0;
 
-let side = 744;
+let side = 744; //744 max
 let numColumns = side;
 let numRows = side;
 
@@ -59,7 +59,6 @@ async function init() {
               return rand_seed.y;
             }
 
-            
 
             struct Vertex {
                 position: array<f32,4>,
@@ -99,7 +98,7 @@ async function init() {
             @group(0) @binding(1) var<storage, read_write> resultMatrix : Points;
             @group(0) @binding(2) var<storage, read> screenSize : ScreenSize;
 
-            @compute @workgroup_size(8,8)
+            @compute @workgroup_size(8,8,1)
             fn main(
                     @builtin(global_invocation_id) GlobalId : vec3<u32>,
                     @builtin(workgroup_id) WorkGroupID : vec3<u32>,
@@ -116,24 +115,24 @@ async function init() {
 
 
                 var indexC:i32 = 0;
-                for(var indexColumns: i32 = 0; indexColumns < i32(screenSize.numColumns/8); indexColumns++) {
-                    for(var indexRows: i32 = 0; indexRows < i32(screenSize.numRows/8); indexRows++) {
+                let numColumnsPiece:i32 = i32(screenSize.numColumns/8);
+                let numRowsPiece:i32 = i32(screenSize.numRows/8);
+                for(var indexColumns:i32 = 0; indexColumns < numColumnsPiece; indexColumns++) {
+                    for(var indexRows:i32 = 0; indexRows < numRowsPiece; indexRows++) {
 
-                        let x:f32 = f32(WorkGroupID.x) * screenSize.numColumns/8 + f32(indexColumns);
-                        let y:f32 = f32(WorkGroupID.y) * screenSize.numRows/8 + f32(indexRows);
+                        let x:f32 = f32(WorkGroupID.x) * f32(numColumnsPiece) + f32(indexColumns);
+                        let y:f32 = f32(WorkGroupID.y) * f32(numRowsPiece) + f32(indexRows);
 
                         let index:f32 = y  + (x * screenSize.numColumns);
-                        //let index:f32 = (x + f32(LocalInvocationID.x) * 2);
                         indexC = i32(index);
-                        //indexC = i32(WorkGroupID.x + WorkGroupID.y);
 
-                        let indexSin = sin( y * x  * screenSize.uTime * .00001);
+                        let z = fusin(1, screenSize.uTime * .1 * x) * fusin(1, screenSize.uTime*.1* y);
+                        let indexSin = z - sin( z - y * x  * screenSize.uTime * .00001 );
                         let indexCos = 1 - cos( y * x  * screenSize.uTime * .00002);
                         let indexTan = tan(index * screenSize.uTime * .003);
-                        let z = fusin(1, screenSize.uTime * .1 * x) * fusin(1, screenSize.uTime*.1* y);
 
                         //let color = array<f32,4>(z,0,0,1);
-                        let color = array<f32,4>(indexSin,indexCos,0,1);
+                        let color = array<f32,4>(indexSin,indexCos, z,1);
                         resultMatrix.points[indexC].vertex0.color = color;
                         resultMatrix.points[indexC].vertex1.color = color;
                         resultMatrix.points[indexC].vertex2.color = color;
