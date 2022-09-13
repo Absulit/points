@@ -179,9 +179,7 @@ export default class WebGPU {
             for (let yIndex = 0; yIndex < numColumns; yIndex++) {
                 const coordinate = new Coordinate(xIndex * this._canvas.clientWidth / this._numColumns, yIndex * this._canvas.clientHeight / this._numRows, .3);
                 this.addPoint(coordinate, this._canvas.clientWidth / this._numColumns, this._canvas.clientHeight / this._numRows, colors);
-
             }
-
         }
         this.createVertexBuffer(new Float32Array(this._vertexArray));
         this.createComputeBuffers();
@@ -197,9 +195,8 @@ export default class WebGPU {
      */
     createVertexBuffer(vertexArray) {
         this._vertexBufferInfo = new VertexBufferInfo(vertexArray);
-
         this._buffer = this._device.createBuffer({
-            size: vertexArray.byteLength,
+            size: vertexArray.byteLength,//TODO: fill via shader this._numColumns*this._numRows*4*60,
             usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
             mappedAtCreation: true,
         });
@@ -314,15 +311,10 @@ export default class WebGPU {
             ]
         });
 
-
-
-
-
-
         //--------------------------------------
 
 
-        this.createVertexBuffer(new Float32Array(this._vertexArray));
+        //this.createVertexBuffer(new Float32Array(this._vertexArray));
         // enum GPUPrimitiveTopology {
         //     'point-list',
         //     'line-list',
