@@ -187,7 +187,6 @@ export default class WebGPU {
         this.createComputeBuffers();
 
 
-        print(this._vertexArray);
         await this.createPipeline();
     }
 
