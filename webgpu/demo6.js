@@ -14,7 +14,7 @@ let capturer = new CCapture({
 });
 /***************/
 
-const demo6ComputeShader = await fetch('./shaders/demo6.compute.wgsl').then(r => r.text());
+const demo6ComputeShader = await fetch('./shaders/points.compute.wgsl').then(r => r.text());
 
 
 const webGPU = new WebGPU('gl-canvas');
