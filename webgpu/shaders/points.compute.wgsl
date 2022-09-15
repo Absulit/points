@@ -38,6 +38,21 @@ struct Points {
     points: array<Point>
 }
 
+fn getWorkgroupByCoordinate(x: u32, y: u32) -> vec2<u32>{
+    // let x:f32 = f32(WorkGroupID.x) * f32(numColumnsPiece) + f32(indexColumns);
+    // let y:f32 = f32(WorkGroupID.y) * f32(numRowsPiece) + f32(indexRows);
+
+    let columnPointsPerWorkgroup:u32 = x % 8u;
+    let rowPointsPerWorkgroup:u32 = y % 8u;
+
+    //let workgroupX:u32 = u32(floor(f32(x) / f32(columnPointsPerWorkgroup)));
+    //let workgroupY:u32 = u32(floor(f32(y) / f32(columnPointsPerWorkgroup)));
+
+    let workgroupX:u32 = columnPointsPerWorkgroup;
+    let workgroupY:u32 = rowPointsPerWorkgroup;
+    return vec2<u32>(workgroupX, workgroupY);
+}
+
 fn fusin(speed: f32, utime: f32) -> f32 {
     return (sin(utime * speed) + 1.) * .5;
 }
@@ -48,6 +63,10 @@ fn getPointAt(x: u32, y: u32) -> Point {
     return r;
 }
 
+struct Test{
+    @builtin(workgroup_id) WorkGroupID: vec3<u32>
+}
+
 fn modifyColorAt(x: u32, y: u32, color: array<f32, 4>) {
     let index:u32 = y + (x * u32(screenSize.numColumns));
     resultMatrix.points[index].vertex0.color = color;
@@ -56,6 +75,7 @@ fn modifyColorAt(x: u32, y: u32, color: array<f32, 4>) {
     resultMatrix.points[index].vertex3.color = color;
     resultMatrix.points[index].vertex4.color = color;
     resultMatrix.points[index].vertex5.color = color;
+
 }
 
 fn plotLineLow(x0: u32, y0: u32, x1: u32, y1: u32, color: array<f32, 4>) {
@@ -118,12 +138,34 @@ fn drawLine(x0: u32, y0: u32, x1: u32, y1: u32, color: array<f32, 4>) {
     }
 }
 
+// fn radians(angle:f32)->f32{
+//     let pi = 3.14159;
+//     return angle * (pi/180.);
+// }
+
+fn polar(distance:u32, radians:f32)->vec2<u32>{
+    return vec2<u32>(  distance * u32(cos(radians)), distance * u32(sin(radians)));
+}
+
+fn drawCircle(x:u32, y:u32, radius:u32, color: array<f32, 4>) {
+    var rads:f32;
+    var lastModifiedPoint = vec2(0u,0u);
+    for (var angle:f32 = 0.; angle < 360.; angle += .1) {
+        rads = radians(angle);
+        let pointFromCenter = polar(radius, rads);
+        //if (lastModifiedPoint.x != x && lastModifiedPoint.y != y) {
+            modifyColorAt( pointFromCenter.x + x, pointFromCenter.y + y, color);
+            //lastModifiedPoint = vec2(x,y);
+        //}
+    }
+}
+
 
 @group(0) @binding(0) var<storage, read> firstMatrix : array<f32>;
 @group(0) @binding(1) var<storage, read_write> resultMatrix : Points;
 @group(0) @binding(2) var<storage, read> screenSize : ScreenSize;
 
-@compute @workgroup_size(8,8,1)
+@compute @workgroup_size(8,8,2)
 fn main(
     @builtin(global_invocation_id) GlobalId: vec3<u32>,
     @builtin(workgroup_id) WorkGroupID: vec3<u32>,
@@ -138,54 +180,43 @@ fn main(
     let numRows:f32 = screenSize.numRows;
     let constant = u32(numColumns) / 96u;
 
-
-
-    var indexC:i32 = 0;
     let numColumnsPiece:i32 = i32(screenSize.numColumns / 8.);
     let numRowsPiece:i32 = i32(screenSize.numRows / 8.);
-    for (var indexColumns:i32 = 0; indexColumns < numColumnsPiece; indexColumns++) {
-        for (var indexRows:i32 = 0; indexRows < numRowsPiece; indexRows++) {
+    if(WorkGroupID.z == 1u){
 
-            let x:f32 = f32(WorkGroupID.x) * f32(numColumnsPiece) + f32(indexColumns);
-            let y:f32 = f32(WorkGroupID.y) * f32(numRowsPiece) + f32(indexRows);
+        for (var indexColumns:i32 = 0; indexColumns < numColumnsPiece; indexColumns++) {
+            for (var indexRows:i32 = 0; indexRows < numRowsPiece; indexRows++) {
 
-            let nx:f32 = x / f32(numColumns);
-            let ny:f32 = y / f32(numRows);
+                let x:f32 = f32(WorkGroupID.x) * f32(numColumnsPiece) + f32(indexColumns);
+                let y:f32 = f32(WorkGroupID.y) * f32(numRowsPiece) + f32(indexRows);
 
-            let index:f32 = y + (x * screenSize.numColumns);
-            indexC = i32(index);
+                let nx:f32 = x / f32(numColumns);
+                let ny:f32 = y / f32(numRows);
 
-            let z = fusin(1., screenSize.uTime * .001 * x) * fusin(1., screenSize.uTime * .1 * y);
-            let indexSin = z - sin(z - y * ny - x * screenSize.uTime * .0001);
-            let indexCos = 1. - cos(nx - y * x * screenSize.uTime * .002);
-            let indexTan = tan(index * screenSize.uTime * .00003);
+                let index:f32 = y + (x * screenSize.numColumns);
 
-            let color1 = array<f32,4>(indexSin, 0., 0., 1.);
-            let color2 = array<f32,4>(z * indexSin, 0., 0., 1.);
-            let color3 = array<f32,4>(0., 0., indexCos, 1.);
-            resultMatrix.points[indexC].vertex0.color = color2;
-            resultMatrix.points[indexC].vertex1.color = color2;
-            resultMatrix.points[indexC].vertex2.color = color2;
-            resultMatrix.points[indexC].vertex3.color = color2;
-            resultMatrix.points[indexC].vertex4.color = color2;
-            resultMatrix.points[indexC].vertex5.color = color2;
+                let z = fusin(1., screenSize.uTime * .001 * x) * fusin(1., screenSize.uTime * .1 * y);
+                let indexSin = z - sin(z - y * ny - x * screenSize.uTime * .0001);
+                let indexCos = 1. - cos(nx - y * x * screenSize.uTime * .002);
+                let indexTan = tan(index * screenSize.uTime * .00003);
+
+                let color1 = array<f32,4>(indexSin, 0., 0., 1.);
+                let color2 = array<f32,4>(z * indexSin, 0., 0., 1.);
+                let color3 = array<f32,4>(0., 0., indexCos, 1.);
+                modifyColorAt(u32(x),u32(y), color2);
+            }
         }
     }
 
-    if (WorkGroupID.x == 0u && WorkGroupID.y == 0u) {
-        // let p:Point = getPointAt(10u, 10u);
 
         let color1:array<f32, 4> = array<f32, 4>(1, 1, 0., 1.);
-        // p.vertex0.color = color1;
-
-        //getPointAt(10u,10u).vertex0.color = color1;
-        // p.vertex1.color = color1;
-        // p.vertex2.color = color1;
-        // p.vertex3.color = color1;
-        // p.vertex4.color = color1;
-        // p.vertex5.color = color1;
 
         modifyColorAt(10u * constant, 10u * constant, color1);
-        drawLine(20u * constant, 20u * constant, 50u * constant, 50u * constant, color1);
-    }
+        drawLine(u32(  fusin(.1, screenSize.uTime ) * 80. )  * constant, 20u * constant, 90u * constant, 90u * constant, color1);
+        drawLine( 10u  * constant, 50u * constant, 60u * constant, 90u * constant, color1);
+
+
+        drawCircle(48u * constant,48u * constant, 100u,color1);
+
+
 }
