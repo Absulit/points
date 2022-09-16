@@ -107,6 +107,7 @@ import ContinuosCircles2 from './js/examples/ContinuosCircles2.js';
 import { print } from './js/utils.js';
 import Snail1 from './js/examples/snail1.js';
 import RandomNoise1 from './js/examples/randomnoise1.js';
+import DrawCircle from './js/examples/drawcircle.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -167,7 +168,7 @@ function init() {
 
     cache = new Cache(60 * 10);
 
-    demo = new RandomNoise1(screen);
+    demo = new DrawCircle(screen);
 
     effects = new Effects(screen);
 
