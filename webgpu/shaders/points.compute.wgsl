@@ -96,6 +96,26 @@ fn getColorsAround(x: u32, y: u32, distance: u32) -> array<  array<f32,4>, 8  > 
     );
 }
 
+fn getColorsAroundCross(x: u32, y: u32, distance: u32) -> array<  array<f32,4>, 4  > {
+
+    return array< array<f32,4>,4 >(
+        getColorAt(x, y - distance),              // top        N 1
+        getColorAt(x - distance, y),              // left        N 1
+        getColorAt(x + distance, y),              // right        N 1
+        getColorAt(x, y + distance),              // bottom         N 1
+    );
+}
+
+fn getColorsAroundX(x: u32, y: u32, distance: u32) -> array<  array<f32,4>, 4> {
+
+    return array< array<f32,4>, 4>(
+        getColorAt(x - distance, y - distance), // top left   NW 0
+        getColorAt(x + distance, y - distance), // top right   NW 0
+        getColorAt(x - distance, y + distance), // bottom left        N 1
+        getColorAt(x + distance, y + distance), // bottom   right      N 1
+    );
+}
+
 fn plotLineLow(x0: u32, y0: u32, x1: u32, y1: u32, color: array<f32, 4>) {
     var dx:i32 = i32(x1) - i32(x0);
     var dy:i32 = i32(y1 - y0);
@@ -180,6 +200,9 @@ fn drawCircle(x: u32, y: u32, radius: u32, color: array<f32, 4>) {
     }
 }
 
+const yellow:array<f32, 4> = array<f32, 4>(1, 1, 0., 1.);
+const green:array<f32, 4> = array<f32, 4>(0., 1, 0., 1.);
+const colorPower = 1.;
 
 @group(0) @binding(0) var<storage, read> firstMatrix : array<f32>;
 @group(0) @binding(1) var<storage, read_write> resultMatrix : Points;
@@ -233,53 +256,46 @@ fn main(
     // }
 
     if (WorkGroupID.z == 0u) {
-
-        let color1:array<f32, 4> = array<f32, 4>(1, 1, 0., 1.);
-        let color2:array<f32, 4> = array<f32, 4>(0., 1, 0., 1.);
-
-        modifyColorAt(10u * constant, 10u * constant, color1);
-        drawLine(u32(fnusin(.1, screenSize.uTime) * 80. * f32(constant)), 20u * constant, 90u * constant, 90u * constant, color1);
-        drawLine(10u * constant, 50u * constant, 60u * constant, 90u * constant, color1);
-        drawLine(1u * constant, 80u * constant, 80u * constant, 10u * constant, color2);
-
-
-        drawCircle(48u * constant, 48u * constant, u32(fnusin(1.5, screenSize.uTime) * 80. * f32(constant)), color1);
+        //modifyColorAt(10u * constant, 10u * constant, yellow);
+        drawLine(u32(fnusin(2, screenSize.uTime) * 80. * f32(constant)), 20u * constant, 90u * constant, 90u * constant, yellow);
+        drawLine(10u * constant, 50u * constant, 60u * constant, 90u * constant, yellow);
+        drawLine(1u * constant, 80u * constant, 80u * constant, 10u * constant, green);
+        drawCircle(48u * constant, 48u * constant, u32(fnusin(1.5, screenSize.uTime) * 80. * f32(constant)), yellow);
     }
 
-
-
-
-
     if (WorkGroupID.z == 1u) {
-
         for (var indexColumns:i32 = 0; indexColumns < numColumnsPiece; indexColumns++) {
             let x:f32 = f32(WorkGroupID.x) * f32(numColumnsPiece) + f32(indexColumns);
+            let ux = u32(x);
             for (var indexRows:i32 = 0; indexRows < numRowsPiece; indexRows++) {
 
                 let y:f32 = f32(WorkGroupID.y) * f32(numRowsPiece) + f32(indexRows);
+                let uy = u32(y);
 
-                let nx:f32 = x / f32(numColumns);
-                let ny:f32 = y / f32(numRows);
+                //let index:f32 = y + (x * screenSize.numColumns);
 
-                let index:f32 = y + (x * screenSize.numColumns);
-                let colorPower = 2.;
-                let colorsAround = getColorsAround(u32(x), u32(y), 1u);
-                var currentColor = getColorAt(u32(x), u32(y));
-                for (var indexColors = 0u; indexColors < 8u; indexColors++) {
+                //let colorsAround = getColorsAround(ux, uy, 1u);
+                let colorsAround = getColorsAroundCross(ux, uy, 1u);
+                //let colorsAround = getColorsAroundX(ux, uy, 1u);
+                var currentColor = getColorAt(ux, uy);
+
+                // soften
+                for (var indexColors = 0u; indexColors < 4u; indexColors++) {
                     let colorAround = colorsAround[indexColors];
                     currentColor[0] = (currentColor[0] + colorAround[0] * colorPower) / (colorPower + 1.);
                     currentColor[1] = (currentColor[1] + colorAround[1] * colorPower) / (colorPower + 1.);
                     currentColor[2] = (currentColor[2] + colorAround[2] * colorPower) / (colorPower + 1.);
                     currentColor[3] = (currentColor[3] + colorAround[3] * colorPower) / (colorPower + 1.);
-                    modifyColorAt(u32(x), u32(y), currentColor);
                 }
 
+                // clear mix
                 let level = 1.01;
-                currentColor[0] = currentColor[0] / level ;
-                currentColor[1] = currentColor[1] / level ;
-                currentColor[2] = currentColor[2] / level ;
-                currentColor[3] = currentColor[3] / level ;
-                modifyColorAt(u32(x), u32(y), currentColor);
+                currentColor[0] = currentColor[0] / level;
+                currentColor[1] = currentColor[1] / level;
+                currentColor[2] = currentColor[2] / level;
+                currentColor[3] = currentColor[3];
+
+                modifyColorAt(ux, uy, currentColor);
             }
         }
     }
