@@ -6,10 +6,11 @@ fn rand() -> f32 {
     return rand_seed.y;
 }
 
-const yellow:array<f32, 4> = array<f32, 4>(1, 1, 0., 1.);
-const green:array<f32, 4> = array<f32, 4>(0., 1, 0., 1.);
-const red:array<f32, 4> = array<f32, 4>(1., 0, 0., 1.);
-const white:array<f32, 4> = array<f32, 4>(1., 1., 1., 1.);
+const yellow:Color = Color(1, 1, 0., 1.);
+const green:Color = Color(0., 1, 0., 1.);
+const red:Color = Color(1., 0, 0., 1.);
+const white:Color = Color(1., 1., 1., 1.);
+const orange:Color = Color(1., .64, 0., 1.);
 
 const clearMixlevel = 1.01;
 const colorPower = 1.;
@@ -22,10 +23,20 @@ struct Color{
     a: f32
 }
 
+struct Position{
+    x: f32,
+    y: f32,
+    z: f32,
+    w: f32
+}
+
+
+
+
 struct Vertex {
-    position: array<f32,4>,
-    color: array<f32,4>,
-    //color: vec4<f32>,
+    position: Position,
+    //color: array<f32,4>,
+    color: Color,
     uv: array<f32,2>,
 }
 
@@ -89,7 +100,7 @@ fn getPointsIndex(x: u32, y: u32) -> u32{
     return y + (x * u32(screenSize.numColumns));
 }
 
-fn modifyColorAt(x: u32, y: u32, color: array<f32, 4>) {
+fn modifyColorAt(x: u32, y: u32, color: Color) {
     let index:u32 = getPointsIndex(x, y);
     let pointerPoint: ptr<storage,Point, read_write> = &resultMatrix.points[index];
     *pointerPoint.vertex0.color = color;
@@ -100,7 +111,7 @@ fn modifyColorAt(x: u32, y: u32, color: array<f32, 4>) {
     *pointerPoint.vertex5.color = color;
 }
 
-fn modifyColorAtPointer(pointerPoint:ptr<private, Point>, color: array<f32, 4>){
+fn modifyColorAtPointer(pointerPoint:ptr<private, Point>, color: Color){
     (*pointerPoint).vertex0.color = color;
     (*pointerPoint).vertex1.color = color;
     (*pointerPoint).vertex2.color = color;
@@ -109,24 +120,24 @@ fn modifyColorAtPointer(pointerPoint:ptr<private, Point>, color: array<f32, 4>){
     (*pointerPoint).vertex5.color = color;
 }
 
-fn getColorAt(x: u32, y: u32) -> array<f32, 4> {
+fn getColorAt(x: u32, y: u32) -> Color {
     let index:u32 = getPointsIndex(x, y);
     return resultMatrix.points[index].vertex0.color;
 }
 
-fn getColorAtIndex(index:u32) -> array<f32, 4> {
+fn getColorAtIndex(index:u32) -> Color {
     return resultMatrix.points[index].vertex0.color;
 }
 
 fn getBrightness(x: u32, y: u32) -> f32{
     let index:u32 = getPointsIndex(x, y);
     let color = resultMatrix.points[index].vertex0.color;
-    return (0.2126 * color[0]) + (0.7152 * color[1]) + (0.0722 * color[2]);
+    return (0.2126 * color.r) + (0.7152 * color.g) + (0.0722 * color.b);
 }
 
-fn getColorsAround(x: u32, y: u32, distance: u32) -> array<  array<f32,4>, 8  > {
+fn getColorsAround(x: u32, y: u32, distance: u32) -> array<  Color, 8  > {
 
-    return array< array<f32,4>,8 >(
+    return array< Color,8 >(
         getColorAt(x - distance, y - distance), // top left   NW 0
         getColorAt(x, y - distance),              // top        N 1
         getColorAt(x + distance, y - distance), // top right   NW 0
@@ -138,17 +149,17 @@ fn getColorsAround(x: u32, y: u32, distance: u32) -> array<  array<f32,4>, 8  > 
     );
 }
 
-fn getRightColor(x: u32, y: u32, distance: u32) -> array<f32,4>{
+fn getRightColor(x: u32, y: u32, distance: u32) -> Color{
     return getColorAt(x + distance, y);
 }
 
-fn getLeftColor(x: u32, y: u32, distance: u32) -> array<f32,4>{
+fn getLeftColor(x: u32, y: u32, distance: u32) -> Color{
     return getColorAt(x - distance, y);
 }
 
-fn getColorsAroundCross(x: u32, y: u32, distance: u32) -> array<  array<f32,4>, 4  > {
+fn getColorsAroundCross(x: u32, y: u32, distance: u32) -> array<  Color, 4  > {
 
-    return array< array<f32,4>,4 >(
+    return array< Color, 4 >(
         getColorAt(x, y - distance),              // top        N 1
         getColorAt(x - distance, y),              // left        N 1
         getColorAt(x + distance, y),              // right        N 1
@@ -156,9 +167,9 @@ fn getColorsAroundCross(x: u32, y: u32, distance: u32) -> array<  array<f32,4>, 
     );
 }
 
-fn getColorsAroundX(x: u32, y: u32, distance: u32) -> array<  array<f32,4>, 4> {
+fn getColorsAroundX(x: u32, y: u32, distance: u32) -> array<  Color, 4> {
 
-    return array< array<f32,4>, 4>(
+    return array< Color, 4>(
         getColorAt(x - distance, y - distance), // top left   NW 0
         getColorAt(x + distance, y - distance), // top right   NW 0
         getColorAt(x - distance, y + distance), // bottom left        N 1
@@ -166,7 +177,7 @@ fn getColorsAroundX(x: u32, y: u32, distance: u32) -> array<  array<f32,4>, 4> {
     );
 }
 
-fn plotLineLow(x0: u32, y0: u32, x1: u32, y1: u32, color: array<f32, 4>) {
+fn plotLineLow(x0: u32, y0: u32, x1: u32, y1: u32, color: Color) {
     var dx:i32 = i32(x1) - i32(x0);
     var dy:i32 = i32(y1 - y0);
     var yi:i32 = 1;
@@ -188,7 +199,7 @@ fn plotLineLow(x0: u32, y0: u32, x1: u32, y1: u32, color: array<f32, 4>) {
     }
 }
 
-fn plotLineHigh(x0: u32, y0: u32, x1: u32, y1: u32, color: array<f32, 4>) {
+fn plotLineHigh(x0: u32, y0: u32, x1: u32, y1: u32, color: Color) {
     var dx:i32 = i32(x1) - i32(x0);
     var dy:i32 = i32(y1 - y0);
     var xi:i32 = 1;
@@ -210,7 +221,7 @@ fn plotLineHigh(x0: u32, y0: u32, x1: u32, y1: u32, color: array<f32, 4>) {
     }
 }
 
-fn drawLine(x0: u32, y0: u32, x1: u32, y1: u32, color: array<f32, 4>) {
+fn drawLine(x0: u32, y0: u32, x1: u32, y1: u32, color: Color) {
     if (abs(y1 - y0) < abs(x1 - x0)) {
         if (x0 > x1) {
             plotLineLow(x1, y1, x0, y0, color);
@@ -235,7 +246,7 @@ fn polar(distance: u32, radians: f32) -> vec2<i32> {
     return vec2<i32>(i32(f32(distance) * cos(radians)), i32(f32(distance) * sin(radians)));
 }
 
-fn drawCircle(x: u32, y: u32, radius: u32, color: array<f32, 4>) {
+fn drawCircle(x: u32, y: u32, radius: u32, color: Color) {
     var rads:f32;
     var lastModifiedPoint:vec2<u32> = vec2(0u, 0u);
     for (var angle:f32 = 0.; angle < 360.; angle += .1) {
@@ -250,13 +261,57 @@ fn drawCircle(x: u32, y: u32, radius: u32, color: array<f32, 4>) {
     }
 }
 
-fn clearMix(r:f32, g:f32, b:f32, a:f32) -> array<f32, 4>{
-    let rr = r / clearMixlevel;
-    let gr = g / clearMixlevel;
-    let br = b / clearMixlevel;
-    return array<f32, 4>(rr, gr, br, a);
+// fn clearMix(r:f32, g:f32, b:f32, a:f32) -> Color{
+//     let rr = r / clearMixlevel;
+//     let gr = g / clearMixlevel;
+//     let br = b / clearMixlevel;
+//     return Color(rr, gr, br, a);
+// }
+
+fn clearMix(color:Color) -> Color{
+    let rr = color.r / clearMixlevel;
+    let gr = color.g / clearMixlevel;
+    let br = color.b / clearMixlevel;
+    return Color(rr, gr, br, color.a);
 }
 
+fn soften8(color:Color, colorsAround:array<Color, 8>, colorPower:f32) -> Color {
+    var newColor:Color = color;
+    for (var indexColors = 0u; indexColors < 8u; indexColors++) {
+        let colorAround = colorsAround[indexColors];
+        newColor.r = (newColor.r + colorAround.r * colorPower) / (colorPower + 1.);
+        newColor.g = (newColor.g + colorAround.g * colorPower) / (colorPower + 1.);
+        newColor.b = (newColor.b + colorAround.b * colorPower) / (colorPower + 1.);
+        newColor.a = (newColor.a + colorAround.a * colorPower) / (colorPower + 1.);
+    }
+    return newColor;
+}
+
+fn soften4(color:Color, colorsAround:array<Color, 4>, colorPower:f32) -> Color {
+    var newColor:Color = color;
+    for (var indexColors = 0u; indexColors < 4u; indexColors++) {
+        let colorAround = colorsAround[indexColors];
+        newColor.r = (newColor.r + colorAround.r * colorPower) / (colorPower + 1.);
+        newColor.g = (newColor.g + colorAround.g * colorPower) / (colorPower + 1.);
+        newColor.b = (newColor.b + colorAround.b * colorPower) / (colorPower + 1.);
+        newColor.a = (newColor.a + colorAround.a * colorPower) / (colorPower + 1.);
+    }
+    return newColor;
+}
+
+fn chromaticAberration(x:u32, y:u32, color:Color, threshold:f32, distance:u32){
+    // thresold .5
+    if(getBrightness(x, y) > threshold ){
+        let rightColor = getRightColor(x, y, distance);
+
+        var newColor = Color((rightColor.r + color.r) / 2, rightColor.g, rightColor.b, (rightColor.a + color.a) / 2) ;
+        modifyColorAt(x + distance, y, newColor);
+
+        let leftColor = getLeftColor(x, y, distance);
+        newColor = Color(leftColor.r, leftColor.g, (leftColor.b + color.b) / 2, (leftColor.a + color.a) / 2) ;
+        modifyColorAt(x - distance, y, newColor);
+    }
+}
 
 
 @group(0) @binding(0) var<storage, read> firstMatrix : array<f32>;
@@ -316,7 +371,7 @@ fn main(
     //     }
     // }
 
-    //if (WorkGroupID.z == 0u) {
+    if (WorkGroupID.z == 0u) {
         //modifyColorAt(10u * constant, 10u * constant, yellow);
         //drawLine(u32(fnusin(2, screenSize.uTime) * 80. * f32(constant)), 20u * constant, 90u * constant, 90u * constant, white);
         //drawLine(10u * constant, 50u * constant, 60u * constant, 90u * constant, yellow);
@@ -330,19 +385,22 @@ fn main(
         let side = numColumns;
         let x = 48u * constant;
         let y = 48u * constant;
+        let ix = i32(x);
+        let iy = i32(y);
 
         var rads:f32;
         var lastModifiedPoint:vec2<u32> = vec2(0u, 0u);
-        for (var angle:f32 = 0.; angle < 360.; angle += 5.) {
+        let fconstant = f32(constant);
+        for (var angle:f32 = 0.; angle < 360.; angle += 1.) {
             rads = radians(angle);
 
 
-            let pointFromCenter = polar( u32(radius * usin * ucos * angle / f32(constant)   )  , rads/usin );
-            let cx:u32 = u32(pointFromCenter.x + i32(x));
-            let cy:u32 = u32(pointFromCenter.y + i32(y));
+            let pointFromCenter = polar( u32(radius * usin * ucos * angle / fconstant   )  , rads/usin );
+            let cx:u32 = u32(pointFromCenter.x + ix);
+            let cy:u32 = u32(pointFromCenter.y + iy);
 
             if (lastModifiedPoint.x != cx && lastModifiedPoint.y != cy) {
-                
+
                 drawLine(lastModifiedPoint.x, lastModifiedPoint.y, cx, cy, white);
                 lastModifiedPoint = vec2(cx, cy);
             }
@@ -350,10 +408,10 @@ fn main(
 
 
 
-    //}
+    }
 
 
-    //if (WorkGroupID.z == 1u) {
+    if (WorkGroupID.z == 1u) {
         for (var indexColumns:i32 = 0; indexColumns < numColumnsPiece; indexColumns++) {
             let x:f32 = f32(WorkGroupID.x) * f32(numColumnsPiece) + f32(indexColumns);
             let ux = u32(x);
@@ -364,62 +422,27 @@ fn main(
 
                 //let index:f32 = y + (x * screenSize.numColumns);
 
-
                 //let colorsAround = getColorsAround(ux, uy, 3u);
-                //let colorsAround = getColorsAroundCross(ux, uy, 1u);
+                let colorsAround = getColorsAroundCross(ux, uy, u32( 1 + 50. * fnusin(1.1, screenSize.uTime)));
                 //let colorsAround = getColorsAroundX(ux, uy, 1u);
                 var currentColor = getColorAt(ux, uy);
-                var r = currentColor[0];
-                var g = currentColor[1];
-                var b = currentColor[2];
-                var a = currentColor[3];
+
 
                 //let d = distance( vec2<f32>(x, y), vec2<f32>(48.*f32(constant),48.*f32(constant))) / numColumns;
                 //modifyColorAt(ux, uy, array<f32, 4>(d,d,d,1));
 
-                // soften
-                //if(getBrightness(ux, uy) > .05 ){
-                    // for (var indexColors = 0u; indexColors < 8u; indexColors++) {
-                    //     let colorAround = colorsAround[indexColors];
-                    //     r = (r + colorAround[0] * colorPower) / (colorPower + 1.);
-                    //     g = (g + colorAround[1] * colorPower) / (colorPower + 1.);
-                    //     b = (b + colorAround[2] * colorPower) / (colorPower + 1.);
-                    //     a = (a + colorAround[3] * colorPower) / (colorPower + 1.);
-                    // }
-                //}
+                currentColor = soften4(currentColor, colorsAround, colorPower);
+                currentColor = clearMix(currentColor);
 
-                // clear mix
-                
-                // r = r / clearMixlevel;
-                // g = g / clearMixlevel;
-                // b = b / clearMixlevel;
-                // a = a;
-                let cm = clearMix(r, g, b, a);
-                r = cm[0];
-                g = cm[1];
-                b = cm[2];
-                a = cm[3];
+                chromaticAberration(ux, uy, currentColor, .5, u32( 2 + 50. * fnusin(.5, screenSize.uTime)) );
 
-
-                //modifyColorAt(ux, uy, array<f32, 4>(r,g,b,a));
-
-                let distance = 2u;
-
-                //chromatic aberration
-                // if(getBrightness(ux, uy) > .5 ){
-                //     var rightColor = getRightColor(ux, uy, distance);
-
-                //     var newColor = array<f32, 4>((rightColor[0] + r) / 2, rightColor[1], rightColor[2], (rightColor[3] + a) / 2) ;
-                //     modifyColorAt(ux + distance, uy, newColor);
-
-                //     var leftColor = getLeftColor(ux, uy, distance);
-                //     newColor = array<f32, 4>(leftColor[0], leftColor[1], (leftColor[2] + b) / 2, (leftColor[3] + a) / 2) ;
-                //     modifyColorAt(ux - distance, uy, newColor);
-                // }
-
-                modifyColorAt(ux, uy, array<f32, 4>(r,g,b,a));
-
+                modifyColorAt(ux, uy, currentColor);
             }
+
+            let centerRows = numRows / 2.;
+            let xCurve = centerRows + sin(( x / f32(constant) * fnusin(.5596, screenSize.uTime) ) + screenSize.uTime) * f32(constant) * 2.;
+            modifyColorAt(ux, u32(xCurve), orange);
+
         }
-    //}
+    }
 }
