@@ -261,6 +261,12 @@ fn drawCircle(x: u32, y: u32, radius: u32, color: Color) {
     }
 }
 
+fn sdfCircle(position:vec2<f32>, currentPosition:vec2<f32>, percent: f32) -> bool{
+    let d = distance( currentPosition, position) / screenSize.numColumns;
+    return d < percent;
+}
+
+
 // fn clearMix(r:f32, g:f32, b:f32, a:f32) -> Color{
 //     let rr = r / clearMixlevel;
 //     let gr = g / clearMixlevel;
@@ -335,41 +341,48 @@ fn main(
 
     let numColumnsPiece:i32 = i32(screenSize.numColumns / f32(workgroupSize));
     let numRowsPiece:i32 = i32(screenSize.numRows / f32(workgroupSize));
-    // if (WorkGroupID.z == 0u) {
+    if (WorkGroupID.z == 0u) {
 
-    //     for (var indexColumns:i32 = 0; indexColumns < numColumnsPiece; indexColumns++) {
-    //         let x:f32 = f32(WorkGroupID.x) * f32(numColumnsPiece) + f32(indexColumns);
-    //         let ux = u32(x);
-    //         for (var indexRows:i32 = 0; indexRows < numRowsPiece; indexRows++) {
+        // for (var indexColumns:i32 = 0; indexColumns < numColumnsPiece; indexColumns++) {
+        //     let x:f32 = f32(WorkGroupID.x) * f32(numColumnsPiece) + f32(indexColumns);
+        //     let ux = u32(x);
+        //     for (var indexRows:i32 = 0; indexRows < numRowsPiece; indexRows++) {
 
-    //             let y:f32 = f32(WorkGroupID.y) * f32(numRowsPiece) + f32(indexRows);
-    //             let uy = u32(y);
+        //         let y:f32 = f32(WorkGroupID.y) * f32(numRowsPiece) + f32(indexRows);
+        //         let uy = u32(y);
 
-    //             let nx:f32 = x / f32(numColumns);
-    //             let ny:f32 = y / f32(numRows);
+        //         let nx:f32 = x / f32(numColumns);
+        //         let ny:f32 = y / f32(numRows);
 
-    //             var currentColor = getColorAt(ux, uy);
+        //         var currentColor = getColorAt(ux, uy);
 
 
-    //             let index:f32 = y + (x * screenSize.numColumns);
+        //         let index:f32 = y + (x * screenSize.numColumns);
 
-    //             let d = distance( vec2<f32>(x, y), vec2<f32>(48.*f32(constant),48.*f32(constant))) / numColumns;
-    //             let z = fnusin(1., screenSize.uTime * .001 * x) * fnusin(1., screenSize.uTime * .1 * y);
-    //             let indexSin = z - sin(z - y * ny - x * screenSize.uTime * .0001);
-    //             let indexCos = 1. - cos(nx - y * x * screenSize.uTime * .002);
-    //             let indexTan = tan(index * screenSize.uTime * .00003);
+        //         let d = distance( vec2<f32>(x, y), vec2<f32>(48.*f32(constant),48.*f32(constant))) / numColumns;
+        //         let z = fnusin(1., screenSize.uTime * .001 * x) * fnusin(1., screenSize.uTime * .1 * y);
+        //         let indexSin = z - sin(z - y * ny - x * screenSize.uTime * .0001);
+        //         let indexCos = 1. - cos(nx - y * x * screenSize.uTime * .002);
+        //         let indexTan = tan(index * screenSize.uTime * .00003);
 
-    //             let color1 = array<f32,4>(indexSin, 0., 0., 1.);
-    //             let color2 = array<f32,4>(z * indexSin, 0., 0., 1.);
-    //             let color3 = array<f32,4>(0., 0., indexCos, 1.);
-    //             modifyColorAt(ux, uy, color2);
-    //         }
-    //         let color1 = array<f32,4>(1., 1., 1., 1.);
-    //         let centerRows = numRows / 2.;
-    //         let xCurve = centerRows + sin(( f32(x) / f32(constant) * 1.) + screenSize.uTime) * f32(constant) * 2.;
-    //         modifyColorAt(u32(x), u32(xCurve), color1);
-    //     }
-    // }
+        //         let color1 = Color(indexSin, 0., 0., 1.);
+        //         let color2 = Color(z * indexSin, 0., 0., 1.);
+        //         let color3 = Color(0., 0., indexCos, 1.);
+
+        //         currentColor = color2;
+        //         if( sdfCircle( vec2<f32>(48.*f32(constant),48.*f32(constant)), vec2<f32>(x, y),  .1 + .2 * fnusin(1.359, screenSize.uTime)  ) ){
+        //             currentColor = white;
+        //         }
+
+        //         modifyColorAt(ux, uy, currentColor);
+                
+        //     }
+        //     let color1 = Color(1., 1., 1., 1.);
+        //     let centerRows = numRows / 2.;
+        //     let xCurve = centerRows + sin(( f32(x) / f32(constant) * 1.) + screenSize.uTime) * f32(constant) * 2.;
+        //     modifyColorAt(u32(x), u32(xCurve), color1);
+        // }
+    }
 
     if (WorkGroupID.z == 0u) {
         //modifyColorAt(10u * constant, 10u * constant, yellow);
@@ -379,35 +392,32 @@ fn main(
         //drawCircle(48u * constant, 48u * constant, u32(fnusin(1.5, screenSize.uTime) * 80. * f32(constant)), red);
 
 
-        let usin = sin(screenSize.uTime);
-        let ucos = cos(screenSize.uTime);
-        let radius = 10.;
-        let side = numColumns;
-        let x = 48u * constant;
-        let y = 48u * constant;
-        let ix = i32(x);
-        let iy = i32(y);
+        // let usin = sin(screenSize.uTime);
+        // let ucos = cos(screenSize.uTime);
+        // let radius = 10.;
+        // let side = numColumns;
+        // let x = 48u * constant;
+        // let y = 48u * constant;
+        // let ix = i32(x);
+        // let iy = i32(y);
 
-        var rads:f32;
-        var lastModifiedPoint:vec2<u32> = vec2(0u, 0u);
-        let fconstant = f32(constant);
-        for (var angle:f32 = 0.; angle < 360.; angle += 1.) {
-            rads = radians(angle);
-
-
-            let pointFromCenter = polar( u32(radius * usin * ucos * angle / fconstant   )  , rads/usin );
-            let cx:u32 = u32(pointFromCenter.x + ix);
-            let cy:u32 = u32(pointFromCenter.y + iy);
-
-            if (lastModifiedPoint.x != cx && lastModifiedPoint.y != cy) {
-
-                drawLine(lastModifiedPoint.x, lastModifiedPoint.y, cx, cy, white);
-                lastModifiedPoint = vec2(cx, cy);
-            }
-        }
+        // var rads:f32;
+        // var lastModifiedPoint:vec2<u32> = vec2(0u, 0u);
+        // let fconstant = f32(constant);
+        // for (var angle:f32 = 0.; angle < 360.; angle += 1.) {
+        //     rads = radians(angle);
 
 
+        //     let pointFromCenter = polar( u32(radius * usin * ucos * angle / fconstant   )  , rads/usin );
+        //     let cx:u32 = u32(pointFromCenter.x + ix);
+        //     let cy:u32 = u32(pointFromCenter.y + iy);
 
+        //     if (lastModifiedPoint.x != cx && lastModifiedPoint.y != cy) {
+
+        //         drawLine(lastModifiedPoint.x, lastModifiedPoint.y, cx, cy, orange);
+        //         lastModifiedPoint = vec2(cx, cy);
+        //     }
+        // }
     }
 
 
@@ -422,19 +432,22 @@ fn main(
 
                 //let index:f32 = y + (x * screenSize.numColumns);
 
-                //let colorsAround = getColorsAround(ux, uy, 3u);
+                //let colorsAround = getColorsAround(ux, uy, 1u);
                 let colorsAround = getColorsAroundCross(ux, uy, u32( 1 + 50. * fnusin(1.1, screenSize.uTime)));
+                //let colorsAround = getColorsAroundCross(ux, uy, 1);
                 //let colorsAround = getColorsAroundX(ux, uy, 1u);
                 var currentColor = getColorAt(ux, uy);
 
 
-                //let d = distance( vec2<f32>(x, y), vec2<f32>(48.*f32(constant),48.*f32(constant))) / numColumns;
-                //modifyColorAt(ux, uy, array<f32, 4>(d,d,d,1));
+                if( sdfCircle( vec2<f32>(48.*f32(constant),48.*f32(constant)), vec2<f32>(x, y),  .1 + .2 * fnusin(1.359, screenSize.uTime)  ) ){
+                    currentColor = white;
+                }
 
                 currentColor = soften4(currentColor, colorsAround, colorPower);
+                //currentColor = soften8(currentColor, colorsAround, colorPower);
                 currentColor = clearMix(currentColor);
 
-                chromaticAberration(ux, uy, currentColor, .5, u32( 2 + 50. * fnusin(.5, screenSize.uTime)) );
+                chromaticAberration(ux, uy, currentColor, .1 + .8 * fnusin(3, screenSize.uTime), u32( 2 + 50. * fnusin(.5, screenSize.uTime)) );
 
                 modifyColorAt(ux, uy, currentColor);
             }
@@ -442,7 +455,6 @@ fn main(
             let centerRows = numRows / 2.;
             let xCurve = centerRows + sin(( x / f32(constant) * fnusin(.5596, screenSize.uTime) ) + screenSize.uTime) * f32(constant) * 2.;
             modifyColorAt(ux, u32(xCurve), orange);
-
         }
     }
 }
