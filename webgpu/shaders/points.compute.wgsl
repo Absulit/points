@@ -30,12 +30,8 @@ struct Position{
     w: f32
 }
 
-
-
-
 struct Vertex {
     position: Position,
-    //color: array<f32,4>,
     color: Color,
     uv: array<f32,2>,
 }
@@ -89,7 +85,7 @@ fn fnusin(speed: f32, utime: f32) -> f32 {
 
 fn getPointAt(x: u32, y: u32, pointerPoint: ptr<function,Point>) {
     let index:u32 = y + (x * u32(screenSize.numColumns));
-    *pointerPoint = resultMatrix.points[index];
+    *pointerPoint = layer0.points[index];
 }
 
 struct Test {
@@ -102,7 +98,7 @@ fn getPointsIndex(x: u32, y: u32) -> u32{
 
 fn modifyColorAt(x: u32, y: u32, color: Color) {
     let index:u32 = getPointsIndex(x, y);
-    let pointerPoint: ptr<storage,Point, read_write> = &resultMatrix.points[index];
+    let pointerPoint: ptr<storage,Point, read_write> = &layer0.points[index];
     *pointerPoint.vertex0.color = color;
     *pointerPoint.vertex1.color = color;
     *pointerPoint.vertex2.color = color;
@@ -122,16 +118,16 @@ fn modifyColorAtPointer(pointerPoint:ptr<private, Point>, color: Color){
 
 fn getColorAt(x: u32, y: u32) -> Color {
     let index:u32 = getPointsIndex(x, y);
-    return resultMatrix.points[index].vertex0.color;
+    return layer0.points[index].vertex0.color;
 }
 
 fn getColorAtIndex(index:u32) -> Color {
-    return resultMatrix.points[index].vertex0.color;
+    return layer0.points[index].vertex0.color;
 }
 
 fn getBrightness(x: u32, y: u32) -> f32{
     let index:u32 = getPointsIndex(x, y);
-    let color = resultMatrix.points[index].vertex0.color;
+    let color = layer0.points[index].vertex0.color;
     return (0.2126 * color.r) + (0.7152 * color.g) + (0.0722 * color.b);
 }
 
@@ -330,9 +326,11 @@ fn chromaticAberration(x:u32, y:u32, color:Color, threshold:f32, distance:u32){
 }
 
 
-@group(0) @binding(0) var<storage, read> firstMatrix : array<f32>;
-@group(0) @binding(1) var<storage, read_write> resultMatrix : Points;
-@group(0) @binding(2) var<storage, read> screenSize : ScreenSize;
+//@group(0) @binding(0) var<storage, read> firstMatrix : array<f32>;
+@group(0) @binding(0) var<storage, read_write> layer0 : Points;
+@group(0) @binding(1) var<storage, read_write> layer1 : Points;
+@group(0) @binding(8) var<storage, read> screenSize : ScreenSize;
+//@group(0) @binding(2) var<storage, read_write> layer1 : Points;
 
 @compute @workgroup_size(workgroupSize,workgroupSize,2)
 fn main(
@@ -341,9 +339,10 @@ fn main(
     @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
 ) {
 
-    let longvarname = firstMatrix[0];
-    //resultMatrix[0] = -1;
+    //let longvarname = firstMatrix[0];
+    //layer0[0] = -1;
     // let b = secondMatrix.size.x;
+    layer1.points[0].vertex0.color.r = 1.;
 
     let numColumns:f32 = screenSize.numColumns;
     let numRows:f32 = screenSize.numRows;
@@ -461,6 +460,7 @@ fn main(
                 currentColor = clearMix(currentColor);
 
                 //chromaticAberration(ux, uy, currentColor, .1 + .8 * fnusin(3, screenSize.uTime), u32( 2 + 50. * fnusin(.5, screenSize.uTime)) );
+                chromaticAberration(ux, uy, currentColor, .8, 1 );
 
                 modifyColorAt(ux, uy, currentColor);
             }

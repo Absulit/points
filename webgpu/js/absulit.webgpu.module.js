@@ -66,8 +66,8 @@ export default class WebGPU {
         this._vertexArray = [];
         this._screenSizeArray = [];
         this._gpuBufferFirstMatrix = [];
-        this._resultMatrixBuffer = [];
-        this._resultMatrixBufferSize = null;
+        this._layer0Buffer = [];
+        this._layer0BufferSize = null;
 
         this._numColumns = null;
         this._numRows = null;
@@ -233,18 +233,31 @@ export default class WebGPU {
         new Float32Array(arrayBufferFirstMatrix).set(firstMatrix);
         this._gpuBufferFirstMatrix.unmap();
 
-        // Result Matrix
+        // Layer0
 
-        this._resultMatrixBufferSize = firstMatrix.byteLength;
-        this._resultMatrixBuffer = this._device.createBuffer({
+        this._layer0BufferSize = firstMatrix.byteLength;
+        this._layer0Buffer = this._device.createBuffer({
             size: firstMatrix.byteLength,
             usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
             mappedAtCreation: true,
         });
 
-        const b = this._resultMatrixBuffer.getMappedRange();
+        const b = this._layer0Buffer.getMappedRange();
         new Float32Array(b).set(firstMatrix);
-        this._resultMatrixBuffer.unmap();
+        this._layer0Buffer.unmap();
+
+        // Layer1
+
+        this._layer1BufferSize = firstMatrix.byteLength;
+        this._layer1Buffer = this._device.createBuffer({
+            size: firstMatrix.byteLength,
+            usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
+            mappedAtCreation: true,
+        });
+
+        const l1b = this._layer1Buffer.getMappedRange();
+        new Float32Array(l1b).set(firstMatrix);
+        this._layer1Buffer.unmap();
     }
 
     /**
@@ -290,20 +303,26 @@ export default class WebGPU {
             //layout: bindGroupLayout,
             layout: this._computePipeline.getBindGroupLayout(0 /* index */),
             entries: [
+                // {
+                //     binding: 0,
+                //     resource: {
+                //         buffer: this._gpuBufferFirstMatrix
+                //     }
+                // },
                 {
                     binding: 0,
                     resource: {
-                        buffer: this._gpuBufferFirstMatrix
+                        buffer: this._layer0Buffer
                     }
                 },
                 {
                     binding: 1,
                     resource: {
-                        buffer: this._resultMatrixBuffer
+                        buffer: this._layer1Buffer
                     }
                 },
                 {
-                    binding: 2,
+                    binding: 8,
                     resource: {
                         buffer: this._screenSizeArrayBuffer
                     }
@@ -462,20 +481,26 @@ export default class WebGPU {
             //layout: bindGroupLayout,
             layout: this._computePipeline.getBindGroupLayout(0 /* index */),
             entries: [
+                // {
+                //     binding: 0,
+                //     resource: {
+                //         buffer: this._gpuBufferFirstMatrix
+                //     }
+                // },
                 {
                     binding: 0,
                     resource: {
-                        buffer: this._gpuBufferFirstMatrix
+                        buffer: this._layer0Buffer
                     }
                 },
                 {
                     binding: 1,
                     resource: {
-                        buffer: this._resultMatrixBuffer
+                        buffer: this._layer1Buffer
                     }
                 },
                 {
-                    binding: 2,
+                    binding: 8,
                     resource: {
                         buffer: this._screenSizeArrayBuffer
                     }
@@ -495,11 +520,11 @@ export default class WebGPU {
 
 
         commandEncoder.copyBufferToBuffer(
-            this._resultMatrixBuffer /* source buffer */,
+            this._layer0Buffer /* source buffer */,
             0 /* source offset */,
             this._buffer /* destination buffer */,
             0 /* destination offset */,
-            this._resultMatrixBufferSize /* size */
+            this._layer0BufferSize /* size */
         );
 
         // ---------------------
