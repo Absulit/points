@@ -177,6 +177,16 @@ fn getColorsAroundX(x: u32, y: u32, distance: u32) -> array<  Color, 4> {
     );
 }
 
+fn getColorsAroundT(x: u32, y: u32, distance: u32) -> array<  Color, 4> {
+
+    return array< Color, 4>(
+        getColorAt(x, y - distance),              // top        N 1
+        getColorAt(x, y),              // left        N 1
+        getColorAt(x + distance, y),              // right        N 1
+        getColorAt(x, y + distance),              // bottom         N 1
+    );
+}
+
 fn plotLineLow(x0: u32, y0: u32, x1: u32, y1: u32, color: Color) {
     var dx:i32 = i32(x1) - i32(x0);
     var dy:i32 = i32(y1 - y0);
@@ -425,29 +435,32 @@ fn main(
         for (var indexColumns:i32 = 0; indexColumns < numColumnsPiece; indexColumns++) {
             let x:f32 = f32(WorkGroupID.x) * f32(numColumnsPiece) + f32(indexColumns);
             let ux = u32(x);
+            let nx = x / numColumns;
             for (var indexRows:i32 = 0; indexRows < numRowsPiece; indexRows++) {
 
                 let y:f32 = f32(WorkGroupID.y) * f32(numRowsPiece) + f32(indexRows);
                 let uy = u32(y);
+                let ny = y / numRows;
 
                 //let index:f32 = y + (x * screenSize.numColumns);
 
                 //let colorsAround = getColorsAround(ux, uy, 1u);
-                let colorsAround = getColorsAroundCross(ux, uy, u32( 1 + 50. * fnusin(1.1, screenSize.uTime)));
+                //let colorsAround = getColorsAroundCross(ux, uy, u32( 1 + 50. * fnusin(1.1, screenSize.uTime)));
                 //let colorsAround = getColorsAroundCross(ux, uy, 1);
+                let colorsAround = getColorsAroundT(ux, uy, 1);
                 //let colorsAround = getColorsAroundX(ux, uy, 1u);
                 var currentColor = getColorAt(ux, uy);
 
 
                 if( sdfCircle( vec2<f32>(48.*f32(constant),48.*f32(constant)), vec2<f32>(x, y),  .1 + .2 * fnusin(1.359, screenSize.uTime)  ) ){
-                    currentColor = white;
+                    currentColor = Color(nx*2,ny*2,0,1);
                 }
 
                 currentColor = soften4(currentColor, colorsAround, colorPower);
                 //currentColor = soften8(currentColor, colorsAround, colorPower);
                 currentColor = clearMix(currentColor);
 
-                chromaticAberration(ux, uy, currentColor, .1 + .8 * fnusin(3, screenSize.uTime), u32( 2 + 50. * fnusin(.5, screenSize.uTime)) );
+                //chromaticAberration(ux, uy, currentColor, .1 + .8 * fnusin(3, screenSize.uTime), u32( 2 + 50. * fnusin(.5, screenSize.uTime)) );
 
                 modifyColorAt(ux, uy, currentColor);
             }
