@@ -206,7 +206,7 @@ export default class WebGPU {
     }
 
     createComputeBuffers() {
-        this._screenSizeArray = new Float32Array([this._numColumns, this._numRows, 0]);
+        this._screenSizeArray = new Float32Array([this._numColumns, this._numRows, 0, 0]);
 
         this._screenSizeArrayBuffer = this._device.createBuffer({
             mappedAtCreation: true,
@@ -258,6 +258,17 @@ export default class WebGPU {
         const l1b = this._layer1Buffer.getMappedRange();
         new Float32Array(l1b).set(firstMatrix);
         this._layer1Buffer.unmap();
+
+        // particles
+
+        const particles = new Float32Array(Array(2000).fill(0));
+        this._particlesBufferSize = firstMatrix.byteLength;
+        this._particlesBuffer = this._device.createBuffer({
+            size: particles.byteLength,
+            usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
+            mappedAtCreation: false,
+        });
+
     }
 
     /**
@@ -319,6 +330,12 @@ export default class WebGPU {
                     binding: 1,
                     resource: {
                         buffer: this._layer1Buffer
+                    }
+                },
+                {
+                    binding: 7,
+                    resource: {
+                        buffer: this._particlesBuffer
                     }
                 },
                 {
@@ -497,6 +514,12 @@ export default class WebGPU {
                     binding: 1,
                     resource: {
                         buffer: this._layer1Buffer
+                    }
+                },
+                {
+                    binding: 7,
+                    resource: {
+                        buffer: this._particlesBuffer
                     }
                 },
                 {

@@ -6,15 +6,42 @@ fn rand() -> f32 {
     return rand_seed.y;
 }
 
+fn rand2(co: vec2<f32>) -> f32 {
+     return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
+
 const yellow:Color = Color(1, 1, 0., 1.);
 const green:Color = Color(0., 1, 0., 1.);
 const red:Color = Color(1., 0, 0., 1.);
 const white:Color = Color(1., 1., 1., 1.);
 const orange:Color = Color(1., .64, 0., 1.);
 
-const clearMixlevel = 1.01;
+const clearMixlevel = 1.01;//1.01
 const colorPower = 1.;
 const workgroupSize = 8;
+
+const PI = 3.14159;
+
+struct Particle {
+    x: f32,
+    y: f32,
+    angle: f32,
+    distance: f32,
+}
+//const particles:array<Particle, 2000> = array<Particle, 2000>();
+const numParticles = 2000;
+fn fillParticles(){
+    for (var i:u32 = 0; i < numParticles; i++) {
+        let particle = &particles[i];
+        *particle.x = screenSize.numColumns * rand();
+        *particle.y = screenSize.numRows * rand();
+        *particle.angle = rand() * PI * 2.;
+        *particle.distance = 1.;
+    }
+}
+
+
 
 struct Color{
     r: f32,
@@ -44,7 +71,8 @@ struct Screen {
 struct ScreenSize {
     numRows: f32,
     numColumns: f32,
-    uTime: f32
+    uTime: f32,
+    notFilled: u32,
 }
 
 struct Point {
@@ -326,11 +354,10 @@ fn chromaticAberration(x:u32, y:u32, color:Color, threshold:f32, distance:u32){
 }
 
 
-//@group(0) @binding(0) var<storage, read> firstMatrix : array<f32>;
 @group(0) @binding(0) var<storage, read_write> layer0 : Points;
 @group(0) @binding(1) var<storage, read_write> layer1 : Points;
-@group(0) @binding(8) var<storage, read> screenSize : ScreenSize;
-//@group(0) @binding(2) var<storage, read_write> layer1 : Points;
+@group(0) @binding(7) var<storage, read_write> particles : array<Particle>;
+@group(0) @binding(8) var<storage, read_write> screenSize : ScreenSize;
 
 @compute @workgroup_size(workgroupSize,workgroupSize,2)
 fn main(
@@ -338,7 +365,10 @@ fn main(
     @builtin(workgroup_id) WorkGroupID: vec3<u32>,
     @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
 ) {
-
+    if(screenSize.notFilled == 0){
+        fillParticles();
+        screenSize.notFilled = 1;
+    }
     //let longvarname = firstMatrix[0];
     //layer0[0] = -1;
     // let b = secondMatrix.size.x;
@@ -430,7 +460,106 @@ fn main(
     }
 
 
-    if (WorkGroupID.z == 1u) {
+    // if (WorkGroupID.z == 1u) {
+    //     for (var indexColumns:i32 = 0; indexColumns < numColumnsPiece; indexColumns++) {
+    //         let x:f32 = f32(WorkGroupID.x) * f32(numColumnsPiece) + f32(indexColumns);
+    //         let ux = u32(x);
+    //         let nx = x / numColumns;
+    //         for (var indexRows:i32 = 0; indexRows < numRowsPiece; indexRows++) {
+
+    //             let y:f32 = f32(WorkGroupID.y) * f32(numRowsPiece) + f32(indexRows);
+    //             let uy = u32(y);
+    //             let ny = y / numRows;
+
+    //             //let index:f32 = y + (x * screenSize.numColumns);
+
+    //             //let colorsAround = getColorsAround(ux, uy, 1u);
+    //             //let colorsAround = getColorsAroundCross(ux, uy, u32( 1 + 50. * fnusin(1.1, screenSize.uTime)));
+    //             //let colorsAround = getColorsAroundCross(ux, uy, 1);
+    //             let colorsAround = getColorsAroundT(ux, uy, 1);
+    //             //let colorsAround = getColorsAroundX(ux, uy, 1u);
+    //             var currentColor = getColorAt(ux, uy);
+
+
+    //             if( sdfCircle( vec2<f32>(48.*f32(constant),48.*f32(constant)), vec2<f32>(x, y),  .1 + .2 * fnusin(1.359, screenSize.uTime)  ) ){
+    //                 currentColor = Color(nx*2,ny*2,0,1);
+    //                 //let r = rand();
+    //                 //currentColor = Color(r,r,r,1);
+    //             }
+
+    //             //currentColor = soften4(currentColor, colorsAround, colorPower);
+    //             //currentColor = soften8(currentColor, colorsAround, colorPower);
+    //             currentColor = clearMix(currentColor);
+
+    //             //chromaticAberration(ux, uy, currentColor, .1 + .8 * fnusin(3, screenSize.uTime), u32( 2 + 50. * fnusin(.5, screenSize.uTime)) );
+    //             chromaticAberration(ux, uy, currentColor, .8, 1 );
+
+    //             modifyColorAt(ux, uy, currentColor);
+    //         }
+
+    //         let centerRows = numRows / 2.;
+    //         let xCurve = centerRows + sin(( x / f32(constant) * fnusin(.5596, screenSize.uTime) ) + screenSize.uTime) * f32(constant) * 2.;
+    //         modifyColorAt(ux, u32(xCurve), orange);
+    //     }
+    // }
+
+    if(WorkGroupID.z == 1u){
+        for (var i:u32 = 0; i < numParticles; i++) {
+            var particle = particles[i];
+            //var p = polar( u32( particle.distance), particle.angle);
+            var p = polar( u32( particle.distance), particle.angle);
+            particle.x += f32(p.x);
+            particle.y += f32(p.y);
+
+            //*particle.x = 372. * rand();
+            //particle.x += fnusin(1., screenSize.uTime) * numColumns;
+            //*particle.y = numColumns * rand() * screenSize.uTime;
+
+            let orX = u32(particle.x);
+            let orY = u32(particle.y);
+
+            //modifyColorAt(orX, orY, white);
+
+            //const point = screen.getPointAt(Math.floor(particle.x), Math.floor(particle.y));
+            var currentColor = getColorAt( u32(particle.x), u32(particle.y));
+
+
+            // https://youtu.be/X-iSQQgOd1A?t=814
+            //if (currentColor) {
+                let turnSpeed = .1;
+                let distance = 3u;
+                p = polar(distance, particle.angle);
+
+                let pointForwardBrightness = getBrightness(u32(particle.x + f32(p.x)), u32(particle.y + f32(p.y)));
+
+                p = polar(distance, particle.angle + radians(15));
+                let pointRightBrightness = getBrightness( u32(particle.x + f32(p.x)), u32(particle.y + f32(p.y)));
+
+                p = polar(distance, particle.angle - radians(15));
+                let pointLeftBrightness = getBrightness( u32(particle.x + f32(p.x)), u32(particle.y + f32(p.y)));
+
+                if (pointForwardBrightness > pointLeftBrightness && pointForwardBrightness > pointRightBrightness) {
+                    // do nothing, continue
+                } else if (pointForwardBrightness < pointLeftBrightness && pointForwardBrightness < pointRightBrightness) {
+                    // turn randomly
+                    particle.angle += (rand() - .5) * 2 * turnSpeed * screenSize.uTime;
+                } else if (pointRightBrightness > pointLeftBrightness) {
+                    // turn right
+                    particle.angle += rand() * turnSpeed * screenSize.uTime;
+                } else if (pointLeftBrightness > pointRightBrightness) {
+                    // turn left
+                    particle.angle -= rand() * turnSpeed * screenSize.uTime;
+                }
+
+                // let nx = particle.x / numColumns;
+                // let ny = particle.y / numRows;
+                modifyColorAt(u32(particle.x), u32(particle.y), white);
+            // } else {
+            //     particle.angle = rand() * PI * 2;
+            // }
+        }
+
+
         for (var indexColumns:i32 = 0; indexColumns < numColumnsPiece; indexColumns++) {
             let x:f32 = f32(WorkGroupID.x) * f32(numColumnsPiece) + f32(indexColumns);
             let ux = u32(x);
@@ -441,33 +570,14 @@ fn main(
                 let uy = u32(y);
                 let ny = y / numRows;
 
-                //let index:f32 = y + (x * screenSize.numColumns);
-
-                //let colorsAround = getColorsAround(ux, uy, 1u);
-                //let colorsAround = getColorsAroundCross(ux, uy, u32( 1 + 50. * fnusin(1.1, screenSize.uTime)));
-                //let colorsAround = getColorsAroundCross(ux, uy, 1);
                 let colorsAround = getColorsAroundT(ux, uy, 1);
-                //let colorsAround = getColorsAroundX(ux, uy, 1u);
                 var currentColor = getColorAt(ux, uy);
-
-
-                if( sdfCircle( vec2<f32>(48.*f32(constant),48.*f32(constant)), vec2<f32>(x, y),  .1 + .2 * fnusin(1.359, screenSize.uTime)  ) ){
-                    currentColor = Color(nx*2,ny*2,0,1);
-                }
-
                 currentColor = soften4(currentColor, colorsAround, colorPower);
-                //currentColor = soften8(currentColor, colorsAround, colorPower);
                 currentColor = clearMix(currentColor);
-
-                //chromaticAberration(ux, uy, currentColor, .1 + .8 * fnusin(3, screenSize.uTime), u32( 2 + 50. * fnusin(.5, screenSize.uTime)) );
-                chromaticAberration(ux, uy, currentColor, .8, 1 );
-
+                //chromaticAberration(ux, uy, currentColor, .8, 1 );
                 modifyColorAt(ux, uy, currentColor);
             }
-
-            let centerRows = numRows / 2.;
-            let xCurve = centerRows + sin(( x / f32(constant) * fnusin(.5596, screenSize.uTime) ) + screenSize.uTime) * f32(constant) * 2.;
-            modifyColorAt(ux, u32(xCurve), orange);
         }
+
     }
 }
