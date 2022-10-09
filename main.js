@@ -108,6 +108,8 @@ import { print } from './js/utils.js';
 import Snail1 from './js/examples/snail1.js';
 import RandomNoise1 from './js/examples/randomnoise1.js';
 import DrawCircle from './js/examples/drawcircle.js';
+import Slime4 from './js/examples/slime4.js';
+import ArtificialLife1 from './js/examples/artificial_life1.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -151,7 +153,7 @@ let effects;
 const sliders = { 'a': 0, 'b': 0, 'c': 0 }
 
 let side = 100;
-let numLayers = 4;
+let numLayers = 1;
 let numColumns = side;
 let numRows = side;
 let numMargin = 0;
@@ -168,7 +170,7 @@ function init() {
 
     cache = new Cache(60 * 10);
 
-    demo = new DrawCircle(screen);
+    demo = new ArtificialLife1(screen);
 
     effects = new Effects(screen);
 

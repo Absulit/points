@@ -405,11 +405,13 @@ class Screen {
     clear(color = null) {
         this._currentLayer.rows.forEach(row => {
             row.forEach(point => {
-                if (color) {
-                    point.setRGBAColor(color);
-                } else {
-                    point.setColor(0, 0, 0, 0);
-                }
+                
+                point.color.a > .1 && (
+                color && point.modifyColor(c => {
+                    c.setColor(color);
+                }) || color && point.modifyColor(c => {
+                    c.set(0,0,0,0);
+                }));
             });
         });
     }

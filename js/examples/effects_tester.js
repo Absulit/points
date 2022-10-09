@@ -5,6 +5,7 @@ import FlowFields from '../flowfields.js';
 import ImageLoader from '../imageloader.js';
 import MathUtil from '../mathutil.js';
 import SpriteLoader from '../spriteloader.js';
+import { print } from '../utils.js';
 import Particle from './Particle.js';
 
 
