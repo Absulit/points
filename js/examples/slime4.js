@@ -8,7 +8,7 @@ import SpriteLoader from '../spriteloader.js';
 import Particle from './Particle.js';
 
 
-export default class Slime {
+export default class Slime4 {
     /**
      *
      * @param {Screen} screen
@@ -48,7 +48,7 @@ export default class Slime {
 
         this._particles = [];
 
-        for (let index = 0; index < 2000; index++) {
+        for (let index = 0; index < 500 * this._constant; index++) {
             const particle = {
                 x: screen.center.x,
                 y: screen.center.y,
@@ -106,6 +106,8 @@ export default class Slime {
 
             } else {
                 particle.angle = Math.random() * Math.PI * 2;
+                particle.x = side * Math.random();
+                particle.y = side * Math.random();
             }
         }
 
