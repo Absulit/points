@@ -25,7 +25,6 @@ class Screen {
         this._layerIndex = 0;
 
         this._pointSize = 1;
-        this._init();
 
         this._dimension = 3;
         this._vertices = [];
@@ -33,6 +32,7 @@ class Screen {
         this._pointsizes = [];
         this._atlasids = [];
 
+        this._init();
 
     }
 
@@ -59,7 +59,7 @@ class Screen {
         for (let yCoordinate = 0; yCoordinate < this._numRows; yCoordinate++) {
             row = [];
             for (let xCoordinate = 0; xCoordinate < this._numColumns; xCoordinate++) {
-                point = new Point();
+                point = new Point(this);
                 point.layer = layer;
                 point.position.set((xCoordinate * this._pointSizeFull) + this._pointSizeHalf, (yCoordinate * this._pointSizeFull) + this._pointSizeHalf, zDepth);
                 //point.setColor(Math.random(), 1, Math.random(), 1);
@@ -91,7 +91,13 @@ class Screen {
 
     _createLayers() {
         for (let layerIndex = 0; layerIndex < this._numLayers; layerIndex++) {
-            this._layers.push(this._createLayer(((layerIndex) / this._numLayers) * -1));
+            const layer = this._createLayer(((layerIndex) / this._numLayers) * -1);
+            this._vertices = this._vertices.concat(layer.vertices);
+            this._colors = this._colors.concat(layer.colors);
+            console.log(this._colors)
+            this._pointsizes = this._pointsizes.concat(layer.pointsizes);
+            this._atlasids = this._atlasids.concat(layer.atlasIds);
+            this._layers.push(layer);
         }
         this._currentLayer = this._layers[this._layerIndex];
     }
@@ -402,16 +408,16 @@ class Screen {
     }
 
 
-    clear(color = null) {
+    clear(color = null, alphaAmount = .1) {
         this._currentLayer.rows.forEach(row => {
             row.forEach(point => {
-                
-                point.color.a > .1 && (
-                color && point.modifyColor(c => {
-                    c.setColor(color);
-                }) || color && point.modifyColor(c => {
-                    c.set(0,0,0,0);
-                }));
+
+                point.color.a > alphaAmount && (
+                    color && point.modifyColor(c => {
+                        c.setColor(color);
+                    }) || color && point.modifyColor(c => {
+                        c.set(0, 0, 0, 0);
+                    }));
             });
         });
     }
@@ -428,13 +434,15 @@ class Screen {
                 //row.forEach(point => {
                 const point = row[i];
                 if (point.modified) {
-                    pointColor = point.color;
-                    point.setColor(
-                        (pointColor.r + color.r) / level,
-                        (pointColor.g + color.g) / level,
-                        (pointColor.b + color.b) / level,
-                        (pointColor.a + color.a)
-                    );
+
+                    point.modifyColor(pointColor => {
+                        pointColor.set(
+                            (pointColor.r + color.r) / level,
+                            (pointColor.g + color.g) / level,
+                            (pointColor.b + color.b) / level,
+                            (pointColor.a + color.a)
+                        );
+                    });
                 }
                 if (point.size < this._pointSize) {
                     point.size = this._pointSize;
@@ -457,13 +465,11 @@ class Screen {
                 //row.forEach(point => {
                 const point = row[i];
                 if (point.modified) {
-                    pointColor = point.color;
-                    point.setColor(
-                        (pointColor.r),
-                        (pointColor.g),
-                        (pointColor.b),
-                        (pointColor.a) / level
-                    );
+
+                    point.modifyColor(color => {
+                        color.set(color.r, color.g, color.b, (color.a) / level);
+                    });
+
                 }
                 if (point.size < this._pointSize) {
                     point.size = this._pointSize;
@@ -511,11 +517,7 @@ class Screen {
      */
     movePointTo(point, columnIndex, rowIndex) {
         let pointToReplace = this.getPointAt(columnIndex, rowIndex);
-        if (pointToReplace) {
-            const { r, g, b, a } = point.color;
-            pointToReplace.setColor(r, g, b, a);
-            //pointToReplace.color = new RGBAColor(1,0,0);
-        }
+        pointToReplace && pointToReplace.modifyColor(color => color.setColor(point.color));
         return pointToReplace;
     }
 
@@ -591,13 +593,10 @@ class Screen {
 
         for (let x = x0; x < x1; x++) {
             let point = this.getPointAt(x, y);
-            if (point) {
-                if(modifyColorFunction){
-                    point.modifyColor(modifyColorFunction);
-                }else{
-                    point.setRGBAColor(color);
-                }
-            }
+
+            point && modifyColorFunction && point.modifyColor(modifyColorFunction);
+            point && !modifyColorFunction && point.modifyColor(c => c.setColor(color));
+
             if (D > 0) {
                 y = y + yi
                 D = D + (2 * (dy - dx))
@@ -620,13 +619,10 @@ class Screen {
 
         for (let y = y0; y < y1; y++) {
             let point = this.getPointAt(x, y);
-            if (point) {
-                if(modifyColorFunction){
-                    point.modifyColor(modifyColorFunction);
-                }else{
-                    point.setRGBAColor(color);
-                }
-            }
+
+            point && modifyColorFunction && point.modifyColor(modifyColorFunction);
+            point && !modifyColorFunction && point.modifyColor(c => c.setColor(color));
+
             if (D > 0) {
                 x = x + xi;
                 D = D + (2 * (dx - dy));
@@ -643,7 +639,7 @@ class Screen {
             pointFromCenter = MathUtil.vector(radius, radians);
             point = this.getPointAt(Math.round(pointFromCenter.x + x), Math.round(pointFromCenter.y + y));
             if (point && (point !== lastModifiedPoint)) {
-                point.setColor(r, g, b, a);
+                point.modifyColor(color => color.set(r, g, b, a));
                 lastModifiedPoint = point;
             }
         }
@@ -775,9 +771,9 @@ class Screen {
         this._atlasids = this._mainLayer.atlasIds;
     };
 
-    moveColorToLayer(layerIndex){
+    moveColorToLayer(layerIndex) {
         this._currentLayer.points.forEach((point, index) => {
-            if(point.color.a > 0){
+            if (point.color.a > 0) {
                 const pointInLayer = this._layers[layerIndex].points[index];
                 pointInLayer.setRGBAColor(point.color);
             }

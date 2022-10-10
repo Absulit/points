@@ -28,10 +28,11 @@ export default class SpeedPoints3 {
 
             const c = Math.cos(nx * ny * (1890*this._constant + 10*this._constant * fusin(.1)) + fnusin(.5) * 10*this._constant) * d;
 
-            point.setColor(
+            point.modifyColor(color => color.set(
                 (1 - d) * ((1-c)*.4) * nx,
                 (c) * .4 * ny,
-                d * ny * nx * (1-c));
+                d * ny * nx * (1-c) 
+            ));
             //point.setBrightness(c);
         });
 

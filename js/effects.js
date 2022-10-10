@@ -70,15 +70,18 @@ class Effects {
         let p;
         for (let index = 0; index < pointsLength; index++) {
             p = this._screen.currentLayer.points[index];
+            let pointBrightness = p.modifyColor(color => (color.brightness));
 
-            if (p.getBrightness() > brightnessSensitivity) {
+            if (pointBrightness > brightnessSensitivity) {
                 let nextPoint = this._screen.getRightPoint(p, distance);
                 if (nextPoint) {
-                    nextPoint.setColor((nextPoint.color.r + p.color.r) / 2, nextPoint.color.g, nextPoint.color.b, (nextPoint.color.a + p.color.a) / 2);
+                    //nextPoint.setColor((nextPoint.color.r + p.color.r) / 2, nextPoint.color.g, nextPoint.color.b, (nextPoint.color.a + p.color.a) / 2);
+                    nextPoint.modifyColor(color => color.set((nextPoint.color.r + p.color.r) / 2, nextPoint.color.g, nextPoint.color.b, (nextPoint.color.a + p.color.a) / 2));
                 }
                 let prevPoint = this._screen.getLeftPoint(p, distance);
                 if (prevPoint) {
-                    prevPoint.setColor(prevPoint.color.r, prevPoint.color.g, (prevPoint.color.b + p.color.b) / 2, (prevPoint.color.a + p.color.a) / 2);
+                    //prevPoint.setColor(prevPoint.color.r, prevPoint.color.g, (prevPoint.color.b + p.color.b) / 2, (prevPoint.color.a + p.color.a) / 2);
+                    prevPoint.modifyColor(color => color.set(prevPoint.color.r, prevPoint.color.g, (prevPoint.color.b + p.color.b) / 2, (prevPoint.color.a + p.color.a) / 2));
                 }
             }
         }
@@ -99,12 +102,14 @@ class Effects {
                 const points = this._screen.getPointsAround(point);
                 points.forEach(pointAround => {
                     if (pointAround) {
-                        pointAround.setColor(
-                            (point.color.r + pointAround.color.r * colorPower) / (colorPower + 1),
-                            (point.color.g + pointAround.color.g * colorPower) / (colorPower + 1),
-                            (point.color.b + pointAround.color.b * colorPower) / (colorPower + 1),
-                            (point.color.a + pointAround.color.a * colorPower) / (colorPower + 1)
-                        );
+                        pointAround.modifyColor(color => {
+                            color.set(
+                                (point.color.r + color.r * colorPower) / (colorPower + 1),
+                                (point.color.g + color.g * colorPower) / (colorPower + 1),
+                                (point.color.b + color.b * colorPower) / (colorPower + 1),
+                                (point.color.a + color.a * colorPower) / (colorPower + 1)
+                            );
+                        });
                     }
                 })
             }
@@ -122,12 +127,14 @@ class Effects {
                 const points = this._screen.getPointsInCircle(point, distance);
                 points.forEach(pointAround => {
                     if (pointAround) {
-                        pointAround.setColor(
-                            (point.color.r + pointAround.color.r * colorPower) / (colorPower + 1),
-                            (point.color.g + pointAround.color.g * colorPower) / (colorPower + 1),
-                            (point.color.b + pointAround.color.b * colorPower) / (colorPower + 1),
-                            (point.color.a + pointAround.color.a * colorPower) / (colorPower + 1)
-                        );
+                        pointAround.modifyColor(color => {
+                            color.set(
+                                (point.color.r + color.r * colorPower) / (colorPower + 1),
+                                (point.color.g + color.g * colorPower) / (colorPower + 1),
+                                (point.color.b + color.b * colorPower) / (colorPower + 1),
+                                (point.color.a + color.a * colorPower) / (colorPower + 1)
+                            );
+                        });
                     }
                 })
             }
@@ -142,11 +149,13 @@ class Effects {
                 const points = this._screen.getPointsInCircle(point, distance);
                 points.forEach(pointAround => {
                     if (pointAround) {
-                        pointAround.setColor(
-                            (point.color.r + pointAround.color.r * colorPower) / (colorPower + 1),
-                            (point.color.g + pointAround.color.g * colorPower) / (colorPower + 1),
-                            (point.color.b + pointAround.color.b * colorPower) / (colorPower + 1)
-                        );
+                        pointAround.modifyColor(color => {
+                            color.set(
+                                (point.color.r + color.r * colorPower) / (colorPower + 1),
+                                (point.color.g + color.g * colorPower) / (colorPower + 1),
+                                (point.color.b + color.b * colorPower) / (colorPower + 1),
+                            );
+                        });
                     }
                 })
             }
@@ -175,11 +184,15 @@ class Effects {
 
                 pointsAround = this._screen.getPointsAround(point);
 
-                l.n = pointsAround[1] ? pointsAround[1].getBrightness() : 0;
-                l.w = pointsAround[3] ? pointsAround[3].getBrightness() : 0;
-                l.e = pointsAround[4] ? pointsAround[4].getBrightness() : 0;
-                l.s = pointsAround[6] ? pointsAround[6].getBrightness() : 0;
-                l.m = point.getBrightness();
+                l.n = pointsAround[1] ? pointsAround[1].color.brightness : 0;
+                l.w = pointsAround[3] ? pointsAround[3].color.brightness : 0;
+                l.e = pointsAround[4] ? pointsAround[4].color.brightness : 0;
+                l.s = pointsAround[6] ? pointsAround[6].color.brightness : 0;
+                l.m = point.color.brightness;
+
+                // point.modifyColor(color => {
+                //     l.m = color.brightness;
+                // });
 
 
                 l.highest = Math.max(Math.max(Math.max(Math.max(l.n, l.e), l.s), l.w), l.m);
@@ -196,12 +209,16 @@ class Effects {
                 points = this._screen.getPointsAround(point);
                 points.forEach(pointAround => {
                     if (pointAround) {
-                        pointAround.setColor(
-                            (point.color.r + pointAround.color.r * colorPower) / (colorPower + 1),
-                            (point.color.g + pointAround.color.g * colorPower) / (colorPower + 1),
-                            (point.color.b + pointAround.color.b * colorPower) / (colorPower + 1),
-                            (point.color.a + pointAround.color.a * colorPower) / (colorPower + 1)
-                        );
+
+                        pointAround.modifyColor(color => {
+                            color.set(
+                                (point.color.r + color.r * colorPower) / (colorPower + 1),
+                                (point.color.g + color.g * colorPower) / (colorPower + 1),
+                                (point.color.b + color.b * colorPower) / (colorPower + 1),
+                                (point.color.a + color.a * colorPower) / (colorPower + 1)
+                            );
+                        });
+
                     }
                 });
             }
@@ -362,7 +379,7 @@ class Effects {
 
     }
 
-    orderedDithering(depth = 32, threshold_map){
+    orderedDithering(depth = 32, threshold_map) {
         this._threshold_map = threshold_map || this._threshold_map;
         const screen = this._screen;
         for (let cIndex = 0; cIndex < screen.numColumns; cIndex++) {

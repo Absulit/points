@@ -19,7 +19,8 @@ export default class CustomNoise3 {
             const { x: cx, y: cy } = point.coordinates
             const c = this.noise21(cx * .002, cy *.002);
 
-            point.setBrightness(c);
+            //point.setBrightness(c);
+            point.modifyColor(color => color.brightness = c);
         });
     }
 

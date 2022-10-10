@@ -56,7 +56,8 @@ export default class SineLines {
             const b = Math.sin(point.coordinates.x * .5 / this._constant + wave * fusin(1));
 
 
-            point.setBrightness(b);
+            //point.setBrightness(b);
+            point.modifyColor(color => color.brightness = b);
             //point.setColor(b * ny, wave * nx, 0);
         });
 

@@ -153,7 +153,7 @@ let effects;
 const sliders = { 'a': 0, 'b': 0, 'c': 0 }
 
 let side = 100;
-let numLayers = 1;
+let numLayers = 2;
 let numColumns = side;
 let numRows = side;
 let numMargin = 0;
@@ -170,7 +170,7 @@ function init() {
 
     cache = new Cache(60 * 10);
 
-    demo = new ArtificialLife1(screen);
+    demo = new SineLines(screen);
 
     effects = new Effects(screen);
 
@@ -210,12 +210,13 @@ function update() {
         screen.layerIndex = 0;//--------------------------- LAYER 0
         demo.update({ sliders, usin, ucos, side, utime, nusin, nucos, fusin, fucos, fnusin, fnucos, fnsin, fncos });
 
-        screen._groupLayers();
+        //screen._groupLayers();
 
         vertices = screen._vertices;
         colors = screen._colors;
         pointsizes = screen._pointsizes;
         atlasids = screen._atlasids;
+        //console.log(colors);
 
         // cache.data = {
         //     vertices: vertices,
@@ -224,10 +225,10 @@ function update() {
         //     atlasids: atlasids,
         // }
 
-        screen._vertices = [];
-        screen._colors = [];
-        screen._pointsizes = [];
-        screen._atlasids = [];
+        // screen._vertices = [];
+        // screen._colors = [];
+        // screen._pointsizes = [];
+        // screen._atlasids = [];
 
     }, currentFrameData => {
         vertices = currentFrameData.vertices;

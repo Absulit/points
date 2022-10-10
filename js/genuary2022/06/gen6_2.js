@@ -66,7 +66,8 @@ export default class Gen6_2 {
             if (point) {
                 //point.setBrightness(1);
                 const { x, y } = point.normalPosition;
-                point.setColor(1 - x, 1 - y, x * nusin);
+                //point.setColor(1 - x, 1 - y, x * nusin);
+                point.modifyColor(color => color.set(1 - x, 1 - y, x * nusin));
                 //point.color.a = particle.a;
             }
         }

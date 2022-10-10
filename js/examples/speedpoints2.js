@@ -28,7 +28,7 @@ export default class SpeedPoints2 {
 
             const d = MathUtil.distance(centerClone, point.coordinates) / side;
             const b = Math.sin(200 * nx * ny * d * (1 - nx) + fnusin(5) * 10);
-            point.setColor(1 - nx * b, (ny * -b), 0);
+            point.modifyColor(color => color.set(1 - nx * b, (ny * -b), 0) );
             //point.setBrightness(Math.cos(d * fnucos(5)));
             //point.setBrightness(b);
         });

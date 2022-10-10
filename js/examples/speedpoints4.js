@@ -48,7 +48,8 @@ export default class SpeedPoints4 {
 
             const c = d1 * d2;
 
-            point.setColor(c + (1 - c) * (ny) * (1-d1), nx* (1 - c) * .5, d2 * c * ny);
+            //point.setColor(c + (1 - c) * (ny) * (1-d1), nx* (1 - c) * .5, d2 * c * ny);
+            point.modifyColor(color => color.set(c + (1 - c) * (ny) * (1-d1), nx* (1 - c) * .5, d2 * c * ny) );
             //point.setBrightness(c);
         });
 

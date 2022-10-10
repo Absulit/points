@@ -25,7 +25,7 @@ export default class Fluid1 {
         let distance = 1;
         screen.currentLayer.shufflePoints();
         screen.currentLayer.shuffledPoints.forEach((point, index) => {
-            let brightness = point.getBrightness();
+            let brightness = point.color.brightness;
             //point.setBrightness(brightness);
             let pointTo = null;
             if (brightness > .8) {

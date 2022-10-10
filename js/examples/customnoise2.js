@@ -48,7 +48,8 @@ export default class CustomNoise2 {
 
         screen.points.forEach((point, index) => {
             const b = result[index % result.length];
-            point.setBrightness(b / scaleSum);
+            //point.setBrightness(b / scaleSum);
+            point.modifyColor(color => color.brightness = b / scaleSum);
         });
 
         // result.forEach((r, index) => {

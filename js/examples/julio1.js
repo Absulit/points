@@ -29,13 +29,16 @@ export default class Julio1 {
             centerClone.x *= fnusin(1);
 
             const d = MathUtil.distance(point.coordinates, centerClone) / side ;
-
+            //console.log(nx);debugger
             const checkers = fnsin(nx * 20) * fnsin(ny * 20);
             const lines = Math.sin(Math.sin(nx * 50) );
             const z = d * lines;
 
             //point.setColor(z, 0, ny * dcheckers);
-            point.setBrightness(lines);
+            //point.setBrightness(lines);
+
+            point.modifyColor(color => color.brightness = checkers);
+            //point.modifyColor(color => color.set(z, 0, ny * checkers));
         });
         //screen.drawCircle(screen.center.x, screen.center.y, 10 * this._constant, 1,0,0)
 
