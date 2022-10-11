@@ -48,7 +48,7 @@ export default class SpeedPoints2_1 {
             centerClone.x *= fusin(1.1556) * 2;
 
             const pointBelow = screen.getPointFromLayer(point, 0);
-            const z = pointBelow.getBrightness();
+            const z = pointBelow.color.brightness;
             const zi = 1 - z;
 
             const d = MathUtil.distance(centerClone, point.coordinates) / side * z;
@@ -56,7 +56,7 @@ export default class SpeedPoints2_1 {
 
 
 
-            point.setColor(1 - nx * b, (ny * -b), z);
+            point.modifyColor(color => color.set(1 - nx * b, (ny * -b), z));
             //point.setBrightness(Math.cos(d * fnucos(5)));
             //point.setBrightness(b);
         });

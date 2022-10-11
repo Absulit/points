@@ -30,9 +30,7 @@ export default class ContinuosCircles2 {
         this._v.generate();
         this._v.data.forEach(d => {
             const point = screen.getPointAt(d.x, d.y);
-            if (point) {
-                point.setBrightness(d.value);
-            }
+            point && point.modifyColor(color => color.brightness = d.value);
         });
     }
 
@@ -61,7 +59,7 @@ export default class ContinuosCircles2 {
             // coordinatesClone.x *= 2;
             // coordinatesClone.y *= 2;
             const point0 = screen.getPointFromLayer(point, 0);
-            const noise = point0.getBrightness();
+            const noise = point0.color.brightness;
 
             const distance = Math.sin(MathUtil.distance(coordinatesClone, screen.center) / side * noise * 30 + 100 * utime * -.1);
 

@@ -55,14 +55,14 @@ export default class Gen4_1 {
 
         screen.layerIndex = 2;//--------------------------- LAYER 1
         screen.points.forEach((point, index) => {
-            point.setBrightness(0);
+            point.modifyColor(color => color.brightness = 0);
         });
 
 
         screen.layerIndex = 2;//--------------------------- LAYER 2
         screen.points.forEach((point, index) => {
             //point.angle = (point.position.x / screen.numColumns) * Math.PI;
-            point.angle = screen.layers[0].points[index].getBrightness() * Math.PI * 4;
+            point.angle = screen.layers[0].points[index].color.brightness * Math.PI * 4;
         });
     }
 

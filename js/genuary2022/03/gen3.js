@@ -32,15 +32,15 @@ export default class Gen3 {
         ]
     }
 
-    update(usin, ucos, side, utime) {
+    update({ usin, ucos, side, utime }) {
         const screen = this._screen
 
         let cx = this._center.x, cy = this._center.y;
 
         let point = screen.getPointAt(cx, cy);
-        point.setColor(1,1,0);
+        point.modifyColor(color => color.set(1, 1, 0));
         screen.getPointsAround(point).forEach(pointAround => {
-            pointAround.setColor(1,1,0);
+            pointAround.modifyColor(color => color.set(1, 1, 0));
         })
 
         this._planets.forEach((planet, index) => {
@@ -49,13 +49,12 @@ export default class Gen3 {
             pointFromCenter = MathUtil.vector(planet.radius, radians);
             point = screen.getPointAt(Math.round(pointFromCenter.x + cx), Math.round(pointFromCenter.y + cy));
             const { x, y } = point.position;
-            if (point) {
-                point.setColor(y / side, x / side, ucos);
-                //point.setColor(1, 1, 1, 1);
-            }
+
+            point && point.modifyColor(color => color.set(y / side, x / side, ucos));
+            //point.setColor(1, 1, 1, 1);
 
             // if greater than 360 set back to zero, also increment
-            planet.angle = (planet.angle * (planet.angle < 360) || 0) + (planet.speed*.3);
+            planet.angle = (planet.angle * (planet.angle < 360) || 0) + (planet.speed * .3);
 
         });
 
@@ -66,8 +65,8 @@ export default class Gen3 {
         this._effects.soften1(3);
         //this._effects.antialias(3);
 
-        screen.points.forEach(point =>{
-            point.size = screen.pointSize * point.getBrightness();
-        });
+        // screen.points.forEach(point => {
+        //     point.size = screen.pointSize * point.color.brightness;
+        // });
     }
 }

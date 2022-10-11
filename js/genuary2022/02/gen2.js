@@ -19,8 +19,8 @@ export default class Gen2 {
         this._imageLoader.load('../../img/angel_600x600.jpg');
     }
 
-    find_closest_palette_color(brightness){
-        return brightness > 0.5  ? 1.0  : 0.0
+    find_closest_palette_color(brightness) {
+        return brightness > 0.5 ? 1.0 : 0.0
         //return brightness + (Math.random() - 0.5)  > 0.5  ? 1.0  : 0.0
     }
 
@@ -32,13 +32,13 @@ export default class Gen2 {
             /*point.tempR = point.tempR || point.color.r;
             let brightness = point.tempR + (Math.random() - 0.5) > 0.5  ? 1.0  : 0.0
             brightness = brightness > Math.random()  ? 1.0  : 0.0*/
-            const {r,g,b} = point.color;
-            const brightness = 0.3*r + 0.59*b + 0.11*g
+            const { r, g, b } = point.color;
+            const brightness = 0.3 * r + 0.59 * b + 0.11 * g
             const originalBrighness = brightness;
             const newBrightness = this.find_closest_palette_color(originalBrighness);
             const quant_error = originalBrighness - newBrightness;
 
-            point.setBrightness(newBrightness);
+            point.modifyColor(color => color.brightness = newBrightness);
             //const pointsAround = screen.getPointsAround(point);
             let columnIndex = point.coordinates.x;
             let rowIndex = point.coordinates.y;
@@ -47,12 +47,8 @@ export default class Gen2 {
             const bottomPoint = screen.getPointAt(columnIndex, rowIndex + distance);
             //const bottomRightPoint = screen.getPointAt(columnIndex + distance, rowIndex + distance);
 
-            if(rightPoint){
-                rightPoint.setBrightness(rightPoint.getBrightness() + (.5*quant_error));
-            }
-            if(bottomPoint){
-                bottomPoint.setBrightness(bottomPoint.getBrightness() + (.5*quant_error));
-            }
+            rightPoint && rightPoint.modifyColor(color => color.brightness = rightPoint.color.brightness + (.5 * quant_error));
+            bottomPoint && bottomPoint.modifyColor(color => color.brightness = bottomPoint.color.brightness + (.5 * quant_error));
             /*if(bottomRightPoint){
                 bottomRightPoint.setBrightness(bottomRightPoint.getBrightness() ));
             }*/

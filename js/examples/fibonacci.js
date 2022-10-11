@@ -4,7 +4,7 @@ export default class Fibonacci {
     constructor(screen) {
         this._screen = screen;
         this._clearMixColor = new RGBAColor(0, 0, 0);
-
+        this._constant = screen.numColumns / 100;
 
         this._effects = new Effects(screen);
 
@@ -49,13 +49,13 @@ export default class Fibonacci {
 
     }
 
-    update(usin, ucos, side, utime) {
+    update({usin, ucos, side, utime}) {
         const screen = this._screen;
         let lastPoint = this._lastPoint;
         screen.layerIndex = 0;
 
         let point = screen.getPointAt(0, 0);
-        point.setColor(1, 0, 0);
+        point.modifyColor(color => color.set(1,0,0));
 
         //screen.points.forEach((element, index) => {
             if (lastPoint) {
@@ -67,7 +67,7 @@ export default class Fibonacci {
                     if (!point.used) {
                         ++this._counter;
                         //point.setColor(this._counter / screen.points.length, 1 - (this._counter / screen.points.length), 0);
-                        point.setColor(this._counter / screen.points.length / usin, 1 - (this._counter / screen.points.length) * usin, usin);
+                        point.modifyColor(color => color.set(this._counter / screen.points.length / usin, 1 - (this._counter / screen.points.length) * usin, usin));
                         if(this._counter % 3 == 0){
                             point.used = true;
                             this._directionBW();
@@ -84,7 +84,7 @@ export default class Fibonacci {
             } else {
                 const center = screen.center;
                 point = screen.getPointAt(center.x, center.y);
-                point.setColor(0, 1, 0);
+                point.modifyColor(color => color.set(0,1,0));
                 point.used = true;
                 lastPoint = point;
             }

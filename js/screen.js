@@ -94,7 +94,6 @@ class Screen {
             const layer = this._createLayer(((layerIndex) / this._numLayers) * -1);
             this._vertices = this._vertices.concat(layer.vertices);
             this._colors = this._colors.concat(layer.colors);
-            console.log(this._colors)
             this._pointsizes = this._pointsizes.concat(layer.pointsizes);
             this._atlasids = this._atlasids.concat(layer.atlasIds);
             this._layers.push(layer);
@@ -736,9 +735,7 @@ class Screen {
 
             for (let currentY = y; currentY < finalY; currentY++) {
                 point = this.getPointAt(currentX, currentY);
-                if (point) {
-                    point.setColor(r, g, b);
-                }
+                point && point.modifyColor(color => color.set(r, g, b));
             }
 
         }

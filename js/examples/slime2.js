@@ -86,23 +86,23 @@ export default class Slime2 {
                 p = MathUtil.polar(distance, particle.angle - MathUtil.radians(15));
                 const pointLeft = screen.getPointAt(Math.floor(particle.x + p.x), Math.floor(particle.y + p.y));
 
-                if (pointForward && pointRight && pointLeft && pointForward.getBrightness() > pointLeft.getBrightness() && pointForward.getBrightness() > pointRight.getBrightness()) {
+                if (pointForward && pointRight && pointLeft && pointForward.color.brightness > pointLeft.color.brightness && pointForward.color.brightness > pointRight.color.brightness) {
                     // do nothing, continue
-                } else if (pointForward && pointRight && pointLeft && pointForward.getBrightness() < pointLeft.getBrightness() && pointForward.getBrightness() < pointRight.getBrightness()) {
+                } else if (pointForward && pointRight && pointLeft && pointForward.color.brightness < pointLeft.color.brightness && pointForward.color.brightness < pointRight.color.brightness) {
                     // turn randomly
                     particle.angle += (Math.random() - .5) * 2 * turnSpeed * utime
-                } else if (pointRight && pointLeft && pointRight.getBrightness() > pointLeft.getBrightness()) {
+                } else if (pointRight && pointLeft && pointRight.color.brightness > pointLeft.color.brightness) {
                     // turn right
                     particle.angle += Math.random() * turnSpeed * utime;
-                } else if (pointLeft && pointRight && pointLeft.getBrightness() > pointRight.getBrightness()) {
+                } else if (pointLeft && pointRight && pointLeft.color.brightness > pointRight.color.brightness) {
                     // turn left
                     particle.angle -= Math.random() * turnSpeed * utime;
                 }
 
                 const { x, y } = point.normalPosition;
-                point.setBrightness(1);
+                point.modifyColor(color => color.brightness = 1);
                 const pointAbove = screen.getPointFromLayer(point, 2);
-                pointAbove.setColor(1 - x, 1 - y, x * nusin);
+                pointAbove.modifyColor(color => color.set(1 - x, 1 - y, x * nusin));
 
             } else {
                 particle.angle = Math.random() * Math.PI * 2

@@ -45,7 +45,7 @@ export default class SineLines {
 
 
         screen.points.forEach(point => {
-            const { x: nx, y: ny } = point.normalPosition;
+            //const { x: nx, y: ny } = point.normalPosition;
 
             const wave = Math.sin(point.coordinates.y * .2 / this._constant + utime );
             //const wave = Math.sin(point.coordinates.y + point.coordinates.x);
