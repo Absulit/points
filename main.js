@@ -110,6 +110,7 @@ import RandomNoise1 from './js/examples/randomnoise1.js';
 import DrawCircle from './js/examples/drawcircle.js';
 import Slime4 from './js/examples/slime4.js';
 import ArtificialLife1 from './js/examples/artificial_life1.js';
+import Fibonacci from './js/examples/fibonacci.js';
 
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -142,6 +143,7 @@ let fucos;
 
 let demo;
 
+ /** @type {Cache} */
 let cache;
 
 let vertices = [];
@@ -153,7 +155,7 @@ let effects;
 const sliders = { 'a': 0, 'b': 0, 'c': 0 }
 
 let side = 100;
-let numLayers = 2;
+let numLayers = 3;
 let numColumns = side;
 let numRows = side;
 let numMargin = 0;
@@ -170,7 +172,7 @@ function init() {
 
     cache = new Cache(60 * 10);
 
-    demo = new SineLines(screen);
+    demo = new FlowFieldsAnimated2(screen);
 
     effects = new Effects(screen);
 

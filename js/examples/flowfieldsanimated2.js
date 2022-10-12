@@ -74,7 +74,8 @@ export default class FlowFieldsAnimated2 {
             const angleWaves = Math.sin(angle * Math.PI * 32 * nusin / 10);
             //point.setColor(distance, point.normalPosition.x * a / angleWaves, point.normalPosition.y * distance * angleWaves);
             //console.log(angle);
-            point.setBrightness((distance));
+            //point.setBrightness((distance));
+            point.modifyColor(color => color.brightness = distance);
         });
 
 
@@ -91,7 +92,8 @@ export default class FlowFieldsAnimated2 {
                 const { x, y } = point.normalPosition;
                 this._flowFields.radians = x*x* Math.PI * 2;
                 //this._flowFields.radians = nusin * Math.PI * 2;
-                point.setColor(1 - x, 1 - y, x *x* nusin);
+                //point.setColor(1 - x, 1 - y, x *x* nusin);
+                point.modifyColor(color => color.set(1 - x, 1 - y, x *x* nusin));
             }
         });
 

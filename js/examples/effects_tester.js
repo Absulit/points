@@ -49,21 +49,33 @@ export default class EffectsTester {
 
     update({ usin, ucos, side, utime, nusin, fnusin }) {
         const screen = this._screen;
-        //screen.clear(this._clearMixColor);
 
-        // screen.points.forEach(point => {
-        //     let d = MathUtil.distance(point.coordinates, { x: 35 * this._constant, y: screen.center.y }) / side;
+        screen.layerIndex = 1;//--------------------------- LAYER 1
+        screen.clear(this._clearMixColor);
 
-        //     if (d < .1 + .1 * fnusin(2)) {
-        //         point.modifyColor(color => {
-        //             color.set(1, 0, 0);
-        //         });
-        //     }
-        // });
+        screen.points.forEach(point => {
+            let d = MathUtil.distance(point.coordinates, { x: 35 * this._constant, y: screen.center.y }) / side;
 
-        screen.drawLine(0,0, 50,50, this._red);
-        screen.drawCircle(50,50, 1 + 10 * fnusin(2), 1,0,0);
-        screen.drawPolygon(50, 50, 30, 3, this._orange, 180 * fnusin(2.144));
+            if (d < .1 + .1 * fnusin(2)) {
+                point.modifyColor(color => {
+                    color.set(1, 0, 0);
+                });
+            }
+        });
+
+        const point = screen.getPointAt(50,50);
+        point.modifyColor(color => color.set(1,1,0));
+
+        const point2 = screen.getPointAt(40,60);
+        point2.modifyColor(color => color.set(1,1,0));
+
+
+
+        this._screen.drawLineWithPoints(point2, point);
+
+        // screen.drawLine(0,0, 50,50, this._red);
+        // screen.drawCircle(50,50, 1 + 10 * fnusin(2), 1,0,0);
+        // screen.drawPolygon(50, 50, 30, 3, this._orange, 180 * fnusin(2.144));
 
 
         // const point = screen.getPointAt(screen.center.x, Math.floor( side * fnusin(3.14)));
@@ -72,17 +84,17 @@ export default class EffectsTester {
         // });
 
 
-        // screen.layerIndex = 1;//--------------------------- LAYER 1
-        // screen.clear(this._clearMixColor);
-        // screen.points.forEach(point => {
-        //     let d = MathUtil.distance(point.coordinates, { x: 55 * this._constant, y: screen.center.y }) / side;
+        screen.layerIndex = 0;//--------------------------- LAYER 1
+        screen.clear(this._clearMixColor);
+        screen.points.forEach(point => {
+            let d = MathUtil.distance(point.coordinates, { x: 55 * this._constant, y: screen.center.y }) / side;
 
-        //     if (d < .1 + .1 * fnusin(2.1)) {
-        //         point.modifyColor(color => {
-        //             color.set(1, 1, 1, 1);
-        //         });
-        //     }
-        // });
+            if (d < .1 + .1 * fnusin(2.1)) {
+                point.modifyColor(color => {
+                    color.set(1, 1, 1, 1);
+                });
+            }
+        });
 
 
 
@@ -91,10 +103,10 @@ export default class EffectsTester {
 
         //this._effects.chromaticAberration(.05, 2);
         //this._effects.fire(1);
-        this._effects.soften2(30);
+        //this._effects.soften2(30);
         //this._effects.antialias();
         //this._screen.clearMix(this._clearMixColor, 1.1);
-        this._screen.clearAlpha(1.01);
+        //this._screen.clearAlpha(1.01);
         //this._effects.orderedDithering();
     }
 

@@ -60,7 +60,7 @@ export default class FlowFields {
      */
     init(screenLayer) {
         this._screen.currentLayer.points.forEach((point, index) => {
-            point.angle = screenLayer.points[index].getBrightness();
+            point.angle = screenLayer.points[index].color.brightness;
         });
         this._initCalled = true;
     }

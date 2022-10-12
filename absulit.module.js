@@ -42,6 +42,14 @@ export function getBuffer2(vs) {
     return bufferId;
 }
 
+export function getBuffer3(bufferId, vs) {
+    bufferId = bufferId || gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, bufferId);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(vs), gl.STATIC_DRAW);
+    //gl.bufferData(gl.ARRAY_BUFFER, vs, gl.STATIC_DRAW);
+    return bufferId;
+}
+
 export function assignShaders(vertexName, fragmentName) {
     program = initShaders(gl, vertexName, fragmentName);
     gl.useProgram(program);
@@ -212,24 +220,34 @@ export function generateBuffers(meshRes) {
 const dimension4 = 4;
 const dimension3 = 3;
 const dimension1 = 1;
+
+let verticesBufferId;
+let colorBufferId;
+let pointSizesBufferId;
+let atlasIdsBufferId;
 export function printPoints(vertices, colors, pointsizes, atlasids) {
     //vertices = flatten(vertices);
     const vBuffer = getBuffer2(vertices);
+    //getBuffer3(verticesBufferId, vertices);
     shaderVariableToBuffer("vPosition", dimension3);
 
     //colors = flatten(colors); // TODO: test if call is required
     getBuffer2(colors);
+    //getBuffer3(colorBufferId, colors);
     shaderVariableToBuffer("vColor", dimension4);
 
     //pointsizes = pointsizes;
     getBuffer2(pointsizes);
+    //getBuffer3(pointSizesBufferId, pointsizes);
     shaderVariableToBuffer("vPointSize", dimension1);
 
     //atlasids = atlasids;
     getBuffer2(atlasids);
+    //getBuffer3(atlasIdsBufferId, atlasids);
     shaderVariableToBuffer("vAtlasId", dimension1);
 
     drawPoints2(vBuffer, vertices, dimension3);
+    //drawPoints2(verticesBufferId, vertices, dimension3);
 }
 
 function printPoint(point) {
