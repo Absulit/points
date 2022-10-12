@@ -52,7 +52,7 @@ export default class FlowFieldsAnimated2 {
         this._pointIndex = 0;
     }
 
-    update(usin, ucos, side, utime, nusin) {
+    update({usin, ucos, side, utime, nusin}) {
         const screen = this._screen;
 
 

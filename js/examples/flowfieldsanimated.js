@@ -76,7 +76,7 @@ export default class FlowFieldsAnimated {
             //console.log(angle);
             //point.setBrightness((1 - point.normalPosition.x) * (point.normalPosition.y) * (1 - distance) * angleWaves);
 
-            point.modifyColor(color => color.set((1 - point.normalPosition.x) * (point.normalPosition.y) * (1 - distance) * angleWaves));
+            point.modifyColor(color => color.brightness = (1 - point.normalPosition.x) * (point.normalPosition.y) * (1 - distance) * angleWaves);
         });
 
 
