@@ -1,6 +1,8 @@
 'use strict';
+import Screen from '../js/screen.js';
 import { print } from '../js/utils.js';
 import WebGPU from './js/absulit.webgpu.module.js';
+import EffectsTester from './../js/examples/effects_tester.js';
 
 /***************/
 const stats = new Stats();
@@ -22,14 +24,42 @@ webGPU.useTexture = false;
 
 let utime = 0;
 
-let side = 744; //744 max
+let side = 96; //744 max
 let numColumns = side;
 let numRows = side;
+let numLayers = 3;
+let numMargin = 0;
+let demo;
+
+let sideScreen = 96; //744 max
+let numColumnsScreen = sideScreen;
+let numRowsScreen = sideScreen;
+
+let uround;
+let urounddec;
+let usin;
+let nusin;
+let nucos;
+let ucos;
+let fnusin;
+let fnucos;
+let fnsin;
+let fncos;
+let fusin;
+let fucos;
+const sliders = { 'a': 0, 'b': 0, 'c': 0 }
 
 let shaderModule;
 
+/** @type {Screen} */
+let screen;
+let canvas = document.getElementById('gl-canvas');
 
 async function init() {
+
+    screen = new Screen(canvas, numColumnsScreen, numRowsScreen, numMargin, numLayers);
+    demo = new EffectsTester(screen);
+
     const initialized = await webGPU.init();
     if (initialized) {
         //webGPU.createVertexBuffer(vertexArray);
@@ -48,12 +78,43 @@ async function update() {
     stats.begin();
     utime += 1 / 60;
 
+
+    uround = Math.round(utime);
+    usin = Math.sin(utime);
+    ucos = Math.cos(utime);
+    urounddec = utime % 1;
+    nusin = (Math.sin(utime) + 1) * .5;
+    nucos = (Math.cos(utime) + 1) * .5;
+
+    fusin = speed => Math.sin(utime * speed);
+    fucos = speed => Math.cos(utime * speed);
+
+    fnusin = speed => (Math.sin(utime * speed) + 1) * .5;
+    fnucos = speed => (Math.cos(utime * speed) + 1) * .5;
+
+    fnsin = speed => (Math.sin(speed) + 1) * .5;
+    fncos = speed => (Math.cos(speed) + 1) * .5;
+
+
+    screen.layerIndex = 0;//--------------------------- LAYER 0
+    demo.update({ sliders, usin, ucos, side, utime, nusin, nucos, fusin, fucos, fnusin, fnucos, fnsin, fncos });
+
+
+
+
+
+
+
+
+
+
+
     webGPU._screenSizeArray[2] = utime;
     webGPU.update();
 
     stats.end();
 
-    capturer.capture(document.getElementById('gl-canvas'));
+    capturer.capture(canvas);
     requestAnimationFrame(update);
 }
 

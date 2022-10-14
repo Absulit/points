@@ -154,7 +154,7 @@ let effects;
 
 const sliders = { 'a': 0, 'b': 0, 'c': 0 }
 
-let side = 80;
+let side = 100;
 let numLayers = 3;
 let numColumns = side;
 let numRows = side;
@@ -162,7 +162,7 @@ let numMargin = 0;
 
 function init() {
     initWebGL("gl-canvas", true);
-    aspect = canvas.width / canvas.height;
+    //aspect = canvas.width / canvas.height;
     setClearColor([0, 0, 0, 0]);
 
     assignShaders("vertex-shader", "fragment-shader");
@@ -172,7 +172,7 @@ function init() {
 
     cache = new Cache(60 * 10);
 
-    demo = new FlowFieldsAnimated(screen);
+    demo = new EffectsTester(screen);
 
     effects = new Effects(screen);
 

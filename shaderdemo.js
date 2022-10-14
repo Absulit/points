@@ -121,7 +121,7 @@ function update() {
             pointList.push(point);
             if (point) {
                 const { x, y } = point.normalPosition;
-                point.setColor(1-x, 1-y, x);
+                point.modifyColor(color => color.set(1-x, 1-y, x));
                 //point.setBrightness(1);
             }
 
