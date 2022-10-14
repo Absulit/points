@@ -146,6 +146,7 @@ export default class EffectsTester {
 
                 let index = resultCell.y + resultCell.x * u32(secondMatrix.size.y);
                 resultMatrix.numbers[index] = result;
+                resultMatrix.numbers[0] = 99.;
               }
             `
         });
@@ -175,6 +176,24 @@ export default class EffectsTester {
     }
 
     async updateWebGPU() {
+        if (!this._device) return;
+        this._firstMatrix = new Float32Array([
+            2 /* rows */, 4 /* columns */,
+            Math.random(), 2, 3, 4,
+            5, 6, 7, 8
+        ]);
+        this._gpuBufferFirstMatrix = this._device.createBuffer({
+            mappedAtCreation: true,
+            size: this._firstMatrix.byteLength,
+            usage: GPUBufferUsage.STORAGE,
+        });
+
+        const arrayBufferFirstMatrix = this._gpuBufferFirstMatrix.getMappedRange();
+        new Float32Array(arrayBufferFirstMatrix).set(this._firstMatrix);
+        this._gpuBufferFirstMatrix.unmap();
+
+        ///-----------------
+
         // bind group is the data itself
         // we tell the GPU the expected data defined in the layout
         this._bindGroup = this._device.createBindGroup({
