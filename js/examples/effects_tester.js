@@ -39,11 +39,12 @@ export default class EffectsTester {
 
         this._red = new RGBAColor(1, 0, 0);
         this._orange = new RGBAColor(1, .5, 0);
+        this._empt = Array(screen.numColumns*screen.numRows).fill(0)
 
         this._device = null;
         this._gpuReadBuffer = null;
         this._commandEncoder = null;
-        this._resultMatrixBufferSize=0;
+        this._resultMatrixBufferSize = 0;
         this._resultMatrixBuffer = null;
         this._computePipeline = null;
         this._bindGroup = null;
@@ -56,11 +57,11 @@ export default class EffectsTester {
 
         this.init();
     }
-    async init(){
+    async init() {
         await this.initWebGPU();
         this._callUpdateWebGPU = true;
     }
-    
+
     async initWebGPU() {
 
         const adapter = await navigator.gpu.requestAdapter();
@@ -86,31 +87,13 @@ export default class EffectsTester {
         this._gpuBufferFirstMatrix.unmap();
 
 
-        // Second Matrix
-
-        this._secondMatrix = new Float32Array([
-            4 /* rows */, 2 /* columns */,
-            1, 2,
-            3, 4,
-            5, 6,
-            7, 8
-        ]);
-
-        this._gpuBufferSecondMatrix = this._device.createBuffer({
-            mappedAtCreation: true,
-            size: this._secondMatrix.byteLength,
-            usage: GPUBufferUsage.STORAGE,
-        });
-        const arrayBufferSecondMatrix = this._gpuBufferSecondMatrix.getMappedRange();
-        new Float32Array(arrayBufferSecondMatrix).set(this._secondMatrix);
-        this._gpuBufferSecondMatrix.unmap();
 
 
         // Result Matrix
 
-        this._resultMatrixBufferSize = Float32Array.BYTES_PER_ELEMENT * (2 + this._firstMatrix[0] * this._secondMatrix[1]);
+        this._resultMatrixBufferSize = this._firstMatrix.byteLength;
         this._resultMatrixBuffer = this._device.createBuffer({
-            size: this._resultMatrixBufferSize,
+            size: this._firstMatrix.byteLength,
             usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC
         });
 
@@ -119,34 +102,26 @@ export default class EffectsTester {
         const shaderModule = this._device.createShaderModule({
             code: /* wgsl */`
               struct Matrix {
-                size : vec2<f32>,
                 numbers: array<f32>,
               }
 
               @group(0) @binding(0) var<storage, read> firstMatrix : Matrix;
-              @group(0) @binding(1) var<storage, read> secondMatrix : Matrix;
-              @group(0) @binding(2) var<storage, read_write> resultMatrix : Matrix;
+              @group(0) @binding(1) var<storage, read_write> resultMatrix : Matrix;
 
               @compute @workgroup_size(8, 8)
               fn main(@builtin(global_invocation_id) global_id : vec3<u32>) {
-                // Guard against out-of-bounds work group sizes
-                if (global_id.x >= u32(firstMatrix.size.x) || global_id.y >= u32(secondMatrix.size.y)) {
-                  return;
+
+                resultMatrix.numbers[0] = firstMatrix.numbers[0];
+
+                for(var i:u32; i < 10000u; i++){
+
+                    resultMatrix.numbers[i * 4] = 1.;
+                    resultMatrix.numbers[i * 4 + 1] = 1.;
+                    resultMatrix.numbers[i * 4 + 2] = 1.;
+                    resultMatrix.numbers[i * 4 + 3] = 1.;
                 }
 
-                resultMatrix.size = vec2(firstMatrix.size.x, secondMatrix.size.y);
 
-                let resultCell = vec2(global_id.x, global_id.y);
-                var result = 0.0;
-                for (var i = 0u; i < u32(firstMatrix.size.y); i = i + 1u) {
-                  let a = i + resultCell.x * u32(firstMatrix.size.y);
-                  let b = resultCell.y + i * u32(secondMatrix.size.y);
-                  result = result + firstMatrix.numbers[a] * secondMatrix.numbers[b];
-                }
-
-                let index = resultCell.y + resultCell.x * u32(secondMatrix.size.y);
-                resultMatrix.numbers[index] = result;
-                resultMatrix.numbers[0] = 99.;
               }
             `
         });
@@ -166,22 +141,13 @@ export default class EffectsTester {
         });
 
 
-
-
-
-
-
         //await this.updateWebGPU();
 
     }
 
-    async updateWebGPU() {
+    async updateWebGPU(arrayParam) {
         if (!this._device) return;
-        this._firstMatrix = new Float32Array([
-            2 /* rows */, 4 /* columns */,
-            Math.random(), 2, 3, 4,
-            5, 6, 7, 8
-        ]);
+        this._firstMatrix = new Float32Array(arrayParam);
         this._gpuBufferFirstMatrix = this._device.createBuffer({
             mappedAtCreation: true,
             size: this._firstMatrix.byteLength,
@@ -191,6 +157,13 @@ export default class EffectsTester {
         const arrayBufferFirstMatrix = this._gpuBufferFirstMatrix.getMappedRange();
         new Float32Array(arrayBufferFirstMatrix).set(this._firstMatrix);
         this._gpuBufferFirstMatrix.unmap();
+
+
+        this._resultMatrixBufferSize = this._firstMatrix.byteLength;
+        this._resultMatrixBuffer = this._device.createBuffer({
+            size: this._firstMatrix.byteLength,
+            usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC
+        });
 
         ///-----------------
 
@@ -209,12 +182,6 @@ export default class EffectsTester {
                 {
                     binding: 1,
                     resource: {
-                        buffer: this._gpuBufferSecondMatrix
-                    }
-                },
-                {
-                    binding: 2,
-                    resource: {
                         buffer: this._resultMatrixBuffer
                     }
                 }
@@ -228,9 +195,7 @@ export default class EffectsTester {
         const passEncoder = this._commandEncoder.beginComputePass();
         passEncoder.setPipeline(this._computePipeline);
         passEncoder.setBindGroup(0, this._bindGroup);
-        const workgroupCountX = Math.ceil(this._firstMatrix[0] / 8);
-        const workgroupCountY = Math.ceil(this._secondMatrix[1] / 8);
-        passEncoder.dispatchWorkgroups(workgroupCountX, workgroupCountY);
+        passEncoder.dispatchWorkgroups(8, 8);
         passEncoder.end();
 
 
@@ -258,14 +223,16 @@ export default class EffectsTester {
 
         let arrayBuffer = null;
         try {
-            
+
             await this._gpuReadBuffer.mapAsync(GPUMapMode.READ);
             arrayBuffer = this._gpuReadBuffer.getMappedRange();
         } catch (error) {
             //console.log(error);
-        }finally{
+            return [11];
+        } finally {
 
-            console.log(new Float32Array(arrayBuffer));
+            //console.log(new Float32Array(arrayBuffer));
+            return Array.from(new Float32Array(arrayBuffer));
         }
     }
 
@@ -279,26 +246,31 @@ export default class EffectsTester {
     async update({ usin, ucos, side, utime, nusin, fnusin }) {
         const screen = this._screen;
 
-        this._callUpdateWebGPU && await this.updateWebGPU();
 
         screen.layerIndex = 1;//--------------------------- LAYER 1
-        screen.clear(this._clearMixColor);
+        if(this._callUpdateWebGPU){
 
-        screen.points.forEach(point => {
-            let d = MathUtil.distance(point.coordinates, { x: 35 * this._constant, y: screen.center.y }) / side;
+            screen._colors = await this.updateWebGPU(screen._colors);
+            //console.log(a);
+        }
+        //screen._colors = this._empt;
+        //screen.clear(this._clearMixColor);
 
-            if (d < .1 + .1 * fnusin(2)) {
-                point.modifyColor(color => {
-                    color.set(1, 0, 0);
-                });
-            }
-        });
+        // screen.points.forEach(point => {
+        //     let d = MathUtil.distance(point.coordinates, { x: 35 * this._constant, y: screen.center.y }) / side;
 
-        // const point = screen.getPointAt(50,50);
-        // point.modifyColor(color => color.set(1,1,0));
-        // const point2 = screen.getPointAt(40,60);
-        // point2.modifyColor(color => color.set(1,1,0));
-        // this._screen.drawLineWithPoints(point2, point);
+        //     if (d < .1 + .1 * fnusin(2)) {
+        //         point.modifyColor(color => {
+        //             color.set(1, 0, 0);
+        //         });
+        //     }
+        // });
+
+        const point = screen.getPointAt(50,50);
+        point.modifyColor(color => color.set(1,1,0));
+        const point2 = screen.getPointAt(40,60);
+        point2.modifyColor(color => color.set(1,1,0));
+        this._screen.drawLineWithPoints(point2, point);
 
         // screen.drawLine(0,0, 50,50, this._red);
         // screen.drawCircle(50,50, 1 + 10 * fnusin(2), 1,0,0);
