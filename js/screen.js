@@ -27,10 +27,14 @@ class Screen {
         this._pointSize = 1;
 
         this._dimension = 3;
-        this._vertices = [];
-        this._colors = [];
-        this._pointsizes = [];
-        this._atlasids = [];
+        //this._vertices = [];
+        this._vertices = new Float32Array();
+        //this._colors = [];
+        this._colors = new Float32Array();
+        //this._pointsizes = [];
+        this._pointsizes = new Float32Array();
+        //this._atlasids = [];
+        this._atlasids = new Int32Array();
 
         this._init();
 
@@ -92,10 +96,14 @@ class Screen {
     _createLayers() {
         for (let layerIndex = 0; layerIndex < this._numLayers; layerIndex++) {
             const layer = this._createLayer(((layerIndex) / this._numLayers) * -1);
-            this._vertices = this._vertices.concat(layer.vertices);
-            this._colors = this._colors.concat(layer.colors);
-            this._pointsizes = this._pointsizes.concat(layer.pointsizes);
-            this._atlasids = this._atlasids.concat(layer.atlasIds);
+            //this._vertices = this._vertices.concat(layer.vertices);
+            this._vertices = new Float32Array([...this._vertices, ...layer.vertices]);
+            //this._colors =  this._colors.concat(layer.colors);
+            this._colors = new Float32Array([...this._colors, ...layer.colors]);// this._colors.concat(layer.colors);
+            //this._pointsizes = this._pointsizes.concat(layer.pointsizes);
+            this._pointsizes = new Float32Array([...this._pointsizes, ...layer.pointsizes]);
+            //this._atlasids = this._atlasids.concat(layer.atlasIds);
+            this._atlasids = new Int32Array([...this._atlasids, ...layer.atlasIds]);
             this._layers.push(layer);
         }
         this._currentLayer = this._layers[this._layerIndex];
@@ -156,20 +164,20 @@ class Screen {
         }
     }
 
-    _groupLayers() {
-        for (let layerIndex = 0; layerIndex < this._layers.length; layerIndex++) {
-            const layer = this._layers[layerIndex];
-            this._vertices = this._vertices.concat(layer.vertices);
-            this._colors = this._colors.concat(layer.colors);
-            this._pointsizes = this._pointsizes.concat(layer.pointsizes);
-            this._atlasids = this._atlasids.concat(layer.atlasIds);
+    // _groupLayers() {
+    //     for (let layerIndex = 0; layerIndex < this._layers.length; layerIndex++) {
+    //         const layer = this._layers[layerIndex];
+    //         this._vertices = this._vertices.concat(layer.vertices);
+    //         this._colors = this._colors.concat(layer.colors);
+    //         this._pointsizes = this._pointsizes.concat(layer.pointsizes);
+    //         this._atlasids = this._atlasids.concat(layer.atlasIds);
 
-            // layer.vertices.forEach(i => this._vertices.push(i));
-            // layer.colors.forEach(i => this._colors.push(i));
-            // layer.pointsizes.forEach(i => this._pointsizes.push(i));
-            // layer.atlasIds.forEach(i => this._atlasids.push(i));
-        }
-    }
+    //         // layer.vertices.forEach(i => this._vertices.push(i));
+    //         // layer.colors.forEach(i => this._colors.push(i));
+    //         // layer.pointsizes.forEach(i => this._pointsizes.push(i));
+    //         // layer.atlasIds.forEach(i => this._atlasids.push(i));
+    //     }
+    // }
 
     get numColumns() {
         return this._numColumns;
@@ -408,47 +416,48 @@ class Screen {
 
 
     clear(color = null, alphaAmount = .1) {
-        this._currentLayer.rows.forEach(row => {
-            row.forEach(point => {
-
-                point.color.a > alphaAmount && (
-                    color && point.modifyColor(c => {
-                        c.setColor(color);
-                    }) || color && point.modifyColor(c => {
-                        c.set(0, 0, 0, 0);
-                    }));
-            });
-        });
-    }
-
-    clearMix(color, level = 2) {
-        let pointColor = null;
-        //this._currentLayer.rows.forEach(row => {
         const rowsLength = this._currentLayer.rows.length;
         let rowLength;
         for (let index = 0; index < rowsLength; index++) {
             const row = this._currentLayer.rows[index];
             rowLength = row.length
             for (let i = 0; i < rowLength; i++) {
-                //row.forEach(point => {
                 const point = row[i];
-                if (point.modified) {
 
-                    point.modifyColor(pointColor => {
-                        pointColor.set(
-                            (pointColor.r + color.r) / level,
-                            (pointColor.g + color.g) / level,
-                            (pointColor.b + color.b) / level,
-                            (pointColor.a + color.a)
-                        );
-                    });
-                }
+                point.modified && point.color.a > alphaAmount && (
+                    color && point.modifyColor(c => {
+                        c.setColor(color);
+                    }) || color && point.modifyColor(c => {
+                        c.set(0, 0, 0, 0);
+                    }));
+            }
+        }
+    }
+
+    clearMix(color, level = 2) {
+
+        const rowsLength = this._currentLayer.rows.length;
+        let rowLength;
+        for (let index = 0; index < rowsLength; index++) {
+            const row = this._currentLayer.rows[index];
+            rowLength = row.length
+            for (let i = 0; i < rowLength; i++) {
+                const point = row[i];
+
+                point.modified && point.modifyColor(pointColor => {
+                    pointColor.set(
+                        (pointColor.r + color.r) / level,
+                        (pointColor.g + color.g) / level,
+                        (pointColor.b + color.b) / level,
+                        (pointColor.a + color.a)
+                    );
+                });
                 if (point.size < this._pointSize) {
                     point.size = this._pointSize;
                 }
-                //});
+
             }
-            //});
+
         }
     }
 

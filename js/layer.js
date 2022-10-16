@@ -12,10 +12,14 @@ class Layer {
         this._shuffledPoints = null;
 
         const numItems = numRows * numColumns;
-        this._vertices = Array(numItems * 3).fill(0);
-        this._colors = Array(numItems * 4).fill(0);
-        this._pointsizes = Array(numItems).fill(0);
-        this._atlasIds = Array(numItems).fill(-1);
+        //this._vertices = Array(numItems * 3).fill(0);
+        this._vertices = new Float32Array(numItems * 3);
+        //this._colors = Array(numItems * 4).fill(0);
+        this._colors = new Float32Array(numItems * 4);
+        //this._pointsizes = Array(numItems).fill(0);
+        this._pointsizes = new Float32Array(numItems);
+        //this._atlasIds = Array(numItems).fill(-1);
+        this._atlasIds = new Int32Array(Array(numItems).fill(-1));
     }
 
     get columns() {

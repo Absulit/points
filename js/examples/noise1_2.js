@@ -3,8 +3,13 @@ import Coordinate from '../coordinate.js';
 import Effects from '../effects.js';
 import ImageLoader from '../imageloader.js';
 import MathUtil from '../mathutil.js';
+import Screen from '../screen.js';
 
 export default class Noise1_2 {
+    /**
+     * 
+     * @param {Screen} screen 
+     */
     constructor(screen) {
         this._screen = screen;
         this._effects = new Effects(screen);
@@ -32,7 +37,8 @@ export default class Noise1_2 {
 
         screen.layerIndex = 2;//--------------------------- LAYER 2
         //screen.clear();
-        screen.points.forEach(point => point.setColor(0, 0, 0, 1));
+        //screen.points.forEach(point => point.setColor(0, 0, 0, 1));
+        screen.points.forEach(point => point.modifyColor(color => color.set(0, 0, 0, 1)));
     }
 
     update({ fnucos, fnusin, fusin, side, fnsin, utime }) {
@@ -50,7 +56,7 @@ export default class Noise1_2 {
         screen.points.forEach(point => {
             const { x: nx, y: ny } = point.normalPosition;
 
-            const wave = Math.sin(point.coordinates.y * .2 / this._constant + utime );
+            const wave = Math.sin(point.coordinates.y * .2 / this._constant + utime);
             //const wave = Math.sin(point.coordinates.y + point.coordinates.x);
 
 
@@ -59,7 +65,8 @@ export default class Noise1_2 {
             const b = Math.sin(point.coordinates.x * .5 / this._constant + wave * fusin(1));
 
 
-            point.setBrightness(b);
+            //point.setBrightness(b);
+            point.modifyColor(color => color.brightness = b);
             //point.setColor(b * ny, wave * nx, 0);
         });
 
@@ -68,7 +75,8 @@ export default class Noise1_2 {
 
         screen.points.forEach(point => {
             const { x: nx, y: ny } = point.normalPosition;
-            point.setColor(nx, ny, 1 - nx);
+            //point.setColor(nx, ny, 1 - nx);
+            point.modifyColor(color => color.set(nx, ny, 1 - nx));
         });
 
         //this._imageLoader2.loadToLayer();
@@ -83,7 +91,7 @@ export default class Noise1_2 {
             const point0 = screen.getPointFromLayer(point, 0);
             const point1 = screen.getPointFromLayer(point, 1);
 
-            const angle = point0.getBrightness() * Math.PI * 2 + 2 * fusin(.98);
+            const angle = point0.color.brightness * Math.PI * 2 + 2 * fusin(.98);
 
             const newCoordinate = MathUtil.polar(5 * this._constant + 5 * fnusin(.56) * this._constant, angle);
             const newPoint = screen.getPointAt(Math.floor(point.coordinates.x + newCoordinate.x), Math.floor(point.coordinates.y + newCoordinate.y));

@@ -154,7 +154,7 @@ let effects;
 
 const sliders = { 'a': 0, 'b': 0, 'c': 0 }
 
-let side = 100;
+let side = 200;
 let numLayers = 3;
 let numColumns = side;
 let numRows = side;
@@ -172,9 +172,9 @@ function init() {
 
     cache = new Cache(60 * 10);
 
-    demo = new EffectsTester(screen);
+    demo = new SineLines(screen);
 
-    effects = new Effects(screen);
+    //effects = new Effects(screen);
 
     // point size
     // this is not used, just legacy:
@@ -238,6 +238,7 @@ function update() {
         pointsizes = currentFrameData.pointsizes;
         atlasids = currentFrameData.atlasids;
     });
+    //print(colors[0],colors[1], colors[2],colors[3]);debugger;
     printPoints(vertices, colors, pointsizes, atlasids);
 
     /*************/

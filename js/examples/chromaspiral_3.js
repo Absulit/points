@@ -10,7 +10,7 @@ export default class ChromaSpiral_3 {
         this._constant = screen.numColumns / 200;
     }
 
-    update(usin, ucos, side, utime) {
+    update({usin, ucos, side, utime}) {
         let x = this._screen.center.x, y = this._screen.center.y, radius = 10;
         let pointFromCenter, point, radians, angle, lastModifiedPoint;
 
@@ -43,7 +43,7 @@ export default class ChromaSpiral_3 {
                 if(lastModifiedPoint){
                     this._screen.drawLineWithPoints(lastModifiedPoint, point);
                 }
-                point.setBrightness(1);
+                point.modifyColor(color => color.brightness = 1);
                 lastModifiedPoint = point;
             }
         }
@@ -71,7 +71,7 @@ export default class ChromaSpiral_3 {
                 if(lastModifiedPoint){
                     this._screen.drawLineWithPoints(lastModifiedPoint, point);
                 }
-                point.setBrightness(1);
+                point.modifyColor(color => color.brightness = 1);
                 lastModifiedPoint = point;
             }
         }

@@ -37,8 +37,8 @@ export function getBuffer(size) {
 export function getBuffer2(vs) {
     const bufferId = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, bufferId);
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(vs), gl.STATIC_DRAW);
-    //gl.bufferData(gl.ARRAY_BUFFER, vs, gl.STATIC_DRAW);
+    //gl.bufferData(gl.ARRAY_BUFFER, flatten(vs), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, vs, gl.STATIC_DRAW);
     return bufferId;
 }
 
@@ -248,6 +248,26 @@ export function printPoints(vertices, colors, pointsizes, atlasids) {
 
     drawPoints2(vBuffer, vertices, dimension3);
     //drawPoints2(verticesBufferId, vertices, dimension3);
+}
+
+export function printTriangles(vertices, colors, pointsizes, atlasids){
+    const vBuffer = getBuffer2(vertices);
+    shaderVariableToBuffer("vPosition", dimension3);
+
+    getBuffer2(colors);
+    shaderVariableToBuffer("vColor", dimension4);
+
+    getBuffer2(pointsizes);
+    shaderVariableToBuffer("vPointSize", dimension1);
+
+    //atlasids = atlasids;
+    getBuffer2(atlasids);
+    shaderVariableToBuffer("vAtlasId", dimension1);
+
+
+
+
+    drawTriangles2(vBuffer, vertices, dimension3);
 }
 
 function printPoint(point) {
