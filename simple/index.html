@@ -26,6 +26,12 @@
             precision mediump float;
 
             uniform float utime;
+            uniform float screenWidth;
+            uniform float screenHeight;
+
+            uniform float planetPoints;
+            uniform float planetPointsLength;
+
             varying vec4 fColor;
             varying float fAtlasId;
 
@@ -33,20 +39,29 @@
             uniform vec2 textureAtlasSize;  // eg 64x32
             uniform vec2 imageSize;         // eg 16x16
 
-            vec4 clearMix(vec4 pointColor, vec4 color, float level){
-                float r = (pointColor.r + color.r) / level;
-                float g = (pointColor.g + color.g) / level;
-                float b = (pointColor.b + color.b) / level;
-                float a = (pointColor.a + color.a);
-                return vec4(r, g, b, a);
-            }
             float fnusin(float speed){
                 return sin(utime * speed) * .5;
             }
 
+            float sdfSegment( in vec2 p, in vec2 a, in vec2 b ){
+                vec2 pa = p-a, ba = b-a;
+                float h = clamp( dot(pa,ba)/dot(ba,ba), 0.0, 1.0 );
+                return length( pa - ba*h );
+            }
+
+            float line(vec2 uv, vec2 p1, vec2 p2, float pixelStroke){
+                vec2 v1 = vec2(p1.x/screenWidth, 1.-p1.y/screenWidth);
+                vec2 v2 = vec2(p2.x/screenHeight, 1.-p2.y/screenHeight);
+                float d = sdfSegment(uv, v1, v2);
+                float value = 1.0;
+                if(d > pixelStroke/800.){
+                    value = 0.;
+                }
+                return value;
+            }
+
             void main() {
                 vec4 finalColor;
-                float side = .1;
                 vec2 uv = gl_FragCoord.xy/800.;
 
                 if(fAtlasId > -1.0){
@@ -58,7 +73,7 @@
                     vec2 uv = (imageCoord + imageSize * gl_PointCoord) / textureAtlasSize;
                     finalColor = texture2D(textureAtlas, uv);
                 }else{
-                    //finalColor = fColor;
+                    ////finalColor = fColor;
                     float cellSize = 20. + 10. * fnusin(1.);
                     float a = sin(uv.x  * cellSize) * sin(uv.y * cellSize);
                     float b = sin(uv.x * uv.y * 10. * 9.1 * .25 );
@@ -66,8 +81,21 @@
                     float d = distance(a,b);
                     float f = d * uv.x * uv.y;
                     finalColor = vec4(a*d,f*c*a,f, 1.);
+
+                    //float constant = .02;
+                    //float wave = sin(uv.y * 20. + 5. * fnusin(1.55222) + utime);
+                    //float b = sin(uv.x * 25. + 5. * fnusin(2.15654) + wave * fnusin(1.));
+                    //finalColor = vec4(b);
+
+                    //float a = mod(gl_FragCoord.x, 30.);
+                    //float b = mod(gl_FragCoord.y, 30.);
+                    //finalColor = vec4((1.-a) * (1.-b));
+
+                    //float v = line(uv, vec2(10.,10.),  vec2(780.,780.), 1.  );
+                    //finalColor = vec4(v);
+
+
                 }
-                //finalColor = clearMix(finalColor, vec4(0,0,0, 1), 1.1 );
                 gl_FragColor = finalColor;
 
             }

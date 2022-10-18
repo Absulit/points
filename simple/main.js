@@ -12,8 +12,11 @@ import {
     printPoints,
     printLayers,
     shaderUniformToBuffer,
-    printTriangles
+    printTriangles,
+    getBuffer2,
+    shaderVariableToBuffer
 } from '../absulit.module.js';
+import MathUtil from '../js/mathutil.js';
 
 
 const stats = new Stats();
@@ -32,10 +35,10 @@ let vertices = new Float32Array([
     -1.0, -1.0, 0.0,
     -1.0, 1.0, 0.0,
     1.0, 1.0, 0.0,
-    
+
     1.0, 1.0, 0.0,
     1.0, -1.0, 0.0,
-    
+
     -1.0, -1.0, 0.0,
 
 
@@ -70,16 +73,24 @@ let atlasids = new Float32Array([
 
 const sliders = { 'a': 0, 'b': 0, 'c': 0 }
 
-
+let planets;
 function init() {
     initWebGL("gl-canvas", true);
-    //aspect = canvas.width / canvas.height;
     setClearColor([0, 0, 0, 0]);
 
     assignShaders("vertex-shader", "fragment-shader");
 
     //-----------
-
+    planets = [
+        { radius: 5, speed: 10, angle: Math.random() * 360 },
+        { radius: 10, speed: 7, angle: Math.random() * 360 },
+        { radius: 13, speed: 6, angle: Math.random() * 360 },
+        { radius: 16, speed: 5, angle: Math.random() * 360 },
+        { radius: 20, speed: 5, angle: Math.random() * 360 },
+        { radius: 23, speed: 1, angle: Math.random() * 360 },
+        { radius: 27, speed: -1, angle: Math.random() * 360 },
+        { radius: 32, speed: .1, angle: Math.random() * 360 },
+    ]
 }
 
 function update() {
@@ -88,10 +99,34 @@ function update() {
 
     shaderUniformToBuffer('utime', utime);
 
+    shaderUniformToBuffer('screenWidth', canvas.width);
+    shaderUniformToBuffer('screenHeight', canvas.height);
+
     utime += 0.01666;//1 / 60;//0.01666;
 
     //
     // CODE HERE
+    let cx = canvas.width * .5, cy = canvas.height * .5;
+    let planetPoints = [];
+    planets.forEach((planet, index) => {
+        let pointFromCenter, point, radians;
+        radians = MathUtil.radians(planet.angle);
+        pointFromCenter = MathUtil.vector(planet.radius, radians);
+        let coord = {
+            x: Math.round(pointFromCenter.x + cx),
+            y: Math.round(pointFromCenter.y + cy)
+        };
+        planetPoints.push(coord.x);
+        planetPoints.push(coord.y);
+
+        // if greater than 360 set back to zero, also increment
+        planet.angle = (planet.angle * (planet.angle < 360) || 0) + (planet.speed * .3);
+
+    });
+
+    //getBuffer2(new Float32Array(planetPoints));
+    shaderUniformToBuffer("planetPoints", new Float32Array(planetPoints) );
+    shaderUniformToBuffer("planetPointsLength", 8 );
 
     //
     //printPoints(vertices, colors, pointsizes, atlasids);
