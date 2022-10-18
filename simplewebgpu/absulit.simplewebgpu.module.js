@@ -57,6 +57,8 @@ export default class WebGPU {
         this._vertexBufferInfo = null;
         this._buffer = null;
         this._screenSizeArrayBuffer = null;
+        this._uniformsBuffer = null;
+
         this._uniformBindGroup = null;
         this._computeBindGroups = null;
         this._presentationSize = null;
@@ -211,11 +213,21 @@ export default class WebGPU {
         this._screenSizeArrayBuffer = this._device.createBuffer({
             mappedAtCreation: true,
             size: this._screenSizeArray.byteLength,
-            usage: GPUBufferUsage.STORAGE,
+            usage: GPUBufferUsage.STORAGE | GPUBufferUsage.UNIFORM,
         });
         const screenSizeArrayMappedRange = this._screenSizeArrayBuffer.getMappedRange();
         new Float32Array(screenSizeArrayMappedRange).set(this._screenSizeArray);
         this._screenSizeArrayBuffer.unmap();
+        //--------------------------------------------
+        this._uniformsArray = new Float32Array([0]);
+        this._uniformsBuffer = this._device.createBuffer({
+            mappedAtCreation: true,
+            size: this._uniformsArray.byteLength,
+            usage: GPUBufferUsage.UNIFORM,
+        });
+
+        new Float32Array(this._uniformsBuffer.getMappedRange()).set(this._uniformsArray);
+        this._uniformsBuffer.unmap();
         //--------------------------------------------
 
 
@@ -457,9 +469,9 @@ export default class WebGPU {
             layout: this._pipeline.getBindGroupLayout(0),
             entries: [
                 {
-                    binding: 8,
+                    binding: 0,
                     resource: {
-                        buffer: this._screenSizeArrayBuffer
+                        buffer: this._uniformsBuffer,
                     }
                 }
             ],
@@ -479,6 +491,15 @@ export default class WebGPU {
         new Float32Array(this._screenSizeArrayBuffer.getMappedRange()).set(this._screenSizeArray);
         this._screenSizeArrayBuffer.unmap();
         ///----------------
+        this._uniformsBuffer = this._device.createBuffer({
+            mappedAtCreation: true,
+            size: this._uniformsArray.byteLength,
+            usage: GPUBufferUsage.UNIFORM,
+        });
+
+        new Float32Array(this._uniformsBuffer.getMappedRange()).set(this._uniformsArray);
+        this._uniformsBuffer.unmap();
+        //--------------------------------------------
 
         this._computeBindGroups = this._device.createBindGroup({
             //layout: bindGroupLayout,
@@ -505,20 +526,6 @@ export default class WebGPU {
             ]
         });
 
-        // this._uniformBindGroup = this._device.createBindGroup({
-        //     layout: this._pipeline.getBindGroupLayout(0),
-        //     entries: [
-        //         {
-        //             binding: 8,
-        //             resource: {
-        //                 buffer: this._screenSizeArrayBuffer
-        //             }
-        //         }
-        //     ],
-        // });
-
-
-        
 
         let commandEncoder = this._device.createCommandEncoder();
 
@@ -552,6 +559,9 @@ export default class WebGPU {
             if (this._useTexture) {
                 passEncoder.setBindGroup(0, this._uniformBindGroup);
             }
+
+            this._createParams();
+            passEncoder.setBindGroup(0, this._uniformBindGroup);
             passEncoder.setVertexBuffer(0, this._buffer);
 
             /**
