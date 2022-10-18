@@ -53,7 +53,7 @@ export default class SpeedPoints8 {
             //point.setColor(a * z, b * z, z * d);
             //point.setColor(d, nx * b, 1 - d * a * z);
             //point.setColor(nx * zi + ny * z * d, (1 - ny) * zi + z * (1 - nx), (1 - nx) * zi + z * (ny));
-            point.setColor(nx, ny * zi, z * d * dcheckers);
+            point.modifyColor(color => color.set(nx, ny * zi, z * d * dcheckers));
 
             //point.setBrightness(fnusin(nx) * fnusin(ny));
             //point.setBrightness(  Math.sin(Math.sin(nx * 10) + Math.sin(ny * 10)));

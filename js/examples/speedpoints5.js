@@ -41,7 +41,7 @@ export default class SpeedPoints5 {
             //const u = this.normalize([z * ny * (z) * (b), z * nx * (z * ny), 0]);
 
             //point.setColor(a, b * z, z * normalIndex);
-            point.setColor(z + (1 - z) * (ny) * (1-a), nx* (1 - z) * .5, b * z * ny);
+            point.modifyColor(color => color.set(z + (1 - z) * (ny) * (1-a), nx* (1 - z) * .5, b * z * ny))
            // point.setBrightness(z);
         });
 

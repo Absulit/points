@@ -58,7 +58,7 @@ export default class SpeedPoints7 {
             //point.setBrightness(  Math.sin(Math.sin(nx / ny* 10) / Math.sin(ny / 10)))
             //point.setBrightness(Math.sin(Math.sin(nx / ny * 10) * Math.sin(ny / 10)))
             //point.setBrightness(Math.sin(Math.sin(nx / ny * 10) / Math.sin(z / 10)))
-            point.setBrightness(Math.sin(Math.sin(nx / ny * 10) / Math.sin(d / 10)))
+            point.modifyColor(color => color.brightness = Math.sin(Math.sin(nx / ny * 10) / Math.sin(d / 10)));
         });
 
         //this._effects.chromaticAberration(.05, 2);

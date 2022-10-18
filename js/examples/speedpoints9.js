@@ -26,17 +26,15 @@ export default class SpeedPoints9 {
             Math.floor(screen.center.x + 48 * this._constant * fusin(10) * fusin(.5)),
             Math.floor(screen.center.y + 50 * this._constant * fusin(1.5))
         );
-        if (centerPoint) {
-            centerPoint.setBrightness(1);
-        }
+
+        centerPoint && centerPoint.modifyColor(color => color.brightness = 1);
 
         const centerPoint2 = screen.getPointAt(
             Math.floor(screen.center.x + 48 * this._constant * fusin(9.911)),
             Math.floor(screen.center.y + 30 * this._constant * fusin(9.13)  * fusin(.36) )
         );
-        if (centerPoint2) {
-            centerPoint2.setBrightness(1);
-        }
+
+        centerPoint2 && centerPoint2.modifyColor(color => color.brightness = 1);
 
         //screen.drawLineWithPoints(centerPoint, centerPoint2);
 
@@ -54,7 +52,7 @@ export default class SpeedPoints9 {
             const { x: nx, y: ny } = point.normalPosition;
 
             const point0 = screen.getPointFromLayer(point, 0);
-            const b = point0.getBrightness();
+            const b = point0.color.brightness;
 
             const a = Math.sin(nx * 50 + 15 * fnusin(2.545));
             //const b = Math.sin(ny * 50 + 17 * fnusin(.568));
@@ -66,7 +64,7 @@ export default class SpeedPoints9 {
 
             //point.setColor(z, ny * b, b * z);
             //point.setColor(nx * b, (ny * -b), z * b);
-            point.setColor(ny * b, nx* b, (1-ny) * b);
+            point.modifyColor(color => color.set(ny * b, nx* b, (1-ny) * b));
         });
         //this._effects.chromaticAberration(.05, 2);
 

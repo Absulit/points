@@ -47,7 +47,7 @@ export default class SpeedPoints6 {
             //point.setColor(z + (1 - z) * (ny) * (1-a), nx* (1 - z) * .5, b * z * ny);
             //point.setColor(a * z, b * z, z * d);
             //point.setColor(d, nx * b, 1 - d * a * z);
-            point.setColor(nx * zi + ny*z, (1-ny) * zi + z * (1-nx), (1-nx) * zi + z * (ny));
+            point.modifyColor(color => color.set(nx * zi + ny*z, (1-ny) * zi + z * (1-nx), (1-nx) * zi + z * (ny)));
             //point.setBrightness(1-z);
         });
 
