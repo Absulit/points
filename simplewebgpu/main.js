@@ -50,7 +50,11 @@ async function update() {
 
     // code here
     webGPU._screenSizeArray[2] = utime;
+
     webGPU._uniformsArray[0] = utime;
+    webGPU._uniformsArray[1] = window.innerWidth;
+    webGPU._uniformsArray[2] = window.innerHeight;
+
     webGPU.update();
 
     // 
@@ -101,3 +105,11 @@ sliderC.addEventListener('change', e => localStorage.setItem('slider-c', e.targe
 sliderA.addEventListener('change', e => print(e.target.value));
 sliderB.addEventListener('change', e => print(e.target.value));
 sliderC.addEventListener('change', e => print(e.target.value));
+//
+// var resizeViewport = function () {
+//     let aspect = window.innerWidth / window.innerHeight;
+//     canvas.width = window.innerWidth;
+//     canvas.height = window.innerHeight;
+// }
+
+// window.addEventListener('resize', resizeViewport, false);

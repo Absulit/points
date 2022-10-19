@@ -1,7 +1,16 @@
+@group(0) @binding(0) var<uniform> params: Params;
+
+struct Params {
+    utime: f32,
+    screenWidth:f32,
+    screenHeight:f32
+}
+
 struct Fragment {
     @builtin(position) Position: vec4<f32>,
     @location(0) Color: vec4<f32>,
-    @location(1) uv: vec2<f32>
+    @location(1) uv: vec2<f32>,
+    @location(2) ratio: f32
 }
 
 
@@ -15,9 +24,10 @@ fn main(
 
     var result: Fragment;
 
+    result.ratio = params.screenWidth / params.screenHeight;
     result.Position = vec4<f32>(position);
     result.Color = vec4<f32>(color);
-    result.uv = uv;
+    result.uv = vec2(uv.x * result.ratio, uv.y);
 
     return result;
 }

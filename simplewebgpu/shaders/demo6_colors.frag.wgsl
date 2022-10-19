@@ -1,4 +1,10 @@
-@group(0) @binding(0) var<uniform> utime: f32;
+@group(0) @binding(0) var<uniform> params: Params;
+
+struct Params {
+    utime: f32,
+    screenWidth:f32,
+    screenHeight:f32
+}
 
 struct ScreenSize {
     numRows: f32,
@@ -8,7 +14,7 @@ struct ScreenSize {
 }
 
 fn fnusin(speed: f32) -> f32{
-    return sin(utime * speed) * .5;
+    return sin(params.utime * speed) * .5;
 }
 
 // float sdfSegment( in vec2 p, in vec2 a, in vec2 b ){
@@ -33,9 +39,12 @@ fn fnusin(speed: f32) -> f32{
 fn main(
         @location(0) Color: vec4<f32>,
         @location(1) uv: vec2<f32>,
+        @location(2) ratio: f32,
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
+    // let ratio = params.screenWidth / params.screenHeight;
+    // let uuv:vec2<f32> = vec2(uv.x * ratio, uv.y);
 
     let cellSize = 20. + 10. * fnusin(1.);
     let a = sin(uv.x  * cellSize) * sin(uv.y * cellSize);

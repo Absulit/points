@@ -219,7 +219,7 @@ export default class WebGPU {
         new Float32Array(screenSizeArrayMappedRange).set(this._screenSizeArray);
         this._screenSizeArrayBuffer.unmap();
         //--------------------------------------------
-        this._uniformsArray = new Float32Array([0]);
+        this._uniformsArray = new Float32Array([0,0,0]);
         this._uniformsBuffer = this._device.createBuffer({
             mappedAtCreation: true,
             size: this._uniformsArray.byteLength,
