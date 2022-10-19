@@ -52,8 +52,8 @@ async function update() {
     webGPU._screenSizeArray[2] = utime;
 
     webGPU._uniformsArray[0] = utime;
-    webGPU._uniformsArray[1] = window.innerWidth;
-    webGPU._uniformsArray[2] = window.innerHeight;
+    webGPU._uniformsArray[1] = canvas.width;
+    webGPU._uniformsArray[2] = canvas.height;
 
     webGPU.update();
 
