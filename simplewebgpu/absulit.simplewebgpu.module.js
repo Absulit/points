@@ -82,11 +82,11 @@ export default class WebGPU {
     }
 
     async init(vertexShaderPath, fragmentShaderPath) {
-        const colorsVertWGSL = await getShaderSource(vertexShaderPath || './shaders/demo6_colors.vert.wgsl');
-        const colorsFragWGSL = await getShaderSource(fragmentShaderPath || './shaders/demo6_colors.frag.wgsl');
+        const colorsVertWGSL = await getShaderSource(vertexShaderPath || './shaders/default.vert.wgsl');
+        const colorsFragWGSL = await getShaderSource(fragmentShaderPath || './shaders/default.frag.wgsl');
 
-        const textureVertWGSL = await getShaderSource('./shaders/demo6_texture.vert.wgsl');
-        const textureFragWGSL = await getShaderSource('./shaders/demo6_texture.frag.wgsl');
+        const textureVertWGSL = await getShaderSource('./shaders/default.vert.wgsl');
+        const textureFragWGSL = await getShaderSource('./shaders/default.frag.wgsl');
 
         const updatePointsWGSL = await getShaderSource('./shaders/demo6_update.points.wgsl');
 

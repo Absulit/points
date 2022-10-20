@@ -30,7 +30,7 @@ let shaderModule;
 let canvas = document.getElementById('gl-canvas');
 
 async function init() {
-    const initialized = await webGPU.init();
+    const initialized = await webGPU.init(null, './shaders/test1.frag.wgsl');
     if (initialized) {
         //webGPU.createVertexBuffer(vertexArray);
         // COMPUTE SHADER WGSL
