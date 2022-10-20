@@ -1,4 +1,10 @@
 @group(0) @binding(0) var<uniform> params: Params;
+@group(0) @binding(1) var<storage> particles: array<Particle>;
+
+struct Particle{
+    x: f32,
+    y: f32
+}
 
 struct Params {
     utime: f32,
@@ -46,6 +52,7 @@ fn main(
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
+    let particle = particles[0];
 
     let cellSize = 300.;
     let a = sin(uv.x  * cellSize) * sin(uv.y * cellSize);

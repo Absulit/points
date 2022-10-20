@@ -1,4 +1,5 @@
 'use strict';
+import MathUtil from '../js/mathutil.js';
 import { print } from '../js/utils.js';
 import WebGPU from './absulit.simplewebgpu.module.js';
 
@@ -29,8 +30,20 @@ let shaderModule;
 
 let canvas = document.getElementById('gl-canvas');
 
+let planets = [
+    { radius: 5 , speed: 10, angle: Math.random() * 360 },
+    { radius: 10 , speed: 7, angle: Math.random() * 360 },
+    { radius: 13 , speed: 6, angle: Math.random() * 360 },
+    { radius: 16 , speed: 5, angle: Math.random() * 360 },
+    { radius: 20 , speed: 5, angle: Math.random() * 360 },
+    { radius: 23 , speed: 1, angle: Math.random() * 360 },
+    { radius: 27 , speed: -1, angle: Math.random() * 360 },
+    { radius: 32 , speed: .1, angle: Math.random() * 360 },
+]
+
 async function init() {
-    const initialized = await webGPU.init(null, './shaders/test1.frag.wgsl');
+    //const initialized = await webGPU.init();
+    const initialized = await webGPU.init(null, './shaders/planets.frag.wgsl');
     if (initialized) {
         //webGPU.createVertexBuffer(vertexArray);
         // COMPUTE SHADER WGSL
@@ -54,6 +67,25 @@ async function update() {
     webGPU._uniformsArray[0] = utime;
     webGPU._uniformsArray[1] = canvas.width;
     webGPU._uniformsArray[2] = canvas.height;
+
+
+
+    planets.forEach((planet, index) => {
+        let pointFromCenter, point, radians;
+        radians = MathUtil.radians(planet.angle);
+        pointFromCenter = MathUtil.vector(planet.radius, radians);
+        const x = (pointFromCenter.x + 4) * .1;
+        const y = (pointFromCenter.y + 4) * .1;
+
+        // if greater than 360 set back to zero, also increment
+        planet.angle = (planet.angle * (planet.angle < 360) || 0) + (planet.speed * .3);
+
+        webGPU._particles[index * 2] = x;
+        webGPU._particles[index * 2 + 1] = y;
+    });
+
+
+    //webGPU._particles[0] = 1;
 
     webGPU.update();
 

@@ -229,7 +229,17 @@ export default class WebGPU {
         new Float32Array(this._uniformsBuffer.getMappedRange()).set(this._uniformsArray);
         this._uniformsBuffer.unmap();
         //--------------------------------------------
+        //--------------------------------------------
+        this._particles = new Float32Array(Array(300).fill(0));
+        this._particlesBuffer = this._device.createBuffer({
+            mappedAtCreation: true,
+            size: this._particles.byteLength,
+            usage: GPUBufferUsage.STORAGE,
+        });
 
+        new Float32Array(this._particlesBuffer.getMappedRange()).set(this._particles);
+        this._particlesBuffer.unmap();
+        //--------------------------------------------
 
 
         // First Matrix
@@ -473,6 +483,12 @@ export default class WebGPU {
                     resource: {
                         buffer: this._uniformsBuffer,
                     }
+                },
+                {
+                    binding: 1,
+                    resource: {
+                        buffer: this._particlesBuffer,
+                    }
                 }
             ],
         });
@@ -499,6 +515,17 @@ export default class WebGPU {
 
         new Float32Array(this._uniformsBuffer.getMappedRange()).set(this._uniformsArray);
         this._uniformsBuffer.unmap();
+        //--------------------------------------------
+        //--------------------------------------------
+        //this._particles = new Float32Array(Array(100).fill(0));
+        this._particlesBuffer = this._device.createBuffer({
+            mappedAtCreation: true,
+            size: this._particles.byteLength,
+            usage: GPUBufferUsage.STORAGE,
+        });
+
+        new Float32Array(this._particlesBuffer.getMappedRange()).set(this._particles);
+        this._particlesBuffer.unmap();
         //--------------------------------------------
 
         this._computeBindGroups = this._device.createBindGroup({
@@ -562,6 +589,7 @@ export default class WebGPU {
 
             this._createParams();
             passEncoder.setBindGroup(0, this._uniformBindGroup);
+            //passEncoder.setBindGroup(1, this._particleBindGroup);
             passEncoder.setVertexBuffer(0, this._buffer);
 
             /**

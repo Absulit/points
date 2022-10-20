@@ -49,18 +49,27 @@ fn main(
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
-    let particle = particles[0];
+    let scale = .1;
 
-    let cellSize = 20. + 10. * fnusin(1.);
-    let a = sin(uv.x  * cellSize) * sin(uv.y * cellSize);
-    let b = sin(uv.x * uv.y * 10. * 9.1 * .25 );
-    let c = fnusin(uv.x * uv.y * 10.);
-    let d = distance(a,b);
-    let f = d * uv.x * uv.y;
-    let finalColor:vec4<f32> = vec4(a*d,f*c*a,f, 1.);
+    var c = 1.;
+    var r = 0.;
 
+    //for(var i:u32=0; i < 8u; i++){
+        var particle = particles[0];
+        var d = distance(uv, vec2(particle.x*scale + .5, particle.y*scale + .5));
+        if(d > .01){
+            c = 0.;
+        }
+        r += c;
 
-
+        particle = particles[1];
+        d = distance(uv, vec2(particle.x*scale + .5, particle.y*scale + .5));
+        if(d > .01){
+            c = 0.;
+        }
+        r += c;        
+    //}
+    let finalColor:vec4<f32> = vec4(r);
 
 
     return finalColor;
