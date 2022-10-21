@@ -80,7 +80,7 @@ fn main(
     // r += c;
 
     let r = c + lastDistance;
-    let g = 1 - lastDistance;
+    let g = lastDistance;
     let b = 1 - lastDistance * 32;
 
     let finalColor:vec4<f32> = vec4(r, g, b, 1 );
