@@ -52,24 +52,38 @@ fn main(
     let scale = .1;
 
     var c = 1.;
-    var r = 0.;
 
-    //for(var i:u32=0; i < 8u; i++){
-        var particle = particles[0];
-        var d = distance(uv, vec2(particle.x*scale + .5, particle.y*scale + .5));
-        if(d > .01){
-            c = 0.;
-        }
-        r += c;
+    var particle = particles[0];
+    var lastDistance = -1.;
+    for(var i:u32 = 0; i < 8u; i++){
+        var particle = particles[i];
+        var d = distance(uv, vec2(particle.x * scale + .5, particle.y * scale + .5));
 
-        particle = particles[1];
-        d = distance(uv, vec2(particle.x*scale + .5, particle.y*scale + .5));
-        if(d > .01){
-            c = 0.;
+
+        if(lastDistance != -1.){
+            lastDistance = min(lastDistance, d);
+        }else{
+            lastDistance = d;
         }
-        r += c;        
-    //}
-    let finalColor:vec4<f32> = vec4(r);
+    }
+    if(lastDistance > .01){
+        c = 0.;
+    }
+
+    // var d1 = distance(uv, vec2( .5, .5) );
+    // var d2 = distance(uv, vec2( .6, .6) );
+    // var d3 = distance(uv, vec2( .7, .7) );
+    // var d = min(min(d1,d3), d2);
+    // if(d > .1){
+    //     c = 0.;
+    // }
+    // r += c;
+
+    let r = c + lastDistance;
+    let g = 1 - lastDistance;
+    let b = 1 - lastDistance * 32;
+
+    let finalColor:vec4<f32> = vec4(r, g, b, 1 );
 
 
     return finalColor;
