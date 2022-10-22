@@ -1,5 +1,4 @@
 @group(0) @binding(0) var<uniform> params: Params;
-//@group(0) @binding(1) var<storage> particles: array<Particle>;
 
 struct Particle{
     x: f32,
@@ -17,7 +16,6 @@ struct Fragment {
     @location(0) Color: vec4<f32>,
     @location(1) uv: vec2<f32>,
     @location(2) ratio: f32,
-    //@location(3) particles: array<Particle>
 }
 
 
@@ -35,7 +33,6 @@ fn main(
     result.Position = vec4<f32>(position);
     result.Color = vec4<f32>(color);
     result.uv = vec2(uv.x * result.ratio, uv.y);
-    //result.particles = particles;
 
     return result;
 }

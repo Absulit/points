@@ -43,7 +43,7 @@ let planets = [
 
 async function init() {
     //const initialized = await webGPU.init();
-    const initialized = await webGPU.init(null, './shaders/planets.frag.wgsl');
+    const initialized = await webGPU.init(null, './shaders/planets2.frag.wgsl');
     if (initialized) {
         //webGPU.createVertexBuffer(vertexArray);
         // COMPUTE SHADER WGSL
