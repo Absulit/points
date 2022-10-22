@@ -62,7 +62,7 @@ async function update() {
     utime += 1 / 60;
 
     // code here
-    webGPU._screenSizeArray[2] = utime;
+    //webGPU._screenSizeArray[2] = utime;
 
     webGPU._uniformsArray[0] = utime;
     webGPU._uniformsArray[1] = canvas.width;

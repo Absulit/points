@@ -32,15 +32,15 @@ struct Points {
     points: array<Point>
 }
 
-struct ScreenSize {
-    numRows: f32,
-    numColumns: f32,
-    uTime: f32,
-    notFilled: u32,
-}
+// struct ScreenSize {
+//     numRows: f32,
+//     numColumns: f32,
+//     uTime: f32,
+//     notFilled: u32,
+// }
 
 @group(0) @binding(0) var<storage, read_write> layer0 : Points;
-@group(0) @binding(8) var<storage, read_write> screenSize : ScreenSize;
+//@group(0) @binding(8) var<storage, read_write> screenSize : ScreenSize;
 
 @compute @workgroup_size(8,8,1)
 fn main(
@@ -48,7 +48,8 @@ fn main(
     @builtin(workgroup_id) WorkGroupID: vec3<u32>,
     @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
 ) {
-    let l0 = layer0.points[0];
-    let utime = screenSize.uTime;
+    var l0 = layer0.points[400];
+    //let utime = screenSize.uTime;
+
 
 }

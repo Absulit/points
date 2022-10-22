@@ -56,7 +56,6 @@ export default class WebGPU {
         this._computePipeline = null;
         this._vertexBufferInfo = null;
         this._buffer = null;
-        this._screenSizeArrayBuffer = null;
         this._uniformsBuffer = null;
 
         this._uniformBindGroup = null;
@@ -66,7 +65,6 @@ export default class WebGPU {
         this._commandEncoder = null;
 
         this._vertexArray = [];
-        this._screenSizeArray = [];
         this._gpuBufferFirstMatrix = [];
         this._layer0Buffer = [];
         this._layer0BufferSize = null;
@@ -197,14 +195,7 @@ export default class WebGPU {
      */
     createVertexBuffer(vertexArray) {
         this._vertexBufferInfo = new VertexBufferInfo(vertexArray);
-        this._buffer = this._device.createBuffer({
-            size: vertexArray.byteLength,//TODO: fill via shader this._numColumns*this._numRows*4*60,
-            usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
-            mappedAtCreation: true,
-        });
-        new Float32Array(this._buffer.getMappedRange()).set(vertexArray);
-        this._buffer.unmap();
-        return this._buffer;
+        this._buffer = this._createAndMapBuffer(vertexArray, GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST);
     }
 
     /**
@@ -226,9 +217,6 @@ export default class WebGPU {
     }
 
     createComputeBuffers() {
-        this._screenSizeArray = new Float32Array([this._numColumns, this._numRows, 0, 0]);
-        this._screenSizeArrayBuffer = this._createAndMapBuffer(this._screenSizeArray, GPUBufferUsage.STORAGE | GPUBufferUsage.UNIFORM);
-        //--------------------------------------------
         this._uniformsArray = new Float32Array([0,0,0]);
         this._uniformsBuffer = this._createAndMapBuffer(this._uniformsArray, GPUBufferUsage.UNIFORM);
         //--------------------------------------------
@@ -277,22 +265,10 @@ export default class WebGPU {
             //layout: bindGroupLayout,
             layout: this._computePipeline.getBindGroupLayout(0 /* index */),
             entries: [
-                // {
-                //     binding: 0,
-                //     resource: {
-                //         buffer: this._gpuBufferFirstMatrix
-                //     }
-                // },
                 {
                     binding: 0,
                     resource: {
                         buffer: this._layer0Buffer
-                    }
-                },
-                {
-                    binding: 8,
-                    resource: {
-                        buffer: this._screenSizeArrayBuffer
                     }
                 }
             ]
@@ -462,7 +438,6 @@ export default class WebGPU {
         if (!this._canvas) return;
         if (!this._device) return;
 
-        this._screenSizeArrayBuffer = this._createAndMapBuffer(this._screenSizeArray, GPUBufferUsage.STORAGE);
         //--------------------------------------------
         this._uniformsBuffer = this._createAndMapBuffer(this._uniformsArray, GPUBufferUsage.UNIFORM);
         //--------------------------------------------
@@ -478,12 +453,6 @@ export default class WebGPU {
                     resource: {
                         buffer: this._layer0Buffer
                     }
-                },
-                {
-                    binding: 8,
-                    resource: {
-                        buffer: this._screenSizeArrayBuffer
-                    }
                 }
             ]
         });
@@ -496,7 +465,7 @@ export default class WebGPU {
         const passEncoder = commandEncoder.beginComputePass();
         passEncoder.setPipeline(this._computePipeline);
         passEncoder.setBindGroup(0, this._computeBindGroups);
-        passEncoder.dispatchWorkgroups(8,8,2);
+        passEncoder.dispatchWorkgroups(8,8,1);
         passEncoder.end();
 
 
