@@ -207,67 +207,36 @@ export default class WebGPU {
         return this._buffer;
     }
 
+    /**
+     * 
+     * @param {Float32Array} data 
+     * @param {GPUBufferUsageFlags} usage 
+     * @param {Boolean} mappedAtCreation 
+     */
+    _createAndMapBuffer(data, usage, mappedAtCreation = true){
+        const buffer = this._device.createBuffer({
+            mappedAtCreation: mappedAtCreation,
+            size: data.byteLength,
+            usage: usage,
+        });
+
+        new Float32Array(buffer.getMappedRange()).set(data);
+        buffer.unmap();
+        return buffer;
+    }
+
     createComputeBuffers() {
         this._screenSizeArray = new Float32Array([this._numColumns, this._numRows, 0, 0]);
-
-        this._screenSizeArrayBuffer = this._device.createBuffer({
-            mappedAtCreation: true,
-            size: this._screenSizeArray.byteLength,
-            usage: GPUBufferUsage.STORAGE | GPUBufferUsage.UNIFORM,
-        });
-        const screenSizeArrayMappedRange = this._screenSizeArrayBuffer.getMappedRange();
-        new Float32Array(screenSizeArrayMappedRange).set(this._screenSizeArray);
-        this._screenSizeArrayBuffer.unmap();
+        this._screenSizeArrayBuffer = this._createAndMapBuffer(this._screenSizeArray, GPUBufferUsage.STORAGE | GPUBufferUsage.UNIFORM);
         //--------------------------------------------
         this._uniformsArray = new Float32Array([0,0,0]);
-        this._uniformsBuffer = this._device.createBuffer({
-            mappedAtCreation: true,
-            size: this._uniformsArray.byteLength,
-            usage: GPUBufferUsage.UNIFORM,
-        });
-
-        new Float32Array(this._uniformsBuffer.getMappedRange()).set(this._uniformsArray);
-        this._uniformsBuffer.unmap();
-        //--------------------------------------------
+        this._uniformsBuffer = this._createAndMapBuffer(this._uniformsArray, GPUBufferUsage.UNIFORM);
         //--------------------------------------------
         this._particles = new Float32Array(Array(300).fill(0));
-        this._particlesBuffer = this._device.createBuffer({
-            mappedAtCreation: true,
-            size: this._particles.byteLength,
-            usage: GPUBufferUsage.STORAGE,
-        });
-
-        new Float32Array(this._particlesBuffer.getMappedRange()).set(this._particles);
-        this._particlesBuffer.unmap();
+        this._particlesBuffer = this._createAndMapBuffer(this._particles, GPUBufferUsage.STORAGE);
         //--------------------------------------------
-
-
-        // First Matrix
-
-        const firstMatrix = new Float32Array(this._vertexArray);
-
-        this._gpuBufferFirstMatrix = this._device.createBuffer({
-            mappedAtCreation: true,
-            size: firstMatrix.byteLength,
-            usage: GPUBufferUsage.STORAGE,
-        });
-        const arrayBufferFirstMatrix = this._gpuBufferFirstMatrix.getMappedRange();
-        new Float32Array(arrayBufferFirstMatrix).set(firstMatrix);
-        this._gpuBufferFirstMatrix.unmap();
-
-        // Layer0
-
-        this._layer0BufferSize = firstMatrix.byteLength;
-        this._layer0Buffer = this._device.createBuffer({
-            size: firstMatrix.byteLength,
-            usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
-            mappedAtCreation: true,
-        });
-
-        const b = this._layer0Buffer.getMappedRange();
-        new Float32Array(b).set(firstMatrix);
-        this._layer0Buffer.unmap();
-
+        const va = new Float32Array(this._vertexArray);
+        this._layer0Buffer = this._createAndMapBuffer(va, GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC);
     }
 
     /**
@@ -291,7 +260,6 @@ export default class WebGPU {
         return gpuWriteBuffer;
     }
 
-
     async createPipeline() {
 
         this._computePipeline = this._device.createComputePipeline({
@@ -304,10 +272,6 @@ export default class WebGPU {
                 entryPoint: "main"
             }
         });
-
-
-
-
 
         this._computeBindGroups = this._device.createBindGroup({
             //layout: bindGroupLayout,
@@ -498,46 +462,17 @@ export default class WebGPU {
         if (!this._canvas) return;
         if (!this._device) return;
 
-        this._screenSizeArrayBuffer = this._device.createBuffer({
-            mappedAtCreation: true,
-            size: this._screenSizeArray.byteLength,
-            usage: GPUBufferUsage.STORAGE,
-        });
-
-        new Float32Array(this._screenSizeArrayBuffer.getMappedRange()).set(this._screenSizeArray);
-        this._screenSizeArrayBuffer.unmap();
-        ///----------------
-        this._uniformsBuffer = this._device.createBuffer({
-            mappedAtCreation: true,
-            size: this._uniformsArray.byteLength,
-            usage: GPUBufferUsage.UNIFORM,
-        });
-
-        new Float32Array(this._uniformsBuffer.getMappedRange()).set(this._uniformsArray);
-        this._uniformsBuffer.unmap();
+        this._screenSizeArrayBuffer = this._createAndMapBuffer(this._screenSizeArray, GPUBufferUsage.STORAGE);
         //--------------------------------------------
+        this._uniformsBuffer = this._createAndMapBuffer(this._uniformsArray, GPUBufferUsage.UNIFORM);
         //--------------------------------------------
-        //this._particles = new Float32Array(Array(100).fill(0));
-        this._particlesBuffer = this._device.createBuffer({
-            mappedAtCreation: true,
-            size: this._particles.byteLength,
-            usage: GPUBufferUsage.STORAGE,
-        });
-
-        new Float32Array(this._particlesBuffer.getMappedRange()).set(this._particles);
-        this._particlesBuffer.unmap();
+        this._particlesBuffer = this._createAndMapBuffer(this._particles, GPUBufferUsage.STORAGE);
         //--------------------------------------------
 
         this._computeBindGroups = this._device.createBindGroup({
             //layout: bindGroupLayout,
             layout: this._computePipeline.getBindGroupLayout(0 /* index */),
             entries: [
-                // {
-                //     binding: 0,
-                //     resource: {
-                //         buffer: this._gpuBufferFirstMatrix
-                //     }
-                // },
                 {
                     binding: 0,
                     resource: {
