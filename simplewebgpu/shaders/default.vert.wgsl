@@ -8,7 +8,9 @@ struct Particle{
 struct Params {
     utime: f32,
     screenWidth:f32,
-    screenHeight:f32
+    screenHeight:f32,
+    mouseX: f32,
+    mouseY: f32
 }
 
 struct Fragment {
@@ -16,6 +18,7 @@ struct Fragment {
     @location(0) Color: vec4<f32>,
     @location(1) uv: vec2<f32>,
     @location(2) ratio: f32,
+    @location(3) mouse: vec2<f32>
 }
 
 
@@ -33,6 +36,7 @@ fn main(
     result.Position = vec4<f32>(position);
     result.Color = vec4<f32>(color);
     result.uv = vec2(uv.x * result.ratio, uv.y);
+    result.mouse = vec2(params.mouseX / params.screenWidth, params.mouseY / params.screenHeight);
 
     return result;
 }

@@ -239,7 +239,7 @@ export default class WebGPU {
     }
 
     createComputeBuffers() {
-        this._uniformsArray = new Float32Array([0, 0, 0]);
+        this._uniformsArray = new Float32Array([0, 0, 0, 0, 0]);
         this._uniformsBuffer = this._createAndMapBuffer(this._uniformsArray, GPUBufferUsage.UNIFORM);
         //--------------------------------------------
         this._particles = new Float32Array(Array(300).fill(0));

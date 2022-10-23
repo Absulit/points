@@ -22,6 +22,8 @@ const webGPU = new WebGPU('gl-canvas');
 webGPU.useTexture = false;
 
 let utime = 0;
+let mouseX = 0;
+let mouseY = 0;
 
 
 const sliders = { 'a': 0, 'b': 0, 'c': 0 }
@@ -31,19 +33,19 @@ let shaderModule;
 let canvas = document.getElementById('gl-canvas');
 
 let planets = [
-    { radius: 5 , speed: 10, angle: Math.random() * 360 },
-    { radius: 10 , speed: 7, angle: Math.random() * 360 },
-    { radius: 13 , speed: 6, angle: Math.random() * 360 },
-    { radius: 16 , speed: 5, angle: Math.random() * 360 },
-    { radius: 20 , speed: 5, angle: Math.random() * 360 },
-    { radius: 23 , speed: 1, angle: Math.random() * 360 },
-    { radius: 27 , speed: -1, angle: Math.random() * 360 },
-    { radius: 32 , speed: .1, angle: Math.random() * 360 },
+    { radius: 5, speed: 10, angle: Math.random() * 360 },
+    { radius: 10, speed: 7, angle: Math.random() * 360 },
+    { radius: 13, speed: 6, angle: Math.random() * 360 },
+    { radius: 16, speed: 5, angle: Math.random() * 360 },
+    { radius: 20, speed: 5, angle: Math.random() * 360 },
+    { radius: 23, speed: 1, angle: Math.random() * 360 },
+    { radius: 27, speed: -1, angle: Math.random() * 360 },
+    { radius: 32, speed: .1, angle: Math.random() * 360 },
 ]
 
 async function init() {
     //const initialized = await webGPU.init();
-    const initialized = await webGPU.init(null, './shaders/planetsblur.frag.wgsl');
+    const initialized = await webGPU.init(null, './shaders/planetsblur2.frag.wgsl');
     if (initialized) {
         //webGPU.createVertexBuffer(vertexArray);
         // COMPUTE SHADER WGSL
@@ -67,6 +69,8 @@ async function update() {
     webGPU._uniformsArray[0] = utime;
     webGPU._uniformsArray[1] = canvas.width;
     webGPU._uniformsArray[2] = canvas.height;
+    webGPU._uniformsArray[3] = mouseX;
+    webGPU._uniformsArray[4] = mouseY;
 
 
 
@@ -145,3 +149,8 @@ sliderC.addEventListener('change', e => print(e.target.value));
 // }
 
 // window.addEventListener('resize', resizeViewport, false);
+
+document.onmousemove = function (e) {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+}
