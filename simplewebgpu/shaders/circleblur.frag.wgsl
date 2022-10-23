@@ -56,7 +56,7 @@ fn main(
     ) -> @location(0) vec4<f32> {
 
     //let texColor = textureSample(myTexture, mySampler, uv * 1.0 + .1 * fnusin(2));
-    let texColor = textureSample(myTexture, mySampler, uv);
+    let texColor = textureSample(myTexture, mySampler, uv * vec2(1,-1));
 
     var particle = particles[0];
 
@@ -66,10 +66,10 @@ fn main(
         c = 0;
     }
 
-    let decayR =  texColor.r *.9;
-    let decayG =  texColor.g *.8;
-    let decayB =  texColor.b *.1;
-    let decayA =  texColor.a *.1;
+    let decayR =  texColor.r * .99;
+    let decayG =  texColor.g * .99;
+    let decayB =  texColor.b * .99;
+    let decayA =  texColor.a * .9;
     var finalColor:vec4<f32> = vec4(uv.x * c + decayR, uv.y * c + decayR, c + decayB, 1);
 
     // let cellSize = 20. + 10. * fnusin(1.);
@@ -78,7 +78,7 @@ fn main(
     // let cc = fnusin(uv.x * uv.y * 10.);
     // let dd = distance(a,b);
     // let f = dd * uv.x * uv.y;
-    // var finalColor = vec4(a*dd + decayR,f*cc*a,f, 1.);
+    // var finalColor = vec4(a*dd + decayR,f*cc*a+decayG,f+decayB, a*dd + decayA);
 
 
 

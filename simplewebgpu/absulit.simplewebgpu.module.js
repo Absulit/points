@@ -151,8 +151,12 @@ export default class WebGPU {
 
         // Create a sampler with linear filtering for smooth interpolation.
         this._sampler = this._device.createSampler({
+            addressModeU: 'repeat',
+            addressModeV: 'repeat',
             magFilter: 'linear',
             minFilter: 'linear',
+            mipmapFilter: 'linear',
+            //maxAnisotropy: 10,
         });
 
         this._renderPassDescriptor = {
