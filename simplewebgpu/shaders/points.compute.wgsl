@@ -48,7 +48,7 @@ fn main(
     @builtin(workgroup_id) WorkGroupID: vec3<u32>,
     @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
 ) {
-    var l0 = layer0.points[400];
+    var l0 = layer0.points[0];
     //let utime = screenSize.uTime;
 
 

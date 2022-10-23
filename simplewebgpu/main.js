@@ -43,7 +43,7 @@ let planets = [
 
 async function init() {
     //const initialized = await webGPU.init();
-    const initialized = await webGPU.init(null, './shaders/planets2.frag.wgsl');
+    const initialized = await webGPU.init(null, './shaders/circleblur.frag.wgsl');
     if (initialized) {
         //webGPU.createVertexBuffer(vertexArray);
         // COMPUTE SHADER WGSL
@@ -71,7 +71,7 @@ async function update() {
 
 
     planets.forEach((planet, index) => {
-        let pointFromCenter, point, radians;
+        let pointFromCenter, radians;
         radians = MathUtil.radians(planet.angle);
         pointFromCenter = MathUtil.vector(planet.radius, radians);
         const x = (pointFromCenter.x + 4) * .1;
