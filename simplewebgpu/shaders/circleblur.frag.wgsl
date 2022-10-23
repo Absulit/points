@@ -1,6 +1,10 @@
 @group(0) @binding(0) var<uniform> params: Params;
 @group(0) @binding(1) var<storage> particles: array<Particle>;
 
+@group(0) @binding(2) var mySampler: sampler;
+@group(0) @binding(3) var myTexture: texture_2d<f32>;
+
+
 struct Particle{
     x: f32,
     y: f32
@@ -21,6 +25,9 @@ struct ScreenSize {
 
 fn fnusin(speed: f32) -> f32{
     return sin(params.utime * speed) * .5;
+}
+fn fusin(speed: f32) -> f32{
+    return sin(params.utime * speed);
 }
 
 fn sdfSegment(  p:vec2<f32>, a:vec2<f32>, b:vec2<f32> ) -> f32{
@@ -48,17 +55,31 @@ fn main(
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
+    //let texColor = textureSample(myTexture, mySampler, uv * 1.0 + .1 * fnusin(2));
+    let texColor = textureSample(myTexture, mySampler, uv);
 
     var particle = particles[0];
 
-    let d = distance(uv, vec2(.5,.5));
+    let d = distance(uv, vec2(.5 + .1 * fusin(2), .5  + .1 * fusin(4.123)));
     var c = 1.;
     if(d > .1){
         c = 0;
     }
 
+    let decayR =  texColor.r *.9;
+    let decayG =  texColor.g *.8;
+    let decayB =  texColor.b *.1;
+    let decayA =  texColor.a *.1;
+    var finalColor:vec4<f32> = vec4(uv.x * c + decayR, uv.y * c + decayR, c + decayB, 1);
 
-    let finalColor:vec4<f32> = vec4(1,1,1,c);
+    // let cellSize = 20. + 10. * fnusin(1.);
+    // let a = sin(uv.x  * cellSize) * sin(uv.y * cellSize);
+    // let b = sin(uv.x * uv.y * 10. * 9.1 * .25 );
+    // let cc = fnusin(uv.x * uv.y * 10.);
+    // let dd = distance(a,b);
+    // let f = dd * uv.x * uv.y;
+    // var finalColor = vec4(a*dd + decayR,f*cc*a,f, 1.);
+
 
 
     return finalColor;

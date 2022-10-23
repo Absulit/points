@@ -129,12 +129,30 @@ export default class WebGPU {
             width: this._canvas.clientWidth,
             height: this._canvas.clientHeight,
             alphaMode: 'premultiplied',
+
+            // Specify we want both RENDER_ATTACHMENT and COPY_SRC since we
+            // will copy out of the swapchain texture.
+            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
         });
 
         this._depthTexture = this._device.createTexture({
             size: this._presentationSize,
             format: 'depth24plus',
             usage: GPUTextureUsage.RENDER_ATTACHMENT,
+        });
+
+        // We will copy the frame's rendering results into this texture and
+        // sample it on the next frame.
+        this._cubeTexture = this._device.createTexture({
+            size: this._presentationSize,
+            format: this._presentationFormat, // if 'depth24plus' throws error
+            usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
+        });
+
+        // Create a sampler with linear filtering for smooth interpolation.
+        this._sampler = this._device.createSampler({
+            magFilter: 'linear',
+            minFilter: 'linear',
         });
 
         this._renderPassDescriptor = {
@@ -204,7 +222,7 @@ export default class WebGPU {
      * @param {GPUBufferUsageFlags} usage 
      * @param {Boolean} mappedAtCreation 
      */
-    _createAndMapBuffer(data, usage, mappedAtCreation = true){
+    _createAndMapBuffer(data, usage, mappedAtCreation = true) {
         const buffer = this._device.createBuffer({
             mappedAtCreation: mappedAtCreation,
             size: data.byteLength,
@@ -217,7 +235,7 @@ export default class WebGPU {
     }
 
     createComputeBuffers() {
-        this._uniformsArray = new Float32Array([0,0,0]);
+        this._uniformsArray = new Float32Array([0, 0, 0]);
         this._uniformsBuffer = this._createAndMapBuffer(this._uniformsArray, GPUBufferUsage.UNIFORM);
         //--------------------------------------------
         this._particles = new Float32Array(Array(300).fill(0));
@@ -414,7 +432,7 @@ export default class WebGPU {
         });
     }
 
-    _createParams(){
+    _createParams() {
         this._uniformBindGroup = this._device.createBindGroup({
             layout: this._pipeline.getBindGroupLayout(0),
             entries: [
@@ -429,7 +447,15 @@ export default class WebGPU {
                     resource: {
                         buffer: this._particlesBuffer,
                     }
-                }
+                },
+                {
+                    binding: 2,
+                    resource: this._sampler,
+                },
+                {
+                    binding: 3,
+                    resource: this._cubeTexture.createView(),
+                },
             ],
         });
     }
@@ -465,7 +491,7 @@ export default class WebGPU {
         const passEncoder = commandEncoder.beginComputePass();
         passEncoder.setPipeline(this._computePipeline);
         passEncoder.setBindGroup(0, this._computeBindGroups);
-        passEncoder.dispatchWorkgroups(8,8,1);
+        passEncoder.dispatchWorkgroups(8, 8, 1);
         passEncoder.end();
 
 
@@ -481,6 +507,12 @@ export default class WebGPU {
 
         this._renderPassDescriptor.colorAttachments[0].view = this._context.getCurrentTexture().createView();
         this._renderPassDescriptor.depthStencilAttachment.view = this._depthTexture.createView();
+
+
+        const swapChainTexture = this._context.getCurrentTexture();
+        // prettier-ignore
+        this._renderPassDescriptor.colorAttachments[0].view = swapChainTexture.createView();
+
 
         //commandEncoder = this._device.createCommandEncoder();
         {
@@ -506,6 +538,21 @@ export default class WebGPU {
             passEncoder.draw(this._vertexBufferInfo.vertexCount);
             passEncoder.end();
         }
+
+        // Copy the rendering results from the swapchain into |cubeTexture|.
+        commandEncoder.copyTextureToTexture(
+            {
+                texture: swapChainTexture,
+            },
+            {
+                texture: this._cubeTexture,
+            },
+            this._presentationSize
+        );
+
+
+
+
 
         this._commandsFinished.push(commandEncoder.finish());
         this._device.queue.submit(this._commandsFinished);
