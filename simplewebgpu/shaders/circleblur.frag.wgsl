@@ -2,7 +2,7 @@
 @group(0) @binding(1) var<storage> particles: array<Particle>;
 
 @group(0) @binding(2) var feedbackSampler: sampler;
-@group(0) @binding(3) var feedback: texture_2d<f32>;
+@group(0) @binding(3) var feedbackTexture: texture_2d<f32>;
 
 
 struct Particle{
@@ -57,7 +57,7 @@ fn main(
     ) -> @location(0) vec4<f32> {
 
     //let texColor = textureSample(myTexture, mySampler, uv * 1.0 + .1 * fnusin(2));
-    let texColor = textureSample(feedback, feedbackSampler, uv * vec2(1,-1));
+    let texColor = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1));
 
     var particle = particles[0];
 

@@ -18,8 +18,6 @@ export class VertexBufferInfo {
         this._colorOffset = vertexArray.BYTES_PER_ELEMENT * colorOffset; // Byte offset of triangle vertex color attribute.
         this._uvOffset = vertexArray.BYTES_PER_ELEMENT * uvOffset;
         this._vertexCount = vertexArray.byteLength / this._vertexSize;
-
-
     }
 
     get vertexSize() {
@@ -121,7 +119,6 @@ export default class WebGPU {
         //this._presentationFormat = this._context.getPreferredFormat(adapter);
         this._presentationFormat = navigator.gpu.getPreferredCanvasFormat();
 
-
         this._context.configure({
             device: this._device,
             format: this._presentationFormat,
@@ -143,7 +140,7 @@ export default class WebGPU {
 
         // We will copy the frame's rendering results into this texture and
         // sample it on the next frame.
-        this._cubeTexture = this._device.createTexture({
+        this._feedbackLoopTexture = this._device.createTexture({
             size: this._presentationSize,
             format: this._presentationFormat, // if 'depth24plus' throws error
             usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
@@ -171,7 +168,6 @@ export default class WebGPU {
             ],
             depthStencilAttachment: {
                 //view: this._depthTexture.createView(),
-
                 depthClearValue: 1.0,
                 depthLoadOp: 'clear',
                 depthStoreOp: 'store',
@@ -205,7 +201,6 @@ export default class WebGPU {
         }
         this.createVertexBuffer(new Float32Array(this._vertexArray));
         this.createComputeBuffers();
-
 
         await this.createPipeline();
     }
@@ -270,6 +265,29 @@ export default class WebGPU {
         return gpuWriteBuffer;
     }
 
+    _createComputeBindGroup() {
+        this._computeBindGroups = this._device.createBindGroup({
+            //layout: bindGroupLayout,
+            layout: this._computePipeline.getBindGroupLayout(0 /* index */),
+            entries: [
+                {
+                    binding: 0,
+                    resource: {
+                        buffer: this._layer0Buffer
+                    }
+                },
+                {
+                    binding: 1,
+                    resource: this._sampler,
+                },
+                {
+                    binding: 2,
+                    resource: this._feedbackLoopTexture.createView(),
+                },
+            ]
+        });
+    }
+
     async createPipeline() {
 
         this._computePipeline = this._device.createComputePipeline({
@@ -283,18 +301,7 @@ export default class WebGPU {
             }
         });
 
-        this._computeBindGroups = this._device.createBindGroup({
-            //layout: bindGroupLayout,
-            layout: this._computePipeline.getBindGroupLayout(0 /* index */),
-            entries: [
-                {
-                    binding: 0,
-                    resource: {
-                        buffer: this._layer0Buffer
-                    }
-                }
-            ]
-        });
+        this._createComputeBindGroup();
 
         //--------------------------------------
 
@@ -378,20 +385,11 @@ export default class WebGPU {
 
         });
 
-
-
-
-
         if (this._useTexture) {
             await this._createTexture();
         }
 
-
         this._createParams();
-
-
-
-
     }
 
     async _createTexture() {
@@ -458,7 +456,7 @@ export default class WebGPU {
                 },
                 {
                     binding: 3,
-                    resource: this._cubeTexture.createView(),
+                    resource: this._feedbackLoopTexture.createView(),
                 },
             ],
         });
@@ -474,18 +472,7 @@ export default class WebGPU {
         this._particlesBuffer = this._createAndMapBuffer(this._particles, GPUBufferUsage.STORAGE);
         //--------------------------------------------
 
-        this._computeBindGroups = this._device.createBindGroup({
-            //layout: bindGroupLayout,
-            layout: this._computePipeline.getBindGroupLayout(0 /* index */),
-            entries: [
-                {
-                    binding: 0,
-                    resource: {
-                        buffer: this._layer0Buffer
-                    }
-                }
-            ]
-        });
+        this._createComputeBindGroup();
 
 
         let commandEncoder = this._device.createCommandEncoder();
@@ -549,14 +536,10 @@ export default class WebGPU {
                 texture: swapChainTexture,
             },
             {
-                texture: this._cubeTexture,
+                texture: this._feedbackLoopTexture,
             },
             this._presentationSize
         );
-
-
-
-
 
         this._commandsFinished.push(commandEncoder.finish());
         this._device.queue.submit(this._commandsFinished);
@@ -603,52 +586,7 @@ export default class WebGPU {
             +nw, -nh, nz, 1, r3, g3, b3, a3, 1, 0,// 5 bottom right
         );
     }
-
-    modifyPointColor(coordinate, color) {
-        const { x, y, z } = coordinate;
-        const { r, g, b, a } = color;
-
-        const numColumns = 100;
-        const index = y + (x * numColumns);
-
-        for (let row = 0; row < 6; row++) {
-            //const rowIndex = row * this._vertexBufferInfo.vertexSize;
-            const rowIndex = row * 10;
-            this._vertexArray[rowIndex + index * 60 + 4] = r;
-            this._vertexArray[rowIndex + index * 60 + 5] = g;
-            this._vertexArray[rowIndex + index * 60 + 6] = b;
-            this._vertexArray[rowIndex + index * 60 + 7] = a;
-        }
-
-    }
-    /**
-     * 
-     * @param {Coordinate} coordinate 
-     * @param {*} buffer 
-     */
-    modifyPointColor2(coordinate, gpuWriteBuffer) {
-        const { x, y, z } = coordinate;
-        //const coordinateValue = coordinate.value;
-        //const colorValue = color.value;
-
-        const index = y + (x * this._numColumns);
-
-        const commandEncoder = this._device.createCommandEncoder();
-        for (let vertexIndex = 0; vertexIndex < 6; vertexIndex++) {
-            commandEncoder.copyBufferToBuffer(
-                gpuWriteBuffer /* source buffer */,
-                0 /* source offset */,
-                this._buffer /* destination buffer */,
-                4 * (vertexIndex * 10 + index * 60 + 4)/* destination offset */, //4 * (index * 10 + 4)
-                gpuWriteBuffer.size /* size */
-            );
-        }
-
-        const copyCommands = commandEncoder.finish();
-        this._commandsFinished.push(copyCommands);
-        //this._device.queue.submit([copyCommands]);
-    }
-
+ 
     get canvas() {
         return this._canvas;
     }
