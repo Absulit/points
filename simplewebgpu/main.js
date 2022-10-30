@@ -61,7 +61,7 @@ async function init() {
 
 async function update() {
     stats.begin();
-    utime += 1 / 60;
+    utime += 0.016666666666666666;//1 / 60;
 
     // code here
     //webGPU._screenSizeArray[2] = utime;
@@ -74,19 +74,19 @@ async function update() {
 
     
 
-    planets.forEach((planet, index) => {
-        let pointFromCenter, radians;
-        radians = MathUtil.radians(planet.angle);
-        pointFromCenter = MathUtil.vector(planet.radius, radians);
-        const x = (pointFromCenter.x + 4) * .1;
-        const y = (pointFromCenter.y + 4) * .1;
+    // planets.forEach((planet, index) => {
+    //     let pointFromCenter, radians;
+    //     radians = MathUtil.radians(planet.angle);
+    //     pointFromCenter = MathUtil.vector(planet.radius, radians);
+    //     const x = (pointFromCenter.x + 4) * .1;
+    //     const y = (pointFromCenter.y + 4) * .1;
 
-        // if greater than 360 set back to zero, also increment
-        planet.angle = (planet.angle * (planet.angle < 360) || 0) + (planet.speed * .3);
+    //     // if greater than 360 set back to zero, also increment
+    //     planet.angle = (planet.angle * (planet.angle < 360) || 0) + (planet.speed * .3);
 
-        webGPU._particles[index * 2] = x;
-        webGPU._particles[index * 2 + 1] = y;
-    });
+    //     webGPU._particles[index * 2] = x;
+    //     webGPU._particles[index * 2 + 1] = y;
+    // });
 
 
     //webGPU._particles[0] = 1;

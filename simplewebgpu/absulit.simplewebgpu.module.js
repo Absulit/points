@@ -249,7 +249,7 @@ export default class WebGPU {
      * @returns buffer
      */
     _createBuffer(size, usage) {
-        const buffer = device.createBuffer({
+        const buffer = this._device.createBuffer({
             size: size,
             usage: usage,
         });
@@ -260,8 +260,9 @@ export default class WebGPU {
         this._uniformsArray = new Float32Array([0, 0, 0, 0, 0]);
         this._uniformsBuffer = this._createAndMapBuffer(this._uniformsArray, GPUBufferUsage.UNIFORM);
         //--------------------------------------------
-        this._particles = new Float32Array(Array(300).fill(0));
-        this._particlesBuffer = this._createAndMapBuffer(this._particles, GPUBufferUsage.STORAGE);
+        //this._particles = new Float32Array(Array(300).fill(0));
+        //this._particlesBuffer = this._createAndMapBuffer(this._particles, GPUBufferUsage.STORAGE);
+        this._particlesBuffer = this._createBuffer(10000 *3*4, GPUBufferUsage.STORAGE);
         //--------------------------------------------
         const va = new Float32Array(this._vertexArray);
         this._layer0Buffer = this._createAndMapBuffer(va, GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC);
@@ -293,6 +294,7 @@ export default class WebGPU {
 
     _createComputeBindGroup() {
         this._computeBindGroups = this._device.createBindGroup({
+            label: '_createComputeBindGroup',
             //layout: bindGroupLayout,
             layout: this._computePipeline.getBindGroupLayout(0 /* index */),
             entries: [
@@ -319,6 +321,12 @@ export default class WebGPU {
                     resource: {
                         buffer: this._variablesBuffer
                     },
+                },
+                {
+                    binding: 5,
+                    resource: {
+                        buffer: this._particlesBuffer,
+                    }
                 },
             ]
         });
@@ -509,7 +517,7 @@ export default class WebGPU {
         //--------------------------------------------
         this._uniformsBuffer = this._createAndMapBuffer(this._uniformsArray, GPUBufferUsage.UNIFORM);
         //--------------------------------------------
-        this._particlesBuffer = this._createAndMapBuffer(this._particles, GPUBufferUsage.STORAGE);
+        //this._particlesBuffer = this._createAndMapBuffer(this._particles, GPUBufferUsage.STORAGE);
         //--------------------------------------------
 
         this._createComputeBindGroup();
