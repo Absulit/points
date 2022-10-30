@@ -146,6 +146,12 @@ export default class WebGPU {
             usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
         });
 
+        this._outputTexture = this._device.createTexture({
+            size: this._presentationSize,
+            format: 'rgba8unorm',
+            usage: GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
+        });
+
         // Create a sampler with linear filtering for smooth interpolation.
         this._sampler = this._device.createSampler({
             addressModeU: 'repeat',
@@ -283,6 +289,10 @@ export default class WebGPU {
                 {
                     binding: 2,
                     resource: this._feedbackLoopTexture.createView(),
+                },
+                {
+                    binding: 3,
+                    resource: this._outputTexture.createView(),
                 },
             ]
         });
@@ -457,6 +467,10 @@ export default class WebGPU {
                 {
                     binding: 3,
                     resource: this._feedbackLoopTexture.createView(),
+                },
+                {
+                    binding: 4,
+                    resource: this._outputTexture.createView(),
                 },
             ],
         });

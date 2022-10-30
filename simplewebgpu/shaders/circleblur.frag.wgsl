@@ -1,10 +1,3 @@
-@group(0) @binding(0) var<uniform> params: Params;
-@group(0) @binding(1) var<storage> particles: array<Particle>;
-
-@group(0) @binding(2) var feedbackSampler: sampler;
-@group(0) @binding(3) var feedbackTexture: texture_2d<f32>;
-
-
 struct Particle{
     x: f32,
     y: f32
@@ -46,6 +39,14 @@ fn line2(uv:vec2<f32>, p1:vec2<f32>, p2:vec2<f32>, pixelStroke:f32)->f32{
     return value;
 }
 
+@group(0) @binding(0) var<uniform> params: Params;
+@group(0) @binding(1) var<storage> particles: array<Particle>;
+
+@group(0) @binding(2) var feedbackSampler: sampler;
+@group(0) @binding(3) var feedbackTexture: texture_2d<f32>;
+
+@group(0) @binding(4) var computeTexture: texture_2d<f32>;
+
 
 @fragment
 fn main(
@@ -58,6 +59,10 @@ fn main(
 
     //let texColor = textureSample(myTexture, mySampler, uv * 1.0 + .1 * fnusin(2));
     let texColor = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1));
+    let texColor2 = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1) + vec2(-.001,1));
+    let texColor3 = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1) + vec2(.001,1));
+
+    let texColorCompute = textureSample(computeTexture, feedbackSampler, uv * vec2(1,-1));
 
     var particle = particles[0];
 
@@ -67,11 +72,14 @@ fn main(
         c = 0;
     }
 
-    let decayR =  texColor.r * .99;
-    let decayG =  texColor.g * .99;
-    let decayB =  texColor.b * .99;
+    let decayR =  texColor.r * .9 * texColor2.r;
+    let decayG =  texColor.g * .9;
+    let decayB =  texColor.b * .9 * texColor3.b;
     let decayA =  texColor.a * .9;
-    var finalColor:vec4<f32> = vec4(uv.x * c + decayR, uv.y * c + decayR, c + decayB, 1);
+    //var finalColor:vec4<f32> = vec4(uv.x * c + decayR, uv.y * c + decayR, c + decayB, 1);
+    var finalColor:vec4<f32> = vec4(uv.x * c, uv.y * c, c, 1);
+    finalColor += vec4(decayR, decayG, decayB, 1);
+    finalColor += texColorCompute;
 
     // let cellSize = 20. + 10. * fnusin(1.);
     // let a = sin(uv.x  * cellSize) * sin(uv.y * cellSize);
@@ -79,7 +87,8 @@ fn main(
     // let cc = fnusin(uv.x * uv.y * 10.);
     // let dd = distance(a,b);
     // let f = dd * uv.x * uv.y;
-    // var finalColor = vec4(a*dd + decayR,f*cc*a+decayG,f+decayB, a*dd + decayA);
+    // finalColor = vec4(a*dd + decayR,f*cc*a+decayG,f+decayB, a*dd + decayA);
+    // finalColor += vec4(decayR, decayG, decayB, decayA) * .1;
 
 
 
