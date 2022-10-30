@@ -65,6 +65,7 @@ export default class WebGPU {
         this._vertexArray = [];
         this._gpuBufferFirstMatrix = [];
         this._layer0Buffer = [];
+        this._variablesArray = [];
         this._layer0BufferSize = null;
 
         this._numColumns = null;
@@ -226,6 +227,7 @@ export default class WebGPU {
      * @param {Float32Array} data 
      * @param {GPUBufferUsageFlags} usage 
      * @param {Boolean} mappedAtCreation 
+     * @returns mapped buffer
      */
     _createAndMapBuffer(data, usage, mappedAtCreation = true) {
         const buffer = this._device.createBuffer({
@@ -239,6 +241,21 @@ export default class WebGPU {
         return buffer;
     }
 
+
+    /**
+     * It creates with size, no with data, so it's empty
+     * @param {Number} size numItems * instanceByteSize ;
+     * @param {GPUBufferUsageFlags} usage 
+     * @returns buffer
+     */
+    _createBuffer(size, usage) {
+        const buffer = device.createBuffer({
+            size: size,
+            usage: usage,
+        });
+        return buffer
+    }
+
     createComputeBuffers() {
         this._uniformsArray = new Float32Array([0, 0, 0, 0, 0]);
         this._uniformsBuffer = this._createAndMapBuffer(this._uniformsArray, GPUBufferUsage.UNIFORM);
@@ -248,6 +265,9 @@ export default class WebGPU {
         //--------------------------------------------
         const va = new Float32Array(this._vertexArray);
         this._layer0Buffer = this._createAndMapBuffer(va, GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC);
+        //--------------------------------------------
+        this._variablesArray = new Float32Array([0, 0, 0, 0, 0]);
+        this._variablesBuffer = this._createAndMapBuffer(this._variablesArray, GPUBufferUsage.STORAGE);
     }
 
     /**
@@ -293,6 +313,12 @@ export default class WebGPU {
                 {
                     binding: 3,
                     resource: this._outputTexture.createView(),
+                },
+                {
+                    binding: 4,
+                    resource: {
+                        buffer: this._variablesBuffer
+                    },
                 },
             ]
         });
@@ -600,7 +626,7 @@ export default class WebGPU {
             +nw, -nh, nz, 1, r3, g3, b3, a3, 1, 0,// 5 bottom right
         );
     }
- 
+
     get canvas() {
         return this._canvas;
     }

@@ -15,7 +15,7 @@ let capturer = new CCapture({
 });
 /***************/
 
-const demo6ComputeShader = await fetch('./shaders/circleblur.compute.wgsl').then(r => r.text());
+const demo6ComputeShader = await fetch('./shaders/planets3.compute.wgsl').then(r => r.text());
 
 
 const webGPU = new WebGPU('gl-canvas');
@@ -45,7 +45,7 @@ let planets = [
 
 async function init() {
     //const initialized = await webGPU.init();
-    const initialized = await webGPU.init(null, './shaders/circleblur.frag.wgsl');
+    const initialized = await webGPU.init(null, './shaders/planets3.frag.wgsl');
     if (initialized) {
         //webGPU.createVertexBuffer(vertexArray);
         // COMPUTE SHADER WGSL
@@ -72,7 +72,7 @@ async function update() {
     webGPU._uniformsArray[3] = mouseX;
     webGPU._uniformsArray[4] = mouseY;
 
-
+    
 
     planets.forEach((planet, index) => {
         let pointFromCenter, radians;
@@ -90,8 +90,12 @@ async function update() {
 
 
     //webGPU._particles[0] = 1;
-
+    //webGPU._variablesArray[0] = Math.random() > .9? 1: 0;
+    
     webGPU.update();
+
+
+    
 
     // 
 
