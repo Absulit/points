@@ -86,7 +86,7 @@ struct Particles{
     planets: array<Planet>
 }
 
-var<private> numParticles:u32 = 10000;
+var<private> numParticles:u32 = 4096;
 //var<workgroup> particles: array<Planet, 8>;
 //var<private> particlesCreated = false;
 
