@@ -15,7 +15,7 @@ let capturer = new CCapture({
 });
 /***************/
 
-const demo6ComputeShader = await fetch('./shaders/planets3.compute.wgsl').then(r => r.text());
+const demo6ComputeShader = await fetch('./shaders/planets.compute.wgsl').then(r => r.text());
 
 
 const webGPU = new WebGPU('gl-canvas');
@@ -32,20 +32,9 @@ let shaderModule;
 
 let canvas = document.getElementById('gl-canvas');
 
-let planets = [
-    { radius: 5, speed: 10, angle: Math.random() * 360 },
-    { radius: 10, speed: 7, angle: Math.random() * 360 },
-    { radius: 13, speed: 6, angle: Math.random() * 360 },
-    { radius: 16, speed: 5, angle: Math.random() * 360 },
-    { radius: 20, speed: 5, angle: Math.random() * 360 },
-    { radius: 23, speed: 1, angle: Math.random() * 360 },
-    { radius: 27, speed: -1, angle: Math.random() * 360 },
-    { radius: 32, speed: .1, angle: Math.random() * 360 },
-];
-
 async function init() {
     //const initialized = await webGPU.init();
-    const initialized = await webGPU.init(null, './shaders/planets3.frag.wgsl');
+    const initialized = await webGPU.init(null, './shaders/planets.frag.wgsl');
     if (initialized) {
         //webGPU.createVertexBuffer(vertexArray);
         // COMPUTE SHADER WGSL
@@ -72,32 +61,9 @@ async function update() {
     webGPU._uniformsArray[3] = mouseX;
     webGPU._uniformsArray[4] = mouseY;
 
-    
-
-    // planets.forEach((planet, index) => {
-    //     let pointFromCenter, radians;
-    //     radians = MathUtil.radians(planet.angle);
-    //     pointFromCenter = MathUtil.vector(planet.radius, radians);
-    //     const x = (pointFromCenter.x + 4) * .1;
-    //     const y = (pointFromCenter.y + 4) * .1;
-
-    //     // if greater than 360 set back to zero, also increment
-    //     planet.angle = (planet.angle * (planet.angle < 360) || 0) + (planet.speed * .3);
-
-    //     webGPU._particles[index * 2] = x;
-    //     webGPU._particles[index * 2 + 1] = y;
-    // });
-
-
-    //webGPU._particles[0] = 1;
-    //webGPU._variablesArray[0] = Math.random() > .9? 1: 0;
-    
     webGPU.update();
 
-
-    
-
-    // 
+    //
 
     stats.end();
 
@@ -158,3 +124,17 @@ document.onmousemove = function (e) {
     mouseX = e.clientX;
     mouseY = e.clientY;
 }
+
+const statsBtn = document.getElementById('statsBtn');
+let statsVisible = (localStorage.getItem('stats-visible') === 'true') || false;
+statsBtn.onclick = () => {
+    console.log('---- statsBtn.onclick', statsVisible);
+    statsVisible = !statsVisible;
+    console.log('---- statsBtn.onclick', statsVisible);
+    statsVisible && (stats.dom.style.display = 'block');
+    !statsVisible && (stats.dom.style.display = 'none');
+    localStorage.setItem('stats-visible', statsVisible)
+
+};
+statsVisible && (stats.dom.style.display = 'block');
+!statsVisible && (stats.dom.style.display = 'none');
