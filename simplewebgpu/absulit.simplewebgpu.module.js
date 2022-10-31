@@ -328,6 +328,12 @@ export default class WebGPU {
                         buffer: this._particlesBuffer,
                     }
                 },
+                {
+                    binding: 6,
+                    resource: {
+                        buffer: this._uniformsBuffer,
+                    }
+                },
             ]
         });
     }
