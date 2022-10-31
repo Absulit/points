@@ -1,9 +1,13 @@
-@group(0) @binding(0) var<uniform> params: Params;
-@group(0) @binding(1) var<storage> particles: array<Particle>;
-
-struct Particle{
+struct Planet {
+    radius: f32,
+    speed: f32,
+    angle: f32,
     x: f32,
     y: f32
+}
+
+struct Particles{
+    planets: array<Planet>
 }
 
 struct Params {
@@ -39,23 +43,33 @@ fn line2(uv:vec2<f32>, p1:vec2<f32>, p2:vec2<f32>, pixelStroke:f32)->f32{
     return value;
 }
 
+@group(0) @binding(0) var<uniform> params: Params;
+@group(0) @binding(1) var<storage> particles: Particles;
 
+@group(0) @binding(2) var feedbackSampler: sampler;
+@group(0) @binding(3) var feedbackTexture: texture_2d<f32>;
+
+@group(0) @binding(4) var computeTexture: texture_2d<f32>;
 @fragment
 fn main(
         @location(0) Color: vec4<f32>,
         @location(1) uv: vec2<f32>,
         @location(2) ratio: f32,
+        @location(3) mouse: vec2<f32>,
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
-    let scale = .1;
+    let texColor = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1));
+    let texColorCompute = textureSample(computeTexture, feedbackSampler, uv * vec2(1,-1));
+
+    let scale = .01;
 
     var c = 1.;
 
-    var particle = particles[0];
+    //var particle = particles[0];
     var lastDistance = -1.;
     for(var i:u32 = 0; i < 8u; i++){
-        var particle = particles[i];
+        var particle = particles.planets[i];
         var d = distance(uv, vec2(particle.x * scale + .5, particle.y * scale + .5));
 
         if(i > 1u && i < 8u){
@@ -64,8 +78,8 @@ fn main(
 
         if(lastDistance != -1.){
 
-            let p1 = particles[i - 1];
-            let p2 = particles[i];
+            let p1 = particles.planets[i - 1];
+            let p2 = particles.planets[i];
             let dSegment = sdfSegment(uv, vec2(p1.x * scale + .5,p1.y * scale + .5), vec2(p2.x * scale + .5,p2.y * scale + .5));
             d = min(dSegment, d);
 
