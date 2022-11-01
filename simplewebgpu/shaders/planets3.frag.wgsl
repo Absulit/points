@@ -73,12 +73,12 @@ fn main(
     }
 
     let decayR =  texColor.r * .9 * texColor2.r;
-    let decayG =  texColor.g * .9;
+    let decayG =  texColor.g * 1.99;
     let decayB =  texColor.b * .9 * texColor3.b;
     let decayA =  texColor.a * .9;
     //var finalColor:vec4<f32> = vec4(uv.x * c + decayR, uv.y * c + decayR, c + decayB, 1);
-    var finalColor:vec4<f32> = vec4(uv.x * c, uv.y * c, c, 1);
-    finalColor += vec4(decayR, decayG, decayB, 1);
+    //var finalColor:vec4<f32> = vec4(uv.x * c, uv.y * c, c, 1);
+    var finalColor = vec4(decayR, decayG, decayB, 1);
     finalColor += texColorCompute;
 
     // let cellSize = 20. + 10. * fnusin(1.);

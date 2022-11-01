@@ -54,7 +54,7 @@ struct Variables{
     testValue: f32
 }
 
-const clearMixlevel = 1.1;//1.01
+const clearMixlevel = 100.1;//1.01
 fn clearMix(color:vec4<f32>) -> vec4<f32> {
     let rr = color.r / clearMixlevel;
     let gr = color.g / clearMixlevel;
@@ -93,12 +93,13 @@ struct Particles{
     items: array<Particle>
 }
 
-var<private> numParticles:u32 = 4096;
+var<private> numParticles:u32 = 500;
 //var<workgroup> particles: array<Planet, 8>;
 //var<private> particlesCreated = false;
 
 const workgroupSize = 8;
 const PI = 3.14159265;
+const MARGIN = 20;
 
 @compute @workgroup_size(workgroupSize,workgroupSize,1)
 fn main(
@@ -147,12 +148,14 @@ fn main(
             //let index:f32 = y + (x * screenSize.numColumns);
             var rgba = textureSampleLevel(feedbackTexture, feedbackSampler, vec2<f32>(x,y),  0.0).rgba;
 
-            //rgba += vec4<f32>(0.,0.,0.,1.);
-            //rgba = clearMix(rgba);
-            //rgba = vec4<f32>(0.,0.,0.,1.);
+            //rgba += vec4<f32>(1.,0.,0.,.5);
+            rgba = clearMix(rgba);
 
             textureStore(outputTex, vec2<u32>(ux,uy), rgba);
+
         }
+
+
     }
 
     //workgroupBarrier();
@@ -170,15 +173,16 @@ fn main(
 
         let turnSpeed = .1;
         let distance = 3.;
+        let angleRotation = 15.;
 
         p = polar( (*particle).distance, (*particle).angle);
 
 
         let pointForward = vec2( (*particle).x + p.x, (*particle).y + p.y );
-        p = polar( (*particle).distance, (*particle).angle + radians(15));
+        p = polar( (*particle).distance, (*particle).angle + radians(angleRotation));
 
         let pointRight = vec2( (*particle).x + p.x, (*particle).y + p.y );
-        p = polar( (*particle).distance, (*particle).angle - radians(15));
+        p = polar( (*particle).distance, (*particle).angle - radians(angleRotation));
 
         let pointLeft = vec2( (*particle).x + p.x, (*particle).y + p.y );
 
@@ -186,49 +190,38 @@ fn main(
         let pointLeftBrightness = textureSampleLevel(feedbackTexture, feedbackSampler, pointRight,  0.0).g;
         let pointRightBrightness = textureSampleLevel(feedbackTexture, feedbackSampler, pointLeft,  0.0).g;
 
-        let pointForwardInLimits = f32(dims.x-1) > pointForward.x && pointForward.x >= 0  &&  f32(dims.y-1) > pointForward.y && pointForward.y >= 0 ;
-        let pointLeftInLimits = f32(dims.x-1) > pointLeft.x && pointLeft.x >= 0  &&  f32(dims.y-1) > pointLeft.y && pointLeft.y >= 0 ;
-        let pointRightInLimits = f32(dims.x-1) > pointRight.x && pointRight.x >= 0  &&  f32(dims.y-1) > pointRight.y && pointRight.y >= 0 ;
+        let pointForwardInLimits = f32(dims.x-MARGIN) >= pointForward.x && pointForward.x >= MARGIN  &&  f32(dims.y-MARGIN) >= pointForward.y && pointForward.y >= MARGIN ;
+        let pointLeftInLimits = f32(dims.x-MARGIN) >= pointLeft.x && pointLeft.x >= MARGIN  &&  f32(dims.y-MARGIN) >= pointLeft.y && pointLeft.y >= MARGIN;
+        let pointRightInLimits = f32(dims.x-MARGIN) >= pointRight.x && pointRight.x >= MARGIN  &&  f32(dims.y-MARGIN) >= pointRight.y && pointRight.y >= MARGIN;
 
-        if(pointForwardInLimits && pointRightInLimits && pointLeftInLimits && (pointForwardBrightness > pointLeftBrightness) && (pointForwardBrightness > pointRightBrightness)){
-            // do nothing continue
-        }else if( pointForwardInLimits && pointRightInLimits && pointLeftInLimits && (pointForwardBrightness < pointLeftBrightness) && (pointForwardBrightness < pointRightBrightness) ){
-            // turn randomly
-            (*particle).angle += (rand() - .5) * 2 * turnSpeed * params.utime;
-        }else if(pointRightInLimits && pointLeftInLimits && (pointRightBrightness > pointLeftBrightness)){
-            // turn right
-            (*particle).angle += rand() * turnSpeed * params.utime;
-        }else if(pointLeftInLimits && pointRightInLimits && (pointLeftBrightness > pointRightBrightness)){
-            // turn left
-            (*particle).angle -= rand() * turnSpeed * params.utime;
+
+        if(pointForwardInLimits && pointLeftInLimits && pointRightInLimits){
+
+            if(pointForwardInLimits && pointRightInLimits && pointLeftInLimits && (pointForwardBrightness > pointLeftBrightness) && (pointForwardBrightness > pointRightBrightness)){
+                // do nothing continue
+            }else if( pointForwardInLimits && pointRightInLimits && pointLeftInLimits && (pointForwardBrightness < pointLeftBrightness) && (pointForwardBrightness < pointRightBrightness) ){
+                // turn randomly
+                (*particle).angle += (rand() - .5) * 2 * turnSpeed * params.utime;
+            }else if(pointRightInLimits && pointLeftInLimits && (pointRightBrightness > pointLeftBrightness)){
+                // turn right
+                (*particle).angle += rand() * turnSpeed * params.utime;
+            }else if(pointLeftInLimits && pointRightInLimits && (pointLeftBrightness > pointRightBrightness)){
+                // turn left
+                (*particle).angle -= rand() * turnSpeed * params.utime;
+            }
         }else{
             (*particle).angle = rand() * PI * 2;
+
         }
 
-
-
-            //     } else if (pointLeft && pointRight && pointLeft.color.brightness > pointRight.color.brightness) {
-            //         // turn left
-            //         particle.angle -= Math.random() * turnSpeed * utime;
-            //     }
-
-            //     const { x, y } = point.normalPosition;
-            //     point.modifyColor(color => color.brightness = 1);
-            //     const pointAbove = screen.getPointFromLayer(point, 2);
-            //     pointAbove.modifyColor(color => color.set(1 - x, 1 - y, x * nusin));
-
-            // } else {
-            //     particle.angle = Math.random() * Math.PI * 2;
-            // }
-
-
-
         //
-        //var rgba = textureSampleLevel(feedbackTexture, feedbackSampler, particle.xy,  0.0).rgba;
 
-        var xy = vec2<u32>( u32((*particle).x), u32((*particle).y) );
-        xy = vec2<u32>(0,0);
-        textureStore(outputTex, xy, vec4<f32>(1,1,1,1));
+        var uxy = vec2<u32>( u32((*particle).x), u32((*particle).y) );
+        var xy = vec2<f32>( (*particle).x, (*particle).y);
+        var rgba = textureSampleLevel(feedbackTexture, feedbackSampler, xy,  0.0).rgba;
+        //xy = vec2<u32>(0,0);
+        textureStore(outputTex, uxy, vec4<f32>(1,1,1,1) + rgba);
+        
     }
 
 

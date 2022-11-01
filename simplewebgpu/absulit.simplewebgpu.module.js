@@ -262,7 +262,7 @@ export default class WebGPU {
         //--------------------------------------------
         //this._particles = new Float32Array(Array(300).fill(0));
         //this._particlesBuffer = this._createAndMapBuffer(this._particles, GPUBufferUsage.STORAGE);
-        this._particlesBuffer = this._createBuffer(4096 *5*4, GPUBufferUsage.STORAGE);
+        this._particlesBuffer = this._createBuffer(500 *5*4, GPUBufferUsage.STORAGE);
         //--------------------------------------------
         const va = new Float32Array(this._vertexArray);
         this._layer0Buffer = this._createAndMapBuffer(va, GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC);

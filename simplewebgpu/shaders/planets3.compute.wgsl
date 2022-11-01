@@ -10,6 +10,11 @@ fn rand2(co: vec2<f32>) -> f32 {
      return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
 }
 
+struct Params {
+    utime: f32,
+    screenWidth:f32,
+    screenHeight:f32
+}
 
 struct Color{
     r: f32,
@@ -75,6 +80,7 @@ fn polar(distance: f32, radians: f32) -> vec2<f32> {
 @group(0) @binding(3) var outputTex : texture_storage_2d<rgba8unorm, write>;
 @group(0) @binding(4) var <storage, read_write> variables: Variables;
 @group(0) @binding(5) var <storage, read_write> particles: Particles;
+@group(0) @binding(6) var<uniform> params: Params;
 
 struct Planet{
     radius: f32,
@@ -99,6 +105,7 @@ fn main(
     @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
 ) {
     var l0 = layer0.points[0];
+    let utime = params.utime;
 
     let pc: ptr<storage, f32, read_write> = &variables.particlesCreated;
 
