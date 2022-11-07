@@ -216,7 +216,7 @@ fn main(
             //let index:f32 = y + (x * screenSize.numColumns);
             var rgba = textureLoad(feedbackTexture, vec2<i32>(ix,iy), 0).rgba;
 
-            let colorsAround = getColorsAround(vec2<i32>(ix,iy), i32(10 + 100 * fnusin(1)));
+            let colorsAround = getColorsAround(vec2<i32>(ix,iy), i32(10 + 200 * fnusin(.5)));
             rgba = soften8(rgba, colorsAround, 1.);
 
             //rgba = vec4<f32>(1,0,0,1);
