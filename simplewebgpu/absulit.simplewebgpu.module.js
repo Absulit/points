@@ -610,7 +610,7 @@ export default class WebGPU {
     };
 
     /**
-     * 
+     * Adds two triangles as a quad called Point
      * @param {Coordinate} coordinate `x` from 0 to canvas.width, `y` from 0 to canvas.height, `z` it goes from 0.0 to 1.0 and forward
      * @param {Number} width point width
      * @param {Number} height point height

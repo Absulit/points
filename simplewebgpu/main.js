@@ -15,7 +15,7 @@ let capturer = new CCapture({
 });
 /***************/
 
-const demo6ComputeShader = await fetch('./shaders/slime2.compute.wgsl').then(r => r.text());
+const demo6ComputeShader = await fetch('./shaders/blur1.compute.wgsl').then(r => r.text());
 
 
 const webGPU = new WebGPU('gl-canvas');
@@ -34,7 +34,7 @@ let canvas = document.getElementById('gl-canvas');
 
 async function init() {
     //const initialized = await webGPU.init();
-    const initialized = await webGPU.init(null, './shaders/slime2.frag.wgsl');
+    const initialized = await webGPU.init(null, './shaders/blur1.frag.wgsl');
     if (initialized) {
         //webGPU.createVertexBuffer(vertexArray);
         // COMPUTE SHADER WGSL
