@@ -78,8 +78,10 @@ fn main(
     let decayA =  texColor.a * .5;
     //var finalColor:vec4<f32> = vec4(uv.x * c + decayR, uv.y * c + decayR, c + decayB, 1);
     //var finalColor:vec4<f32> = vec4(uv.x * c, uv.y * c, c, 1);
-    var finalColor = vec4(decayR, decayG, decayB, 1);
-    finalColor += texColorCompute;
+    // var finalColor = vec4(decayR, decayG, decayB, 1);
+    // finalColor = (finalColor + texColorCompute) *.48;
+
+    var finalColor = texColorCompute; // * vec4<f32>(uv.x, uv.y, 0, 1);
 
     // let cellSize = 20. + 10. * fnusin(1.);
     // let a = sin(uv.x  * cellSize) * sin(uv.y * cellSize);

@@ -54,24 +54,61 @@ struct Variables{
     testValue: f32
 }
 
-const clearMixlevel = 100.1;//1.01
-fn clearMix(color:vec4<f32>) -> vec4<f32> {
-    let rr = color.r / clearMixlevel;
-    let gr = color.g / clearMixlevel;
-    let br = color.b / clearMixlevel;
-    return vec4<f32>(rr, gr, br, color.a);
+//const clearMixlevel = 1.81;//1.01
+fn clearMix(color:vec4<f32>, level:f32) -> vec4<f32> {
+    let rr = color.r / level;
+    let gr = color.g / level;
+    let br = color.b / level;
+    var ar = color.a / level;
+    if(ar < .09){
+        ar = 0.;
+    }
+    return vec4<f32>(rr, gr, br, ar);
+}
+
+// level 2.
+fn clearAlpha(currentColor:vec4<f32>, level:f32) -> vec4<f32>{
+    let ar = currentColor.a / level;
+    return vec4<f32>(currentColor.rgb, ar);
 }
 
 fn polar(distance: f32, radians: f32) -> vec2<f32> {
     return vec2<f32>(distance * cos(radians), distance * sin(radians));
 }
 
-// fn fnusin(speed: f32) -> f32{
-//     return sin(params.utime * speed) * .5;
-// }
-// fn fusin(speed: f32) -> f32{
-//     return sin(params.utime * speed);
-// }
+fn getColorsAround(position: vec2<i32>, distance: i32) -> array<  vec4<f32>, 8  > {
+    return array< vec4<f32>,8 >(
+        textureLoad(feedbackTexture, vec2<i32>( position.x-distance, position.y-distance  ),  0).rgba,
+        textureLoad(feedbackTexture, vec2<i32>( position.x, position.y-distance  ),  0).rgba,
+        textureLoad(feedbackTexture, vec2<i32>( position.x+distance, position.y-distance  ),  0).rgba,
+        textureLoad(feedbackTexture, vec2<i32>( position.x-distance, position.y  ),  0).rgba,
+        textureLoad(feedbackTexture, vec2<i32>( position.x+distance, position.y  ),  0).rgba,
+        textureLoad(feedbackTexture, vec2<i32>( position.x-distance, position.y+distance  ),  0).rgba,
+        textureLoad(feedbackTexture, vec2<i32>( position.x, position.y+distance  ),  0).rgba,
+        textureLoad(feedbackTexture, vec2<i32>( position.x+distance, position.y+distance  ),  0).rgba,
+    );
+}
+
+fn soften8(color:vec4<f32>, colorsAround:array<vec4<f32>, 8>, colorPower:f32) -> vec4<f32> {
+    var newColor:vec4<f32> = color;
+    for (var indexColors = 0u; indexColors < 8u; indexColors++) {
+        var colorAround = colorsAround[indexColors];
+        colorAround.r = (color.r + colorAround.r * colorPower) / (colorPower + 1.);
+        colorAround.g = (color.g + colorAround.g * colorPower) / (colorPower + 1.);
+        colorAround.b = (color.b + colorAround.b * colorPower) / (colorPower + 1.);
+        colorAround.a = (color.a + colorAround.a * colorPower) / (colorPower + 1.);
+
+        newColor += colorAround;
+    }
+    return newColor / 5;
+}
+
+fn fnusin(speed: f32) -> f32{
+    return sin(params.utime * speed) * .5;
+}
+fn fusin(speed: f32) -> f32{
+    return sin(params.utime * speed);
+}
 
 //'function', 'private', 'push_constant', 'storage', 'uniform', 'workgroup'
 @group(0) @binding(0) var<storage, read_write> layer0: Points;
@@ -93,7 +130,7 @@ struct Particles{
     items: array<Particle>
 }
 
-var<private> numParticles:u32 = 500;
+var<private> numParticles:u32 = 2048;
 //var<workgroup> particles: array<Planet, 8>;
 //var<private> particlesCreated = false;
 
@@ -138,18 +175,24 @@ fn main(
     for (var indexColumns:i32 = 0; indexColumns < numColumnsPiece; indexColumns++) {
         let x:f32 = f32(WorkGroupID.x) * f32(numColumnsPiece) + f32(indexColumns);
         let ux = u32(x);
+        let ix = i32(x);
         let nx = x / numColumns;
         for (var indexRows:i32 = 0; indexRows < numRowsPiece; indexRows++) {
 
             let y:f32 = f32(WorkGroupID.y) * f32(numRowsPiece) + f32(indexRows);
             let uy = u32(y);
+            let iy = i32(y);
             let ny = y / numRows;
 
             //let index:f32 = y + (x * screenSize.numColumns);
-            var rgba = textureSampleLevel(feedbackTexture, feedbackSampler, vec2<f32>(x,y),  0.0).rgba;
+            var rgba = textureLoad(feedbackTexture, vec2<i32>(ix,iy), 0).rgba;
 
-            //rgba += vec4<f32>(1.,0.,0.,.5);
-            rgba = clearMix(rgba);
+            let colorsAround = getColorsAround(vec2<i32>(ix,iy), 1);
+            rgba = soften8(rgba, colorsAround, 1.);
+
+            //rgba = vec4<f32>(0,0,0,1);
+            //rgba = clearMix(rgba, 1.85);
+            rgba = clearAlpha(rgba, 2.54);
 
             textureStore(outputTex, vec2<u32>(ux,uy), rgba);
 
@@ -162,37 +205,39 @@ fn main(
 
     let numIndexPiece:u32 = numParticles / workgroupSize * workgroupSize;
 
-    for(var indexPiece:u32; indexPiece<numIndexPiece; indexPiece++){
+    let turnSpeed = 1.;
+    let distance = 17.;
+    let angleRotation = 69.;
+
+    for(var indexPiece:u32; indexPiece<=numIndexPiece; indexPiece++){
         let k:u32 = WorkGroupID.x * WorkGroupID.y * numParticles + indexPiece;
         let particle  = &particles.items[k];
         //var particlePointer = (*particle);
 
         var p = polar( (*particle).distance, (*particle).angle);
-        (*particle).x += p.x;
-        (*particle).y += p.y;
-
-        let turnSpeed = .1;
-        let distance = 3.;
-        let angleRotation = 15.;
-
-        p = polar( (*particle).distance, (*particle).angle);
+        (*particle).x += p.x * .11;
+        (*particle).y += p.y * .11;
 
 
-        let pointForward = vec2( (*particle).x + p.x, (*particle).y + p.y );
-        p = polar( (*particle).distance, (*particle).angle + radians(angleRotation));
 
-        let pointRight = vec2( (*particle).x + p.x, (*particle).y + p.y );
-        p = polar( (*particle).distance, (*particle).angle - radians(angleRotation));
+        p = polar( distance, (*particle).angle);
 
-        let pointLeft = vec2( (*particle).x + p.x, (*particle).y + p.y );
 
-        let pointForwardBrightness = textureSampleLevel(feedbackTexture, feedbackSampler, pointForward,  0.0).g;
-        let pointLeftBrightness = textureSampleLevel(feedbackTexture, feedbackSampler, pointRight,  0.0).g;
-        let pointRightBrightness = textureSampleLevel(feedbackTexture, feedbackSampler, pointLeft,  0.0).g;
+        let pointForward = vec2( i32((*particle).x + p.x), i32((*particle).y + p.y ));
+        p = polar( distance, (*particle).angle + radians(angleRotation));
 
-        let pointForwardInLimits = f32(dims.x-MARGIN) >= pointForward.x && pointForward.x >= MARGIN  &&  f32(dims.y-MARGIN) >= pointForward.y && pointForward.y >= MARGIN ;
-        let pointLeftInLimits = f32(dims.x-MARGIN) >= pointLeft.x && pointLeft.x >= MARGIN  &&  f32(dims.y-MARGIN) >= pointLeft.y && pointLeft.y >= MARGIN;
-        let pointRightInLimits = f32(dims.x-MARGIN) >= pointRight.x && pointRight.x >= MARGIN  &&  f32(dims.y-MARGIN) >= pointRight.y && pointRight.y >= MARGIN;
+        let pointRight = vec2( i32((*particle).x + p.x), i32((*particle).y + p.y) );
+        p = polar( distance, (*particle).angle - radians(angleRotation));
+
+        let pointLeft = vec2( i32((*particle).x + p.x), i32((*particle).y + p.y) );
+
+        let pointForwardBrightness = textureLoad(feedbackTexture, pointForward,  0).g;
+        let pointLeftBrightness = textureLoad(feedbackTexture, pointRight,  0).g;
+        let pointRightBrightness = textureLoad(feedbackTexture, pointLeft,  0).g;
+
+        let pointForwardInLimits = i32(dims.x-MARGIN) >= pointForward.x && pointForward.x >= MARGIN  &&  i32(dims.y-MARGIN) >= pointForward.y && pointForward.y >= MARGIN ;
+        let pointLeftInLimits = i32(dims.x-MARGIN) >= pointLeft.x && pointLeft.x >= MARGIN  &&  i32(dims.y-MARGIN) >= pointLeft.y && pointLeft.y >= MARGIN;
+        let pointRightInLimits = i32(dims.x-MARGIN) >= pointRight.x && pointRight.x >= MARGIN  &&  i32(dims.y-MARGIN) >= pointRight.y && pointRight.y >= MARGIN;
 
 
         if(pointForwardInLimits && pointLeftInLimits && pointRightInLimits){
@@ -201,7 +246,7 @@ fn main(
                 // do nothing continue
             }else if( pointForwardInLimits && pointRightInLimits && pointLeftInLimits && (pointForwardBrightness < pointLeftBrightness) && (pointForwardBrightness < pointRightBrightness) ){
                 // turn randomly
-                (*particle).angle += (rand() - .5) * 2 * turnSpeed * params.utime;
+                (*particle).angle += (rand() - .5) *  turnSpeed * params.utime;
             }else if(pointRightInLimits && pointLeftInLimits && (pointRightBrightness > pointLeftBrightness)){
                 // turn right
                 (*particle).angle += rand() * turnSpeed * params.utime;
@@ -215,11 +260,12 @@ fn main(
         }
 
         //
-
-        var uxy = vec2<u32>( u32((*particle).x), u32((*particle).y) );
         var xy = vec2<f32>( (*particle).x, (*particle).y);
         var rgba = textureSampleLevel(feedbackTexture, feedbackSampler, xy,  0.0).rgba;
-        //xy = vec2<u32>(0,0);
+
+        var uxy = vec2<u32>( u32((*particle).x), u32((*particle).y) );
+        var ixy = vec2<i32>( i32((*particle).x), i32((*particle).y) );
+        rgba = textureLoad(feedbackTexture, ixy,  0).rgba;
         textureStore(outputTex, uxy, vec4<f32>(1,1,1,1) + rgba);
         
     }
