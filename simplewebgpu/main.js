@@ -61,6 +61,10 @@ async function update() {
     webGPU._uniformsArray[3] = mouseX;
     webGPU._uniformsArray[4] = mouseY;
 
+    webGPU._uniformsArray[5] = sliders.a;
+    webGPU._uniformsArray[6] = sliders.b;
+    webGPU._uniformsArray[7] = sliders.c;
+
     webGPU.update();
 
     //

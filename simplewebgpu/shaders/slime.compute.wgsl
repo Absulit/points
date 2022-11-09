@@ -13,9 +13,13 @@ fn rand2(co: vec2<f32>) -> f32 {
 struct Params {
     utime: f32,
     screenWidth:f32,
-    screenHeight:f32
+    screenHeight:f32,
+    mouseX: f32,
+    mouseY: f32,
+    sliderA: f32,
+    sliderB: f32,
+    sliderC: f32
 }
-
 struct Color{
     r: f32,
     g: f32,
@@ -205,9 +209,9 @@ fn main(
 
     let numIndexPiece:u32 = numParticles / workgroupSize * workgroupSize;
 
-    let turnSpeed = 1.;
-    let distance = 17.;
-    let angleRotation = 69.;
+    let turnSpeed = 10. * params.sliderA; //1.
+    let distance = 300. * params.sliderB; //17.
+    let angleRotation = 360. * params.sliderC; //69.
 
     for(var indexPiece:u32; indexPiece<=numIndexPiece; indexPiece++){
         let k:u32 = WorkGroupID.x * WorkGroupID.y * numParticles + indexPiece;
