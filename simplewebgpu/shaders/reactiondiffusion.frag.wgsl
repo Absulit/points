@@ -6,7 +6,12 @@ struct Particle{
 struct Params {
     utime: f32,
     screenWidth:f32,
-    screenHeight:f32
+    screenHeight:f32,
+    mouseX: f32,
+    mouseY: f32,
+    sliderA: f32,
+    sliderB: f32,
+    sliderC: f32
 }
 
 struct ScreenSize {
@@ -37,6 +42,15 @@ fn line2(uv:vec2<f32>, p1:vec2<f32>, p2:vec2<f32>, pixelStroke:f32)->f32{
         value = 0.;
     }
     return value;
+}
+
+fn hsvAux(h:f32, s:f32, v:f32, n:f32) -> f32 {
+    let k:f32 = (n + h * 6.) % 6.;
+    return v - v * s * max(      min(min(k, 4. - k), 1.), 0.);
+};
+
+fn RGBAFromHSV(h:f32, s:f32, v:f32) ->  vec4<f32>{
+    return vec4<f32>(hsvAux(h, s, v, 5), hsvAux(h, s, v, 3), hsvAux(h, s, v, 1), 1);
 }
 
 @group(0) @binding(0) var<uniform> params: Params;
@@ -84,7 +98,9 @@ fn main(
     //var finalColor = vec4(decayR, decayG, decayB, 1);
     // finalColor = (finalColor + texColorCompute) *.48;
 
-    var finalColor = (1 - texColorCompute); //* vec4<f32>(uv.x, uv.y, 0, 1);
+    //var finalColor = (1 - texColorCompute); //* vec4<f32>(uv.x, uv.y, 0, 1);
+    let a = (1 - texColorCompute);
+    var finalColor = RGBAFromHSV(a.r - .732, 1, a.r);
 
 
 
