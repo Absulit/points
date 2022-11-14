@@ -115,20 +115,6 @@ fn fusin(speed: f32) -> f32{
     return sin(params.utime * speed);
 }
 
-// fn getColorsAround(position: vec2<i32>, distance: i32) -> array<  vec4<f32>, 8  > {
-//     return array< vec4<f32>,8 >(
-//         textureLoad(feedbackTexture, vec2<i32>( position.x-distance, position.y-distance  ),  0).rgba,
-//         textureLoad(feedbackTexture, vec2<i32>( position.x, position.y-distance  ),  0).rgba,
-//         textureLoad(feedbackTexture, vec2<i32>( position.x+distance, position.y-distance  ),  0).rgba,
-//         textureLoad(feedbackTexture, vec2<i32>( position.x-distance, position.y  ),  0).rgba,
-//         textureLoad(feedbackTexture, vec2<i32>( position.x+distance, position.y  ),  0).rgba,
-//         textureLoad(feedbackTexture, vec2<i32>( position.x-distance, position.y+distance  ),  0).rgba,
-//         textureLoad(feedbackTexture, vec2<i32>( position.x, position.y+distance  ),  0).rgba,
-//         textureLoad(feedbackTexture, vec2<i32>( position.x+distance, position.y+distance  ),  0).rgba,
-//     );
-// }
-
-
 fn getPointsAround(position: vec2<i32>, distance: i32) -> array<  Chemical, 8  >{
     let index0 = (position.x-distance) + ( (position.y-distance) * 800);
     let index1 = (position.x)           + ( (position.y-distance) * 800);
@@ -149,30 +135,6 @@ fn getPointsAround(position: vec2<i32>, distance: i32) -> array<  Chemical, 8  >
         particles.chemicals[index7]
     );
 }
-
-    // laplace(point, prop) {
-    //     const pointsAround = this._screen.getPointsAround(point);
-    //     if (pointsAround.includes(null)) {
-    //         return 0;
-    //     }
-    //     const direct = .2;
-    //     const diagonal = .05;
-    //     let sum = 0;
-    //     sum += point.chemicals[prop] * -1;
-
-    //     sum += pointsAround[1].chemicals[prop] * direct;
-    //     sum += pointsAround[3].chemicals[prop] * direct;
-    //     sum += pointsAround[4].chemicals[prop] * direct;
-    //     sum += pointsAround[6].chemicals[prop] * direct;
-
-    //     sum += pointsAround[0].chemicals[prop] * diagonal;
-    //     sum += pointsAround[2].chemicals[prop] * diagonal;
-    //     sum += pointsAround[5].chemicals[prop] * diagonal;
-    //     sum += pointsAround[7].chemicals[prop] * diagonal;
-
-    //     return sum;
-    // }
-
 
 fn laplaceA(position:vec2<i32>, chemical:Chemical) -> f32{
     let pointsAround = getPointsAround(position, 1);
