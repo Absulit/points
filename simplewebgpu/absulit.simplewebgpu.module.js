@@ -2,6 +2,9 @@ import Coordinate from './coordinate.js';
 import { getShaderSource } from './shader_loader.js';
 import { print } from '../../js/utils.js';
 import RGBAColor from './../webgpu/js/color.js';
+import defaultVert from './shaders/default.vert.js';
+import defaultFrag from './shaders/default.frag.js';
+
 
 export class VertexBufferInfo {
     /**
@@ -78,9 +81,9 @@ export default class WebGPU {
         this._renderPassDescriptor = null;
     }
 
-    async init(vertexShaderPath, fragmentShaderPath) {
-        const colorsVertWGSL = await getShaderSource(vertexShaderPath || './shaders/default.vert.wgsl');
-        const colorsFragWGSL = await getShaderSource(fragmentShaderPath || './shaders/default.frag.wgsl');
+    async init(vertexShader, fragmentShader) {
+        const colorsVertWGSL = vertexShader || defaultVert;
+        const colorsFragWGSL = fragmentShader || defaultFrag;
 
         const textureVertWGSL = await getShaderSource('./shaders/default.vert.wgsl');
         const textureFragWGSL = await getShaderSource('./shaders/default.frag.wgsl');
