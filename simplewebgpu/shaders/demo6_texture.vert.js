@@ -1,3 +1,5 @@
+const demo6_textureVert = /*wgsl*/`
+
 struct Fragment {
     @builtin(position) Position: vec4<f32>,
     @location(0) Color: vec4<f32>,
@@ -16,3 +18,7 @@ fn main(@location(0) position: vec4<f32>, @location(1) color: vec4<f32>, @locati
 
     return result;
 }
+`;
+
+export default demo6_textureVert;
+

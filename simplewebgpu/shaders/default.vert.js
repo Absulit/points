@@ -1,6 +1,6 @@
 const defaultVert = /*wgsl*/`
 
-@group(0) @binding(0) var<uniform> params: Params;
+
 
 struct Particle{
     x: f32,
@@ -23,6 +23,7 @@ struct Fragment {
     @location(3) mouse: vec2<f32>
 }
 
+@group(0) @binding(0) var<uniform> params: Params;
 
 @vertex
 fn main(

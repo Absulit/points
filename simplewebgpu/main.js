@@ -9,6 +9,8 @@ import circleblurFrag from './shaders/circleblur.frag.js';
 import defaultCompute from './shaders/default.compute.js';
 import defaultFrag from './shaders/default.frag.js';
 import defaultVert from './shaders/default.vert.js';
+import demo6_textureFrag from './shaders/demo6_texture.frag.js';
+import demo6_textureVert from './shaders/demo6_texture.vert.js';
 import planetsCompute from './shaders/planets.compute.js';
 import planetsFrag from './shaders/planets.frag.js';
 import planets2Compute from './shaders/planets2.compute.js';
