@@ -493,6 +493,7 @@ export default class WebGPU {
 
     _createParams() {
         this._uniformBindGroup = this._device.createBindGroup({
+            label: '_createParams()',
             layout: this._pipeline.getBindGroupLayout(0),
             entries: [
                 {

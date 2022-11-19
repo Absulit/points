@@ -1,3 +1,4 @@
+const blur1Compute = /*wgsl*/`
 var<private> rand_seed : vec2<f32>;
 
 fn rand() -> f32 {
@@ -52,6 +53,15 @@ struct Points {
 struct Variables{
     particlesCreated: f32,
     testValue: f32
+}
+
+struct Chemical{
+    a: f32,
+    b: f32
+}
+
+struct Particles{
+    chemicals: array<Chemical>
 }
 
 const clearMixlevel = 100.1;//1.01
@@ -139,24 +149,25 @@ fn fusin(speed: f32) -> f32{
 }
 
 //'function', 'private', 'push_constant', 'storage', 'uniform', 'workgroup'
-@group(0) @binding(0) var<storage, read_write> layer0: Points;
+@group(0) @binding(0) var <storage, read_write> layer0: Points;
 @group(0) @binding(1) var feedbackSampler: sampler;
 @group(0) @binding(2) var feedbackTexture: texture_2d<f32>;
 @group(0) @binding(3) var outputTex : texture_storage_2d<rgba8unorm, write>;
 @group(0) @binding(4) var <storage, read_write> variables: Variables;
 @group(0) @binding(5) var <storage, read_write> particles: Particles;
-@group(0) @binding(6) var<uniform> params: Params;
+@group(0) @binding(6) var <uniform> params: Params;
+@group(0) @binding(7) var <storage, read_write> particles2: Particles;
 
-struct Particle{
-    x: f32,
-    y: f32,
-    angle: f32,
-    distance: f32
-}
+// struct Particle{
+//     x: f32,
+//     y: f32,
+//     angle: f32,
+//     distance: f32
+// }
 
-struct Particles{
-    items: array<Particle>
-}
+// struct Particles{
+//     items: array<Particle>
+// }
 
 var<private> numParticles:u32 = 500;
 //var<workgroup> particles: array<Planet, 8>;
@@ -174,17 +185,9 @@ fn main(
 ) {
     var l0 = layer0.points[0];
     let utime = params.utime;
-
-    let pc: ptr<storage, f32, read_write> = &variables.particlesCreated;
-
-    if((*pc) == 0){
-        for(var k:u32; k<numParticles; k++){
-            particles.items[k] = Particle(400, 400, rand() * PI * 2, 1. );
-        }
-
-        (*pc) = 1;
-    }
-
+    let chemical = particles.chemicals[0];
+    let chemical2 = particles2.chemicals[0];
+    let tv: ptr<storage, f32, read_write> = &variables.testValue;
 
 
 
@@ -240,3 +243,6 @@ fn main(
    
 
 }
+`;
+
+export default blur1Compute;

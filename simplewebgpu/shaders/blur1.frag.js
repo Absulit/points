@@ -1,3 +1,4 @@
+const blur1Frag = /*wgsl*/`
 struct Particle{
     x: f32,
     y: f32
@@ -46,6 +47,7 @@ fn line2(uv:vec2<f32>, p1:vec2<f32>, p2:vec2<f32>, pixelStroke:f32)->f32{
 @group(0) @binding(3) var feedbackTexture: texture_2d<f32>;
 
 @group(0) @binding(4) var computeTexture: texture_2d<f32>;
+@group(0) @binding(5) var<storage> particles2: array<Particle>;
 
 
 @fragment
@@ -64,7 +66,8 @@ fn main(
 
     let texColorCompute = textureSample(computeTexture, feedbackSampler, uv * vec2(1,-1));
 
-    var particle = particles[0];
+    let particle = particles[0];
+    let particle2 = particles2[0];
 
     let d = distance(uv, vec2(.5 + .1 * fusin(2), .5  + .1 * fusin(4.123)));
     //let d = distance(uv, vec2(.5, .5));
@@ -89,4 +92,6 @@ fn main(
 
     return finalColor;
 }
+`;
 
+export default blur1Frag;
