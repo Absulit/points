@@ -2,11 +2,18 @@
 import MathUtil from '../js/mathutil.js';
 import { print } from '../js/utils.js';
 import WebGPU from './absulit.simplewebgpu.module.js';
+import blur1Compute from './shaders/blur1.compute.js';
+import blur1Frag from './shaders/blur1.frag.js';
+import circleblurCompute from './shaders/circleblur.compute.js';
+import circleblurFrag from './shaders/circleblur.frag.js';
 import defaultCompute from './shaders/default.compute.js';
 import defaultFrag from './shaders/default.frag.js';
 import defaultVert from './shaders/default.vert.js';
+import planetsCompute from './shaders/planets.compute.js';
+import planetsFrag from './shaders/planets.frag.js';
 import reactiondiffusionCompute from './shaders/reactiondiffusion.compute.js';
 import reactiondiffusionFrag from './shaders/reactiondiffusion.frag.js';
+import test1Frag from './shaders/test1.frag.js';
 
 /***************/
 const stats = new Stats();
