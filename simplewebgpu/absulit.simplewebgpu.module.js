@@ -85,9 +85,6 @@ export default class WebGPU {
         const colorsVertWGSL = vertexShader || defaultVert;
         const colorsFragWGSL = fragmentShader || defaultFrag;
 
-        const textureVertWGSL = await getShaderSource('./shaders/default.vert.wgsl');
-        const textureFragWGSL = await getShaderSource('./shaders/default.frag.wgsl');
-
         const updatePointsWGSL = await getShaderSource('./shaders/demo6_update.points.wgsl');
 
         this._shaders = {
@@ -96,8 +93,8 @@ export default class WebGPU {
                 fragment: colorsFragWGSL
             },
             true: {
-                vertex: textureVertWGSL,
-                fragment: textureFragWGSL
+                vertex: defaultVert,
+                fragment: defaultFrag
             },
             points: {
                 update: updatePointsWGSL

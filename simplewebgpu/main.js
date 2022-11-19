@@ -2,6 +2,8 @@
 import MathUtil from '../js/mathutil.js';
 import { print } from '../js/utils.js';
 import WebGPU from './absulit.simplewebgpu.module.js';
+import defaultCompute from './shaders/default.compute.js';
+import defaultFrag from './shaders/default.frag.js';
 import defaultVert from './shaders/default.vert.js';
 import reactiondiffusionCompute from './shaders/reactiondiffusion.compute.js';
 import reactiondiffusionFrag from './shaders/reactiondiffusion.frag.js';
@@ -35,12 +37,12 @@ let canvas = document.getElementById('gl-canvas');
 
 async function init() {
     //const initialized = await webGPU.init();
-    const initialized = await webGPU.init(defaultVert, reactiondiffusionFrag);
+    const initialized = await webGPU.init(defaultVert, defaultFrag);
     if (initialized) {
         //webGPU.createVertexBuffer(vertexArray);
         // COMPUTE SHADER WGSL
         shaderModule = webGPU._device.createShaderModule({
-            code: reactiondiffusionCompute
+            code: defaultCompute
         });
 
         webGPU._shaderModule = shaderModule;
