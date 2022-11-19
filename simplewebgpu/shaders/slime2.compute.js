@@ -1,3 +1,5 @@
+const slime2Compute = /*wgsl*/`
+
 var<private> rand_seed : vec2<f32>;
 
 fn rand() -> f32 {
@@ -96,7 +98,7 @@ fn sense(particle:Particle, sensorAngleOffset:f32){
     let sensorDir = vec2<f32>(cos(sensorAngle),sin(sensorAngle));
     let sensorCenter = particle.position + sensorDir * sensorAngleOffset;
     let sum = 0.;
-    
+
 }
 
 // fn fnusin(speed: f32) -> f32{
@@ -107,13 +109,14 @@ fn sense(particle:Particle, sensorAngleOffset:f32){
 // }
 
 //'function', 'private', 'push_constant', 'storage', 'uniform', 'workgroup'
-@group(0) @binding(0) var<storage, read_write> layer0: Points;
+@group(0) @binding(0) var <storage, read_write> layer0: Points;
 @group(0) @binding(1) var feedbackSampler: sampler;
 @group(0) @binding(2) var feedbackTexture: texture_2d<f32>;
 @group(0) @binding(3) var outputTex : texture_storage_2d<rgba8unorm, write>;
 @group(0) @binding(4) var <storage, read_write> variables: Variables;
 @group(0) @binding(5) var <storage, read_write> particles: Particles;
-@group(0) @binding(6) var<uniform> params: Params;
+@group(0) @binding(6) var <uniform> params: Params;
+@group(0) @binding(7) var <storage, read_write> particles2: Particles;
 
 struct Particle{
     position: vec2<f32>,
@@ -140,6 +143,8 @@ fn main(
     @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
 ) {
     var l0 = layer0.points[0];
+
+    let item2 = particles2.items[0];
 
     let pc: ptr<storage, f32, read_write> = &variables.particlesCreated;
 
@@ -186,7 +191,7 @@ fn main(
             rgba = vec4<f32>(1,0,0,1);
             rgba = clearMix(rgba);
 
-            
+
             textureStore(outputTex, vec2<u32>(ux,uy), rgba * .01);
 
         }
@@ -215,7 +220,7 @@ fn main(
         }
 
         (*particle).position = newPos;
- 
+
 
         //
 
@@ -226,11 +231,10 @@ fn main(
 
         //xy = vec2<u32>(0,0);
         textureStore(outputTex, uxy, vec4<f32>(1,1,1,1) );
-        
-
-
 
     }
 
-
 }
+`;
+
+export default slime2Compute;

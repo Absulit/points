@@ -23,6 +23,8 @@ import reactiondiffusionCompute from './shaders/reactiondiffusion.compute.js';
 import reactiondiffusionFrag from './shaders/reactiondiffusion.frag.js';
 import slimeCompute from './shaders/slime.compute.js';
 import slimeFrag from './shaders/slime.frag.js';
+import slime2Compute from './shaders/slime2.compute.js';
+import slime2Frag from './shaders/slime2.frag.js';
 import test1Frag from './shaders/test1.frag.js';
 
 /***************/
