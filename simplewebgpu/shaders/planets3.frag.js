@@ -1,3 +1,5 @@
+const planets3Frag = /*wgsl*/`
+
 struct Particle{
     x: f32,
     y: f32
@@ -46,6 +48,7 @@ fn line2(uv:vec2<f32>, p1:vec2<f32>, p2:vec2<f32>, pixelStroke:f32)->f32{
 @group(0) @binding(3) var feedbackTexture: texture_2d<f32>;
 
 @group(0) @binding(4) var computeTexture: texture_2d<f32>;
+@group(0) @binding(5) var<storage> particles2: array<Particle>;
 
 
 @fragment
@@ -58,13 +61,15 @@ fn main(
     ) -> @location(0) vec4<f32> {
 
     //let texColor = textureSample(myTexture, mySampler, uv * 1.0 + .1 * fnusin(2));
-    let texColor = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1));
     let texColor2 = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1) + vec2(-.001,1));
     let texColor3 = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1) + vec2(.001,1));
 
-    let texColorCompute = textureSample(computeTexture, feedbackSampler, uv * vec2(1,-1));
 
-    var particle = particles[0];
+    let particle = particles[0];
+    let particle2 = particles2[0];
+
+    let texColor = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1));
+    let texColorCompute = textureSample(computeTexture, feedbackSampler, uv * vec2(1,-1));
 
     let d = distance(uv, vec2(.5 + .1 * fusin(2), .5  + .1 * fusin(4.123)));
     var c = 1.;
@@ -73,7 +78,7 @@ fn main(
     }
 
     let decayR =  texColor.r * .9 * texColor2.r;
-    let decayG =  texColor.g * 1.99;
+    let decayG =  texColor.g * .99;
     let decayB =  texColor.b * .9 * texColor3.b;
     let decayA =  texColor.a * .9;
     //var finalColor:vec4<f32> = vec4(uv.x * c + decayR, uv.y * c + decayR, c + decayB, 1);
@@ -94,4 +99,6 @@ fn main(
 
     return finalColor;
 }
+`;
 
+export default planets3Frag;
