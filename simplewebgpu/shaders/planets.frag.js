@@ -1,4 +1,10 @@
 
+const planetsFrag = /*wgsl*/`
+
+struct Particle{
+    x: f32,
+    y: f32
+}
 
 struct Planet {
     radius: f32,
@@ -53,7 +59,7 @@ fn fnusin(speed: f32) -> f32{
 @group(0) @binding(3) var feedbackTexture: texture_2d<f32>;
 
 @group(0) @binding(4) var computeTexture: texture_2d<f32>;
-
+@group(0) @binding(5) var<storage> particles2: Particles;
 
 @fragment
 fn main(
@@ -63,6 +69,9 @@ fn main(
         @location(3) mouse: vec2<f32>,
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
+
+    let particle = particles.planets[0];
+    let particle2 = particles2.planets[0];
 
     let texColor = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1));
     let texColorCompute = textureSample(computeTexture, feedbackSampler, uv * vec2(1,-1));
@@ -106,4 +115,6 @@ fn main(
 
     return finalColor;
 }
+`;
 
+export default planetsFrag;
