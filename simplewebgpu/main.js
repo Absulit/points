@@ -11,6 +11,8 @@ import defaultFrag from './shaders/default.frag.js';
 import defaultVert from './shaders/default.vert.js';
 import planetsCompute from './shaders/planets.compute.js';
 import planetsFrag from './shaders/planets.frag.js';
+import planets2Compute from './shaders/planets2.compute.js';
+import planets2Frag from './shaders/planets2.frag.js';
 import reactiondiffusionCompute from './shaders/reactiondiffusion.compute.js';
 import reactiondiffusionFrag from './shaders/reactiondiffusion.frag.js';
 import test1Frag from './shaders/test1.frag.js';

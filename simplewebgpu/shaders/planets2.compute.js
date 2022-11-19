@@ -1,3 +1,5 @@
+const planets2Compute = /*wgsl*/`
+
 var<private> rand_seed : vec2<f32>;
 
 fn rand() -> f32 {
@@ -10,6 +12,16 @@ fn rand2(co: vec2<f32>) -> f32 {
      return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
 }
 
+struct Params {
+    utime: f32,
+    screenWidth:f32,
+    screenHeight:f32,
+    mouseX: f32,
+    mouseY: f32,
+    sliderA: f32,
+    sliderB: f32,
+    sliderC: f32
+}
 
 struct Color{
     r: f32,
@@ -69,12 +81,14 @@ fn polar(distance: f32, radians: f32) -> vec2<f32> {
 // }
 
 //'function', 'private', 'push_constant', 'storage', 'uniform', 'workgroup'
-@group(0) @binding(0) var<storage, read_write> layer0: Points;
+@group(0) @binding(0) var <storage, read_write> layer0: Points;
 @group(0) @binding(1) var feedbackSampler: sampler;
 @group(0) @binding(2) var feedbackTexture: texture_2d<f32>;
 @group(0) @binding(3) var outputTex : texture_storage_2d<rgba8unorm, write>;
 @group(0) @binding(4) var <storage, read_write> variables: Variables;
 @group(0) @binding(5) var <storage, read_write> particles: Particles;
+@group(0) @binding(6) var <uniform> params: Params;
+@group(0) @binding(7) var <storage, read_write> particles2: Particles;
 
 struct Planet{
     radius: f32,
@@ -101,6 +115,8 @@ fn main(
     @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
 ) {
     var l0 = layer0.points[0];
+    let utime = params.utime;
+    let planet2 = particles2.planets[0];
 
     let pc: ptr<storage, f32, read_write> = &variables.particlesCreated;
 
@@ -159,3 +175,7 @@ fn main(
 
 
 }
+`;
+
+export default planets2Compute;
+

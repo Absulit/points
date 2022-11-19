@@ -1,3 +1,5 @@
+const planets2Frag = /*wgsl*/`
+
 struct Planet {
     radius: f32,
     speed: f32,
@@ -50,6 +52,8 @@ fn line2(uv:vec2<f32>, p1:vec2<f32>, p2:vec2<f32>, pixelStroke:f32)->f32{
 @group(0) @binding(3) var feedbackTexture: texture_2d<f32>;
 
 @group(0) @binding(4) var computeTexture: texture_2d<f32>;
+@group(0) @binding(5) var<storage> particles2: Particles;
+
 @fragment
 fn main(
         @location(0) Color: vec4<f32>,
@@ -59,8 +63,11 @@ fn main(
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
-    let texColor = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1));
-    let texColorCompute = textureSample(computeTexture, feedbackSampler, uv * vec2(1,-1));
+        let particle = particles.planets[0];
+        let particle2 = particles2.planets[0];
+    
+        let texColor = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1));
+        let texColorCompute = textureSample(computeTexture, feedbackSampler, uv * vec2(1,-1));
 
     let scale = .01;
 
@@ -111,4 +118,6 @@ fn main(
 
     return finalColor;
 }
+`;
 
+export default planets2Frag;
