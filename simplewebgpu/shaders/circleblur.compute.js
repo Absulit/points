@@ -1,3 +1,15 @@
+const circleblurCompute = /*wgsl*/`
+
+struct Params {
+    utime: f32,
+    screenWidth:f32,
+    screenHeight:f32,
+    mouseX: f32,
+    mouseY: f32,
+    sliderA: f32,
+    sliderB: f32,
+    sliderC: f32
+}
 
 struct Color{
     r: f32,
@@ -27,16 +39,21 @@ struct Point {
     vertex4: Vertex,
     vertex5: Vertex,
 }
-
 struct Points {
     points: array<Point>
 }
-
-struct Params {
-  filterDim : u32,
-  blockDim : u32,
+struct Variables{
+    testValue: f32
 }
 
+struct Chemical{
+    a: f32,
+    b: f32
+}
+
+struct Particles{
+    chemicals: array<Chemical>
+}
 const clearMixlevel = 1.01;//1.01
 fn clearMix(color:vec4<f32>) -> vec4<f32> {
     let rr = color.r / clearMixlevel;
@@ -50,6 +67,10 @@ fn clearMix(color:vec4<f32>) -> vec4<f32> {
 @group(0) @binding(1) var feedbackSampler: sampler;
 @group(0) @binding(2) var feedbackTexture: texture_2d<f32>;
 @group(0) @binding(3) var outputTex : texture_storage_2d<rgba8unorm, write>;
+@group(0) @binding(4) var <storage, read_write> variables: Variables;
+@group(0) @binding(5) var <storage, read_write> particles: Particles;
+@group(0) @binding(6) var<uniform> params: Params;
+@group(0) @binding(7) var <storage, read_write> particles2: Particles;
 
 var<workgroup> tile : array<array<vec3<f32>, 128>, 4>;
 
@@ -62,6 +83,10 @@ fn main(
     @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
 ) {
     var l0 = layer0.points[0];
+    let utime = params.utime;
+    let chemical = particles.chemicals[0];
+    let chemical2 = particles2.chemicals[0];
+    let tv: ptr<storage, f32, read_write> = &variables.testValue;
 
 
     //let dims : vec2<u32> = textureDimensions(feedbackTexture, 0);
@@ -159,3 +184,6 @@ fn main(
 
 
 }
+`;
+
+export default circleblurCompute;
