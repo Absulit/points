@@ -1,3 +1,5 @@
+const slimeCompute = /*wgsl*/`
+
 var<private> rand_seed : vec2<f32>;
 
 fn rand() -> f32 {
@@ -115,13 +117,14 @@ fn fusin(speed: f32) -> f32{
 }
 
 //'function', 'private', 'push_constant', 'storage', 'uniform', 'workgroup'
-@group(0) @binding(0) var<storage, read_write> layer0: Points;
+@group(0) @binding(0) var <storage, read_write> layer0: Points;
 @group(0) @binding(1) var feedbackSampler: sampler;
 @group(0) @binding(2) var feedbackTexture: texture_2d<f32>;
 @group(0) @binding(3) var outputTex : texture_storage_2d<rgba8unorm, write>;
 @group(0) @binding(4) var <storage, read_write> variables: Variables;
 @group(0) @binding(5) var <storage, read_write> particles: Particles;
-@group(0) @binding(6) var<uniform> params: Params;
+@group(0) @binding(6) var <uniform> params: Params;
+@group(0) @binding(7) var <storage, read_write> particles2: Particles;
 
 struct Particle{
     x: f32,
@@ -151,6 +154,8 @@ fn main(
     var l0 = layer0.points[0];
 
     let pc: ptr<storage, f32, read_write> = &variables.particlesCreated;
+
+    let particle2 = particles2.items[0];
 
     if((*pc) == 0){
         for(var k:u32; k<numParticles; k++){
@@ -271,8 +276,11 @@ fn main(
         var ixy = vec2<i32>( i32((*particle).x), i32((*particle).y) );
         rgba = textureLoad(feedbackTexture, ixy,  0).rgba;
         textureStore(outputTex, uxy, vec4<f32>(1,1,1,1) + rgba);
-        
+
     }
 
-
 }
+`;
+
+export default slimeCompute;
+

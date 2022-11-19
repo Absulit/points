@@ -21,6 +21,8 @@ import planetsblur2Compute from './shaders/planetsblur2.compute.js';
 import planetsblur2Frag from './shaders/planetsblur2.frag.js';
 import reactiondiffusionCompute from './shaders/reactiondiffusion.compute.js';
 import reactiondiffusionFrag from './shaders/reactiondiffusion.frag.js';
+import slimeCompute from './shaders/slime.compute.js';
+import slimeFrag from './shaders/slime.frag.js';
 import test1Frag from './shaders/test1.frag.js';
 
 /***************/
