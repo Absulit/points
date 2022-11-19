@@ -8,14 +8,12 @@ struct Particle{
 struct Params {
     utime: f32,
     screenWidth:f32,
-    screenHeight:f32
-}
-
-struct ScreenSize {
-    numRows: f32,
-    numColumns: f32,
-    uTime: f32,
-    notFilled: u32,
+    screenHeight:f32,
+    mouseX: f32,
+    mouseY: f32,
+    sliderA: f32,
+    sliderB: f32,
+    sliderC: f32
 }
 
 fn fnusin(speed: f32) -> f32{

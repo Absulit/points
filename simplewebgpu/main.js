@@ -15,6 +15,8 @@ import planets2Compute from './shaders/planets2.compute.js';
 import planets2Frag from './shaders/planets2.frag.js';
 import planets3Compute from './shaders/planets3.compute.js';
 import planets3Frag from './shaders/planets3.frag.js';
+import planetsblurCompute from './shaders/planetsblur.compute.js';
+import planetsblurFrag from './shaders/planetsblur.frag.js';
 import reactiondiffusionCompute from './shaders/reactiondiffusion.compute.js';
 import reactiondiffusionFrag from './shaders/reactiondiffusion.frag.js';
 import test1Frag from './shaders/test1.frag.js';
