@@ -1,26 +1,12 @@
+import defaultStructs from './defaultStructs.js';
+
 const defaultVert = /*wgsl*/`
 
-
+${defaultStructs}
 
 struct Particle{
     x: f32,
     y: f32
-}
-
-struct Params {
-    utime: f32,
-    screenWidth:f32,
-    screenHeight:f32,
-    mouseX: f32,
-    mouseY: f32
-}
-
-struct Fragment {
-    @builtin(position) Position: vec4<f32>,
-    @location(0) Color: vec4<f32>,
-    @location(1) uv: vec2<f32>,
-    @location(2) ratio: f32,
-    @location(3) mouse: vec2<f32>
 }
 
 @group(0) @binding(0) var<uniform> params: Params;
