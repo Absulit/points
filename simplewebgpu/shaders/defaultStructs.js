@@ -48,6 +48,10 @@ struct Point {
     vertex5: Vertex,
 }
 
+struct Points {
+    points: array<Point>
+}
+
 `;
 
 export default defaultStructs;
