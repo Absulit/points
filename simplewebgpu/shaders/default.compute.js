@@ -5,9 +5,6 @@ const defaultCompute = /*wgsl*/`
 
 ${defaultStructs}
 
-struct Points {
-    points: array<Point>
-}
 struct Variables{
     testValue: f32
 }

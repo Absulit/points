@@ -1,21 +1,13 @@
+import defaultStructs from './defaultStructs.js';
+
 const demo6_textureFrag = /*wgsl*/`
 
-struct Params {
-    utime: f32,
-    screenWidth:f32,
-    screenHeight:f32,
-    mouseX: f32,
-    mouseY: f32,
-    sliderA: f32,
-    sliderB: f32,
-    sliderC: f32
-}
+${defaultStructs}
 
 struct Particle{
     x: f32,
     y: f32
 }
-
 
 @group(0) @binding(0) var<uniform> params: Params;
 @group(0) @binding(1) var<storage> particles: array<Particle>;
@@ -36,7 +28,6 @@ fn main(@location(0) Color: vec4<f32>, @location(1) uv: vec2<f32>) -> @location(
 
     let texColor = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1));
     let texColorCompute = textureSample(computeTexture, feedbackSampler, uv * vec2(1,-1));
-
 
     return Color;
 }
