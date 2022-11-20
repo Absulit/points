@@ -1,5 +1,6 @@
 import { clearAlpha, clearMix, fnusin, fusin, getColorsAround, polar, rand, soften8 } from './defaultFunctions.js';
 import defaultStructs from './defaultStructs.js';
+import { PI } from './defaultConstants.js';
 
 const reactiondiffusionCompute = /*wgsl*/`
 
@@ -10,6 +11,16 @@ struct Variables{
     testValue: f32,
     squaresCreated: f32
 }
+
+struct Chemical{
+    a: f32,
+    b: f32
+}
+
+struct Particles{
+    chemicals: array<Chemical>
+}
+
 
 ${rand}
 ${clearMix}
@@ -90,35 +101,11 @@ fn laplaceB(position:vec2<i32>, chemical:Chemical) -> f32{
     return sum;
 }
 
-//'function', 'private', 'push_constant', 'storage', 'uniform', 'workgroup'
-@group(0) @binding(0) var<storage, read_write> layer0: Points;
-@group(0) @binding(1) var feedbackSampler: sampler;
-@group(0) @binding(2) var feedbackTexture: texture_2d<f32>;
-@group(0) @binding(3) var outputTex : texture_storage_2d<rgba8unorm, write>;
-@group(0) @binding(4) var <storage, read_write> variables: Variables;
-@group(0) @binding(5) var <storage, read_write> particles: Particles;
-@group(0) @binding(6) var<uniform> params: Params;
-@group(0) @binding(7) var <storage, read_write> particles2: Particles;
-
-struct Chemical{
-    a: f32,
-    b: f32
-}
-
-struct Particles{
-    chemicals: array<Chemical>
-}
-
 var<private> numParticles:u32 = 800*800;
-//var<workgroup> particles: array<Planet, 8>;
-//var<private> particlesCreated = false;
 
+${PI}
 const workgroupSize = 8;
-const PI = 3.14159265;
-const MARGIN = 20;
 const SQUARESIDE = 400;
-
-const RATIO = 1.;
 
 // .1,.5,.055,.062 // original
 // .1,.5,.022,.050 // scary
@@ -134,6 +121,16 @@ const DA = 1.; //1.
 const DB = .5; //.5
 const FEED = .055; // .055
 const K = .062; //.062
+
+//'function', 'private', 'push_constant', 'storage', 'uniform', 'workgroup'
+@group(0) @binding(0) var<storage, read_write> layer0: Points;
+@group(0) @binding(1) var feedbackSampler: sampler;
+@group(0) @binding(2) var feedbackTexture: texture_2d<f32>;
+@group(0) @binding(3) var outputTex : texture_storage_2d<rgba8unorm, write>;
+@group(0) @binding(4) var <storage, read_write> variables: Variables;
+@group(0) @binding(5) var <storage, read_write> particles: Particles;
+@group(0) @binding(6) var<uniform> params: Params;
+@group(0) @binding(7) var <storage, read_write> particles2: Particles;
 
 @compute @workgroup_size(workgroupSize,workgroupSize,1)
 fn main(

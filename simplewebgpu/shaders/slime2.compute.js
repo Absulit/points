@@ -1,3 +1,4 @@
+import { PI } from './defaultConstants.js';
 import { clearMix, getColorsAround, polar, rand, soften8 } from './defaultFunctions.js';
 import defaultStructs from './defaultStructs.js';
 
@@ -8,6 +9,16 @@ ${defaultStructs}
 struct Variables{
     particlesCreated: f32,
     testValue: f32
+}
+
+struct Particle{
+    position: vec2<f32>,
+    angle: f32,
+    distance: f32
+}
+
+struct Particles{
+    items: array<Particle>
 }
 
 ${rand}
@@ -21,15 +32,12 @@ fn sense(particle:Particle, sensorAngleOffset:f32){
     let sensorDir = vec2<f32>(cos(sensorAngle),sin(sensorAngle));
     let sensorCenter = particle.position + sensorDir * sensorAngleOffset;
     let sum = 0.;
-
 }
 
-// fn fnusin(speed: f32) -> f32{
-//     return sin(params.utime * speed) * .5;
-// }
-// fn fusin(speed: f32) -> f32{
-//     return sin(params.utime * speed);
-// }
+var<private> numParticles:u32 = 500;
+${PI}
+const workgroupSize = 8;
+const MARGIN = 20;
 
 //'function', 'private', 'push_constant', 'storage', 'uniform', 'workgroup'
 @group(0) @binding(0) var <storage, read_write> layer0: Points;
@@ -41,24 +49,6 @@ fn sense(particle:Particle, sensorAngleOffset:f32){
 @group(0) @binding(6) var <uniform> params: Params;
 @group(0) @binding(7) var <storage, read_write> particles2: Particles;
 
-struct Particle{
-    position: vec2<f32>,
-    angle: f32,
-    distance: f32
-}
-
-struct Particles{
-    items: array<Particle>
-}
-
-var<private> numParticles:u32 = 500;
-//var<workgroup> particles: array<Planet, 8>;
-//var<private> particlesCreated = false;
-
-const workgroupSize = 8;
-const PI = 3.14159265;
-const MARGIN = 20;
-
 @compute @workgroup_size(workgroupSize,workgroupSize,1)
 fn main(
     @builtin(global_invocation_id) GlobalId: vec3<u32>,
@@ -66,9 +56,7 @@ fn main(
     @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
 ) {
     var l0 = layer0.points[0];
-
     let item2 = particles2.items[0];
-
     let pc: ptr<storage, f32, read_write> = &variables.particlesCreated;
 
     if((*pc) == 0){
@@ -78,9 +66,6 @@ fn main(
 
         (*pc) = 1;
     }
-
-
-
 
     //let dims : vec2<u32> = textureDimensions(feedbackTexture, 0);
     //let rgb = textureSampleLevel(feedbackTexture, feedbackSampler, (vec2<f32>(0) + vec2<f32>(0.25, 0.25)) / vec2<f32>(dims),0.0).rgb;
@@ -118,10 +103,7 @@ fn main(
 
 
             textureStore(outputTex, vec2<i32>(ix,iy), rgba * .01);
-
         }
-
-
     }
 
     let moveSpeed = .01;
