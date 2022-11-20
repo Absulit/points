@@ -1,54 +1,9 @@
+import { clearMix, fnusin, getColorsAround, sftn, soften8 } from './defaultFunctions.js';
+import defaultStructs from './defaultStructs.js';
+
 const blur1Compute = /*wgsl*/`
-var<private> rand_seed : vec2<f32>;
 
-fn rand() -> f32 {
-    rand_seed.x = fract(cos(dot(rand_seed, vec2<f32>(23.14077926, 232.61690225))) * 136.8168);
-    rand_seed.y = fract(cos(dot(rand_seed, vec2<f32>(54.47856553, 345.84153136))) * 534.7645);
-    return rand_seed.y;
-}
-
-fn rand2(co: vec2<f32>) -> f32 {
-     return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
-}
-
-struct Params {
-    utime: f32,
-    screenWidth:f32,
-    screenHeight:f32
-}
-
-struct Color{
-    r: f32,
-    g: f32,
-    b: f32,
-    a: f32
-}
-
-struct Position{
-    x: f32,
-    y: f32,
-    z: f32,
-    w: f32
-}
-
-struct Vertex {
-    position: Position,
-    color: Color,
-    uv: array<f32,2>,
-}
-
-struct Point {
-    vertex0: Vertex,
-    vertex1: Vertex,
-    vertex2: Vertex,
-    vertex3: Vertex,
-    vertex4: Vertex,
-    vertex5: Vertex,
-}
-
-struct Points {
-    points: array<Point>
-}
+${defaultStructs}
 
 struct Variables{
     particlesCreated: f32,
@@ -64,89 +19,13 @@ struct Particles{
     chemicals: array<Chemical>
 }
 
-const clearMixlevel = 100.1;//1.01
-fn clearMix(color:vec4<f32>) -> vec4<f32> {
-    let rr = color.r / clearMixlevel;
-    let gr = color.g / clearMixlevel;
-    let br = color.b / clearMixlevel;
-    return vec4<f32>(rr, gr, br, color.a);
-}
+${clearMix}
+${getColorsAround}
+${soften8}
+${sftn}
+${fnusin}
 
-fn polar(distance: f32, radians: f32) -> vec2<f32> {
-    return vec2<f32>(distance * cos(radians), distance * sin(radians));
-}
-
-fn getColorsAround(position: vec2<i32>, distance: i32) -> array<  vec4<f32>, 8  > {
-    return array< vec4<f32>,8 >(
-        textureLoad(feedbackTexture, vec2<i32>( position.x-distance, position.y-distance  ),  0).rgba,
-        textureLoad(feedbackTexture, vec2<i32>( position.x, position.y-distance  ),  0).rgba,
-        textureLoad(feedbackTexture, vec2<i32>( position.x+distance, position.y-distance  ),  0).rgba,
-        textureLoad(feedbackTexture, vec2<i32>( position.x-distance, position.y  ),  0).rgba,
-        textureLoad(feedbackTexture, vec2<i32>( position.x+distance, position.y  ),  0).rgba,
-        textureLoad(feedbackTexture, vec2<i32>( position.x-distance, position.y+distance  ),  0).rgba,
-        textureLoad(feedbackTexture, vec2<i32>( position.x, position.y+distance  ),  0).rgba,
-        textureLoad(feedbackTexture, vec2<i32>( position.x+distance, position.y+distance  ),  0).rgba,
-    );
-}
-
-fn soften8(color:vec4<f32>, colorsAround:array<vec4<f32>, 8>, colorPower:f32) -> vec4<f32> {
-    var newColor:vec4<f32> = color;
-    for (var indexColors = 0u; indexColors < 8u; indexColors++) {
-        var colorAround = colorsAround[indexColors];
-        colorAround.r = (color.r + colorAround.r * colorPower) / (colorPower + 1.);
-        colorAround.g = (color.g + colorAround.g * colorPower) / (colorPower + 1.);
-        colorAround.b = (color.b + colorAround.b * colorPower) / (colorPower + 1.);
-        colorAround.a = (color.a + colorAround.a * colorPower) / (colorPower + 1.);
-
-        newColor += colorAround;
-    }
-    return newColor / 5;
-}
-
-fn sftn(position: vec2<i32>, distance: i32, colorPower:f32){
-
-    var color = textureLoad(feedbackTexture, position,  0).rgba;
-    var newColor:vec4<f32> = vec4<f32>();
-    var positions = array< vec2<i32>, 8 >(
-        vec2<i32>( position.x-distance, position.y-distance  ),
-        vec2<i32>( position.x, position.y-distance  ),
-        vec2<i32>( position.x+distance, position.y-distance  ),
-        vec2<i32>( position.x-distance, position.y  ),
-        vec2<i32>( position.x+distance, position.y  ),
-        vec2<i32>( position.x-distance, position.y+distance  ),
-        vec2<i32>( position.x, position.y+distance  ),
-        vec2<i32>( position.x+distance, position.y+distance  )
-    );
-    let colorsAround = array< vec4<f32>,8 >(
-        textureLoad(feedbackTexture, positions[0],  0).rgba,
-        textureLoad(feedbackTexture, positions[1],  0).rgba,
-        textureLoad(feedbackTexture, positions[2],  0).rgba,
-        textureLoad(feedbackTexture, positions[3],  0).rgba,
-        textureLoad(feedbackTexture, positions[4],  0).rgba,
-        textureLoad(feedbackTexture, positions[5],  0).rgba,
-        textureLoad(feedbackTexture, positions[6],  0).rgba,
-        textureLoad(feedbackTexture, positions[7],  0).rgba,
-    );
-
-    for (var indexColors = 0u; indexColors < 8u; indexColors++) {
-        var colorAround = colorsAround[indexColors];
-        colorAround.r = (color.r + colorAround.r * colorPower) / (colorPower + 1.);
-        colorAround.g = (color.g + colorAround.g * colorPower) / (colorPower + 1.);
-        colorAround.b = (color.b + colorAround.b * colorPower) / (colorPower + 1.);
-        colorAround.a = (color.a + colorAround.a * colorPower) / (colorPower + 1.);
-
-        let uPosition = vec2<u32>( u32(positions[indexColors].x), u32(positions[indexColors].y));
-        textureStore(outputTex, uPosition, colorAround);
-    }
-
-}
-
-fn fnusin(speed: f32) -> f32{
-    return sin(params.utime * speed) * .5;
-}
-fn fusin(speed: f32) -> f32{
-    return sin(params.utime * speed);
-}
+const workgroupSize = 8;
 
 //'function', 'private', 'push_constant', 'storage', 'uniform', 'workgroup'
 @group(0) @binding(0) var <storage, read_write> layer0: Points;
@@ -158,24 +37,7 @@ fn fusin(speed: f32) -> f32{
 @group(0) @binding(6) var <uniform> params: Params;
 @group(0) @binding(7) var <storage, read_write> particles2: Particles;
 
-// struct Particle{
-//     x: f32,
-//     y: f32,
-//     angle: f32,
-//     distance: f32
-// }
 
-// struct Particles{
-//     items: array<Particle>
-// }
-
-var<private> numParticles:u32 = 500;
-//var<workgroup> particles: array<Planet, 8>;
-//var<private> particlesCreated = false;
-
-const workgroupSize = 8;
-const PI = 3.14159265;
-const MARGIN = 20;
 
 @compute @workgroup_size(workgroupSize,workgroupSize,1)
 fn main(
@@ -223,7 +85,7 @@ fn main(
             rgba = soften8(rgba, colorsAround, 1.);
 
             //rgba = vec4<f32>(1,0,0,1);
-            //rgba = clearMix(rgba);
+            //rgba = clearMix(rgba, 1.1);
             //sftn(vec2<i32>(ix,iy), 1, 1);
 
             textureStore(outputTex, vec2<u32>(ux,uy), rgba);
@@ -232,7 +94,7 @@ fn main(
 
 
     }
-    
+
 
      var rgba = textureSampleLevel(feedbackTexture, feedbackSampler, vec2<f32>(400,400),  0.0);
     // if(rgba.r > 0){
@@ -240,7 +102,7 @@ fn main(
     //     textureStore(outputTex, vec2<u32>(200,200), vec4<f32>(1,0,0,1));
     // }
 
-   
+
 
 }
 `;
