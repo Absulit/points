@@ -1,97 +1,20 @@
+import { clearMix, getColorsAround, polar, rand, soften8 } from './defaultFunctions.js';
+import defaultStructs from './defaultStructs.js';
+
 const slime2Compute = /*wgsl*/`
 
-var<private> rand_seed : vec2<f32>;
-
-fn rand() -> f32 {
-    rand_seed.x = fract(cos(dot(rand_seed, vec2<f32>(23.14077926, 232.61690225))) * 136.8168);
-    rand_seed.y = fract(cos(dot(rand_seed, vec2<f32>(54.47856553, 345.84153136))) * 534.7645);
-    return rand_seed.y;
-}
-
-fn rand2(co: vec2<f32>) -> f32 {
-     return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
-}
-
-struct Params {
-    utime: f32,
-    screenWidth:f32,
-    screenHeight:f32
-}
-
-struct Color{
-    r: f32,
-    g: f32,
-    b: f32,
-    a: f32
-}
-
-struct Position{
-    x: f32,
-    y: f32,
-    z: f32,
-    w: f32
-}
-
-struct Vertex {
-    position: Position,
-    color: Color,
-    uv: array<f32,2>,
-}
-
-struct Point {
-    vertex0: Vertex,
-    vertex1: Vertex,
-    vertex2: Vertex,
-    vertex3: Vertex,
-    vertex4: Vertex,
-    vertex5: Vertex,
-}
-
-struct Points {
-    points: array<Point>
-}
+${defaultStructs}
 
 struct Variables{
     particlesCreated: f32,
     testValue: f32
 }
 
-const clearMixlevel = 1.01;//1.01
-fn clearMix(color:vec4<f32>) -> vec4<f32> {
-    let rr = color.r / clearMixlevel;
-    let gr = color.g / clearMixlevel;
-    let br = color.b / clearMixlevel;
-    return vec4<f32>(rr, gr, br, color.a);
-}
-
-fn polar(distance: f32, radians: f32) -> vec2<f32> {
-    return vec2<f32>(distance * cos(radians), distance * sin(radians));
-}
-
-fn getColorsAround(position: vec2<f32>, distance: f32) -> array<  vec4<f32>, 8  > {
-    return array< vec4<f32>,8 >(
-        textureSampleLevel(feedbackTexture, feedbackSampler, vec2<f32>( position.x-distance, position.y-distance  ),  0.0).rgba,
-        textureSampleLevel(feedbackTexture, feedbackSampler, vec2<f32>( position.x, position.y-distance  ),  0.0).rgba,
-        textureSampleLevel(feedbackTexture, feedbackSampler, vec2<f32>( position.x+distance, position.y-distance  ),  0.0).rgba,
-        textureSampleLevel(feedbackTexture, feedbackSampler, vec2<f32>( position.x-distance, position.y  ),  0.0).rgba,
-        textureSampleLevel(feedbackTexture, feedbackSampler, vec2<f32>( position.x+distance, position.y  ),  0.0).rgba,
-        textureSampleLevel(feedbackTexture, feedbackSampler, vec2<f32>( position.x-distance, position.y+distance  ),  0.0).rgba,
-        textureSampleLevel(feedbackTexture, feedbackSampler, vec2<f32>( position.x, position.y+distance  ),  0.0).rgba,
-        textureSampleLevel(feedbackTexture, feedbackSampler, vec2<f32>( position.x+distance, position.y+distance  ),  0.0).rgba,
-    );
-}
-
-fn soften8(color:vec4<f32>, colorsAround:array<vec4<f32>, 8>, colorPower:f32) -> vec4<f32> {
-    var newColor:vec4<f32> = color;
-    for (var indexColors = 0u; indexColors < 8u; indexColors++) {
-        let colorAround = colorsAround[indexColors];
-        newColor.r = (newColor.r + colorAround.r * colorPower) / (colorPower + 1.);
-        newColor.g = (newColor.g + colorAround.g * colorPower) / (colorPower + 1.);
-        newColor.b = (newColor.b + colorAround.b * colorPower) / (colorPower + 1.);
-        newColor.a = (newColor.a + colorAround.a * colorPower) / (colorPower + 1.);
-    }
-    return newColor;
-}
+${rand}
+${clearMix}
+${polar}
+${getColorsAround}
+${soften8}
 
 fn sense(particle:Particle, sensorAngleOffset:f32){
     let sensorAngle = particle.angle + sensorAngleOffset;
@@ -175,24 +98,26 @@ fn main(
     for (var indexColumns:i32 = 0; indexColumns < numColumnsPiece; indexColumns++) {
         let x:f32 = f32(WorkGroupID.x) * f32(numColumnsPiece) + f32(indexColumns);
         let ux = u32(x);
+        let ix = i32(x);
         let nx = x / numColumns;
         for (var indexRows:i32 = 0; indexRows < numRowsPiece; indexRows++) {
 
             let y:f32 = f32(WorkGroupID.y) * f32(numRowsPiece) + f32(indexRows);
             let uy = u32(y);
+            let iy = i32(y);
             let ny = y / numRows;
 
             //let index:f32 = y + (x * screenSize.numColumns);
             var rgba = textureSampleLevel(feedbackTexture, feedbackSampler, vec2<f32>(x,y),  0.0).rgba;
 
-            let colorsAround = getColorsAround(vec2<f32>(x,y), 1.);
+            let colorsAround = getColorsAround(vec2<i32>(ix,iy), 1);
             rgba = soften8(rgba, colorsAround, 1.);
 
             rgba = vec4<f32>(1,0,0,1);
-            rgba = clearMix(rgba);
+            rgba = clearMix(rgba, 1.01);
 
 
-            textureStore(outputTex, vec2<u32>(ux,uy), rgba * .01);
+            textureStore(outputTex, vec2<i32>(ix,iy), rgba * .01);
 
         }
 

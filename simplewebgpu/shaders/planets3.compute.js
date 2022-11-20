@@ -1,79 +1,20 @@
+import defaultStructs from './defaultStructs.js';
+import { clearMix, polar, rand } from './defaultFunctions.js';
+
 const planets3Compute = /*wgsl*/`
 
-var<private> rand_seed : vec2<f32>;
+${defaultStructs}
 
-fn rand() -> f32 {
-    rand_seed.x = fract(cos(dot(rand_seed, vec2<f32>(23.14077926, 232.61690225))) * 136.8168);
-    rand_seed.y = fract(cos(dot(rand_seed, vec2<f32>(54.47856553, 345.84153136))) * 534.7645);
-    return rand_seed.y;
-}
-
-fn rand2(co: vec2<f32>) -> f32 {
-     return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
-}
-
-struct Params {
-    utime: f32,
-    screenWidth:f32,
-    screenHeight:f32
-}
-
-struct Color{
-    r: f32,
-    g: f32,
-    b: f32,
-    a: f32
-}
-
-struct Position{
-    x: f32,
-    y: f32,
-    z: f32,
-    w: f32
-}
-
-struct Vertex {
-    position: Position,
-    color: Color,
-    uv: array<f32,2>,
-}
-
-struct Point {
-    vertex0: Vertex,
-    vertex1: Vertex,
-    vertex2: Vertex,
-    vertex3: Vertex,
-    vertex4: Vertex,
-    vertex5: Vertex,
-}
-
-struct Points {
-    points: array<Point>
-}
 
 struct Variables{
     particlesCreated: f32,
     testValue: f32
 }
 
-const clearMixlevel = 1.01;//1.01
-fn clearMix(color:vec4<f32>) -> vec4<f32> {
-    let rr = color.r / clearMixlevel;
-    let gr = color.g / clearMixlevel;
-    let br = color.b / clearMixlevel;
-    return vec4<f32>(rr, gr, br, color.a);
-}
+${rand}
+${clearMix}
+${polar}
 
-fn polar(distance: f32, radians: f32) -> vec2<f32> {
-    return vec2<f32>(distance * cos(radians), distance * sin(radians));
-}
-
-// fn fnusin(speed: f32) -> f32{
-//     return sin(params.utime * speed) * .5;
-// }
-// fn fusin(speed: f32) -> f32{
-//     return sin(params.utime * speed);
-// }
 
 //'function', 'private', 'push_constant', 'storage', 'uniform', 'workgroup'
 @group(0) @binding(0) var <storage, read_write> layer0: Points;
@@ -152,7 +93,7 @@ fn main(
             var rgba = textureSampleLevel(feedbackTexture, feedbackSampler, vec2<f32>(x,y),  0.0).rgba;
 
             //rgba += vec4<f32>(1.,0.,0.,.5);
-            //rgba = clearMix(rgba);
+            //rgba = clearMix(rgba, 1.01);
 
             textureStore(outputTex, vec2<u32>(ux,uy), rgba);
 

@@ -1,58 +1,9 @@
+import { clearAlpha, clearMix, fnusin, fusin, getColorsAround, polar, rand, soften8 } from './defaultFunctions.js';
+import defaultStructs from './defaultStructs.js';
+
 const reactiondiffusionCompute = /*wgsl*/`
-var<private> rand_seed : vec2<f32>;
 
-fn rand() -> f32 {
-    rand_seed.x = fract(cos(dot(rand_seed, vec2<f32>(23.14077926, 232.61690225))) * 136.8168);
-    rand_seed.y = fract(cos(dot(rand_seed, vec2<f32>(54.47856553, 345.84153136))) * 534.7645);
-    return rand_seed.y;
-}
-
-fn rand2(co: vec2<f32>) -> f32 {
-     return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
-}
-
-struct Params {
-    utime: f32,
-    screenWidth:f32,
-    screenHeight:f32,
-    mouseX: f32,
-    mouseY: f32,
-    sliderA: f32,
-    sliderB: f32,
-    sliderC: f32
-}
-struct Color{
-    r: f32,
-    g: f32,
-    b: f32,
-    a: f32
-}
-
-struct Position{
-    x: f32,
-    y: f32,
-    z: f32,
-    w: f32
-}
-
-struct Vertex {
-    position: Position,
-    color: Color,
-    uv: array<f32,2>,
-}
-
-struct Point {
-    vertex0: Vertex,
-    vertex1: Vertex,
-    vertex2: Vertex,
-    vertex3: Vertex,
-    vertex4: Vertex,
-    vertex5: Vertex,
-}
-
-struct Points {
-    points: array<Point>
-}
+${defaultStructs}
 
 struct Variables{
     particlesCreated: f32,
@@ -60,61 +11,15 @@ struct Variables{
     squaresCreated: f32
 }
 
-//const clearMixlevel = 1.81;//1.01
-fn clearMix(color:vec4<f32>, level:f32) -> vec4<f32> {
-    let rr = color.r / level;
-    let gr = color.g / level;
-    let br = color.b / level;
-    var ar = color.a / level;
-    if(ar < .09){
-        ar = 0.;
-    }
-    return vec4<f32>(rr, gr, br, ar);
-}
+${rand}
+${clearMix}
+${clearAlpha}
+${polar}
+${getColorsAround}
+${soften8}
+${fnusin}
+${fusin}
 
-// level 2.
-fn clearAlpha(currentColor:vec4<f32>, level:f32) -> vec4<f32>{
-    let ar = currentColor.a / level;
-    return vec4<f32>(currentColor.rgb, ar);
-}
-
-fn polar(distance: f32, radians: f32) -> vec2<f32> {
-    return vec2<f32>(distance * cos(radians), distance * sin(radians));
-}
-
-fn getColorsAround(position: vec2<i32>, distance: i32) -> array<  vec4<f32>, 8  > {
-    return array< vec4<f32>,8 >(
-        textureLoad(feedbackTexture, vec2<i32>( position.x-distance, position.y-distance  ),  0).rgba,
-        textureLoad(feedbackTexture, vec2<i32>( position.x, position.y-distance  ),  0).rgba,
-        textureLoad(feedbackTexture, vec2<i32>( position.x+distance, position.y-distance  ),  0).rgba,
-        textureLoad(feedbackTexture, vec2<i32>( position.x-distance, position.y  ),  0).rgba,
-        textureLoad(feedbackTexture, vec2<i32>( position.x+distance, position.y  ),  0).rgba,
-        textureLoad(feedbackTexture, vec2<i32>( position.x-distance, position.y+distance  ),  0).rgba,
-        textureLoad(feedbackTexture, vec2<i32>( position.x, position.y+distance  ),  0).rgba,
-        textureLoad(feedbackTexture, vec2<i32>( position.x+distance, position.y+distance  ),  0).rgba,
-    );
-}
-
-fn soften8(color:vec4<f32>, colorsAround:array<vec4<f32>, 8>, colorPower:f32) -> vec4<f32> {
-    var newColor:vec4<f32> = color;
-    for (var indexColors = 0u; indexColors < 8u; indexColors++) {
-        var colorAround = colorsAround[indexColors];
-        colorAround.r = (color.r + colorAround.r * colorPower) / (colorPower + 1.);
-        colorAround.g = (color.g + colorAround.g * colorPower) / (colorPower + 1.);
-        colorAround.b = (color.b + colorAround.b * colorPower) / (colorPower + 1.);
-        colorAround.a = (color.a + colorAround.a * colorPower) / (colorPower + 1.);
-
-        newColor += colorAround;
-    }
-    return newColor / 5;
-}
-
-fn fnusin(speed: f32) -> f32{
-    return sin(params.utime * speed) * .5;
-}
-fn fusin(speed: f32) -> f32{
-    return sin(params.utime * speed);
-}
 
 fn getPointsAround(position: vec2<i32>, distance: i32) -> array<  Chemical, 8  >{
     let index0 = (position.x-distance) + ( (position.y-distance) * 800);

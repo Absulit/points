@@ -1,58 +1,18 @@
+import { fusin, RGBAFromHSV } from './defaultFunctions.js';
+import defaultStructs from './defaultStructs.js';
+
 const reactiondiffusionFrag = /*wgsl */`
+
+${defaultStructs}
+
 struct Particle{
     x: f32,
     y: f32
 }
 
-struct Params {
-    utime: f32,
-    screenWidth:f32,
-    screenHeight:f32,
-    mouseX: f32,
-    mouseY: f32,
-    sliderA: f32,
-    sliderB: f32,
-    sliderC: f32
-}
+${fusin}
+${RGBAFromHSV}
 
-struct ScreenSize {
-    numRows: f32,
-    numColumns: f32,
-    uTime: f32,
-    notFilled: u32,
-}
-
-fn fnusin(speed: f32) -> f32{
-    return sin(params.utime * speed) * .5;
-}
-fn fusin(speed: f32) -> f32{
-    return sin(params.utime * speed);
-}
-
-fn sdfSegment(  p:vec2<f32>, a:vec2<f32>, b:vec2<f32> ) -> f32{
-    let pa = p-a;
-    let ba = b-a;
-    let h:f32 = clamp( dot(pa,ba)/dot(ba,ba), 0.0, 1.0 );
-    return length( pa - ba*h );
-}
-
-fn line2(uv:vec2<f32>, p1:vec2<f32>, p2:vec2<f32>, pixelStroke:f32)->f32{
-    let d = sdfSegment(uv, p1, p2);
-    var value = 1.0;
-    if(d > pixelStroke/800.){
-        value = 0.;
-    }
-    return value;
-}
-
-fn hsvAux(h:f32, s:f32, v:f32, n:f32) -> f32 {
-    let k:f32 = (n + h * 6.) % 6.;
-    return v - v * s * max(      min(min(k, 4. - k), 1.), 0.);
-};
-
-fn RGBAFromHSV(h:f32, s:f32, v:f32) ->  vec4<f32>{
-    return vec4<f32>(hsvAux(h, s, v, 5), hsvAux(h, s, v, 3), hsvAux(h, s, v, 1), 1);
-}
 
 @group(0) @binding(0) var<uniform> params: Params;
 @group(0) @binding(1) var<storage> particles: array<Particle>;
@@ -103,8 +63,6 @@ fn main(
     let a = (1 - texColorCompute);
     var finalColor = RGBAFromHSV(a.r - .732, 1, a.r);
     //var finalColor = a;
-
-
 
     return finalColor;
 }

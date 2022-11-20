@@ -131,12 +131,27 @@ fn rand2(co: vec2<f32>) -> f32 {
 }
 `;
 
-// fn sdfSegment(  p:vec2<f32>, a:vec2<f32>, b:vec2<f32> ) -> f32{
-//     let pa = p-a;
-//     let ba = b-a;
-//     let h:f32 = clamp( dot(pa,ba)/dot(ba,ba), 0.0, 1.0 );
-//     return length( pa - ba*h );
-// }
+export const sdfSegment = /*wgsl*/`;
+fn sdfSegment(  p:vec2<f32>, a:vec2<f32>, b:vec2<f32> ) -> f32{
+    let pa = p-a;
+    let ba = b-a;
+    let h:f32 = clamp( dot(pa,ba)/dot(ba,ba), 0.0, 1.0 );
+    return length( pa - ba*h );
+}
+`;
+
+
+export const RGBAFromHSV = /*wgsl*/`;
+fn hsvAux(h:f32, s:f32, v:f32, n:f32) -> f32 {
+    let k:f32 = (n + h * 6.) % 6.;
+    return v - v * s * max(      min(min(k, 4. - k), 1.), 0.);
+};
+
+fn RGBAFromHSV(h:f32, s:f32, v:f32) ->  vec4<f32>{
+    return vec4<f32>(hsvAux(h, s, v, 5), hsvAux(h, s, v, 3), hsvAux(h, s, v, 1), 1);
+}
+`;
+
 
 // fn line2(uv:vec2<f32>, p1:vec2<f32>, p2:vec2<f32>, pixelStroke:f32)->f32{
 //     let d = sdfSegment(uv, p1, p2);
