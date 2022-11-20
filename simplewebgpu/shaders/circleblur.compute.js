@@ -1,47 +1,11 @@
+import { clearMix } from './defaultFunctions.js';
+import defaultStructs from './defaultStructs.js';
+
 const circleblurCompute = /*wgsl*/`
 
-struct Params {
-    utime: f32,
-    screenWidth:f32,
-    screenHeight:f32,
-    mouseX: f32,
-    mouseY: f32,
-    sliderA: f32,
-    sliderB: f32,
-    sliderC: f32
-}
+${defaultStructs}
 
-struct Color{
-    r: f32,
-    g: f32,
-    b: f32,
-    a: f32
-}
 
-struct Position{
-    x: f32,
-    y: f32,
-    z: f32,
-    w: f32
-}
-
-struct Vertex {
-    position: Position,
-    color: Color,
-    uv: array<f32,2>,
-}
-
-struct Point {
-    vertex0: Vertex,
-    vertex1: Vertex,
-    vertex2: Vertex,
-    vertex3: Vertex,
-    vertex4: Vertex,
-    vertex5: Vertex,
-}
-struct Points {
-    points: array<Point>
-}
 struct Variables{
     testValue: f32
 }
@@ -54,13 +18,12 @@ struct Chemical{
 struct Particles{
     chemicals: array<Chemical>
 }
-const clearMixlevel = 1.01;//1.01
-fn clearMix(color:vec4<f32>) -> vec4<f32> {
-    let rr = color.r / clearMixlevel;
-    let gr = color.g / clearMixlevel;
-    let br = color.b / clearMixlevel;
-    return vec4<f32>(rr, gr, br, color.a);
-}
+
+${clearMix}
+
+var<workgroup> tile : array<array<vec3<f32>, 128>, 4>;
+
+const workgroupSize = 8;
 
 //'function', 'private', 'push_constant', 'storage', 'uniform', 'workgroup'
 @group(0) @binding(0) var<storage, read_write> layer0: Points;
@@ -72,9 +35,6 @@ fn clearMix(color:vec4<f32>) -> vec4<f32> {
 @group(0) @binding(6) var<uniform> params: Params;
 @group(0) @binding(7) var <storage, read_write> particles2: Particles;
 
-var<workgroup> tile : array<array<vec3<f32>, 128>, 4>;
-
-const workgroupSize = 8;
 
 @compute @workgroup_size(workgroupSize,workgroupSize,1)
 fn main(
@@ -172,7 +132,7 @@ fn main(
             var rgba = textureSampleLevel(feedbackTexture,feedbackSampler, vec2<f32>(x,y),  0.0).rgba;
 
             //rgba += vec4<f32>(1.,0.,0.,.5);
-            rgba = clearMix(rgba) + vec4<f32>(1.,0.,0., .5);
+            rgba = clearMix(rgba, 1.01) + vec4<f32>(1.,0.,0., .5);
 
             textureStore(outputTex, vec2<u32>(ux,uy), rgba);
 

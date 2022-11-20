@@ -1,3 +1,1 @@
-export const PI = /*wgsl*/`;
-const PI = 3.14159265;
-`;
+export const PI = /*wgsl*/`const PI = 3.14159265;`;
