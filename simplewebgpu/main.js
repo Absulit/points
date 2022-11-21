@@ -28,6 +28,8 @@ import slimeFrag from './shaders/slime.frag.js';
 import slime2Compute from './shaders/slime2.compute.js';
 import slime2Frag from './shaders/slime2.frag.js';
 import test1Frag from './shaders/test1.frag.js';
+import random1Frag from './shaders/random1.frag.js';
+import random1Compute from './shaders/random1.compute.js';
 
 /***************/
 const stats = new Stats();
@@ -52,21 +54,13 @@ let mouseY = 0;
 
 const sliders = { 'a': 0, 'b': 0, 'c': 0 }
 
-let shaderModule;
-
 let canvas = document.getElementById('gl-canvas');
 
 async function init() {
     //const initialized = await webGPU.init();
-    const initialized = await webGPU.init(defaultVert, defaultFrag);
+    webGPU.addVariable('randNumber', 0);
+    const initialized = await webGPU.init(defaultVert, random1Compute, random1Frag);
     if (initialized) {
-        //webGPU.createVertexBuffer(vertexArray);
-        // COMPUTE SHADER WGSL
-        shaderModule = webGPU._device.createShaderModule({
-            code: defaultCompute
-        });
-
-        webGPU._shaderModule = shaderModule;
         await webGPU.createScreen(1, 1);
     }
     await update();
@@ -88,6 +82,8 @@ async function update() {
     webGPU._uniformsArray[5] = sliders.a;
     webGPU._uniformsArray[6] = sliders.b;
     webGPU._uniformsArray[7] = sliders.c;
+
+    webGPU.updateVariable('randNumber', Math.random());
 
     webGPU.update();
 

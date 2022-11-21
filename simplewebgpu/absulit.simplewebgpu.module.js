@@ -77,8 +77,6 @@ export default class WebGPU {
 
         this._commandsFinished = [];
 
-        this._shaderModule = null;
-
         this._renderPassDescriptor = null;
     }
 
