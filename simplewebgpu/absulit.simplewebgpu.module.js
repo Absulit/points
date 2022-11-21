@@ -4,6 +4,7 @@ import { print } from '../../js/utils.js';
 import RGBAColor from './../webgpu/js/color.js';
 import defaultVert from './shaders/default.vert.js';
 import defaultFrag from './shaders/default.frag.js';
+import defaultCompute from './shaders/default.compute.js';
 
 
 export class VertexBufferInfo {
@@ -81,13 +82,28 @@ export default class WebGPU {
         this._renderPassDescriptor = null;
     }
 
-    async init(vertexShader, fragmentShader) {
+    /**
+     * Set a variable to send to all shaders
+     * @param {string} name 
+     * @param {*} value Any value
+     */
+    addVariable(name, value){
+
+    }
+
+    updateVariable(){
+
+    }
+
+    async init(vertexShader, computeShader, fragmentShader) {
         const colorsVertWGSL = vertexShader || defaultVert;
+        const colorsComputeWGSL = computeShader || defaultCompute;
         const colorsFragWGSL = fragmentShader || defaultFrag;
 
         this._shaders = {
             false: {
                 vertex: colorsVertWGSL,
+                compute: colorsComputeWGSL,
                 fragment: colorsFragWGSL
             },
             true: {
@@ -348,7 +364,9 @@ export default class WebGPU {
             }),*/
             layout: 'auto',
             compute: {
-                module: this._shaderModule,
+                module: this._device.createShaderModule({
+                    code: this._shaders[this._useTexture].compute
+                }),
                 entryPoint: "main"
             }
         });

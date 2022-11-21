@@ -1,6 +1,6 @@
 import defaultStructs from './defaultStructs.js';
 
-const defaultCompute = /*wgsl*/`
+const random1Compute = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -46,4 +46,4 @@ fn main(
 }
 `;
 
-export default defaultCompute;
+export default random1Compute;
