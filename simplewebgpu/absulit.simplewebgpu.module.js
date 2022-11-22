@@ -78,6 +78,8 @@ export default class WebGPU {
         this._commandsFinished = [];
 
         this._renderPassDescriptor = null;
+
+        this._variables = [];
     }
 
     /**
@@ -86,17 +88,32 @@ export default class WebGPU {
      * @param {*} value Any value
      */
     addVariable(name, value){
-
+        this._variables.push({
+            name: name,
+            array: new Float32Array([value]),
+            buffer: null
+        })
     }
 
-    updateVariable(){
-
+    updateVariable(name, value){
+        const variable = this._variables.find(v => v.name === name);
+        if(!variable){
+            throw '`updateVariable()` can\'t be called without first `addVariable()`.';
+        }
+        variable.array = new Float32Array([value]);
     }
 
     async init(vertexShader, computeShader, fragmentShader) {
         const colorsVertWGSL = vertexShader || defaultVert;
-        const colorsComputeWGSL = computeShader || defaultCompute;
+        let colorsComputeWGSL = computeShader || defaultCompute;
         const colorsFragWGSL = fragmentShader || defaultFrag;
+
+        let dynamicGroupBindings = '';
+        this._variables.forEach( (variable, index) => {
+            dynamicGroupBindings += /*wgsl*/`@group(1) @binding(${index}) var <uniform> ${variable.name}: f32;\n`
+        });
+
+        colorsComputeWGSL = dynamicGroupBindings + colorsComputeWGSL;
 
         this._shaders = {
             false: {
@@ -279,6 +296,12 @@ export default class WebGPU {
         //--------------------------------------------
         this._variablesArray = new Float32Array([0, 0, 0, 0, 0]);
         this._variablesBuffer = this._createAndMapBuffer(this._variablesArray, GPUBufferUsage.STORAGE);
+
+        //--------------------------------------------
+        this._variables.forEach(variable =>{
+            //console.log(variable);
+            variable.buffer = this._createAndMapBuffer(variable.array, GPUBufferUsage.UNIFORM);
+        });
     }
 
     /**
@@ -304,8 +327,7 @@ export default class WebGPU {
 
     _createComputeBindGroup() {
         this._computeBindGroups = this._device.createBindGroup({
-            label: '_createComputeBindGroup',
-            //layout: bindGroupLayout,
+            label: '_createComputeBindGroup 0',
             layout: this._computePipeline.getBindGroupLayout(0 /* index */),
             entries: [
                 {
@@ -352,6 +374,24 @@ export default class WebGPU {
                 }
             ]
         });
+
+        if(this._variables.length){
+            const entries = [];
+            this._variables.forEach( (variable, index) => {
+                entries.push({
+                    binding: index,
+                    resource: {
+                        buffer: variable.buffer
+                    }
+                });
+            });
+
+            this._computeBindGroups2 = this._device.createBindGroup({
+                label: '_createComputeBindGroup 1',
+                layout: this._computePipeline.getBindGroupLayout(1 /* index */),
+                entries: entries
+            });
+        }
     }
 
     async createPipeline() {
@@ -360,6 +400,7 @@ export default class WebGPU {
             /*layout: device.createPipelineLayout({
                 bindGroupLayouts: [bindGroupLayout]
             }),*/
+            label: 'createPipeline(): DID YOU CALL THE VARIABLE IN THE SHADER?',
             layout: 'auto',
             compute: {
                 module: this._device.createShaderModule({
@@ -551,6 +592,12 @@ export default class WebGPU {
         //this._particlesBuffer = this._createAndMapBuffer(this._particles, GPUBufferUsage.STORAGE);
         //--------------------------------------------
 
+        this._variables.forEach(variable =>{
+            //console.log(variable);
+            variable.buffer = this._createAndMapBuffer(variable.array, GPUBufferUsage.UNIFORM);
+        });
+
+
         this._createComputeBindGroup();
 
 
@@ -561,6 +608,9 @@ export default class WebGPU {
         const passEncoder = commandEncoder.beginComputePass();
         passEncoder.setPipeline(this._computePipeline);
         passEncoder.setBindGroup(0, this._computeBindGroups);
+        if(this._variables.length){
+            passEncoder.setBindGroup(1, this._computeBindGroups2);
+        }
         passEncoder.dispatchWorkgroups(8, 8, 1);
         passEncoder.end();
 

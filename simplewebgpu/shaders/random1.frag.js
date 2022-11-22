@@ -47,7 +47,7 @@ fn main(
     }
 
 
-    let finalColor:vec4<f32> = vec4(c);
+    let finalColor:vec4<f32> = vec4(c) + texColorCompute;
 
     return finalColor;
 }

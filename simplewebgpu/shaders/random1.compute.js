@@ -17,6 +17,8 @@ struct Particles{
     chemicals: array<Chemical>
 }
 
+
+
 @group(0) @binding(0) var <storage, read_write> layer0: Points;
 @group(0) @binding(1) var feedbackSampler: sampler;
 @group(0) @binding(2) var feedbackTexture: texture_2d<f32>;
@@ -25,6 +27,8 @@ struct Particles{
 @group(0) @binding(5) var <storage, read_write> particles: Particles;
 @group(0) @binding(6) var <uniform> params: Params;
 @group(0) @binding(7) var <storage, read_write> particles2: Particles;
+
+//@group(1) @binding(0) var <uniform> randNumber: f32;
 
 
 @compute @workgroup_size(8,8,1)
@@ -42,7 +46,11 @@ fn main(
     let dims: vec2<u32> = textureDimensions(feedbackTexture, 0);
     var rgba = textureSampleLevel(feedbackTexture, feedbackSampler, vec2(0),  0.0).rgba;
 
-    textureStore(outputTex, vec2<u32>(0,0), rgba);
+    let r = randNumber;
+
+    textureStore(outputTex, vec2<u32>( u32(r * 800.) ,  u32(r * 800.) ), vec4<f32>(1,0,0,1));
+
+    //textureStore(outputTex, vec2<u32>(0,0), rgba);
 }
 `;
 
