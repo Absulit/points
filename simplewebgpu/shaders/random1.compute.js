@@ -17,8 +17,18 @@ struct Particles{
     chemicals: array<Chemical>
 }
 
+struct Star{
+    a: f32,
+    b: f32,
+    c: f32,
+    d: f32,
+}
 
+struct Stars{
+    items: array<Star>
+}
 
+//@group(1) @binding(1) var <storage, read_write> stars: Stars;
 @group(0) @binding(0) var <storage, read_write> layer0: Points;
 @group(0) @binding(1) var feedbackSampler: sampler;
 @group(0) @binding(2) var feedbackTexture: texture_2d<f32>;
@@ -45,6 +55,8 @@ fn main(
 
     let r = params.randNumber;
     let r2 = params.randNumber2;
+
+    let star = stars.items[0];
 
     textureStore(outputTex, vec2<u32>( u32(r * 800.) ,  u32(r2 * 800.) ), vec4<f32>(1, params.sliderA,0,1));
 

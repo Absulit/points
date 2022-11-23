@@ -9,6 +9,17 @@ struct Particle{
     y: f32
 }
 
+struct Star{
+    a: f32,
+    b: f32,
+    c: f32,
+    d: f32,
+}
+
+struct Stars{
+    items: array<Star>
+}
+
 @vertex
 fn main(
     @location(0) position: vec4<f32>,

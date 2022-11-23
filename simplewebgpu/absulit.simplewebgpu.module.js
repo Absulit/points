@@ -79,19 +79,22 @@ export default class WebGPU {
         this._renderPassDescriptor = null;
 
         this._parameters = [];
+        this._storage = [];
     }
 
     /**
-     * Set a param as uniform to send to all shaders
+     * Set a param as uniform to send to all shaders.
+     * A Uniform is a value that can only be changed
+     * from the outside, and unless changed it remains
+     * consistent. To change it use `updateUniform()`
      * @param {string} name name of the Param, you can invoke it later in shaders as `Params.[name]`
      * @param {Number} value Number will be converted to `f32`
      */
-    addParam(name, value) {
+    addUniform(name, value) {
         this._parameters.push({
             name: name,
             value: value,
-            buffer: null
-        })
+        });
     }
 
     /**
@@ -99,12 +102,30 @@ export default class WebGPU {
      * @param {string} name name of the param to update
      * @param {*} value Number will be converted to `f32`
      */
-    updateParam(name, value) {
+    updateUniform(name, value) {
         const variable = this._parameters.find(v => v.name === name);
         if (!variable) {
             throw '`updateVariable()` can\'t be called without first `addVariable()`.';
         }
         variable.value = value;
+    }
+
+
+    /**
+     * Creates a persistent memory buffer across every frame call.
+     * @param {string} name Name that the Storage will have in the shader
+     * @param {Number} size Number of items it will have.
+     * Multiply this by number of properties in the struct if necessary.
+     * @param {string} structName Name of the struct already existing on the
+     * shader that will be the type of the Storage
+     */
+    addStorage(name, size, structName) {
+        this._storage.push({
+            name: name,
+            size: size,
+            structName: structName,
+            buffer: null
+        });
     }
 
     async init(vertexShader, computeShader, fragmentShader) {
@@ -118,7 +139,7 @@ export default class WebGPU {
             dynamicStructParams += /*wgsl*/`${variable.name}:f32, \n`;
         });
 
-        if(this._parameters.length){
+        if (this._parameters.length) {
             dynamicStructParams = /*wgsl*/`
                 struct Params {
                     ${dynamicStructParams}
@@ -128,9 +149,15 @@ export default class WebGPU {
 
         dynamicGroupBindings += dynamicStructParams;
 
-        if(this._parameters.length){
-            dynamicGroupBindings += /*wgsl*/`@group(1) @binding(0) var <uniform> params: Params;\n`
+        let bindingIndex = 0;
+        if (this._parameters.length) {
+            dynamicGroupBindings += /*wgsl*/`@group(1) @binding(0) var <uniform> params: Params;\n`;
+            bindingIndex += 1;
         }
+        console.log(this._storage);
+        this._storage.forEach((storageItem, index) => {
+            dynamicGroupBindings += /*wgsl*/`@group(1) @binding(${bindingIndex + index}) var <storage, read_write> ${storageItem.name}: ${storageItem.structName};\n`
+        })
 
         colorsVertWGSL = dynamicGroupBindings + colorsVertWGSL;
         colorsComputeWGSL = dynamicGroupBindings + colorsComputeWGSL;
@@ -323,6 +350,10 @@ export default class WebGPU {
 
         //--------------------------------------------
         this._createParametersUniforms();
+        //--------------------------------------------
+        this._storage.forEach(storageItem => {
+            storageItem.buffer = this._createBuffer(storageItem.size * 4, GPUBufferUsage.STORAGE);
+        })
     }
 
     /**
@@ -390,16 +421,33 @@ export default class WebGPU {
             ]
         });
 
+        let entries = [];
         if (this._parameters.length) {
-            const entries = [
+            entries.push(
                 {
                     binding: 0,
                     resource: {
                         buffer: this._parameters.buffer
                     }
                 }
-            ];
+            );
 
+        }
+
+        if (this._storage.length) {
+            const entriesIndex = entries.length;
+            this._storage.forEach((storageItem, index) => {
+                entries.push(
+                    {
+                        binding: entriesIndex + index,
+                        resource: {
+                            buffer: storageItem.buffer
+                        }
+                    }
+                );
+            });
+        }
+        if (entries.length) {
             this._computeBindGroups2 = this._device.createBindGroup({
                 label: '_createComputeBindGroup 1',
                 layout: this._computePipeline.getBindGroupLayout(1 /* index */),
@@ -589,22 +637,40 @@ export default class WebGPU {
             ],
         });
 
+        let entries = [];
         if (this._parameters.length) {
-            const entries = [
+            entries.push(
                 {
                     binding: 0,
                     resource: {
                         buffer: this._parameters.buffer
                     }
                 }
-            ];
+            );
 
+        }
+
+        if (this._storage.length) {
+            const entriesIndex = entries.length;
+            this._storage.forEach((storageItem, index) => {
+                entries.push(
+                    {
+                        binding: entriesIndex + index,
+                        resource: {
+                            buffer: storageItem.buffer
+                        }
+                    }
+                );
+            });
+        }
+        if (entries.length) {
             this._uniformBindGroup2 = this._device.createBindGroup({
                 label: '_createParams() 1',
                 layout: this._pipeline.getBindGroupLayout(1 /* index */),
                 entries: entries
             });
         }
+
     }
 
     update() {
@@ -665,7 +731,7 @@ export default class WebGPU {
 
             this._createParams();
             passEncoder.setBindGroup(0, this._uniformBindGroup);
-            if(this._parameters.length){
+            if (this._parameters.length) {
                 passEncoder.setBindGroup(1, this._uniformBindGroup2);
             }
             passEncoder.setVertexBuffer(0, this._buffer);

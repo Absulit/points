@@ -59,18 +59,20 @@ let canvas = document.getElementById('gl-canvas');
 async function init() {
 
 
-    webGPU.addParam('utime', 0);
-    webGPU.addParam('screenWidth', 0);
-    webGPU.addParam('screenHeight', 0);
-    webGPU.addParam('mouseX', 0);
-    webGPU.addParam('mouseY', 0);
-    webGPU.addParam('sliderA', 0);
-    webGPU.addParam('sliderB', 0);
-    webGPU.addParam('sliderC', 0);
+    webGPU.addUniform('utime', 0);
+    webGPU.addUniform('screenWidth', 0);
+    webGPU.addUniform('screenHeight', 0);
+    webGPU.addUniform('mouseX', 0);
+    webGPU.addUniform('mouseY', 0);
+    webGPU.addUniform('sliderA', 0);
+    webGPU.addUniform('sliderB', 0);
+    webGPU.addUniform('sliderC', 0);
+
+    webGPU.addStorage('stars', 800*800*4, 'Stars');
 
 
-    webGPU.addParam('randNumber', 0);
-    webGPU.addParam('randNumber2', 0);
+    webGPU.addUniform('randNumber', 0);
+    webGPU.addUniform('randNumber2', 0);
 
     const initialized = await webGPU.init(defaultVert, random1Compute, random1Frag);
     if (initialized) {
@@ -85,18 +87,18 @@ async function update() {
 
     // code here
 
-    webGPU.updateParam('utime', utime);
-    webGPU.updateParam('screenWidth', canvas.width);
-    webGPU.updateParam('screenHeight', canvas.height);
-    webGPU.updateParam('mouseX', mouseX);
-    webGPU.updateParam('mouseY', mouseY);
-    webGPU.updateParam('sliderA', sliders.a);
-    webGPU.updateParam('sliderB', sliders.b);
-    webGPU.updateParam('sliderC', sliders.c);
+    webGPU.updateUniform('utime', utime);
+    webGPU.updateUniform('screenWidth', canvas.width);
+    webGPU.updateUniform('screenHeight', canvas.height);
+    webGPU.updateUniform('mouseX', mouseX);
+    webGPU.updateUniform('mouseY', mouseY);
+    webGPU.updateUniform('sliderA', sliders.a);
+    webGPU.updateUniform('sliderB', sliders.b);
+    webGPU.updateUniform('sliderC', sliders.c);
 
 
-    webGPU.updateParam('randNumber', Math.random());
-    webGPU.updateParam('randNumber2', Math.random());
+    webGPU.updateUniform('randNumber', Math.random());
+    webGPU.updateUniform('randNumber2', Math.random());
 
     webGPU.update();
 
