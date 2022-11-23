@@ -117,14 +117,20 @@ export default class WebGPU {
         this._parameters.forEach((variable, index) => {
             dynamicStructParams += /*wgsl*/`${variable.name}:f32, \n`;
         });
-        dynamicStructParams = /*wgsl*/`
-            struct Params {
-                ${dynamicStructParams}
-            }
-        `;
+
+        if(this._parameters.length){
+            dynamicStructParams = /*wgsl*/`
+                struct Params {
+                    ${dynamicStructParams}
+                }
+            `;
+        }
 
         dynamicGroupBindings += dynamicStructParams;
-        dynamicGroupBindings += /*wgsl*/`@group(1) @binding(0) var <uniform> params: Params;\n`
+
+        if(this._parameters.length){
+            dynamicGroupBindings += /*wgsl*/`@group(1) @binding(0) var <uniform> params: Params;\n`
+        }
 
         colorsVertWGSL = dynamicGroupBindings + colorsVertWGSL;
         colorsComputeWGSL = dynamicGroupBindings + colorsComputeWGSL;
@@ -659,7 +665,9 @@ export default class WebGPU {
 
             this._createParams();
             passEncoder.setBindGroup(0, this._uniformBindGroup);
-            passEncoder.setBindGroup(1, this._uniformBindGroup2);
+            if(this._parameters.length){
+                passEncoder.setBindGroup(1, this._uniformBindGroup2);
+            }
             passEncoder.setVertexBuffer(0, this._buffer);
 
             /**

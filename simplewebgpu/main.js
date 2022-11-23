@@ -57,7 +57,7 @@ const sliders = { 'a': 0, 'b': 0, 'c': 0 }
 let canvas = document.getElementById('gl-canvas');
 
 async function init() {
-    //const initialized = await webGPU.init();
+
 
     webGPU.addParam('utime', 0);
     webGPU.addParam('screenWidth', 0);
@@ -71,6 +71,7 @@ async function init() {
 
     webGPU.addParam('randNumber', 0);
     webGPU.addParam('randNumber2', 0);
+
     const initialized = await webGPU.init(defaultVert, random1Compute, random1Frag);
     if (initialized) {
         await webGPU.createScreen(1, 1);
