@@ -129,8 +129,7 @@ const K = .062; //.062
 @group(0) @binding(3) var outputTex : texture_storage_2d<rgba8unorm, write>;
 @group(0) @binding(4) var <storage, read_write> variables: Variables;
 @group(0) @binding(5) var <storage, read_write> particles: Particles;
-@group(0) @binding(6) var<uniform> params: Params;
-@group(0) @binding(7) var <storage, read_write> particles2: Particles;
+@group(0) @binding(6) var <storage, read_write> particles2: Particles;
 
 @compute @workgroup_size(workgroupSize,workgroupSize,1)
 fn main(

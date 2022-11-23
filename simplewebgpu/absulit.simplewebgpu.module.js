@@ -599,8 +599,6 @@ export default class WebGPU {
                 entries: entries
             });
         }
-
-        
     }
 
     update() {

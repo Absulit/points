@@ -24,7 +24,7 @@ struct Particles{
 
 ${fnusin}
 
-@group(0) @binding(0) var<uniform> params: Params;
+//@group(0) @binding(0) var<uniform> params: Params;
 @group(0) @binding(1) var<storage> particles: Particles;
 
 @group(0) @binding(2) var feedbackSampler: sampler;

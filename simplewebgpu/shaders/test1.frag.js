@@ -1,3 +1,4 @@
+import { fnusin, fusin } from './defaultFunctions.js';
 import defaultStructs from './defaultStructs.js';
 
 const test1Frag = /*wgsl*/`
@@ -9,7 +10,10 @@ struct Particle{
     y: f32
 }
 
-@group(0) @binding(0) var<uniform> params: Params;
+${fusin}
+${fnusin}
+
+//@group(0) @binding(0) var<uniform> params: Params;
 @group(0) @binding(1) var<storage> particles: array<Particle>;
 
 @group(0) @binding(2) var feedbackSampler: sampler;
