@@ -59,6 +59,7 @@ let canvas = document.getElementById('gl-canvas');
 async function init() {
     //const initialized = await webGPU.init();
     webGPU.addVariable('randNumber', 0);
+    webGPU.addVariable('randNumber2', 0);
     const initialized = await webGPU.init(defaultVert, random1Compute, random1Frag);
     if (initialized) {
         await webGPU.createScreen(1, 1);
@@ -84,6 +85,7 @@ async function update() {
     webGPU._uniformsArray[7] = sliders.c;
 
     webGPU.updateVariable('randNumber', Math.random());
+    webGPU.updateVariable('randNumber2', Math.random());
 
     webGPU.update();
 

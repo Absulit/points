@@ -299,7 +299,6 @@ export default class WebGPU {
 
         //--------------------------------------------
         this._variables.forEach(variable =>{
-            //console.log(variable);
             variable.buffer = this._createAndMapBuffer(variable.array, GPUBufferUsage.UNIFORM);
         });
     }
@@ -593,7 +592,6 @@ export default class WebGPU {
         //--------------------------------------------
 
         this._variables.forEach(variable =>{
-            //console.log(variable);
             variable.buffer = this._createAndMapBuffer(variable.array, GPUBufferUsage.UNIFORM);
         });
 
