@@ -58,8 +58,19 @@ let canvas = document.getElementById('gl-canvas');
 
 async function init() {
     //const initialized = await webGPU.init();
-    webGPU.addVariable('randNumber', 0);
-    webGPU.addVariable('randNumber2', 0);
+
+    webGPU.addParam('utime', 0);
+    webGPU.addParam('screenWidth', 0);
+    webGPU.addParam('screenHeight', 0);
+    webGPU.addParam('mouseX', 0);
+    webGPU.addParam('mouseY', 0);
+    webGPU.addParam('sliderA', 0);
+    webGPU.addParam('sliderB', 0);
+    webGPU.addParam('sliderC', 0);
+
+
+    webGPU.addParam('randNumber', 0);
+    webGPU.addParam('randNumber2', 0);
     const initialized = await webGPU.init(defaultVert, random1Compute, random1Frag);
     if (initialized) {
         await webGPU.createScreen(1, 1);
@@ -84,8 +95,19 @@ async function update() {
     webGPU._uniformsArray[6] = sliders.b;
     webGPU._uniformsArray[7] = sliders.c;
 
-    webGPU.updateVariable('randNumber', Math.random());
-    webGPU.updateVariable('randNumber2', Math.random());
+
+    webGPU.updateParam('utime', utime);
+    webGPU.updateParam('screenWidth', canvas.width);
+    webGPU.updateParam('screenHeight', canvas.height);
+    webGPU.updateParam('mouseX', mouseX);
+    webGPU.updateParam('mouseY', mouseY);
+    webGPU.updateParam('sliderA', sliders.a);
+    webGPU.updateParam('sliderB', sliders.b);
+    webGPU.updateParam('sliderC', sliders.c);
+
+
+    webGPU.updateParam('randNumber', Math.random());
+    webGPU.updateParam('randNumber2', Math.random());
 
     webGPU.update();
 

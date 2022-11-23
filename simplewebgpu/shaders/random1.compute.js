@@ -46,10 +46,10 @@ fn main(
     let dims: vec2<u32> = textureDimensions(feedbackTexture, 0);
     var rgba = textureSampleLevel(feedbackTexture, feedbackSampler, vec2(0),  0.0).rgba;
 
-    let r = randNumber;
-    let r2 = randNumber2;
+    let r = params2.randNumber;
+    let r2 = params2.randNumber2;
 
-    textureStore(outputTex, vec2<u32>( u32(r * 800.) ,  u32(r2 * 800.) ), vec4<f32>(1,0,0,1));
+    textureStore(outputTex, vec2<u32>( u32(r * 800.) ,  u32(r2 * 800.) ), vec4<f32>(1, params2.sliderA,0,1));
 
     //textureStore(outputTex, vec2<u32>(0,0), rgba);
 }
