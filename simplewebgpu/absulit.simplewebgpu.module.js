@@ -58,7 +58,6 @@ export default class WebGPU {
         this._computePipeline = null;
         this._vertexBufferInfo = null;
         this._buffer = null;
-        this._uniformsBuffer = null;
 
         this._uniformBindGroup = null;
         this._computeBindGroups = null;
@@ -109,9 +108,9 @@ export default class WebGPU {
     }
 
     async init(vertexShader, computeShader, fragmentShader) {
-        const colorsVertWGSL = vertexShader || defaultVert;
+        let colorsVertWGSL = vertexShader || defaultVert;
         let colorsComputeWGSL = computeShader || defaultCompute;
-        const colorsFragWGSL = fragmentShader || defaultFrag;
+        let colorsFragWGSL = fragmentShader || defaultFrag;
 
         let dynamicGroupBindings = '';
         let dynamicStructParams = '';
@@ -119,15 +118,17 @@ export default class WebGPU {
             dynamicStructParams += /*wgsl*/`${variable.name}:f32, \n`;
         });
         dynamicStructParams = /*wgsl*/`
-            struct Params2 {
+            struct Params {
                 ${dynamicStructParams}
             }
         `;
 
         dynamicGroupBindings += dynamicStructParams;
-        dynamicGroupBindings += /*wgsl*/`@group(1) @binding(0) var <uniform> params2: Params2;\n`
+        dynamicGroupBindings += /*wgsl*/`@group(1) @binding(0) var <uniform> params: Params;\n`
 
+        colorsVertWGSL = dynamicGroupBindings + colorsVertWGSL;
         colorsComputeWGSL = dynamicGroupBindings + colorsComputeWGSL;
+        colorsFragWGSL = dynamicGroupBindings + colorsFragWGSL;
 
         this._shaders = {
             false: {
@@ -302,8 +303,6 @@ export default class WebGPU {
     }
 
     createComputeBuffers() {
-        this._uniformsArray = new Float32Array([0, 0, 0, 0, 0, 0, 0, 0]);
-        this._uniformsBuffer = this._createAndMapBuffer(this._uniformsArray, GPUBufferUsage.UNIFORM);
         //--------------------------------------------
         //this._particles = new Float32Array(Array(300).fill(0));
         //this._particlesBuffer = this._createAndMapBuffer(this._particles, GPUBufferUsage.STORAGE);
@@ -378,12 +377,6 @@ export default class WebGPU {
                 },
                 {
                     binding: 6,
-                    resource: {
-                        buffer: this._uniformsBuffer,
-                    }
-                },
-                {
-                    binding: 7,
                     resource: {
                         buffer: this._particlesBuffer2,
                     }
@@ -560,15 +553,9 @@ export default class WebGPU {
 
     _createParams() {
         this._uniformBindGroup = this._device.createBindGroup({
-            label: '_createParams()',
+            label: '_createParams() 0',
             layout: this._pipeline.getBindGroupLayout(0),
             entries: [
-                {
-                    binding: 0,
-                    resource: {
-                        buffer: this._uniformsBuffer,
-                    }
-                },
                 {
                     binding: 1,
                     resource: {
@@ -595,6 +582,25 @@ export default class WebGPU {
                 },
             ],
         });
+
+        if (this._parameters.length) {
+            const entries = [
+                {
+                    binding: 0,
+                    resource: {
+                        buffer: this._parameters.buffer
+                    }
+                }
+            ];
+
+            this._uniformBindGroup2 = this._device.createBindGroup({
+                label: '_createParams() 1',
+                layout: this._pipeline.getBindGroupLayout(1 /* index */),
+                entries: entries
+            });
+        }
+
+        
     }
 
     update() {
@@ -602,7 +608,6 @@ export default class WebGPU {
         if (!this._device) return;
 
         //--------------------------------------------
-        this._uniformsBuffer = this._createAndMapBuffer(this._uniformsArray, GPUBufferUsage.UNIFORM);
         //--------------------------------------------
         //this._particlesBuffer = this._createAndMapBuffer(this._particles, GPUBufferUsage.STORAGE);
         //--------------------------------------------
@@ -656,7 +661,7 @@ export default class WebGPU {
 
             this._createParams();
             passEncoder.setBindGroup(0, this._uniformBindGroup);
-            //passEncoder.setBindGroup(1, this._particleBindGroup);
+            passEncoder.setBindGroup(1, this._uniformBindGroup2);
             passEncoder.setVertexBuffer(0, this._buffer);
 
             /**

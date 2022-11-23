@@ -8,17 +8,6 @@ struct Fragment {
     @location(3) mouse: vec2<f32>
 }
 
-struct Params {
-    utime: f32,
-    screenWidth:f32,
-    screenHeight:f32,
-    mouseX: f32,
-    mouseY: f32,
-    sliderA: f32,
-    sliderB: f32,
-    sliderC: f32
-}
-
 struct Color{
     r: f32,
     g: f32,

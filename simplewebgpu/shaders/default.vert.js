@@ -9,8 +9,6 @@ struct Particle{
     y: f32
 }
 
-@group(0) @binding(0) var<uniform> params: Params;
-
 @vertex
 fn main(
     @location(0) position: vec4<f32>,

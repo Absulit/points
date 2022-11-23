@@ -83,18 +83,6 @@ async function update() {
     utime += 0.016666666666666666;//1 / 60;
 
     // code here
-    //webGPU._screenSizeArray[2] = utime;
-
-    webGPU._uniformsArray[0] = utime;
-    webGPU._uniformsArray[1] = canvas.width;
-    webGPU._uniformsArray[2] = canvas.height;
-    webGPU._uniformsArray[3] = mouseX;
-    webGPU._uniformsArray[4] = mouseY;
-
-    webGPU._uniformsArray[5] = sliders.a;
-    webGPU._uniformsArray[6] = sliders.b;
-    webGPU._uniformsArray[7] = sliders.c;
-
 
     webGPU.updateParam('utime', utime);
     webGPU.updateParam('screenWidth', canvas.width);
