@@ -17,10 +17,6 @@ struct Chemical{
     b: f32
 }
 
-struct Particles{
-    chemicals: array<Chemical>
-}
-
 
 ${rand}
 ${clearMix}
@@ -42,14 +38,14 @@ fn getPointsAround(position: vec2<i32>, distance: i32) -> array<  Chemical, 8  >
     let index6 = (position.x)           + ( (position.y+distance) * 800);
     let index7 = (position.x+distance) + ( (position.y+distance) * 800);
     return array< Chemical, 8 >(
-        particles.chemicals[index0],
-        particles.chemicals[index1],
-        particles.chemicals[index2],
-        particles.chemicals[index3],
-        particles.chemicals[index4],
-        particles.chemicals[index5],
-        particles.chemicals[index6],
-        particles.chemicals[index7]
+        chemicals[index0],
+        chemicals[index1],
+        chemicals[index2],
+        chemicals[index3],
+        chemicals[index4],
+        chemicals[index5],
+        chemicals[index6],
+        chemicals[index7]
     );
 }
 
@@ -128,8 +124,6 @@ const K = .062; //.062
 @group(0) @binding(2) var feedbackTexture: texture_2d<f32>;
 @group(0) @binding(3) var outputTex : texture_storage_2d<rgba8unorm, write>;
 @group(0) @binding(4) var <storage, read_write> variables: Variables;
-@group(0) @binding(5) var <storage, read_write> particles: Particles;
-@group(0) @binding(6) var <storage, read_write> particles2: Particles;
 
 @compute @workgroup_size(workgroupSize,workgroupSize,1)
 fn main(
@@ -139,16 +133,16 @@ fn main(
 ) {
     var l0 = layer0.points[0];
     let utime = params.utime;
-    let chemical = particles.chemicals[0];
-    let chemical2 = particles2.chemicals[0];
+    let chemical = chemicals[0];
+    let chemical2 = chemicals2[0];
 
     let sc: ptr<storage, f32, read_write> = &variables.squaresCreated;
 
     if((*sc) == 0){
 
         for(var k:u32; k<numParticles;k++){
-            particles.chemicals[k] = Chemical(1, 0);
-            particles2.chemicals[k] = Chemical(1, 0);
+            chemicals[k] = Chemical(1, 0);
+            chemicals2[k] = Chemical(1, 0);
         }
 
         let centerIndex:u32 = u32((400 - SQUARESIDE*.5) +( (400 - SQUARESIDE*.5)*800));
@@ -156,7 +150,7 @@ fn main(
         for (var i:u32 = 0; i < SQUARESIDE; i++) {
             for (var j:u32 = 0; j < SQUARESIDE; j++) {
                 //index = i+(j*800)
-                let chemical = &particles.chemicals[centerIndex + i+(j*800)];
+                let chemical = &chemicals[centerIndex + i+(j*800)];
                 (*chemical).b = 1;
             }
         }
@@ -206,10 +200,10 @@ fn main(
 
 
             //--------------------------------------------------------------
-            let chemicalBelow = &particles.chemicals[ux+(uy*800)];
-            let chemicalAbove = &particles2.chemicals[ux+(uy*800)];
+            let chemicalBelow = &chemicals[ux+(uy*800)];
+            let chemicalAbove = &chemicals2[ux+(uy*800)];
 
-            let chemicalAboveClone = particles2.chemicals[ux+(uy*800)];
+            let chemicalAboveClone = chemicals2[ux+(uy*800)];
 
             (*chemicalAbove).a = (*chemicalBelow).a;
             (*chemicalAbove).b = (*chemicalBelow).b;
