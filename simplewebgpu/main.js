@@ -30,6 +30,7 @@ import slime2Frag from './shaders/slime2.frag.js';
 import test1Frag from './shaders/test1.frag.js';
 import random1Frag from './shaders/random1.frag.js';
 import random1Compute from './shaders/random1.compute.js';
+import random1Vert from './shaders/random1.vert.js';
 
 /***************/
 const stats = new Stats();
@@ -68,13 +69,13 @@ async function init() {
     webGPU.addUniform('sliderB', 0);
     webGPU.addUniform('sliderC', 0);
 
-    webGPU.addStorage('stars', 800*800*4, 'Stars');
+    //webGPU.addStorage('stars', 800*800*4, 'Star');
 
 
     webGPU.addUniform('randNumber', 0);
     webGPU.addUniform('randNumber2', 0);
 
-    const initialized = await webGPU.init(defaultVert, random1Compute, random1Frag);
+    const initialized = await webGPU.init(defaultVert, defaultCompute, defaultFrag);
     if (initialized) {
         await webGPU.createScreen(1, 1);
     }

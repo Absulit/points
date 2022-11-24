@@ -117,7 +117,7 @@ export default class WebGPU {
      * @param {Number} size Number of items it will have.
      * Multiply this by number of properties in the struct if necessary.
      * @param {string} structName Name of the struct already existing on the
-     * shader that will be the type of the Storage
+     * shader that will be the array<structName> of the Storage
      */
     addStorage(name, size, structName) {
         this._storage.push({
@@ -156,7 +156,7 @@ export default class WebGPU {
         }
         console.log(this._storage);
         this._storage.forEach((storageItem, index) => {
-            dynamicGroupBindings += /*wgsl*/`@group(1) @binding(${bindingIndex + index}) var <storage, read_write> ${storageItem.name}: ${storageItem.structName};\n`
+            dynamicGroupBindings += /*wgsl*/`@group(1) @binding(${bindingIndex + index}) var <storage, read_write> ${storageItem.name}: array<${storageItem.structName}>;\n`
         })
 
         colorsVertWGSL = dynamicGroupBindings + colorsVertWGSL;

@@ -1,12 +1,19 @@
 import defaultStructs from './defaultStructs.js';
 
-const defaultVert = /*wgsl*/`
+const random1Vert = /*wgsl*/`
 
 ${defaultStructs}
 
 struct Particle{
     x: f32,
     y: f32
+}
+
+struct Star{
+    a: f32,
+    b: f32,
+    c: f32,
+    d: f32,
 }
 
 @vertex
@@ -29,4 +36,4 @@ fn main(
 }
 `;
 
-export default defaultVert;
+export default random1Vert;

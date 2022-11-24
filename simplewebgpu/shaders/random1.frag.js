@@ -17,10 +17,6 @@ struct Star{
     d: f32,
 }
 
-struct Stars{
-    items: array<Star>
-}
-
 ${fnusin}
 ${fusin}
 
@@ -46,7 +42,7 @@ fn main(
 
     let particle = particles[0];
     let particle2 = particles2[0];
-    let star = stars.items[0];
+    let star = stars[0];
 
     let texColor = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1));
     let texColorCompute = textureSample(computeTexture, feedbackSampler, uv * vec2(1,-1));
