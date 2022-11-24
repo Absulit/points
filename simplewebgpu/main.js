@@ -35,6 +35,7 @@ import planetsVert from './shaders/planets.vert.js';
 import reactiondifussionVert from './shaders/reactiondiffusion.vert.js';
 import slimeVert from './shaders/slime.vert.js';
 import blur1Vert from './shaders/blur1.vert.js';
+import circleblurVert from './shaders/circleblur.vert.js';
 
 /***************/
 const stats = new Stats();
@@ -88,7 +89,7 @@ async function init() {
 
 
 
-    const initialized = await webGPU.init(blur1Vert, blur1Compute, blur1Frag);
+    const initialized = await webGPU.init(circleblurVert, circleblurCompute, circleblurFrag);
     if (initialized) {
         await webGPU.createScreen(1, 1);
     }
