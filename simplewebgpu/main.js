@@ -78,9 +78,10 @@ async function init() {
     //webGPU.addUniform('randNumber2', 0); // random1
     //webGPU.addStorage('stars', 800*800*4, 'Star'); // random1
 
-    //webGPU.addStorage('planets', 8*5, 'Planet'); // planets
-    //webGPU.addStorage('chemicals', 800*800*2, 'Chemical'); // ractiondiffusion
-    //webGPU.addStorage('chemicals2', 800*800*2, 'Chemical'); // ractiondiffusion
+    webGPU.addStorage('planets', 8*5, 'Planet'); // planets
+
+    // webGPU.addStorage('chemicals', 800*800*2, 'Chemical'); // ractiondiffusion
+    // webGPU.addStorage('chemicals2', 800*800*2, 'Chemical'); // ractiondiffusion
 
     // const numParticles = 2048;
     // webGPU.addUniform('numParticles', numParticles);
@@ -89,7 +90,7 @@ async function init() {
 
 
 
-    const initialized = await webGPU.init(circleblurVert, circleblurCompute, circleblurFrag);
+    const initialized = await webGPU.init(planetsVert, planetsCompute, planetsFrag);
     if (initialized) {
         await webGPU.createScreen(1, 1);
     }

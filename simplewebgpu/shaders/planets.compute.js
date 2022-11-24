@@ -34,8 +34,6 @@ const workgroupSize = 8;
 @group(0) @binding(2) var feedbackTexture: texture_2d<f32>;
 @group(0) @binding(3) var outputTex : texture_storage_2d<rgba8unorm, write>;
 @group(0) @binding(4) var <storage, read_write> variables: Variables;
-//@group(0) @binding(5) var <storage, read_write> particles: Particles;
-@group(0) @binding(6) var <storage, read_write> particles2: array<Planet>;
 
 
 @compute @workgroup_size(workgroupSize,workgroupSize,1)
@@ -46,9 +44,6 @@ fn main(
 ) {
     var l0 = layer0.points[0];
     let utime = params.utime;
-    //let chemical = particles.chemicals[0];
-    let planet2 = particles2[0];
-    let tv: ptr<storage, f32, read_write> = &variables.testValue;
 
     let pc: ptr<storage, f32, read_write> = &variables.particlesCreated;
 
