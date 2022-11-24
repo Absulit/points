@@ -31,6 +31,7 @@ import test1Frag from './shaders/test1.frag.js';
 import random1Frag from './shaders/random1.frag.js';
 import random1Compute from './shaders/random1.compute.js';
 import random1Vert from './shaders/random1.vert.js';
+import planetsVert from './shaders/planets.vert.js';
 
 /***************/
 const stats = new Stats();
@@ -69,7 +70,8 @@ async function init() {
     webGPU.addUniform('sliderB', 0);
     webGPU.addUniform('sliderC', 0);
 
-    //webGPU.addStorage('stars', 800*800*4, 'Star');
+    //webGPU.addStorage('stars', 800*800*4, 'Star'); // random1
+    //webGPU.addStorage('planets', 8*5, 'Planet'); // planets
 
 
     webGPU.addUniform('randNumber', 0);

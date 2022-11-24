@@ -337,9 +337,6 @@ export default class WebGPU {
 
     createComputeBuffers() {
         //--------------------------------------------
-        //this._particles = new Float32Array(Array(300).fill(0));
-        //this._particlesBuffer = this._createAndMapBuffer(this._particles, GPUBufferUsage.STORAGE);
-        this._particlesBuffer = this._createBuffer(800 * 800 * 4 * 4, GPUBufferUsage.STORAGE);
         this._particlesBuffer2 = this._createBuffer(800 * 800 * 4 * 4, GPUBufferUsage.STORAGE);
         //--------------------------------------------
         const va = new Float32Array(this._vertexArray);
@@ -405,12 +402,6 @@ export default class WebGPU {
                     resource: {
                         buffer: this._parametersBuffer
                     },
-                },
-                {
-                    binding: 5,
-                    resource: {
-                        buffer: this._particlesBuffer,
-                    }
                 },
                 {
                     binding: 6,
@@ -610,12 +601,6 @@ export default class WebGPU {
             label: '_createParams() 0',
             layout: this._pipeline.getBindGroupLayout(0),
             entries: [
-                {
-                    binding: 1,
-                    resource: {
-                        buffer: this._particlesBuffer,
-                    }
-                },
                 {
                     binding: 2,
                     resource: this._sampler,

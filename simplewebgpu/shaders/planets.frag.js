@@ -25,7 +25,7 @@ struct Particles{
 ${fnusin}
 
 //@group(0) @binding(0) var<uniform> params: Params;
-@group(0) @binding(1) var<storage> particles: Particles;
+//@group(0) @binding(1) var<storage> particles: Particles;
 
 @group(0) @binding(2) var feedbackSampler: sampler;
 @group(0) @binding(3) var feedbackTexture: texture_2d<f32>;
@@ -42,7 +42,7 @@ fn main(
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
-    let particle = particles.planets[0];
+    let planet = planets[0];
     let particle2 = particles2.planets[0];
 
     let texColor = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1));
@@ -52,11 +52,11 @@ fn main(
 
     var c = 1.;
 
-    //var particle = particles[0];
+    //var planet = 0];
     var lastDistance = -1.;
     for(var i:u32 = 0; i < 8u; i++){
-        var particle = particles.planets[i];
-        var d = distance(uv, vec2(particle.x * scale + .5, particle.y * scale + .5));
+        var planet = planets[i];
+        var d = distance(uv, vec2(planet.x * scale + .5, planet.y * scale + .5));
 
 
         if(lastDistance != -1.){
