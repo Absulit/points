@@ -13,10 +13,6 @@ struct Particle{
     distance: f32
 }
 
-struct Particles{
-    items: array<Particle>
-}
-
 struct Variables{
     particlesCreated: f32,
     testValue: f32
@@ -33,16 +29,13 @@ ${PI}
 const workgroupSize = 8;
 const MARGIN = 20;
 
-var<private> numParticles:u32 = 2048;
-
 //'function', 'private', 'push_constant', 'storage', 'uniform', 'workgroup'
 @group(0) @binding(0) var <storage, read_write> layer0: Points;
 @group(0) @binding(1) var feedbackSampler: sampler;
 @group(0) @binding(2) var feedbackTexture: texture_2d<f32>;
 @group(0) @binding(3) var outputTex : texture_storage_2d<rgba8unorm, write>;
 @group(0) @binding(4) var <storage, read_write> variables: Variables;
-@group(0) @binding(5) var <storage, read_write> particles: Particles;
-@group(0) @binding(6) var <storage, read_write> particles2: Particles;
+
 
 @compute @workgroup_size(workgroupSize,workgroupSize,1)
 fn main(
@@ -50,15 +43,16 @@ fn main(
     @builtin(workgroup_id) WorkGroupID: vec3<u32>,
     @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
 ) {
+    let numParticles = u32(params.numParticles);
     var l0 = layer0.points[0];
 
     let pc: ptr<storage, f32, read_write> = &variables.particlesCreated;
 
-    let particle2 = particles2.items[0];
+    let particle2 = particles2[0];
 
     if((*pc) == 0){
         for(var k:u32; k<numParticles; k++){
-            particles.items[k] = Particle(400, 400, rand() * PI * 2, 1. );
+            particles[k] = Particle(400, 400, rand() * PI * 2, 1. );
         }
 
         (*pc) = 1;
@@ -113,7 +107,7 @@ fn main(
 
     for(var indexPiece:u32; indexPiece<=numIndexPiece; indexPiece++){
         let k:u32 = WorkGroupID.x * WorkGroupID.y * numParticles + indexPiece;
-        let particle  = &particles.items[k];
+        let particle  = &particles[k];
         //var particlePointer = (*particle);
 
         var p = polar( (*particle).distance, (*particle).angle);
@@ -176,4 +170,3 @@ fn main(
 `;
 
 export default slimeCompute;
-

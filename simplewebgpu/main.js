@@ -32,6 +32,8 @@ import random1Frag from './shaders/random1.frag.js';
 import random1Compute from './shaders/random1.compute.js';
 import random1Vert from './shaders/random1.vert.js';
 import planetsVert from './shaders/planets.vert.js';
+import reactiondifussionVert from './shaders/reactiondiffusion.vert.js';
+import slimeVert from './shaders/slime.vert.js';
 
 /***************/
 const stats = new Stats();
@@ -70,14 +72,22 @@ async function init() {
     webGPU.addUniform('sliderB', 0);
     webGPU.addUniform('sliderC', 0);
 
+    //webGPU.addUniform('randNumber', 0); // random1
+    //webGPU.addUniform('randNumber2', 0); // random1
     //webGPU.addStorage('stars', 800*800*4, 'Star'); // random1
+
     //webGPU.addStorage('planets', 8*5, 'Planet'); // planets
+    //webGPU.addStorage('chemicals', 800*800*2, 'Chemical'); // ractiondiffusion
+    //webGPU.addStorage('chemicals2', 800*800*2, 'Chemical'); // ractiondiffusion
+
+    // const numParticles = 2048;
+    // webGPU.addUniform('numParticles', numParticles);
+    // webGPU.addStorage('particles', numParticles*4, 'Particle'); // slime
+    // webGPU.addStorage('particles2', numParticles*4, 'Particle'); // slime
 
 
-    webGPU.addUniform('randNumber', 0);
-    webGPU.addUniform('randNumber2', 0);
 
-    const initialized = await webGPU.init(defaultVert, defaultCompute, defaultFrag);
+    const initialized = await webGPU.init(demo6_textureVert, defaultCompute, demo6_textureFrag);
     if (initialized) {
         await webGPU.createScreen(1, 1);
     }
@@ -100,8 +110,8 @@ async function update() {
     webGPU.updateUniform('sliderC', sliders.c);
 
 
-    webGPU.updateUniform('randNumber', Math.random());
-    webGPU.updateUniform('randNumber2', Math.random());
+    // webGPU.updateUniform('randNumber', Math.random()); // random1
+    // webGPU.updateUniform('randNumber2', Math.random()); // random1
 
     webGPU.update();
 
