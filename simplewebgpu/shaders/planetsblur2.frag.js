@@ -5,21 +5,24 @@ const planetsblur2Frag = /*wgsl*/`
 
 ${defaultStructs}
 
-struct Particle{
+struct Variable{
+    particlesCreated: f32,
+}
+
+struct Planet{
+    radius: f32,
+    speed: f32,
+    angle: f32,
     x: f32,
     y: f32
 }
 
-${fnusin}
 
-//@group(0) @binding(0) var<uniform> params: Params;
-@group(0) @binding(1) var<storage> particles: array<Particle>;
+${fnusin}
 
 @group(0) @binding(2) var feedbackSampler: sampler;
 @group(0) @binding(3) var feedbackTexture: texture_2d<f32>;
-
 @group(0) @binding(4) var computeTexture: texture_2d<f32>;
-@group(0) @binding(5) var<storage> particles2: array<Particle>;
 
 @fragment
 fn main(
@@ -33,8 +36,8 @@ fn main(
     //let texColor = textureSample(myTexture, mySampler, uv * 1.0 + .1 * fnusin(2));
     let texColor = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1.001 * mouse.x * 2,-1.001 * mouse.y * 2));
 
-    let particle = particles[0];
-    let particle2 = particles2[0];
+    let numParticles = params.numParticles;
+    let pc: ptr<storage, f32, read_write> = &variables.particlesCreated;
 
     let texColorCompute = textureSample(computeTexture, feedbackSampler, uv * vec2(1,-1));
 
@@ -67,7 +70,7 @@ fn main(
     //var particle = particles[0];
     var lastDistance = -1.;
     for(var i:u32 = 0; i < 8u; i++){
-        var particle = particles[i];
+        var particle = planets[i];
         var d = distance(uv, vec2(particle.x * scale + .5, particle.y * scale + .5));
 
 

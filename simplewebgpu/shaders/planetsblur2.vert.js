@@ -1,8 +1,21 @@
 import defaultStructs from './defaultStructs.js';
 
-const defaultVert = /*wgsl*/`
+const planetsblur2Vert = /*wgsl*/`
 
 ${defaultStructs}
+
+struct Variable{
+    particlesCreated: f32,
+}
+
+struct Planet{
+    radius: f32,
+    speed: f32,
+    angle: f32,
+    x: f32,
+    y: f32
+}
+
 
 @vertex
 fn main(
@@ -24,4 +37,4 @@ fn main(
 }
 `;
 
-export default defaultVert;
+export default planetsblur2Vert;
