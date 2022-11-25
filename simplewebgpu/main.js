@@ -40,6 +40,7 @@ import planets2Vert from './shaders/planets2.vert.js';
 import planets3Vert from './shaders/planets3.vert.js';
 import planetsblurVert from './shaders/planetsblur.vert.js';
 import planetsblur2Vert from './shaders/planetsblur2.vert.js';
+import slime2Vert from './shaders/slime2.vert.js';
 
 /***************/
 const stats = new Stats();
@@ -97,22 +98,27 @@ async function init() {
     // webGPU.addStorage('planets', numParticles, 'Planet', 5); // planetsblur
     // webGPU.addStorage('variables', 1, 'Variable', 1); // planetsblur
 
-    const numParticles = 8; // planetsblur2
-    webGPU.addUniform('numParticles', numParticles); // planetsblur2
-    webGPU.addStorage('planets', numParticles, 'Planet', 5); // planetsblur2
-    webGPU.addStorage('variables', 1, 'Variable', 1); // planetsblur2
+    // const numParticles = 8; // planetsblur2
+    // webGPU.addUniform('numParticles', numParticles); // planetsblur2
+    // webGPU.addStorage('planets', numParticles, 'Planet', 5); // planetsblur2
+    // webGPU.addStorage('variables', 1, 'Variable', 1); // planetsblur2
 
     // webGPU.addStorage('chemicals', 800*800, 'Chemical', 2); // ractiondiffusion
     // webGPU.addStorage('chemicals2', 800*800, 'Chemical', 2); // ractiondiffusion
 
-    // const numParticles = 1024 * 2;
-    // webGPU.addUniform('numParticles', numParticles);
+    // const numParticles = 1024 * 2;// slime
+    // webGPU.addUniform('numParticles', numParticles);// slime
     // webGPU.addStorage('particles', numParticles, 'Particle', 4); // slime
     // webGPU.addStorage('variables', 1, 'Variable', 1); // slime
 
+    const numParticles = 1024 * 2;// slime2
+    webGPU.addUniform('numParticles', numParticles);// slime2
+    webGPU.addStorage('particles', numParticles, 'Particle', 4); // slime2
+    webGPU.addStorage('variables', 1, 'Variable', 1); // slime2
 
 
-    const initialized = await webGPU.init(planetsblur2Vert, planetsblur2Compute, planetsblur2Frag);
+
+    const initialized = await webGPU.init(slime2Vert, slime2Compute, slime2Frag);
     if (initialized) {
         await webGPU.createScreen(1, 1);
     }

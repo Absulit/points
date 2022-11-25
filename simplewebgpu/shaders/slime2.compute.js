@@ -6,19 +6,14 @@ const slime2Compute = /*wgsl*/`
 
 ${defaultStructs}
 
-struct Variables{
+struct Variable{
     particlesCreated: f32,
-    testValue: f32
 }
 
 struct Particle{
     position: vec2<f32>,
     angle: f32,
     distance: f32
-}
-
-struct Particles{
-    items: array<Particle>
 }
 
 ${rand}
@@ -34,7 +29,6 @@ fn sense(particle:Particle, sensorAngleOffset:f32){
     let sum = 0.;
 }
 
-var<private> numParticles:u32 = 500;
 ${PI}
 const workgroupSize = 8;
 const MARGIN = 20;
@@ -44,9 +38,6 @@ const MARGIN = 20;
 @group(0) @binding(1) var feedbackSampler: sampler;
 @group(0) @binding(2) var feedbackTexture: texture_2d<f32>;
 @group(0) @binding(3) var outputTex : texture_storage_2d<rgba8unorm, write>;
-@group(0) @binding(4) var <storage, read_write> variables: Variables;
-@group(0) @binding(5) var <storage, read_write> particles: Particles;
-@group(0) @binding(6) var <storage, read_write> particles2: Particles;
 
 @compute @workgroup_size(workgroupSize,workgroupSize,1)
 fn main(
@@ -55,12 +46,12 @@ fn main(
     @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
 ) {
     var l0 = layer0.points[0];
-    let item2 = particles2.items[0];
     let pc: ptr<storage, f32, read_write> = &variables.particlesCreated;
+    let numParticles = u32(params.numParticles);
 
     if((*pc) == 0){
-        for(var k:u32; k<numParticles; k++){
-            particles.items[k] = Particle( vec2<f32>(400., 400.), rand() * PI * 2, 1. );
+        for(var k:u32; k < numParticles; k++){
+            particles[k] = Particle( vec2<f32>(400., 400.), rand() * PI * 2, 1. );
         }
 
         (*pc) = 1;
@@ -112,7 +103,7 @@ fn main(
 
     for(var indexPiece:u32; indexPiece<numIndexPiece; indexPiece++){
         let k:u32 = WorkGroupID.x * WorkGroupID.y * numParticles + indexPiece;
-        let particle  = &particles.items[k];
+        let particle  = &particles[k];
 
         let direction = vec2<f32>(cos( (*particle).angle ), sin( (*particle).angle ));
         var newPos = (*particle).position + direction * moveSpeed * params.utime;

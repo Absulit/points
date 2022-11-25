@@ -1,6 +1,6 @@
 import defaultStructs from './defaultStructs.js';
 
-const defaultVert = /*wgsl*/`
+const slime2Vert = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -34,4 +34,4 @@ fn main(
 }
 `;
 
-export default defaultVert;
+export default slime2Vert;

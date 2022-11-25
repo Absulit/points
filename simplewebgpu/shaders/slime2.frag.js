@@ -5,21 +5,21 @@ const slime2Frag = /*wgsl*/`
 
 ${defaultStructs}
 
+struct Variable{
+    particlesCreated: f32,
+}
+
 struct Particle{
-    x: f32,
-    y: f32
+    position: vec2<f32>,
+    angle: f32,
+    distance: f32
 }
 
 ${fusin}
 
-//@group(0) @binding(0) var<uniform> params: Params;
-@group(0) @binding(1) var<storage> particles: array<Particle>;
-
 @group(0) @binding(2) var feedbackSampler: sampler;
 @group(0) @binding(3) var feedbackTexture: texture_2d<f32>;
-
 @group(0) @binding(4) var computeTexture: texture_2d<f32>;
-@group(0) @binding(5) var<storage> particles2: array<Particle>;
 
 
 @fragment
@@ -39,7 +39,8 @@ fn main(
     let texColorCompute = textureSample(computeTexture, feedbackSampler, uv * vec2(1,-1));
 
     let particle = particles[0];
-    let particle2 = particles2[0];
+    let pc: ptr<storage, f32, read_write> = &variables.particlesCreated;
+    let numParticles = params.numParticles;
 
     let d = distance(uv, vec2(.5 + .1 * fusin(2), .5  + .1 * fusin(4.123)));
     var c = 1.;
