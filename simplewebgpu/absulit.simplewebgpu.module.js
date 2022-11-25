@@ -154,7 +154,7 @@ export default class WebGPU {
             dynamicGroupBindings += /*wgsl*/`@group(1) @binding(0) var <uniform> params: Params;\n`;
             bindingIndex += 1;
         }
-        console.log(this._storage);
+
         this._storage.forEach((storageItem, index) => {
             let T = storageItem.structName;
             if (storageItem.size > 1) {
@@ -164,7 +164,7 @@ export default class WebGPU {
         });
 
         colorsVertWGSL = dynamicGroupBindings + colorsVertWGSL;
-        console.log(colorsVertWGSL);
+
         colorsComputeWGSL = dynamicGroupBindings + colorsComputeWGSL;
         colorsFragWGSL = dynamicGroupBindings + colorsFragWGSL;
 

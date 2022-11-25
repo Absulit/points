@@ -38,7 +38,6 @@ fn main(
     let texColorCompute = textureSample(computeTexture, feedbackSampler, uv * vec2(1,-1));
 
     let particle = particles[0];
-    let particle2 = particles2[0];
     let pc: ptr<storage, f32, read_write> = &variables.particlesCreated;
 
     let d = distance(uv, vec2(.5 + .1 * fusin(2), .5  + .1 * fusin(4.123)));

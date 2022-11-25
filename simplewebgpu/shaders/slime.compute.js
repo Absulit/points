@@ -42,13 +42,13 @@ fn main(
 ) {
     let numParticles = u32(params.numParticles);
     var l0 = layer0.points[0];
-
     let pc: ptr<storage, f32, read_write> = &variables.particlesCreated;
-    let particle2 = particles2[0];
+
 
     if((*pc) == 0){
         for(var k:u32; k<numParticles; k++){
-            particles[k] = Particle(400, 400, rand() * PI * 2, 1. );
+            rand_seed = vec2<f32>( f32(k), f32(k));
+            particles[k] = Particle(400 + rand() * 50, 400 + rand() * 50, rand() * PI * 2, 1. );
         }
 
         (*pc) = 1;

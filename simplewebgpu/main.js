@@ -83,11 +83,11 @@ async function init() {
     // webGPU.addStorage('chemicals', 800*800, 'Chemical', 2); // ractiondiffusion
     // webGPU.addStorage('chemicals2', 800*800, 'Chemical', 2); // ractiondiffusion
 
-    const numParticles = 2048;
+    const numParticles = 1024 * 2;
     webGPU.addUniform('numParticles', numParticles);
     webGPU.addStorage('particles', numParticles, 'Particle', 4); // slime
-    webGPU.addStorage('particles2', numParticles, 'Particle', 4); // slime
-    webGPU.addStorage('variables', 1, 'Variable', 1); // slime ****
+    //webGPU.addStorage('particles2', numParticles, 'Particle', 4); // slime
+    webGPU.addStorage('variables', 1, 'Variable', 1); // slime
 
 
 
