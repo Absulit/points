@@ -6,7 +6,6 @@ struct Fragment {
     @location(1) uv: vec2<f32>
 }
 
-
 @vertex
 fn main(@location(0) position: vec4<f32>, @location(1) color: vec4<f32>, @location(2) uv: vec2<f32>, @builtin(vertex_index) VertexIndex: u32) -> Fragment {
 
@@ -21,4 +20,3 @@ fn main(@location(0) position: vec4<f32>, @location(1) color: vec4<f32>, @locati
 `;
 
 export default demo6_textureVert;
-

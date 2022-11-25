@@ -37,6 +37,7 @@ import slimeVert from './shaders/slime.vert.js';
 import blur1Vert from './shaders/blur1.vert.js';
 import circleblurVert from './shaders/circleblur.vert.js';
 import planets2Vert from './shaders/planets2.vert.js';
+import planets3Vert from './shaders/planets3.vert.js';
 
 /***************/
 const stats = new Stats();
@@ -84,6 +85,11 @@ async function init() {
     // webGPU.addStorage('planets', 8, 'Planet', 5); // planets2
     // webGPU.addStorage('variables', 1, 'Variable', 1); // planets2
 
+    const numParticles = 1024 * 4; // planets3
+    webGPU.addUniform('numParticles', numParticles); // planets3
+    webGPU.addStorage('planets', numParticles, 'Planet', 3); // planets3
+    webGPU.addStorage('variables', 1, 'Variable', 1); // planets3
+
     // webGPU.addStorage('chemicals', 800*800, 'Chemical', 2); // ractiondiffusion
     // webGPU.addStorage('chemicals2', 800*800, 'Chemical', 2); // ractiondiffusion
 
@@ -94,7 +100,7 @@ async function init() {
 
 
 
-    const initialized = await webGPU.init(defaultVert, defaultCompute, test1Frag);
+    const initialized = await webGPU.init(planets3Vert, planets3Compute, planets3Frag);
     if (initialized) {
         await webGPU.createScreen(1, 1);
     }
