@@ -68,7 +68,6 @@ export default class WebGPU {
         this._vertexArray = [];
         this._gpuBufferFirstMatrix = [];
         this._layer0Buffer = [];
-        this._parametersArray = [];
         this._layer0BufferSize = null;
 
         this._numColumns = null;
@@ -119,11 +118,12 @@ export default class WebGPU {
      * @param {string} structName Name of the struct already existing on the
      * shader that will be the array<structName> of the Storage
      */
-    addStorage(name, size, structName) {
+    addStorage(name, size, structName, structSize) {
         this._storage.push({
             name: name,
             size: size,
             structName: structName,
+            structSize: structSize,
             buffer: null
         });
     }
@@ -144,7 +144,7 @@ export default class WebGPU {
                 struct Params {
                     ${dynamicStructParams}
                 }
-            `;
+            \n`;
         }
 
         dynamicGroupBindings += dynamicStructParams;
@@ -156,10 +156,15 @@ export default class WebGPU {
         }
         console.log(this._storage);
         this._storage.forEach((storageItem, index) => {
-            dynamicGroupBindings += /*wgsl*/`@group(1) @binding(${bindingIndex + index}) var <storage, read_write> ${storageItem.name}: array<${storageItem.structName}>;\n`
-        })
+            let T = storageItem.structName;
+            if (storageItem.size > 1) {
+                T = `array<${storageItem.structName}>`;
+            }
+            dynamicGroupBindings += /*wgsl*/`@group(1) @binding(${bindingIndex + index}) var <storage, read_write> ${storageItem.name}: ${T};\n`
+        });
 
         colorsVertWGSL = dynamicGroupBindings + colorsVertWGSL;
+        console.log(colorsVertWGSL);
         colorsComputeWGSL = dynamicGroupBindings + colorsComputeWGSL;
         colorsFragWGSL = dynamicGroupBindings + colorsFragWGSL;
 
@@ -341,14 +346,10 @@ export default class WebGPU {
         const va = new Float32Array(this._vertexArray);
         this._layer0Buffer = this._createAndMapBuffer(va, GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC);
         //--------------------------------------------
-        this._parametersArray = new Float32Array([0, 0, 0, 0, 0]);
-        this._parametersBuffer = this._createAndMapBuffer(this._parametersArray, GPUBufferUsage.STORAGE);
-
-        //--------------------------------------------
         this._createParametersUniforms();
         //--------------------------------------------
         this._storage.forEach(storageItem => {
-            storageItem.buffer = this._createBuffer(storageItem.size * 4, GPUBufferUsage.STORAGE);
+            storageItem.buffer = this._createBuffer(storageItem.size * storageItem.structSize * 4, GPUBufferUsage.STORAGE);
         })
     }
 
@@ -395,12 +396,6 @@ export default class WebGPU {
                 {
                     binding: 3,
                     resource: this._outputTexture.createView(),
-                },
-                {
-                    binding: 4,
-                    resource: {
-                        buffer: this._parametersBuffer
-                    },
                 }
             ]
         });

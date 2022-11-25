@@ -76,21 +76,22 @@ async function init() {
 
     //webGPU.addUniform('randNumber', 0); // random1
     //webGPU.addUniform('randNumber2', 0); // random1
-    //webGPU.addStorage('stars', 800*800*4, 'Star'); // random1
+    //webGPU.addStorage('stars', 800*800, 'Star', 4); // random1
 
-    webGPU.addStorage('planets', 8*5, 'Planet'); // planets
+    // webGPU.addStorage('planets', 8, 'Planet', 5); // planets
 
-    // webGPU.addStorage('chemicals', 800*800*2, 'Chemical'); // ractiondiffusion
-    // webGPU.addStorage('chemicals2', 800*800*2, 'Chemical'); // ractiondiffusion
+    // webGPU.addStorage('chemicals', 800*800, 'Chemical', 2); // ractiondiffusion
+    // webGPU.addStorage('chemicals2', 800*800, 'Chemical', 2); // ractiondiffusion
 
-    // const numParticles = 2048;
-    // webGPU.addUniform('numParticles', numParticles);
-    // webGPU.addStorage('particles', numParticles*4, 'Particle'); // slime
-    // webGPU.addStorage('particles2', numParticles*4, 'Particle'); // slime
+    const numParticles = 2048;
+    webGPU.addUniform('numParticles', numParticles);
+    webGPU.addStorage('particles', numParticles, 'Particle', 4); // slime
+    webGPU.addStorage('particles2', numParticles, 'Particle', 4); // slime
+    webGPU.addStorage('variables', 1, 'Variable', 1); // slime ****
 
 
 
-    const initialized = await webGPU.init(planetsVert, planetsCompute, planetsFrag);
+    const initialized = await webGPU.init(slimeVert, slimeCompute, slimeFrag);
     if (initialized) {
         await webGPU.createScreen(1, 1);
     }

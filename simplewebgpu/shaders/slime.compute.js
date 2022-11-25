@@ -13,9 +13,8 @@ struct Particle{
     distance: f32
 }
 
-struct Variables{
-    particlesCreated: f32,
-    testValue: f32
+struct Variable{
+    particlesCreated: f32
 }
 
 ${rand}
@@ -34,8 +33,6 @@ const MARGIN = 20;
 @group(0) @binding(1) var feedbackSampler: sampler;
 @group(0) @binding(2) var feedbackTexture: texture_2d<f32>;
 @group(0) @binding(3) var outputTex : texture_storage_2d<rgba8unorm, write>;
-@group(0) @binding(4) var <storage, read_write> variables: Variables;
-
 
 @compute @workgroup_size(workgroupSize,workgroupSize,1)
 fn main(
@@ -47,7 +44,6 @@ fn main(
     var l0 = layer0.points[0];
 
     let pc: ptr<storage, f32, read_write> = &variables.particlesCreated;
-
     let particle2 = particles2[0];
 
     if((*pc) == 0){
