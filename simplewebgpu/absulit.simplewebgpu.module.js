@@ -1,5 +1,4 @@
 import Coordinate from './coordinate.js';
-import { getShaderSource } from './shader_loader.js';
 import { print } from '../../js/utils.js';
 import RGBAColor from './../webgpu/js/color.js';
 import defaultVert from './shaders/default.vert.js';
