@@ -77,7 +77,7 @@ export default class WebGPU {
 
         this._renderPassDescriptor = null;
 
-        this._parameters = [];
+        this._uniforms = [];
         this._storage = [];
     }
 
@@ -90,7 +90,7 @@ export default class WebGPU {
      * @param {Number} value Number will be converted to `f32`
      */
     addUniform(name, value) {
-        this._parameters.push({
+        this._uniforms.push({
             name: name,
             value: value,
         });
@@ -102,7 +102,7 @@ export default class WebGPU {
      * @param {*} value Number will be converted to `f32`
      */
     updateUniform(name, value) {
-        const variable = this._parameters.find(v => v.name === name);
+        const variable = this._uniforms.find(v => v.name === name);
         if (!variable) {
             throw '`updateVariable()` can\'t be called without first `addVariable()`.';
         }
@@ -135,11 +135,11 @@ export default class WebGPU {
 
         let dynamicGroupBindings = '';
         let dynamicStructParams = '';
-        this._parameters.forEach((variable, index) => {
+        this._uniforms.forEach((variable, index) => {
             dynamicStructParams += /*wgsl*/`${variable.name}:f32, \n`;
         });
 
-        if (this._parameters.length) {
+        if (this._uniforms.length) {
             dynamicStructParams = /*wgsl*/`
                 struct Params {
                     ${dynamicStructParams}
@@ -150,7 +150,7 @@ export default class WebGPU {
         dynamicGroupBindings += dynamicStructParams;
 
         let bindingIndex = 0;
-        if (this._parameters.length) {
+        if (this._uniforms.length) {
             dynamicGroupBindings += /*wgsl*/`@group(1) @binding(0) var <uniform> params: Params;\n`;
             bindingIndex += 1;
         }
@@ -336,8 +336,8 @@ export default class WebGPU {
     }
 
     _createParametersUniforms() {
-        const values = new Float32Array(this._parameters.map(v => v.value));
-        this._parameters.buffer = this._createAndMapBuffer(values, GPUBufferUsage.UNIFORM);
+        const values = new Float32Array(this._uniforms.map(v => v.value));
+        this._uniforms.buffer = this._createAndMapBuffer(values, GPUBufferUsage.UNIFORM);
     }
 
     createComputeBuffers() {
@@ -401,12 +401,12 @@ export default class WebGPU {
         });
 
         let entries = [];
-        if (this._parameters.length) {
+        if (this._uniforms.length) {
             entries.push(
                 {
                     binding: 0,
                     resource: {
-                        buffer: this._parameters.buffer
+                        buffer: this._uniforms.buffer
                     }
                 }
             );
@@ -605,12 +605,12 @@ export default class WebGPU {
         });
 
         let entries = [];
-        if (this._parameters.length) {
+        if (this._uniforms.length) {
             entries.push(
                 {
                     binding: 0,
                     resource: {
-                        buffer: this._parameters.buffer
+                        buffer: this._uniforms.buffer
                     }
                 }
             );
@@ -661,7 +661,7 @@ export default class WebGPU {
         const passEncoder = commandEncoder.beginComputePass();
         passEncoder.setPipeline(this._computePipeline);
         passEncoder.setBindGroup(0, this._computeBindGroups);
-        if (this._parameters.length) {
+        if (this._uniforms.length) {
             passEncoder.setBindGroup(1, this._computeBindGroups2);
         }
         passEncoder.dispatchWorkgroups(8, 8, 1);
@@ -698,7 +698,7 @@ export default class WebGPU {
 
             this._createParams();
             passEncoder.setBindGroup(0, this._uniformBindGroup);
-            if (this._parameters.length) {
+            if (this._uniforms.length) {
                 passEncoder.setBindGroup(1, this._uniformBindGroup2);
             }
             passEncoder.setVertexBuffer(0, this._buffer);
