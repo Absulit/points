@@ -76,6 +76,7 @@ export default class WebGPU {
 
         this._uniforms = [];
         this._storage = [];
+        this._samplers = [];
     }
 
     /**
@@ -125,6 +126,29 @@ export default class WebGPU {
         });
     }
 
+    /**
+     * Creates a `sampler` to be sent to the shaders.
+     * @param {string} name Name of the `sampler` to be called in the shaders.
+     * @param {GPUSamplerDescriptor} descriptor
+     */
+    addSampler(name, descriptor) {
+        // Create a sampler with linear filtering for smooth interpolation.
+        descriptor = descriptor || {
+            addressModeU: 'repeat',
+            addressModeV: 'repeat',
+            magFilter: 'linear',
+            minFilter: 'linear',
+            mipmapFilter: 'linear',
+            //maxAnisotropy: 10,
+        };
+
+        this._samplers.push({
+            name: name,
+            descriptor: descriptor,
+            resource: null
+        });
+    }
+
     async init(vertexShader, computeShader, fragmentShader) {
         let colorsVertWGSL = vertexShader || defaultVert;
         let colorsComputeWGSL = computeShader || defaultCompute;
@@ -159,6 +183,12 @@ export default class WebGPU {
             }
             dynamicGroupBindings += /*wgsl*/`@group(1) @binding(${bindingIndex + index}) var <storage, read_write> ${storageItem.name}: ${T};\n`
         });
+        bindingIndex += this._storage.length || 0;
+
+        this._samplers.forEach((sampler, index) => {
+            dynamicGroupBindings += /*wgsl*/`@group(1) @binding(${bindingIndex + index}) var ${sampler.name}: sampler;\n`;
+        });
+        bindingIndex += this._storage.length || 0;
 
         colorsVertWGSL = dynamicGroupBindings + colorsVertWGSL;
         colorsComputeWGSL = dynamicGroupBindings + colorsComputeWGSL;
@@ -226,16 +256,6 @@ export default class WebGPU {
             size: this._presentationSize,
             format: 'rgba8unorm',
             usage: GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
-        });
-
-        // Create a sampler with linear filtering for smooth interpolation.
-        this._sampler = this._device.createSampler({
-            addressModeU: 'repeat',
-            addressModeV: 'repeat',
-            magFilter: 'linear',
-            minFilter: 'linear',
-            mipmapFilter: 'linear',
-            //maxAnisotropy: 10,
         });
 
         this._renderPassDescriptor = {
@@ -342,7 +362,9 @@ export default class WebGPU {
         //--------------------------------------------
         this._storage.forEach(storageItem => {
             storageItem.buffer = this._createBuffer(storageItem.size * storageItem.structSize * 4, GPUBufferUsage.STORAGE);
-        })
+        });
+
+        this._samplers.forEach(sampler => sampler.resource = this._device.createSampler(sampler.descriptor));
     }
 
     /**
@@ -371,10 +393,6 @@ export default class WebGPU {
             label: '_createComputeBindGroup 0',
             layout: this._computePipeline.getBindGroupLayout(0 /* index */),
             entries: [
-                {
-                    binding: 1,
-                    resource: this._sampler,
-                },
                 {
                     binding: 2,
                     resource: this._feedbackLoopTexture.createView(),
@@ -408,6 +426,17 @@ export default class WebGPU {
                         resource: {
                             buffer: storageItem.buffer
                         }
+                    }
+                );
+            });
+        }
+        if (this._samplers.length) {
+            const entriesIndex = entries.length;
+            this._samplers.forEach((sampler, index) => {
+                entries.push(
+                    {
+                        binding: entriesIndex + index,
+                        resource: sampler.resource
                     }
                 );
             });
@@ -576,10 +605,6 @@ export default class WebGPU {
             layout: this._pipeline.getBindGroupLayout(0),
             entries: [
                 {
-                    binding: 2,
-                    resource: this._sampler,
-                },
-                {
                     binding: 3,
                     resource: this._feedbackLoopTexture.createView(),
                 },
@@ -612,6 +637,17 @@ export default class WebGPU {
                         resource: {
                             buffer: storageItem.buffer
                         }
+                    }
+                );
+            });
+        }
+        if (this._samplers.length) {
+            const entriesIndex = entries.length;
+            this._samplers.forEach((sampler, index) => {
+                entries.push(
+                    {
+                        binding: entriesIndex + index,
+                        resource: sampler.resource
                     }
                 );
             });
