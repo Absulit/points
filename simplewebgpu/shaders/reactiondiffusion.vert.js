@@ -4,6 +4,10 @@ const reactiondifussionVert = /*wgsl*/`
 
 ${defaultStructs}
 
+struct Variable{
+    squaresCreated: f32
+}
+
 struct Chemical{
     a: f32,
     b: f32

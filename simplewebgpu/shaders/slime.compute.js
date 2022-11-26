@@ -26,10 +26,9 @@ ${soften8}
 
 ${PI}
 const workgroupSize = 8;
-const MARGIN = 20;
+const MARGIN = 2;
 
 //'function', 'private', 'push_constant', 'storage', 'uniform', 'workgroup'
-@group(0) @binding(0) var <storage, read_write> layer0: Points;
 @group(0) @binding(1) var feedbackSampler: sampler;
 @group(0) @binding(2) var feedbackTexture: texture_2d<f32>;
 @group(0) @binding(3) var outputTex : texture_storage_2d<rgba8unorm, write>;
@@ -41,7 +40,6 @@ fn main(
     @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
 ) {
     let numParticles = u32(params.numParticles);
-    var l0 = layer0.points[0];
     let pc: ptr<storage, f32, read_write> = &variables.particlesCreated;
 
 

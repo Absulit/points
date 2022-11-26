@@ -66,8 +66,6 @@ export default class WebGPU {
 
         this._vertexArray = [];
         this._gpuBufferFirstMatrix = [];
-        this._layer0Buffer = [];
-        this._layer0BufferSize = null;
 
         this._numColumns = null;
         this._numRows = null;
@@ -163,7 +161,6 @@ export default class WebGPU {
         });
 
         colorsVertWGSL = dynamicGroupBindings + colorsVertWGSL;
-
         colorsComputeWGSL = dynamicGroupBindings + colorsComputeWGSL;
         colorsFragWGSL = dynamicGroupBindings + colorsFragWGSL;
 
@@ -341,10 +338,6 @@ export default class WebGPU {
 
     createComputeBuffers() {
         //--------------------------------------------
-        //--------------------------------------------
-        const va = new Float32Array(this._vertexArray);
-        this._layer0Buffer = this._createAndMapBuffer(va, GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC);
-        //--------------------------------------------
         this._createParametersUniforms();
         //--------------------------------------------
         this._storage.forEach(storageItem => {
@@ -378,12 +371,6 @@ export default class WebGPU {
             label: '_createComputeBindGroup 0',
             layout: this._computePipeline.getBindGroupLayout(0 /* index */),
             entries: [
-                {
-                    binding: 0,
-                    resource: {
-                        buffer: this._layer0Buffer
-                    }
-                },
                 {
                     binding: 1,
                     resource: this._sampler,
@@ -667,13 +654,13 @@ export default class WebGPU {
         passEncoder.end();
 
 
-        commandEncoder.copyBufferToBuffer(
-            this._layer0Buffer /* source buffer */,
-            0 /* source offset */,
-            this._buffer /* destination buffer */,
-            0 /* destination offset */,
-            this._layer0BufferSize /* size */
-        );
+        // commandEncoder.copyBufferToBuffer(
+        //     this._layer0Buffer /* source buffer */,
+        //     0 /* source offset */,
+        //     this._buffer /* destination buffer */,
+        //     0 /* destination offset */,
+        //     this._layer0BufferSize /* size */
+        // );
 
         // ---------------------
 

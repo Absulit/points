@@ -4,9 +4,8 @@ const planetsVert = /*wgsl*/`
 
 ${defaultStructs}
 
-struct Particle{
-    x: f32,
-    y: f32
+struct Variable{
+    particlesCreated: f32,
 }
 
 struct Planet{

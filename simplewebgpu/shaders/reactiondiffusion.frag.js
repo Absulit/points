@@ -5,6 +5,10 @@ const reactiondiffusionFrag = /*wgsl */`
 
 ${defaultStructs}
 
+struct Variable{
+    squaresCreated: f32
+}
+
 struct Chemical{
     a: f32,
     b: f32
@@ -37,6 +41,7 @@ fn main(
 
     var particle = chemicals[0];
     var particle2 = chemicals2[0];
+    let sc: ptr<storage, f32, read_write> = &variables.squaresCreated;
 
     let d = distance(uv, vec2(.5 + .1 * fusin(2), .5  + .1 * fusin(4.123)));
     var c = 1.;

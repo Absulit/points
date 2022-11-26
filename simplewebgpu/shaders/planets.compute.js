@@ -9,9 +9,8 @@ ${rand}
 ${clearMix}
 ${polar}
 
-struct Variables{
+struct Variable{
     particlesCreated: f32,
-    testValue: f32
 }
 
 struct Planet{
@@ -22,18 +21,15 @@ struct Planet{
     y: f32
 }
 
-
 var<private> numParticles:u32 = 8;
 
 
 const workgroupSize = 8;
 
 //'function', 'private', 'push_constant', 'storage', 'uniform', 'workgroup'
-@group(0) @binding(0) var <storage, read_write> layer0: Points;
 @group(0) @binding(1) var feedbackSampler: sampler;
 @group(0) @binding(2) var feedbackTexture: texture_2d<f32>;
 @group(0) @binding(3) var outputTex : texture_storage_2d<rgba8unorm, write>;
-@group(0) @binding(4) var <storage, read_write> variables: Variables;
 
 
 @compute @workgroup_size(workgroupSize,workgroupSize,1)
@@ -42,7 +38,6 @@ fn main(
     @builtin(workgroup_id) WorkGroupID: vec3<u32>,
     @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
 ) {
-    var l0 = layer0.points[0];
     let utime = params.utime;
 
     let pc: ptr<storage, f32, read_write> = &variables.particlesCreated;
@@ -85,8 +80,6 @@ fn main(
         let y = f32(pointFromCenter.y);
         let ux = u32(x);
         let uy = u32(y);
-
-        variables.testValue += .1;
 
         if((*planet).angle > 360){
             (*planet).angle = 0.;

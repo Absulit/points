@@ -79,11 +79,12 @@ async function init() {
     webGPU.addUniform('sliderB', 0);
     webGPU.addUniform('sliderC', 0);
 
-    //webGPU.addUniform('randNumber', 0); // random1
-    //webGPU.addUniform('randNumber2', 0); // random1
-    //webGPU.addStorage('stars', 800*800, 'Star', 4); // random1
+    // webGPU.addUniform('randNumber', 0); // random1
+    // webGPU.addUniform('randNumber2', 0); // random1
+    // webGPU.addStorage('stars', 800*800, 'Star', 4); // random1
 
     // webGPU.addStorage('planets', 8, 'Planet', 5); // planets
+    // webGPU.addStorage('variables', 1, 'Variable', 1); // planets
 
     // webGPU.addStorage('planets', 8, 'Planet', 5); // planets2
     // webGPU.addStorage('variables', 1, 'Variable', 1); // planets2
@@ -103,8 +104,9 @@ async function init() {
     // webGPU.addStorage('planets', numParticles, 'Planet', 5); // planetsblur2
     // webGPU.addStorage('variables', 1, 'Variable', 1); // planetsblur2
 
-    // webGPU.addStorage('chemicals', 800*800, 'Chemical', 2); // ractiondiffusion
-    // webGPU.addStorage('chemicals2', 800*800, 'Chemical', 2); // ractiondiffusion
+    // webGPU.addStorage('chemicals', 800 * 800, 'Chemical', 2); // ractiondiffusion
+    // webGPU.addStorage('chemicals2', 800 * 800, 'Chemical', 2); // ractiondiffusion
+    // webGPU.addStorage('variables', 1, 'Variable', 1); // ractiondiffusion
 
     // const numParticles = 1024 * 2;// slime
     // webGPU.addUniform('numParticles', numParticles);// slime
@@ -118,7 +120,7 @@ async function init() {
 
 
 
-    const initialized = await webGPU.init(slime2Vert, slime2Compute, slime2Frag);
+    const initialized = await webGPU.init(slimeVert, slimeCompute, slimeFrag);
     if (initialized) {
         await webGPU.createScreen(1, 1);
     }

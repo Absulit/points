@@ -6,9 +6,7 @@ const reactiondiffusionCompute = /*wgsl*/`
 
 ${defaultStructs}
 
-struct Variables{
-    particlesCreated: f32,
-    testValue: f32,
+struct Variable{
     squaresCreated: f32
 }
 
@@ -16,7 +14,6 @@ struct Chemical{
     a: f32,
     b: f32
 }
-
 
 ${rand}
 ${clearMix}
@@ -119,11 +116,9 @@ const FEED = .055; // .055
 const K = .062; //.062
 
 //'function', 'private', 'push_constant', 'storage', 'uniform', 'workgroup'
-@group(0) @binding(0) var<storage, read_write> layer0: Points;
 @group(0) @binding(1) var feedbackSampler: sampler;
 @group(0) @binding(2) var feedbackTexture: texture_2d<f32>;
 @group(0) @binding(3) var outputTex : texture_storage_2d<rgba8unorm, write>;
-@group(0) @binding(4) var <storage, read_write> variables: Variables;
 
 @compute @workgroup_size(workgroupSize,workgroupSize,1)
 fn main(
@@ -131,7 +126,6 @@ fn main(
     @builtin(workgroup_id) WorkGroupID: vec3<u32>,
     @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
 ) {
-    var l0 = layer0.points[0];
     let utime = params.utime;
     let chemical = chemicals[0];
     let chemical2 = chemicals2[0];

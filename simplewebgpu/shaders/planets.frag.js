@@ -5,12 +5,11 @@ const planetsFrag = /*wgsl*/`
 
 ${defaultStructs}
 
-struct Particle{
-    x: f32,
-    y: f32
+struct Variable{
+    particlesCreated: f32,
 }
 
-struct Planet {
+struct Planet{
     radius: f32,
     speed: f32,
     angle: f32,
@@ -18,12 +17,7 @@ struct Planet {
     y: f32
 }
 
-struct Particles{
-    planets: array<Planet>
-}
-
 ${fnusin}
-
 
 @group(0) @binding(2) var feedbackSampler: sampler;
 @group(0) @binding(3) var feedbackTexture: texture_2d<f32>;
@@ -38,6 +32,7 @@ fn main(
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
+    let pc: ptr<storage, f32, read_write> = &variables.particlesCreated;
 
     let texColor = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1));
     let texColorCompute = textureSample(computeTexture, feedbackSampler, uv * vec2(1,-1));

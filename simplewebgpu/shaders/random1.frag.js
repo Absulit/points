@@ -20,16 +20,9 @@ struct Star{
 ${fnusin}
 ${fusin}
 
-
-//@group(0) @binding(0) var<uniform> params: Params;
-@group(0) @binding(1) var<storage> particles: array<Particle>;
-
 @group(0) @binding(2) var feedbackSampler: sampler;
 @group(0) @binding(3) var feedbackTexture: texture_2d<f32>;
-
 @group(0) @binding(4) var computeTexture: texture_2d<f32>;
-@group(0) @binding(5) var<storage> particles2: array<Particle>;
-
 
 @fragment
 fn main(
@@ -40,8 +33,6 @@ fn main(
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
-    let particle = particles[0];
-    let particle2 = particles2[0];
     let star = stars[0];
 
     let texColor = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1));

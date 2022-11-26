@@ -10,7 +10,6 @@ struct Particle{
     y: f32
 }
 
-
 ${fnusin}
 ${fusin}
 
