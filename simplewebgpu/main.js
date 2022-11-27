@@ -117,7 +117,9 @@ async function init() {
     webGPU.addUniform('numParticles', numParticles);// slime2
     webGPU.addStorage('particles', numParticles, 'Particle', 4); // slime2
     webGPU.addStorage('variables', 1, 'Variable', 1); // slime2
-    webGPU.addSampler('feedbackSampler');
+    webGPU.addSampler('feedbackSampler'); // slime2
+    webGPU.addTexture2d('feedbackTexture', true); // slime2
+    webGPU.addTextureStorage2dToTexture2d('outputTex', 'computeTexture'); // slime2
 
 
 

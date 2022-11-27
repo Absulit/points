@@ -77,6 +77,8 @@ export default class WebGPU {
         this._uniforms = [];
         this._storage = [];
         this._samplers = [];
+        this._textures2d = [];
+        this._texturesStorage2d = [];
     }
 
     /**
@@ -149,6 +151,29 @@ export default class WebGPU {
         });
     }
 
+    /**
+     * Create a `texture_2d` in the shaders.
+     * @param {string} name Name to call the texture in the shaders.
+     * @param {boolean} copyCurrentTexture If you want the fragment output to be copied here.
+     */
+    addTexture2d(name, copyCurrentTexture) {
+        this._textures2d.push({
+            name: name,
+            copyCurrentTexture: copyCurrentTexture,
+            texture: null
+        });
+    }
+
+    //
+    addTextureStorage2dToTexture2d(computeTextureStorage2dName, fragmentTexture2dName) {
+        this._texturesStorage2d.push({
+            computeTextureStorage2dName: computeTextureStorage2dName,
+            texture: null
+        });
+
+        this.addTexture2d(fragmentTexture2dName, false);
+    }
+
     async init(vertexShader, computeShader, fragmentShader) {
         let colorsVertWGSL = vertexShader || defaultVert;
         let colorsComputeWGSL = computeShader || defaultCompute;
@@ -188,11 +213,25 @@ export default class WebGPU {
         this._samplers.forEach((sampler, index) => {
             dynamicGroupBindings += /*wgsl*/`@group(1) @binding(${bindingIndex + index}) var ${sampler.name}: sampler;\n`;
         });
-        bindingIndex += this._storage.length || 0;
+        bindingIndex += this._samplers.length || 0;
+
+        this._texturesStorage2d.forEach((texture, index) => {
+            dynamicGroupBindings += /*wgsl*/`@group(1) @binding(${bindingIndex + index}) var ${texture.name}: texture_storage_2d<rgba8unorm, write>;\n`;
+        });
+        bindingIndex += this._texturesStorage2d.length || 0;
+
+        this._textures2d.forEach((texture, index) => {
+            dynamicGroupBindings += /*wgsl*/`@group(1) @binding(${bindingIndex + index}) var ${texture.name}: texture_2d<f32>;\n`;
+        });
+        bindingIndex += this._textures2d.length || 0;
 
         colorsVertWGSL = dynamicGroupBindings + colorsVertWGSL;
         colorsComputeWGSL = dynamicGroupBindings + colorsComputeWGSL;
         colorsFragWGSL = dynamicGroupBindings + colorsFragWGSL;
+
+        console.log(colorsVertWGSL);
+        console.log(colorsComputeWGSL);
+        console.log(colorsFragWGSL);
 
         this._shaders = {
             false: {
@@ -244,13 +283,13 @@ export default class WebGPU {
             usage: GPUTextureUsage.RENDER_ATTACHMENT,
         });
 
-        // We will copy the frame's rendering results into this texture and
-        // sample it on the next frame.
-        this._feedbackLoopTexture = this._device.createTexture({
-            size: this._presentationSize,
-            format: this._presentationFormat, // if 'depth24plus' throws error
-            usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
-        });
+        // // We will copy the frame's rendering results into this texture and
+        // // sample it on the next frame.
+        // this._feedbackLoopTexture = this._device.createTexture({
+        //     size: this._presentationSize,
+        //     format: this._presentationFormat, // if 'depth24plus' throws error
+        //     usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
+        // });
 
         this._outputTexture = this._device.createTexture({
             size: this._presentationSize,
@@ -363,8 +402,16 @@ export default class WebGPU {
         this._storage.forEach(storageItem => {
             storageItem.buffer = this._createBuffer(storageItem.size * storageItem.structSize * 4, GPUBufferUsage.STORAGE);
         });
-
+        //--------------------------------------------
         this._samplers.forEach(sampler => sampler.resource = this._device.createSampler(sampler.descriptor));
+        //--------------------------------------------
+        this._textures2d.forEach(texture2d => {
+            texture2d.texture = this._device.createTexture({
+                size: this._presentationSize,
+                format: this._presentationFormat, // if 'depth24plus' throws error
+                usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
+            });
+        });
     }
 
     /**
@@ -393,10 +440,10 @@ export default class WebGPU {
             label: '_createComputeBindGroup 0',
             layout: this._computePipeline.getBindGroupLayout(0 /* index */),
             entries: [
-                {
-                    binding: 2,
-                    resource: this._feedbackLoopTexture.createView(),
-                },
+                // {
+                //     binding: 2,
+                //     resource: this._feedbackLoopTexture.createView(),
+                // },
                 {
                     binding: 3,
                     resource: this._outputTexture.createView(),
@@ -404,43 +451,7 @@ export default class WebGPU {
             ]
         });
 
-        let entries = [];
-        if (this._uniforms.length) {
-            entries.push(
-                {
-                    binding: 0,
-                    resource: {
-                        buffer: this._uniforms.buffer
-                    }
-                }
-            );
-
-        }
-
-        if (this._storage.length) {
-            const entriesIndex = entries.length;
-            this._storage.forEach((storageItem, index) => {
-                entries.push(
-                    {
-                        binding: entriesIndex + index,
-                        resource: {
-                            buffer: storageItem.buffer
-                        }
-                    }
-                );
-            });
-        }
-        if (this._samplers.length) {
-            const entriesIndex = entries.length;
-            this._samplers.forEach((sampler, index) => {
-                entries.push(
-                    {
-                        binding: entriesIndex + index,
-                        resource: sampler.resource
-                    }
-                );
-            });
-        }
+        const entries = this._createEntries();
         if (entries.length) {
             this._computeBindGroups2 = this._device.createBindGroup({
                 label: '_createComputeBindGroup 1',
@@ -599,22 +610,11 @@ export default class WebGPU {
         });
     }
 
-    _createParams() {
-        this._uniformBindGroup = this._device.createBindGroup({
-            label: '_createParams() 0',
-            layout: this._pipeline.getBindGroupLayout(0),
-            entries: [
-                {
-                    binding: 3,
-                    resource: this._feedbackLoopTexture.createView(),
-                },
-                {
-                    binding: 4,
-                    resource: this._outputTexture.createView(),
-                }
-            ],
-        });
-
+    /**
+     * Creates the entries for the pipeline
+     * @returns an array with the entries
+     */
+    _createEntries() {
         let entries = [];
         if (this._uniforms.length) {
             entries.push(
@@ -652,6 +652,38 @@ export default class WebGPU {
                 );
             });
         }
+        if (this._textures2d.length) {
+            const entriesIndex = entries.length;
+            this._textures2d.forEach((texture2d, index) => {
+                entries.push(
+                    {
+                        binding: entriesIndex + index,
+                        resource: texture2d.texture.createView()
+                    }
+                );
+            });
+        }
+
+        return entries;
+    }
+
+    _createParams() {
+        this._uniformBindGroup = this._device.createBindGroup({
+            label: '_createParams() 0',
+            layout: this._pipeline.getBindGroupLayout(0),
+            entries: [
+                // {
+                //     binding: 3,
+                //     resource: this._feedbackLoopTexture.createView(),
+                // },
+                {
+                    binding: 4,
+                    resource: this._outputTexture.createView(),
+                }
+            ],
+        });
+
+        const entries = this._createEntries();
         if (entries.length) {
             this._uniformBindGroup2 = this._device.createBindGroup({
                 label: '_createParams() 1',
@@ -666,9 +698,6 @@ export default class WebGPU {
         if (!this._canvas) return;
         if (!this._device) return;
 
-        //--------------------------------------------
-        //--------------------------------------------
-        //this._particlesBuffer = this._createAndMapBuffer(this._particles, GPUBufferUsage.STORAGE);
         //--------------------------------------------
 
         this._createParametersUniforms();
@@ -706,7 +735,7 @@ export default class WebGPU {
 
         const swapChainTexture = this._context.getCurrentTexture();
         // prettier-ignore
-        this._renderPassDescriptor.colorAttachments[0].view = swapChainTexture.createView();
+        //this._renderPassDescriptor.colorAttachments[0].view = swapChainTexture.createView();
 
 
         //commandEncoder = this._device.createCommandEncoder();
@@ -737,15 +766,30 @@ export default class WebGPU {
         }
 
         // Copy the rendering results from the swapchain into |cubeTexture|.
-        commandEncoder.copyTextureToTexture(
-            {
-                texture: swapChainTexture,
-            },
-            {
-                texture: this._feedbackLoopTexture,
-            },
-            this._presentationSize
-        );
+
+        this._textures2d.forEach(texture2d => {
+            if (texture2d.copyCurrentTexture) {
+                commandEncoder.copyTextureToTexture(
+                    {
+                        texture: swapChainTexture,
+                    },
+                    {
+                        texture: texture2d.texture,
+                    },
+                    this._presentationSize
+                );
+            }
+        })
+
+        // commandEncoder.copyTextureToTexture(
+        //     {
+        //         texture: swapChainTexture,
+        //     },
+        //     {
+        //         texture: this._feedbackLoopTexture,
+        //     },
+        //     this._presentationSize
+        // );
 
         this._commandsFinished.push(commandEncoder.finish());
         this._device.queue.submit(this._commandsFinished);
