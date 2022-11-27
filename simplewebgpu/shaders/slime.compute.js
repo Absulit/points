@@ -29,7 +29,7 @@ const workgroupSize = 8;
 const MARGIN = 2;
 
 //'function', 'private', 'push_constant', 'storage', 'uniform', 'workgroup'
-@group(0) @binding(3) var outputTex : texture_storage_2d<rgba8unorm, write>;
+// @group(0) @binding(3) var outputTex : texture_storage_2d<rgba8unorm, write>;
 
 @compute @workgroup_size(workgroupSize,workgroupSize,1)
 fn main(

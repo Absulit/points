@@ -1,7 +1,7 @@
 'use strict';
 import MathUtil from '../js/mathutil.js';
 import { print } from '../js/utils.js';
-import WebGPU from './absulit.simplewebgpu.module.js';
+import WebGPU, { ShaderType } from './absulit.simplewebgpu.module.js';
 import blur1Compute from './shaders/blur1.compute.js';
 import blur1Frag from './shaders/blur1.frag.js';
 import circleblurCompute from './shaders/circleblur.compute.js';
@@ -119,6 +119,8 @@ async function init() {
     webGPU.addStorage('variables', 1, 'Variable', 1); // slime2
     webGPU.addSampler('feedbackSampler'); // slime2
     webGPU.addTexture2d('feedbackTexture', true); // slime2
+    webGPU.addTextureStorage2d('outputTex', ShaderType.COMPUTE)
+    webGPU.addTexture2d('computeTexture', false, ShaderType.FRAGMENT); // slime2
     //webGPU.addTextureStorage2dToTexture2d('outputTex', 'computeTexture'); // slime2
 
 
