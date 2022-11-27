@@ -203,10 +203,11 @@ export default class WebGPU {
         if (!shaderType) {
             throw '`ShaderType` is required';
         }
+        const groupId = 1;
         let dynamicGroupBindings = '';
         let bindingIndex = 0;
         if (this._uniforms.length) {
-            dynamicGroupBindings += /*wgsl*/`@group(1) @binding(0) var <uniform> params: Params;\n`;
+            dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(0) var <uniform> params: Params;\n`;
             bindingIndex += 1;
         }
 
@@ -216,35 +217,31 @@ export default class WebGPU {
                 if (storageItem.size > 1) {
                     T = `array<${storageItem.structName}>`;
                 }
-                dynamicGroupBindings += /*wgsl*/`@group(1) @binding(${bindingIndex}) var <storage, read_write> ${storageItem.name}: ${T};\n`
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, read_write> ${storageItem.name}: ${T};\n`
                 bindingIndex += 1;
             }
         });
-        //bindingIndex += this._storage.length || 0;
 
         this._samplers.forEach((sampler, index) => {
             if (!sampler.shaderType || sampler.shaderType == shaderType) {
-                dynamicGroupBindings += /*wgsl*/`@group(1) @binding(${bindingIndex}) var ${sampler.name}: sampler;\n`;
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${sampler.name}: sampler;\n`;
                 bindingIndex += 1;
             }
         });
-        //bindingIndex += this._samplers.length || 0;
 
         this._texturesStorage2d.forEach((texture, index) => {
             if (!texture.shaderType || texture.shaderType == shaderType) {
-                dynamicGroupBindings += /*wgsl*/`@group(1) @binding(${bindingIndex}) var ${texture.name}: texture_storage_2d<rgba8unorm, write>;\n`;
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_storage_2d<rgba8unorm, write>;\n`;
                 bindingIndex += 1;
             }
         });
-        //bindingIndex += this._texturesStorage2d.length || 0;
 
         this._textures2d.forEach((texture, index) => {
             if (!texture.shaderType || texture.shaderType == shaderType) {
-                dynamicGroupBindings += /*wgsl*/`@group(1) @binding(${bindingIndex}) var ${texture.name}: texture_2d<f32>;\n`;
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d<f32>;\n`;
                 bindingIndex += 1;
             }
         });
-        //bindingIndex += this._textures2d.length || 0;
 
         return dynamicGroupBindings;
     }
@@ -338,19 +335,11 @@ export default class WebGPU {
             usage: GPUTextureUsage.RENDER_ATTACHMENT,
         });
 
-        // // We will copy the frame's rendering results into this texture and
-        // // sample it on the next frame.
-        // this._feedbackLoopTexture = this._device.createTexture({
-        //     size: this._presentationSize,
-        //     format: this._presentationFormat, // if 'depth24plus' throws error
-        //     usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
-        // });
-
-        // this._outputTexture = this._device.createTexture({
-        //     size: this._presentationSize,
-        //     format: 'rgba8unorm',
-        //     usage: GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
-        // });
+        this._outputTexture = this._device.createTexture({
+            size: this._presentationSize,
+            format: 'rgba8unorm',
+            usage: GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
+        });
 
         this._renderPassDescriptor = {
             colorAttachments: [
@@ -503,14 +492,10 @@ export default class WebGPU {
             label: '_createComputeBindGroup 0',
             layout: this._computePipeline.getBindGroupLayout(0 /* index */),
             entries: [
-                // {
-                //     binding: 2,
-                //     resource: this._feedbackLoopTexture.createView(),
-                // },
-                // {
-                //     binding: 3,
-                //     resource: this._outputTexture.createView(),
-                // }
+                {
+                    binding: 3,
+                    resource: this._outputTexture.createView(),
+                }
             ]
         });
 
@@ -756,14 +741,10 @@ export default class WebGPU {
             label: '_createParams() 0',
             layout: this._pipeline.getBindGroupLayout(0),
             entries: [
-                // {
-                //     binding: 3,
-                //     resource: this._feedbackLoopTexture.createView(),
-                // },
-                // {
-                //     binding: 4,
-                //     resource: this._outputTexture.createView(),
-                // }
+                {
+                    binding: 4,
+                    resource: this._outputTexture.createView(),
+                }
             ],
         });
 
