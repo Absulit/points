@@ -37,6 +37,7 @@ fn main(
 
     let particle = particles[0];
     let pc: ptr<storage, f32, read_write> = &variables.particlesCreated;
+    //textureStore(outputTex, vec2<u32>( u32(uv.x), u32(uv.y)), vec4<f32>(1,0,0,1));
 
     let d = distance(uv, vec2(.5 + .1 * fusin(2), .5  + .1 * fusin(4.123)));
     var c = 1.;

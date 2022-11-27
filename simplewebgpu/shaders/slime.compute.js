@@ -40,6 +40,8 @@ fn main(
     let numParticles = u32(params.numParticles);
     let pc: ptr<storage, f32, read_write> = &variables.particlesCreated;
 
+    //let texColorCompute = textureLoad(computeTexture, vec2(1,-1), 0);// non used from fragment
+
 
     if((*pc) == 0){
         for(var k:u32; k<numParticles; k++){

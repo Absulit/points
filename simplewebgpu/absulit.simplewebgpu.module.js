@@ -5,6 +5,11 @@ import defaultVert from './shaders/default.vert.js';
 import defaultFrag from './shaders/default.frag.js';
 import defaultCompute from './shaders/default.compute.js';
 
+class ShaderType{
+    static VERTEX = '0';
+    static COMPUTE = '1';
+    static FRAGMENT = '2';
+}
 
 export class VertexBufferInfo {
     /**
@@ -167,34 +172,21 @@ export default class WebGPU {
     //
     addTextureStorage2dToTexture2d(computeTextureStorage2dName, fragmentTexture2dName) {
         this._texturesStorage2d.push({
-            computeTextureStorage2dName: computeTextureStorage2dName,
+            name: computeTextureStorage2dName,
+            shader: ShaderType.COMPUTE,
             texture: null
         });
 
         this.addTexture2d(fragmentTexture2dName, false);
     }
 
-    async init(vertexShader, computeShader, fragmentShader) {
-        let colorsVertWGSL = vertexShader || defaultVert;
-        let colorsComputeWGSL = computeShader || defaultCompute;
-        let colorsFragWGSL = fragmentShader || defaultFrag;
-
+    /**
+     * 
+     * @param {ShaderType} shaderType 
+     * @returns string with bindings
+     */
+    _createDynamicGroupBindings(shaderType){
         let dynamicGroupBindings = '';
-        let dynamicStructParams = '';
-        this._uniforms.forEach((variable, index) => {
-            dynamicStructParams += /*wgsl*/`${variable.name}:f32, \n`;
-        });
-
-        if (this._uniforms.length) {
-            dynamicStructParams = /*wgsl*/`
-                struct Params {
-                    ${dynamicStructParams}
-                }
-            \n`;
-        }
-
-        dynamicGroupBindings += dynamicStructParams;
-
         let bindingIndex = 0;
         if (this._uniforms.length) {
             dynamicGroupBindings += /*wgsl*/`@group(1) @binding(0) var <uniform> params: Params;\n`;
@@ -224,6 +216,32 @@ export default class WebGPU {
             dynamicGroupBindings += /*wgsl*/`@group(1) @binding(${bindingIndex + index}) var ${texture.name}: texture_2d<f32>;\n`;
         });
         bindingIndex += this._textures2d.length || 0;
+
+        return dynamicGroupBindings;
+    }
+
+    async init(vertexShader, computeShader, fragmentShader) {
+        let colorsVertWGSL = vertexShader || defaultVert;
+        let colorsComputeWGSL = computeShader || defaultCompute;
+        let colorsFragWGSL = fragmentShader || defaultFrag;
+
+        let dynamicGroupBindings = '';
+        let dynamicStructParams = '';
+        this._uniforms.forEach((variable, index) => {
+            dynamicStructParams += /*wgsl*/`${variable.name}:f32, \n`;
+        });
+
+        if (this._uniforms.length) {
+            dynamicStructParams = /*wgsl*/`
+                struct Params {
+                    ${dynamicStructParams}
+                }
+            \n`;
+        }
+
+        dynamicGroupBindings += dynamicStructParams;
+
+        dynamicGroupBindings += this._createDynamicGroupBindings();
 
         colorsVertWGSL = dynamicGroupBindings + colorsVertWGSL;
         colorsComputeWGSL = dynamicGroupBindings + colorsComputeWGSL;
@@ -404,6 +422,14 @@ export default class WebGPU {
         });
         //--------------------------------------------
         this._samplers.forEach(sampler => sampler.resource = this._device.createSampler(sampler.descriptor));
+        //--------------------------------------------
+        this._texturesStorage2d.forEach(textureStorage2d => {
+            textureStorage2d.texture = this._device.createTexture({
+                size: this._presentationSize,
+                format: 'rgba8unorm',
+                usage: GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
+            });
+        });
         //--------------------------------------------
         this._textures2d.forEach(texture2d => {
             texture2d.texture = this._device.createTexture({
@@ -652,6 +678,19 @@ export default class WebGPU {
                 );
             });
         }
+
+        if(this._texturesStorage2d.length){
+            const entriesIndex = entries.length;
+            this._texturesStorage2d.forEach((textureStorage2d, index) => {
+                entries.push(
+                    {
+                        binding: entriesIndex + index,
+                        resource: textureStorage2d.texture.createView()
+                    }
+                );
+            });
+        }
+
         if (this._textures2d.length) {
             const entriesIndex = entries.length;
             this._textures2d.forEach((texture2d, index) => {
