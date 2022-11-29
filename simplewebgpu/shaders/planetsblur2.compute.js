@@ -23,9 +23,6 @@ ${rand}
 const workgroupSize = 8;
 
 //'function', 'private', 'push_constant', 'storage', 'uniform', 'workgroup'
-@group(0) @binding(1) var feedbackSampler: sampler;
-@group(0) @binding(2) var feedbackTexture: texture_2d<f32>;
-@group(0) @binding(3) var outputTex : texture_storage_2d<rgba8unorm, write>;
 
 @compute @workgroup_size(workgroupSize,workgroupSize,1)
 fn main(
@@ -50,7 +47,6 @@ fn main(
 
     let dims : vec2<u32> = textureDimensions(feedbackTexture, 0);
     let rgb = textureSampleLevel(feedbackTexture, feedbackSampler, vec2<f32>(0) ,0.0).rgb;
-    textureStore(outputTex, vec2<u32>(0,0), vec4<f32>(1,1,1,1));
 
     //--------------------------------------------------------------
 
