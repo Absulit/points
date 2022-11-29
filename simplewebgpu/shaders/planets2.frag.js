@@ -29,14 +29,8 @@ fn main(
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
-    let particle = planets[0];
     let pc: ptr<storage, f32, read_write> = &variables.particlesCreated;
-
-    let texColor = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1));
-    let texColorCompute = textureSample(computeTexture, feedbackSampler, uv * vec2(1,-1));
-
     let scale = .01;
-
     var c = 1.;
 
     var lastDistance = -1.;

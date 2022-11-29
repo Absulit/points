@@ -49,10 +49,6 @@ fn main(
     }
 
 
-    let dims : vec2<u32> = textureDimensions(feedbackTexture, 0);
-    let rgb = textureSampleLevel(feedbackTexture, feedbackSampler, vec2<f32>(0) ,0.0).rgb;
-    textureStore(outputTex, vec2<u32>(0,0), vec4<f32>(1,1,1,1));
-
     //--------------------------------------------------------------
 
 
@@ -79,10 +75,6 @@ fn main(
         (*particle).angle += ((*particle).speed * .1);
         (*particle).x = x;
         (*particle).y = y;
-
-        //var rgba = textureSampleLevel(feedbackTexture, feedbackSampler, vec2<f32>(x, y),  0.0).rgba;
-
-        //textureStore(outputTex, vec2<u32>(ux,uy), vec4<f32>(1,1,1,1));
     }
 }
 `;
