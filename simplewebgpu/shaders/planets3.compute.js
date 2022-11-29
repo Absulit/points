@@ -41,9 +41,6 @@ fn main(
         (*pc) = 1;
     }
 
-
-    //let dims : vec2<u32> = textureDimensions(feedbackTexture, 0);
-    //let rgb = textureSampleLevel(feedbackTexture, feedbackSampler, (vec2<f32>(0) + vec2<f32>(0.25, 0.25)) / vec2<f32>(dims),0.0).rgb;
     //--------------------------------------------------------------
 
     let dims: vec2<u32> = textureDimensions(feedbackTexture, 0);

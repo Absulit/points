@@ -103,6 +103,9 @@ async function init() {
     // webGPU.addStorage('planets', 8, 'Planet', 5); // planets2
     // webGPU.addStorage('variables', 1, 'Variable', 1); // planets2
 
+    // vertexShader = planets3Vert;
+    // computeShader = planets3Compute;
+    // fragmentShader = planets3Frag;
     // const numParticles = 1024 * 4; // planets3
     // webGPU.addUniform('numParticles', numParticles); // planets3
     // webGPU.addStorage('planets', numParticles, 'Planet', 3); // planets3
@@ -111,8 +114,9 @@ async function init() {
     // webGPU.addTexture2d('feedbackTexture', true); // planets3
     // webGPU.addBindingTexture('outputTex', 'computeTexture'); // planets3
 
-    // TODO: - review upwards from here
-
+    // vertexShader = planetsblurVert;
+    // computeShader = planetsblurCompute;
+    // fragmentShader = planetsblurFrag;
     // const numParticles = 8; // planetsblur
     // webGPU.addUniform('numParticles', numParticles); // planetsblur
     // webGPU.addStorage('planets', numParticles, 'Planet', 5); // planetsblur
@@ -120,6 +124,9 @@ async function init() {
     // webGPU.addSampler('feedbackSampler'); // planetsblur
     // webGPU.addTexture2d('feedbackTexture', true); // planetsblur
 
+    // vertexShader = planetsblur2Vert;
+    // computeShader = planetsblur2Compute;
+    // fragmentShader = planetsblur2Frag;
     // const numParticles = 8; // planetsblur2
     // webGPU.addUniform('numParticles', numParticles); // planetsblur2
     // webGPU.addStorage('planets', numParticles, 'Planet', 5); // planetsblur2
@@ -127,21 +134,30 @@ async function init() {
     // webGPU.addSampler('feedbackSampler'); // planetsblur2
     // webGPU.addTexture2d('feedbackTexture', true); // planetsblur2
 
-    // webGPU.addStorage('chemicals', 800 * 800, 'Chemical', 2); // ractiondiffusion
-    // webGPU.addStorage('chemicals2', 800 * 800, 'Chemical', 2); // ractiondiffusion
-    // webGPU.addStorage('variables', 1, 'Variable', 1); // ractiondiffusion
-    // webGPU.addSampler('feedbackSampler'); // ractiondiffusion
-    // webGPU.addTexture2d('feedbackTexture', true); // ractiondiffusion
-    // webGPU.addBindingTexture('outputTex', 'computeTexture'); // ractiondiffusion
+    // vertexShader = reactiondiffusionVert;
+    // computeShader = reactiondiffusionCompute;
+    // fragmentShader = reactiondiffusionFrag;
+    // webGPU.addStorage('chemicals', 800 * 800, 'Chemical', 2); // reactiondiffusion
+    // webGPU.addStorage('chemicals2', 800 * 800, 'Chemical', 2); // reactiondiffusion
+    // webGPU.addStorage('variables', 1, 'Variable', 1); // reactiondiffusion
+    // webGPU.addSampler('feedbackSampler'); // reactiondiffusion
+    // webGPU.addTexture2d('feedbackTexture', true); // reactiondiffusion
+    // webGPU.addBindingTexture('outputTex', 'computeTexture'); // reactiondiffusion
 
-    // const numParticles = 1024 * 2;// slime
-    // webGPU.addUniform('numParticles', numParticles);// slime
-    // webGPU.addStorage('particles', numParticles, 'Particle', 4); // slime
-    // webGPU.addStorage('variables', 1, 'Variable', 1); // slime
-    // webGPU.addSampler('feedbackSampler'); // slime
-    // webGPU.addTexture2d('feedbackTexture', true); // slime
-    // webGPU.addBindingTexture('outputTex', 'computeTexture'); // slime
+    vertexShader = slimeVert;
+    computeShader = slimeCompute;
+    fragmentShader = slimeFrag;
+    const numParticles = 1024 * 2;// slime
+    webGPU.addUniform('numParticles', numParticles);// slime
+    webGPU.addStorage('particles', numParticles, 'Particle', 4); // slime
+    webGPU.addStorage('variables', 1, 'Variable', 1); // slime
+    webGPU.addSampler('feedbackSampler'); // slime
+    webGPU.addTexture2d('feedbackTexture', true); // slime
+    webGPU.addBindingTexture('outputTex', 'computeTexture'); // slime
 
+    // vertexShader = slime2Vert;
+    // computeShader = slime2Compute;
+    // fragmentShader = slime2Frag;
     // const numParticles = 1024 * 2;// slime2
     // webGPU.addUniform('numParticles', numParticles);// slime2
     // webGPU.addStorage('particles', numParticles, 'Particle', 4); // slime2
