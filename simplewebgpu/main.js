@@ -21,6 +21,7 @@ import planetsblurCompute from './shaders/planetsblur.compute.js';
 import planetsblurFrag from './shaders/planetsblur.frag.js';
 import planetsblur2Compute from './shaders/planetsblur2.compute.js';
 import planetsblur2Frag from './shaders/planetsblur2.frag.js';
+import reactiondiffusionVert from './shaders/reactiondiffusion.vert.js';
 import reactiondiffusionCompute from './shaders/reactiondiffusion.compute.js';
 import reactiondiffusionFrag from './shaders/reactiondiffusion.frag.js';
 import slimeCompute from './shaders/slime.compute.js';
@@ -32,7 +33,6 @@ import random1Frag from './shaders/random1.frag.js';
 import random1Compute from './shaders/random1.compute.js';
 import random1Vert from './shaders/random1.vert.js';
 import planetsVert from './shaders/planets.vert.js';
-import reactiondifussionVert from './shaders/reactiondiffusion.vert.js';
 import slimeVert from './shaders/slime.vert.js';
 import blur1Vert from './shaders/blur1.vert.js';
 import circleblurVert from './shaders/circleblur.vert.js';
@@ -106,12 +106,14 @@ async function init() {
     // webGPU.addTexture2d('feedbackTexture', true); // planets3
     // webGPU.addBindingTexture('outputTex', 'computeTexture'); // planets3
 
-    const numParticles = 8; // planetsblur
-    webGPU.addUniform('numParticles', numParticles); // planetsblur
-    webGPU.addStorage('planets', numParticles, 'Planet', 5); // planetsblur
-    webGPU.addStorage('variables', 1, 'Variable', 1); // planetsblur
-    webGPU.addSampler('feedbackSampler'); // planetsblur
-    webGPU.addTexture2d('feedbackTexture', true); // planetsblur
+    // TODO: - review upwards from here
+
+    // const numParticles = 8; // planetsblur
+    // webGPU.addUniform('numParticles', numParticles); // planetsblur
+    // webGPU.addStorage('planets', numParticles, 'Planet', 5); // planetsblur
+    // webGPU.addStorage('variables', 1, 'Variable', 1); // planetsblur
+    // webGPU.addSampler('feedbackSampler'); // planetsblur
+    // webGPU.addTexture2d('feedbackTexture', true); // planetsblur
 
     // const numParticles = 8; // planetsblur2
     // webGPU.addUniform('numParticles', numParticles); // planetsblur2
@@ -120,9 +122,12 @@ async function init() {
     // webGPU.addSampler('feedbackSampler'); // planetsblur2
     // webGPU.addTexture2d('feedbackTexture', true); // planetsblur2
 
-    // webGPU.addStorage('chemicals', 800 * 800, 'Chemical', 2); // ractiondiffusion
-    // webGPU.addStorage('chemicals2', 800 * 800, 'Chemical', 2); // ractiondiffusion
-    // webGPU.addStorage('variables', 1, 'Variable', 1); // ractiondiffusion
+    webGPU.addStorage('chemicals', 800 * 800, 'Chemical', 2); // ractiondiffusion
+    webGPU.addStorage('chemicals2', 800 * 800, 'Chemical', 2); // ractiondiffusion
+    webGPU.addStorage('variables', 1, 'Variable', 1); // ractiondiffusion
+    webGPU.addSampler('feedbackSampler'); // ractiondiffusion
+    webGPU.addTexture2d('feedbackTexture', true); // ractiondiffusion
+    webGPU.addBindingTexture('outputTex', 'computeTexture'); // ractiondiffusion
 
     // const numParticles = 1024 * 2;// slime
     // webGPU.addUniform('numParticles', numParticles);// slime
@@ -137,7 +142,7 @@ async function init() {
     // webGPU.addTexture2d('feedbackTexture', true); // slime2
     // webGPU.addBindingTexture('outputTex', 'computeTexture'); // slime2
 
-    const initialized = await webGPU.init(planetsblurVert, planetsblurCompute, planetsblurFrag);
+    const initialized = await webGPU.init(reactiondiffusionVert, reactiondiffusionCompute, reactiondiffusionFrag);
     if (initialized) {
         await webGPU.createScreen(1, 1);
     }

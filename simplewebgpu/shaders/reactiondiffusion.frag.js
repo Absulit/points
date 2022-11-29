@@ -19,9 +19,9 @@ ${RGBAFromHSV}
 
 
 
-@group(0) @binding(2) var feedbackSampler: sampler;
-@group(0) @binding(3) var feedbackTexture: texture_2d<f32>;
-@group(0) @binding(4) var computeTexture: texture_2d<f32>;
+// @group(0) @binding(2) var feedbackSampler: sampler;
+// @group(0) @binding(3) var feedbackTexture: texture_2d<f32>;
+// @group(0) @binding(4) var computeTexture: texture_2d<f32>;
 
 @fragment
 fn main(
@@ -49,15 +49,6 @@ fn main(
         c = 0;
     }
 
-    let decayR =  texColor.r * .9 * texColor2.r;
-    let decayG =  texColor.g * .9;
-    let decayB =  texColor.b * .9 * texColor3.b;
-    let decayA =  texColor.a * .5;
-
-    //var finalColor:vec4<f32> = vec4(uv.x * c + decayR, uv.y * c + decayR, c + decayB, 1);
-    //var finalColor:vec4<f32> = vec4(uv.x * c, uv.y * c, 0, 1);
-    //var finalColor = vec4(decayR, decayG, decayB, 1);
-    // finalColor = (finalColor + texColorCompute) *.48;
 
     //var finalColor = (1 - texColorCompute); //* vec4<f32>(uv.x, uv.y, 0, 1);
     let a = (1 - texColorCompute);

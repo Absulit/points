@@ -1,6 +1,6 @@
 import defaultStructs from './defaultStructs.js';
 
-const reactiondifussionVert = /*wgsl*/`
+const reactiondiffusionVert = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -33,4 +33,4 @@ fn main(
 }
 `;
 
-export default reactiondifussionVert;
+export default reactiondiffusionVert;
