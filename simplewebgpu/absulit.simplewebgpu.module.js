@@ -84,6 +84,7 @@ export default class WebGPU {
         this._samplers = [];
         this._textures2d = [];
         this._texturesStorage2d = [];
+        this._bindingTextures = [];
     }
 
     /**
@@ -179,6 +180,20 @@ export default class WebGPU {
         });
     }
 
+    addBindingTexture(computeName, fragmentName){
+        this._bindingTextures.push({
+            compute: {
+                name: computeName,
+                shaderType: ShaderType.COMPUTE
+            },
+            fragment: {
+                name: fragmentName,
+                shaderType: ShaderType.FRAGMENT
+            },
+            texture: null
+        });
+    }
+
     /**
      * @deprecated to be removed
      * @param {*} computeTextureStorage2dName 
@@ -239,6 +254,18 @@ export default class WebGPU {
         this._textures2d.forEach((texture, index) => {
             if (!texture.shaderType || texture.shaderType == shaderType) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d<f32>;\n`;
+                bindingIndex += 1;
+            }
+        });
+
+        this._bindingTextures.forEach(bidingTexture => {
+            if (bidingTexture.compute.shaderType == shaderType) {
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bidingTexture.compute.name}: texture_storage_2d<rgba8unorm, write>;\n`;
+                bindingIndex += 1;
+            }
+
+            if (bidingTexture.fragment.shaderType == shaderType) {
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bidingTexture.fragment.name}: texture_2d<f32>;\n`;
                 bindingIndex += 1;
             }
         });
@@ -333,12 +360,6 @@ export default class WebGPU {
             size: this._presentationSize,
             format: 'depth24plus',
             usage: GPUTextureUsage.RENDER_ATTACHMENT,
-        });
-
-        this._outputTexture = this._device.createTexture({
-            size: this._presentationSize,
-            format: 'rgba8unorm',
-            usage: GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
         });
 
         this._renderPassDescriptor = {
@@ -464,6 +485,14 @@ export default class WebGPU {
                 usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
             });
         });
+        //--------------------------------------------
+        this._bindingTextures.forEach(bindingTexture => {
+            bindingTexture.texture = this._device.createTexture({
+                size: this._presentationSize,
+                format: 'rgba8unorm',
+                usage: GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
+            });
+        });
     }
 
     /**
@@ -492,10 +521,6 @@ export default class WebGPU {
             label: '_createComputeBindGroup 0',
             layout: this._computePipeline.getBindGroupLayout(0 /* index */),
             entries: [
-                {
-                    binding: 3,
-                    resource: this._outputTexture.createView(),
-                }
             ]
         });
 
@@ -733,6 +758,32 @@ export default class WebGPU {
             });
         }
 
+        if(this._bindingTextures.length){
+            let entriesIndex = entries.length;
+            this._bindingTextures.forEach((bindingTexture, index) => {
+                if (bindingTexture.compute.shaderType == shaderType) {
+                    entries.push(
+                        {
+                            binding: entriesIndex + index,
+                            resource: bindingTexture.texture.createView()
+                        }
+                    );
+                }
+            });
+
+            entriesIndex = entries.length;
+            this._bindingTextures.forEach((bindingTexture, index) => {
+                if (bindingTexture.fragment.shaderType == shaderType) {
+                    entries.push(
+                        {
+                            binding: entriesIndex + index,
+                            resource: bindingTexture.texture.createView()
+                        }
+                    );
+                }
+            });
+        }
+
         return entries;
     }
 
@@ -741,10 +792,6 @@ export default class WebGPU {
             label: '_createParams() 0',
             layout: this._pipeline.getBindGroupLayout(0),
             entries: [
-                {
-                    binding: 4,
-                    resource: this._outputTexture.createView(),
-                }
             ],
         });
 

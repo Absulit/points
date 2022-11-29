@@ -119,10 +119,7 @@ async function init() {
     webGPU.addStorage('variables', 1, 'Variable', 1); // slime2
     webGPU.addSampler('feedbackSampler'); // slime2
     webGPU.addTexture2d('feedbackTexture', true); // slime2
-    //webGPU.addTextureStorage2d('outputTex', ShaderType.COMPUTE)
-    //webGPU.addTexture2d('computeTexture', false, ShaderType.FRAGMENT); // slime2
-
-
+    webGPU.addBindingTexture('outputTex', 'computeTexture');
 
     const initialized = await webGPU.init(slimeVert, slimeCompute, slimeFrag);
     if (initialized) {
