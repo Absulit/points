@@ -24,12 +24,6 @@ struct Star{
     d: f32,
 }
 
-//@group(1) @binding(1) var <storage, read_write> stars: Stars;
-@group(0) @binding(1) var feedbackSampler: sampler;
-@group(0) @binding(2) var feedbackTexture: texture_2d<f32>;
-@group(0) @binding(3) var outputTex : texture_storage_2d<rgba8unorm, write>;
-
-
 @compute @workgroup_size(8,8,1)
 fn main(
     @builtin(global_invocation_id) GlobalId: vec3<u32>,

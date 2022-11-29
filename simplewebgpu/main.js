@@ -79,9 +79,12 @@ async function init() {
     webGPU.addUniform('sliderB', 0);
     webGPU.addUniform('sliderC', 0);
 
-    // webGPU.addUniform('randNumber', 0); // random1
-    // webGPU.addUniform('randNumber2', 0); // random1
-    // webGPU.addStorage('stars', 800*800, 'Star', 4); // random1
+    webGPU.addUniform('randNumber', 0); // random1
+    webGPU.addUniform('randNumber2', 0); // random1
+    webGPU.addStorage('stars', 800*800, 'Star', 4); // random1
+    webGPU.addSampler('feedbackSampler'); // random1
+    webGPU.addTexture2d('feedbackTexture', true); // random1
+    webGPU.addBindingTexture('outputTex', 'computeTexture'); // random1
 
     // webGPU.addStorage('planets', 8, 'Planet', 5); // planets
     // webGPU.addStorage('variables', 1, 'Variable', 1); // planets
@@ -113,15 +116,15 @@ async function init() {
     // webGPU.addStorage('particles', numParticles, 'Particle', 4); // slime
     // webGPU.addStorage('variables', 1, 'Variable', 1); // slime
 
-    const numParticles = 1024 * 2;// slime2
-    webGPU.addUniform('numParticles', numParticles);// slime2
-    webGPU.addStorage('particles', numParticles, 'Particle', 4); // slime2
-    webGPU.addStorage('variables', 1, 'Variable', 1); // slime2
-    webGPU.addSampler('feedbackSampler'); // slime2
-    webGPU.addTexture2d('feedbackTexture', true); // slime2
-    webGPU.addBindingTexture('outputTex', 'computeTexture');
+    // const numParticles = 1024 * 2;// slime2
+    // webGPU.addUniform('numParticles', numParticles);// slime2
+    // webGPU.addStorage('particles', numParticles, 'Particle', 4); // slime2
+    // webGPU.addStorage('variables', 1, 'Variable', 1); // slime2
+    // webGPU.addSampler('feedbackSampler'); // slime2
+    // webGPU.addTexture2d('feedbackTexture', true); // slime2
+    // webGPU.addBindingTexture('outputTex', 'computeTexture'); // slime2
 
-    const initialized = await webGPU.init(slimeVert, slimeCompute, slimeFrag);
+    const initialized = await webGPU.init(random1Vert, random1Compute, random1Frag);
     if (initialized) {
         await webGPU.createScreen(1, 1);
     }
@@ -144,8 +147,8 @@ async function update() {
     webGPU.updateUniform('sliderC', sliders.c);
 
 
-    // webGPU.updateUniform('randNumber', Math.random()); // random1
-    // webGPU.updateUniform('randNumber2', Math.random()); // random1
+    webGPU.updateUniform('randNumber', Math.random()); // random1
+    webGPU.updateUniform('randNumber2', Math.random()); // random1
 
     webGPU.update();
 
