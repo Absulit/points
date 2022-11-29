@@ -122,27 +122,30 @@ async function init() {
     // webGPU.addSampler('feedbackSampler'); // planetsblur2
     // webGPU.addTexture2d('feedbackTexture', true); // planetsblur2
 
-    webGPU.addStorage('chemicals', 800 * 800, 'Chemical', 2); // ractiondiffusion
-    webGPU.addStorage('chemicals2', 800 * 800, 'Chemical', 2); // ractiondiffusion
-    webGPU.addStorage('variables', 1, 'Variable', 1); // ractiondiffusion
-    webGPU.addSampler('feedbackSampler'); // ractiondiffusion
-    webGPU.addTexture2d('feedbackTexture', true); // ractiondiffusion
-    webGPU.addBindingTexture('outputTex', 'computeTexture'); // ractiondiffusion
+    // webGPU.addStorage('chemicals', 800 * 800, 'Chemical', 2); // ractiondiffusion
+    // webGPU.addStorage('chemicals2', 800 * 800, 'Chemical', 2); // ractiondiffusion
+    // webGPU.addStorage('variables', 1, 'Variable', 1); // ractiondiffusion
+    // webGPU.addSampler('feedbackSampler'); // ractiondiffusion
+    // webGPU.addTexture2d('feedbackTexture', true); // ractiondiffusion
+    // webGPU.addBindingTexture('outputTex', 'computeTexture'); // ractiondiffusion
 
     // const numParticles = 1024 * 2;// slime
     // webGPU.addUniform('numParticles', numParticles);// slime
     // webGPU.addStorage('particles', numParticles, 'Particle', 4); // slime
     // webGPU.addStorage('variables', 1, 'Variable', 1); // slime
+    // webGPU.addSampler('feedbackSampler'); // slime
+    // webGPU.addTexture2d('feedbackTexture', true); // slime
+    // webGPU.addBindingTexture('outputTex', 'computeTexture'); // slime
 
-    // const numParticles = 1024 * 2;// slime2
-    // webGPU.addUniform('numParticles', numParticles);// slime2
-    // webGPU.addStorage('particles', numParticles, 'Particle', 4); // slime2
-    // webGPU.addStorage('variables', 1, 'Variable', 1); // slime2
-    // webGPU.addSampler('feedbackSampler'); // slime2
-    // webGPU.addTexture2d('feedbackTexture', true); // slime2
-    // webGPU.addBindingTexture('outputTex', 'computeTexture'); // slime2
+    const numParticles = 1024 * 2;// slime2
+    webGPU.addUniform('numParticles', numParticles);// slime2
+    webGPU.addStorage('particles', numParticles, 'Particle', 4); // slime2
+    webGPU.addStorage('variables', 1, 'Variable', 1); // slime2
+    webGPU.addSampler('feedbackSampler'); // slime2
+    webGPU.addTexture2d('feedbackTexture', true); // slime2
+    webGPU.addBindingTexture('outputTex', 'computeTexture'); // slime2
 
-    const initialized = await webGPU.init(reactiondiffusionVert, reactiondiffusionCompute, reactiondiffusionFrag);
+    const initialized = await webGPU.init(slime2Vert, slime2Compute, slime2Frag);
     if (initialized) {
         await webGPU.createScreen(1, 1);
     }
