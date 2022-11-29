@@ -85,6 +85,10 @@ async function init() {
     computeShader = defaultCompute;
     fragmentShader = defaultFrag;
 
+    // vertexShader = defaultVert;
+    // computeShader = defaultCompute;
+    // fragmentShader = test1Frag;
+
     // vertexShader = random1Vert;
     // computeShader = random1Compute;
     // fragmentShader = random1Frag;
