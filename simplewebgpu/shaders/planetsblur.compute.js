@@ -49,7 +49,6 @@ fn main(
 
     let dims : vec2<u32> = textureDimensions(feedbackTexture, 0);
     let rgb = textureSampleLevel(feedbackTexture, feedbackSampler, vec2<f32>(0) ,0.0).rgb;
-    textureStore(outputTex, vec2<u32>(0,0), vec4<f32>(1,1,1,1));
 
     //--------------------------------------------------------------
 

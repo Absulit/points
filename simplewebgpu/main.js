@@ -106,20 +106,19 @@ async function init() {
     // webGPU.addTexture2d('feedbackTexture', true); // planets3
     // webGPU.addBindingTexture('outputTex', 'computeTexture'); // planets3
 
-    // const numParticles = 8; // planetsblur
-    // webGPU.addUniform('numParticles', numParticles); // planetsblur
-    // webGPU.addStorage('planets', numParticles, 'Planet', 5); // planetsblur
-    // webGPU.addStorage('variables', 1, 'Variable', 1); // planetsblur
-    // webGPU.addSampler('feedbackSampler'); // planetsblur
-    // webGPU.addTexture2d('feedbackTexture', true); // planetsblur
-    // webGPU.addBindingTexture('outputTex', 'computeTexture'); // planetsblur
+    const numParticles = 8; // planetsblur
+    webGPU.addUniform('numParticles', numParticles); // planetsblur
+    webGPU.addStorage('planets', numParticles, 'Planet', 5); // planetsblur
+    webGPU.addStorage('variables', 1, 'Variable', 1); // planetsblur
+    webGPU.addSampler('feedbackSampler'); // planetsblur
+    webGPU.addTexture2d('feedbackTexture', true); // planetsblur
 
-    const numParticles = 8; // planetsblur2
-    webGPU.addUniform('numParticles', numParticles); // planetsblur2
-    webGPU.addStorage('planets', numParticles, 'Planet', 5); // planetsblur2
-    webGPU.addStorage('variables', 1, 'Variable', 1); // planetsblur2
-    webGPU.addSampler('feedbackSampler'); // planetsblur2
-    webGPU.addTexture2d('feedbackTexture', true); // planetsblur2
+    // const numParticles = 8; // planetsblur2
+    // webGPU.addUniform('numParticles', numParticles); // planetsblur2
+    // webGPU.addStorage('planets', numParticles, 'Planet', 5); // planetsblur2
+    // webGPU.addStorage('variables', 1, 'Variable', 1); // planetsblur2
+    // webGPU.addSampler('feedbackSampler'); // planetsblur2
+    // webGPU.addTexture2d('feedbackTexture', true); // planetsblur2
 
     // webGPU.addStorage('chemicals', 800 * 800, 'Chemical', 2); // ractiondiffusion
     // webGPU.addStorage('chemicals2', 800 * 800, 'Chemical', 2); // ractiondiffusion
@@ -138,7 +137,7 @@ async function init() {
     // webGPU.addTexture2d('feedbackTexture', true); // slime2
     // webGPU.addBindingTexture('outputTex', 'computeTexture'); // slime2
 
-    const initialized = await webGPU.init(planetsblur2Vert, planetsblur2Compute, planetsblur2Frag);
+    const initialized = await webGPU.init(planetsblurVert, planetsblurCompute, planetsblurFrag);
     if (initialized) {
         await webGPU.createScreen(1, 1);
     }

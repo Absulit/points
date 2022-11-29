@@ -32,8 +32,6 @@ fn main(
     //let texColor = textureSample(myTexture, mySampler, uv * 1.0 + .1 * fnusin(2));
     let texColor = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1.001325,-1.001));
 
-    let texColorCompute = textureSample(computeTexture, feedbackSampler, uv * vec2(1,-1));
-
     let particle = planets[0];
     let pc: ptr<storage, f32, read_write> = &variables.particlesCreated;
 
