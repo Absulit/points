@@ -15,12 +15,7 @@ struct Variable{
     pc: f32
 }
 
-
 ${fusin}
-
-@group(0) @binding(2) var feedbackSampler: sampler;
-@group(0) @binding(3) var feedbackTexture: texture_2d<f32>;
-@group(0) @binding(4) var computeTexture: texture_2d<f32>;
 
 @fragment
 fn main(

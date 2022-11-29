@@ -92,16 +92,19 @@ async function init() {
     // webGPU.addTexture2d('feedbackTexture', true); // planets
     // webGPU.addBindingTexture('outputTex', 'computeTexture'); // planets
 
-    webGPU.addStorage('planets', 8, 'Planet', 5); // planets2
-    webGPU.addStorage('variables', 1, 'Variable', 1); // planets2
-    webGPU.addSampler('feedbackSampler'); // planets2
-    webGPU.addTexture2d('feedbackTexture', true); // planets2
-    webGPU.addBindingTexture('outputTex', 'computeTexture'); // planets2
+    // webGPU.addStorage('planets', 8, 'Planet', 5); // planets2
+    // webGPU.addStorage('variables', 1, 'Variable', 1); // planets2
+    // webGPU.addSampler('feedbackSampler'); // planets2
+    // webGPU.addTexture2d('feedbackTexture', true); // planets2
+    // webGPU.addBindingTexture('outputTex', 'computeTexture'); // planets2
 
-    // const numParticles = 1024 * 4; // planets3
-    // webGPU.addUniform('numParticles', numParticles); // planets3
-    // webGPU.addStorage('planets', numParticles, 'Planet', 3); // planets3
-    // webGPU.addStorage('variables', 1, 'Variable', 1); // planets3
+    const numParticles = 1024 * 4; // planets3
+    webGPU.addUniform('numParticles', numParticles); // planets3
+    webGPU.addStorage('planets', numParticles, 'Planet', 3); // planets3
+    webGPU.addStorage('variables', 1, 'Variable', 1); // planets3
+    webGPU.addSampler('feedbackSampler'); // planets3
+    webGPU.addTexture2d('feedbackTexture', true); // planets3
+    webGPU.addBindingTexture('outputTex', 'computeTexture'); // planets3
 
     // const numParticles = 8; // planetsblur
     // webGPU.addUniform('numParticles', numParticles); // planetsblur
@@ -130,7 +133,7 @@ async function init() {
     // webGPU.addTexture2d('feedbackTexture', true); // slime2
     // webGPU.addBindingTexture('outputTex', 'computeTexture'); // slime2
 
-    const initialized = await webGPU.init(planets2Vert, planets2Compute, planets2Frag);
+    const initialized = await webGPU.init(planets3Vert, planets3Compute, planets3Frag);
     if (initialized) {
         await webGPU.createScreen(1, 1);
     }
