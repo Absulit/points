@@ -81,9 +81,9 @@ async function init() {
     webGPU.addUniform('sliderB', 0);
     webGPU.addUniform('sliderC', 0);
 
-    vertexShader = defaultVert;
-    computeShader = defaultCompute;
-    fragmentShader = defaultFrag;
+    // vertexShader = defaultVert;
+    // computeShader = defaultCompute;
+    // fragmentShader = defaultFrag;
 
     // vertexShader = defaultVert;
     // computeShader = defaultCompute;
@@ -173,6 +173,13 @@ async function init() {
     // webGPU.addSampler('feedbackSampler'); // slime2
     // webGPU.addTexture2d('feedbackTexture', true); // slime2
     // webGPU.addBindingTexture('outputTex', 'computeTexture'); // slime2
+
+    vertexShader = blur1Vert;
+    computeShader = blur1Compute;
+    fragmentShader = blur1Frag;
+    webGPU.addSampler('feedbackSampler'); // blur1
+    webGPU.addTexture2d('feedbackTexture', true); // blur1
+    webGPU.addBindingTexture('outputTex', 'computeTexture'); // blur1
 
     const initialized = await webGPU.init(vertexShader, computeShader, fragmentShader);
     if (initialized) {
