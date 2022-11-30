@@ -188,6 +188,10 @@ async function init() {
     // webGPU.addTexture2d('feedbackTexture', true); // circleblur
     // webGPU.addBindingTexture('outputTex', 'computeTexture'); // circleblur
 
+    vertexShader = demo6_textureVert;
+    computeShader = defaultCompute;
+    fragmentShader = demo6_textureFrag;
+
     const initialized = await webGPU.init(vertexShader, computeShader, fragmentShader);
     if (initialized) {
         await webGPU.createScreen(1, 1);
