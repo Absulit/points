@@ -110,15 +110,12 @@ const SQUARESIDE = 400;
 // .98,.9,.012,.045 // fungi
 // .98,.9,.012,.044 // fungi
 
-const DA = 1.; //1.
-const DB = .5; //.5
-const FEED = .055; // .055
-const K = .062; //.062
+const DA = .98; //1.
+const DB = .9; //.5
+const FEED = .013; // .055
+const K = .045; //.062
 
 //'function', 'private', 'push_constant', 'storage', 'uniform', 'workgroup'
-// @group(0) @binding(1) var feedbackSampler: sampler;
-// @group(0) @binding(2) var feedbackTexture: texture_2d<f32>;
-// @group(0) @binding(3) var outputTex : texture_storage_2d<rgba8unorm, write>;
 
 @compute @workgroup_size(workgroupSize,workgroupSize,1)
 fn main(
@@ -161,11 +158,6 @@ fn main(
         (*sc) = 1;
     }
 
-
-
-
-    //let dims : vec2<u32> = textureDimensions(feedbackTexture, 0);
-    var rgba = textureSampleLevel(feedbackTexture, feedbackSampler, vec2(0),  0.0).rgba;
     //--------------------------------------------------------------
 
     let dims: vec2<u32> = textureDimensions(feedbackTexture, 0);
@@ -190,7 +182,7 @@ fn main(
             let ny = y / numRows;
 
             //let index:f32 = y + (x * screenSize.numColumns);
-            var rgba = textureLoad(feedbackTexture, vec2<i32>(ix,iy), 0).rgba;
+            //var rgba = textureLoad(feedbackTexture, vec2<i32>(ix,iy), 0).rgba;
 
 
             //--------------------------------------------------------------

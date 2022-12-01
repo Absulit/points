@@ -17,12 +17,6 @@ struct Chemical{
 ${fusin}
 ${RGBAFromHSV}
 
-
-
-// @group(0) @binding(2) var feedbackSampler: sampler;
-// @group(0) @binding(3) var feedbackTexture: texture_2d<f32>;
-// @group(0) @binding(4) var computeTexture: texture_2d<f32>;
-
 @fragment
 fn main(
         @location(0) Color: vec4<f32>,
@@ -33,9 +27,9 @@ fn main(
     ) -> @location(0) vec4<f32> {
 
     //let texColor = textureSample(myTexture, mySampler, uv * 1.0 + .1 * fnusin(2));
-    let texColor = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1));
-    let texColor2 = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1) + vec2(-.001,1));
-    let texColor3 = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1) + vec2(.001,1));
+    // let texColor = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1));
+    // let texColor2 = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1) + vec2(-.001,1));
+    // let texColor3 = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1) + vec2(.001,1));
 
     let texColorCompute = textureSample(computeTexture, feedbackSampler, uv * vec2(1,-1));
 
