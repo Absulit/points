@@ -29,7 +29,7 @@ fn clearMix(color:vec4<f32>, level:f32) -> vec4<f32> {
     let gr = color.g / level;
     let br = color.b / level;
     var ar = color.a / level;
-    if(ar < .09){
+    if(ar <= .09){
         ar = 0.;
     }
     return vec4<f32>(rr, gr, br, ar);

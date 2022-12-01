@@ -39,20 +39,15 @@ fn main(
     let numParticles = u32(params.numParticles);
     let pc: ptr<storage, f32, read_write> = &variables.particlesCreated;
 
-    //let texColorCompute = textureLoad(computeTexture, vec2(1,-1), 0);// non used from fragment
-
-
     if((*pc) == 0){
         for(var k:u32; k<numParticles; k++){
-            rand_seed = vec2<f32>( f32(k), f32(k));
+            rand_seed = vec2<f32>( f32(k));
             particles[k] = Particle(400 + rand() * 50, 400 + rand() * 50, rand() * PI * 2, 1. );
         }
 
         (*pc) = 1;
     }
 
-    //let dims : vec2<u32> = textureDimensions(feedbackTexture, 0);
-    //let rgb = textureSampleLevel(feedbackTexture, feedbackSampler, (vec2<f32>(0) + vec2<f32>(0.25, 0.25)) / vec2<f32>(dims),0.0).rgb;
     //--------------------------------------------------------------
 
     let dims: vec2<u32> = textureDimensions(feedbackTexture, 0);
@@ -85,6 +80,7 @@ fn main(
             //rgba = vec4<f32>(0,0,0,1);
             //rgba = clearMix(rgba, 1.85);
             rgba = clearAlpha(rgba, 2.54);
+            //rgba = clearMix(rgba, 2 * params.sliderA);
 
             textureStore(outputTex, vec2<u32>(ux,uy), rgba);
         }
@@ -149,12 +145,10 @@ fn main(
         }
 
         //
-        var xy = vec2<f32>( (*particle).x, (*particle).y);
-        var rgba = textureSampleLevel(feedbackTexture, feedbackSampler, xy,  0.0).rgba;
 
         var uxy = vec2<u32>( u32((*particle).x), u32((*particle).y) );
         var ixy = vec2<i32>( i32((*particle).x), i32((*particle).y) );
-        rgba = textureLoad(feedbackTexture, ixy,  0).rgba;
+        var rgba = textureLoad(feedbackTexture, ixy,  0).rgba;
         textureStore(outputTex, uxy, vec4<f32>(1,1,1,1) + rgba);
 
     }
