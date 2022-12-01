@@ -124,12 +124,13 @@ export default class WebGPU {
      * @param {string} structName Name of the struct already existing on the
      * shader that will be the array<structName> of the Storage
      */
-    addStorage(name, size, structName, structSize) {
+    addStorage(name, size, structName, structSize, shaderType) {
         this._storage.push({
             name: name,
             size: size,
             structName: structName,
             structSize: structSize,
+            shaderType: shaderType,
             buffer: null
         });
     }
@@ -139,7 +140,7 @@ export default class WebGPU {
      * @param {string} name Name of the `sampler` to be called in the shaders.
      * @param {GPUSamplerDescriptor} descriptor
      */
-    addSampler(name, descriptor) {
+    addSampler(name, descriptor, shaderType) {
         // Create a sampler with linear filtering for smooth interpolation.
         descriptor = descriptor || {
             addressModeU: 'repeat',
@@ -153,6 +154,7 @@ export default class WebGPU {
         this._samplers.push({
             name: name,
             descriptor: descriptor,
+            shaderType: shaderType,
             resource: null
         });
     }
