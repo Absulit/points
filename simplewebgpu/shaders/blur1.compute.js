@@ -78,16 +78,6 @@ fn main(
 
 
     }
-
-
-     var rgba = textureSampleLevel(feedbackTexture, feedbackSampler, vec2<f32>(400,400),  0.0);
-    // if(rgba.r > 0){
-
-    //     textureStore(outputTex, vec2<u32>(200,200), vec4<f32>(1,0,0,1));
-    // }
-
-
-
 }
 `;
 

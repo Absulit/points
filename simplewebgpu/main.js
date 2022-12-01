@@ -174,12 +174,12 @@ async function init() {
     // webGPU.addTexture2d('feedbackTexture', true); // slime2
     // webGPU.addBindingTexture('outputTex', 'computeTexture'); // slime2
 
-    // vertexShader = blur1Vert;
-    // computeShader = blur1Compute;
-    // fragmentShader = blur1Frag;
-    // webGPU.addSampler('feedbackSampler'); // blur1
-    // webGPU.addTexture2d('feedbackTexture', true); // blur1
-    // webGPU.addBindingTexture('outputTex', 'computeTexture'); // blur1
+    vertexShader = blur1Vert;
+    computeShader = blur1Compute;
+    fragmentShader = blur1Frag;
+    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT); // blur1
+    webGPU.addTexture2d('feedbackTexture', true); // blur1
+    webGPU.addBindingTexture('outputTex', 'computeTexture'); // blur1
 
     // vertexShader = circleblurVert;
     // computeShader = circleblurCompute;
@@ -188,9 +188,9 @@ async function init() {
     // webGPU.addTexture2d('feedbackTexture', true); // circleblur
     // webGPU.addBindingTexture('outputTex', 'computeTexture'); // circleblur
 
-    vertexShader = demo6_textureVert;
-    computeShader = defaultCompute;
-    fragmentShader = demo6_textureFrag;
+    // vertexShader = demo6_textureVert;
+    // computeShader = defaultCompute;
+    // fragmentShader = demo6_textureFrag;
 
     const initialized = await webGPU.init(vertexShader, computeShader, fragmentShader);
     if (initialized) {
