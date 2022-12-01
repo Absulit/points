@@ -76,18 +76,17 @@ fn main(
             let uy = u32(y);
             let iy = i32(y);
             let ny = y / numRows;
+            let ixy = vec2<i32>(ix,iy);
 
-            //let index:f32 = y + (x * screenSize.numColumns);
-            var rgba = textureSampleLevel(feedbackTexture, feedbackSampler, vec2<f32>(x,y),  0.0).rgba;
+            var rgba = textureLoad(feedbackTexture, ixy, 0).rgba;
 
-            let colorsAround = getColorsAround(vec2<i32>(ix,iy), 1);
+            let colorsAround = getColorsAround(ixy, 1);
             rgba = soften8(rgba, colorsAround, 1.);
 
-            rgba = vec4<f32>(1,0,0,1);
+            //rgba = vec4<f32>(1,0,0,1);
             rgba = clearMix(rgba, 1.01);
 
-
-            textureStore(outputTex, vec2<i32>(ix,iy), rgba * .01);
+            textureStore(outputTex, ixy, rgba * .01);
         }
     }
 
@@ -118,14 +117,10 @@ fn main(
 
         var uxy = vec2<u32>( (*particle).position );
         var xy = (*particle).position;
-        var rgba = textureSampleLevel(feedbackTexture, feedbackSampler, xy,  0.0).rgba;
+        var rgba = textureLoad(feedbackTexture, vec2<i32>(xy), 0).rgba;
 
-
-        //xy = vec2<u32>(0,0);
         textureStore(outputTex, uxy, vec4<f32>(1,1,1,1) );
-
     }
-
 }
 `;
 
