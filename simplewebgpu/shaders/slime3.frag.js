@@ -50,7 +50,7 @@ fn main(
     //var finalColor:vec4<f32> = vec4(uv.x * c + decayR, uv.y * c + decayR, c + decayB, 1);
     //var finalColor:vec4<f32> = vec4(uv.x * c, uv.y * c, c, 1);
     var finalColor = vec4(decayR, decayG, decayB, 1);
-    finalColor += texColorCompute;
+    finalColor = texColorCompute;
 
     // let cellSize = 20. + 10. * fnusin(1.);
     // let a = sin(uv.x  * cellSize) * sin(uv.y * cellSize);

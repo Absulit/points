@@ -110,7 +110,7 @@ export default class WebGPU {
     updateUniform(name, value) {
         const variable = this._uniforms.find(v => v.name === name);
         if (!variable) {
-            throw '`updateVariable()` can\'t be called without first `addVariable()`.';
+            throw '`updateUniform()` can\'t be called without first `addUniform()`.';
         }
         variable.value = value;
     }
