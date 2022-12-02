@@ -41,6 +41,9 @@ import planets3Vert from './shaders/planets3.vert.js';
 import planetsblurVert from './shaders/planetsblur.vert.js';
 import planetsblur2Vert from './shaders/planetsblur2.vert.js';
 import slime2Vert from './shaders/slime2.vert.js';
+import slime3Vert from './shaders/slime3.vert.js';
+import slime3Compute from './shaders/slime3.compute.js';
+import slime3Frag from './shaders/slime3.frag.js';
 
 /***************/
 const stats = new Stats();
@@ -142,15 +145,15 @@ async function init() {
     // webGPU.addSampler('feedbackSampler'); // planetsblur2
     // webGPU.addTexture2d('feedbackTexture', true); // planetsblur2
 
-    vertexShader = reactiondiffusionVert;
-    computeShader = reactiondiffusionCompute;
-    fragmentShader = reactiondiffusionFrag;
-    webGPU.addStorage('chemicals', 800 * 800, 'Chemical', 2); // reactiondiffusion
-    webGPU.addStorage('chemicals2', 800 * 800, 'Chemical', 2); // reactiondiffusion
-    webGPU.addStorage('variables', 1, 'Variable', 1); // reactiondiffusion
-    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT); // reactiondiffusion
-    webGPU.addTexture2d('feedbackTexture', true, ShaderType.COMPUTE); // reactiondiffusion
-    webGPU.addBindingTexture('outputTex', 'computeTexture'); // reactiondiffusion
+    // vertexShader = reactiondiffusionVert;
+    // computeShader = reactiondiffusionCompute;
+    // fragmentShader = reactiondiffusionFrag;
+    // webGPU.addStorage('chemicals', 800 * 800, 'Chemical', 2); // reactiondiffusion
+    // webGPU.addStorage('chemicals2', 800 * 800, 'Chemical', 2); // reactiondiffusion
+    // webGPU.addStorage('variables', 1, 'Variable', 1); // reactiondiffusion
+    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT); // reactiondiffusion
+    // webGPU.addTexture2d('feedbackTexture', true, ShaderType.COMPUTE); // reactiondiffusion
+    // webGPU.addBindingTexture('outputTex', 'computeTexture'); // reactiondiffusion
 
     // vertexShader = slimeVert;
     // computeShader = slimeCompute;
@@ -173,6 +176,17 @@ async function init() {
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT); // slime2
     // webGPU.addTexture2d('feedbackTexture', true); // slime2
     // webGPU.addBindingTexture('outputTex', 'computeTexture'); // slime2
+
+    vertexShader = slime3Vert;
+    computeShader = slime3Compute;
+    fragmentShader = slime3Frag;
+    const numParticles = 1024 * 2;// slime2
+    webGPU.addUniform('numParticles', numParticles);// slime2
+    webGPU.addStorage('particles', numParticles, 'Particle', 4); // slime2
+    webGPU.addStorage('variables', 1, 'Variable', 1); // slime2
+    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT); // slime2
+    webGPU.addTexture2d('feedbackTexture', true); // slime2
+    webGPU.addBindingTexture('outputTex', 'computeTexture'); // slime2
 
     // vertexShader = blur1Vert;
     // computeShader = blur1Compute;
