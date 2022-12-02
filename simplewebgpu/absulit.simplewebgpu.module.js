@@ -131,8 +131,27 @@ export default class WebGPU {
             structName: structName,
             structSize: structSize,
             shaderType: shaderType,
+            array: null,
             buffer: null
         });
+    }
+
+    addStorageMap(name, arrayData, structName){
+        this._storage.push({
+            mapped: true,
+            name: name,
+            structName: structName,
+            array: arrayData,
+            buffer: null
+        });
+    }
+
+    updateStorageMap(name, arrayData){
+        const variable = this._storage.find(v => v.name === name);
+        if (!variable) {
+            throw '`updateStorageMap()` can\'t be called without first `addStorageMap()`.';
+        }
+        variable.array = arrayData;
     }
 
     /**
@@ -231,6 +250,9 @@ export default class WebGPU {
         this._storage.forEach((storageItem, index) => {
             if (!storageItem.shaderType || storageItem.shaderType == shaderType) {
                 let T = storageItem.structName;
+                if(storageItem.array && storageItem.array.length){
+                    storageItem.size = storageItem.array.length;
+                }
                 if (storageItem.size > 1) {
                     T = `array<${storageItem.structName}>`;
                 }
@@ -467,7 +489,12 @@ export default class WebGPU {
         this._createParametersUniforms();
         //--------------------------------------------
         this._storage.forEach(storageItem => {
-            storageItem.buffer = this._createBuffer(storageItem.size * storageItem.structSize * 4, GPUBufferUsage.STORAGE);
+            if(storageItem.mapped){
+                const values = new Float32Array(storageItem.array);
+                storageItem.buffer = this._createAndMapBuffer(values, GPUBufferUsage.STORAGE);
+            }else{
+                storageItem.buffer = this._createBuffer(storageItem.size * storageItem.structSize * 4, GPUBufferUsage.STORAGE);
+            }
         });
         //--------------------------------------------
         this._samplers.forEach(sampler => sampler.resource = this._device.createSampler(sampler.descriptor));
@@ -815,6 +842,14 @@ export default class WebGPU {
         //--------------------------------------------
 
         this._createParametersUniforms();
+
+        // TODO: create method for this
+        this._storage.forEach(storageItem => {
+            if(storageItem.mapped){
+                const values = new Float32Array(storageItem.array);
+                storageItem.buffer = this._createAndMapBuffer(values, GPUBufferUsage.STORAGE);
+            }
+        });
 
         this._createComputeBindGroup();
 

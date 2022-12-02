@@ -111,6 +111,12 @@ async function init() {
     webGPU.addUniform('randNumber', 0); // random1
     webGPU.addUniform('randNumber2', 0); // random1
     webGPU.addStorage('stars', 800*800, 'Star', 4); // random1
+    let data = [];
+    for (let k = 0; k < 800*800; k++) {
+        data.push(Math.random());
+        
+    }
+    webGPU.addStorageMap('rands', [0,0], 'f32');
     webGPU.addSampler('feedbackSampler'); // random1
     webGPU.addTexture2d('feedbackTexture', true); // random1
     webGPU.addBindingTexture('outputTex', 'computeTexture'); // random1
@@ -251,6 +257,15 @@ async function update() {
 
     webGPU.updateUniform('randNumber', Math.random()); // random2
     webGPU.updateUniform('randNumber2', Math.random()); // random2
+
+
+    let data = [];
+    for (let k = 0; k < 800*800; k++) {
+        data.push(Math.random());
+        
+    }
+
+    webGPU.updateStorageMap('rands', data);
 
     webGPU.update();
 

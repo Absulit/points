@@ -30,6 +30,7 @@ fn main(
     ) -> @location(0) vec4<f32> {
 
     let star = stars[0];
+    let rand = rands[0];
 
     let texColor = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1));
     let texColorCompute = textureSample(computeTexture, feedbackSampler, uv * vec2(1,-1));
