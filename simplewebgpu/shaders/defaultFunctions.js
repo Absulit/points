@@ -132,7 +132,7 @@ fn rand2(co: vec2<f32>) -> f32 {
 `;
 
 export const sdfSegment = /*wgsl*/`;
-fn sdfSegment(  p:vec2<f32>, a:vec2<f32>, b:vec2<f32> ) -> f32{
+fn sdfSegment(p:vec2<f32>, a:vec2<f32>, b:vec2<f32> ) -> f32{
     let pa = p-a;
     let ba = b-a;
     let h:f32 = clamp( dot(pa,ba)/dot(ba,ba), 0.0, 1.0 );

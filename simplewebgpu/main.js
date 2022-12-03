@@ -47,6 +47,9 @@ import slime3Frag from './shaders/slime3.frag.js';
 import random2Vert from './shaders/random2.vert.js';
 import random2Compute from './shaders/random2.compute.js';
 import random2Frag from './shaders/random2.frag.js';
+import shapes1Vert from './shaders/shapes1.vert.js';
+import shapes1Compute from './shaders/shapes1.compute.js';
+import shapes1Frag from './shaders/shapes1.frag.js';
 
 /***************/
 const stats = new Stats();
@@ -94,6 +97,10 @@ async function init() {
     // vertexShader = defaultVert;
     // computeShader = defaultCompute;
     // fragmentShader = test1Frag;
+
+    vertexShader = shapes1Vert;
+    computeShader = shapes1Compute;
+    fragmentShader = shapes1Frag;
 
     // vertexShader = random1Vert;
     // computeShader = random1Compute;
@@ -173,16 +180,16 @@ async function init() {
     // webGPU.addTexture2d('feedbackTexture', true, ShaderType.COMPUTE); // reactiondiffusion
     // webGPU.addBindingTexture('outputTex', 'computeTexture'); // reactiondiffusion
 
-    vertexShader = slimeVert;
-    computeShader = slimeCompute;
-    fragmentShader = slimeFrag;
-    const numParticles = 1024 * 2;// slime
-    webGPU.addUniform('numParticles', numParticles);// slime
-    webGPU.addStorage('particles', numParticles, 'Particle', 4); // slime
-    webGPU.addStorage('variables', 1, 'Variable', 1); // slime
-    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT); // slime
-    webGPU.addTexture2d('feedbackTexture', true); // slime
-    webGPU.addBindingTexture('outputTex', 'computeTexture'); // slime
+    // vertexShader = slimeVert;
+    // computeShader = slimeCompute;
+    // fragmentShader = slimeFrag;
+    // const numParticles = 1024 * 2;// slime
+    // webGPU.addUniform('numParticles', numParticles);// slime
+    // webGPU.addStorage('particles', numParticles, 'Particle', 4); // slime
+    // webGPU.addStorage('variables', 1, 'Variable', 1); // slime
+    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT); // slime
+    // webGPU.addTexture2d('feedbackTexture', true); // slime
+    // webGPU.addBindingTexture('outputTex', 'computeTexture'); // slime
 
     // vertexShader = slime2Vert;
     // computeShader = slime2Compute;
