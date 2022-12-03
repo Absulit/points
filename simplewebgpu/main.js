@@ -105,21 +105,20 @@ async function init() {
     // webGPU.addTexture2d('feedbackTexture', true); // random1
     // webGPU.addBindingTexture('outputTex', 'computeTexture'); // random1
 
-    vertexShader = random2Vert;
-    computeShader = random2Compute;
-    fragmentShader = random2Frag;
-    webGPU.addUniform('randNumber', 0); // random1
-    webGPU.addUniform('randNumber2', 0); // random1
-    webGPU.addStorage('stars', 800*800, 'Star', 4); // random1
-    let data = [];
-    for (let k = 0; k < 800*800; k++) {
-        data.push(Math.random());
-        
-    }
-    webGPU.addStorageMap('rands', [0,0], 'f32');
-    webGPU.addSampler('feedbackSampler'); // random1
-    webGPU.addTexture2d('feedbackTexture', true); // random1
-    webGPU.addBindingTexture('outputTex', 'computeTexture'); // random1
+    // vertexShader = random2Vert;
+    // computeShader = random2Compute;
+    // fragmentShader = random2Frag;
+    // webGPU.addUniform('randNumber', 0); // random2
+    // webGPU.addUniform('randNumber2', 0); // random2
+    // webGPU.addStorage('stars', 800*800, 'Star', 4); // random2
+    // let data = [];
+    // for (let k = 0; k < 800*800; k++) {
+    //     data.push(Math.random());
+    // }
+    // webGPU.addStorageMap('rands', [0,0], 'f32');
+    // webGPU.addSampler('feedbackSampler'); // random2
+    // webGPU.addTexture2d('feedbackTexture', true); // random2
+    // webGPU.addBindingTexture('outputTex', 'computeTexture'); // random2
 
     // vertexShader = planetsVert;
     // computeShader = planetsCompute;
@@ -174,16 +173,16 @@ async function init() {
     // webGPU.addTexture2d('feedbackTexture', true, ShaderType.COMPUTE); // reactiondiffusion
     // webGPU.addBindingTexture('outputTex', 'computeTexture'); // reactiondiffusion
 
-    // vertexShader = slimeVert;
-    // computeShader = slimeCompute;
-    // fragmentShader = slimeFrag;
-    // const numParticles = 1024 * 2;// slime
-    // webGPU.addUniform('numParticles', numParticles);// slime
-    // webGPU.addStorage('particles', numParticles, 'Particle', 4); // slime
-    // webGPU.addStorage('variables', 1, 'Variable', 1); // slime
-    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT); // slime
-    // webGPU.addTexture2d('feedbackTexture', true); // slime
-    // webGPU.addBindingTexture('outputTex', 'computeTexture'); // slime
+    vertexShader = slimeVert;
+    computeShader = slimeCompute;
+    fragmentShader = slimeFrag;
+    const numParticles = 1024 * 2;// slime
+    webGPU.addUniform('numParticles', numParticles);// slime
+    webGPU.addStorage('particles', numParticles, 'Particle', 4); // slime
+    webGPU.addStorage('variables', 1, 'Variable', 1); // slime
+    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT); // slime
+    webGPU.addTexture2d('feedbackTexture', true); // slime
+    webGPU.addBindingTexture('outputTex', 'computeTexture'); // slime
 
     // vertexShader = slime2Vert;
     // computeShader = slime2Compute;
@@ -255,17 +254,13 @@ async function update() {
     // webGPU.updateUniform('randNumber', Math.random()); // random1
     // webGPU.updateUniform('randNumber2', Math.random()); // random1
 
-    webGPU.updateUniform('randNumber', Math.random()); // random2
-    webGPU.updateUniform('randNumber2', Math.random()); // random2
-
-
-    let data = [];
-    for (let k = 0; k < 800*800; k++) {
-        data.push(Math.random());
-        
-    }
-
-    webGPU.updateStorageMap('rands', data);
+    // webGPU.updateUniform('randNumber', Math.random()); // random2
+    // webGPU.updateUniform('randNumber2', Math.random()); // random2
+    // let data = [];
+    // for (let k = 0; k < 800*800; k++) {
+    //     data.push(Math.random());
+    // }
+    // webGPU.updateStorageMap('rands', data);// random2
 
     webGPU.update();
 
