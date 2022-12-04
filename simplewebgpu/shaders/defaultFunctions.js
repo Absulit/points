@@ -153,11 +153,13 @@ fn RGBAFromHSV(h:f32, s:f32, v:f32) ->  vec4<f32>{
 `;
 
 
-// fn line2(uv:vec2<f32>, p1:vec2<f32>, p2:vec2<f32>, pixelStroke:f32)->f32{
-//     let d = sdfSegment(uv, p1, p2);
-//     var value = 1.0;
-//     if(d > pixelStroke/800.){
-//         value = 0.;
-//     }
-//     return value;
-// }
+export const sdfLine = /*wgsl*/`
+fn sdfLine(uv:vec2<f32>, p1:vec2<f32>, p2:vec2<f32>, pixelStroke:f32)->f32{
+    let d = sdfSegment(uv, p1, p2);
+    var value = 1.0;
+    if(d > pixelStroke/800.){
+        value = 0.;
+    }
+    return value;
+}
+`;
