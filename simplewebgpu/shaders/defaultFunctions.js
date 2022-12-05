@@ -164,9 +164,9 @@ fn RGBAFromHSV(h:f32, s:f32, v:f32) ->  vec4<f32>{
 `;
 
 export const sdfCircle = /*wgsl*/`;
-fn sdfCircle(position:vec2<f32>, radius: f32, stroke: f32, uv:vec2<f32>) -> vec4<f32> {
+fn sdfCircle(position:vec2<f32>, radius: f32, feather: f32, uv:vec2<f32>) -> vec4<f32> {
     let d = distance(uv, position);
-    let st = 1 - smoothstep(radius, radius + stroke, d);
+    let st = 1 - smoothstep(radius, radius + feather, d);
     return vec4(st);
 }
 `;
@@ -182,24 +182,24 @@ fn rotateVector(p:vec2<f32>, rads:f32 ) -> vec2<f32> {
 `;
 
 export const sdfSquare = /*wgsl*/`;
-fn sdfSquare(position:vec2<f32>, radius:f32, stroke:f32, rotationRads: f32, uv:vec2<f32>) -> vec4<f32> {
+fn sdfSquare(position:vec2<f32>, radius:f32, feather:f32, rotationRads: f32, uv:vec2<f32>) -> vec4<f32> {
     let positionRotated = rotateVector(position, rotationRads);
     let uvRotated = rotateVector(uv, rotationRads);
 
     var d = distance(uvRotated.x,  positionRotated.x );
-    var s = smoothstep(radius, radius + stroke,  d);
+    var s = smoothstep(radius, radius + feather,  d);
 
     d = distance(uvRotated.y,  positionRotated.y);
-    s += smoothstep(radius, radius + stroke,  d);
+    s += smoothstep(radius, radius + feather,  d);
     s = clamp(0,1, s);
     return vec4(1-s);
 }
 `;
 
 export const sdfLine2 = /*wgsl*/`;
-fn sdfLine2(p1:vec2<f32>, p2:vec2<f32>, stroke:f32, uv:vec2<f32>)->f32{
+fn sdfLine2(p1:vec2<f32>, p2:vec2<f32>, feather:f32, uv:vec2<f32>)->f32{
     let d = sdfSegment(uv, p1, p2);
-    var s = smoothstep(0, stroke,  d);
+    var s = smoothstep(0, feather,  d);
     return 1-s;
 }
 `;
