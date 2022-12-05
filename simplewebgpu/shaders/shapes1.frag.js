@@ -1,5 +1,5 @@
 import defaultStructs from './defaultStructs.js';
-import { fnusin, polar, sdfLine, sdfSegment } from './defaultFunctions.js';
+import { fnusin, polar, rotateVector, sdfCircle, sdfLine, sdfLine2, sdfSegment, sdfSquare } from './defaultFunctions.js';
 
 const shapes1Frag = /*wgsl*/`
 
@@ -9,42 +9,10 @@ ${fnusin}
 ${sdfSegment}
 ${sdfLine}
 ${polar}
-
-
-fn sdfCircle(position:vec2<f32>, radius: f32, stroke: f32, uv:vec2<f32>) -> vec4<f32> {
-    let d = distance(uv, position);
-    let st = 1 - smoothstep(radius, radius + stroke, d);
-    return vec4(st);
-}
-
-fn rotateVector(p:vec2<f32>, rads:f32 ) -> vec2<f32> {
-    let s = sin(rads);
-    let c = cos(rads);
-    let xnew = p.x * c - p.y * s;
-    let ynew = p.x * s + p.y * c;
-    return vec2(xnew, ynew);
-}
-
-fn sdfSquare(position:vec2<f32>, radius:f32, stroke:f32, rotationRads: f32, uv:vec2<f32>) -> vec4<f32> {
-    let positionRotated = rotateVector(position, rotationRads);
-    let uvRotated = rotateVector(uv, rotationRads);
-
-    var d = distance(uvRotated.x,  positionRotated.x );
-    var s = smoothstep(radius, radius + stroke,  d);
-
-    d = distance(uvRotated.y,  positionRotated.y);
-    s += smoothstep(radius, radius + stroke,  d);
-    s = clamp(0,1, s);
-    return vec4(1-s);
-}
-
-
-fn sdfLine2(p1:vec2<f32>, p2:vec2<f32>, stroke:f32, uv:vec2<f32>)->f32{
-    let d = sdfSegment(uv, p1, p2);
-    var s = smoothstep(0, stroke,  d);
-    return 1-s;
-}
-
+${sdfCircle}
+${rotateVector}
+${sdfSquare}
+${sdfLine2}
 
 @fragment
 fn main(
@@ -63,7 +31,7 @@ fn main(
     var finalColor:vec4<f32> = mix(orangeBall, redBall, uv.x);
 
     //finalColor += sdfSquare(uv, vec2(.9, .5  ),  10);
-    //finalColor += sdfLine(uv, vec2(.0,.0), vec2(.6,.6), 1 );
+    //finalColor += sdfLine(vec2(.5,.5), vec2(.6,.6), .001, uv );
     finalColor += sdfLine2( vec2(.5,.5), vec2(.6,.6), .001, uv );
 
 
@@ -86,6 +54,7 @@ fn main(
 
         //finalColor += sdfSquare(pointPosition, .001 * 4, 0, 0, uv) * vec4(1,1,0,  1);
         finalColor += sdfLine2( pointPosition, pointPosition2, .001 + .1 * params.sliderC, uv );
+        //finalColor += sdfLine(pointPosition, pointPosition2, .001 + 10 * params.sliderC, uv  );
     }
 
     return finalColor;

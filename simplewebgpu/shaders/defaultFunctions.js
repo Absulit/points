@@ -141,7 +141,7 @@ fn sdfSegment(p:vec2<f32>, a:vec2<f32>, b:vec2<f32> ) -> f32{
 `;
 
 export const sdfLine = /*wgsl*/`
-fn sdfLine(uv:vec2<f32>, p1:vec2<f32>, p2:vec2<f32>, pixelStroke:f32)->f32{
+fn sdfLine(p1:vec2<f32>, p2:vec2<f32>, pixelStroke:f32, uv:vec2<f32>)->f32{
     let d = sdfSegment(uv, p1, p2);
     var value = 1.0;
     if(d > pixelStroke/800.){
@@ -160,5 +160,46 @@ fn hsvAux(h:f32, s:f32, v:f32, n:f32) -> f32 {
 
 fn RGBAFromHSV(h:f32, s:f32, v:f32) ->  vec4<f32>{
     return vec4<f32>(hsvAux(h, s, v, 5), hsvAux(h, s, v, 3), hsvAux(h, s, v, 1), 1);
+}
+`;
+
+export const sdfCircle = /*wgsl*/`;
+fn sdfCircle(position:vec2<f32>, radius: f32, stroke: f32, uv:vec2<f32>) -> vec4<f32> {
+    let d = distance(uv, position);
+    let st = 1 - smoothstep(radius, radius + stroke, d);
+    return vec4(st);
+}
+`;
+
+export const rotateVector = /*wgsl*/`;
+fn rotateVector(p:vec2<f32>, rads:f32 ) -> vec2<f32> {
+    let s = sin(rads);
+    let c = cos(rads);
+    let xnew = p.x * c - p.y * s;
+    let ynew = p.x * s + p.y * c;
+    return vec2(xnew, ynew);
+}
+`;
+
+export const sdfSquare = /*wgsl*/`;
+fn sdfSquare(position:vec2<f32>, radius:f32, stroke:f32, rotationRads: f32, uv:vec2<f32>) -> vec4<f32> {
+    let positionRotated = rotateVector(position, rotationRads);
+    let uvRotated = rotateVector(uv, rotationRads);
+
+    var d = distance(uvRotated.x,  positionRotated.x );
+    var s = smoothstep(radius, radius + stroke,  d);
+
+    d = distance(uvRotated.y,  positionRotated.y);
+    s += smoothstep(radius, radius + stroke,  d);
+    s = clamp(0,1, s);
+    return vec4(1-s);
+}
+`;
+
+export const sdfLine2 = /*wgsl*/`;
+fn sdfLine2(p1:vec2<f32>, p2:vec2<f32>, stroke:f32, uv:vec2<f32>)->f32{
+    let d = sdfSegment(uv, p1, p2);
+    var s = smoothstep(0, stroke,  d);
+    return 1-s;
 }
 `;
