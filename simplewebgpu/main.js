@@ -50,6 +50,9 @@ import random2Frag from './shaders/random2.frag.js';
 import shapes1Vert from './shaders/shapes1.vert.js';
 import shapes1Compute from './shaders/shapes1.compute.js';
 import shapes1Frag from './shaders/shapes1.frag.js';
+import shapes2Vert from './shaders/shapes2.vert.js';
+import shapes2Compute from './shaders/shapes2.compute.js';
+import shapes2Frag from './shaders/shapes2.frag.js';
 
 /***************/
 const stats = new Stats();
@@ -98,12 +101,21 @@ async function init() {
     // computeShader = defaultCompute;
     // fragmentShader = test1Frag;
 
-    vertexShader = shapes1Vert;
-    computeShader = shapes1Compute;
-    fragmentShader = shapes1Frag;
-    const numPoints = 128;
+    // vertexShader = shapes1Vert;
+    // computeShader = shapes1Compute;
+    // fragmentShader = shapes1Frag;
+    // const numPoints = 128;
+    // webGPU.addUniform('numPoints', numPoints);
+    // webGPU.addStorage('points', numPoints, 'vec2<f32>', 2);
+
+    vertexShader = shapes2Vert;
+    computeShader = shapes2Compute;
+    fragmentShader = shapes2Frag;
+    const numPoints = 800*800;
     webGPU.addUniform('numPoints', numPoints);
-    webGPU.addStorage('points', numPoints, 'vec2<f32>', 2);
+    webGPU.addStorage('points', numPoints, 'vec4<f32>', 4);
+    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    webGPU.addBindingTexture('outputTex', 'computeTexture');
 
     // vertexShader = random1Vert;
     // computeShader = random1Compute;
