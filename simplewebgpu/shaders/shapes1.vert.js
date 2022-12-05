@@ -8,11 +8,6 @@ struct Variable{
     particlesCreated: f32,
 }
 
-struct Particle{
-    position: vec2<f32>,
-    angle: f32,
-    distance: f32
-}
 
 @vertex
 fn main(

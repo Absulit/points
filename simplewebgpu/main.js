@@ -101,6 +101,9 @@ async function init() {
     vertexShader = shapes1Vert;
     computeShader = shapes1Compute;
     fragmentShader = shapes1Frag;
+    const numPoints = 128; // planetsblur
+    webGPU.addUniform('numPoints', numPoints);
+    webGPU.addStorage('points', numPoints, 'vec2<f32>', 2); // random1
 
     // vertexShader = random1Vert;
     // computeShader = random1Compute;

@@ -140,6 +140,17 @@ fn sdfSegment(p:vec2<f32>, a:vec2<f32>, b:vec2<f32> ) -> f32{
 }
 `;
 
+export const sdfLine = /*wgsl*/`
+fn sdfLine(uv:vec2<f32>, p1:vec2<f32>, p2:vec2<f32>, pixelStroke:f32)->f32{
+    let d = sdfSegment(uv, p1, p2);
+    var value = 1.0;
+    if(d > pixelStroke/800.){
+        value = 0.;
+    }
+    return value;
+}
+`;
+
 
 export const RGBAFromHSV = /*wgsl*/`;
 fn hsvAux(h:f32, s:f32, v:f32, n:f32) -> f32 {
@@ -149,17 +160,5 @@ fn hsvAux(h:f32, s:f32, v:f32, n:f32) -> f32 {
 
 fn RGBAFromHSV(h:f32, s:f32, v:f32) ->  vec4<f32>{
     return vec4<f32>(hsvAux(h, s, v, 5), hsvAux(h, s, v, 3), hsvAux(h, s, v, 1), 1);
-}
-`;
-
-
-export const sdfLine = /*wgsl*/`
-fn sdfLine(uv:vec2<f32>, p1:vec2<f32>, p2:vec2<f32>, pixelStroke:f32)->f32{
-    let d = sdfSegment(uv, p1, p2);
-    var value = 1.0;
-    if(d > pixelStroke/800.){
-        value = 0.;
-    }
-    return value;
 }
 `;
