@@ -44,8 +44,8 @@ fn clearAlpha(currentColor:vec4<f32>, level:f32) -> vec4<f32>{
 }
 `;
 
-export const getColorsAround = /*wgsl*/`;
-fn getColorsAround(texture:texture_2d<f32>, position: vec2<i32>, distance: i32) -> array<  vec4<f32>, 8  > {
+export const getColorsAroundTexture = /*wgsl*/`;
+fn getColorsAroundTexture(texture:texture_2d<f32>, position: vec2<i32>, distance: i32) -> array<  vec4<f32>, 8  > {
     return array< vec4<f32>,8 >(
         textureLoad(texture, vec2<i32>( position.x-distance, position.y-distance  ),  0).rgba,
         textureLoad(texture, vec2<i32>( position.x, position.y-distance  ),  0).rgba,
@@ -57,6 +57,10 @@ fn getColorsAround(texture:texture_2d<f32>, position: vec2<i32>, distance: i32) 
         textureLoad(texture, vec2<i32>( position.x+distance, position.y+distance  ),  0).rgba,
     );
 }
+`;
+
+export const getColorsAroundBuffer = /*wgsl*/`;
+
 `;
 
 export const soften8 = /*wgsl*/`;
@@ -72,46 +76,6 @@ fn soften8(color:vec4<f32>, colorsAround:array<vec4<f32>, 8>, colorPower:f32) ->
         newColor += colorAround;
     }
     return newColor / 5;
-}
-`;
-
-export const sftn = /*wgsl*/`;
-fn sftn(position: vec2<i32>, distance: i32, colorPower:f32){
-
-    var color = textureLoad(feedbackTexture, position,  0).rgba;
-    var newColor:vec4<f32> = vec4<f32>();
-    var positions = array< vec2<i32>, 8 >(
-        vec2<i32>( position.x-distance, position.y-distance  ),
-        vec2<i32>( position.x, position.y-distance  ),
-        vec2<i32>( position.x+distance, position.y-distance  ),
-        vec2<i32>( position.x-distance, position.y  ),
-        vec2<i32>( position.x+distance, position.y  ),
-        vec2<i32>( position.x-distance, position.y+distance  ),
-        vec2<i32>( position.x, position.y+distance  ),
-        vec2<i32>( position.x+distance, position.y+distance  )
-    );
-    let colorsAround = array< vec4<f32>,8 >(
-        textureLoad(feedbackTexture, positions[0],  0).rgba,
-        textureLoad(feedbackTexture, positions[1],  0).rgba,
-        textureLoad(feedbackTexture, positions[2],  0).rgba,
-        textureLoad(feedbackTexture, positions[3],  0).rgba,
-        textureLoad(feedbackTexture, positions[4],  0).rgba,
-        textureLoad(feedbackTexture, positions[5],  0).rgba,
-        textureLoad(feedbackTexture, positions[6],  0).rgba,
-        textureLoad(feedbackTexture, positions[7],  0).rgba,
-    );
-
-    for (var indexColors = 0u; indexColors < 8u; indexColors++) {
-        var colorAround = colorsAround[indexColors];
-        colorAround.r = (color.r + colorAround.r * colorPower) / (colorPower + 1.);
-        colorAround.g = (color.g + colorAround.g * colorPower) / (colorPower + 1.);
-        colorAround.b = (color.b + colorAround.b * colorPower) / (colorPower + 1.);
-        colorAround.a = (color.a + colorAround.a * colorPower) / (colorPower + 1.);
-
-        let uPosition = vec2<u32>( u32(positions[indexColors].x), u32(positions[indexColors].y));
-        textureStore(outputTex, uPosition, colorAround);
-    }
-
 }
 `;
 

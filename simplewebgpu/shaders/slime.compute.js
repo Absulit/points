@@ -1,5 +1,5 @@
 import { PI } from './defaultConstants.js';
-import { clearAlpha, clearMix, getColorsAround, polar, rand, soften8 } from './defaultFunctions.js';
+import { clearAlpha, clearMix, getColorsAroundTexture, polar, rand, soften8 } from './defaultFunctions.js';
 import defaultStructs from './defaultStructs.js';
 
 const slimeCompute = /*wgsl*/`
@@ -21,7 +21,7 @@ ${rand}
 ${polar}
 ${clearMix}
 ${clearAlpha}
-${getColorsAround}
+${getColorsAroundTexture}
 ${soften8}
 
 ${PI}
@@ -74,7 +74,7 @@ fn main(
             //let index:f32 = y + (x * screenSize.numColumns);
             var rgba = textureLoad(feedbackTexture, vec2<i32>(ix,iy), 0).rgba;
 
-            let colorsAround = getColorsAround(feedbackTexture, vec2<i32>(ix,iy), 1);
+            let colorsAround = getColorsAroundTexture(feedbackTexture, vec2<i32>(ix,iy), 1);
             rgba = soften8(rgba, colorsAround, 1.);
 
             //rgba = vec4<f32>(0,0,0,1);

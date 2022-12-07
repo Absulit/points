@@ -1,5 +1,5 @@
 import { PI } from './defaultConstants.js';
-import { clearMix, getColorsAround, polar, rand, soften8 } from './defaultFunctions.js';
+import { clearMix, getColorsAroundTexture, polar, rand, soften8 } from './defaultFunctions.js';
 import defaultStructs from './defaultStructs.js';
 
 const slime2Compute = /*wgsl*/`
@@ -19,7 +19,7 @@ struct Particle{
 ${rand}
 ${clearMix}
 ${polar}
-${getColorsAround}
+${getColorsAroundTexture}
 ${soften8}
 
 fn sense(particle:Particle, sensorAngleOffset:f32){
@@ -80,7 +80,7 @@ fn main(
 
             var rgba = textureLoad(feedbackTexture, ixy, 0).rgba;
 
-            let colorsAround = getColorsAround(ixy, 1);
+            let colorsAround = getColorsAroundTexture(ixy, 1);
             rgba = soften8(rgba, colorsAround, 1.);
 
             //rgba = vec4<f32>(1,0,0,1);

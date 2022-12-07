@@ -1,4 +1,4 @@
-import { clearAlpha, clearMix, fnusin, fusin, getColorsAround, polar, rand, soften8 } from './defaultFunctions.js';
+import { clearAlpha, clearMix, fnusin, fusin, getColorsAroundTexture, polar, rand, soften8 } from './defaultFunctions.js';
 import defaultStructs from './defaultStructs.js';
 import { PI } from './defaultConstants.js';
 
@@ -19,7 +19,7 @@ ${rand}
 ${clearMix}
 ${clearAlpha}
 ${polar}
-${getColorsAround}
+${getColorsAroundTexture}
 ${soften8}
 ${fnusin}
 ${fusin}
@@ -211,7 +211,7 @@ fn main(
             let c = clamp( (*chemicalBelow).a - (*chemicalBelow).b, 0, 1 );
 
 
-            //let colorsAround = getColorsAround(vec2<i32>(ix,iy), 1);
+            //let colorsAround = getColorsAroundTexture(vec2<i32>(ix,iy), 1);
             //rgba = soften8(rgba, colorsAround, 1.);
 
 

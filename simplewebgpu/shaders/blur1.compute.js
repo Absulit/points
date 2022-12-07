@@ -1,4 +1,4 @@
-import { clearMix, fnusin, getColorsAround, sftn, soften8 } from './defaultFunctions.js';
+import { clearMix, fnusin, getColorsAroundTexture, soften8 } from './defaultFunctions.js';
 import defaultStructs from './defaultStructs.js';
 
 const blur1Compute = /*wgsl*/`
@@ -20,9 +20,8 @@ struct Particles{
 }
 
 ${clearMix}
-${getColorsAround}
+${getColorsAroundTexture}
 ${soften8}
-${sftn}
 ${fnusin}
 
 const workgroupSize = 8;
@@ -65,7 +64,7 @@ fn main(
             //let index:f32 = y + (x * screenSize.numColumns);
             var rgba = textureLoad(feedbackTexture, vec2<i32>(ix,iy), 0).rgba;
 
-            let colorsAround = getColorsAround(feedbackTexture, vec2<i32>(ix,iy), i32(10 + 200 * fnusin(.5)));
+            let colorsAround = getColorsAroundTexture(feedbackTexture, vec2<i32>(ix,iy), i32(10 + 200 * fnusin(.5)));
             rgba = soften8(rgba, colorsAround, 1.);
 
             //rgba = vec4<f32>(1,0,0,1);
