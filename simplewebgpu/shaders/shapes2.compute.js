@@ -1,8 +1,38 @@
+import { clearAlpha, soften8 } from './defaultFunctions.js';
 import defaultStructs from './defaultStructs.js';
 
 const shapes2Compute = /*wgsl*/`
 
 ${defaultStructs}
+
+${soften8}
+${clearAlpha}
+
+struct Colors{
+    items: array< vec4<f32>, 800*800 >
+}
+
+fn getPointsIndex(position:vec2<u32>) -> u32{
+    return position.y + (position.x * u32(params.screenWidth));
+}
+
+fn getColorAt(position:vec2<u32>) -> vec4<f32> {
+    let index:u32 = getPointsIndex(position);
+    return points[index];
+}
+
+fn getColorsAroundLayer(position: vec2<u32>, distance: u32) -> array<  vec4<f32>, 8  > {
+    return array< vec4<f32>,8 >(
+        getColorAt( vec2<u32>( position.x-distance, position.y-distance  ) ).rgba,
+        getColorAt( vec2<u32>( position.x, position.y-distance  ) ).rgba,
+        getColorAt( vec2<u32>( position.x+distance, position.y-distance  ) ).rgba,
+        getColorAt( vec2<u32>( position.x-distance, position.y  ) ).rgba,
+        getColorAt( vec2<u32>( position.x+distance, position.y  ) ).rgba,
+        getColorAt( vec2<u32>( position.x-distance, position.y+distance  ) ).rgba,
+        getColorAt( vec2<u32>( position.x, position.y+distance  ) ).rgba,
+        getColorAt( vec2<u32>( position.x+distance, position.y+distance  ) ).rgba,
+    );
+}
 
 const workgroupSize = 8;
 
@@ -22,12 +52,21 @@ fn main(
 
 
 
-    let x = 450.;
-    let y = 450.;
-    let index = u32(y + (x * numColumns));
+    var x = 450.;
+    var y = 450.;
+    var index = u32(y + (x * numColumns));
     let point = &points[index];
 
     (*point) = vec4(1,0,0,1);
+
+
+    x = 555.;
+    y = 455.;
+    index = u32(y + (x * numColumns));
+    let point2 = &points[index];
+
+    (*point2) = vec4(1,0,1,1);
+
 
     for (var indexColumns:i32 = 0; indexColumns < numColumnsPiece; indexColumns++) {
         let x:f32 = f32(WorkGroupID.x) * f32(numColumnsPiece) + f32(indexColumns);
@@ -42,35 +81,27 @@ fn main(
             let ny = y / numRows;
             let uv = vec2(nx,ny);
 
-            let index = y + (x * numColumns);
-            let uIndex = u32(y + (x * numColumns));
-            let rgba = &points[uIndex];
-            let a = sin(uv.x * params.utime);
-            (*rgba) = vec4(a * uv.x, 1-uv.y, a, 1);
+            let positionU = vec2<u32>(ux,uy);
+
+            let uIndex = getPointsIndex(positionU);
+            // let rgba = &points[uIndex];
+            // let a = sin(uv.x * params.utime);
+            // (*rgba) = vec4(a * uv.x, 1-uv.y, a, 1);
+
+            var rgba = getColorAt(positionU);
+            let colorsAround = getColorsAroundLayer(positionU, 1);
+
+            let rgbaP = &points[uIndex];
+            (*rgbaP) = soften8(rgba, colorsAround, 1.);
+            rgba = getColorAt(positionU);
+            (*rgbaP) = clearAlpha(rgba, 1.8);
 
 
-        }
-    }
+
+            rgba = points[uIndex];
 
 
-
-    for (var indexColumns:i32 = 0; indexColumns < numColumnsPiece; indexColumns++) {
-        let x:f32 = f32(WorkGroupID.x) * f32(numColumnsPiece) + f32(indexColumns);
-        let ux = u32(x);
-        let ix = i32(x);
-        let nx = x / numColumns;
-        for (var indexRows:i32 = 0; indexRows < numRowsPiece; indexRows++) {
-
-            let y:f32 = f32(WorkGroupID.y) * f32(numRowsPiece) + f32(indexRows);
-            let uy = u32(y);
-            let iy = i32(y);
-            let ny = y / numRows;
-
-            let index = u32(y + (x * numColumns));
-            var rgba = points[index];
-
-
-            textureStore(outputTex, vec2<u32>(ux,uy), rgba);
+            textureStore(outputTex, positionU, rgba);
         }
     }
 

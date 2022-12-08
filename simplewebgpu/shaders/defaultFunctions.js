@@ -59,9 +59,12 @@ fn getColorsAroundTexture(texture:texture_2d<f32>, position: vec2<i32>, distance
 }
 `;
 
-export const getColorsAroundBuffer = /*wgsl*/`;
+// export const getColorsAroundBuffer = /*wgsl*/`;
 
-`;
+// fn getColorsAroundBuffer(bufferPointer: ptr<function, array<vec4<f32>> >, position: vec2<i32>, distance: i32) -> array<  vec4<f32>, 8  >{
+
+// }
+// `;
 
 export const soften8 = /*wgsl*/`;
 fn soften8(color:vec4<f32>, colorsAround:array<vec4<f32>, 8>, colorPower:f32) -> vec4<f32> {
