@@ -1,4 +1,4 @@
-import { clearAlpha, soften8 } from './defaultFunctions.js';
+import { clearAlpha, sdfCircle, sdfLine2, sdfSegment, soften4, soften8 } from './defaultFunctions.js';
 import defaultStructs from './defaultStructs.js';
 
 const shapes2Compute = /*wgsl*/`
@@ -6,7 +6,11 @@ const shapes2Compute = /*wgsl*/`
 ${defaultStructs}
 
 ${soften8}
+${soften4}
 ${clearAlpha}
+${sdfSegment}
+${sdfLine2}
+${sdfCircle}
 
 struct Colors{
     items: array< vec4<f32>, 800*800 >
@@ -31,6 +35,19 @@ fn getColorsAroundLayer(position: vec2<u32>, distance: u32) -> array<  vec4<f32>
         getColorAt( vec2<u32>( position.x-distance, position.y+distance  ) ).rgba,
         getColorAt( vec2<u32>( position.x, position.y+distance  ) ).rgba,
         getColorAt( vec2<u32>( position.x+distance, position.y+distance  ) ).rgba,
+    );
+}
+
+fn getColorsAround4Layer(position: vec2<u32>, distance: u32) -> array<  vec4<f32>, 4 > {
+    return array< vec4<f32>, 4 >(
+        //getColorAt( vec2<u32>( position.x-distance, position.y-distance  ) ).rgba,
+        getColorAt( vec2<u32>( position.x, position.y-distance  ) ).rgba,
+        //getColorAt( vec2<u32>( position.x+distance, position.y-distance  ) ).rgba,
+        getColorAt( vec2<u32>( position.x-distance, position.y  ) ).rgba,
+        getColorAt( vec2<u32>( position.x+distance, position.y  ) ).rgba,
+        //getColorAt( vec2<u32>( position.x-distance, position.y+distance  ) ).rgba,
+        getColorAt( vec2<u32>( position.x, position.y+distance  ) ).rgba,
+        //getColorAt( vec2<u32>( position.x+distance, position.y+distance  ) ).rgba,
     );
 }
 
@@ -68,6 +85,8 @@ fn main(
     (*point2) = vec4(1,0,1,1);
 
 
+    var rgba = vec4(0.);
+    var colorsAround = array<  vec4<f32>, 4  >();
     for (var indexColumns:i32 = 0; indexColumns < numColumnsPiece; indexColumns++) {
         let x:f32 = f32(WorkGroupID.x) * f32(numColumnsPiece) + f32(indexColumns);
         let ux = u32(x);
@@ -88,14 +107,16 @@ fn main(
             // let a = sin(uv.x * params.utime);
             // (*rgba) = vec4(a * uv.x, 1-uv.y, a, 1);
 
-            var rgba = getColorAt(positionU);
-            let colorsAround = getColorsAroundLayer(positionU, 1);
-
+            rgba = points[uIndex];
+            colorsAround = getColorsAround4Layer(positionU, 1);
             let rgbaP = &points[uIndex];
-            (*rgbaP) = soften8(rgba, colorsAround, 1.);
-            rgba = getColorAt(positionU);
-            (*rgbaP) = clearAlpha(rgba, 1.8);
 
+            (*rgbaP) = soften4(rgba, colorsAround, 1.);
+            rgba = points[uIndex];
+            (*rgbaP) = clearAlpha(rgba, 1.1);
+
+            let sdf = sdfCircle(vec2<f32>(.3,.3), .1, 0., uv);
+            (*rgbaP) += sdf;
 
 
             rgba = points[uIndex];
@@ -104,19 +125,6 @@ fn main(
             textureStore(outputTex, positionU, rgba);
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

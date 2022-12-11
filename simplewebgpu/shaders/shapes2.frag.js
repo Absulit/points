@@ -16,17 +16,8 @@ fn main(
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
-    let point = points[0];
+    _ = points[0];
     let texColorCompute = textureSample(computeTexture, feedbackSampler, uv * vec2(1,-1));
-
-    let cellSize = 20. + 10. * fnusin(1.);
-    let a = sin(uv.x  * cellSize) * sin(uv.y * cellSize);
-    let b = sin(uv.x * uv.y * 10. * 9.1 * .25 );
-    let c = fnusin(uv.x * uv.y * 10.);
-    let d = distance(a,b);
-    let f = d * uv.x * uv.y;
-    let finalColor:vec4<f32> = vec4(a*d,f*c*a,f, 1.);
-
     return texColorCompute;
 }
 `;
