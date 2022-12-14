@@ -14,6 +14,14 @@ fn fusin(speed: f32) -> f32{
 
 `;
 
+export const fucos = /*wgsl*/`
+
+fn fucos(speed: f32) -> f32{
+    return cos(params.utime * speed);
+}
+
+`;
+
 export const polar = /*wgsl*/`
 
 fn polar(distance: f32, radians: f32) -> vec2<f32> {
@@ -39,7 +47,10 @@ fn clearMix(color:vec4<f32>, level:f32) -> vec4<f32> {
 export const clearAlpha = /*wgsl*/`;
 // level 2.
 fn clearAlpha(currentColor:vec4<f32>, level:f32) -> vec4<f32>{
-    let ar = currentColor.a / level;
+    var ar = currentColor.a / level;
+    if(ar <= .09){
+        ar = 0.;
+    }
     return vec4<f32>(currentColor.rgb, ar);
 }
 `;
