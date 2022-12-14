@@ -21,7 +21,7 @@ fn main(
     result.ratio = params.screenWidth / params.screenHeight;
     result.Position = vec4<f32>(position);
     result.Color = vec4<f32>(color);
-    result.uv = vec2(uv.x * result.ratio, uv.y);
+    result.uv = vec2(uv.x * result.ratio, -uv.y);
     result.mouse = vec2(params.mouseX / params.screenWidth, params.mouseY / params.screenHeight);
 
     return result;

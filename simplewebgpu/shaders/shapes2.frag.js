@@ -7,6 +7,8 @@ ${defaultStructs}
 
 ${fnusin}
 
+const CHROMATIC_DISPLACEMENT = 0.003695;
+
 @fragment
 fn main(
         @location(0) Color: vec4<f32>,
@@ -17,8 +19,13 @@ fn main(
     ) -> @location(0) vec4<f32> {
 
     _ = points[0];
-    let texColorCompute = textureSample(computeTexture, feedbackSampler, uv * vec2(1,-1));
-    return texColorCompute;
+    let texColorCompute = textureSample(computeTexture, feedbackSampler, uv);
+
+    let texColorComputeR = textureSample(computeTexture, feedbackSampler, uv + vec2(CHROMATIC_DISPLACEMENT, 0.)).r;
+    let texColorComputeB = textureSample(computeTexture, feedbackSampler, uv - vec2(CHROMATIC_DISPLACEMENT, 0.)).b;
+
+
+    return (texColorCompute + vec4(texColorComputeR,0,0,1) + vec4(0,0,texColorComputeB,1));
 }
 `;
 

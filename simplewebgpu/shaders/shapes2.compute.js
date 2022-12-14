@@ -113,7 +113,7 @@ fn main(
 
             (*rgbaP) = soften4(rgba, colorsAround, 1.);
             rgba = points[uIndex];
-            (*rgbaP) = clearAlpha(rgba, 1.1);
+            (*rgbaP) = clearAlpha(rgba, 1.01);
 
             let sdf = sdfCircle(vec2<f32>(.3,.3), .1, 0., uv);
             (*rgbaP) += sdf;
