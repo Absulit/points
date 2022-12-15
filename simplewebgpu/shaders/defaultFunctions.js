@@ -218,3 +218,14 @@ fn sdfLine2(p1:vec2<f32>, p2:vec2<f32>, feather:f32, uv:vec2<f32>)->f32{
     return 1-s;
 }
 `;
+
+export const pixelateTexture = /*wgsl*/`;
+fn pixelateTexture(texture:texture_2d<f32>, textureSampler:sampler, pixelsWidth:f32, pixelsHeight:f32, uv:vec2<f32>) -> vec4<f32> {
+    let dx = pixelsWidth * (1. / params.screenWidth);
+    let dy = pixelsHeight * (1. / params.screenHeight);
+
+    let coord = vec2(dx*floor( uv.x / dx), dy * floor( uv.y / dy));
+
+    return textureSample(texture, textureSampler, coord);
+}
+`;
