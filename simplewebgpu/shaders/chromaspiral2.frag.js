@@ -1,7 +1,7 @@
 import defaultStructs from './defaultStructs.js';
 import { fnusin, pixelateTexture } from './defaultFunctions.js';
 
-const chromaspiralFrag = /*wgsl*/`
+const chromaspiral2Frag = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -21,8 +21,8 @@ fn main(
 
     _ = points[0];
 
-    let texColorCompute = textureSample(computeTexture, feedbackSampler, uv);
-    //let texColorCompute = pixelateTexture(computeTexture, feedbackSampler, 100 * params.sliderA, 100 * params.sliderA, uv);
+    //let texColorCompute = textureSample(computeTexture, feedbackSampler, coord);
+    let texColorCompute = pixelateTexture(computeTexture, feedbackSampler, 100 * params.sliderA, 100 * params.sliderA, uv);
 
 
     let texColorComputeR = textureSample(computeTexture, feedbackSampler, uv + vec2(CHROMATIC_DISPLACEMENT * params.sliderA, 0.)).r;
@@ -34,4 +34,4 @@ fn main(
 }
 `;
 
-export default chromaspiralFrag;
+export default chromaspiral2Frag;

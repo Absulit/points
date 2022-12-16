@@ -1,8 +1,9 @@
 import defaultStructs from './defaultStructs.js';
 
-const circleblurVert = /*wgsl*/`
+const chromaspiral2Vert = /*wgsl*/`
 
 ${defaultStructs}
+
 
 @vertex
 fn main(
@@ -24,4 +25,4 @@ fn main(
 }
 `;
 
-export default circleblurVert;
+export default chromaspiral2Vert;

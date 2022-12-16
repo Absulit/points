@@ -23,11 +23,11 @@ fn main(
     ) -> @location(0) vec4<f32> {
 
     //let texColor = textureSample(myTexture, mySampler, uv * 1.0 + .1 * fnusin(2));
-    let texColor = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1));
-    let texColor2 = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1) + vec2(-.001,1));
-    let texColor3 = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1) + vec2(.001,1));
+    let texColor = textureSample(feedbackTexture, feedbackSampler, uv);
+    let texColor2 = textureSample(feedbackTexture, feedbackSampler, uv + vec2(-.001,1));
+    let texColor3 = textureSample(feedbackTexture, feedbackSampler, uv + vec2(.001,1));
 
-    let texColorCompute = textureSample(computeTexture, feedbackSampler, uv * vec2(1,-1));
+    let texColorCompute = textureSample(computeTexture, feedbackSampler, uv);
 
     let d = distance(uv, vec2(.5 + .1 * fusin(2), .5  + .1 * fusin(4.123)));
     var c = 1.;

@@ -56,6 +56,9 @@ import shapes2Frag from './shaders/shapes2.frag.js';
 import chromaspiralVert from './shaders/chromaspiral.vert.js';
 import chromaspiralCompute from './shaders/chromaspiral.compute.js';
 import chromaspiralFrag from './shaders/chromaspiral.frag.js';
+import chromaspiral2Vert from './shaders/chromaspiral2.vert.js';
+import chromaspiral2Compute from './shaders/chromaspiral2.compute.js';
+import chromaspiral2Frag from './shaders/chromaspiral2.frag.js';
 
 /***************/
 const stats = new Stats();
@@ -112,6 +115,16 @@ async function init() {
     webGPU.addStorage('points', numPoints, 'vec4<f32>', 4);
     webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
     webGPU.addBindingTexture('outputTex', 'computeTexture');
+
+
+    // vertexShader = chromaspiral2Vert;
+    // computeShader = chromaspiral2Compute;
+    // fragmentShader = chromaspiral2Frag;
+    // const numPoints = 800*800;
+    // webGPU.addUniform('numPoints', numPoints);
+    // webGPU.addStorage('points', numPoints, 'vec4<f32>', 4);
+    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
     // vertexShader = shapes1Vert;
     // computeShader = shapes1Compute;
