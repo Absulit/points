@@ -59,6 +59,9 @@ import chromaspiralFrag from './shaders/chromaspiral.frag.js';
 import chromaspiral2Vert from './shaders/chromaspiral2.vert.js';
 import chromaspiral2Compute from './shaders/chromaspiral2.compute.js';
 import chromaspiral2Frag from './shaders/chromaspiral2.frag.js';
+import twigl1Vert from './shaders/twigl1/twigl1.vert.js';
+import twigl1Compute from './shaders/twigl1/twigl1.compute.js';
+import twigl1Frag from './shaders/twigl1/twigl1.frag.js';
 
 /***************/
 const stats = new Stats();
@@ -106,6 +109,10 @@ async function init() {
     // vertexShader = defaultVert;
     // computeShader = defaultCompute;
     // fragmentShader = test1Frag;
+
+    vertexShader = twigl1Vert;
+    computeShader = twigl1Compute;
+    fragmentShader = twigl1Frag;
 
     // vertexShader = chromaspiralVert;
     // computeShader = chromaspiralCompute;
