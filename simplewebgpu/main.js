@@ -1,14 +1,14 @@
 'use strict';
 import MathUtil from '../js/mathutil.js';
 import { print } from '../js/utils.js';
-import WebGPU, { ShaderType } from './absulit.simplewebgpu.module.js';
+import WebGPU from './absulit.simplewebgpu.module.js';
 import blur1Compute from './shaders/blur1.compute.js';
 import blur1Frag from './shaders/blur1.frag.js';
 import circleblurCompute from './shaders/circleblur.compute.js';
 import circleblurFrag from './shaders/circleblur.frag.js';
-import defaultCompute from './shaders/default.compute.js';
-import defaultFrag from './shaders/default.frag.js';
-import defaultVert from './shaders/default.vert.js';
+import defaultCompute from './shaders/default/default.compute.js';
+import defaultFrag from './shaders/default/default.frag.js';
+import defaultVert from './shaders/default/default.vert.js';
 import demo6_textureFrag from './shaders/demo6_texture.frag.js';
 import demo6_textureVert from './shaders/demo6_texture.vert.js';
 import planetsCompute from './shaders/planets.compute.js';
@@ -99,22 +99,22 @@ async function init() {
     webGPU.addUniform('sliderB', 0);
     webGPU.addUniform('sliderC', 0);
 
-    // vertexShader = defaultVert;
-    // computeShader = defaultCompute;
-    // fragmentShader = defaultFrag;
+    vertexShader = defaultVert;
+    computeShader = defaultCompute;
+    fragmentShader = defaultFrag;
 
     // vertexShader = defaultVert;
     // computeShader = defaultCompute;
     // fragmentShader = test1Frag;
 
-    vertexShader = chromaspiralVert;
-    computeShader = chromaspiralCompute;
-    fragmentShader = chromaspiralFrag;
-    const numPoints = 800*800;
-    webGPU.addUniform('numPoints', numPoints);
-    webGPU.addStorage('points', numPoints, 'vec4<f32>', 4);
-    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    webGPU.addBindingTexture('outputTex', 'computeTexture');
+    // vertexShader = chromaspiralVert;
+    // computeShader = chromaspiralCompute;
+    // fragmentShader = chromaspiralFrag;
+    // const numPoints = 800*800;
+    // webGPU.addUniform('numPoints', numPoints);
+    // webGPU.addStorage('points', numPoints, 'vec4<f32>', 4);
+    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
 
     // vertexShader = chromaspiral2Vert;

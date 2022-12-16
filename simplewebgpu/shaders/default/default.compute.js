@@ -1,4 +1,4 @@
-import defaultStructs from './defaultStructs.js';
+import defaultStructs from '../defaultStructs.js';
 
 const defaultCompute = /*wgsl*/`
 

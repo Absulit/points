@@ -1,9 +1,9 @@
 import Coordinate from './coordinate.js';
 import { print } from '../../js/utils.js';
 import RGBAColor from './../webgpu/js/color.js';
-import defaultVert from './shaders/default.vert.js';
-import defaultFrag from './shaders/default.frag.js';
-import defaultCompute from './shaders/default.compute.js';
+import defaultVert from './shaders/default/default.vert.js';
+import defaultFrag from './shaders/default/default.frag.js';
+import defaultCompute from './shaders/default/default.compute.js';
 
 export class ShaderType {
     static VERTEX = '0';
