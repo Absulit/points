@@ -1,7 +1,7 @@
 export const fnusin = /*wgsl*/`
 
 fn fnusin(speed: f32) -> f32{
-    return sin(params.utime * speed) * .5;
+    return (sin(params.utime * speed) + 1) * .5;
 }
 
 `;

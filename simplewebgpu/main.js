@@ -62,6 +62,9 @@ import chromaspiral2Frag from './shaders/chromaspiral2.frag.js';
 import twigl1Vert from './shaders/twigl1/twigl1.vert.js';
 import twigl1Compute from './shaders/twigl1/twigl1.compute.js';
 import twigl1Frag from './shaders/twigl1/twigl1.frag.js';
+import kaleidoscope1Vert from './shaders/kaleidoscope1/kaleidoscope1.vert.js';
+import kaleidoscope1Compute from './shaders/kaleidoscope1/kaleidoscope1.compute.js';
+import kaleidoscope1Frag from './shaders/kaleidoscope1/kaleidoscope1.frag.js';
 
 /***************/
 const stats = new Stats();
@@ -110,9 +113,13 @@ async function init() {
     // computeShader = defaultCompute;
     // fragmentShader = test1Frag;
 
-    vertexShader = twigl1Vert;
-    computeShader = twigl1Compute;
-    fragmentShader = twigl1Frag;
+    // vertexShader = twigl1Vert;
+    // computeShader = twigl1Compute;
+    // fragmentShader = twigl1Frag;
+
+    vertexShader = kaleidoscope1Vert;
+    computeShader = kaleidoscope1Compute;
+    fragmentShader = kaleidoscope1Frag;
 
     // vertexShader = chromaspiralVert;
     // computeShader = chromaspiralCompute;
