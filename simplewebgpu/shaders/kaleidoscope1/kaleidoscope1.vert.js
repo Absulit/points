@@ -16,7 +16,7 @@ fn main(
 
     result.ratio = params.screenWidth / params.screenHeight;
     result.ratioW = params.screenWidth / params.screenHeight;
-    result.ratioH = params.screenHeight / params.screenWidth;
+    result.ratioH = 1 / result.ratioW / (params.screenHeight / params.screenWidth);
     result.Position = vec4<f32>(position);
     result.Color = vec4<f32>(color);
     result.uv = vec2(uv.x * result.ratioW, uv.y);

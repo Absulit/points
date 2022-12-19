@@ -56,7 +56,7 @@ fn main(
     var texCoord:vec2<f32> = uv;
 
     var moveInW = ratioW * .5;
-    var moveInH = 1/ratioW/ratioH * .5;
+    var moveInH = ratioH * .5;
 
     texCoord -= vec2(moveInW, moveInH);
     var angle:f32 = fnusin(.1) * 2 * 3.14 ;
