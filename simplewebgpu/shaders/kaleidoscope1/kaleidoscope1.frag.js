@@ -46,19 +46,14 @@ fn gradient(p:vec2<f32>, color1:vec4<f32>, color2:vec4<f32>) -> vec4<f32> {
 fn main(
         @location(0) Color: vec4<f32>,
         @location(1) uv: vec2<f32>,
-        @location(2) ratio: f32,
+        @location(2) ratio: vec2<f32>,
         @location(3) mouse: vec2<f32>,
-        @location(4) ratioW: f32,
-        @location(5) ratioH: f32,
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
     var texCoord:vec2<f32> = uv;
 
-    var moveInW = ratioW * .5;
-    var moveInH = ratioH * .5;
-
-    texCoord -= vec2(moveInW, moveInH);
+    texCoord -= ratio * .5;
     var angle:f32 = fnusin(.1) * 2 * 3.14 ;
 
     // Initialize the color accumulator

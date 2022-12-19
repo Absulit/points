@@ -14,12 +14,12 @@ fn main(
 
     var result: Fragment;
 
-    result.ratio = params.screenWidth / params.screenHeight;
-    result.ratioW = params.screenWidth / params.screenHeight;
-    result.ratioH = 1 / result.ratioW / (params.screenHeight / params.screenWidth);
+    let ratioX = params.screenWidth / params.screenHeight;
+    let ratioY = 1 / ratioX / (params.screenHeight / params.screenWidth);
+    result.ratio = vec2(ratioX, ratioY);
     result.Position = vec4<f32>(position);
     result.Color = vec4<f32>(color);
-    result.uv = vec2(uv.x * result.ratioW, uv.y);
+    result.uv = vec2(uv.x * result.ratio.x, uv.y);
     result.mouse = vec2(params.mouseX / params.screenWidth, params.mouseY / params.screenHeight);
 
     return result;
