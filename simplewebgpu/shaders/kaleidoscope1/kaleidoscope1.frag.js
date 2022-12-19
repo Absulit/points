@@ -48,10 +48,17 @@ fn main(
         @location(1) uv: vec2<f32>,
         @location(2) ratio: f32,
         @location(3) mouse: vec2<f32>,
+        @location(4) ratioW: f32,
+        @location(5) ratioH: f32,
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
     var texCoord:vec2<f32> = uv;
+
+    var moveInW = ratioW * .5;
+    var moveInH = 1/ratioW/ratioH * .5;
+
+    texCoord -= vec2(moveInW, moveInH);
     var angle:f32 = fnusin(.1) * 2 * 3.14 ;
 
     // Initialize the color accumulator
@@ -66,7 +73,7 @@ fn main(
     // Generate a color for each mirrored and rotated texture coordinate
     for (var i = 0; i < segments; i++) {
         let segmentAngle = f32(i) * angleStep;
-        let rotatedCoord = rotate((texCoord + -.5) / params.sliderB , angle + segmentAngle);
+        let rotatedCoord = rotate((texCoord) / params.sliderB , angle + segmentAngle);
         let mirroredTexCoord = mirror(rotatedCoord, 0.0);
         let pattern = mirroredTexCoord.x  * fnusin(fract(rotatedCoord.x * rotatedCoord.x));
         //color += gradient(mirroredTexCoord, vec4(1.0, 0.0, 0.0, .1), vec4(0.0, 0.0, 1.0, .1));
@@ -82,8 +89,10 @@ fn main(
     // 0.3252
     // 0.4668
 
-    return RGBAFromHSV(color.a - (0.3252 + (0.1416 * fnusin(1)) ), 1, color.a);
     //return vec4(rotate(texCoord + vec2(-.5,-.5), angle), 0,1);
+    //return RGBAFromHSV(color.a - (0.3252 + (0.1416 * fnusin(1)) ), 1, color.a);
+    //return mix(RGBAFromHSV(color.a - 0.3252, 1, color.a), RGBAFromHSV(color.a - params.sliderA, 1, color.a), color.a);
+    return mix(vec4(1,0,0,1), vec4(1,1,0,1), 1-color.a);
 }
 `;
 

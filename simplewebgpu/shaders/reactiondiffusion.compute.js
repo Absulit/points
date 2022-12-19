@@ -94,7 +94,7 @@ fn laplaceB(position:vec2<i32>, chemical:Chemical) -> f32{
     return sum;
 }
 
-var<private> numParticles:u32 = 800*800;
+//var<private> numParticles:u32 = 800*800;
 
 ${PI}
 const workgroupSize = 8;
@@ -127,11 +127,13 @@ fn main(
     let chemical = chemicals[0];
     let chemical2 = chemicals2[0];
 
+    let numPoints = u32(params.numPoints);
+
     let sc: ptr<storage, f32, read_write> = &variables.squaresCreated;
 
     if((*sc) == 0){
 
-        for(var k:u32; k<numParticles;k++){
+        for(var k:u32; k<numPoints;k++){
             chemicals[k] = Chemical(1, 0);
             chemicals2[k] = Chemical(1, 0);
         }

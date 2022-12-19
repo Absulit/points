@@ -1,7 +1,7 @@
 'use strict';
 import MathUtil from '../js/mathutil.js';
 import { print } from '../js/utils.js';
-import WebGPU from './absulit.simplewebgpu.module.js';
+import WebGPU, { ShaderType } from './absulit.simplewebgpu.module.js';
 import blur1Compute from './shaders/blur1.compute.js';
 import blur1Frag from './shaders/blur1.frag.js';
 import circleblurCompute from './shaders/circleblur.compute.js';
@@ -227,8 +227,10 @@ async function init() {
     // vertexShader = reactiondiffusionVert;
     // computeShader = reactiondiffusionCompute;
     // fragmentShader = reactiondiffusionFrag;
-    // webGPU.addStorage('chemicals', 800 * 800, 'Chemical', 2); // reactiondiffusion
-    // webGPU.addStorage('chemicals2', 800 * 800, 'Chemical', 2); // reactiondiffusion
+    // const numPoints = 800*800;
+    // webGPU.addUniform('numPoints', numPoints);// slime
+    // webGPU.addStorage('chemicals', numPoints, 'Chemical', 2); // reactiondiffusion
+    // webGPU.addStorage('chemicals2', numPoints, 'Chemical', 2); // reactiondiffusion
     // webGPU.addStorage('variables', 1, 'Variable', 1); // reactiondiffusion
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT); // reactiondiffusion
     // webGPU.addTexture2d('feedbackTexture', true, ShaderType.COMPUTE); // reactiondiffusion
