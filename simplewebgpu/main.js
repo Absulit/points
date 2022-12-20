@@ -109,9 +109,9 @@ async function init() {
     computeShader = defaultCompute;
     fragmentShader = defaultFrag;
 
-    // vertexShader = defaultVert;
-    // computeShader = defaultCompute;
-    // fragmentShader = test1Frag;
+    vertexShader = defaultVert;
+    computeShader = defaultCompute;
+    fragmentShader = test1Frag;
 
     // vertexShader = twigl1Vert;
     // computeShader = twigl1Compute;

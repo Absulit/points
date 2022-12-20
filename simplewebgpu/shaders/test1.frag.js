@@ -12,7 +12,7 @@ ${fnusin}
 fn main(
         @location(0) Color: vec4<f32>,
         @location(1) uv: vec2<f32>,
-        @location(2) ratio: f32,
+        @location(2) ratio: vec2<f32>,
         @location(3) mouse: vec2<f32>,
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
@@ -31,7 +31,7 @@ fn main(
     // const b = Math.sin(200 * nx * ny * d * (1 - nx) + fnusin(5) * 10);
     // point.modifyColor(color => color.set(1 - nx * b, (ny * -b), 0) );
 
-    let center = vec2(.5 * ratio * fusin(1.1556) * 2.,.5);
+    let center = vec2(ratio.x * fnusin(1.1556), ratio.y * .5);
     let d = distance(center, uv);// / params.screenHeight;
     let b = sin(200 * uv.x * uv.y * d * (1-uv.x) + fnusin(5) * 10);
 
