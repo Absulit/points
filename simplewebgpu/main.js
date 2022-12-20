@@ -117,9 +117,9 @@ async function init() {
     // computeShader = twigl1Compute;
     // fragmentShader = twigl1Frag;
 
-    vertexShader = kaleidoscope1Vert;
-    computeShader = kaleidoscope1Compute;
-    fragmentShader = kaleidoscope1Frag;
+    // vertexShader = kaleidoscope1Vert;
+    // computeShader = kaleidoscope1Compute;
+    // fragmentShader = kaleidoscope1Frag;
 
     // vertexShader = chromaspiralVert;
     // computeShader = chromaspiralCompute;
