@@ -1,5 +1,5 @@
-import { defaultVertexBody } from './defaultFunctions.js';
-import defaultStructs from './defaultStructs.js';
+import { defaultVertexBody } from '../defaultFunctions.js';
+import defaultStructs from '../defaultStructs.js';
 
 const chromaspiralVert = /*wgsl*/`
 

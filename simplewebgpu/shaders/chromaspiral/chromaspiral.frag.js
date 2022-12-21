@@ -1,5 +1,5 @@
-import defaultStructs from './defaultStructs.js';
-import { fnusin, pixelateTexture } from './defaultFunctions.js';
+import defaultStructs from '../defaultStructs.js';
+import { fnusin, pixelateTexture } from '../defaultFunctions.js';
 
 const chromaspiralFrag = /*wgsl*/`
 
