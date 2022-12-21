@@ -56,9 +56,9 @@ import shapes2Frag from './shaders/shapes2.frag.js';
 import chromaspiralVert from './shaders/chromaspiral/chromaspiral.vert.js';
 import chromaspiralCompute from './shaders/chromaspiral/chromaspiral.compute.js';
 import chromaspiralFrag from './shaders/chromaspiral/chromaspiral.frag.js';
-import chromaspiral2Vert from './shaders/chromaspiral2.vert.js';
-import chromaspiral2Compute from './shaders/chromaspiral2.compute.js';
-import chromaspiral2Frag from './shaders/chromaspiral2.frag.js';
+import chromaspiral2Vert from './shaders/chromaspiral2/chromaspiral2.vert.js';
+import chromaspiral2Compute from './shaders/chromaspiral2/chromaspiral2.compute.js';
+import chromaspiral2Frag from './shaders/chromaspiral2/chromaspiral2.frag.js';
 import twigl1Vert from './shaders/twigl1/twigl1.vert.js';
 import twigl1Compute from './shaders/twigl1/twigl1.compute.js';
 import twigl1Frag from './shaders/twigl1/twigl1.frag.js';
@@ -121,25 +121,25 @@ async function init() {
     // computeShader = kaleidoscope1Compute;
     // fragmentShader = kaleidoscope1Frag;
 
-    vertexShader = chromaspiralVert;
-    computeShader = chromaspiralCompute;
-    fragmentShader = chromaspiralFrag;
-    const numPoints = canvas.width*canvas.height;
-    console.log(canvas.width,canvas.height);
-    webGPU.addUniform('numPoints', numPoints);
-    webGPU.addStorage('points', numPoints, 'vec4<f32>', 4);
-    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    webGPU.addBindingTexture('outputTex', 'computeTexture');
-
-
-    // vertexShader = chromaspiral2Vert;
-    // computeShader = chromaspiral2Compute;
-    // fragmentShader = chromaspiral2Frag;
-    // const numPoints = 800*800;
+    // vertexShader = chromaspiralVert;
+    // computeShader = chromaspiralCompute;
+    // fragmentShader = chromaspiralFrag;
+    // const numPoints = canvas.width*canvas.height;
+    // console.log(canvas.width,canvas.height);
     // webGPU.addUniform('numPoints', numPoints);
     // webGPU.addStorage('points', numPoints, 'vec4<f32>', 4);
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
     // webGPU.addBindingTexture('outputTex', 'computeTexture');
+
+
+    vertexShader = chromaspiral2Vert;
+    computeShader = chromaspiral2Compute;
+    fragmentShader = chromaspiral2Frag;
+    const numPoints = 800*800;
+    webGPU.addUniform('numPoints', numPoints);
+    webGPU.addStorage('points', numPoints, 'vec4<f32>', 4);
+    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    webGPU.addBindingTexture('outputTex', 'computeTexture');
 
     // vertexShader = shapes1Vert;
     // computeShader = shapes1Compute;

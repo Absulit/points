@@ -1,5 +1,5 @@
-import defaultStructs from './defaultStructs.js';
-import { fnusin, pixelateTexture } from './defaultFunctions.js';
+import defaultStructs from '../defaultStructs.js';
+import { fnusin, pixelateTexture } from '../defaultFunctions.js';
 
 const chromaspiral2Frag = /*wgsl*/`
 
@@ -14,7 +14,7 @@ const CHROMATIC_DISPLACEMENT = 0.1;
 fn main(
         @location(0) Color: vec4<f32>,
         @location(1) uv: vec2<f32>,
-        @location(2) ratio: f32,
+        @location(2) ratio: vec2<f32>,
         @location(3) mouse: vec2<f32>,
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
