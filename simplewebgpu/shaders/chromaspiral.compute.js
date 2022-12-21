@@ -17,10 +17,6 @@ ${fusin}
 ${fucos}
 ${fnusin}
 
-struct Colors{
-    items: array< vec4<f32>, 800*800 >
-}
-
 fn getPointsIndex(position:vec2<u32>) -> u32{
     return position.y + (position.x * u32(params.screenWidth));
 }
@@ -75,8 +71,8 @@ fn main(
 
 
 
-    var x = 400.;
-    var y = 400.;
+    var x = params.screenWidth*.5;
+    var y = params.screenHeight*.5;
     // var index = u32(y + (x * numColumns));
     // let point = &points[index];
 

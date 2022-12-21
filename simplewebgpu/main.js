@@ -109,9 +109,9 @@ async function init() {
     computeShader = defaultCompute;
     fragmentShader = defaultFrag;
 
-    vertexShader = defaultVert;
-    computeShader = defaultCompute;
-    fragmentShader = test1Frag;
+    // vertexShader = defaultVert;
+    // computeShader = defaultCompute;
+    // fragmentShader = test1Frag;
 
     // vertexShader = twigl1Vert;
     // computeShader = twigl1Compute;
@@ -121,14 +121,15 @@ async function init() {
     // computeShader = kaleidoscope1Compute;
     // fragmentShader = kaleidoscope1Frag;
 
-    // vertexShader = chromaspiralVert;
-    // computeShader = chromaspiralCompute;
-    // fragmentShader = chromaspiralFrag;
-    // const numPoints = 800*800;
-    // webGPU.addUniform('numPoints', numPoints);
-    // webGPU.addStorage('points', numPoints, 'vec4<f32>', 4);
-    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // webGPU.addBindingTexture('outputTex', 'computeTexture');
+    vertexShader = chromaspiralVert;
+    computeShader = chromaspiralCompute;
+    fragmentShader = chromaspiralFrag;
+    const numPoints = canvas.width*canvas.height;
+    console.log(canvas.width,canvas.height);
+    webGPU.addUniform('numPoints', numPoints);
+    webGPU.addStorage('points', numPoints, 'vec4<f32>', 4);
+    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    webGPU.addBindingTexture('outputTex', 'computeTexture');
 
 
     // vertexShader = chromaspiral2Vert;
