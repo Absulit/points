@@ -32,7 +32,7 @@ fn main(
 
     //finalColor += sdfSquare(uv, vec2(.9, .5  ),  10);
     //finalColor += sdfLine(vec2(.5,.5), vec2(.6,.6), .001, uv );
-    finalColor += sdfLine2( vec2(.5,.5), vec2(.6,.6), .001, uv );
+    finalColor += sdfLine2( vec2(.5,.5), vec2(.6,.6), .001, uv / ratio);
 
 
     for(var i:u32; i<10;i++){
@@ -53,7 +53,7 @@ fn main(
         let pointPosition2 = vec2(point2.x, point2.y + .5);
 
         //finalColor += sdfSquare(pointPosition, .001 * 4, 0, 0, uv) * vec4(1,1,0,  1);
-        finalColor += sdfLine2( pointPosition, pointPosition2, .001 + .1 * params.sliderC, uv );
+        finalColor += sdfLine2( pointPosition, pointPosition2, .001 + .1 * params.sliderC, uv / ratio );
         //finalColor += sdfLine(pointPosition, pointPosition2, .001 + 10 * params.sliderC, uv  );
     }
 

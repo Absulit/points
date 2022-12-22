@@ -21,12 +21,12 @@ fn main(
 
     _ = points[0];
 
-    let texColorCompute = textureSample(computeTexture, feedbackSampler, uv);
+    let texColorCompute = textureSample(computeTexture, feedbackSampler, uv / ratio);
     //let texColorCompute = pixelateTexture(computeTexture, feedbackSampler, 100 * params.sliderA, 100 * params.sliderA, uv);
 
 
-    let texColorComputeR = textureSample(computeTexture, feedbackSampler, uv + vec2(CHROMATIC_DISPLACEMENT * params.sliderA, 0.)).r;
-    let texColorComputeB = textureSample(computeTexture, feedbackSampler, uv - vec2(CHROMATIC_DISPLACEMENT * params.sliderA, 0.)).b;
+    let texColorComputeR = textureSample(computeTexture, feedbackSampler, uv / ratio + vec2(CHROMATIC_DISPLACEMENT * params.sliderA, 0.)).r;
+    let texColorComputeB = textureSample(computeTexture, feedbackSampler, uv / ratio - vec2(CHROMATIC_DISPLACEMENT * params.sliderA, 0.)).b;
 
 
     return (texColorCompute + vec4(texColorComputeR,0,0,1) + vec4(0,0,texColorComputeB,1));

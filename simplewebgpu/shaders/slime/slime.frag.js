@@ -27,11 +27,12 @@ fn main(
     ) -> @location(0) vec4<f32> {
 
     //let texColor = textureSample(myTexture, mySampler, uv * 1.0 + .1 * fnusin(2));
-    let texColor = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1));
-    let texColor2 = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1) + vec2(-.001,1));
-    let texColor3 = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1) + vec2(.001,1));
+    let texColor = textureSample(feedbackTexture, feedbackSampler, uv);
+    let texColor2 = textureSample(feedbackTexture, feedbackSampler, uv + vec2(-.001,1));
+    let texColor3 = textureSample(feedbackTexture, feedbackSampler, uv + vec2(.001,1));
 
-    let texColorCompute = textureSample(computeTexture, feedbackSampler, uv * vec2(1,-1));
+    // fix to width and height ratio  is uv / ratio
+    let texColorCompute = textureSample(computeTexture, feedbackSampler, uv / ratio * vec2(1,-1));
 
     let particle = particles[0];
     let pc: ptr<storage, f32, read_write> = &variables.particlesCreated;

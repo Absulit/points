@@ -123,6 +123,8 @@ export default class WebGPU {
      * Multiply this by number of properties in the struct if necessary.
      * @param {string} structName Name of the struct already existing on the
      * shader that will be the array<structName> of the Storage
+     * @param {Number} structSize this tells how many sub items the struct has
+     * @param {ShaderType} shaderType this tells to what shader the storage is bound
      */
     addStorage(name, size, structName, structSize, shaderType) {
         this._storage.push({

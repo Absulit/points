@@ -126,7 +126,7 @@ async function init() {
     // fragmentShader = chromaspiralFrag;
     // const numPoints = canvas.width*canvas.height;
     // console.log(canvas.width,canvas.height);
-    // webGPU.addUniform('numPoints', numPoints);
+    // //webGPU.addUniform('numPoints', numPoints);
     // webGPU.addStorage('points', numPoints, 'vec4<f32>', 4);
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
     // webGPU.addBindingTexture('outputTex', 'computeTexture');
@@ -237,16 +237,16 @@ async function init() {
     // webGPU.addTexture2d('feedbackTexture', true, ShaderType.COMPUTE);
     // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
-    // vertexShader = slimeVert;
-    // computeShader = slimeCompute;
-    // fragmentShader = slimeFrag;
-    // const numParticles = 1024 * 2;
-    // webGPU.addUniform('numParticles', numParticles);
-    // webGPU.addStorage('particles', numParticles, 'Particle', 4);
-    // webGPU.addStorage('variables', 1, 'Variable', 1);
-    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // webGPU.addTexture2d('feedbackTexture', true);
-    // webGPU.addBindingTexture('outputTex', 'computeTexture');
+    vertexShader = slimeVert;
+    computeShader = slimeCompute;
+    fragmentShader = slimeFrag;
+    const numParticles = 1024 * 2;
+    webGPU.addUniform('numParticles', numParticles);
+    webGPU.addStorage('particles', numParticles, 'Particle', 4);
+    webGPU.addStorage('variables', 1, 'Variable', 1);
+    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    webGPU.addTexture2d('feedbackTexture', true);
+    webGPU.addBindingTexture('outputTex', 'computeTexture');
 
     // vertexShader = slime2Vert;
     // computeShader = slime2Compute;
