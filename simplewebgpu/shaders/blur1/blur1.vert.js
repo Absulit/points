@@ -1,8 +1,10 @@
-import defaultStructs from '../defaultStructs.js';
+import { defaultVertexBody } from '../defaultFunctions.js';
+import defaultStructs from './../defaultStructs.js';
 
 const blur1Vert = /*wgsl*/`
 
 ${defaultStructs}
+${defaultVertexBody}
 
 @vertex
 fn main(
@@ -12,15 +14,8 @@ fn main(
     @builtin(vertex_index) VertexIndex: u32
 ) -> Fragment {
 
-    var result: Fragment;
+    return defaultVertexBody(position, color, uv);
 
-    result.ratio = params.screenWidth / params.screenHeight;
-    result.Position = vec4<f32>(position);
-    result.Color = vec4<f32>(color);
-    result.uv = vec2(uv.x * result.ratio, uv.y);
-    result.mouse = vec2(params.mouseX / params.screenWidth, params.mouseY / params.screenHeight);
-
-    return result;
 }
 `;
 

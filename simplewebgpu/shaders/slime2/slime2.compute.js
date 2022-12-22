@@ -80,7 +80,7 @@ fn main(
 
             var rgba = textureLoad(feedbackTexture, ixy, 0).rgba;
 
-            let colorsAround = getColorsAroundTexture(ixy, 1);
+            let colorsAround = getColorsAroundTexture(feedbackTexture, ixy, 1);
             rgba = soften8(rgba, colorsAround, 1.);
 
             //rgba = vec4<f32>(1,0,0,1);

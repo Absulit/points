@@ -1,4 +1,5 @@
-import defaultStructs from '../defaultStructs.js';
+import { defaultVertexBody } from '../defaultFunctions.js';
+import defaultStructs from './../defaultStructs.js';
 
 const planets3Vert = /*wgsl*/`
 
@@ -14,6 +15,8 @@ struct Variable{
     pc: f32
 }
 
+${defaultVertexBody}
+
 @vertex
 fn main(
     @location(0) position: vec4<f32>,
@@ -22,15 +25,7 @@ fn main(
     @builtin(vertex_index) VertexIndex: u32
 ) -> Fragment {
 
-    var result: Fragment;
-
-    result.ratio = params.screenWidth / params.screenHeight;
-    result.Position = vec4<f32>(position);
-    result.Color = vec4<f32>(color);
-    result.uv = vec2(uv.x * result.ratio, uv.y);
-    result.mouse = vec2(params.mouseX / params.screenWidth, params.mouseY / params.screenHeight);
-
-    return result;
+    return defaultVertexBody(position, color, uv);
 }
 `;
 

@@ -188,105 +188,102 @@ async function init() {
     // webGPU.addStorage('planets', 8, 'Planet', 5);
     // webGPU.addStorage('variables', 1, 'Variable', 1);
 
-    vertexShader = planets2Vert;
-    computeShader = planets2Compute;
-    fragmentShader = planets2Frag;
-    webGPU.addStorage('planets', 8, 'Planet', 5); // planets2
-    webGPU.addStorage('variables', 1, 'Variable', 1); // planets2
+    // vertexShader = planets2Vert;
+    // computeShader = planets2Compute;
+    // fragmentShader = planets2Frag;
+    // webGPU.addStorage('planets', 8, 'Planet', 5);
+    // webGPU.addStorage('variables', 1, 'Variable', 1);
 
     // vertexShader = planets3Vert;
     // computeShader = planets3Compute;
     // fragmentShader = planets3Frag;
-    // const numParticles = 1024 * 4; // planets3
-    // webGPU.addUniform('numParticles', numParticles); // planets3
-    // webGPU.addStorage('planets', numParticles, 'Planet', 3); // planets3
-    // webGPU.addStorage('variables', 1, 'Variable', 1); // planets3
-    // webGPU.addSampler('feedbackSampler'); // planets3
-    // webGPU.addTexture2d('feedbackTexture', true); // planets3
-    // webGPU.addBindingTexture('outputTex', 'computeTexture'); // planets3
+    // const numParticles = 1024 * 4;
+    // webGPU.addUniform('numParticles', numParticles);
+    // webGPU.addStorage('planets', numParticles, 'Planet', 3);
+    // webGPU.addStorage('variables', 1, 'Variable', 1);
+    // webGPU.addSampler('feedbackSampler');
+    // webGPU.addTexture2d('feedbackTexture', true);
+    // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
     // vertexShader = planetsblurVert;
     // computeShader = planetsblurCompute;
     // fragmentShader = planetsblurFrag;
-    // const numParticles = 8; // planetsblur
-    // webGPU.addUniform('numParticles', numParticles); // planetsblur
-    // webGPU.addStorage('planets', numParticles, 'Planet', 5); // planetsblur
-    // webGPU.addStorage('variables', 1, 'Variable', 1); // planetsblur
-    // webGPU.addSampler('feedbackSampler'); // planetsblur
-    // webGPU.addTexture2d('feedbackTexture', true); // planetsblur
+    // const numParticles = 8;
+    // webGPU.addUniform('numParticles', numParticles);
+    // webGPU.addStorage('planets', numParticles, 'Planet', 5);
+    // webGPU.addStorage('variables', 1, 'Variable', 1);
+    // webGPU.addSampler('feedbackSampler');
+    // webGPU.addTexture2d('feedbackTexture', true);
 
     // vertexShader = planetsblur2Vert;
     // computeShader = planetsblur2Compute;
     // fragmentShader = planetsblur2Frag;
-    // const numParticles = 8; // planetsblur2
-    // webGPU.addUniform('numParticles', numParticles); // planetsblur2
-    // webGPU.addStorage('planets', numParticles, 'Planet', 5); // planetsblur2
-    // webGPU.addStorage('variables', 1, 'Variable', 1); // planetsblur2
-    // webGPU.addSampler('feedbackSampler'); // planetsblur2
-    // webGPU.addTexture2d('feedbackTexture', true); // planetsblur2
+    // const numParticles = 8;
+    // webGPU.addUniform('numParticles', numParticles);
+    // webGPU.addStorage('planets', numParticles, 'Planet', 5);
+    // webGPU.addStorage('variables', 1, 'Variable', 1);
+    // webGPU.addSampler('feedbackSampler');
+    // webGPU.addTexture2d('feedbackTexture', true);
 
     // vertexShader = reactiondiffusionVert;
     // computeShader = reactiondiffusionCompute;
     // fragmentShader = reactiondiffusionFrag;
     // const numPoints = 800*800;
-    // webGPU.addUniform('numPoints', numPoints);// slime
-    // webGPU.addStorage('chemicals', numPoints, 'Chemical', 2); // reactiondiffusion
-    // webGPU.addStorage('chemicals2', numPoints, 'Chemical', 2); // reactiondiffusion
-    // webGPU.addStorage('variables', 1, 'Variable', 1); // reactiondiffusion
-    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT); // reactiondiffusion
-    // webGPU.addTexture2d('feedbackTexture', true, ShaderType.COMPUTE); // reactiondiffusion
-    // webGPU.addBindingTexture('outputTex', 'computeTexture'); // reactiondiffusion
+    // webGPU.addUniform('numPoints', numPoints);
+    // webGPU.addStorage('chemicals', numPoints, 'Chemical', 2);
+    // webGPU.addStorage('chemicals2', numPoints, 'Chemical', 2);
+    // webGPU.addStorage('variables', 1, 'Variable', 1);
+    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    // webGPU.addTexture2d('feedbackTexture', true, ShaderType.COMPUTE);
+    // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
     // vertexShader = slimeVert;
     // computeShader = slimeCompute;
     // fragmentShader = slimeFrag;
-    // const numParticles = 1024 * 2;// slime
-    // webGPU.addUniform('numParticles', numParticles);// slime
-    // webGPU.addStorage('particles', numParticles, 'Particle', 4); // slime
-    // webGPU.addStorage('variables', 1, 'Variable', 1); // slime
-    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT); // slime
-    // webGPU.addTexture2d('feedbackTexture', true); // slime
-    // webGPU.addBindingTexture('outputTex', 'computeTexture'); // slime
+    // const numParticles = 1024 * 2;
+    // webGPU.addUniform('numParticles', numParticles);
+    // webGPU.addStorage('particles', numParticles, 'Particle', 4);
+    // webGPU.addStorage('variables', 1, 'Variable', 1);
+    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    // webGPU.addTexture2d('feedbackTexture', true);
+    // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
     // vertexShader = slime2Vert;
     // computeShader = slime2Compute;
     // fragmentShader = slime2Frag;
-    // const numParticles = 1024 * 2;// slime2
-    // webGPU.addUniform('numParticles', numParticles);// slime2
-    // webGPU.addStorage('particles', numParticles, 'Particle', 4); // slime2
-    // webGPU.addStorage('variables', 1, 'Variable', 1); // slime2
-    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT); // slime2
-    // webGPU.addTexture2d('feedbackTexture', true); // slime2
-    // webGPU.addBindingTexture('outputTex', 'computeTexture'); // slime2
+    // const numParticles = 1024 * 2;
+    // webGPU.addUniform('numParticles', numParticles)
+    // webGPU.addStorage('particles', numParticles, 'Particle', 4);
+    // webGPU.addStorage('variables', 1, 'Variable', 1);
+    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    // webGPU.addTexture2d('feedbackTexture', true);
+    // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
     // vertexShader = slime3Vert;
     // computeShader = slime3Compute;
     // fragmentShader = slime3Frag;
-    // const numParticles = 1024 * 2;// slime3
-    // webGPU.addUniform('numParticles', numParticles);// slime3
-    // webGPU.addStorage('particles', numParticles, 'Particle', 4); // slime3
-    // webGPU.addStorage('variables', 1, 'Variable', 1); // slime3
-
-    // webGPU.addStorage('layer0', 1, 'Color', 4); // slime3
-
-
-    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT); // slime3
-    // webGPU.addTexture2d('feedbackTexture', true); // slime3
-    // webGPU.addBindingTexture('outputTex', 'computeTexture'); // slime3
+    // const numParticles = 1024 * 2;
+    // webGPU.addUniform('numParticles', numParticles);
+    // webGPU.addStorage('particles', numParticles, 'Particle', 4);
+    // webGPU.addStorage('variables', 1, 'Variable', 1);
+    // ////webGPU.addStorage('layer0', 1, 'Color', 4);
+    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    // webGPU.addTexture2d('feedbackTexture', true);
+    // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
     // vertexShader = blur1Vert;
     // computeShader = blur1Compute;
     // fragmentShader = blur1Frag;
-    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT); // blur1
-    // webGPU.addTexture2d('feedbackTexture', true); // blur1
-    // webGPU.addBindingTexture('outputTex', 'computeTexture'); // blur1
+    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    // webGPU.addTexture2d('feedbackTexture', true);
+    // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
     // vertexShader = circleblurVert;
     // computeShader = circleblurCompute;
     // fragmentShader = circleblurFrag;
-    // webGPU.addSampler('feedbackSampler'); // circleblur
-    // webGPU.addTexture2d('feedbackTexture', true); // circleblur
-    // webGPU.addBindingTexture('outputTex', 'computeTexture'); // circleblur
+    // webGPU.addSampler('feedbackSampler');
+    // webGPU.addTexture2d('feedbackTexture', true);
+    // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
     // vertexShader = demo6_textureVert;
     // computeShader = defaultCompute;

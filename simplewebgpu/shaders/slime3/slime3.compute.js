@@ -57,7 +57,7 @@ fn main(
 
     //--------------------------------------------------------------
 
-    //let dims: vec2<u32> = textureDimensions(feedbackTexture, 0);
+    let dims: vec2<u32> = textureDimensions(feedbackTexture, 0);
 
     let numColumns:f32 = params.screenWidth;
     let numRows:f32 = params.screenHeight;
