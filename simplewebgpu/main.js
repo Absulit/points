@@ -65,6 +65,9 @@ import twigl1Frag from './shaders/twigl1/twigl1.frag.js';
 import kaleidoscope1Vert from './shaders/kaleidoscope1/kaleidoscope1.vert.js';
 import kaleidoscope1Compute from './shaders/kaleidoscope1/kaleidoscope1.compute.js';
 import kaleidoscope1Frag from './shaders/kaleidoscope1/kaleidoscope1.frag.js';
+import random3Vert from './shaders/random3/random3.vert.js';
+import random3Compute from './shaders/random3/random3.compute.js';
+import random3Frag from './shaders/random3/random3.frag.js';
 
 /***************/
 const stats = new Stats();
@@ -182,6 +185,13 @@ async function init() {
     // webGPU.addTexture2d('feedbackTexture', true);
     // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
+    vertexShader = random3Vert;
+    computeShader = random3Compute;
+    fragmentShader = random3Frag;
+    webGPU.addSampler('feedbackSampler');
+    webGPU.addTexture2d('feedbackTexture', true);
+    webGPU.addBindingTexture('outputTex', 'computeTexture');
+
     // vertexShader = planetsVert;
     // computeShader = planetsCompute;
     // fragmentShader = planetsFrag;
@@ -237,16 +247,16 @@ async function init() {
     // webGPU.addTexture2d('feedbackTexture', true, ShaderType.COMPUTE);
     // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
-    vertexShader = slimeVert;
-    computeShader = slimeCompute;
-    fragmentShader = slimeFrag;
-    const numParticles = 1024 * 2;
-    webGPU.addUniform('numParticles', numParticles);
-    webGPU.addStorage('particles', numParticles, 'Particle', 4);
-    webGPU.addStorage('variables', 1, 'Variable', 1);
-    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    webGPU.addTexture2d('feedbackTexture', true);
-    webGPU.addBindingTexture('outputTex', 'computeTexture');
+    // vertexShader = slimeVert;
+    // computeShader = slimeCompute;
+    // fragmentShader = slimeFrag;
+    // const numParticles = 1024 * 2;
+    // webGPU.addUniform('numParticles', numParticles);
+    // webGPU.addStorage('particles', numParticles, 'Particle', 4);
+    // webGPU.addStorage('variables', 1, 'Variable', 1);
+    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    // webGPU.addTexture2d('feedbackTexture', true);
+    // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
     // vertexShader = slime2Vert;
     // computeShader = slime2Compute;
