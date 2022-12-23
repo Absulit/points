@@ -1,4 +1,4 @@
-import { rand } from '../defaultFunctions.js';
+import { rand, RGBAFromHSV } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
 import { random } from '../random.js';
 
@@ -7,6 +7,7 @@ const random3Compute = /*wgsl*/`
 ${defaultStructs}
 ${random}
 ${rand}
+${RGBAFromHSV}
 
 
 struct Star{
@@ -57,13 +58,15 @@ fn main(
 
             seed += i32(WorkGroupID.x + WorkGroupID.y);
 
-            let randNumber = random();
+            let randNumber = rand();
+            rand_seed.y += randNumber + fract(utime);
             var v = 0.;
             if(randNumber < .5){
                 v = 1.;
             }
 
-            textureStore(outputTex, vec2<u32>(ux,uy), vec4(v));
+            //textureStore(outputTex, vec2<u32>(ux,uy), vec4(randNumber));
+            textureStore(outputTex, vec2<u32>(ux,uy), RGBAFromHSV(randNumber, 1, 1));
         }
     }
 
