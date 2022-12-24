@@ -85,6 +85,10 @@ export default class WebGPU {
         this._textures2d = [];
         this._texturesStorage2d = [];
         this._bindingTextures = [];
+
+        this._layers = [];
+
+        this._canvas = document.getElementById(this._canvasId);
     }
 
     /**
@@ -154,6 +158,21 @@ export default class WebGPU {
             throw '`updateStorageMap()` can\'t be called without first `addStorageMap()`.';
         }
         variable.array = arrayData;
+    }
+
+    addLayers(numLayers, shaderType){
+        for (let layerIndex = 0; layerIndex < numLayers; layerIndex++) {
+            //const element = numLayers;
+            this._layers.push({
+                name: `layer_${layerIndex}`,
+                size: this._canvas.width * this._canvas.height,
+                structName: 'vec4<f32>',
+                structSize: 4,
+                shaderType: shaderType,
+                array: null,
+                buffer: null
+            });
+        }
     }
 
     /**
@@ -350,7 +369,6 @@ export default class WebGPU {
             }
         }
 
-        this._canvas = document.getElementById(this._canvasId);
         const adapter = await navigator.gpu.requestAdapter();
         if (!adapter) { return false; }
         this._device = await adapter.requestDevice();

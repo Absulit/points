@@ -68,6 +68,9 @@ import kaleidoscope1Frag from './shaders/kaleidoscope1/kaleidoscope1.frag.js';
 import random3Vert from './shaders/random3/random3.vert.js';
 import random3Compute from './shaders/random3/random3.compute.js';
 import random3Frag from './shaders/random3/random3.frag.js';
+import layers1Vert from './shaders/layers1/layers1.vert.js';
+import layers1Compute from './shaders/layers1/layers1.compute.js';
+import layers1Frag from './shaders/layers1/layers1.frag.js';
 
 /***************/
 const stats = new Stats();
@@ -115,6 +118,14 @@ async function init() {
     // vertexShader = defaultVert;
     // computeShader = defaultCompute;
     // fragmentShader = test1Frag;
+
+    vertexShader = layers1Vert;
+    computeShader = layers1Compute;
+    fragmentShader = layers1Frag;
+    const numPoints = 800*800;
+    webGPU.addUniform('numPoints', numPoints);
+    webGPU.addStorage('points', numPoints, 'vec4<f32>', 4);
+    webGPU.addLayers(2);
 
     // vertexShader = twigl1Vert;
     // computeShader = twigl1Compute;
@@ -185,12 +196,12 @@ async function init() {
     // webGPU.addTexture2d('feedbackTexture', true);
     // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
-    vertexShader = random3Vert;
-    computeShader = random3Compute;
-    fragmentShader = random3Frag;
-    webGPU.addSampler('feedbackSampler');
-    webGPU.addTexture2d('feedbackTexture', true);
-    webGPU.addBindingTexture('outputTex', 'computeTexture');
+    // vertexShader = random3Vert;
+    // computeShader = random3Compute;
+    // fragmentShader = random3Frag;
+    // webGPU.addSampler('feedbackSampler');
+    // webGPU.addTexture2d('feedbackTexture', true);
+    // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
     // vertexShader = planetsVert;
     // computeShader = planetsCompute;
