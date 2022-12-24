@@ -162,13 +162,12 @@ export default class WebGPU {
 
     addLayers(numLayers, shaderType){
         for (let layerIndex = 0; layerIndex < numLayers; layerIndex++) {
-            //const element = numLayers;
+            this._layers.shaderType = shaderType;
             this._layers.push({
-                name: `layer_${layerIndex}`,
+                name: `layer${layerIndex}`,
                 size: this._canvas.width * this._canvas.height,
                 structName: 'vec4<f32>',
                 structSize: 4,
-                shaderType: shaderType,
                 array: null,
                 buffer: null
             });
@@ -282,6 +281,11 @@ export default class WebGPU {
             }
         });
 
+        if(this._layers.length){
+            dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, read_write> layers: Layers;\n`
+            bindingIndex += 1;
+        }
+
         this._samplers.forEach((sampler, index) => {
             if (!sampler.shaderType || sampler.shaderType == shaderType) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${sampler.name}: sampler;\n`;
@@ -341,9 +345,21 @@ export default class WebGPU {
             \n`;
         }
 
-        dynamicGroupBindingsVertex += dynamicStructParams;
-        dynamicGroupBindingsCompute += dynamicStructParams;
-        dynamicGroupBindingsFragment += dynamicStructParams;
+        let dynamicStructLayers = '';
+        this._layers.forEach((variable, index) => {
+            dynamicStructLayers += /*wgsl*/`layer${index}:array<vec4<f32>, ${variable.size}>, \n`;
+        });
+        if (this._layers.length) {
+            dynamicStructLayers = /*wgsl*/`
+                struct Layers {
+                    ${dynamicStructLayers}
+                }
+            \n`;
+        }
+
+        dynamicGroupBindingsVertex += dynamicStructParams + dynamicStructLayers;
+        dynamicGroupBindingsCompute += dynamicStructParams + dynamicStructLayers;
+        dynamicGroupBindingsFragment += dynamicStructParams + dynamicStructLayers;
 
         dynamicGroupBindingsVertex += this._createDynamicGroupBindings(ShaderType.VERTEX);
         dynamicGroupBindingsCompute += this._createDynamicGroupBindings(ShaderType.COMPUTE);
@@ -516,6 +532,16 @@ export default class WebGPU {
                 storageItem.buffer = this._createBuffer(storageItem.size * storageItem.structSize * 4, GPUBufferUsage.STORAGE);
             }
         });
+        //--------------------------------------------
+        if(this._layers.length){
+            //let layerValues = [];
+            let layersSize = 0;
+            this._layers.forEach(layerItem => {
+                layersSize += layerItem.size * layerItem.structSize * 4;
+            });
+            this._layers.buffer = this._createBuffer(layersSize, GPUBufferUsage.STORAGE);
+        }
+
         //--------------------------------------------
         this._samplers.forEach(sampler => sampler.resource = this._device.createSampler(sampler.descriptor));
         //--------------------------------------------
@@ -765,6 +791,21 @@ export default class WebGPU {
                 }
             });
         }
+
+        if(this._layers.length){
+            if (!this._layers.shaderType || this._layers.shaderType == shaderType) {
+                const entriesIndex = entries.length;
+                entries.push(
+                    {
+                        binding: entriesIndex,
+                        resource: {
+                            buffer: this._layers.buffer
+                        }
+                    }
+                );
+            }
+        }
+
         if (this._samplers.length) {
             const entriesIndex = entries.length;
             this._samplers.forEach((sampler, index) => {

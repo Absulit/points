@@ -125,7 +125,7 @@ async function init() {
     const numPoints = 800*800;
     webGPU.addUniform('numPoints', numPoints);
     webGPU.addStorage('points', numPoints, 'vec4<f32>', 4);
-    webGPU.addLayers(2);
+    webGPU.addLayers(2, ShaderType.COMPUTE);
 
     // vertexShader = twigl1Vert;
     // computeShader = twigl1Compute;

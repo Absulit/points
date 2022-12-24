@@ -17,6 +17,7 @@ fn main(
     ) -> @location(0) vec4<f32> {
 
     _ = points[0];
+    //_ = layers.layer0[0];
 
     let cellSize = 20. + 10. * fnusin(1.);
     let a = sin(uv.x  * cellSize) * sin(uv.y * cellSize);

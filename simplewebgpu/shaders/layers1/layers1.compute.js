@@ -13,6 +13,7 @@ fn main(
     let utime = params.utime;
 
     _ = points[0];
+    _ = layers.layer0[0];
 }
 `;
 
