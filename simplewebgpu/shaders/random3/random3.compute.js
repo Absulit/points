@@ -1,4 +1,4 @@
-import { rand, RGBAFromHSV } from '../defaultFunctions.js';
+import { fnusin, rand, RGBAFromHSV } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
 import { random } from '../random.js';
 
@@ -8,6 +8,7 @@ ${defaultStructs}
 ${random}
 ${rand}
 ${RGBAFromHSV}
+${fnusin}
 
 
 struct Star{
@@ -59,14 +60,17 @@ fn main(
             seed += i32(WorkGroupID.x + WorkGroupID.y);
 
             let randNumber = rand();
-            rand_seed.y += randNumber + fract(utime);
+            rand_seed.y += randNumber + fract(params.sliderA);
             var v = 0.;
             if(randNumber < .5){
                 v = 1.;
             }
 
             //textureStore(outputTex, vec2<u32>(ux,uy), vec4(randNumber));
-            textureStore(outputTex, vec2<u32>(ux,uy), RGBAFromHSV(randNumber, 1, 1));
+            //textureStore(outputTex, vec2<u32>(ux,uy), RGBAFromHSV(randNumber, 1, 1));
+            //textureStore(outputTex, vec2<u32>(ux,uy), RGBAFromHSV( fnusin(randNumber), 1, 1));
+            //textureStore(outputTex, vec2<u32>(ux,uy), vec4( fnusin(randNumber)));
+            textureStore(outputTex, vec2<u32>(ux,uy), vec4( fract(randNumber + fnusin(1))));
         }
     }
 
