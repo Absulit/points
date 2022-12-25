@@ -282,8 +282,10 @@ export default class WebGPU {
         });
 
         if(this._layers.length){
-            dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, read_write> layers: Layers;\n`
-            bindingIndex += 1;
+            if (!this._layers.shaderType || this._layers.shaderType == shaderType) {
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, read_write> layers: Layers;\n`
+                bindingIndex += 1;
+            }
         }
 
         this._samplers.forEach((sampler, index) => {
@@ -334,7 +336,7 @@ export default class WebGPU {
 
         let dynamicStructParams = '';
         this._uniforms.forEach((variable, index) => {
-            dynamicStructParams += /*wgsl*/`${variable.name}:f32, \n`;
+            dynamicStructParams += /*wgsl*/`${variable.name}:f32, \n\t\t\t\t\t`;
         });
 
         if (this._uniforms.length) {
@@ -347,7 +349,7 @@ export default class WebGPU {
 
         let dynamicStructLayers = '';
         this._layers.forEach((variable, index) => {
-            dynamicStructLayers += /*wgsl*/`layer${index}:array<vec4<f32>, ${variable.size}>, \n`;
+            dynamicStructLayers += /*wgsl*/`layer${index}:array<vec4<f32>, ${variable.size}>, \n\t\t\t\t\t`;
         });
         if (this._layers.length) {
             dynamicStructLayers = /*wgsl*/`
@@ -369,9 +371,9 @@ export default class WebGPU {
         colorsComputeWGSL = dynamicGroupBindingsCompute + colorsComputeWGSL;
         colorsFragWGSL = dynamicGroupBindingsFragment + colorsFragWGSL;
 
-        //console.log(colorsVertWGSL);
-        console.log(colorsComputeWGSL);
-        console.log(colorsFragWGSL);
+        //console.log(`VERTEX:\n${colorsVertWGSL}`);
+        console.log(`%cCOMPUTE:\n${colorsComputeWGSL}`, 'color: #ffffff');
+        console.log(`%cFRAGMENT:\n${colorsFragWGSL}`, 'color: #ff99ff');
 
         this._shaders = {
             false: {

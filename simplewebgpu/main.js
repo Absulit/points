@@ -119,13 +119,13 @@ async function init() {
     // computeShader = defaultCompute;
     // fragmentShader = test1Frag;
 
-    vertexShader = layers1Vert;
-    computeShader = layers1Compute;
-    fragmentShader = layers1Frag;
-    const numPoints = 800*800;
-    webGPU.addUniform('numPoints', numPoints);
-    webGPU.addStorage('points', numPoints, 'vec4<f32>', 4);
-    webGPU.addLayers(2, ShaderType.COMPUTE);
+    // vertexShader = layers1Vert;
+    // computeShader = layers1Compute;
+    // fragmentShader = layers1Frag;
+    // const numPoints = 800*800;
+    // webGPU.addUniform('numPoints', numPoints);
+    // webGPU.addStorage('points', numPoints, 'vec4<f32>', 4);
+    // webGPU.addLayers(2, ShaderType.COMPUTE);
 
     // vertexShader = twigl1Vert;
     // computeShader = twigl1Compute;
@@ -135,15 +135,12 @@ async function init() {
     // computeShader = kaleidoscope1Compute;
     // fragmentShader = kaleidoscope1Frag;
 
-    // vertexShader = chromaspiralVert;
-    // computeShader = chromaspiralCompute;
-    // fragmentShader = chromaspiralFrag;
-    // const numPoints = canvas.width*canvas.height;
-    // console.log(canvas.width,canvas.height);
-    // //webGPU.addUniform('numPoints', numPoints);
-    // webGPU.addStorage('points', numPoints, 'vec4<f32>', 4);
-    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // webGPU.addBindingTexture('outputTex', 'computeTexture');
+    vertexShader = chromaspiralVert;
+    computeShader = chromaspiralCompute;
+    fragmentShader = chromaspiralFrag;
+    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    webGPU.addBindingTexture('outputTex', 'computeTexture');
+    webGPU.addLayers(1, ShaderType.COMPUTE);
 
 
     // vertexShader = chromaspiral2Vert;

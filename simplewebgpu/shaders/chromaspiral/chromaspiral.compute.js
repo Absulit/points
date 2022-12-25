@@ -23,7 +23,7 @@ fn getPointsIndex(position:vec2<u32>) -> u32{
 
 fn getColorAt(position:vec2<u32>) -> vec4<f32> {
     let index:u32 = getPointsIndex(position);
-    return points[index];
+    return layers.layer0[index];
 }
 
 fn getColorsAroundLayer(position: vec2<u32>, distance: u32) -> array<  vec4<f32>, 8  > {
@@ -92,7 +92,7 @@ fn main(
         let positionU = vec2<u32>(u32(pointFromCenter.x + x), u32(pointFromCenter.y + y));
 
         let uIndex = getPointsIndex(positionU);
-        let rgbaP = &points[uIndex];
+        let rgbaP = &layers.layer0[uIndex];
         (*rgbaP) = vec4(1);
 
         //rgba = points[uIndex];
@@ -123,17 +123,17 @@ fn main(
             let uIndex = getPointsIndex(positionU);
 
 
-            rgba = points[uIndex];
-            let rgbaP = &points[uIndex];
+            rgba = layers.layer0[uIndex];
+            let rgbaP = &layers.layer0[uIndex];
 
             colorsAround = getColorsAround4Layer(positionU, 1);
 
             (*rgbaP) = soften4(rgba, colorsAround, 1.);
-            rgba = points[uIndex];
+            rgba = layers.layer0[uIndex];
             //(*rgbaP) = clearAlpha(rgba, 10.01);
             (*rgbaP) = clearMix(rgba, 1.01);
 
-            rgba = points[uIndex];
+            rgba = layers.layer0[uIndex];
 
             textureStore(outputTex, positionU, rgba);
         }

@@ -19,7 +19,7 @@ fn main(
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
-    _ = points[0];
+    //_ = layers.layer0[0];
 
     let texColorCompute = textureSample(computeTexture, feedbackSampler, uv / ratio);
     //let texColorCompute = pixelateTexture(computeTexture, feedbackSampler, 100 * params.sliderA, 100 * params.sliderA, uv);
