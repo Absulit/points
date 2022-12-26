@@ -71,6 +71,9 @@ import random3Frag from './shaders/random3/random3.frag.js';
 import layers1Vert from './shaders/layers1/layers1.vert.js';
 import layers1Compute from './shaders/layers1/layers1.compute.js';
 import layers1Frag from './shaders/layers1/layers1.frag.js';
+import noise1Vert from './shaders/noise1/noise1.vert.js';
+import noise1Compute from './shaders/noise1/noise1.compute.js';
+import noise1Frag from './shaders/noise1/noise1.frag.js';
 
 /***************/
 const stats = new Stats();
@@ -119,6 +122,14 @@ async function init() {
     // computeShader = defaultCompute;
     // fragmentShader = test1Frag;
 
+    vertexShader = noise1Vert;
+    computeShader = noise1Compute;
+    fragmentShader = noise1Frag;
+    const numPoints = 800*800;
+    webGPU.addUniform('value_noise_data_length', numPoints);
+    webGPU.addStorage('value_noise_data', numPoints, 'f32', 1, ShaderType.COMPUTE);
+    webGPU.addStorage('variables', 1, 'Variable', 1, ShaderType.COMPUTE);
+
     // vertexShader = layers1Vert;
     // computeShader = layers1Compute;
     // fragmentShader = layers1Frag;
@@ -135,12 +146,12 @@ async function init() {
     // computeShader = kaleidoscope1Compute;
     // fragmentShader = kaleidoscope1Frag;
 
-    vertexShader = chromaspiralVert;
-    computeShader = chromaspiralCompute;
-    fragmentShader = chromaspiralFrag;
-    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    webGPU.addBindingTexture('outputTex', 'computeTexture');
-    webGPU.addLayers(1, ShaderType.COMPUTE);
+    // vertexShader = chromaspiralVert;
+    // computeShader = chromaspiralCompute;
+    // fragmentShader = chromaspiralFrag;
+    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    // webGPU.addBindingTexture('outputTex', 'computeTexture');
+    // webGPU.addLayers(1, ShaderType.COMPUTE);
 
 
     // vertexShader = chromaspiral2Vert;

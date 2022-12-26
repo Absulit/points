@@ -1,5 +1,6 @@
 import defaultStructs from '../defaultStructs.js';
-import { clearMix, polar, rand } from '../defaultFunctions.js';
+import { clearMix, polar } from '../defaultFunctions.js';
+import { rand } from '../random.js';
 
 const planets2Compute = /*wgsl*/`
 

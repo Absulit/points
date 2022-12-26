@@ -1,6 +1,7 @@
-import { clearAlpha, clearMix, fnusin, fusin, getColorsAroundTexture, polar, rand, soften8 } from '../defaultFunctions.js';
+import { clearAlpha, clearMix, fnusin, fusin, getColorsAroundTexture, polar, soften8 } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
 import { PI } from '../defaultConstants.js';
+import { rand } from '../random.js';
 
 const reactiondiffusionCompute = /*wgsl*/`
 

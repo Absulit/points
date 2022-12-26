@@ -146,22 +146,6 @@ fn blur8(color:vec4<f32>, colorsAround:array<vec4<f32>, 8>, amount:f32) -> {
 }
 `;
 
-export const rand = /*wgsl*/`;
-var<private> rand_seed : vec2<f32>;
-
-fn rand() -> f32 {
-    rand_seed.x = fract(cos(dot(rand_seed, vec2<f32>(23.14077926, 232.61690225))) * 136.8168);
-    rand_seed.y = fract(cos(dot(rand_seed, vec2<f32>(54.47856553, 345.84153136))) * 534.7645);
-    return rand_seed.y;
-}
-`;
-
-export const rand2 = /*wgsl*/`;
-fn rand2(co: vec2<f32>) -> f32 {
-    return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
-}
-`;
-
 export const sdfSegment = /*wgsl*/`;
 fn sdfSegment(p:vec2<f32>, a:vec2<f32>, b:vec2<f32> ) -> f32{
     let pa = p-a;

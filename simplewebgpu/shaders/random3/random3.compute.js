@@ -1,6 +1,6 @@
-import { fnusin, rand, RGBAFromHSV } from '../defaultFunctions.js';
+import { fnusin, RGBAFromHSV } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
-import { random } from '../random.js';
+import { rand, random } from '../random.js';
 
 const random3Compute = /*wgsl*/`
 

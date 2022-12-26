@@ -1,6 +1,7 @@
 import { PI } from '../defaultConstants.js';
-import { clearMix, getColorsAroundTexture, polar, rand, soften8 } from '../defaultFunctions.js';
+import { clearMix, getColorsAroundTexture, polar, soften8 } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
+import { rand } from '../random.js';
 
 const slime2Compute = /*wgsl*/`
 

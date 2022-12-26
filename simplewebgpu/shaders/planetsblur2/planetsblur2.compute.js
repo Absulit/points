@@ -1,5 +1,6 @@
-import { polar, rand } from '../defaultFunctions.js';
+import { polar } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
+import { rand } from '../random.js';
 
 const planetsblur2Compute = /*wgsl*/`
 
