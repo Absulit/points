@@ -8,8 +8,8 @@ fn voronoi(p:vec2<f32>, numPoints:u32) -> vec2<f32> {
     var lastDistance = -1.;
     var c = 1.;
     for(var i:u32 = 0; i < numPoints; i++){
-        var d = distance(p, vec2(rand(), rand()));
-
+        rand();
+        var d = distance(p, rand_seed);
 
         if(lastDistance != -1.){
             lastDistance = min(lastDistance, d);
