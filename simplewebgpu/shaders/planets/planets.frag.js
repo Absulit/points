@@ -1,6 +1,7 @@
 
 import { fnusin } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
+import { rand } from '../random.js';
 const planetsFrag = /*wgsl*/`
 
 ${defaultStructs}
@@ -18,6 +19,7 @@ struct Planet{
 }
 
 ${fnusin}
+${rand}
 
 @fragment
 fn main(
@@ -36,9 +38,9 @@ fn main(
 
     //var planet = 0];
     var lastDistance = -1.;
-    for(var i:u32 = 0; i < 8u; i++){
+    for(var i:u32 = 0; i < u32(800 * params.sliderA); i++){
         var planet = planets[i];
-        var d = distance(uv, vec2(planet.x * scale + .5, planet.y * scale + .5));
+        var d = distance(uv / ratio * 200 * params.sliderA * params.sliderB, vec2(rand(), rand()) * 200 * params.sliderB);
 
 
         if(lastDistance != -1.){
@@ -64,7 +66,7 @@ fn main(
     let g = lastDistance;
     let b = 1 - lastDistance * 32;
 
-    let finalColor:vec4<f32> = vec4(r, g, b, 1 );
+    let finalColor:vec4<f32> = vec4(1-lastDistance);
 
 
     return finalColor;
