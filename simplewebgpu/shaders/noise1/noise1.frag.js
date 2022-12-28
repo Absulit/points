@@ -30,7 +30,8 @@ fn main(
     //let finalColor:vec4<f32> = vec4(a*d*n2,f*c*a*n3,f * n1, 1.);
     //let finalColor = vec4(fract(n1 * n2 + n3));
     let n4 = fract(n1 * n2 + n3);
-    let finalColor = vec4(n4, uv.x - n4, 0, 1);
+    //let finalColor = vec4(n4, uv.x - n4, 0, 1);
+    let finalColor = mix( vec4(1, 0, 0, 1)  , vec4(1, 1, 0, 1), n4 );
 
     return finalColor;
 }
