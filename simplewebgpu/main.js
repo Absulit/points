@@ -80,6 +80,9 @@ import flowfieldsanimatedFrag from './shaders/flowfieldsanimated/flowfieldsanima
 import noisecircle1Vert from './shaders/noisecircle1/noisecircle1.vert.js';
 import noisecircle1Compute from './shaders/noisecircle1/noisecircle1.compute.js';
 import noisecircle1Frag from './shaders/noisecircle1/noisecircle1.frag.js';
+import noise2Vert from './shaders/noise2/noise2.vert.js';
+import noise2Compute from './shaders/noise2/noise2.compute.js';
+import noise2Frag from './shaders/noise2/noise2.frag.js';
 
 /***************/
 const stats = new Stats();
@@ -128,21 +131,29 @@ async function init() {
     // computeShader = defaultCompute;
     // fragmentShader = test1Frag;
 
-    vertexShader = flowfieldsanimatedVert;
-    computeShader = flowfieldsanimatedCompute;
-    fragmentShader = flowfieldsanimatedFrag;
-    const lineAmount = 1024;
-    webGPU.addUniform('flowfields_lineAmount', lineAmount);
-    webGPU.addUniform('flowfields_numSteps', 10);
-    webGPU.addUniform('flowfields_stepLength', 10);
-    webGPU.addUniform('flowfields_radians', Math.PI * 2); // angle
-    webGPU.addStorage('flowfields_startPositions', lineAmount, 'StartPosition', 2, ShaderType.COMPUTE);
-    webGPU.addStorage('variables', 1, 'Variable', 2, ShaderType.COMPUTE);
-    webGPU.addLayers(2, ShaderType.COMPUTE);
+    // vertexShader = flowfieldsanimatedVert;
+    // computeShader = flowfieldsanimatedCompute;
+    // fragmentShader = flowfieldsanimatedFrag;
+    // const lineAmount = 1024;
+    // webGPU.addUniform('flowfields_lineAmount', lineAmount);
+    // webGPU.addUniform('flowfields_numSteps', 10);
+    // webGPU.addUniform('flowfields_stepLength', 10);
+    // webGPU.addUniform('flowfields_radians', Math.PI * 2); // angle
+    // webGPU.addStorage('flowfields_startPositions', lineAmount, 'StartPosition', 2, ShaderType.COMPUTE);
+    // webGPU.addStorage('variables', 1, 'Variable', 2, ShaderType.COMPUTE);
+    // webGPU.addLayers(2, ShaderType.COMPUTE);
 
     // vertexShader = noise1Vert;
     // computeShader = noise1Compute;
     // fragmentShader = noise1Frag;
+    // const numPoints = 800*800;
+    // webGPU.addUniform('value_noise_data_length', numPoints);
+    // webGPU.addStorage('value_noise_data', numPoints, 'f32', 1, ShaderType.COMPUTE);
+    // webGPU.addStorage('variables', 1, 'Variable', 1, ShaderType.COMPUTE);
+
+    vertexShader = noise2Vert;
+    computeShader = noise2Compute;
+    fragmentShader = noise2Frag;
     // const numPoints = 800*800;
     // webGPU.addUniform('value_noise_data_length', numPoints);
     // webGPU.addStorage('value_noise_data', numPoints, 'f32', 1, ShaderType.COMPUTE);
