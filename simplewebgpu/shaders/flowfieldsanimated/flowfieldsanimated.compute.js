@@ -1,3 +1,4 @@
+import { polar } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
 import { rand } from '../random.js';
 
@@ -16,6 +17,15 @@ struct StartPosition{
 }
 
 ${rand}
+${polar}
+
+fn drawCurve(startPositionIndex:i32){
+    let startPositionP = &flowfields_startPositions[startPositionIndex];
+    for(var numStepsIndex=0; numStepsIndex < i32(params.flowfields_numSteps); numStepsIndex++){
+        let mathPoint = polar(params.flowfields_stepLength, (*startPositionP).position.x);
+    }
+
+}
 
 @compute @workgroup_size(8,8,1)
 fn main(
@@ -26,6 +36,7 @@ fn main(
     let utime = params.utime;
 
     _ = flowfields_startPositions[0];
+    _ = layers[0];
 
     if(variables.linesCreated == 0){
 
@@ -40,6 +51,17 @@ fn main(
 
 
         variables.linesCreated = 1;
+    }
+
+    for(var i:i32; i < i32(params.screenWidth * params.screenHeight); i++){
+        //let startPosition = flowfields_startPositions[i];
+        drawCurve(i);
+    }
+
+    //add lines
+    for(var i:i32; i < i32(params.flowfields_lineAmount); i++){
+
+
     }
 
 }

@@ -43,7 +43,7 @@ export default class FlowFieldsAnimated {
         screen.layerIndex = 1;//--------------------------- LAYER 1
 
         this._flowFields = new FlowFields(screen, 1000 * this._constant);
-        this._flowFields.init(screen.layers[0]);
+        //this._flowFields.init(screen.layers[0]);
         screen.clear(this._clearMixColor);
 
 
