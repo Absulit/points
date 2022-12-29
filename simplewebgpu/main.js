@@ -74,6 +74,9 @@ import layers1Frag from './shaders/layers1/layers1.frag.js';
 import noise1Vert from './shaders/noise1/noise1.vert.js';
 import noise1Compute from './shaders/noise1/noise1.compute.js';
 import noise1Frag from './shaders/noise1/noise1.frag.js';
+import flowfieldsanimatedCompute from './shaders/flowfieldsanimated/flowfieldsanimated.compute.js';
+import flowfieldsanimatedVert from './shaders/flowfieldsanimated/flowfieldsanimated.vert.js';
+import flowfieldsanimatedFrag from './shaders/flowfieldsanimated/flowfieldsanimated.frag.js';
 
 /***************/
 const stats = new Stats();
@@ -122,13 +125,25 @@ async function init() {
     // computeShader = defaultCompute;
     // fragmentShader = test1Frag;
 
-    vertexShader = noise1Vert;
-    computeShader = noise1Compute;
-    fragmentShader = noise1Frag;
-    const numPoints = 800*800;
-    webGPU.addUniform('value_noise_data_length', numPoints);
-    webGPU.addStorage('value_noise_data', numPoints, 'f32', 1, ShaderType.COMPUTE);
-    webGPU.addStorage('variables', 1, 'Variable', 1, ShaderType.COMPUTE);
+    vertexShader = flowfieldsanimatedVert;
+    computeShader = flowfieldsanimatedCompute;
+    fragmentShader = flowfieldsanimatedFrag;
+    const lineAmount = 1024;
+    webGPU.addUniform('flowfields_lineAmount', lineAmount);
+    webGPU.addUniform('flowfields_numSteps', 10);
+    webGPU.addUniform('flowfields_stepLength', 10);
+    webGPU.addUniform('flowfields_radians', Math.PI * 2); // angle
+
+    webGPU.addStorage('flowfields_startPositions', lineAmount, 'StartPosition', 2, ShaderType.COMPUTE);
+    webGPU.addStorage('variables', 1, 'Variable', 2, ShaderType.COMPUTE);
+
+    // vertexShader = noise1Vert;
+    // computeShader = noise1Compute;
+    // fragmentShader = noise1Frag;
+    // const numPoints = 800*800;
+    // webGPU.addUniform('value_noise_data_length', numPoints);
+    // webGPU.addStorage('value_noise_data', numPoints, 'f32', 1, ShaderType.COMPUTE);
+    // webGPU.addStorage('variables', 1, 'Variable', 1, ShaderType.COMPUTE);
 
     // vertexShader = layers1Vert;
     // computeShader = layers1Compute;
