@@ -78,55 +78,18 @@ fn main(
 
 
     if(variables.initialized == 0){
-        rand_seed = vec2(fract(params.epoch), fract(params.epoch) + .1);
+        rand_seed = vec2(1, .1);
         for(var pointIndex = 0; pointIndex < i32(params.numPoints); pointIndex++){
             let pointP = &points[pointIndex];
             rand();
             (*pointP).position = rand_seed * ratio;
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        //-----------------------
+        //-----------------------
 
         variables.initialized = 1;
     }else{
-        // for(var pointIndex = 0; pointIndex < i32(params.numPoints); pointIndex++){
-        //     let pointP = &points[pointIndex];
-        //     let iPosition = vec2<i32>( i32((*pointP).position.x * params.screenWidth),  i32((*pointP).position.y * params.screenHeight));
-        //     //rand();
-        //     var rgba = textureLoad(feedbackTexture, iPosition, 0);
-        //     //let b = brightness(rgba);
-        //     let b = rgba.g;
-
-        //     let mathpoint = polar(.0001, b * PI * 2. );
-
-
-        //     (*pointP).position.x += mathpoint.x;
-        //     (*pointP).position.y += mathpoint.y;
-        // }
-
-        //-----------------------
-
         let numColumns:f32 = sqrt(params.numPoints);
         let numRows:f32 = sqrt(params.numPoints);
         //let constant = u32(numColumns) / 93u;

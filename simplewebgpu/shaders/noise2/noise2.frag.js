@@ -53,9 +53,11 @@ fn main(
             lastDistance = d;
         }
 
+        let isPrevNotZero = point.prev != vec2(0,0);
         if(lines != -1){
-
-            lines += sdfLine(point.position, point.prev, 1, uv);
+            if(isPrevNotZero.x && isPrevNotZero.y){
+                lines += sdfLine(point.position, point.prev, 1, uv);
+            }
         }else{
             lines = 0;
         }
@@ -65,9 +67,6 @@ fn main(
     if(lastDistance > .01){
         c = 0.;
     }
-
-
-
 
 
 
