@@ -156,11 +156,14 @@ async function init() {
     vertexShader = noise2Vert;
     computeShader = noise2Compute;
     fragmentShader = noise2Frag;
-    const numPoints = 1024;
+    const numPoints = 64;
     webGPU.addUniform('numPoints', numPoints);
     webGPU.addStorage('points', numPoints, 'Point', 4);
     webGPU.addStorage('variables', 1, 'Variable', 1, ShaderType.COMPUTE);
     webGPU.addTexture2d('feedbackTexture', true, ShaderType.COMPUTE);
+    webGPU.addLayers(1, ShaderType.COMPUTE);
+    webGPU.addBindingTexture('outputTex', 'computeTexture');
+    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
 
 
     // vertexShader = noisecircle1Vert;

@@ -25,7 +25,8 @@ fn main(
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
-    //let texColor = textureSample(feedbackTexture, feedbackSampler, uv);
+    let texColorCompute = textureSample(computeTexture, feedbackSampler, uv);
+
 
     var n1 = snoise(uv * 200 * params.sliderA + 10 * .033 ); //fnusin(.01)
     n1 = (n1+1) * .5;
@@ -57,7 +58,7 @@ fn main(
 
 
     rand();
-    let finalColor = vec4(n1) + vec4(c) * vec4(rand_seed, 0, 1);
+    let finalColor = texColorCompute + vec4(c) * vec4(rand_seed, 0, 1);
 
     return finalColor;
 }

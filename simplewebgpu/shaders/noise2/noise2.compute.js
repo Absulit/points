@@ -1,6 +1,7 @@
 import { PI } from '../defaultConstants.js';
 import { brightness, polar } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
+import { snoise } from '../noise2d.js';
 import { rand } from '../random.js';
 
 const noise2Compute = /*wgsl*/`
@@ -20,6 +21,7 @@ ${rand}
 ${brightness}
 ${polar}
 ${PI}
+${snoise}
 
 const workgroupSize = 8;
 
@@ -37,6 +39,44 @@ fn main(
     let ratioY = 1 / ratioX / (params.screenHeight / params.screenWidth);
     let ratio = vec2(ratioX, ratioY);
 
+
+        //--------------------------------------------------
+        let numColumns:f32 = params.screenWidth;
+        let numRows:f32 = params.screenHeight;
+        //let constant = u32(numColumns) / 93u;
+
+        let numColumnsPiece:i32 = i32(numColumns / f32(workgroupSize));
+        let numRowsPiece:i32 = i32(numRows / f32(workgroupSize));
+
+        for (var indexColumns:i32 = 0; indexColumns < numColumnsPiece; indexColumns++) {
+            let x:f32 = f32(WorkGroupID.x) * f32(numColumnsPiece) + f32(indexColumns);
+            let ux = u32(x);
+            // let ix = i32(x);
+            let nx = x / numColumns;
+            for (var indexRows:i32 = 0; indexRows < numRowsPiece; indexRows++) {
+
+                let y:f32 = f32(WorkGroupID.y) * f32(numRowsPiece) + f32(indexRows);
+                let uy = u32(y);
+                // let iy = i32(y);
+                let ny = y / numRows;
+                let uv = vec2(nx,ny);
+
+                let pointIndex = i32(y + (x * numColumns));
+
+                var n1 = snoise(uv * 200 * params.sliderA + 10 * .033 ); //fnusin(.01)
+                n1 = (n1+1) * .5;
+
+                let pointP = &layers[0][pointIndex];
+                (*pointP) = vec4(n1);
+
+                let positionU = vec2<u32>(ux,uy);
+                textureStore(outputTex, positionU, vec4(n1));
+            }
+        }
+        //--------------------------------------------------
+
+
+
     if(variables.initialized == 0){
         rand_seed = vec2(fract(params.epoch), fract(params.epoch) + .01);
         for(var pointIndex = 0; pointIndex < i32(params.numPoints); pointIndex++){
@@ -44,6 +84,28 @@ fn main(
             rand();
             (*pointP).position = rand_seed * ratio;
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
         variables.initialized = 1;
@@ -68,34 +130,37 @@ fn main(
         let numColumns:f32 = sqrt(params.numPoints);
         let numRows:f32 = sqrt(params.numPoints);
         //let constant = u32(numColumns) / 93u;
-    
+
         let numColumnsPiece:i32 = i32(numColumns / f32(workgroupSize));
         let numRowsPiece:i32 = i32(numRows / f32(workgroupSize));
-    
+
         for (var indexColumns:i32 = 0; indexColumns < numColumnsPiece; indexColumns++) {
             let x:f32 = f32(WorkGroupID.x) * f32(numColumnsPiece) + f32(indexColumns);
             let ux = u32(x);
             let ix = i32(x);
             let nx = x / numColumns;
             for (var indexRows:i32 = 0; indexRows < numRowsPiece; indexRows++) {
-    
+
                 let y:f32 = f32(WorkGroupID.y) * f32(numRowsPiece) + f32(indexRows);
                 let uy = u32(y);
                 let iy = i32(y);
                 let ny = y / numRows;
-    
+
                 let pointIndex = i32(y + (x * numColumns));
 
                 let pointP = &points[pointIndex];
                 let iPosition = vec2<i32>( i32((*pointP).position.x * params.screenWidth),  i32((*pointP).position.y * params.screenHeight));
                 //rand();
-                var rgba = textureLoad(feedbackTexture, iPosition, 0);
-                //let b = brightness(rgba);
-                let b = rgba.g;
-    
+
+                //var rgba = textureLoad(feedbackTexture, iPosition, 0);
+                var rgba = layers[0][ iPosition.y + (iPosition.x * i32(params.screenWidth)) ];
+
+                let b = brightness(rgba);
+                //let b = rgba.g;
+
                 let mathpoint = polar(.01, b * PI * 2. );
-    
-    
+
+
                 (*pointP).position.x += mathpoint.x;
                 (*pointP).position.y += mathpoint.y;
 
