@@ -160,7 +160,7 @@ async function init() {
     webGPU.addUniform('numPoints', numPoints);
     webGPU.addStorage('points', numPoints, 'Point', 4);
     webGPU.addStorage('variables', 1, 'Variable', 1, ShaderType.COMPUTE);
-    webGPU.addTexture2d('feedbackTexture', true, ShaderType.COMPUTE);
+    webGPU.addTexture2d('feedbackTexture', true, ShaderType.FRAGMENT);
     webGPU.addLayers(1, ShaderType.COMPUTE);
     webGPU.addBindingTexture('outputTex', 'computeTexture');
     webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);

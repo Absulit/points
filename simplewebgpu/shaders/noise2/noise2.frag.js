@@ -1,5 +1,5 @@
 import defaultStructs from '../defaultStructs.js';
-import { fnusin } from '../defaultFunctions.js';
+import { fnusin, sdfLine, sdfLine2, sdfSegment } from '../defaultFunctions.js';
 import { snoise } from '../noise2d.js';
 import { rand } from '../random.js';
 
@@ -15,6 +15,9 @@ struct Point{
 ${fnusin}
 ${snoise}
 ${rand}
+${sdfSegment}
+${sdfLine}
+${sdfLine2}
 
 @fragment
 fn main(
@@ -25,7 +28,8 @@ fn main(
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
-    let texColorCompute = textureSample(computeTexture, feedbackSampler, uv);
+    let rgbaFeedbackTexture = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1));
+    let rgbaCompute = textureSample(computeTexture, feedbackSampler, uv);
 
 
     var n1 = snoise(uv * 200 * params.sliderA + 10 * .033 ); //fnusin(.01)
@@ -37,9 +41,10 @@ fn main(
 
     //var planet = 0];
     var lastDistance = -1.;
+    var lines = -1.;
     for(var i:i32 = 0; i < i32(params.numPoints); i++){
         var point = points[i];
-        var d = distance(uv, vec2(point.position.x, point.position.y));
+        var d = distance(uv, point.position);
 
 
         if(lastDistance != -1.){
@@ -47,6 +52,15 @@ fn main(
         }else{
             lastDistance = d;
         }
+
+        if(lines != -1){
+
+            lines += sdfLine(point.position, point.prev, 1, uv);
+        }else{
+            lines = 0;
+        }
+
+
     }
     if(lastDistance > .01){
         c = 0.;
@@ -58,7 +72,7 @@ fn main(
 
 
     rand();
-    let finalColor = texColorCompute + vec4(c) * vec4(rand_seed, 0, 1);
+    let finalColor = rgbaFeedbackTexture + vec4(lines) * vec4(rand_seed, 0, lines);
 
     return finalColor;
 }

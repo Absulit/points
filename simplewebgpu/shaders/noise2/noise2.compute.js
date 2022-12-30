@@ -32,7 +32,7 @@ fn main(
     @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
 ) {
     let utime = params.utime;
-    let dims : vec2<u32> = textureDimensions(feedbackTexture, 0);
+    //let dims : vec2<u32> = textureDimensions(feedbackTexture, 0);
     _ = points[0];
 
     let ratioX = params.screenWidth / params.screenHeight;
@@ -78,7 +78,7 @@ fn main(
 
 
     if(variables.initialized == 0){
-        rand_seed = vec2(fract(params.epoch), fract(params.epoch) + .01);
+        rand_seed = vec2(fract(params.epoch), fract(params.epoch) + .1);
         for(var pointIndex = 0; pointIndex < i32(params.numPoints); pointIndex++){
             let pointP = &points[pointIndex];
             rand();
@@ -159,6 +159,8 @@ fn main(
                 //let b = rgba.g;
 
                 let mathpoint = polar(.01, b * PI * 2. );
+
+                (*pointP).prev = (*pointP).position;
 
 
                 (*pointP).position.x += mathpoint.x;
