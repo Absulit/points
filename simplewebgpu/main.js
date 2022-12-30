@@ -101,6 +101,7 @@ const webGPU = new WebGPU('gl-canvas');
 webGPU.useTexture = false;
 
 let utime = 0;
+let epoch = 0;
 let mouseX = 0;
 let mouseY = 0;
 
@@ -115,6 +116,7 @@ async function init() {
 
 
     webGPU.addUniform('utime', 0);
+    webGPU.addUniform('epoch', 0);
     webGPU.addUniform('screenWidth', 0);
     webGPU.addUniform('screenHeight', 0);
     webGPU.addUniform('mouseX', 0);
@@ -154,10 +156,12 @@ async function init() {
     vertexShader = noise2Vert;
     computeShader = noise2Compute;
     fragmentShader = noise2Frag;
-    // const numPoints = 800*800;
-    // webGPU.addUniform('value_noise_data_length', numPoints);
-    // webGPU.addStorage('value_noise_data', numPoints, 'f32', 1, ShaderType.COMPUTE);
-    // webGPU.addStorage('variables', 1, 'Variable', 1, ShaderType.COMPUTE);
+    const numPoints = 1024;
+    webGPU.addUniform('numPoints', numPoints);
+    webGPU.addStorage('points', numPoints, 'Point', 4);
+    webGPU.addStorage('variables', 1, 'Variable', 1, ShaderType.COMPUTE);
+    webGPU.addTexture2d('feedbackTexture', true, ShaderType.COMPUTE);
+
 
     // vertexShader = noisecircle1Vert;
     // computeShader = noisecircle1Compute;
@@ -364,10 +368,12 @@ async function init() {
 async function update() {
     stats.begin();
     utime += 0.016666666666666666;//1 / 60;
+    epoch = new Date() / 1000;
 
     // code here
 
     webGPU.updateUniform('utime', utime);
+    webGPU.updateUniform('epoch', epoch);
     webGPU.updateUniform('screenWidth', canvas.width);
     webGPU.updateUniform('screenHeight', canvas.height);
     webGPU.updateUniform('mouseX', mouseX);

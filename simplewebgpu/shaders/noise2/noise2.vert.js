@@ -4,6 +4,12 @@ import defaultStructs from '../defaultStructs.js';
 const noise2Vert = /*wgsl*/`
 
 ${defaultStructs}
+
+struct Point{
+    position: vec2<f32>,
+    prev: vec2<f32>,
+}
+
 ${defaultVertexBody}
 
 @vertex

@@ -229,3 +229,15 @@ fn pixelateTexture(texture:texture_2d<f32>, textureSampler:sampler, pixelsWidth:
     return textureSample(texture, textureSampler, coord);
 }
 `;
+
+export const brightness = /*wgsl*/`
+fn brightness(color:vec4<f32>) -> f32 {
+    // #Standard
+    // LuminanceA = (0.2126*R) + (0.7152*G) + (0.0722*B)
+    // #Percieved A
+    // LuminanceB = (0.299*R + 0.587*G + 0.114*B)
+    // #Perceived B, slower to calculate
+    // LuminanceC = sqrt(0.299*(R**2) + 0.587*(G**2) + 0.114*(B**2))
+    return (0.2126 * color.r) + (0.7152 * color.g) + (0.0722 * color.b);
+}
+`;
