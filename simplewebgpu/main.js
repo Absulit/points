@@ -157,7 +157,7 @@ async function init() {
     computeShader = noise2Compute;
     fragmentShader = noise2Frag;
     const numPoints = 1024;
-    const lineAmount = 128;
+    const lineAmount = 4;
     webGPU.addUniform('numPoints', numPoints);
     webGPU.addUniform('lineAmount', lineAmount);
     webGPU.addStorage('points', numPoints, 'Point', 4);

@@ -74,7 +74,7 @@ fn main(
 
     //rand_seed = vec2(.5484,.6544);
     rand();
-    let finalColor = rgbaFeedbackTexture * .99804684 + vec4(lines) * vec4(rand_seed, 0, 1) ;
+    let finalColor = rgbaFeedbackTexture * .99804684 + vec4(lines) * vec4(rand_seed, 0, 1);
     //let finalColor = (rgbaFeedbackTexture + vec4(lines) * vec4(rand_seed * uv, 1-uv.y, 1))/2;
     //let finalColor = (rgbaFeedbackTexture + vec4(lines) * RGBAFromHSV( fnusin(1), 1, 1)) * .5  ;
 

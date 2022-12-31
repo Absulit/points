@@ -66,8 +66,13 @@ fn main(
 
                 let pointIndex = i32(y + (x * numColumns));
 
-                var n1 = snoise(uv * 15 * params.sliderA + 10 * .033 ); //fnusin(.01)
-                n1 = (n1+1) * .5;
+                // var n1 = snoise(uv * 15 * params.sliderA + 10 * .033 ); //fnusin(.01)
+                // n1 = (n1+1) * .5;
+                let n1 = snoise(uv * 200 * params.sliderA + 10 * fnusin(.01));
+                // let n2 = snoise(uv * 200 * params.sliderB + 10 * fnusin(.02));
+                // let n3 = snoise(uv * 200 * params.sliderC + 10 * fnusin(.03));
+                // let n4 = fract(n1 * n2 + n3);
+
 
                 let pointP = &layers[0][pointIndex];
                 (*pointP) = vec4(n1);
@@ -95,7 +100,7 @@ fn main(
     }else{
 
         rand_seed = vec2( f32(variables.indexPoints), fract(epoch) + .01);
-        
+
         for(var indexLineAmount = 0; indexLineAmount < i32(params.lineAmount); indexLineAmount++){
 
             if(variables.indexPoints < i32(params.numPoints)){
