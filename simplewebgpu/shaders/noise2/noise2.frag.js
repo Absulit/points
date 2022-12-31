@@ -32,14 +32,8 @@ fn main(
     let rgbaFeedbackTexture = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1)); //* .998046;
     _ = textureSample(computeTexture, feedbackSampler, uv);
 
-    var n1 = snoise(uv * 200 * params.sliderA + 10 * .033 ); //fnusin(.01)
-    n1 = (n1+1) * .5;
-
-
-    let scale = .01;
     var c = 1.;
 
-    //var planet = 0];
     var lastDistance = -1.;
     var lines = -1.;
     for(var i:i32 = 0; i < i32(params.numPoints); i++){
