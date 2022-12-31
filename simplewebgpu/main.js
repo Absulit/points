@@ -156,10 +156,12 @@ async function init() {
     vertexShader = noise2Vert;
     computeShader = noise2Compute;
     fragmentShader = noise2Frag;
-    const numPoints = 64;
+    const numPoints = 1024;
+    const lineAmount = 128;
     webGPU.addUniform('numPoints', numPoints);
+    webGPU.addUniform('lineAmount', lineAmount);
     webGPU.addStorage('points', numPoints, 'Point', 4);
-    webGPU.addStorage('variables', 1, 'Variable', 1, ShaderType.COMPUTE);
+    webGPU.addStorage('variables', 1, 'Variable', 2, ShaderType.COMPUTE);
     webGPU.addTexture2d('feedbackTexture', true, ShaderType.FRAGMENT);
     webGPU.addLayers(1, ShaderType.COMPUTE);
     webGPU.addBindingTexture('outputTex', 'computeTexture');

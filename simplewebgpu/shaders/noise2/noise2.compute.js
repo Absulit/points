@@ -1,5 +1,5 @@
 import { PI } from '../defaultConstants.js';
-import { brightness, polar } from '../defaultFunctions.js';
+import { brightness, fnusin, polar } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
 import { snoise } from '../noise2d.js';
 import { rand } from '../random.js';
@@ -15,6 +15,7 @@ struct Point{
 
 struct Variable{
     initialized: i32,
+    indexPoints: i32,
 }
 
 ${rand}
@@ -22,6 +23,7 @@ ${brightness}
 ${polar}
 ${PI}
 ${snoise}
+${fnusin}
 
 const workgroupSize = 8;
 
@@ -32,6 +34,7 @@ fn main(
     @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
 ) {
     let utime = params.utime;
+    let epoch = params.epoch;
     //let dims : vec2<u32> = textureDimensions(feedbackTexture, 0);
     _ = points[0];
 
@@ -63,7 +66,7 @@ fn main(
 
                 let pointIndex = i32(y + (x * numColumns));
 
-                var n1 = snoise(uv * 200 * params.sliderA + 10 * .033 ); //fnusin(.01)
+                var n1 = snoise(uv * 15 * params.sliderA + 10 * .033 ); //fnusin(.01)
                 n1 = (n1+1) * .5;
 
                 let pointP = &layers[0][pointIndex];
@@ -78,18 +81,38 @@ fn main(
 
 
     if(variables.initialized == 0){
-        rand_seed = vec2(1, .1);
-        for(var pointIndex = 0; pointIndex < i32(params.numPoints); pointIndex++){
-            let pointP = &points[pointIndex];
-            rand();
-            (*pointP).position = rand_seed * ratio;
-        }
+        // rand_seed = vec2(1, .1);
+        // for(var pointIndex = 0; pointIndex < i32(params.numPoints); pointIndex++){
+        //     let pointP = &points[pointIndex];
+        //     rand();
+        //     (*pointP).position = rand_seed * ratio;
+        // }
 
         //-----------------------
         //-----------------------
 
         variables.initialized = 1;
     }else{
+
+        rand_seed = vec2( f32(variables.indexPoints), fract(epoch) + .01);
+        
+        for(var indexLineAmount = 0; indexLineAmount < i32(params.lineAmount); indexLineAmount++){
+
+            if(variables.indexPoints < i32(params.numPoints)){
+                let pointP = &points[variables.indexPoints];
+                rand();
+                (*pointP).position = rand_seed * ratio;
+            }else{
+                let pointP = &points[variables.indexPoints];
+                variables.indexPoints = 0;
+                // (*pointP).position = vec2(0,0);
+                // (*pointP).prev = vec2(0,0);
+            }
+            variables.indexPoints++;
+        }
+
+
+
         let numColumns:f32 = sqrt(params.numPoints);
         let numRows:f32 = sqrt(params.numPoints);
         //let constant = u32(numColumns) / 93u;
@@ -121,7 +144,7 @@ fn main(
                 let b = brightness(rgba);
                 //let b = rgba.g;
 
-                let mathpoint = polar(.01, b * PI * 2. );
+                let mathpoint = polar(.01, b * PI * 2. * params.sliderB);
 
                 (*pointP).prev = (*pointP).position;
 

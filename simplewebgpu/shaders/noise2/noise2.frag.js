@@ -1,5 +1,5 @@
 import defaultStructs from '../defaultStructs.js';
-import { fnusin, sdfLine, sdfLine2, sdfSegment } from '../defaultFunctions.js';
+import { fnusin, RGBAFromHSV, sdfLine, sdfLine2, sdfSegment } from '../defaultFunctions.js';
 import { snoise } from '../noise2d.js';
 import { rand } from '../random.js';
 
@@ -18,6 +18,7 @@ ${rand}
 ${sdfSegment}
 ${sdfLine}
 ${sdfLine2}
+${RGBAFromHSV}
 
 @fragment
 fn main(
@@ -28,7 +29,7 @@ fn main(
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
-    let rgbaFeedbackTexture = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1));
+    let rgbaFeedbackTexture = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1)); //* .998046;
     let rgbaCompute = textureSample(computeTexture, feedbackSampler, uv);
 
 
@@ -53,10 +54,12 @@ fn main(
             lastDistance = d;
         }
 
-        let isPrevNotZero = point.prev != vec2(0,0);
+        let prevDistance = distance(point.prev, point.position) * params.screenWidth;
+        let isPrevDistanceShort = prevDistance < 20.;
+        let isPrevNotZero = (point.prev > vec2(0,0));
         if(lines != -1){
-            if(isPrevNotZero.x && isPrevNotZero.y){
-                lines += sdfLine(point.position, point.prev, 1, uv);
+            if(isPrevNotZero.x && isPrevNotZero.y && isPrevDistanceShort){
+                lines += sdfLine(point.position, point.prev, 1., uv);
             }
         }else{
             lines = 0;
@@ -69,9 +72,11 @@ fn main(
     }
 
 
-
+    //rand_seed = vec2(.5484,.6544);
     rand();
-    let finalColor = rgbaFeedbackTexture + vec4(lines) * vec4(rand_seed, 0, lines);
+    let finalColor = rgbaFeedbackTexture * .99804684 + vec4(lines) * vec4(rand_seed, 0, 1) ;
+    //let finalColor = (rgbaFeedbackTexture + vec4(lines) * vec4(rand_seed * uv, 1-uv.y, 1))/2;
+    //let finalColor = (rgbaFeedbackTexture + vec4(lines) * RGBAFromHSV( fnusin(1), 1, 1)) * .5  ;
 
     return finalColor;
 }
