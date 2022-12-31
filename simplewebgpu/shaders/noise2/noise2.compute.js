@@ -16,6 +16,7 @@ struct Point{
 struct Variable{
     initialized: i32,
     indexPoints: i32,
+    lastSliderA: f32
 }
 
 ${rand}
@@ -36,12 +37,23 @@ fn main(
     let utime = params.utime;
     let epoch = params.epoch;
     //let dims : vec2<u32> = textureDimensions(feedbackTexture, 0);
-    _ = points[0];
 
     let ratioX = params.screenWidth / params.screenHeight;
     let ratioY = 1 / ratioX / (params.screenHeight / params.screenWidth);
     let ratio = vec2(ratioX, ratioY);
 
+
+
+
+    let sliderAChanged = variables.lastSliderA != params.sliderA;
+
+    if( (variables.initialized == 0) || sliderAChanged ){
+        // rand_seed = vec2(1, .1);
+        // for(var pointIndex = 0; pointIndex < i32(params.numPoints); pointIndex++){
+        //     let pointP = &points[pointIndex];
+        //     rand();
+        //     (*pointP).position = rand_seed * ratio;
+        // }
 
         //--------------------------------------------------
         let numColumns:f32 = params.screenWidth;
@@ -68,7 +80,7 @@ fn main(
 
                 // var n1 = snoise(uv * 15 * params.sliderA + 10 * .033 ); //fnusin(.01)
                 // n1 = (n1+1) * .5;
-                let n1 = snoise(uv * 200 * params.sliderA + 10 * fnusin(.01));
+                let n1 = snoise(uv * 15 * params.sliderA + 10 * fnusin(.01));
                 // let n2 = snoise(uv * 200 * params.sliderB + 10 * fnusin(.02));
                 // let n3 = snoise(uv * 200 * params.sliderC + 10 * fnusin(.03));
                 // let n4 = fract(n1 * n2 + n3);
@@ -82,19 +94,6 @@ fn main(
             }
         }
         //--------------------------------------------------
-
-
-
-    if(variables.initialized == 0){
-        // rand_seed = vec2(1, .1);
-        // for(var pointIndex = 0; pointIndex < i32(params.numPoints); pointIndex++){
-        //     let pointP = &points[pointIndex];
-        //     rand();
-        //     (*pointP).position = rand_seed * ratio;
-        // }
-
-        //-----------------------
-        //-----------------------
 
         variables.initialized = 1;
     }else{
@@ -163,6 +162,8 @@ fn main(
 
 
     }
+
+    variables.lastSliderA = params.sliderA;
 
 }
 `;

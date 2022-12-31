@@ -30,8 +30,7 @@ fn main(
     ) -> @location(0) vec4<f32> {
 
     let rgbaFeedbackTexture = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1)); //* .998046;
-    let rgbaCompute = textureSample(computeTexture, feedbackSampler, uv);
-
+    _ = textureSample(computeTexture, feedbackSampler, uv);
 
     var n1 = snoise(uv * 200 * params.sliderA + 10 * .033 ); //fnusin(.01)
     n1 = (n1+1) * .5;
@@ -59,7 +58,7 @@ fn main(
         let isPrevNotZero = (point.prev > vec2(0,0));
         if(lines != -1){
             if(isPrevNotZero.x && isPrevNotZero.y && isPrevDistanceShort){
-                lines += sdfLine(point.position, point.prev, 1., uv);
+                lines += sdfLine(point.position, point.prev, .5, uv);
             }
         }else{
             lines = 0;
