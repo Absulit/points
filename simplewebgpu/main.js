@@ -83,6 +83,9 @@ import noisecircle1Frag from './shaders/noisecircle1/noisecircle1.frag.js';
 import noise2Vert from './shaders/noise2/noise2.vert.js';
 import noise2Compute from './shaders/noise2/noise2.compute.js';
 import noise2Frag from './shaders/noise2/noise2.frag.js';
+import oscilloscope1Vert from './shaders/oscilloscope1/oscilloscope1.vert.js';
+import oscilloscope1Compute from './shaders/oscilloscope1/oscilloscope1.compute.js';
+import oscilloscope1Frag from './shaders/oscilloscope1/oscilloscope1.frag.js';
 
 /***************/
 const stats = new Stats();
@@ -133,6 +136,12 @@ async function init() {
     // computeShader = defaultCompute;
     // fragmentShader = test1Frag;
 
+    vertexShader = oscilloscope1Vert;
+    computeShader = oscilloscope1Compute;
+    fragmentShader = oscilloscope1Frag;
+    webGPU.addTexture2d('feedbackTexture', true, ShaderType.FRAGMENT);
+    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+
     // vertexShader = flowfieldsanimatedVert;
     // computeShader = flowfieldsanimatedCompute;
     // fragmentShader = flowfieldsanimatedFrag;
@@ -153,20 +162,20 @@ async function init() {
     // webGPU.addStorage('value_noise_data', numPoints, 'f32', 1, ShaderType.COMPUTE);
     // webGPU.addStorage('variables', 1, 'Variable', 1, ShaderType.COMPUTE);
 
-    vertexShader = noise2Vert;
-    computeShader = noise2Compute;
-    fragmentShader = noise2Frag;
-    const numPoints = 1024;
-    const lineAmount = 8;
-    webGPU.addUniform('numPoints', numPoints);
-    webGPU.addUniform('initializeAgain', 0);
-    webGPU.addUniform('lineAmount', lineAmount);
-    webGPU.addStorage('points', numPoints, 'Point', 4);
-    webGPU.addStorage('variables', 1, 'Variable', 3, ShaderType.COMPUTE);
-    webGPU.addTexture2d('feedbackTexture', true, ShaderType.FRAGMENT);
-    webGPU.addLayers(1, ShaderType.COMPUTE);
-    webGPU.addBindingTexture('outputTex', 'computeTexture');
-    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    // vertexShader = noise2Vert;
+    // computeShader = noise2Compute;
+    // fragmentShader = noise2Frag;
+    // const numPoints = 1024;
+    // const lineAmount = 8;
+    // webGPU.addUniform('numPoints', numPoints);
+    // webGPU.addUniform('initializeAgain', 0);
+    // webGPU.addUniform('lineAmount', lineAmount);
+    // webGPU.addStorage('points', numPoints, 'Point', 4);
+    // webGPU.addStorage('variables', 1, 'Variable', 3, ShaderType.COMPUTE);
+    // webGPU.addTexture2d('feedbackTexture', true, ShaderType.FRAGMENT);
+    // webGPU.addLayers(1, ShaderType.COMPUTE);
+    // webGPU.addBindingTexture('outputTex', 'computeTexture');
+    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
 
 
     // vertexShader = noisecircle1Vert;
