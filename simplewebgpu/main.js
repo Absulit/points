@@ -141,6 +141,7 @@ async function init() {
     fragmentShader = oscilloscope1Frag;
     webGPU.addTexture2d('feedbackTexture', true, ShaderType.FRAGMENT);
     webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    webGPU.addStorage('variables', 1, 'Variable', 2, ShaderType.FRAGMENT);
 
     // vertexShader = flowfieldsanimatedVert;
     // computeShader = flowfieldsanimatedCompute;

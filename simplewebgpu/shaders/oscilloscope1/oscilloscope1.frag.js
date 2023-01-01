@@ -1,13 +1,19 @@
 import defaultStructs from '../defaultStructs.js';
-import { fnusin, fusin, sdfCircle } from '../defaultFunctions.js';
+import { fnusin, fusin, sdfCircle, sdfLine, sdfSegment } from '../defaultFunctions.js';
 
 const oscilloscope1Frag = /*wgsl*/`
 
 ${defaultStructs}
 
+struct Variable{
+    lastPoint: vec2<f32>,
+}
+
 ${fnusin}
 ${fusin}
 ${sdfCircle}
+${sdfSegment}
+${sdfLine}
 
 @fragment
 fn main(
@@ -21,10 +27,14 @@ fn main(
     let rgbaFeedbackTexture = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1) / ratio); //* .998046;
 
 
-    let pointPosition = vec2(.5 + .1 * fusin(10 * params.sliderA),.5 + .1 * fusin(10 * params.sliderB));
-    let finalColor:vec4<f32> =  sdfCircle(pointPosition * ratio, 0.01 * .25, 0, uv);
+    let pointPosition = vec2(.5 + .2 * fusin(10 * params.sliderA),.5 + .2 * fusin(10 * params.sliderB));
+    //let finalColor:vec4<f32> =  sdfCircle(pointPosition * ratio, 0.01 * .25, 0, uv);
+    let line = sdfLine(variables.lastPoint * ratio, pointPosition * ratio, 10., uv);
+    let finalColor:vec4<f32> = vec4(line); 
 
-    return rgbaFeedbackTexture * 0.998046 + finalColor;
+    variables.lastPoint = pointPosition;
+
+    return rgbaFeedbackTexture * 0.998046 + finalColor * vec4(0,1,0,1);
 }
 `;
 
