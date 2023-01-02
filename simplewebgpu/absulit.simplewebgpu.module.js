@@ -213,6 +213,28 @@ export default class WebGPU {
         });
     }
 
+    /**
+     * Load an image as texture2d
+     * @param {string} name
+     * @param {string} path
+     * @param {ShaderType} shaderType
+     */
+    async addTextureImage(name, path, shaderType){
+        const response = await fetch(path);
+        const blob = await response.blob();
+        const imageBitmap = await createImageBitmap(blob);
+
+        this._textures2d.push({
+            name: name,
+            copyCurrentTexture: false,
+            shaderType: shaderType,
+            texture: null,
+            imageTexture: {
+                bitmap: imageBitmap
+            }
+        });
+    }
+
     //
     addTextureStorage2d(name, shaderType) {
         this._texturesStorage2d.push({
@@ -238,8 +260,8 @@ export default class WebGPU {
 
     /**
      * @deprecated to be removed
-     * @param {*} computeTextureStorage2dName 
-     * @param {*} fragmentTexture2dName 
+     * @param {*} computeTextureStorage2dName
+     * @param {*} fragmentTexture2dName
      */
     addTextureStorage2dToTexture2d(computeTextureStorage2dName, fragmentTexture2dName) {
         this._texturesStorage2d.push({
@@ -252,8 +274,8 @@ export default class WebGPU {
     }
 
     /**
-     * 
-     * @param {ShaderType} shaderType 
+     *
+     * @param {ShaderType} shaderType
      * @returns string with bindings
      */
     _createDynamicGroupBindings(shaderType) {
@@ -437,9 +459,9 @@ export default class WebGPU {
     }
 
     /**
-     * 
-     * @param {Number} numColumns 
-     * @param {Number} numRows 
+     *
+     * @param {Number} numColumns
+     * @param {Number} numRows
      */
     async createScreen(numColumns = 10, numRows = 10) {
         let colors = [
@@ -475,10 +497,10 @@ export default class WebGPU {
     }
 
     /**
-     * 
-     * @param {Float32Array} data 
-     * @param {GPUBufferUsageFlags} usage 
-     * @param {Boolean} mappedAtCreation 
+     *
+     * @param {Float32Array} data
+     * @param {GPUBufferUsageFlags} usage
+     * @param {Boolean} mappedAtCreation
      * @returns mapped buffer
      */
     _createAndMapBuffer(data, usage, mappedAtCreation = true) {
@@ -497,7 +519,7 @@ export default class WebGPU {
     /**
      * It creates with size, no with data, so it's empty
      * @param {Number} size numItems * instanceByteSize ;
-     * @param {GPUBufferUsageFlags} usage 
+     * @param {GPUBufferUsageFlags} usage
      * @returns buffer
      */
     _createBuffer(size, usage) {
@@ -547,11 +569,33 @@ export default class WebGPU {
         });
         //--------------------------------------------
         this._textures2d.forEach(texture2d => {
-            texture2d.texture = this._device.createTexture({
-                size: this._presentationSize,
-                format: this._presentationFormat, // if 'depth24plus' throws error
-                usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
-            });
+            if(texture2d.imageTexture){
+                let cubeTexture;
+                const imageBitmap = texture2d.imageTexture.bitmap;
+
+                cubeTexture = this._device.createTexture({
+                    size: [imageBitmap.width, imageBitmap.height, 1],
+                    format: 'rgba8unorm',
+                    usage:
+                    GPUTextureUsage.TEXTURE_BINDING |
+                    GPUTextureUsage.COPY_DST |
+                    GPUTextureUsage.RENDER_ATTACHMENT,
+                });
+
+                this._device.queue.copyExternalImageToTexture(
+                    { source: imageBitmap },
+                    { texture: cubeTexture },
+                    [imageBitmap.width, imageBitmap.height]
+                );
+
+                texture2d.texture = cubeTexture;
+            }else{
+                texture2d.texture = this._device.createTexture({
+                    size: this._presentationSize,
+                    format: this._presentationFormat, // if 'depth24plus' throws error
+                    usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
+                });
+            }
         });
         //--------------------------------------------
         this._bindingTextures.forEach(bindingTexture => {
@@ -564,8 +608,8 @@ export default class WebGPU {
     }
 
     /**
-     * 
-     * @param {Array} data 
+     *
+     * @param {Array} data
      */
     createWriteCopyBuffer(data) {
         const va = new Float32Array(data)
@@ -1014,7 +1058,7 @@ export default class WebGPU {
      * @param {Number} width point width
      * @param {Number} height point height
      * @param {Array<RGBAColor>} colors one color per corner
-     * @param {Boolean} useTexture 
+     * @param {Boolean} useTexture
      */
     addPoint(coordinate, width, height, colors, useTexture = false) {
         const { x, y, z } = coordinate;
