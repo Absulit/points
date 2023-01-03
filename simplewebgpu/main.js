@@ -86,6 +86,9 @@ import noise2Frag from './shaders/noise2/noise2.frag.js';
 import oscilloscope1Vert from './shaders/oscilloscope1/oscilloscope1.vert.js';
 import oscilloscope1Compute from './shaders/oscilloscope1/oscilloscope1.compute.js';
 import oscilloscope1Frag from './shaders/oscilloscope1/oscilloscope1.frag.js';
+import imagetexture1Vert from './shaders/imagetexture1/imagetexture1.vert.js';
+import imagetexture1Compute from './shaders/imagetexture1/imagetexture1.compute.js';
+import imagetexture1Frag from './shaders/imagetexture1/imagetexture1.frag.js';
 
 /***************/
 const stats = new Stats();
@@ -136,12 +139,21 @@ async function init() {
     // computeShader = defaultCompute;
     // fragmentShader = test1Frag;
 
-    vertexShader = oscilloscope1Vert;
-    computeShader = oscilloscope1Compute;
-    fragmentShader = oscilloscope1Frag;
-    webGPU.addTexture2d('feedbackTexture', true, ShaderType.FRAGMENT);
+    // vertexShader = oscilloscope1Vert;
+    // computeShader = oscilloscope1Compute;
+    // fragmentShader = oscilloscope1Frag;
+    // webGPU.addTexture2d('feedbackTexture', true, ShaderType.FRAGMENT);
+    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    // webGPU.addStorage('variables', 1, 'Variable', 2, ShaderType.FRAGMENT);
+
+    vertexShader = imagetexture1Vert;
+    computeShader = imagetexture1Compute;
+    fragmentShader = imagetexture1Frag;
+    //webGPU.addTexture2d('feedbackTexture', true, ShaderType.FRAGMENT);
     webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    webGPU.addStorage('variables', 1, 'Variable', 2, ShaderType.FRAGMENT);
+    //await webGPU.addTextureImage('oldking', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
+    //await webGPU.addTextureImage('oldking', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
+    await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
 
     // vertexShader = flowfieldsanimatedVert;
     // computeShader = flowfieldsanimatedCompute;

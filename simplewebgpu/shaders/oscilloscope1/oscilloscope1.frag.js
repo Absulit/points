@@ -1,6 +1,5 @@
 import defaultStructs from '../defaultStructs.js';
 import { fnusin, fusin, sdfCircle, sdfLine, sdfSegment } from '../defaultFunctions.js';
-import { snoise } from '../noise2d.js';
 
 const oscilloscope1Frag = /*wgsl*/`
 
@@ -15,7 +14,6 @@ ${fusin}
 ${sdfCircle}
 ${sdfSegment}
 ${sdfLine}
-${snoise}
 
 fn f2(speed:f32, substract:f32)->f32{
     return (sin((params.utime - substract) * speed) + 1) * .5;
@@ -30,7 +28,7 @@ fn main(
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
-    let n1 = snoise(uv);
+    //let n1 = snoise(uv);
 
     let rgbaFeedbackTexture = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1) / ratio); //* .998046;
 
