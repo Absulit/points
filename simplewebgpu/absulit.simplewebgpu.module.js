@@ -384,9 +384,15 @@ export default class WebGPU {
         colorsComputeWGSL = dynamicGroupBindingsCompute + colorsComputeWGSL;
         colorsFragWGSL = dynamicGroupBindingsFragment + colorsFragWGSL;
 
-        //console.log(`VERTEX:\n${colorsVertWGSL}`);
-        console.log(`%cCOMPUTE:\n${colorsComputeWGSL}`, 'color: #ffffff');
-        console.log(`%cFRAGMENT:\n${colorsFragWGSL}`, 'color: #ff99ff');
+        console.groupCollapsed('VERTEX');
+        console.log(colorsVertWGSL);
+        console.groupEnd();
+        console.groupCollapsed('COMPUTE');
+        console.log(colorsComputeWGSL, 'color: #ffffff');
+        console.groupEnd();
+        console.groupCollapsed('FRAGMENT');
+        console.log(colorsFragWGSL, 'color: #ff99ff');
+        console.groupEnd();
 
         this._shaders = {
             false: {
@@ -801,25 +807,24 @@ export default class WebGPU {
      */
     _createEntries(shaderType) {
         let entries = [];
+        let bindingIndex = 0;
         if (this._uniforms.length) {
             entries.push(
                 {
-                    binding: 0,
+                    binding: bindingIndex++,
                     resource: {
                         buffer: this._uniforms.buffer
                     }
                 }
             );
-
         }
 
         if (this._storage.length) {
-            const entriesIndex = entries.length;
             this._storage.forEach((storageItem, index) => {
                 if (!storageItem.shaderType || storageItem.shaderType == shaderType) {
                     entries.push(
                         {
-                            binding: entriesIndex + index,
+                            binding: bindingIndex++,
                             resource: {
                                 buffer: storageItem.buffer
                             }
@@ -831,10 +836,9 @@ export default class WebGPU {
 
         if(this._layers.length){
             if (!this._layers.shaderType || this._layers.shaderType == shaderType) {
-                const entriesIndex = entries.length;
                 entries.push(
                     {
-                        binding: entriesIndex,
+                        binding: bindingIndex++,
                         resource: {
                             buffer: this._layers.buffer
                         }
@@ -844,12 +848,11 @@ export default class WebGPU {
         }
 
         if (this._samplers.length) {
-            const entriesIndex = entries.length;
             this._samplers.forEach((sampler, index) => {
                 if (!sampler.shaderType || sampler.shaderType == shaderType) {
                     entries.push(
                         {
-                            binding: entriesIndex + index,
+                            binding: bindingIndex++,
                             resource: sampler.resource
                         }
                     );
@@ -858,12 +861,11 @@ export default class WebGPU {
         }
 
         if (this._texturesStorage2d.length) {
-            const entriesIndex = entries.length;
             this._texturesStorage2d.forEach((textureStorage2d, index) => {
                 if (!textureStorage2d.shaderType || textureStorage2d.shaderType == shaderType) {
                     entries.push(
                         {
-                            binding: entriesIndex + index,
+                            binding: bindingIndex++,
                             resource: textureStorage2d.texture.createView()
                         }
                     );
@@ -872,12 +874,11 @@ export default class WebGPU {
         }
 
         if (this._textures2d.length) {
-            const entriesIndex = entries.length;
             this._textures2d.forEach((texture2d, index) => {
-                if (!texture2d.shaderType || texture2d.shaderType == shaderType) {
+                if (texture2d.shaderType == shaderType) {
                     entries.push(
                         {
-                            binding: entriesIndex + index,
+                            binding: bindingIndex++,
                             resource: texture2d.texture.createView()
                         }
                     );
@@ -886,24 +887,22 @@ export default class WebGPU {
         }
 
         if(this._bindingTextures.length){
-            let entriesIndex = entries.length;
             this._bindingTextures.forEach((bindingTexture, index) => {
                 if (bindingTexture.compute.shaderType == shaderType) {
                     entries.push(
                         {
-                            binding: entriesIndex + index,
+                            binding: bindingIndex++,
                             resource: bindingTexture.texture.createView()
                         }
                     );
                 }
             });
 
-            entriesIndex = entries.length;
             this._bindingTextures.forEach((bindingTexture, index) => {
                 if (bindingTexture.fragment.shaderType == shaderType) {
                     entries.push(
                         {
-                            binding: entriesIndex + index,
+                            binding: bindingIndex, // this does not increase, must match the previous block
                             resource: bindingTexture.texture.createView()
                         }
                     );
