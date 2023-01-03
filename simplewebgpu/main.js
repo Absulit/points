@@ -89,6 +89,9 @@ import oscilloscope1Frag from './shaders/oscilloscope1/oscilloscope1.frag.js';
 import imagetexture1Vert from './shaders/imagetexture1/imagetexture1.vert.js';
 import imagetexture1Compute from './shaders/imagetexture1/imagetexture1.compute.js';
 import imagetexture1Frag from './shaders/imagetexture1/imagetexture1.frag.js';
+import imagetexture2Vert from './shaders/imagetexture2/imagetexture2.vert.js';
+import imagetexture2Compute from './shaders/imagetexture2/imagetexture2.compute.js';
+import imagetexture2Frag from './shaders/imagetexture2/imagetexture2.frag.js';
 
 /***************/
 const stats = new Stats();
@@ -146,10 +149,17 @@ async function init() {
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
     // webGPU.addStorage('variables', 1, 'Variable', 2, ShaderType.FRAGMENT);
 
-    vertexShader = imagetexture1Vert;
-    computeShader = imagetexture1Compute;
-    fragmentShader = imagetexture1Frag;
-    //webGPU.addTexture2d('feedbackTexture', true, ShaderType.FRAGMENT);
+    // vertexShader = imagetexture1Vert;
+    // computeShader = imagetexture1Compute;
+    // fragmentShader = imagetexture1Frag;
+    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    // //await webGPU.addTextureImage('oldking', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
+    // //await webGPU.addTextureImage('oldking', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
+    // await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
+
+    vertexShader = imagetexture2Vert;
+    computeShader = imagetexture2Compute;
+    fragmentShader = imagetexture2Frag;
     webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
     //await webGPU.addTextureImage('oldking', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
     //await webGPU.addTextureImage('oldking', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
