@@ -95,6 +95,9 @@ import imagetexture2Frag from './shaders/imagetexture2/imagetexture2.frag.js';
 import noise3Vert from './shaders/noise3/noise3.vert.js';
 import noise3Compute from './shaders/noise3/noise3.compute.js';
 import noise3Frag from './shaders/noise3/noise3.frag.js';
+import imagetexture3Vert from './shaders/imagetexture3/imagetexture3.vert.js';
+import imagetexture3Compute from './shaders/imagetexture3/imagetexture3.compute.js';
+import imagetexture3Frag from './shaders/imagetexture3/imagetexture3.frag.js';
 
 /***************/
 const stats = new Stats();
@@ -163,10 +166,18 @@ async function init() {
     // vertexShader = imagetexture2Vert;
     // computeShader = imagetexture2Compute;
     // fragmentShader = imagetexture2Frag;
-    // webGPU.addSampler('feedbackSampler', null);
+    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
     // //await webGPU.addTextureImage('oldking', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
     // //await webGPU.addTextureImage('oldking', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
-    // await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg');
+    // await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
+
+    vertexShader = imagetexture3Vert;
+    computeShader = imagetexture3Compute;
+    fragmentShader = imagetexture3Frag;
+    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    //await webGPU.addTextureImage('oldking', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
+    //await webGPU.addTextureImage('oldking', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
+    await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
 
     // vertexShader = flowfieldsanimatedVert;
     // computeShader = flowfieldsanimatedCompute;
@@ -203,23 +214,23 @@ async function init() {
     // webGPU.addBindingTexture('outputTex', 'computeTexture');
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
 
-    vertexShader = noise3Vert;
-    computeShader = noise3Compute;
-    fragmentShader = noise3Frag;
-    const numPoints = 1024;
-    const lineAmount = 16;
-    webGPU.addUniform('numPoints', numPoints);
-    webGPU.addUniform('initializeAgain', 0);
-    webGPU.addUniform('lineAmount', lineAmount);
-    webGPU.addStorage('points', numPoints, 'Point', 4);
-    webGPU.addStorage('variables', 1, 'Variable', 3, ShaderType.COMPUTE);
-    webGPU.addTexture2d('feedbackTexture', true, ShaderType.FRAGMENT);
-    webGPU.addLayers(1, ShaderType.COMPUTE);
-    webGPU.addBindingTexture('outputTex', 'computeTexture');
-    webGPU.addSampler('feedbackSampler', null);
-    //await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.COMPUTE);
-    //await webGPU.addTextureImage('image', './../assets_ignore/pmw_800x800.jpg', ShaderType.COMPUTE);
-    await webGPU.addTextureImage('image', './../img/carmen_lyra_2_800x800.jpg', ShaderType.COMPUTE);
+    // vertexShader = noise3Vert;
+    // computeShader = noise3Compute;
+    // fragmentShader = noise3Frag;
+    // const numPoints = 1024;
+    // const lineAmount = 16;
+    // webGPU.addUniform('numPoints', numPoints);
+    // webGPU.addUniform('initializeAgain', 0);
+    // webGPU.addUniform('lineAmount', lineAmount);
+    // webGPU.addStorage('points', numPoints, 'Point', 4);
+    // webGPU.addStorage('variables', 1, 'Variable', 3, ShaderType.COMPUTE);
+    // webGPU.addTexture2d('feedbackTexture', true, ShaderType.FRAGMENT);
+    // webGPU.addLayers(1, ShaderType.COMPUTE);
+    // webGPU.addBindingTexture('outputTex', 'computeTexture');
+    // webGPU.addSampler('feedbackSampler', null);
+    // //await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.COMPUTE);
+    // //await webGPU.addTextureImage('image', './../assets_ignore/pmw_800x800.jpg', ShaderType.COMPUTE);
+    // await webGPU.addTextureImage('image', './../img/carmen_lyra_2_800x800.jpg', ShaderType.COMPUTE);
 
     // vertexShader = noisecircle1Vert;
     // computeShader = noisecircle1Compute;
