@@ -92,6 +92,9 @@ import imagetexture1Frag from './shaders/imagetexture1/imagetexture1.frag.js';
 import imagetexture2Vert from './shaders/imagetexture2/imagetexture2.vert.js';
 import imagetexture2Compute from './shaders/imagetexture2/imagetexture2.compute.js';
 import imagetexture2Frag from './shaders/imagetexture2/imagetexture2.frag.js';
+import noise3Vert from './shaders/noise3/noise3.vert.js';
+import noise3Compute from './shaders/noise3/noise3.compute.js';
+import noise3Frag from './shaders/noise3/noise3.frag.js';
 
 /***************/
 const stats = new Stats();
@@ -157,13 +160,13 @@ async function init() {
     // //await webGPU.addTextureImage('oldking', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
     // await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
 
-    vertexShader = imagetexture2Vert;
-    computeShader = imagetexture2Compute;
-    fragmentShader = imagetexture2Frag;
-    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    //await webGPU.addTextureImage('oldking', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
-    //await webGPU.addTextureImage('oldking', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
-    await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
+    // vertexShader = imagetexture2Vert;
+    // computeShader = imagetexture2Compute;
+    // fragmentShader = imagetexture2Frag;
+    // webGPU.addSampler('feedbackSampler', null);
+    // //await webGPU.addTextureImage('oldking', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
+    // //await webGPU.addTextureImage('oldking', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
+    // await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg');
 
     // vertexShader = flowfieldsanimatedVert;
     // computeShader = flowfieldsanimatedCompute;
@@ -189,7 +192,7 @@ async function init() {
     // computeShader = noise2Compute;
     // fragmentShader = noise2Frag;
     // const numPoints = 1024;
-    // const lineAmount = 8;
+    // const lineAmount = 16;
     // webGPU.addUniform('numPoints', numPoints);
     // webGPU.addUniform('initializeAgain', 0);
     // webGPU.addUniform('lineAmount', lineAmount);
@@ -200,6 +203,23 @@ async function init() {
     // webGPU.addBindingTexture('outputTex', 'computeTexture');
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
 
+    vertexShader = noise3Vert;
+    computeShader = noise3Compute;
+    fragmentShader = noise3Frag;
+    const numPoints = 1024;
+    const lineAmount = 16;
+    webGPU.addUniform('numPoints', numPoints);
+    webGPU.addUniform('initializeAgain', 0);
+    webGPU.addUniform('lineAmount', lineAmount);
+    webGPU.addStorage('points', numPoints, 'Point', 4);
+    webGPU.addStorage('variables', 1, 'Variable', 3, ShaderType.COMPUTE);
+    webGPU.addTexture2d('feedbackTexture', true, ShaderType.FRAGMENT);
+    webGPU.addLayers(1, ShaderType.COMPUTE);
+    webGPU.addBindingTexture('outputTex', 'computeTexture');
+    webGPU.addSampler('feedbackSampler', null);
+    //await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.COMPUTE);
+    //await webGPU.addTextureImage('image', './../assets_ignore/pmw_800x800.jpg', ShaderType.COMPUTE);
+    await webGPU.addTextureImage('image', './../img/carmen_lyra_2_800x800.jpg', ShaderType.COMPUTE);
 
     // vertexShader = noisecircle1Vert;
     // computeShader = noisecircle1Compute;
