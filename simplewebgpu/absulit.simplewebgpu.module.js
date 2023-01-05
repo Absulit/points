@@ -83,6 +83,7 @@ export default class WebGPU {
         this._storage = [];
         this._samplers = [];
         this._textures2d = [];
+        this._texturesExternal = [];
         this._texturesStorage2d = [];
         this._bindingTextures = [];
 
@@ -143,7 +144,7 @@ export default class WebGPU {
         });
     }
 
-    addStorageMap(name, arrayData, structName){
+    addStorageMap(name, arrayData, structName) {
         this._storage.push({
             mapped: true,
             name: name,
@@ -153,7 +154,7 @@ export default class WebGPU {
         });
     }
 
-    updateStorageMap(name, arrayData){
+    updateStorageMap(name, arrayData) {
         const variable = this._storage.find(v => v.name === name);
         if (!variable) {
             throw '`updateStorageMap()` can\'t be called without first `addStorageMap()`.';
@@ -161,7 +162,7 @@ export default class WebGPU {
         variable.array = arrayData;
     }
 
-    addLayers(numLayers, shaderType){
+    addLayers(numLayers, shaderType) {
         for (let layerIndex = 0; layerIndex < numLayers; layerIndex++) {
             this._layers.shaderType = shaderType;
             this._layers.push({
@@ -219,7 +220,7 @@ export default class WebGPU {
      * @param {string} path
      * @param {ShaderType} shaderType
      */
-    async addTextureImage(name, path, shaderType){
+    async addTextureImage(name, path, shaderType) {
         const response = await fetch(path);
         const blob = await response.blob();
         const imageBitmap = await createImageBitmap(blob);
@@ -235,6 +236,27 @@ export default class WebGPU {
         });
     }
 
+    /**
+     * Load an video as texture2d
+     * @param {string} name
+     * @param {string} path
+     * @param {ShaderType} shaderType
+     */
+    async addTextureVideo(name, path, shaderType) {
+        const video = document.createElement('video');
+        video.loop = true;
+        video.autoplay = true;
+        video.muted = true;
+        video.src = new URL(path, import.meta.url).toString();
+        await video.play();
+
+        this._texturesExternal.push({
+            name: name,
+            shaderType: shaderType,
+            video: video
+        });
+    }
+
     //
     addTextureStorage2d(name, shaderType) {
         this._texturesStorage2d.push({
@@ -244,7 +266,7 @@ export default class WebGPU {
         });
     }
 
-    addBindingTexture(computeName, fragmentName){
+    addBindingTexture(computeName, fragmentName) {
         this._bindingTextures.push({
             compute: {
                 name: computeName,
@@ -293,7 +315,7 @@ export default class WebGPU {
         this._storage.forEach((storageItem, index) => {
             if (!storageItem.shaderType || storageItem.shaderType == shaderType) {
                 let T = storageItem.structName;
-                if(storageItem.array && storageItem.array.length){
+                if (storageItem.array && storageItem.array.length) {
                     storageItem.size = storageItem.array.length;
                 }
                 if (storageItem.size > 1) {
@@ -304,10 +326,10 @@ export default class WebGPU {
             }
         });
 
-        if(this._layers.length){
+        if (this._layers.length) {
             if (!this._layers.shaderType || this._layers.shaderType == shaderType) {
                 let totalSize = 0;
-                this._layers.forEach( layerItem => totalSize += layerItem.size );
+                this._layers.forEach(layerItem => totalSize += layerItem.size);
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, read_write> layers: array<array<vec4<f32>, ${totalSize}>>;\n`
                 bindingIndex += 1;
             }
@@ -330,6 +352,13 @@ export default class WebGPU {
         this._textures2d.forEach((texture, index) => {
             if (!texture.shaderType || texture.shaderType == shaderType) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d<f32>;\n`;
+                bindingIndex += 1;
+            }
+        });
+
+        this._texturesExternal.forEach(externalTexture => {
+            if (!externalTexture.shaderType || externalTexture.shaderType == shaderType) {
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${externalTexture.name}: texture_external;\n`;
                 bindingIndex += 1;
             }
         });
@@ -546,15 +575,15 @@ export default class WebGPU {
         this._createParametersUniforms();
         //--------------------------------------------
         this._storage.forEach(storageItem => {
-            if(storageItem.mapped){
+            if (storageItem.mapped) {
                 const values = new Float32Array(storageItem.array);
                 storageItem.buffer = this._createAndMapBuffer(values, GPUBufferUsage.STORAGE);
-            }else{
+            } else {
                 storageItem.buffer = this._createBuffer(storageItem.size * storageItem.structSize * 4, GPUBufferUsage.STORAGE);
             }
         });
         //--------------------------------------------
-        if(this._layers.length){
+        if (this._layers.length) {
             //let layerValues = [];
             let layersSize = 0;
             this._layers.forEach(layerItem => {
@@ -575,7 +604,7 @@ export default class WebGPU {
         });
         //--------------------------------------------
         this._textures2d.forEach(texture2d => {
-            if(texture2d.imageTexture){
+            if (texture2d.imageTexture) {
                 let cubeTexture;
                 const imageBitmap = texture2d.imageTexture.bitmap;
 
@@ -583,9 +612,9 @@ export default class WebGPU {
                     size: [imageBitmap.width, imageBitmap.height, 1],
                     format: 'rgba8unorm',
                     usage:
-                    GPUTextureUsage.TEXTURE_BINDING |
-                    GPUTextureUsage.COPY_DST |
-                    GPUTextureUsage.RENDER_ATTACHMENT,
+                        GPUTextureUsage.TEXTURE_BINDING |
+                        GPUTextureUsage.COPY_DST |
+                        GPUTextureUsage.RENDER_ATTACHMENT,
                 });
 
                 this._device.queue.copyExternalImageToTexture(
@@ -595,13 +624,19 @@ export default class WebGPU {
                 );
 
                 texture2d.texture = cubeTexture;
-            }else{
+            } else {
                 texture2d.texture = this._device.createTexture({
                     size: this._presentationSize,
                     format: this._presentationFormat, // if 'depth24plus' throws error
                     usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
                 });
             }
+        });
+        //--------------------------------------------
+        this._texturesExternal.forEach(externalTexture => {
+            externalTexture.texture = this._device.importExternalTexture({
+                source: externalTexture.video
+            });
         });
         //--------------------------------------------
         this._bindingTextures.forEach(bindingTexture => {
@@ -834,7 +869,7 @@ export default class WebGPU {
             });
         }
 
-        if(this._layers.length){
+        if (this._layers.length) {
             if (!this._layers.shaderType || this._layers.shaderType == shaderType) {
                 entries.push(
                     {
@@ -886,7 +921,20 @@ export default class WebGPU {
             });
         }
 
-        if(this._bindingTextures.length){
+        if (this._texturesExternal.length) {
+            this._texturesExternal.forEach(externalTexture => {
+                if(externalTexture.shaderType == shaderType){
+                    entries.push(
+                        {
+                            binding: bindingIndex++,
+                            resource: externalTexture.texture
+                        }
+                    );
+                }
+            });
+        }
+
+        if (this._bindingTextures.length) {
             this._bindingTextures.forEach((bindingTexture, index) => {
                 if (bindingTexture.compute.shaderType == shaderType) {
                     entries.push(
@@ -942,11 +990,18 @@ export default class WebGPU {
 
         // TODO: create method for this
         this._storage.forEach(storageItem => {
-            if(storageItem.mapped){
+            if (storageItem.mapped) {
                 const values = new Float32Array(storageItem.array);
                 storageItem.buffer = this._createAndMapBuffer(values, GPUBufferUsage.STORAGE);
             }
         });
+
+        this._texturesExternal.forEach(externalTexture => {
+            externalTexture.texture = this._device.importExternalTexture({
+                source: externalTexture.video
+            });
+        });
+
 
         this._createComputeBindGroup();
 
