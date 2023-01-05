@@ -98,6 +98,9 @@ import noise3Frag from './shaders/noise3/noise3.frag.js';
 import imagetexture3Vert from './shaders/imagetexture3/imagetexture3.vert.js';
 import imagetexture3Compute from './shaders/imagetexture3/imagetexture3.compute.js';
 import imagetexture3Frag from './shaders/imagetexture3/imagetexture3.frag.js';
+import videotexture1Vert from './shaders/videotexture1/videotexture1.vert.js';
+import videotexture1Compute from './shaders/videotexture1/videotexture1.compute.js';
+import videotexture1Frag from './shaders/videotexture1/videotexture1.frag.js';
 
 /***************/
 const stats = new Stats();
@@ -171,13 +174,24 @@ async function init() {
     // //await webGPU.addTextureImage('oldking', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
     // await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
 
-    vertexShader = imagetexture3Vert;
-    computeShader = imagetexture3Compute;
-    fragmentShader = imagetexture3Frag;
+    // vertexShader = imagetexture3Vert;
+    // computeShader = imagetexture3Compute;
+    // fragmentShader = imagetexture3Frag;
+    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    // //await webGPU.addTextureImage('oldking', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
+    // //await webGPU.addTextureImage('oldking', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
+    // await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
+
+
+    vertexShader = videotexture1Vert;
+    computeShader = videotexture1Compute;
+    fragmentShader = videotexture1Frag;
     webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
     //await webGPU.addTextureImage('oldking', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
     //await webGPU.addTextureImage('oldking', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
     await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
+    await webGPU.addTextureVideo('video', './../assets_ignore/Black and White Clouds - Time lapse (480p_30fps_H264-128kbit_AAC).mp4', ShaderType.COMPUTE)
+    webGPU.addBindingTexture('outputTex', 'computeTexture');
 
     // vertexShader = flowfieldsanimatedVert;
     // computeShader = flowfieldsanimatedCompute;
