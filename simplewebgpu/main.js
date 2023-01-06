@@ -195,6 +195,8 @@ async function init() {
     //await webGPU.addTextureImage('oldking', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
     //await webGPU.addTextureImage('oldking', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
     await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
+    webGPU.addStorage('palette', 1, 'array<vec4<f32>, 21>', 4*21, ShaderType.FRAGMENT);
+    webGPU.addStorage('variables', 1, 'Variable', 1, ShaderType.FRAGMENT);
 
     // vertexShader = videotexture1Vert;
     // computeShader = videotexture1Compute;
