@@ -848,6 +848,7 @@ export default class WebGPU {
                 {
                     binding: bindingIndex++,
                     resource: {
+                        label: 'uniform',
                         buffer: this._uniforms.buffer
                     }
                 }
@@ -861,6 +862,7 @@ export default class WebGPU {
                         {
                             binding: bindingIndex++,
                             resource: {
+                                label: 'storage',
                                 buffer: storageItem.buffer
                             }
                         }
@@ -875,6 +877,7 @@ export default class WebGPU {
                     {
                         binding: bindingIndex++,
                         resource: {
+                            label: 'layer',
                             buffer: this._layers.buffer
                         }
                     }
@@ -900,6 +903,7 @@ export default class WebGPU {
                 if (!textureStorage2d.shaderType || textureStorage2d.shaderType == shaderType) {
                     entries.push(
                         {
+                            label: 'texture storage 2d',
                             binding: bindingIndex++,
                             resource: textureStorage2d.texture.createView()
                         }
@@ -910,9 +914,10 @@ export default class WebGPU {
 
         if (this._textures2d.length) {
             this._textures2d.forEach((texture2d, index) => {
-                if (texture2d.shaderType == shaderType) {
+                if (!texture2d.shaderType || texture2d.shaderType == shaderType) {
                     entries.push(
                         {
+                            label: 'texture 2d',
                             binding: bindingIndex++,
                             resource: texture2d.texture.createView()
                         }
@@ -923,9 +928,10 @@ export default class WebGPU {
 
         if (this._texturesExternal.length) {
             this._texturesExternal.forEach(externalTexture => {
-                if(externalTexture.shaderType == shaderType){
+                if(!externalTexture.shaderType || externalTexture.shaderType == shaderTyp){
                     entries.push(
                         {
+                            label: 'external texture',
                             binding: bindingIndex++,
                             resource: externalTexture.texture
                         }
@@ -939,6 +945,7 @@ export default class WebGPU {
                 if (bindingTexture.compute.shaderType == shaderType) {
                     entries.push(
                         {
+                            label: 'binding texture',
                             binding: bindingIndex++,
                             resource: bindingTexture.texture.createView()
                         }
@@ -950,6 +957,7 @@ export default class WebGPU {
                 if (bindingTexture.fragment.shaderType == shaderType) {
                     entries.push(
                         {
+                            label: 'binding texture 2',
                             binding: bindingIndex, // this does not increase, must match the previous block
                             resource: bindingTexture.texture.createView()
                         }
