@@ -104,6 +104,9 @@ import videotexture1Frag from './shaders/videotexture1/videotexture1.frag.js';
 import reactiondiffusion1Vert from './shaders/reactiondiffusion1/reactiondiffusion1.vert.js';
 import reactiondiffusion1Compute from './shaders/reactiondiffusion1/reactiondiffusion1.compute.js';
 import reactiondiffusion1Frag from './shaders/reactiondiffusion1/reactiondiffusion1.frag.js';
+import dithering1Vert from './shaders/dithering1/dithering1.vert.js';
+import dithering1Compute from './shaders/dithering1/dithering1.compute.js';
+import dithering1Frag from './shaders/dithering1/dithering1.frag.js';
 
 /***************/
 const stats = new Stats();
@@ -184,6 +187,14 @@ async function init() {
     // //await webGPU.addTextureImage('oldking', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
     // //await webGPU.addTextureImage('oldking', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
     // await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
+
+    vertexShader = dithering1Vert;
+    computeShader = dithering1Compute;
+    fragmentShader = dithering1Frag;
+    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    //await webGPU.addTextureImage('oldking', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
+    //await webGPU.addTextureImage('oldking', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
+    await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
 
     // vertexShader = videotexture1Vert;
     // computeShader = videotexture1Compute;
@@ -391,23 +402,23 @@ async function init() {
     // webGPU.addTexture2d('feedbackTexture', true, ShaderType.COMPUTE);
     // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
-    vertexShader = reactiondiffusion1Vert;
-    computeShader = reactiondiffusion1Compute;
-    fragmentShader = reactiondiffusion1Frag;
-    const numPoints = 800*800*2;
-    webGPU.addUniform('numPoints', numPoints);
-    webGPU.addStorage('chemicals', numPoints, 'Chemical', 2);
-    webGPU.addStorage('chemicals2', numPoints, 'Chemical', 2);
-    webGPU.addStorage('variables', 1, 'Variable', 2);
-    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    //webGPU.addTexture2d('feedbackTexture', true, ShaderType.COMPUTE);
-    webGPU.addBindingTexture('outputTex', 'computeTexture');
-    await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.COMPUTE);
-    // await webGPU.addTextureImage('image', './../assets_ignore/sunset_800x800_20220604_173907.jpg', ShaderType.COMPUTE);
-    // await webGPU.addTextureImage('image', './../assets_ignore/tucan_jcvp_800x800.jpg', ShaderType.COMPUTE);
-    // await webGPU.addTextureImage('image', './../assets_ignore/pmw_800x800.jpg', ShaderType.COMPUTE);
-    // await webGPU.addTextureImage('image', './../img/carmen_lyra_2_800x800.jpg', ShaderType.COMPUTE);
-    //await webGPU.addTextureImage('image', './../assets_ignore/face_coeff.jpg', ShaderType.COMPUTE);
+    // vertexShader = reactiondiffusion1Vert;
+    // computeShader = reactiondiffusion1Compute;
+    // fragmentShader = reactiondiffusion1Frag;
+    // const numPoints = 800*800*2;
+    // webGPU.addUniform('numPoints', numPoints);
+    // webGPU.addStorage('chemicals', numPoints, 'Chemical', 2);
+    // webGPU.addStorage('chemicals2', numPoints, 'Chemical', 2);
+    // webGPU.addStorage('variables', 1, 'Variable', 2);
+    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    // //webGPU.addTexture2d('feedbackTexture', true, ShaderType.COMPUTE);
+    // webGPU.addBindingTexture('outputTex', 'computeTexture');
+    // await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.COMPUTE);
+    // // await webGPU.addTextureImage('image', './../assets_ignore/sunset_800x800_20220604_173907.jpg', ShaderType.COMPUTE);
+    // // await webGPU.addTextureImage('image', './../assets_ignore/tucan_jcvp_800x800.jpg', ShaderType.COMPUTE);
+    // // await webGPU.addTextureImage('image', './../assets_ignore/pmw_800x800.jpg', ShaderType.COMPUTE);
+    // // await webGPU.addTextureImage('image', './../img/carmen_lyra_2_800x800.jpg', ShaderType.COMPUTE);
+    // //await webGPU.addTextureImage('image', './../assets_ignore/face_coeff.jpg', ShaderType.COMPUTE);
 
     // vertexShader = slimeVert;
     // computeShader = slimeCompute;
