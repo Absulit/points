@@ -8,10 +8,18 @@ fn euclideanDistance(color:vec4<f32>, distanceColor:vec4<f32>) -> f32{
 }
 `;
 
+/**
+ * From a palette declared in `getClosestColorInPalette_palette`
+ * gets the closest color based on `distance`
+ * @param {vec4<f32>} color `vec4<f32>` color to replace with
+ * @param {u32} numPaletteItems `u32` length of getClosestColorInPalette_palette
+ * @param {f32} distance `f32` from 0..1 that indicates how close it should be from the color
+ * @returns `vec4<f32>`
+ */
 export const getClosestColorInPalette = /*wgsl*/`
 ${euclideanDistance}
 
-fn getClosestColorInPalette(color:vec4<f32>, numPaletteItems:u32) -> vec4<f32> {
+fn getClosestColorInPalette(color:vec4<f32>, numPaletteItems:u32, distance:f32) -> vec4<f32> {
     // numPaletteItems = 5
     // getClosestColorInPalette_palette = array< vec4<f32>, 5 /* numPaletteItems */>(
     //     vec4(0),
@@ -20,14 +28,15 @@ fn getClosestColorInPalette(color:vec4<f32>, numPaletteItems:u32) -> vec4<f32> {
     //     vec4(0,0,1,1),
     //     vec4(1,1,1,1),
     // );
-    var distance = 1.;
+    //var distance = .5;
+    var local_distance = distance;
     var selectedColor = vec4(0.);
     for(var i = 0u; i < numPaletteItems; i++){
         let paletteColor = getClosestColorInPalette_palette[i];
         let currentDistance = euclideanDistance(color, paletteColor);
-        if(currentDistance < distance){
+        if(currentDistance < local_distance){
             selectedColor = paletteColor;
-            distance = currentDistance;
+            local_distance = currentDistance;
         }
     }
 

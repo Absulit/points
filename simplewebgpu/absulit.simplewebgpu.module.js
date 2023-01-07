@@ -184,8 +184,8 @@ export default class WebGPU {
     addSampler(name, descriptor, shaderType) {
         // Create a sampler with linear filtering for smooth interpolation.
         descriptor = descriptor || {
-            addressModeU: 'repeat',
-            addressModeV: 'repeat',
+            addressModeU: 'clamp-to-edge',
+            addressModeV: 'clamp-to-edge',
             magFilter: 'linear',
             minFilter: 'linear',
             mipmapFilter: 'linear',
@@ -249,6 +249,31 @@ export default class WebGPU {
         video.muted = true;
         video.src = new URL(path, import.meta.url).toString();
         await video.play();
+
+        this._texturesExternal.push({
+            name: name,
+            shaderType: shaderType,
+            video: video
+        });
+    }
+
+    async addTextureWebcam(name, shaderType) {
+        const video = document.createElement('video');
+        //video.loop = true;
+        //video.autoplay = true;
+        video.muted = true;
+        //document.body.appendChild(video);
+
+        if (navigator.mediaDevices.getUserMedia) {
+            await navigator.mediaDevices.getUserMedia({ video: true })
+                .then(async function (stream) {
+                    video.srcObject = stream;
+                    await video.play();
+                })
+                .catch(function (err) {
+                    console.log(err);
+                });
+        }
 
         this._texturesExternal.push({
             name: name,
@@ -928,7 +953,7 @@ export default class WebGPU {
 
         if (this._texturesExternal.length) {
             this._texturesExternal.forEach(externalTexture => {
-                if(!externalTexture.shaderType || externalTexture.shaderType == shaderTyp){
+                if (!externalTexture.shaderType || externalTexture.shaderType == shaderType) {
                     entries.push(
                         {
                             label: 'external texture',
