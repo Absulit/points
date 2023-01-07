@@ -12,7 +12,14 @@ export const getClosestColorInPalette = /*wgsl*/`
 ${euclideanDistance}
 
 fn getClosestColorInPalette(color:vec4<f32>, numPaletteItems:u32) -> vec4<f32> {
-    // palette should be a Storage passed from Javascript
+    // numPaletteItems = 5
+    // getClosestColorInPalette_palette = array< vec4<f32>, 5 /* numPaletteItems */>(
+    //     vec4(0),
+    //     vec4(0,1,0,1),
+    //     vec4(1,0,0,1),
+    //     vec4(0,0,1,1),
+    //     vec4(1,1,1,1),
+    // );
     var distance = 1.;
     var selectedColor = vec4(0.);
     for(var i = 0u; i < numPaletteItems; i++){
