@@ -1,5 +1,5 @@
 import defaultStructs from '../defaultStructs.js';
-import { brightness, fnusin, fusin } from '../defaultFunctions.js';
+import { brightness, fnusin, fusin, pixelateTexture } from '../defaultFunctions.js';
 import { snoise } from '../noise2d.js';
 import { getClosestColorInPalette, orderedDithering, orderedDithering_threshold_map } from '../effects.js';
 
@@ -13,6 +13,7 @@ ${brightness}
 ${snoise}
 ${getClosestColorInPalette}
 ${orderedDithering}
+${pixelateTexture}
 
 ${orderedDithering_threshold_map}
 
@@ -57,13 +58,14 @@ fn main(
     var dimsRatio = f32(dims.x) / f32(dims.y);
     let imageUV = uv * vec2(1,-1 * dimsRatio) * ratio.y / params.sliderA;
     var rgbaImage = textureSample(image, feedbackSampler, imageUV); //* .998046;
+    //var rgbaImage = pixelateTexture(image, feedbackSampler, 10,10, imageUV);
     let br = brightness(rgbaImage);
 
     // from 8 to 40
     //let depth = floor(8 + 32. * fnusin(1));
     let depth = floor(8 + 32. * params.sliderB);
 
-    //rgbaImage = getClosestColorInPalette(rgbaImage, u32(numPaletteItems * br * params.sliderB * fnusin(1)) + 2);
+    //rgbaImage = getClosestColorInPalette(rgbaImage, u32(numPaletteItems * br * params.sliderB * fnusin(1)) + 2, params.sliderC);
     rgbaImage = orderedDithering(rgbaImage, depth, dims, imageUV); // ⬆⬇ swap these lines or uncomment
 
 

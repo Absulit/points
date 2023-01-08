@@ -219,6 +219,14 @@ fn sdfLine2(p1:vec2<f32>, p2:vec2<f32>, feather:f32, uv:vec2<f32>)->f32{
 }
 `;
 
+/**
+ * Increase the aparent pixel size of the texture image
+ * @param {texture_2d<f32>} texture `texture_2d<f32>`
+ * @param {sampler} textureSampler `sampler`
+ * @param {f32} pixelsWidth `f32`
+ * @param {f32} pixelsHeight `f32`
+ * @param {vec2<f32>} uv `vec2<f32>`
+ */
 export const pixelateTexture = /*wgsl*/`;
 fn pixelateTexture(texture:texture_2d<f32>, textureSampler:sampler, pixelsWidth:f32, pixelsHeight:f32, uv:vec2<f32>) -> vec4<f32> {
     let dx = pixelsWidth * (1. / params.screenWidth);

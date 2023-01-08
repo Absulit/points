@@ -184,8 +184,8 @@ export default class WebGPU {
     addSampler(name, descriptor, shaderType) {
         // Create a sampler with linear filtering for smooth interpolation.
         descriptor = descriptor || {
-            addressModeU: 'clamp-to-edge',
-            addressModeV: 'clamp-to-edge',
+            addressModeU: 'repeat',
+            addressModeV: 'repeat',
             magFilter: 'linear',
             minFilter: 'linear',
             mipmapFilter: 'linear',

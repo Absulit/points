@@ -191,12 +191,13 @@ async function init() {
     // //await webGPU.addTextureImage('oldking', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
     // await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
 
-    // vertexShader = dithering1Vert;
-    // computeShader = dithering1Compute;
-    // fragmentShader = dithering1Frag;
-    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // //await webGPU.addTextureImage('oldking', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
-    // //await webGPU.addTextureImage('oldking', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
+    vertexShader = dithering1Vert;
+    computeShader = dithering1Compute;
+    fragmentShader = dithering1Frag;
+    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    //await webGPU.addTextureImage('oldking', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
+    //await webGPU.addTextureImage('oldking', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
+    await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
 
     // vertexShader = dithering2Vert;
     // computeShader = dithering2Compute;
