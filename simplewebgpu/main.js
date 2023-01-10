@@ -8,9 +8,7 @@ import blur1Vert from './shaders/blur1/blur1.vert.js';
 import circleblurCompute from './shaders/circleblur/circleblur.compute.js';
 import circleblurVert from './shaders/circleblur/circleblur.vert.js';
 import circleblurFrag from './shaders/circleblur/circleblur.frag.js';
-import defaultCompute from './shaders/default/default.compute.js';
-import defaultFrag from './shaders/default/default.frag.js';
-import defaultVert from './shaders/default/default.vert.js';
+import base from './shaders/base/project.js';
 import demo6_textureFrag from './shaders/demo_6/demo6_texture.frag.js';
 import demo6_textureVert from './shaders/demo_6/demo6_texture.vert.js';
 import planetsCompute from './shaders/planets/planets.compute.js';
@@ -114,6 +112,7 @@ import bloom1Vert from './shaders/bloom1/bloom1.vert.js';
 import bloom1Compute from './shaders/bloom1/bloom1.compute.js';
 import bloom1Frag from './shaders/bloom1/bloom1.frag.js';
 
+
 /***************/
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -141,6 +140,7 @@ const sliders = { 'a': 0, 'b': 0, 'c': 0 }
 let canvas = document.getElementById('gl-canvas');
 
 let vertexShader, computeShader, fragmentShader;
+let shaders;
 
 async function init() {
 
@@ -155,22 +155,20 @@ async function init() {
     webGPU.addUniform('sliderB', 0);
     webGPU.addUniform('sliderC', 0);
 
-    vertexShader = defaultVert;
-    computeShader = defaultCompute;
-    fragmentShader = defaultFrag;
+    shaders = base;
 
     // vertexShader = defaultVert;
     // computeShader = defaultCompute;
     // fragmentShader = test1Frag;
 
-    vertexShader = bloom1Vert;
-    computeShader = bloom1Compute;
-    fragmentShader = bloom1Frag;
-    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    //await webGPU.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
-    //await webGPU.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
-    await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
-    //await webGPU.addTextureImage('kernel', './../assets_ignore/ftt_mask_800x800.jpg', ShaderType.FRAGMENT);
+    // vertexShader = bloom1Vert;
+    // computeShader = bloom1Compute;
+    // fragmentShader = bloom1Frag;
+    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    // //await webGPU.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
+    // //await webGPU.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
+    // await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
+    // //await webGPU.addTextureImage('kernel', './../assets_ignore/ftt_mask_800x800.jpg', ShaderType.FRAGMENT);
 
     // vertexShader = oscilloscope1Vert;
     // computeShader = oscilloscope1Compute;
@@ -497,7 +495,7 @@ async function init() {
     // computeShader = defaultCompute;
     // fragmentShader = demo6_textureFrag;
 
-    const initialized = await webGPU.init(vertexShader, computeShader, fragmentShader);
+    const initialized = await webGPU.init(shaders.vert, shaders.compute, shaders.frag);
     if (initialized) {
         await webGPU.createScreen(1, 1);
     }
