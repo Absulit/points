@@ -695,6 +695,9 @@ export default class WebGPU {
     }
 
     _createComputeBindGroup() {
+        /**
+         * @type {GPUBindGroup}
+         */
         this._computeBindGroups = this._device.createBindGroup({
             label: '_createComputeBindGroup 0',
             layout: this._computePipeline.getBindGroupLayout(0 /* index */),
