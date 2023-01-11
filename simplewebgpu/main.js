@@ -5,6 +5,39 @@ import base from './shaders/base/index.js';
 import bloom1 from './shaders/bloom1/index.js';
 import oscilloscope1 from './shaders/oscilloscope1/index.js';
 import imagetexture1 from './shaders/imagetexture1/index.js';
+import imagetexture2 from './shaders/imagetexture2/index.js';
+import imagetexture3 from './shaders/imagetexture3/index.js';
+import dithering1 from './shaders/dithering1/index.js';
+import dithering2 from './shaders/dithering2/index.js';
+import videotexture1 from './shaders/videotexture1/index.js';
+import flowfieldsanimated from './shaders/flowfieldsanimated/index.js';
+import noise1 from './shaders/noise1/index.js';
+import noise2 from './shaders/noise2/index.js';
+import noise3 from './shaders/noise3/index.js';
+import noisecircle1 from './shaders/noisecircle1/index.js';
+import layers1 from './shaders/layers1/index.js';
+import twigl1 from './shaders/twigl1/index.js';
+import kaleidoscope1 from './shaders/kaleidoscope1/index.js';
+import chromaspiral from './shaders/chromaspiral/index.js';
+import chromaspiral2 from './shaders/chromaspiral2/index.js';
+import shapes1 from './shaders/shapes1/index.js';
+import shapes2 from './shaders/shapes2/index.js';
+import random1 from './shaders/random1/index.js';
+import random2 from './shaders/random2/index.js';
+import random3 from './shaders/random3/index.js';
+import planets from './shaders/planets/index.js';
+import planets2 from './shaders/planets2/index.js';
+import planets3 from './shaders/planets3/index.js';
+import planetsblur from './shaders/planetsblur/index.js';
+import planetsblur2 from './shaders/planetsblur2/index.js';
+import reactiondiffusion from './shaders/reactiondiffusion/index.js';
+import reactiondiffusion1 from './shaders/reactiondiffusion1/index.js';
+import slime from './shaders/slime/index.js';
+import slime2 from './shaders/slime2/index.js';
+import slime3 from './shaders/slime3/index.js';
+import blur1 from './shaders/blur1/index.js';
+import circleblur from './shaders/circleblur/index.js';
+import demo6 from './shaders/demo_6/index.js';
 
 
 
@@ -52,6 +85,8 @@ async function init() {
 
     shaders = base;
 
+    //shaders = demo6;
+
     // vertexShader = defaultVert;
     // computeShader = defaultCompute;
     // fragmentShader = test1Frag;
@@ -68,39 +103,31 @@ async function init() {
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
     // webGPU.addStorage('variables', 1, 'Variable', 2, ShaderType.FRAGMENT);
 
-    shaders = imagetexture1;
-    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    //await webGPU.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
-    //await webGPU.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
-    await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
+    // shaders = imagetexture1;
+    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    // //await webGPU.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
+    // //await webGPU.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
+    // await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
 
-    // vertexShader = imagetexture2Vert;
-    // computeShader = imagetexture2Compute;
-    // fragmentShader = imagetexture2Frag;
+    // shaders = imagetexture2;
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
     // //await webGPU.addTextureImage('oldking', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
     // //await webGPU.addTextureImage('oldking', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
     // await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
 
-    // vertexShader = imagetexture3Vert;
-    // computeShader = imagetexture3Compute;
-    // fragmentShader = imagetexture3Frag;
+    // shaders = imagetexture3;
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
     // //await webGPU.addTextureImage('oldking', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
     // //await webGPU.addTextureImage('oldking', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
     // await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
 
-    // vertexShader = dithering1Vert;
-    // computeShader = dithering1Compute;
-    // fragmentShader = dithering1Frag;
+    // shaders = dithering1;
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
     // //await webGPU.addTextureImage('oldking', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
     // //await webGPU.addTextureImage('oldking', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
     // await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
 
-    // vertexShader = dithering2Vert;
-    // computeShader = dithering2Compute;
-    // fragmentShader = dithering2Frag;
+    // shaders = dithering2;
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
     // //await webGPU.addTextureImage('oldking', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
     // //await webGPU.addTextureImage('oldking', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
@@ -108,9 +135,7 @@ async function init() {
     // //await webGPU.addTextureVideo('video', './../assets_ignore/VIDEO0244.mp4', ShaderType.FRAGMENT);
     // await webGPU.addTextureWebcam('video', ShaderType.FRAGMENT);
 
-    // vertexShader = videotexture1Vert;
-    // computeShader = videotexture1Compute;
-    // fragmentShader = videotexture1Frag;
+    // shaders = videotexture1;
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
     // //await webGPU.addTextureImage('oldking', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
     // //await webGPU.addTextureImage('oldking', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
@@ -118,9 +143,7 @@ async function init() {
     // await webGPU.addTextureVideo('video', './../assets_ignore/Black and White Clouds - Time lapse (480p_30fps_H264-128kbit_AAC).mp4', ShaderType.COMPUTE)
     // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
-    // vertexShader = flowfieldsanimatedVert;
-    // computeShader = flowfieldsanimatedCompute;
-    // fragmentShader = flowfieldsanimatedFrag;
+    // shaders = flowfieldsanimated;
     // const lineAmount = 1024;
     // webGPU.addUniform('flowfields_lineAmount', lineAmount);
     // webGPU.addUniform('flowfields_numSteps', 10);
@@ -130,17 +153,13 @@ async function init() {
     // webGPU.addStorage('variables', 1, 'Variable', 2, ShaderType.COMPUTE);
     // webGPU.addLayers(2, ShaderType.COMPUTE);
 
-    // vertexShader = noise1Vert;
-    // computeShader = noise1Compute;
-    // fragmentShader = noise1Frag;
+    // shaders = noise1;
     // const numPoints = 800*800;
     // webGPU.addUniform('value_noise_data_length', numPoints);
     // webGPU.addStorage('value_noise_data', numPoints, 'f32', 1, ShaderType.COMPUTE);
     // webGPU.addStorage('variables', 1, 'Variable', 1, ShaderType.COMPUTE);
 
-    // vertexShader = noise2Vert;
-    // computeShader = noise2Compute;
-    // fragmentShader = noise2Frag;
+    // shaders = noise2;
     // const numPoints = 1024;
     // const lineAmount = 16;
     // webGPU.addUniform('numPoints', numPoints);
@@ -153,9 +172,7 @@ async function init() {
     // webGPU.addBindingTexture('outputTex', 'computeTexture');
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
 
-    // vertexShader = noise3Vert;
-    // computeShader = noise3Compute;
-    // fragmentShader = noise3Frag;
+    // shaders = noise3;
     // const numPoints = 1024;
     // const lineAmount = 16;
     // webGPU.addUniform('numPoints', numPoints);
@@ -171,65 +188,46 @@ async function init() {
     // //await webGPU.addTextureImage('image', './../assets_ignore/pmw_800x800.jpg', ShaderType.COMPUTE);
     // await webGPU.addTextureImage('image', './../img/carmen_lyra_2_800x800.jpg', ShaderType.COMPUTE);
 
-    // vertexShader = noisecircle1Vert;
-    // computeShader = noisecircle1Compute;
-    // fragmentShader = noisecircle1Frag;
+    // shaders = noisecircle1;
     // const numPoints = 128;
     // webGPU.addUniform('numPoints', numPoints);
     // webGPU.addStorage('points', numPoints, 'vec2<f32>', 2);
 
-    // vertexShader = layers1Vert;
-    // computeShader = layers1Compute;
-    // fragmentShader = layers1Frag;
+    // shaders = layers1;
     // const numPoints = 800*800;
     // webGPU.addUniform('numPoints', numPoints);
     // webGPU.addStorage('points', numPoints, 'vec4<f32>', 4);
     // webGPU.addLayers(2, ShaderType.COMPUTE);
 
-    // vertexShader = twigl1Vert;
-    // computeShader = twigl1Compute;
-    // fragmentShader = twigl1Frag;
+    // shaders = twigl1;
 
-    // vertexShader = kaleidoscope1Vert;
-    // computeShader = kaleidoscope1Compute;
-    // fragmentShader = kaleidoscope1Frag;
+    // shaders = kaleidoscope1;
 
-    // vertexShader = chromaspiralVert;
-    // computeShader = chromaspiralCompute;
-    // fragmentShader = chromaspiralFrag;
+    // shaders = chromaspiral;
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
     // webGPU.addBindingTexture('outputTex', 'computeTexture');
     // webGPU.addLayers(1, ShaderType.COMPUTE);
 
-
-    // vertexShader = chromaspiral2Vert;
-    // computeShader = chromaspiral2Compute;
-    // fragmentShader = chromaspiral2Frag;
+    // shaders = chromaspiral2;
     // const numPoints = 800*800;
     // webGPU.addUniform('numPoints', numPoints);
     // webGPU.addStorage('points', numPoints, 'vec4<f32>', 4);
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
     // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
-    // vertexShader = shapes1Vert;
-    // computeShader = shapes1Compute;
-    // fragmentShader = shapes1Frag;
+    // shaders = shapes1;
     // const numPoints = 128;
     // webGPU.addUniform('numPoints', numPoints);
     // webGPU.addStorage('points', numPoints, 'vec2<f32>', 2);
 
-    // vertexShader = shapes2Vert;
-    // computeShader = shapes2Compute;
-    // fragmentShader = shapes2Frag;
+    // shaders = shapes2;
     // const numPoints = 800*800;
     // webGPU.addUniform('numPoints', numPoints);
     // webGPU.addStorage('points', numPoints, 'vec4<f32>', 4);
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
     // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
-    // vertexShader = random1Vert;
-    // computeShader = random1Compute;
-    // fragmentShader = random1Frag;
+    // shaders = random1;
     // webGPU.addUniform('randNumber', 0);
     // webGPU.addUniform('randNumber2', 0);
     // webGPU.addStorage('stars', 800*800, 'Star', 4);
@@ -237,9 +235,7 @@ async function init() {
     // webGPU.addTexture2d('feedbackTexture', true);
     // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
-    // vertexShader = random2Vert;
-    // computeShader = random2Compute;
-    // fragmentShader = random2Frag;
+    // shaders = random2;
     // webGPU.addUniform('randNumber', 0);
     // webGPU.addUniform('randNumber2', 0);
     // webGPU.addStorage('stars', 800*800, 'Star', 4);
@@ -252,28 +248,20 @@ async function init() {
     // webGPU.addTexture2d('feedbackTexture', true);
     // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
-    // vertexShader = random3Vert;
-    // computeShader = random3Compute;
-    // fragmentShader = random3Frag;
+    // shaders = random3;
     // webGPU.addSampler('feedbackSampler');
     // webGPU.addTexture2d('feedbackTexture', true);
     // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
-    // vertexShader = planetsVert;
-    // computeShader = planetsCompute;
-    // fragmentShader = planetsFrag;
+    // shaders = planets;
     // webGPU.addStorage('planets', 8, 'Planet', 5);
     // webGPU.addStorage('variables', 1, 'Variable', 1);
 
-    // vertexShader = planets2Vert;
-    // computeShader = planets2Compute;
-    // fragmentShader = planets2Frag;
+    // shaders = planets2;
     // webGPU.addStorage('planets', 8, 'Planet', 5);
     // webGPU.addStorage('variables', 1, 'Variable', 1);
 
-    // vertexShader = planets3Vert;
-    // computeShader = planets3Compute;
-    // fragmentShader = planets3Frag;
+    // shaders = planets3;
     // const numParticles = 1024 * 4;
     // webGPU.addUniform('numParticles', numParticles);
     // webGPU.addStorage('planets', numParticles, 'Planet', 3);
@@ -282,9 +270,7 @@ async function init() {
     // webGPU.addTexture2d('feedbackTexture', true);
     // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
-    // vertexShader = planetsblurVert;
-    // computeShader = planetsblurCompute;
-    // fragmentShader = planetsblurFrag;
+    // shaders = planetsblur;
     // const numParticles = 8;
     // webGPU.addUniform('numParticles', numParticles);
     // webGPU.addStorage('planets', numParticles, 'Planet', 5);
@@ -292,9 +278,7 @@ async function init() {
     // webGPU.addSampler('feedbackSampler');
     // webGPU.addTexture2d('feedbackTexture', true);
 
-    // vertexShader = planetsblur2Vert;
-    // computeShader = planetsblur2Compute;
-    // fragmentShader = planetsblur2Frag;
+    // shaders = planetsblur2;
     // const numParticles = 8;
     // webGPU.addUniform('numParticles', numParticles);
     // webGPU.addStorage('planets', numParticles, 'Planet', 5);
@@ -302,9 +286,7 @@ async function init() {
     // webGPU.addSampler('feedbackSampler');
     // webGPU.addTexture2d('feedbackTexture', true);
 
-    // vertexShader = reactiondiffusionVert;
-    // computeShader = reactiondiffusionCompute;
-    // fragmentShader = reactiondiffusionFrag;
+    // shaders = reactiondiffusion;
     // const numPoints = 800*800;
     // webGPU.addUniform('numPoints', numPoints);
     // webGPU.addStorage('chemicals', numPoints, 'Chemical', 2);
@@ -314,9 +296,7 @@ async function init() {
     // webGPU.addTexture2d('feedbackTexture', true, ShaderType.COMPUTE);
     // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
-    // vertexShader = reactiondiffusion1Vert;
-    // computeShader = reactiondiffusion1Compute;
-    // fragmentShader = reactiondiffusion1Frag;
+    // shaders = reactiondiffusion1;
     // const numPoints = 800*800*2;
     // webGPU.addUniform('numPoints', numPoints);
     // webGPU.addStorage('chemicals', numPoints, 'Chemical', 2);
@@ -332,9 +312,7 @@ async function init() {
     // // await webGPU.addTextureImage('image', './../img/carmen_lyra_2_800x800.jpg', ShaderType.COMPUTE);
     // //await webGPU.addTextureImage('image', './../assets_ignore/face_coeff.jpg', ShaderType.COMPUTE);
 
-    // vertexShader = slimeVert;
-    // computeShader = slimeCompute;
-    // fragmentShader = slimeFrag;
+    // shaders = slime;
     // const numParticles = 1024 * 2;
     // webGPU.addUniform('numParticles', numParticles);
     // webGPU.addStorage('particles', numParticles, 'Particle', 4);
@@ -343,9 +321,7 @@ async function init() {
     // webGPU.addTexture2d('feedbackTexture', true);
     // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
-    // vertexShader = slime2Vert;
-    // computeShader = slime2Compute;
-    // fragmentShader = slime2Frag;
+    // shaders = slime2;
     // const numParticles = 1024 * 2;
     // webGPU.addUniform('numParticles', numParticles)
     // webGPU.addStorage('particles', numParticles, 'Particle', 4);
@@ -354,9 +330,7 @@ async function init() {
     // webGPU.addTexture2d('feedbackTexture', true);
     // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
-    // vertexShader = slime3Vert;
-    // computeShader = slime3Compute;
-    // fragmentShader = slime3Frag;
+    // shaders = slime3;
     // const numParticles = 1024 * 2;
     // webGPU.addUniform('numParticles', numParticles);
     // webGPU.addStorage('particles', numParticles, 'Particle', 4, ShaderType.COMPUTE);
@@ -366,23 +340,15 @@ async function init() {
     // webGPU.addTexture2d('feedbackTexture', true);
     // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
-    // vertexShader = blur1Vert;
-    // computeShader = blur1Compute;
-    // fragmentShader = blur1Frag;
+    // shaders = blur1;
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
     // webGPU.addTexture2d('feedbackTexture', true);
     // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
-    // vertexShader = circleblurVert;
-    // computeShader = circleblurCompute;
-    // fragmentShader = circleblurFrag;
+    // shaders = circleblur;
     // webGPU.addSampler('feedbackSampler');
     // webGPU.addTexture2d('feedbackTexture', true);
     // webGPU.addBindingTexture('outputTex', 'computeTexture');
-
-    // vertexShader = demo6_textureVert;
-    // computeShader = defaultCompute;
-    // fragmentShader = demo6_textureFrag;
 
     const initialized = await webGPU.init(shaders.vert, shaders.compute, shaders.frag);
     if (initialized) {

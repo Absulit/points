@@ -11,9 +11,6 @@ fn main(
     @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
 ) {
     let utime = params.utime;
-
-    _ = points[0];
-    _ = layers[0];
 }
 `;
 
