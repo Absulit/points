@@ -1,7 +1,7 @@
 import defaultStructs from '../defaultStructs.js';
 import { fnusin, RGBAFromHSV } from '../defaultFunctions.js';
 
-const kaleidoscope1Frag = /*wgsl*/`
+const frag = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -91,4 +91,4 @@ fn main(
 }
 `;
 
-export default kaleidoscope1Frag;
+export default frag;

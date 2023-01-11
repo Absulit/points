@@ -1,6 +1,6 @@
 import defaultStructs from '../defaultStructs.js';
 
-const layers1Compute = /*wgsl*/`
+const compute = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -17,4 +17,4 @@ fn main(
 }
 `;
 
-export default layers1Compute;
+export default compute;

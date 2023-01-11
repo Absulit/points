@@ -1,7 +1,7 @@
 import defaultStructs from '../defaultStructs.js';
 import { fnusin, fusin } from '../defaultFunctions.js';
 
-const random1Frag = /*wgsl*/`
+const frag = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -48,4 +48,4 @@ fn main(
 }
 `;
 
-export default random1Frag;
+export default frag;

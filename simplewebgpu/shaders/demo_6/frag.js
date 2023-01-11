@@ -1,6 +1,6 @@
 import defaultStructs from '../defaultStructs.js';
 
-const demo6_textureFrag = /*wgsl*/`
+const frag = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -12,4 +12,4 @@ fn main(@location(0) Color: vec4<f32>, @location(1) uv: vec2<f32>) -> @location(
 }
 `;
 
-export default demo6_textureFrag;
+export default frag;

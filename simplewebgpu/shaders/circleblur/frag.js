@@ -1,7 +1,7 @@
 import { fnusin, fusin } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
 
-const circleblurFrag = /*wgsl*/`
+const frag = /*wgsl*/`
 ${defaultStructs}
 
 
@@ -59,4 +59,4 @@ fn main(
 }
 `;
 
-export default circleblurFrag;
+export default frag;

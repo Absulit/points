@@ -1,7 +1,7 @@
 import { clearAlpha, sdfCircle, sdfLine2, sdfSegment, soften4, soften8 } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
 
-const shapes2Compute = /*wgsl*/`
+const compute = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -134,4 +134,4 @@ fn main(
 }
 `;
 
-export default shapes2Compute;
+export default compute;

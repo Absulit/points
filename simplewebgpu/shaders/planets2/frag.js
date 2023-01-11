@@ -1,7 +1,7 @@
 import { fnusin, sdfSegment } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
 
-const planets2Frag = /*wgsl*/`
+const frag = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -79,4 +79,4 @@ fn main(
 }
 `;
 
-export default planets2Frag;
+export default frag;

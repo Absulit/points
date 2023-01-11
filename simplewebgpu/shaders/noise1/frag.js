@@ -2,7 +2,7 @@ import defaultStructs from '../defaultStructs.js';
 import { fnusin } from '../defaultFunctions.js';
 import { snoise } from '../noise2d.js';
 
-const noise1Frag = /*wgsl*/`
+const frag = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -37,4 +37,4 @@ fn main(
 }
 `;
 
-export default noise1Frag;
+export default frag;

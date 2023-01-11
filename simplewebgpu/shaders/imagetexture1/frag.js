@@ -3,7 +3,7 @@ import { brightness, fnusin, fusin, polar, sdfCircle, sdfLine, sdfSegment } from
 import { snoise } from '../noise2d.js';
 import { PI } from '../defaultConstants.js';
 
-const imagetexture1Frag = /*wgsl*/`
+const frag = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -60,4 +60,4 @@ fn main(
 }
 `;
 
-export default imagetexture1Frag;
+export default frag;

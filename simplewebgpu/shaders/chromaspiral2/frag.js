@@ -1,7 +1,7 @@
 import defaultStructs from '../defaultStructs.js';
 import { fnusin, pixelateTexture } from '../defaultFunctions.js';
 
-const chromaspiral2Frag = /*wgsl*/`
+const frag = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -34,4 +34,4 @@ fn main(
 }
 `;
 
-export default chromaspiral2Frag;
+export default frag;

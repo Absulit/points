@@ -4,7 +4,7 @@ import defaultStructs from '../defaultStructs.js';
 import { snoise } from '../noise2d.js';
 import { rand } from '../random.js';
 
-const noise2Compute = /*wgsl*/`
+const compute = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -168,4 +168,4 @@ fn main(
 }
 `;
 
-export default noise2Compute;
+export default compute;

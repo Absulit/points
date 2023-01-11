@@ -3,7 +3,7 @@ import defaultStructs from '../defaultStructs.js';
 import { PI } from '../defaultConstants.js';
 import { rand } from '../random.js';
 
-const reactiondiffusionCompute = /*wgsl*/`
+const compute = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -235,4 +235,4 @@ fn main(
 }
 `;
 
-export default reactiondiffusionCompute;
+export default compute;

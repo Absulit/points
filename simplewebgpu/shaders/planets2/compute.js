@@ -2,7 +2,7 @@ import defaultStructs from '../defaultStructs.js';
 import { clearMix, polar } from '../defaultFunctions.js';
 import { rand } from '../random.js';
 
-const planets2Compute = /*wgsl*/`
+const compute = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -80,5 +80,5 @@ fn main(
 }
 `;
 
-export default planets2Compute;
+export default compute;
 

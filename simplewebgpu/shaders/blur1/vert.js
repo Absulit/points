@@ -1,7 +1,7 @@
 import { defaultVertexBody } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
 
-const blur1Vert = /*wgsl*/`
+const vert = /*wgsl*/`
 
 ${defaultStructs}
 ${defaultVertexBody}
@@ -19,4 +19,4 @@ fn main(
 }
 `;
 
-export default blur1Vert;
+export default vert;

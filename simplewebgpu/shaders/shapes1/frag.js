@@ -1,7 +1,7 @@
 import defaultStructs from '../defaultStructs.js';
 import { fnusin, polar, rotateVector, sdfCircle, sdfLine, sdfLine2, sdfSegment, sdfSquare } from '../defaultFunctions.js';
 
-const shapes1Frag = /*wgsl*/`
+const frag = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -61,4 +61,4 @@ fn main(
 }
 `;
 
-export default shapes1Frag;
+export default frag;

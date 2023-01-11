@@ -1,6 +1,6 @@
 import defaultStructs from '../defaultStructs.js';
 
-const dithering2Compute = /*wgsl*/`
+const compute = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -14,4 +14,4 @@ fn main(
 }
 `;
 
-export default dithering2Compute;
+export default compute;

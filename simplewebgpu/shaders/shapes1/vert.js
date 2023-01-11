@@ -1,7 +1,7 @@
 import { defaultVertexBody } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
 
-const shapes1Vert = /*wgsl*/`
+const vert = /*wgsl*/`
 
 ${defaultStructs}
 ${defaultVertexBody}
@@ -23,4 +23,4 @@ fn main(
 }
 `;
 
-export default shapes1Vert;
+export default vert;

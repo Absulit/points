@@ -1,6 +1,6 @@
 import defaultStructs from '../defaultStructs.js';
 
-const imagetexture2Compute = /*wgsl*/`
+const compute = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -14,4 +14,4 @@ fn main(
 }
 `;
 
-export default imagetexture2Compute;
+export default compute;

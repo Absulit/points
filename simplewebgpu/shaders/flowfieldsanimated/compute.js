@@ -2,7 +2,7 @@ import { polar } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
 import { rand } from '../random.js';
 
-const flowfieldsanimatedCompute = /*wgsl*/`
+const compute = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -67,4 +67,4 @@ fn main(
 }
 `;
 
-export default flowfieldsanimatedCompute;
+export default compute;

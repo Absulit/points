@@ -1,7 +1,7 @@
 import { fusin, RGBAFromHSV } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
 
-const reactiondiffusionFrag = /*wgsl */`
+const frag = /*wgsl */`
 
 ${defaultStructs}
 
@@ -52,4 +52,4 @@ fn main(
     return finalColor;
 }
 `;
-export default reactiondiffusionFrag;
+export default frag;

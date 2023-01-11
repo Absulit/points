@@ -1,7 +1,7 @@
 import { defaultVertexBody } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
 
-const chromaspiral2Vert = /*wgsl*/`
+const vert = /*wgsl*/`
 
 ${defaultStructs}
 ${defaultVertexBody}
@@ -19,4 +19,4 @@ fn main(
 }
 `;
 
-export default chromaspiral2Vert;
+export default vert;

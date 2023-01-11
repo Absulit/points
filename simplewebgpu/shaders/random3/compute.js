@@ -2,7 +2,7 @@ import { fnusin, RGBAFromHSV } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
 import { rand, random } from '../random.js';
 
-const random3Compute = /*wgsl*/`
+const compute = /*wgsl*/`
 
 ${defaultStructs}
 ${random}
@@ -86,4 +86,4 @@ fn main(
 }
 `;
 
-export default random3Compute;
+export default compute;

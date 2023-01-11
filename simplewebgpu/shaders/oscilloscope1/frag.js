@@ -1,7 +1,7 @@
 import defaultStructs from '../defaultStructs.js';
 import { fnusin, fusin, sdfCircle, sdfLine, sdfSegment } from '../defaultFunctions.js';
 
-const oscilloscope1Frag = /*wgsl*/`
+const frag = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -46,4 +46,4 @@ fn main(
 }
 `;
 
-export default oscilloscope1Frag;
+export default frag;

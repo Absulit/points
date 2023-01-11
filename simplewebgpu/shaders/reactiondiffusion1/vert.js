@@ -1,7 +1,7 @@
 import { defaultVertexBody } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
 
-const reactiondiffusion1Vert = /*wgsl*/`
+const vert = /*wgsl*/`
 
 ${defaultStructs}
 ${defaultVertexBody}
@@ -26,4 +26,4 @@ fn main(
 }
 `;
 
-export default reactiondiffusion1Vert;
+export default vert;

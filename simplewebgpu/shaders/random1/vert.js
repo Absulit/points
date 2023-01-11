@@ -1,7 +1,7 @@
 import { defaultVertexBody } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
 
-const random1Vert = /*wgsl*/`
+const vert = /*wgsl*/`
 
 ${defaultStructs}
 ${defaultVertexBody}
@@ -30,4 +30,4 @@ fn main(
 }
 `;
 
-export default random1Vert;
+export default vert;

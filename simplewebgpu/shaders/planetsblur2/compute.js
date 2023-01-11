@@ -2,7 +2,7 @@ import { polar } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
 import { rand } from '../random.js';
 
-const planetsblur2Compute = /*wgsl*/`
+const compute = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -80,5 +80,5 @@ fn main(
     }
 }`;
 
-export default planetsblur2Compute;
+export default compute;
 

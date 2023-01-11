@@ -1,6 +1,6 @@
 import defaultStructs from '../defaultStructs.js';
 
-const videotexture1Compute = /*wgsl*/`
+const compute = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -67,4 +67,4 @@ fn main(
 }
 `;
 
-export default videotexture1Compute;
+export default compute;

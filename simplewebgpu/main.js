@@ -108,7 +108,7 @@ import dithering1Frag from './shaders/dithering1/frag.js';
 import dithering2Vert from './shaders/dithering2/vert.js';
 import dithering2Compute from './shaders/dithering2/compute.js';
 import dithering2Frag from './shaders/dithering2/frag.js';
-import bloom1Vert from './shaders/bloom1/bloom1.vert.js';
+import bloom1Vert from './shaders/bloom1/vert.js';
 import bloom1Compute from './shaders/bloom1/compute.js';
 import bloom1Frag from './shaders/bloom1/frag.js';
 

@@ -1,6 +1,6 @@
 import defaultStructs from '../defaultStructs.js';
 
-const kaleidoscope1Vert = /*wgsl*/`
+const vert = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -26,4 +26,4 @@ fn main(
 }
 `;
 
-export default kaleidoscope1Vert;
+export default vert;

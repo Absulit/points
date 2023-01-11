@@ -1,7 +1,7 @@
 import { defaultVertexBody } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
 
-const noise2Vert = /*wgsl*/`
+const vert = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -24,4 +24,4 @@ fn main(
 }
 `;
 
-export default noise2Vert;
+export default vert;

@@ -1,6 +1,6 @@
 import defaultStructs from '../defaultStructs.js';
 
-const twigl1Vert = /*wgsl*/`
+const vert = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -24,4 +24,4 @@ fn main(
 }
 `;
 
-export default twigl1Vert
+export default vert

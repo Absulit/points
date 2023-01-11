@@ -1,7 +1,7 @@
 import defaultStructs from '../defaultStructs.js';
 import { valueNoise } from '../valuenoise.js';
 
-const noise1Compute = /*wgsl*/`
+const compute = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -29,4 +29,4 @@ fn main(
 }
 `;
 
-export default noise1Compute;
+export default compute;

@@ -1,7 +1,7 @@
 import { clearMix, fnusin, getColorsAroundTexture, soften8 } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
 
-const blur1Compute = /*wgsl*/`
+const compute = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -80,4 +80,4 @@ fn main(
 }
 `;
 
-export default blur1Compute;
+export default compute;

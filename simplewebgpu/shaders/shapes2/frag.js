@@ -1,7 +1,7 @@
 import defaultStructs from '../defaultStructs.js';
 import { fnusin } from '../defaultFunctions.js';
 
-const shapes2Frag = /*wgsl*/`
+const frag = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -29,4 +29,4 @@ fn main(
 }
 `;
 
-export default shapes2Frag;
+export default frag;

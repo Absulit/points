@@ -3,7 +3,7 @@ import { clearAlpha, clearMix, getColorsAroundTexture, polar, soften8 } from '..
 import defaultStructs from '../defaultStructs.js';
 import { rand } from '../random.js';
 
-const slimeCompute = /*wgsl*/`
+const compute = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -157,4 +157,4 @@ fn main(
 }
 `;
 
-export default slimeCompute;
+export default compute;

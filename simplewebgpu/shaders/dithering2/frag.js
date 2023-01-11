@@ -3,7 +3,7 @@ import { brightness, fnusin, fusin } from '../defaultFunctions.js';
 import { snoise } from '../noise2d.js';
 import { getClosestColorInPalette, orderedDithering, orderedDithering_threshold_map } from '../effects.js';
 
-const dithering2Frag = /*wgsl*/`
+const frag = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -85,4 +85,4 @@ fn main(
 }
 `;
 
-export default dithering2Frag;
+export default frag;

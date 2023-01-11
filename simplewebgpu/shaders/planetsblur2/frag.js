@@ -1,7 +1,7 @@
 import { fnusin } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
 
-const planetsblur2Frag = /*wgsl*/`
+const frag = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -88,4 +88,4 @@ fn main(
 }
 `;
 
-export default planetsblur2Frag;
+export default frag;

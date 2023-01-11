@@ -2,7 +2,7 @@ import defaultStructs from '../defaultStructs.js';
 import { fnusin, polar, rotateVector, sdfCircle, sdfLine, sdfLine2, sdfSegment, sdfSquare } from '../defaultFunctions.js';
 import { snoise } from '../noise2d.js';
 
-const noisecircle1Frag = /*wgsl*/`
+const frag = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -48,4 +48,4 @@ fn main(
 }
 `;
 
-export default noisecircle1Frag;
+export default frag;

@@ -1,7 +1,7 @@
 import { fusin } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
 
-const blur1Frag = /*wgsl*/`
+const frag = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -49,4 +49,4 @@ fn main(
 }
 `;
 
-export default blur1Frag;
+export default frag;

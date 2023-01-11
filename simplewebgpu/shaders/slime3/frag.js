@@ -1,7 +1,7 @@
 import { fusin } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
 
-const slime3Frag = /*wgsl*/`
+const frag = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -66,4 +66,4 @@ fn main(
 
 `;
 
-export default slime3Frag;
+export default frag;

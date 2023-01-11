@@ -1,7 +1,7 @@
 import { clearMix } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
 
-const circleblurCompute = /*wgsl*/`
+const compute = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -132,4 +132,4 @@ fn main(
 }
 `;
 
-export default circleblurCompute;
+export default compute;

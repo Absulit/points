@@ -2,7 +2,7 @@ import { defaultVertexBody } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
 
 
-const slime3Vert = /*wgsl*/`
+const vert = /*wgsl*/`
 
 ${defaultStructs}
 ${defaultVertexBody}
@@ -28,4 +28,4 @@ fn main(
 }
 `;
 
-export default slime3Vert;
+export default vert;

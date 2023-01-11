@@ -1,7 +1,7 @@
 import { clearAlpha, clearMix, fnusin, fucos, fusin, polar, sdfCircle, sdfLine2, sdfSegment, soften4, soften8 } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
 
-const chromaspiralCompute = /*wgsl*/`
+const compute = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -149,4 +149,4 @@ fn main(
 }
 `;
 
-export default chromaspiralCompute;
+export default compute;

@@ -2,7 +2,7 @@ import defaultStructs from '../defaultStructs.js';
 import { brightness, fnusin, fusin, polar, sdfCircle, sdfLine, sdfSegment } from '../defaultFunctions.js';
 import { snoise } from '../noise2d.js';
 
-const imagetexture2Frag = /*wgsl*/`
+const frag = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -46,4 +46,4 @@ fn main(
 }
 `;
 
-export default imagetexture2Frag;
+export default frag;

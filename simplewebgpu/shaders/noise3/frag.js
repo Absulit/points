@@ -3,7 +3,7 @@ import { fnusin, RGBAFromHSV, sdfLine, sdfLine2, sdfSegment } from '../defaultFu
 import { snoise } from '../noise2d.js';
 import { rand } from '../random.js';
 
-const noise3Frag = /*wgsl*/`
+const frag = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -76,4 +76,4 @@ fn main(
 }
 `;
 
-export default noise3Frag;
+export default frag;

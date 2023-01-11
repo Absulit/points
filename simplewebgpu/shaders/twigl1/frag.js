@@ -1,6 +1,6 @@
 import defaultStructs from '../defaultStructs.js';
 
-const twigl1Frag = /*wgsl*/`
+const frag = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -26,4 +26,4 @@ fn main(
 }
 `;
 
-export default twigl1Frag;
+export default frag;

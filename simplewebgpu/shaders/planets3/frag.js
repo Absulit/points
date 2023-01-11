@@ -1,7 +1,7 @@
 import defaultStructs from '../defaultStructs.js';
 import { fusin } from '../defaultFunctions.js';
 
-const planets3Frag = /*wgsl*/`
+const frag = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -65,4 +65,4 @@ fn main(
 }
 `;
 
-export default planets3Frag;
+export default frag;

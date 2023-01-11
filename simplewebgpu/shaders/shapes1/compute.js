@@ -1,7 +1,7 @@
 import { fnusin, fusin } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
 
-const shapes1Compute = /*wgsl*/`
+const compute = /*wgsl*/`
 
 ${defaultStructs}
 
@@ -30,4 +30,4 @@ fn main(
 }
 `;
 
-export default shapes1Compute;
+export default compute;
