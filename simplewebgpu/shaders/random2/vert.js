@@ -1,21 +1,22 @@
 import { defaultVertexBody } from '../defaultFunctions.js';
-import defaultStructs from './../defaultStructs.js';
+import defaultStructs from '../defaultStructs.js';
 
-const planetsblurVert = /*wgsl*/`
+const random2Vert = /*wgsl*/`
 
 ${defaultStructs}
 ${defaultVertexBody}
 
-struct Variable{
-    particlesCreated: f32,
-}
 
-struct Planet{
-    radius: f32,
-    speed: f32,
-    angle: f32,
+struct Particle{
     x: f32,
     y: f32
+}
+
+struct Star{
+    a: f32,
+    b: f32,
+    c: f32,
+    d: f32,
 }
 
 @vertex
@@ -25,9 +26,8 @@ fn main(
     @location(2) uv: vec2<f32>,
     @builtin(vertex_index) VertexIndex: u32
 ) -> Fragment {
-
     return defaultVertexBody(position, color, uv);
 }
 `;
 
-export default planetsblurVert;
+export default random2Vert;

@@ -1,22 +1,10 @@
 import { defaultVertexBody } from '../defaultFunctions.js';
-import defaultStructs from './../defaultStructs.js';
+import defaultStructs from '../defaultStructs.js';
 
-const random1Vert = /*wgsl*/`
+const shapes2Vert = /*wgsl*/`
 
 ${defaultStructs}
 ${defaultVertexBody}
-
-struct Particle{
-    x: f32,
-    y: f32
-}
-
-struct Star{
-    a: f32,
-    b: f32,
-    c: f32,
-    d: f32,
-}
 
 @vertex
 fn main(
@@ -30,4 +18,4 @@ fn main(
 }
 `;
 
-export default random1Vert;
+export default shapes2Vert;

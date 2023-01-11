@@ -1,21 +1,22 @@
 import { defaultVertexBody } from '../defaultFunctions.js';
-import defaultStructs from './../defaultStructs.js';
+import defaultStructs from '../defaultStructs.js';
 
-const planets3Vert = /*wgsl*/`
+
+const slimeVert = /*wgsl*/`
 
 ${defaultStructs}
+${defaultVertexBody}
 
-struct Planet{
-    radius: f32,
-    speed: f32,
-    angle: f32
+struct Particle{
+    x: f32,
+    y: f32,
+    angle: f32,
+    distance: f32
 }
 
 struct Variable{
-    pc: f32
+    particlesCreated: f32
 }
-
-${defaultVertexBody}
 
 @vertex
 fn main(
@@ -29,4 +30,4 @@ fn main(
 }
 `;
 
-export default planets3Vert;
+export default slimeVert;

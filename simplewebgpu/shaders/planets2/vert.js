@@ -1,8 +1,8 @@
 import { defaultVertexBody } from '../defaultFunctions.js';
-import defaultStructs from './../defaultStructs.js';
+import defaultStructs from '../defaultStructs.js';
 
 
-const planetsVert = /*wgsl*/`
+const planets2Vert = /*wgsl*/`
 
 ${defaultStructs}
 ${defaultVertexBody}
@@ -30,4 +30,4 @@ fn main(
 }
 `;
 
-export default planetsVert;
+export default planets2Vert;

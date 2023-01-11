@@ -1,10 +1,20 @@
 import { defaultVertexBody } from '../defaultFunctions.js';
-import defaultStructs from './../defaultStructs.js';
+import defaultStructs from '../defaultStructs.js';
 
-const blur1Vert = /*wgsl*/`
+const slime2Vert = /*wgsl*/`
 
 ${defaultStructs}
 ${defaultVertexBody}
+
+struct Variable{
+    particlesCreated: f32,
+}
+
+struct Particle{
+    position: vec2<f32>,
+    angle: f32,
+    distance: f32
+}
 
 @vertex
 fn main(
@@ -13,10 +23,8 @@ fn main(
     @location(2) uv: vec2<f32>,
     @builtin(vertex_index) VertexIndex: u32
 ) -> Fragment {
-
     return defaultVertexBody(position, color, uv);
-
 }
 `;
 
-export default blur1Vert;
+export default slime2Vert;

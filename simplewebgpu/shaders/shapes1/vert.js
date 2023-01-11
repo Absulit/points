@@ -1,10 +1,15 @@
 import { defaultVertexBody } from '../defaultFunctions.js';
-import defaultStructs from './../defaultStructs.js';
+import defaultStructs from '../defaultStructs.js';
 
-const shapes2Vert = /*wgsl*/`
+const shapes1Vert = /*wgsl*/`
 
 ${defaultStructs}
 ${defaultVertexBody}
+
+struct Variable{
+    particlesCreated: f32,
+}
+
 
 @vertex
 fn main(
@@ -18,4 +23,4 @@ fn main(
 }
 `;
 
-export default shapes2Vert;
+export default shapes1Vert;

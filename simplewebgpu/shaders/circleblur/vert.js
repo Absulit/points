@@ -1,21 +1,10 @@
 import { defaultVertexBody } from '../defaultFunctions.js';
-import defaultStructs from './../defaultStructs.js';
+import defaultStructs from '../defaultStructs.js';
 
-
-const slime3Vert = /*wgsl*/`
+const circleblurVert = /*wgsl*/`
 
 ${defaultStructs}
 ${defaultVertexBody}
-
-struct Variable{
-    particlesCreated: f32,
-}
-
-struct Particle{
-    position: vec2<f32>,
-    angle: f32,
-    distance: f32
-}
 
 @vertex
 fn main(
@@ -28,4 +17,4 @@ fn main(
 }
 `;
 
-export default slime3Vert;
+export default circleblurVert;

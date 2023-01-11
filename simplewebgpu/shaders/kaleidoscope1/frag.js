@@ -1,5 +1,5 @@
-import defaultStructs from './../defaultStructs.js';
-import { fnusin, RGBAFromHSV } from './../defaultFunctions.js';
+import defaultStructs from '../defaultStructs.js';
+import { fnusin, RGBAFromHSV } from '../defaultFunctions.js';
 
 const kaleidoscope1Frag = /*wgsl*/`
 
