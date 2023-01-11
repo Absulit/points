@@ -1,116 +1,11 @@
 'use strict';
-import MathUtil from '../js/mathutil.js';
 import { print } from '../js/utils.js';
 import WebGPU, { ShaderType } from './absulit.simplewebgpu.module.js';
-import blur1Compute from './shaders/blur1/compute.js';
-import blur1Frag from './shaders/blur1/frag.js';
-import blur1Vert from './shaders/blur1/vert.js';
-import circleblurCompute from './shaders/circleblur/compute.js';
-import circleblurVert from './shaders/circleblur/vert.js';
-import circleblurFrag from './shaders/circleblur/frag.js';
-import base from './shaders/base/project.js';
-import demo6_textureFrag from './shaders/demo_6/frag.js';
-import demo6_textureVert from './shaders/demo_6/vert.js';
-import planetsCompute from './shaders/planets/compute.js';
-import planetsFrag from './shaders/planets/frag.js';
-import planetsVert from './shaders/planets/vert.js';
-import planets2Compute from './shaders/planets2/compute.js';
-import planets2Frag from './shaders/planets2/frag.js';
-import planets2Vert from './shaders/planets2/vert.js';
-import planets3Compute from './shaders/planets3/compute.js';
-import planets3Vert from './shaders/planets3/vert.js';
-import planets3Frag from './shaders/planets3/frag.js';
-import planetsblurCompute from './shaders/planetsblur/compute.js';
-import planetsblurFrag from './shaders/planetsblur/frag.js';
-import planetsblurVert from './shaders/planetsblur/vert.js';
-import planetsblur2Compute from './shaders/planetsblur2/compute.js';
-import planetsblur2Frag from './shaders/planetsblur2/frag.js';
-import planetsblur2Vert from './shaders/planetsblur2/vert.js';
-import reactiondiffusionVert from './shaders/reactiondiffusion/vert.js';
-import reactiondiffusionCompute from './shaders/reactiondiffusion/compute.js';
-import reactiondiffusionFrag from './shaders/reactiondiffusion/frag.js';
-import slimeCompute from './shaders/slime/compute.js';
-import slimeFrag from './shaders/slime/frag.js';
-import slimeVert from './shaders/slime/vert.js';
-import slime2Compute from './shaders/slime2/compute.js';
-import slime2Frag from './shaders/slime2/frag.js';
-import slime2Vert from './shaders/slime2/vert.js';
-import test1Frag from './shaders/test1/frag.js';
-import random1Frag from './shaders/random1/frag.js';
-import random1Compute from './shaders/random1/compute.js';
-import random1Vert from './shaders/random1/vert.js';
-import slime3Vert from './shaders/slime3/vert.js';
-import slime3Compute from './shaders/slime3/compute.js';
-import slime3Frag from './shaders/slime3/frag.js';
-import random2Vert from './shaders/random2/vert.js';
-import random2Compute from './shaders/random2/compute.js';
-import random2Frag from './shaders/random2/frag.js';
-import shapes1Vert from './shaders/shapes1/vert.js';
-import shapes1Compute from './shaders/shapes1/compute.js';
-import shapes1Frag from './shaders/shapes1/frag.js';
-import shapes2Vert from './shaders/shapes2/vert.js';
-import shapes2Compute from './shaders/shapes2/compute.js';
-import shapes2Frag from './shaders/shapes2/frag.js';
-import chromaspiralVert from './shaders/chromaspiral/vert.js';
-import chromaspiralCompute from './shaders/chromaspiral/compute.js';
-import chromaspiralFrag from './shaders/chromaspiral/frag.js';
-import chromaspiral2Vert from './shaders/chromaspiral2/vert.js';
-import chromaspiral2Compute from './shaders/chromaspiral2/compute.js';
-import chromaspiral2Frag from './shaders/chromaspiral2/frag.js';
-import twigl1Vert from './shaders/twigl1/vert.js';
-import twigl1Compute from './shaders/twigl1/compute.js';
-import twigl1Frag from './shaders/twigl1/frag.js';
-import kaleidoscope1Vert from './shaders/kaleidoscope1/vert.js';
-import kaleidoscope1Compute from './shaders/kaleidoscope1/compute.js';
-import kaleidoscope1Frag from './shaders/kaleidoscope1/frag.js';
-import random3Vert from './shaders/random3/vert.js';
-import random3Compute from './shaders/random3/compute.js';
-import random3Frag from './shaders/random3/frag.js';
-import layers1Vert from './shaders/layers1/vert.js';
-import layers1Compute from './shaders/layers1/compute.js';
-import layers1Frag from './shaders/layers1/frag.js';
-import noise1Vert from './shaders/noise1/vert.js';
-import noise1Compute from './shaders/noise1/compute.js';
-import noise1Frag from './shaders/noise1/noise1.frag.js';
-import flowfieldsanimatedCompute from './shaders/flowfieldsanimated/compute.js';
-import flowfieldsanimatedVert from './shaders/flowfieldsanimated/vert.js';
-import flowfieldsanimatedFrag from './shaders/flowfieldsanimated/frag.js';
-import noisecircle1Vert from './shaders/noisecircle1/vert.js';
-import noisecircle1Compute from './shaders/noisecircle1/compute.js';
-import noisecircle1Frag from './shaders/noisecircle1/frag.js';
-import noise2Vert from './shaders/noise2/vert.js';
-import noise2Compute from './shaders/noise2/compute.js';
-import noise2Frag from './shaders/noise2/frag.js';
-import oscilloscope1Vert from './shaders/oscilloscope1/vert.js';
-import oscilloscope1Compute from './shaders/oscilloscope1/compute.js';
-import oscilloscope1Frag from './shaders/oscilloscope1/frag.js';
-import imagetexture1Vert from './shaders/imagetexture1/vert.js';
-import imagetexture1Compute from './shaders/imagetexture1/compute.js';
-import imagetexture1Frag from './shaders/imagetexture1/frag.js';
-import imagetexture2Vert from './shaders/imagetexture2/vert.js';
-import imagetexture2Compute from './shaders/imagetexture2/compute.js';
-import imagetexture2Frag from './shaders/imagetexture2/frag.js';
-import noise3Vert from './shaders/noise3/vert.js';
-import noise3Compute from './shaders/noise3/compute.js';
-import noise3Frag from './shaders/noise3/frag.js';
-import imagetexture3Vert from './shaders/imagetexture3/vert.js';
-import imagetexture3Compute from './shaders/imagetexture3/compute.js';
-import imagetexture3Frag from './shaders/imagetexture3/frag.js';
-import videotexture1Vert from './shaders/videotexture1/vert.js';
-import videotexture1Compute from './shaders/videotexture1/compute.js';
-import videotexture1Frag from './shaders/videotexture1/frag.js';
-import reactiondiffusion1Vert from './shaders/reactiondiffusion1/vert.js';
-import reactiondiffusion1Compute from './shaders/reactiondiffusion1/compute.js';
-import reactiondiffusion1Frag from './shaders/reactiondiffusion1/frag.js';
-import dithering1Vert from './shaders/dithering1/vert.js';
-import dithering1Compute from './shaders/dithering1/compute.js';
-import dithering1Frag from './shaders/dithering1/frag.js';
-import dithering2Vert from './shaders/dithering2/vert.js';
-import dithering2Compute from './shaders/dithering2/compute.js';
-import dithering2Frag from './shaders/dithering2/frag.js';
-import bloom1Vert from './shaders/bloom1/vert.js';
-import bloom1Compute from './shaders/bloom1/compute.js';
-import bloom1Frag from './shaders/bloom1/frag.js';
+import base from './shaders/base/index.js';
+import bloom1 from './shaders/bloom1/index.js';
+import oscilloscope1 from './shaders/oscilloscope1/index.js';
+
+
 
 
 /***************/
@@ -139,7 +34,6 @@ const sliders = { 'a': 0, 'b': 0, 'c': 0 }
 
 let canvas = document.getElementById('gl-canvas');
 
-let vertexShader, computeShader, fragmentShader;
 let shaders;
 
 async function init() {
@@ -161,21 +55,17 @@ async function init() {
     // computeShader = defaultCompute;
     // fragmentShader = test1Frag;
 
-    // vertexShader = bloom1Vert;
-    // computeShader = bloom1Compute;
-    // fragmentShader = bloom1Frag;
+    // shaders = bloom1
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
     // //await webGPU.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
     // //await webGPU.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
     // await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
     // //await webGPU.addTextureImage('kernel', './../assets_ignore/ftt_mask_800x800.jpg', ShaderType.FRAGMENT);
 
-    // vertexShader = oscilloscope1Vert;
-    // computeShader = oscilloscope1Compute;
-    // fragmentShader = oscilloscope1Frag;
-    // webGPU.addTexture2d('feedbackTexture', true, ShaderType.FRAGMENT);
-    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // webGPU.addStorage('variables', 1, 'Variable', 2, ShaderType.FRAGMENT);
+    shaders = oscilloscope1
+    webGPU.addTexture2d('feedbackTexture', true, ShaderType.FRAGMENT);
+    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    webGPU.addStorage('variables', 1, 'Variable', 2, ShaderType.FRAGMENT);
 
     // vertexShader = imagetexture1Vert;
     // computeShader = imagetexture1Compute;
