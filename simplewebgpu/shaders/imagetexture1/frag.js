@@ -38,22 +38,9 @@ fn main(
     //let oldKingUVClamp = uv * vec2(1,1 * dimsRatio) * ratio.x;
     let rgbaImage = textureSample(image, feedbackSampler, imageUV); //* .998046;
 
-    let input = rgbaImage.r;
-    var output = 0.;
-
-    // compute the FFT
-    for (var k = 0; k < i32(N); k++) {
-        for (var n = 0; n < i32(N); n++) {
-            let coef = cos(2.0 * PI * f32(k) * f32(n) / N );
-            output += input * coef * params.sliderB;
-        }
-    }
-
-
-
 
     //let finalColor:vec4<f32> = vec4(brightness(rgbaImage));
-    let finalColor:vec4<f32> = rgbaImage + vec4(output);
+    let finalColor:vec4<f32> = rgbaImage;
 
 
     return finalColor;

@@ -4,6 +4,7 @@ import WebGPU, { ShaderType } from './absulit.simplewebgpu.module.js';
 import base from './shaders/base/index.js';
 import bloom1 from './shaders/bloom1/index.js';
 import oscilloscope1 from './shaders/oscilloscope1/index.js';
+import imagetexture1 from './shaders/imagetexture1/index.js';
 
 
 
@@ -55,25 +56,23 @@ async function init() {
     // computeShader = defaultCompute;
     // fragmentShader = test1Frag;
 
-    // shaders = bloom1
+    // shaders = bloom1;
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
     // //await webGPU.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
     // //await webGPU.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
     // await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
     // //await webGPU.addTextureImage('kernel', './../assets_ignore/ftt_mask_800x800.jpg', ShaderType.FRAGMENT);
 
-    shaders = oscilloscope1
-    webGPU.addTexture2d('feedbackTexture', true, ShaderType.FRAGMENT);
-    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    webGPU.addStorage('variables', 1, 'Variable', 2, ShaderType.FRAGMENT);
-
-    // vertexShader = imagetexture1Vert;
-    // computeShader = imagetexture1Compute;
-    // fragmentShader = imagetexture1Frag;
+    // shaders = oscilloscope1;
+    // webGPU.addTexture2d('feedbackTexture', true, ShaderType.FRAGMENT);
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // //await webGPU.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
-    // //await webGPU.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
-    // await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
+    // webGPU.addStorage('variables', 1, 'Variable', 2, ShaderType.FRAGMENT);
+
+    shaders = imagetexture1;
+    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    //await webGPU.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
+    //await webGPU.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
+    await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
 
     // vertexShader = imagetexture2Vert;
     // computeShader = imagetexture2Compute;
