@@ -55,9 +55,9 @@ fn main(
     let dims: vec2<u32> = textureDimensions(computeTexture, 0);
     var dimsRatio = f32(dims.x) / f32(dims.y);
     let imageUV = uv * vec2(1,-1 * dimsRatio) * ratio.y / params.sliderA;
-    var rgbaImage = textureSample(computeTexture, feedbackSampler, imageUV); //* .998046;
+    var point = textureSample(computeTexture, feedbackSampler, imageUV); //* .998046;
 
-    return rgbaImage;
+    return point;
 }
 `;
 

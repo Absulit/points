@@ -1,8 +1,10 @@
+import { brightness } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
 
 const compute = /*wgsl*/`
 
 ${defaultStructs}
+${brightness}
 
 const workgroupSize = 8;
 
@@ -36,12 +38,37 @@ fn main(
             let ny = y / numRows;
             let uv = vec2(nx,ny);
 
-            let pointIndex = i32(y + (x * numColumns));
+            //let pointIndex = i32(y + (x * numColumns));
 
             var point = textureLoad(image, vec2<i32>(ix,iy), 0);
+            let b = brightness(point);
+            var newBrightness = 0.;
+            if(b > .5){
+                newBrightness = 1.;
+            }
+
+            let quant_error = b - newBrightness;
+            let distance = 1;
+            let distanceU = u32(distance);
+            point = vec4(newBrightness);
+
 
             let positionU = vec2<u32>(ux,uy);
             textureStore(outputTex, positionU, point);
+
+            //color.brightness = rightPoint.color.brightness + (.5 * quant_error)
+            if( (ix+distance) < numColumnsPiece){
+                var rightPoint = textureLoad(image, vec2<i32>(ix+distance,iy), 0);
+                rightPoint = vec4(brightness(rightPoint) + (.5 * quant_error));
+                textureStore(outputTex, positionU + vec2(distanceU,0), rightPoint);
+
+            }
+
+            if( (iy+distance) < numRowsPiece ){
+                var bottomPoint = textureLoad(image, vec2<i32>(ix,iy+distance), 0);
+                bottomPoint = vec4(brightness(bottomPoint) + (.5 * quant_error));
+                textureStore(outputTex, positionU + vec2(0,distanceU), bottomPoint);
+            }
         }
     }
     //--------------------------------------------------
