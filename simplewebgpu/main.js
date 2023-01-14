@@ -38,6 +38,7 @@ import slime3 from './shaders/slime3/index.js';
 import blur1 from './shaders/blur1/index.js';
 import circleblur from './shaders/circleblur/index.js';
 import demo6 from './shaders/demo_6/index.js';
+import dithering3 from './shaders/dithering3/index.js';
 
 
 
@@ -134,6 +135,14 @@ async function init() {
     // await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
     // //await webGPU.addTextureVideo('video', './../assets_ignore/VIDEO0244.mp4', ShaderType.FRAGMENT);
     // await webGPU.addTextureWebcam('video', ShaderType.FRAGMENT);
+
+    shaders = dithering3;
+    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    // await webGPU.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
+    // await webGPU.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
+    // await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
+    await webGPU.addTextureImage('image', './../img/angel_600x600.jpg', ShaderType.COMPUTE);
+    webGPU.addBindingTexture('outputTex', 'computeTexture');
 
     // shaders = videotexture1;
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);

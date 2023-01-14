@@ -62,7 +62,7 @@ fn orderedDithering(color:vec4<f32>, depth:f32, dims:vec2<u32>, uv:vec2<f32>) ->
     //     16, 8, 14, 6
     // );
 
-    let t = orderedDithering_threshold_map[ i32(uv.x + (uv.y * f32(dims.x)) % depth * 32.) ];
+    let t = orderedDithering_threshold_map[ i32(  (uv.x % 4.) + (uv.y % 4. * f32(dims.x))) ];
 
     var r = (color.r + t / depth);
     if(r < 1){r = 0;}
