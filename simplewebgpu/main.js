@@ -406,14 +406,16 @@ function onClickDownloadButton(e) {
     started = !started;
     if (started) {
         // start
-        capturer.start();
+        //capturer.start();
+        webGPU.videoRecordStart();
         downloadBtn.textContent = 'RECORDING (STOP)';
     } else {
         downloadBtn.textContent = buttonTitle;
         // stop and download
-        capturer.stop();
+        //capturer.stop();
         // default save, will download automatically a file called {name}.extension (webm/gif/tar)
-        capturer.save();
+        //capturer.save();
+        webGPU.videoRecordStop();
     }
 }
 

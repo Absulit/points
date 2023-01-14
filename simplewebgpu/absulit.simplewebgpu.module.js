@@ -1208,4 +1208,44 @@ export default class WebGPU {
     get pipeline() {
         return this._pipeline;
     }
+
+    // -----------------------------
+    videoStream = null;
+    mediaRecorder = null;
+    videoRecordStart() {
+        let video = document.getElementById('videorecord') || document.createElement('video');
+        video.id = 'videorecord';
+        video.width = 100;
+        video.height = 100;
+        document.body.appendChild(video);
+
+        const options = {
+            audioBitsPerSecond: 128000,
+            videoBitsPerSecond: 6000000,
+            mimeType: "video/webm",
+        };
+        this.videoStream = this._canvas.captureStream(60);
+        this.mediaRecorder = new MediaRecorder(this.videoStream, options);
+
+        let chunks = [];
+        this.mediaRecorder.ondataavailable = function (e) {
+            chunks.push(e.data);
+        };
+        this.mediaRecorder.onstop = function (e) {
+            const blob = new Blob(chunks, { 'type': 'video/webm' });
+            chunks = [];
+            let videoURL = URL.createObjectURL(blob);
+            video.src = videoURL;
+            video.play();
+        };
+        this.mediaRecorder.ondataavailable = function (e) {
+            chunks.push(e.data);
+        };
+
+        this.mediaRecorder.start();
+    }
+
+    videoRecordStop() {
+        this.mediaRecorder.stop();
+    }
 }
