@@ -442,10 +442,10 @@ export default class WebGPU {
         console.log(colorsVertWGSL);
         console.groupEnd();
         console.groupCollapsed('COMPUTE');
-        console.log(colorsComputeWGSL, 'color: #ffffff');
+        console.log(colorsComputeWGSL);
         console.groupEnd();
         console.groupCollapsed('FRAGMENT');
-        console.log(colorsFragWGSL, 'color: #ff99ff');
+        console.log(colorsFragWGSL);
         console.groupEnd();
 
         this._shaders = {
@@ -515,7 +515,7 @@ export default class WebGPU {
             },
         };
 
-        return true;
+        await this.createScreen(1, 1);
     }
 
     /**
@@ -523,7 +523,7 @@ export default class WebGPU {
      * @param {Number} numColumns
      * @param {Number} numRows
      */
-    async createScreen(numColumns = 10, numRows = 10) {
+    async createScreen(numColumns = 1, numRows = 1) {
         let colors = [
             new RGBAColor(1, 0, 0),
             new RGBAColor(0, 1, 0),

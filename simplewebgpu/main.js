@@ -350,10 +350,7 @@ async function init() {
     // webGPU.addTexture2d('feedbackTexture', true);
     // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
-    const initialized = await webGPU.init(shaders.vert, shaders.compute, shaders.frag);
-    if (initialized) {
-        await webGPU.createScreen(1, 1);
-    }
+    await webGPU.init(shaders.vert, shaders.compute, shaders.frag);
     await update();
 }
 
