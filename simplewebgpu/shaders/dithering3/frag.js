@@ -54,7 +54,9 @@ fn main(
 
     let dims: vec2<u32> = textureDimensions(computeTexture, 0);
     var dimsRatio = f32(dims.x) / f32(dims.y);
+    let f = params.screenWidth / 360.;
     let imageUV = uv * vec2(1,-1 * dimsRatio) * ratio.y / params.sliderA;
+    //let imageUV = (uv / f + vec2(0, .549 ) ) * vec2(1,-1 * dimsRatio) * ratio.y / params.sliderA;
     var point = textureSample(computeTexture, feedbackSampler, imageUV); //* .998046;
 
     return point;

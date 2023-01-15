@@ -1232,7 +1232,7 @@ export default class WebGPU {
             chunks.push(e.data);
         };
         this.mediaRecorder.onstop = function (e) {
-            const blob = new Blob(chunks, { 'type': 'video/webm' });
+            const blob = new Blob(chunks, { 'type': 'video/mp4' });
             chunks = [];
             let videoURL = URL.createObjectURL(blob);
             video.src = videoURL;
