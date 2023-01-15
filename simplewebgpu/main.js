@@ -39,6 +39,7 @@ import blur1 from './shaders/blur1/index.js';
 import circleblur from './shaders/circleblur/index.js';
 import demo6 from './shaders/demo_6/index.js';
 import dithering3 from './shaders/dithering3/index.js';
+import dithering4 from './shaders/dithering4/index.js';
 
 
 
@@ -124,14 +125,14 @@ async function init() {
 
     // shaders = dithering1;
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // //await webGPU.addTextureImage('oldking', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
-    // //await webGPU.addTextureImage('oldking', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
+    // //await webGPU.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
+    // //await webGPU.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
     // await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
 
     // shaders = dithering2;
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // //await webGPU.addTextureImage('oldking', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
-    // //await webGPU.addTextureImage('oldking', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
+    // //await webGPU.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
+    // //await webGPU.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
     // await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
     // //await webGPU.addTextureVideo('video', './../assets_ignore/VIDEO0244.mp4', ShaderType.FRAGMENT);
     // await webGPU.addTextureWebcam('video', ShaderType.FRAGMENT);
@@ -143,13 +144,18 @@ async function init() {
     //await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.COMPUTE);
     // await webGPU.addTextureVideo('image', './../assets_ignore/Black and White Clouds - Time lapse (480p_30fps_H264-128kbit_AAC).mp4', ShaderType.COMPUTE);
     // await webGPU.addTextureVideo('image', './../assets_ignore/weird_4_2_noaudio.mp4', ShaderType.COMPUTE);
-    await webGPU.addTextureVideo('image', './../assets_ignore/VID_57840514_190415.mp4', ShaderType.COMPUTE);
-    // await webGPU.addTextureWebcam('image', ShaderType.COMPUTE);
-
+    // await webGPU.addTextureVideo('image', './../assets_ignore/VID_57840514_190415.mp4', ShaderType.COMPUTE);
+    await webGPU.addTextureWebcam('image', ShaderType.COMPUTE);
     // await webGPU.addTextureImage('image', './../img/angel_600x600.jpg', ShaderType.COMPUTE);
     webGPU.addBindingTexture('outputTex', 'computeTexture');
     webGPU.addLayers(2, ShaderType.COMPUTE);
     webGPU.addStorage('variables', 1, 'Variable', 2, ShaderType.COMPUTE);
+
+    // shaders = dithering4;
+    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    // //await webGPU.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
+    // //await webGPU.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
+    // await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
 
     // shaders = videotexture1;
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
