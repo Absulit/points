@@ -40,6 +40,7 @@ import circleblur from './shaders/circleblur/index.js';
 import demo6 from './shaders/demo_6/index.js';
 import dithering3 from './shaders/dithering3/index.js';
 import dithering4 from './shaders/dithering4/index.js';
+import poisson1 from './shaders/poisson1/index.js';
 
 
 
@@ -93,6 +94,35 @@ async function init() {
     // computeShader = defaultCompute;
     // fragmentShader = test1Frag;
 
+    shaders = poisson1;
+    const r = 30;
+    const k = 10;
+    const w = r / Math.sqrt(2);
+    const rows = Math.floor(webGPU.canvas.width / w);
+    const columns = Math.floor(webGPU.canvas.height / w);;
+    webGPU.addUniform('r', r);
+    webGPU.addUniform('k', k);
+    webGPU.addUniform('w', w);
+    webGPU.addUniform('rows', rows);
+    webGPU.addUniform('columns', columns);
+    const numCels = rows*columns;
+    webGPU.addUniform('numCels', numCels);
+    webGPU.addStorage('grid', numCels, 'vec2<f32>', 2, ShaderType.COMPUTE);
+    webGPU.addStorage('active_grid', numCels, 'vec2<f32>', 2);
+
+    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    // await webGPU.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.COMPUTE);
+    // await webGPU.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.COMPUTE);
+    await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.COMPUTE);
+    // await webGPU.addTextureVideo('image', './../assets_ignore/Black and White Clouds - Time lapse (480p_30fps_H264-128kbit_AAC).mp4', ShaderType.COMPUTE);
+    // await webGPU.addTextureVideo('image', './../assets_ignore/weird_4_2_noaudio.mp4', ShaderType.COMPUTE);
+    // await webGPU.addTextureVideo('image', './../assets_ignore/VID_57840514_190415.mp4', ShaderType.COMPUTE);
+    // await webGPU.addTextureWebcam('image', ShaderType.COMPUTE);
+    // await webGPU.addTextureImage('image', './../img/angel_600x600.jpg', ShaderType.COMPUTE);
+    webGPU.addBindingTexture('outputTex', 'computeTexture');
+    //webGPU.addLayers(2, ShaderType.COMPUTE);
+    webGPU.addStorage('variables', 1, 'Variable', 2, ShaderType.COMPUTE);
+
     // shaders = bloom1;
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
     // //await webGPU.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
@@ -137,19 +167,19 @@ async function init() {
     // //await webGPU.addTextureVideo('video', './../assets_ignore/VIDEO0244.mp4', ShaderType.FRAGMENT);
     // await webGPU.addTextureWebcam('video', ShaderType.FRAGMENT);
 
-    shaders = dithering3;
-    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // await webGPU.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
-    // await webGPU.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
-    //await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.COMPUTE);
-    // await webGPU.addTextureVideo('image', './../assets_ignore/Black and White Clouds - Time lapse (480p_30fps_H264-128kbit_AAC).mp4', ShaderType.COMPUTE);
-    // await webGPU.addTextureVideo('image', './../assets_ignore/weird_4_2_noaudio.mp4', ShaderType.COMPUTE);
-    // await webGPU.addTextureVideo('image', './../assets_ignore/VID_57840514_190415.mp4', ShaderType.COMPUTE);
-    await webGPU.addTextureWebcam('image', ShaderType.COMPUTE);
-    // await webGPU.addTextureImage('image', './../img/angel_600x600.jpg', ShaderType.COMPUTE);
-    webGPU.addBindingTexture('outputTex', 'computeTexture');
-    webGPU.addLayers(2, ShaderType.COMPUTE);
-    webGPU.addStorage('variables', 1, 'Variable', 2, ShaderType.COMPUTE);
+    // shaders = dithering3;
+    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    // // await webGPU.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
+    // // await webGPU.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
+    // //await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.COMPUTE);
+    // // await webGPU.addTextureVideo('image', './../assets_ignore/Black and White Clouds - Time lapse (480p_30fps_H264-128kbit_AAC).mp4', ShaderType.COMPUTE);
+    // // await webGPU.addTextureVideo('image', './../assets_ignore/weird_4_2_noaudio.mp4', ShaderType.COMPUTE);
+    // // await webGPU.addTextureVideo('image', './../assets_ignore/VID_57840514_190415.mp4', ShaderType.COMPUTE);
+    // await webGPU.addTextureWebcam('image', ShaderType.COMPUTE);
+    // // await webGPU.addTextureImage('image', './../img/angel_600x600.jpg', ShaderType.COMPUTE);
+    // webGPU.addBindingTexture('outputTex', 'computeTexture');
+    // webGPU.addLayers(2, ShaderType.COMPUTE);
+    // webGPU.addStorage('variables', 1, 'Variable', 2, ShaderType.COMPUTE);
 
     // shaders = dithering4;
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
