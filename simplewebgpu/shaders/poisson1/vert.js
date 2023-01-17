@@ -1,9 +1,13 @@
 import { defaultVertexBody } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
+import { Point } from './utils.js';
 
 const vert = /*wgsl*/`
 
 ${defaultStructs}
+${Point}
+
+
 ${defaultVertexBody}
 
 @vertex

@@ -1,20 +1,18 @@
 import { brightness } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
 import { rand } from '../random.js';
+import { Point } from './utils.js';
 
 const compute = /*wgsl*/`
 
 ${defaultStructs}
+${Point}
 
-struct PVector{
-    x: f32,
-    y: f32,
-    used: i32
-}
 
 struct Variable{
     init: i32,
     activeIndex: i32,
+    lastRandom: f32,
 }
 
 ${brightness}
@@ -22,29 +20,6 @@ ${rand}
 
 const workgroupSize = 8;
 
-// https://dev.to/christiankastner/poisson-disc-sampling-and-generative-art-2fpd
-
-fn testSample(sample: vec2<f32>) -> bool {
-    let col = floor(sample.x / params.w);
-    let row = floor(sample.y / params.w);
-    //println(col, row, cols, rows, grid[col + row * cols]);
-    if (col > 0 && row > 0 && col < params.columns - 1 && row < params.rows - 1 && (col + row * params.columns) < params.numCels ) {
-      for (var i = -1; i <= 1; i++) {
-        for (var j = -1; j <= 1; j++) {
-          let index = ( i32(col) + i) + (i32(row) + j) * i32(params.columns);
-          let neighbor = grid[index];
-          if (index < i32(params.numCels)) {
-            let d = distance(sample, neighbor);
-            if (d < params.r) {
-              return false;
-            }
-          }
-        }
-      }
-      return true;
-    }
-    return false;
-}
 
 @compute @workgroup_size(workgroupSize,workgroupSize,1)
 fn main(
@@ -56,14 +31,13 @@ fn main(
 
 
 
-    _ = grid[0];
-    _ = active_grid[0];
+    _ = points[0];
 
     //--------------------------------------------------
     let dims = textureDimensions(image);
 
-    let numColumns:f32 = f32(dims.x);
-    let numRows:f32 = f32(dims.y);
+    let numColumns:f32 = params.screenWidth;
+    let numRows:f32 = params.screenHeight;
     //let constant = u32(numColumns) / 93u;
 
     let numColumnsPiece:i32 = i32(numColumns / f32(workgroupSize));
@@ -71,15 +45,12 @@ fn main(
 
     var layerIndex = 0;
     if(variables.init == 0){
+        rand_seed.y = fract(params.epoch);
+        rand();
+        let point = Point(rand_seed.x, rand_seed.y, 2, 1);
 
-        let point = vec2(rand() * params.screenWidth, rand() * params.screenHeight);
+        points[0] = point;
 
-        let i = u32(floor(point.x/params.w));
-        let j = u32(floor(point.y/params.w));
-
-        grid[i + j * u32(params.columns)] = point;
-        variables.activeIndex = 0;
-        active_grid[variables.activeIndex] = point;
 
 
 
@@ -90,30 +61,7 @@ fn main(
 
 
 
-    if (variables.activeIndex > 0) {
-        let i = i32(floor(rand() * f32(variables.activeIndex)));
-        let pos = active_grid[i];
-        for (var j = 0; j < i32(params.k); j++) {
-          rand();
-          var sample = rand_seed;
-          let newMagnitude = params.r + rand() * 2*params.r;// random(r, 2 * r);
-          //sample = length(m);
-          let magnitude = sqrt(sample.x * sample.x + sample.y * sample.y);
-          sample.x = sample.x * newMagnitude / magnitude;
-          sample.y = sample.y * newMagnitude / magnitude;
-          sample += pos;
-          if (testSample(sample) == true) {
-            variables.activeIndex++;
-            active_grid[variables.activeIndex] = sample;
-            let x = i32(floor(sample.x / params.w));
-            let y = i32(floor(sample.y / params.w));
-            grid[x + y * i32(params.columns)] = sample;
-            break;
-          } else if (j == i32(params.k) - 1) {
-            active_grid[i] = vec2(0.); // maybe vec3 and use z as flag
-          }
-        }
-      }
+
 
 
 

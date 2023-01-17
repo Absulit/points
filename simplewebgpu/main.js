@@ -95,33 +95,24 @@ async function init() {
     // fragmentShader = test1Frag;
 
     shaders = poisson1;
-    const r = 30;
-    const k = 10;
+    const r = 200;
+    const k = 30;
     const w = r / Math.sqrt(2);
     const rows = Math.floor(webGPU.canvas.width / w);
     const columns = Math.floor(webGPU.canvas.height / w);;
     webGPU.addUniform('r', r);
     webGPU.addUniform('k', k);
-    webGPU.addUniform('w', w);
     webGPU.addUniform('rows', rows);
     webGPU.addUniform('columns', columns);
-    const numCels = rows*columns;
-    webGPU.addUniform('numCels', numCels);
-    webGPU.addStorage('grid', numCels, 'vec2<f32>', 2, ShaderType.COMPUTE);
-    webGPU.addStorage('active_grid', numCels, 'vec2<f32>', 2);
+    
+    const numPoints = 10;
+    webGPU.addUniform('numPoints', numPoints);
+    webGPU.addStorage('points', numPoints, 'Point', 4);
 
     webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // await webGPU.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.COMPUTE);
-    // await webGPU.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.COMPUTE);
     await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.COMPUTE);
-    // await webGPU.addTextureVideo('image', './../assets_ignore/Black and White Clouds - Time lapse (480p_30fps_H264-128kbit_AAC).mp4', ShaderType.COMPUTE);
-    // await webGPU.addTextureVideo('image', './../assets_ignore/weird_4_2_noaudio.mp4', ShaderType.COMPUTE);
-    // await webGPU.addTextureVideo('image', './../assets_ignore/VID_57840514_190415.mp4', ShaderType.COMPUTE);
-    // await webGPU.addTextureWebcam('image', ShaderType.COMPUTE);
-    // await webGPU.addTextureImage('image', './../img/angel_600x600.jpg', ShaderType.COMPUTE);
     webGPU.addBindingTexture('outputTex', 'computeTexture');
-    //webGPU.addLayers(2, ShaderType.COMPUTE);
-    webGPU.addStorage('variables', 1, 'Variable', 2, ShaderType.COMPUTE);
+    webGPU.addStorage('variables', 1, 'Variable', 3, ShaderType.COMPUTE);
 
     // shaders = bloom1;
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
