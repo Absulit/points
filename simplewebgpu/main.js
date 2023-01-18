@@ -41,6 +41,7 @@ import demo6 from './shaders/demo_6/index.js';
 import dithering3 from './shaders/dithering3/index.js';
 import dithering4 from './shaders/dithering4/index.js';
 import poisson1 from './shaders/poisson1/index.js';
+import costarica_map1 from './shaders/costarica_map1/index.js';
 
 
 
@@ -94,25 +95,25 @@ async function init() {
     // computeShader = defaultCompute;
     // fragmentShader = test1Frag;
 
-    shaders = poisson1;
-    const r = 10;
-    const k = 30;
-    const w = r / Math.sqrt(2);
-    const rows = Math.floor(webGPU.canvas.width / w);
-    const columns = Math.floor(webGPU.canvas.height / w);;
-    webGPU.addUniform('r', r);
-    webGPU.addUniform('k', k);
-    webGPU.addUniform('rows', rows);
-    webGPU.addUniform('columns', columns);
-    
-    const numPoints = 4096;
-    webGPU.addUniform('numPoints', numPoints);
-    webGPU.addStorage('points', numPoints, 'Point', 4);
+    // shaders = poisson1;
+    // const r = 10;
+    // const k = 30;
+    // const w = r / Math.sqrt(2);
+    // const rows = Math.floor(webGPU.canvas.width / w);
+    // const columns = Math.floor(webGPU.canvas.height / w);;
+    // webGPU.addUniform('r', r);
+    // webGPU.addUniform('k', k);
+    // webGPU.addUniform('rows', rows);
+    // webGPU.addUniform('columns', columns);
 
-    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.COMPUTE);
-    webGPU.addBindingTexture('outputTex', 'computeTexture');
-    webGPU.addStorage('variables', 1, 'Variable', 3, ShaderType.COMPUTE);
+    // const numPoints = 4096;
+    // webGPU.addUniform('numPoints', numPoints);
+    // webGPU.addStorage('points', numPoints, 'Point', 4);
+
+    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    // await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.COMPUTE);
+    // webGPU.addBindingTexture('outputTex', 'computeTexture');
+    // webGPU.addStorage('variables', 1, 'Variable', 3, ShaderType.COMPUTE);
 
     // shaders = bloom1;
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
@@ -143,6 +144,12 @@ async function init() {
     // //await webGPU.addTextureImage('oldking', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
     // //await webGPU.addTextureImage('oldking', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
     // await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
+
+    shaders = costarica_map1;
+    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    //await webGPU.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
+    //await webGPU.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
+    await webGPU.addTextureImage('image', './../assets_ignore/costa_rica_map.png', ShaderType.FRAGMENT);
 
     // shaders = dithering1;
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
