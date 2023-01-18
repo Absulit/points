@@ -1,7 +1,7 @@
 import defaultStructs from '../defaultStructs.js';
 import { brightness, fnusin, fusin } from '../defaultFunctions.js';
 import { snoise } from '../noise2d.js';
-import { Point, pointVec2 } from './utils.js';
+import { Point } from './utils.js';
 
 const frag = /*wgsl*/`
 
@@ -12,7 +12,6 @@ ${fnusin}
 ${fusin}
 ${brightness}
 ${snoise}
-${pointVec2}
 
 @fragment
 fn main(
@@ -40,9 +39,9 @@ fn main(
     var lastDistance = -1.;
     for(var i:u32 = 0; i < u32(params.numPoints); i++){
         var point = points[i];
-        if(point.isActive == 1){
+        if(point.used == 1){
             //var d = distance(uv, vec2(planet.x * scale + .5, planet.y * scale + .5));
-            var d = distance(uv, pointVec2(point));
+            var d = distance(uv, point.position);
     
     
             if(lastDistance != -1.){

@@ -1,9 +1,8 @@
 export const Point = /*wgsl*/`
 struct Point{
-    x: f32,
-    y: f32,
+    position:vec2<f32>,
     index: u32,
-    isActive: u32,
+    used: u32,
 }
 `;
 

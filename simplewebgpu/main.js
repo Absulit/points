@@ -95,7 +95,7 @@ async function init() {
     // fragmentShader = test1Frag;
 
     shaders = poisson1;
-    const r = 200;
+    const r = 10;
     const k = 30;
     const w = r / Math.sqrt(2);
     const rows = Math.floor(webGPU.canvas.width / w);
@@ -105,7 +105,7 @@ async function init() {
     webGPU.addUniform('rows', rows);
     webGPU.addUniform('columns', columns);
     
-    const numPoints = 10;
+    const numPoints = 4096;
     webGPU.addUniform('numPoints', numPoints);
     webGPU.addStorage('points', numPoints, 'Point', 4);
 

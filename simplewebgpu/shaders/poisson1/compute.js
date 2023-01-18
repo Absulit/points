@@ -1,7 +1,8 @@
-import { brightness } from '../defaultFunctions.js';
+import { brightness, polar } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
 import { rand } from '../random.js';
 import { Point } from './utils.js';
+import { PI } from './../defaultConstants.js';
 
 const compute = /*wgsl*/`
 
@@ -17,6 +18,9 @@ struct Variable{
 
 ${brightness}
 ${rand}
+${polar}
+
+${PI}
 
 const workgroupSize = 8;
 
@@ -46,12 +50,26 @@ fn main(
     var layerIndex = 0;
     if(variables.init == 0){
         rand_seed.y = fract(params.epoch);
-        rand();
-        let point = Point(rand_seed.x, rand_seed.y, 2, 1);
 
-        points[0] = point;
+        var lastPoint = Point();
+        var point = Point();
+        for(var i = 0; i < i32(params.k); i++){
+            rand();
+            if(lastPoint.used == 0){
+                // first point create at random position
+                point = Point(rand_seed, 2, 1);
+            }else{
+                // second point and forward create in rage
+                let r = params.r / params.screenWidth;
+                let d = rand_seed.x * r + r;
+                let rads = PI * 2 * rand_seed.y;
+                let coordinates = polar(d, rads)  + point.position;
+                point = Point(coordinates, 2, 1);
+            }
+            points[i] = point;
+            lastPoint = point;
 
-
+        }
 
 
         variables.init = 1;
