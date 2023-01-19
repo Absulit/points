@@ -1,5 +1,5 @@
 import defaultStructs from '../defaultStructs.js';
-import { brightness, fnusin, fusin, polar, RGBAFromHSV, sdfCircle, sdfLine, sdfSegment } from '../defaultFunctions.js';
+import { brightness, brightnessB, brightnessC, fnusin, fusin, polar, RGBAFromHSV, sdfCircle, sdfLine, sdfSegment } from '../defaultFunctions.js';
 import { snoise } from '../noise2d.js';
 import { PI } from '../defaultConstants.js';
 
@@ -13,6 +13,8 @@ ${sdfCircle}
 ${sdfSegment}
 ${sdfLine}
 ${brightness}
+${brightnessB}
+${brightnessC}
 ${polar}
 ${snoise}
 ${PI}
@@ -35,22 +37,25 @@ fn main(
     let dims: vec2<u32> = textureDimensions(image, 0);
     var dimsRatio = f32(dims.x) / f32(dims.y);
 
-    let imageUV = uv * vec2(1,-1 * dimsRatio) * ratio.x; // / params.sliderA;
+    let imageUV = uv * vec2(1,-1 * dimsRatio) * ratio.x / params.sliderA;
     //let oldKingUVClamp = uv * vec2(1,1 * dimsRatio) * ratio.x;
     let rgbaImage = textureSample(image, feedbackSampler, imageUV); //* .998046;
+    let rgbaMask = textureSample(mask, feedbackSampler, imageUV); //* .998046;
     let b = brightness(rgbaImage);
 
+    let mask = 1-rgbaMask.g;
     //let finalColor:vec4<f32> = vec4();
-    //let finalColor:vec4<f32> = RGBAFromHSV(b + fract(params.utime), 1, 1) * rgbaImage * params.sliderC * 100;
+    let finalColor:vec4<f32> = RGBAFromHSV(b + fract(params.utime * .1), 1, 1);
     //let finalColor:vec4<f32> = RGBAFromHSV(rgbaImage.g * 2 + fract(params.utime * .1), 1, 1);
     //let finalColor:vec4<f32> = mix( RGBAFromHSV(params.sliderA, 1, 1), RGBAFromHSV(params.sliderB, 1, 1) , params.sliderC  );
-    let mask = rgbaImage.g * 4096;
-    let finalColor:vec4<f32> = mix( RGBAFromHSV(params.sliderA, 1, 1), RGBAFromHSV(params.sliderB, 1, 1) , rgbaImage.g  );
-
-    let clamped = clamp(rgbaImage.g, 0, params.sliderB);
+    //let finalColor:vec4<f32> = mix( RGBAFromHSV(params.sliderA, 1, 1), RGBAFromHSV(params.sliderB, 1, 1) , b  );
+    // let finalColor:vec4<f32> = mix( RGBAFromHSV(b + .5 + fract(params.utime), 1, 1), RGBAFromHSV(b + fract(params.utime), 1, 1) , b  );
 
 
-    return finalColor;
+    return vec4(finalColor.rgb, mask);
+    //return vec4(b);
+    //return vec4(rgbaImage);
+    //return vec4(b);
 }
 `;
 

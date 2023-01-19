@@ -150,6 +150,7 @@ async function init() {
     //await webGPU.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
     //await webGPU.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
     await webGPU.addTextureImage('image', './../assets_ignore/costa_rica_map.png', ShaderType.FRAGMENT);
+    await webGPU.addTextureImage('mask', './../assets_ignore/costa_rica_map_mask.png', ShaderType.FRAGMENT);
 
     // shaders = dithering1;
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
@@ -453,16 +454,16 @@ function onClickDownloadButton(e) {
     started = !started;
     if (started) {
         // start
-        //capturer.start();
-        webGPU.videoRecordStart();
+        capturer.start();
+        //webGPU.videoRecordStart();
         downloadBtn.textContent = 'RECORDING (STOP)';
     } else {
         downloadBtn.textContent = buttonTitle;
         // stop and download
-        //capturer.stop();
+        capturer.stop();
         // default save, will download automatically a file called {name}.extension (webm/gif/tar)
-        //capturer.save();
-        webGPU.videoRecordStop();
+        capturer.save();
+        //webGPU.videoRecordStop();
     }
 }
 

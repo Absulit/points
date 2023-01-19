@@ -249,3 +249,15 @@ fn brightness(color:vec4<f32>) -> f32 {
     return (0.2126 * color.r) + (0.7152 * color.g) + (0.0722 * color.b);
 }
 `;
+
+export const brightnessB = /*wgsl*/`
+fn brightnessB(color:vec4<f32>) -> f32 {
+    return (0.299 * color.r) + (0.587 * color.g) + (0.114 * color.b);
+}
+`;
+
+export const brightnessC = /*wgsl*/`
+fn brightnessC(color:vec4<f32>) -> f32 {
+    return (0.2126 * pow(color.r, 2.)) + (0.7152 * pow(color.g, 2.)) + (0.0722 * pow(color.b, 2.));
+}
+`;
