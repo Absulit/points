@@ -337,10 +337,10 @@ export default class WebGPU {
             bindingIndex += 1;
         }
 
-        this._storage.forEach((storageItem, index) => {
+        this._storage.forEach( storageItem => {
             if (!storageItem.shaderType || storageItem.shaderType == shaderType) {
                 let T = storageItem.structName;
-                if (storageItem.array && storageItem.array.length) {
+                if (storageItem.array?.length) {
                     storageItem.size = storageItem.array.length;
                 }
                 if (storageItem.size > 1) {
