@@ -1,3 +1,4 @@
+'use strict';
 import Coordinate from './coordinate.js';
 import { print } from '../../js/utils.js';
 import RGBAColor from './../webgpu/js/color.js';
@@ -184,8 +185,8 @@ export default class WebGPU {
     addSampler(name, descriptor, shaderType) {
         // Create a sampler with linear filtering for smooth interpolation.
         descriptor = descriptor || {
-            addressModeU: 'repeat',
-            addressModeV: 'repeat',
+            addressModeU: 'clamp-to-edge',
+            addressModeV: 'clamp-to-edge',
             magFilter: 'linear',
             minFilter: 'linear',
             mipmapFilter: 'linear',
