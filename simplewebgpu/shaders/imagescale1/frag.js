@@ -44,12 +44,13 @@ fn main(
     let flipTexture = vec2(1.,-1.);
     let flipTextureCoordinates = vec2(-1.,1.);
 
-    let startPosition = vec2(params.sliderA, params.sliderB + imageRatio3) * flipTextureCoordinates;
-    //let startPosition = vec2(mouse.x, mouse.y + imageRatio3) * flipTextureCoordinates;
+    let startPosition = vec2(.5, .5);
+    let displaceImagePosition = vec2(startPosition.x, startPosition.y + imageRatio3) * flipTextureCoordinates;
+    //let displaceImagePosition = vec2(mouse.x, mouse.y + imageRatio3) * flipTextureCoordinates;
 
     let imageUV1 = uv * vec2(1,-1) / imageRatio1;
     let imageUV2 = uv * vec2(1,-1) / imageRatio2;
-    let imageUV3 = (uv * flipTexture + startPosition) / imageRatio3;
+    let imageUV3 = (uv * flipTexture + displaceImagePosition) / imageRatio3;
 
 
 
@@ -57,10 +58,10 @@ fn main(
     let rgbaImage2 = textureSample(image2, feedbackSampler, imageUV2); //* .998046;
     var rgbaImage3 = textureSample(image3, feedbackSampler, imageUV3); //* .998046;
 
-    let isBeyondImageRight = uv.x > params.sliderA + imageRatio3;
-    let isBeyondImageLeft = uv.x < params.sliderA;
-    let isBeyondTop = uv.y > params.sliderB +  imageRatio3;
-    let isBeyondBottom = uv.y < params.sliderB;
+    let isBeyondImageRight = uv.x > startPosition.x + imageRatio3;
+    let isBeyondImageLeft = uv.x < startPosition.x;
+    let isBeyondTop = uv.y > startPosition.y +  imageRatio3;
+    let isBeyondBottom = uv.y < startPosition.y;
     if(isBeyondTop || isBeyondBottom || isBeyondImageLeft || isBeyondImageRight){
         rgbaImage3 = vec4(0);
     }
