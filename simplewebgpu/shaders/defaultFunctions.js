@@ -9,6 +9,7 @@ fn defaultVertexBody(position: vec4<f32>, color: vec4<f32>, uv: vec2<f32>) -> Fr
     result.Color = vec4<f32>(color);
     result.uv = vec2(uv.x * result.ratio.x, uv.y);
     result.mouse = vec2(params.mouseX / params.screenWidth, params.mouseY / params.screenHeight);
+    result.mouse = result.mouse * vec2(1,-1) - vec2(0, -1); // flip and move up
 
     return result;
 }
@@ -178,6 +179,13 @@ fn RGBAFromHSV(h:f32, s:f32, v:f32) ->  vec4<f32>{
 }
 `;
 
+/**
+ * Creates a circle
+ * @param {vec2<f32>} position
+ * @param {f32} radius
+ * @param {f32} feather
+ * @param {vec2<f32>} uv
+ */
 export const sdfCircle = /*wgsl*/`;
 fn sdfCircle(position:vec2<f32>, radius: f32, feather: f32, uv:vec2<f32>) -> vec4<f32> {
     let d = distance(uv, position);

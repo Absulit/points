@@ -18,7 +18,6 @@ ${snoise}
 ${PI}
 
 
-const N = 2.;
 
 @fragment
 fn main(
@@ -44,7 +43,7 @@ fn main(
     let flipTexture = vec2(1.,-1.);
     let flipTextureCoordinates = vec2(-1.,1.);
 
-    let startPosition = vec2(.5, .5);
+    let startPosition = mouse;
     let displaceImagePosition = vec2(startPosition.x, startPosition.y + imageRatio3) * flipTextureCoordinates;
     //let displaceImagePosition = vec2(mouse.x, mouse.y + imageRatio3) * flipTextureCoordinates;
 
@@ -67,7 +66,6 @@ fn main(
     }
 
     let finalColor:vec4<f32> = rgbaImage3;
-
 
     return finalColor;
 }
