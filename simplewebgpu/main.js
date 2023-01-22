@@ -99,7 +99,7 @@ async function init() {
     shaders = imagescale1;
     webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
     //await webGPU.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
-    await webGPU.addTextureImage('image1', './../img/unnamed_horror_800x800.png', ShaderType.FRAGMENT);
+    await webGPU.addTextureImage('image1', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
     await webGPU.addTextureImage('image2', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
     await webGPU.addTextureImage('image3', './../img/unnamed_horror_100x100.png', ShaderType.FRAGMENT);
 
