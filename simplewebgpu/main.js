@@ -96,13 +96,11 @@ async function init() {
     // computeShader = defaultCompute;
     // fragmentShader = test1Frag;
 
-    shaders = imagescale1;
-    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    //await webGPU.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
-    await webGPU.addTextureImage('image1', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
-    await webGPU.addTextureImage('image2', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
-    await webGPU.addTextureImage('image3', './../img/unnamed_horror_100x100.png', ShaderType.FRAGMENT);
-
+    // shaders = imagescale1;
+    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    // await webGPU.addTextureImage('image1', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
+    // await webGPU.addTextureImage('image2', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
+    // await webGPU.addTextureImage('image3', './../img/unnamed_horror_100x100.png', ShaderType.FRAGMENT);
 
     // shaders = poisson1;
     // const r = 10;
@@ -154,12 +152,12 @@ async function init() {
     // //await webGPU.addTextureImage('oldking', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
     // await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
 
-    // shaders = costarica_map1;
-    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // //await webGPU.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
-    // //await webGPU.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
-    // await webGPU.addTextureImage('image', './../assets_ignore/costa_rica_map.png', ShaderType.FRAGMENT);
-    // await webGPU.addTextureImage('mask', './../assets_ignore/costa_rica_map_mask.png', ShaderType.FRAGMENT);
+    shaders = costarica_map1;
+    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    //await webGPU.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
+    //await webGPU.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
+    await webGPU.addTextureImage('image', './../assets_ignore/costa_rica_map.png', ShaderType.FRAGMENT);
+    await webGPU.addTextureImage('mask', './../assets_ignore/costa_rica_map_mask.png', ShaderType.FRAGMENT);
 
     // shaders = dithering1;
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);

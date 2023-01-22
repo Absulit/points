@@ -1,7 +1,9 @@
 import defaultStructs from '../defaultStructs.js';
-import { brightness, brightnessB, brightnessC, fnusin, fusin, polar, RGBAFromHSV, sdfCircle, sdfLine, sdfSegment } from '../defaultFunctions.js';
+import { brightness, brightnessB, brightnessC, fnusin, fusin, polar, sdfCircle, sdfLine, sdfSegment } from '../defaultFunctions.js';
 import { snoise } from '../noise2d.js';
 import { PI } from '../defaultConstants.js';
+import { RGBAFromHSV } from '../color.js';
+import { texturePosition } from '../image.js';
 
 const frag = /*wgsl*/`
 
@@ -19,6 +21,7 @@ ${polar}
 ${snoise}
 ${PI}
 ${RGBAFromHSV}
+${texturePosition}
 
 
 const N = 2.;
@@ -34,13 +37,9 @@ fn main(
 
     let n1 = snoise(uv * fnusin(1));
 
-    let dims: vec2<u32> = textureDimensions(image, 0);
-    var dimsRatio = f32(dims.x) / f32(dims.y);
-
-    let imageUV = uv * vec2(1,-1 * dimsRatio) * ratio.x / params.sliderA;
-    //let oldKingUVClamp = uv * vec2(1,1 * dimsRatio) * ratio.x;
-    let rgbaImage = textureSample(image, feedbackSampler, imageUV); //* .998046;
-    let rgbaMask = textureSample(mask, feedbackSampler, imageUV); //* .998046;
+    let scale = 6.;
+    let rgbaImage = texturePosition(image, vec2(0.), uv * scale / params.sliderA, false); //* .998046;
+    let rgbaMask = texturePosition(mask, vec2(0.), uv * scale / params.sliderA, false); //* .998046;
     let b = brightness(rgbaImage);
 
     let mask = 1-rgbaMask.g;

@@ -1,4 +1,5 @@
-import { fusin, RGBAFromHSV } from '../defaultFunctions.js';
+import { RGBAFromHSV } from '../color.js';
+import { fusin } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
 
 const frag = /*wgsl */`

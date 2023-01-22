@@ -1,7 +1,8 @@
 import defaultStructs from '../defaultStructs.js';
-import { fnusin, RGBAFromHSV, sdfLine, sdfLine2, sdfSegment } from '../defaultFunctions.js';
+import { fnusin, sdfLine, sdfLine2, sdfSegment } from '../defaultFunctions.js';
 import { snoise } from '../noise2d.js';
 import { rand } from '../random.js';
+import { RGBAFromHSV } from '../color.js';
 
 const frag = /*wgsl*/`
 

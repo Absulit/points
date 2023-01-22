@@ -167,18 +167,6 @@ fn sdfLine(p1:vec2<f32>, p2:vec2<f32>, pixelStroke:f32, uv:vec2<f32>)->f32{
 }
 `;
 
-
-export const RGBAFromHSV = /*wgsl*/`;
-fn hsvAux(h:f32, s:f32, v:f32, n:f32) -> f32 {
-    let k:f32 = (n + h * 6.) % 6.;
-    return v - v * s * max(      min(min(k, 4. - k), 1.), 0.);
-};
-
-fn RGBAFromHSV(h:f32, s:f32, v:f32) ->  vec4<f32>{
-    return vec4<f32>(hsvAux(h, s, v, 5), hsvAux(h, s, v, 3), hsvAux(h, s, v, 1), 1);
-}
-`;
-
 /**
  * Creates a circle
  * @param {vec2<f32>} position

@@ -1,4 +1,5 @@
-import { fnusin, RGBAFromHSV } from '../defaultFunctions.js';
+import { RGBAFromHSV } from '../color.js';
+import { fnusin } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
 import { rand, random } from '../random.js';
 

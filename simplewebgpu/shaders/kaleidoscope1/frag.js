@@ -1,5 +1,6 @@
 import defaultStructs from '../defaultStructs.js';
-import { fnusin, RGBAFromHSV } from '../defaultFunctions.js';
+import { fnusin } from '../defaultFunctions.js';
+import { RGBAFromHSV } from '../color.js';
 
 const frag = /*wgsl*/`
 
