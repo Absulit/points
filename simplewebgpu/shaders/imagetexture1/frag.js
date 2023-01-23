@@ -2,6 +2,7 @@ import defaultStructs from '../defaultStructs.js';
 import { brightness, fnusin, fusin, polar, sdfCircle, sdfLine, sdfSegment } from '../defaultFunctions.js';
 import { snoise } from '../noise2d.js';
 import { PI } from '../defaultConstants.js';
+import { texturePosition } from '../image.js';
 
 const frag = /*wgsl*/`
 
@@ -16,6 +17,7 @@ ${brightness}
 ${polar}
 ${snoise}
 ${PI}
+${texturePosition}
 
 
 const N = 2.;
@@ -31,12 +33,13 @@ fn main(
 
     let n1 = snoise(uv * fnusin(1));
 
-    let dims: vec2<u32> = textureDimensions(image, 0);
-    var dimsRatio = f32(dims.x) / f32(dims.y);
+    // let dims: vec2<u32> = textureDimensions(image, 0);
+    // var dimsRatio = f32(dims.x) / f32(dims.y);
 
-    let imageUV = uv * vec2(1,-1 * dimsRatio) * ratio.x / params.sliderA;
+    //let imageUV = uv * vec2(1,-1 * dimsRatio) * ratio.x / params.sliderA;
     //let oldKingUVClamp = uv * vec2(1,1 * dimsRatio) * ratio.x;
-    let rgbaImage = textureSample(image, feedbackSampler, imageUV); //* .998046;
+    let startPosition = vec2(.0);
+    let rgbaImage = texturePosition(image, startPosition, uv / params.sliderA, false); //* .998046;
 
 
     //let finalColor:vec4<f32> = vec4(brightness(rgbaImage));
