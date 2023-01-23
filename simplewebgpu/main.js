@@ -146,11 +146,11 @@ async function init() {
     // //await webGPU.addTextureImage('oldking', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
     // await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
 
-    shaders = imagetexture3;
-    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    //await webGPU.addTextureImage('oldking', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
-    //await webGPU.addTextureImage('oldking', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
-    await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
+    // shaders = imagetexture3;
+    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    // //await webGPU.addTextureImage('oldking', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
+    // //await webGPU.addTextureImage('oldking', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
+    // await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
 
     // shaders = costarica_map1;
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
@@ -319,14 +319,14 @@ async function init() {
     // webGPU.addStorage('planets', 8, 'Planet', 5);
     // webGPU.addStorage('variables', 1, 'Variable', 1);
 
-    // shaders = planets3;
-    // const numParticles = 1024 * 4;
-    // webGPU.addUniform('numParticles', numParticles);
-    // webGPU.addStorage('planets', numParticles, 'Planet', 3);
-    // webGPU.addStorage('variables', 1, 'Variable', 1);
-    // webGPU.addSampler('feedbackSampler');
-    // webGPU.addTexture2d('feedbackTexture', true);
-    // webGPU.addBindingTexture('outputTex', 'computeTexture');
+    shaders = planets3;
+    const numParticles = 1024 * 4;
+    webGPU.addUniform('numParticles', numParticles);
+    webGPU.addStorage('planets', numParticles, 'Planet', 3);
+    webGPU.addStorage('variables', 1, 'Variable', 1);
+    webGPU.addSampler('feedbackSampler');
+    webGPU.addTexture2d('feedbackTexture', true);
+    webGPU.addBindingTexture('outputTex', 'computeTexture');
 
     // shaders = planetsblur;
     // const numParticles = 8;
