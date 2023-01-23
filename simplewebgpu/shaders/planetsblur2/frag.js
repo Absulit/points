@@ -1,5 +1,6 @@
 import { fnusin } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
+import { texturePosition } from '../image.js';
 
 const frag = /*wgsl*/`
 
@@ -18,6 +19,7 @@ struct Planet{
 }
 
 ${fnusin}
+${texturePosition}
 
 @fragment
 fn main(
@@ -29,7 +31,8 @@ fn main(
     ) -> @location(0) vec4<f32> {
 
     //let texColor = textureSample(myTexture, mySampler, uv * 1.0 + .1 * fnusin(2));
-    let texColor = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1.001 * mouse.x * 2,-1.001 * mouse.y * 2));
+    let startPosition = vec2(0.);
+    let texColor = texturePosition(feedbackTexture, startPosition, uv * vec2(1.001 * mouse.x * 2, 1.001 * mouse.y * 2), false);
 
     let numParticles = params.numParticles;
     let pc: ptr<storage, f32, read_write> = &variables.particlesCreated;
