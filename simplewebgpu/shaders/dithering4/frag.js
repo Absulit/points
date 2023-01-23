@@ -3,6 +3,7 @@ import { brightness, fnusin, fusin, pixelateTexture } from '../defaultFunctions.
 import { snoise } from '../noise2d.js';
 import { getClosestColorInPalette, orderedDithering, orderedDithering_threshold_map } from '../effects.js';
 import { PI } from '../defaultConstants.js';
+import { texturePosition } from '../image.js';
 
 const frag = /*wgsl*/`
 
@@ -44,6 +45,7 @@ const getClosestColorInPalette_palette = array< vec4<f32>, numPaletteItems>(
 );
 
 ${PI}
+${texturePosition}
 
 
 const N = 2.;
@@ -63,7 +65,8 @@ fn main(
     let dimsF = vec2(f32(dims.x),f32(dims.y));
     var dimsRatio = f32(dims.x) / f32(dims.y);
     let imageUV = uv * vec2(1,-1 * dimsRatio) * ratio.y / params.sliderA;
-    var rgbaImage = textureSample(image, feedbackSampler, imageUV); //* .998046;
+    let startPosition = vec2(0.);
+    var rgbaImage = texturePosition(image, startPosition, uv, true); //* .998046;
     //var rgbaImage = pixelateTexture(image, feedbackSampler, 10,10, imageUV);
     let b = brightness(rgbaImage);
     var newBrightness = 0.;
@@ -75,16 +78,17 @@ fn main(
 
 
     let texelSize = imageUV / dimsF;
-    let rgbaImageRight = textureSample(image, feedbackSampler, imageUV + vec2(texelSize.x, 0));
+
+    let rgbaImageRight = texturePosition(image, startPosition, uv + vec2(texelSize.x, 0), true);
     let bRight = brightness(rgbaImageRight) + (.5 * quant_error);
 
-    let rgbaImageLeft = textureSample(image, feedbackSampler, imageUV + vec2(-texelSize.x, 0));
+    let rgbaImageLeft = texturePosition(image, startPosition, uv + vec2(-texelSize.x, 0), true);
     let bLeft = brightness(rgbaImageLeft) + (.5 * quant_error);
 
-    let rgbaImageTop = textureSample(image, feedbackSampler, imageUV + vec2(0, -texelSize.y));
+    let rgbaImageTop = texturePosition(image, startPosition, uv + vec2(0, -texelSize.y), true);
     let bTop = brightness(rgbaImageTop) + (.5 * quant_error);
 
-    let rgbaImageBottom = textureSample(image, feedbackSampler, imageUV + vec2(0, texelSize.y));
+    let rgbaImageBottom = texturePosition(image, startPosition, uv + vec2(0, texelSize.y), true);
     let bBottom = brightness(rgbaImageBottom) + (.5 * quant_error);
 
     let fb = (b + bRight + bLeft + bTop + bBottom) / 5 * params.sliderC;
