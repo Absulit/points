@@ -2,6 +2,7 @@ import defaultStructs from '../defaultStructs.js';
 import { brightness, fnusin, fusin, pixelateTexture } from '../defaultFunctions.js';
 import { snoise } from '../noise2d.js';
 import { getClosestColorInPalette, orderedDithering, orderedDithering_threshold_map } from '../effects.js';
+import { texturePosition } from '../image.js';
 
 const frag = /*wgsl*/`
 
@@ -14,6 +15,7 @@ ${snoise}
 ${getClosestColorInPalette}
 ${orderedDithering}
 ${pixelateTexture}
+${texturePosition}
 
 ${orderedDithering_threshold_map}
 
@@ -57,7 +59,7 @@ fn main(
     let dims: vec2<u32> = textureDimensions(image, 0);
     var dimsRatio = f32(dims.x) / f32(dims.y);
     let imageUV = uv * vec2(1,-1 * dimsRatio) * ratio.y / params.sliderA;
-    var rgbaImage = textureSample(image, feedbackSampler, imageUV); //* .998046;
+    var rgbaImage = texturePosition(image, vec2(0.), uv / params.sliderA, false); //* .998046;
     //var rgbaImage = pixelateTexture(image, feedbackSampler, 10,10, imageUV);
     let br = brightness(rgbaImage);
 
