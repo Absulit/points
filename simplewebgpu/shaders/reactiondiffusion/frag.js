@@ -32,7 +32,7 @@ fn main(
     // let texColor2 = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1) + vec2(-.001,1));
     // let texColor3 = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1) + vec2(.001,1));
 
-    let texColorCompute = textureSample(computeTexture, feedbackSampler, uv * vec2(1,-1));
+    let texColorCompute = textureSample(computeTexture, feedbackSampler, uv);
 
     var particle = chemicals[0];
     var particle2 = chemicals2[0];

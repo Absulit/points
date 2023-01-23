@@ -217,18 +217,18 @@ async function init() {
     // webGPU.addStorage('value_noise_data', numPoints, 'f32', 1, ShaderType.COMPUTE);
     // webGPU.addStorage('variables', 1, 'Variable', 1, ShaderType.COMPUTE);
 
-    shaders = noise2;
-    const numPoints = 1024;
-    const lineAmount = 16;
-    webGPU.addUniform('numPoints', numPoints);
-    webGPU.addUniform('initializeAgain', 0);
-    webGPU.addUniform('lineAmount', lineAmount);
-    webGPU.addStorage('points', numPoints, 'Point', 4);
-    webGPU.addStorage('variables', 1, 'Variable', 3, ShaderType.COMPUTE);
-    webGPU.addTexture2d('feedbackTexture', true, ShaderType.FRAGMENT);
-    webGPU.addLayers(1, ShaderType.COMPUTE);
-    webGPU.addBindingTexture('outputTex', 'computeTexture');
-    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    // shaders = noise2;
+    // const numPoints = 1024;
+    // const lineAmount = 16;
+    // webGPU.addUniform('numPoints', numPoints);
+    // webGPU.addUniform('initializeAgain', 0);
+    // webGPU.addUniform('lineAmount', lineAmount);
+    // webGPU.addStorage('points', numPoints, 'Point', 4);
+    // webGPU.addStorage('variables', 1, 'Variable', 3, ShaderType.COMPUTE);
+    // webGPU.addTexture2d('feedbackTexture', true, ShaderType.FRAGMENT);
+    // webGPU.addLayers(1, ShaderType.COMPUTE);
+    // webGPU.addBindingTexture('outputTex', 'computeTexture');
+    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
 
     // shaders = noise3;
     // const numPoints = 1024;
@@ -344,15 +344,15 @@ async function init() {
     // webGPU.addSampler('feedbackSampler');
     // webGPU.addTexture2d('feedbackTexture', true);
 
-    // shaders = reactiondiffusion;
-    // const numPoints = 800*800;
-    // webGPU.addUniform('numPoints', numPoints);
-    // webGPU.addStorage('chemicals', numPoints, 'Chemical', 2);
-    // webGPU.addStorage('chemicals2', numPoints, 'Chemical', 2);
-    // webGPU.addStorage('variables', 1, 'Variable', 1);
-    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // webGPU.addTexture2d('feedbackTexture', true, ShaderType.COMPUTE);
-    // webGPU.addBindingTexture('outputTex', 'computeTexture');
+    shaders = reactiondiffusion;
+    const numPoints = 800*800;
+    webGPU.addUniform('numPoints', numPoints);
+    webGPU.addStorage('chemicals', numPoints, 'Chemical', 2);
+    webGPU.addStorage('chemicals2', numPoints, 'Chemical', 2);
+    webGPU.addStorage('variables', 1, 'Variable', 1);
+    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    webGPU.addTexture2d('feedbackTexture', true, ShaderType.COMPUTE);
+    webGPU.addBindingTexture('outputTex', 'computeTexture');
 
     // shaders = reactiondiffusion1;
     // const numPoints = 800*800*2;
