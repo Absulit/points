@@ -2,6 +2,8 @@ import defaultStructs from '../defaultStructs.js';
 import { brightness, fnusin, fusin, polar, sdfCircle, sdfLine, sdfSegment } from '../defaultFunctions.js';
 import { snoise } from '../noise2d.js';
 import { PI } from '../defaultConstants.js';
+import { texturePosition } from '../image.js';
+import { bloom } from '../color.js';
 
 const frag = /*wgsl*/`
 
@@ -16,9 +18,9 @@ ${brightness}
 ${polar}
 ${snoise}
 ${PI}
+${texturePosition}
+${bloom}
 
-
-const N = 2.;
 
 @fragment
 fn main(
@@ -29,31 +31,15 @@ fn main(
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
-    let n1 = snoise(uv * fnusin(1));
-
-    let dims: vec2<u32> = textureDimensions(image, 0);
-    var dimsRatio = f32(dims.x) / f32(dims.y);
-
-    let imageUV = uv * vec2(1,-1 * dimsRatio) * ratio.x / params.sliderA;
-    //let oldKingUVClamp = uv * vec2(1,1 * dimsRatio) * ratio.x;
-    let rgbaImage = textureSample(image, feedbackSampler, imageUV); //* .998046;
+    let startPosition = vec2(0.,0.);
+    let rgbaImage = texturePosition(image, startPosition, uv / params.sliderA, true); //* .998046;
 
     let input = rgbaImage.r;
-    var output = 0.;
-
-    // compute the FFT
-    for (var k = 0; k < i32(N); k++) {
-        for (var n = 0; n < i32(N); n++) {
-            let coef = cos(2.0 * PI * f32(k) * f32(n) / N );
-            output += input * coef * params.sliderB;
-        }
-    }
+    let bloomVal = bloom(input, 2, params.sliderB);
+    let rgbaBloom = vec4(bloomVal);
 
 
-
-
-    //let finalColor:vec4<f32> = vec4(brightness(rgbaImage));
-    let finalColor:vec4<f32> = rgbaImage + vec4(output);
+    let finalColor:vec4<f32> = rgbaImage + rgbaBloom;
 
 
     return finalColor;

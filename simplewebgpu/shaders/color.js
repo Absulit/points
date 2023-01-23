@@ -21,3 +21,23 @@ fn RGBAFromHSV(h:f32, s:f32, v:f32) ->  vec4<f32>{
     return vec4<f32>(hsvAux(h, s, v, 5), hsvAux(h, s, v, 3), hsvAux(h, s, v, 1), 1);
 }
 `;
+
+/**
+ * Compute the FFT (Fast Fourier Transform)
+ * @param {f32} input `f32`
+ * @param {i32} iterations `i32` 2, two is good
+ * @param {f32} intensity `f32` 0..1 a percentage
+ */
+export const bloom = /*wgsl*/`
+fn bloom(input:f32, iterations:i32, intensity:f32) -> f32 {
+    var output = 0.;
+    let iterationsF32 = f32(iterations);
+    for (var k = 0; k < iterations; k++) {
+        for (var n = 0; n < iterations; n++) {
+            let coef = cos(2.0 * PI * f32(k) * f32(n) / iterationsF32 );
+            output += input * coef * intensity;
+        }
+    }
+    return output;
+}
+`;
