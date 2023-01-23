@@ -2,6 +2,7 @@ import defaultStructs from '../defaultStructs.js';
 import { brightness, fnusin, fusin, pixelateTexture } from '../defaultFunctions.js';
 import { snoise } from '../noise2d.js';
 import { getClosestColorInPalette, orderedDithering, orderedDithering_threshold_map } from '../effects.js';
+import { texturePosition } from '../image.js';
 
 const frag = /*wgsl*/`
 
@@ -14,6 +15,7 @@ ${snoise}
 ${getClosestColorInPalette}
 ${orderedDithering}
 ${pixelateTexture}
+${texturePosition}
 
 ${orderedDithering_threshold_map}
 
@@ -52,12 +54,9 @@ fn main(
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
-    let dims: vec2<u32> = textureDimensions(computeTexture, 0);
-    var dimsRatio = f32(dims.x) / f32(dims.y);
-    let f = params.screenWidth / 360.;
-    let imageUV = uv * vec2(1,-1 * dimsRatio) * ratio.y / params.sliderA;
     //let imageUV = (uv / f + vec2(0, .549 ) ) * vec2(1,-1 * dimsRatio) * ratio.y / params.sliderA;
-    var point = textureSample(computeTexture, feedbackSampler, imageUV); //* .998046;
+    //var point = textureSample(computeTexture, feedbackSampler, imageUV); //* .998046;
+    var point = texturePosition(computeTexture, vec2(0.), uv / params.sliderA, false); //* .998046;
 
     return point;
 }
