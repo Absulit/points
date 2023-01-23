@@ -344,31 +344,31 @@ async function init() {
     // webGPU.addSampler('feedbackSampler');
     // webGPU.addTexture2d('feedbackTexture', true);
 
-    shaders = reactiondiffusion;
-    const numPoints = 800*800;
-    webGPU.addUniform('numPoints', numPoints);
-    webGPU.addStorage('chemicals', numPoints, 'Chemical', 2);
-    webGPU.addStorage('chemicals2', numPoints, 'Chemical', 2);
-    webGPU.addStorage('variables', 1, 'Variable', 1);
-    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    webGPU.addTexture2d('feedbackTexture', true, ShaderType.COMPUTE);
-    webGPU.addBindingTexture('outputTex', 'computeTexture');
-
-    // shaders = reactiondiffusion1;
-    // const numPoints = 800*800*2;
+    // shaders = reactiondiffusion;
+    // const numPoints = 800*800;
     // webGPU.addUniform('numPoints', numPoints);
     // webGPU.addStorage('chemicals', numPoints, 'Chemical', 2);
     // webGPU.addStorage('chemicals2', numPoints, 'Chemical', 2);
-    // webGPU.addStorage('variables', 1, 'Variable', 2);
+    // webGPU.addStorage('variables', 1, 'Variable', 1);
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // //webGPU.addTexture2d('feedbackTexture', true, ShaderType.COMPUTE);
+    // webGPU.addTexture2d('feedbackTexture', true, ShaderType.COMPUTE);
     // webGPU.addBindingTexture('outputTex', 'computeTexture');
-    // await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.COMPUTE);
-    // // await webGPU.addTextureImage('image', './../assets_ignore/sunset_800x800_20220604_173907.jpg', ShaderType.COMPUTE);
-    // // await webGPU.addTextureImage('image', './../assets_ignore/tucan_jcvp_800x800.jpg', ShaderType.COMPUTE);
-    // // await webGPU.addTextureImage('image', './../assets_ignore/pmw_800x800.jpg', ShaderType.COMPUTE);
-    // // await webGPU.addTextureImage('image', './../img/carmen_lyra_2_800x800.jpg', ShaderType.COMPUTE);
-    // //await webGPU.addTextureImage('image', './../assets_ignore/face_coeff.jpg', ShaderType.COMPUTE);
+
+    shaders = reactiondiffusion1;
+    const numPoints = 800*800*2;
+    webGPU.addUniform('numPoints', numPoints);
+    webGPU.addStorage('chemicals', numPoints, 'Chemical', 2);
+    webGPU.addStorage('chemicals2', numPoints, 'Chemical', 2);
+    webGPU.addStorage('variables', 1, 'Variable', 2);
+    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    //webGPU.addTexture2d('feedbackTexture', true, ShaderType.COMPUTE);
+    webGPU.addBindingTexture('outputTex', 'computeTexture');
+    await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.COMPUTE);
+    // await webGPU.addTextureImage('image', './../assets_ignore/sunset_800x800_20220604_173907.jpg', ShaderType.COMPUTE);
+    // await webGPU.addTextureImage('image', './../assets_ignore/tucan_jcvp_800x800.jpg', ShaderType.COMPUTE);
+    // await webGPU.addTextureImage('image', './../assets_ignore/pmw_800x800.jpg', ShaderType.COMPUTE);
+    // await webGPU.addTextureImage('image', './../img/carmen_lyra_2_800x800.jpg', ShaderType.COMPUTE);
+    //await webGPU.addTextureImage('image', './../assets_ignore/face_coeff.jpg', ShaderType.COMPUTE);
 
     // shaders = slime;
     // const numParticles = 1024 * 2;

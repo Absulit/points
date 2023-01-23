@@ -1,6 +1,7 @@
 import { RGBAFromHSV } from '../color.js';
 import { fusin } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
+import { texturePosition } from '../image.js';
 
 const frag = /*wgsl */`
 
@@ -17,6 +18,7 @@ struct Chemical{
 
 ${fusin}
 ${RGBAFromHSV}
+${texturePosition}
 
 @fragment
 fn main(
@@ -32,7 +34,8 @@ fn main(
     // let texColor2 = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1) + vec2(-.001,1));
     // let texColor3 = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1) + vec2(.001,1));
 
-    let texColorCompute = textureSample(computeTexture, feedbackSampler, uv * vec2(1,-1));
+    let startPosition = vec2(0.);
+    let texColorCompute = texturePosition(computeTexture, startPosition, uv / params.sliderA, false);
 
     _ = chemicals[0];
     _ = chemicals2[0];
