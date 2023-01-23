@@ -336,13 +336,13 @@ async function init() {
     // webGPU.addSampler('feedbackSampler');
     // webGPU.addTexture2d('feedbackTexture', true);
 
-    shaders = planetsblur2;
-    const numParticles = 8;
-    webGPU.addUniform('numParticles', numParticles);
-    webGPU.addStorage('planets', numParticles, 'Planet', 5);
-    webGPU.addStorage('variables', 1, 'Variable', 1);
-    webGPU.addSampler('feedbackSampler');
-    webGPU.addTexture2d('feedbackTexture', true);
+    // shaders = planetsblur2;
+    // const numParticles = 8;
+    // webGPU.addUniform('numParticles', numParticles);
+    // webGPU.addStorage('planets', numParticles, 'Planet', 5);
+    // webGPU.addStorage('variables', 1, 'Variable', 1);
+    // webGPU.addSampler('feedbackSampler');
+    // webGPU.addTexture2d('feedbackTexture', true);
 
     // shaders = reactiondiffusion;
     // const numPoints = 800*800;
@@ -370,14 +370,14 @@ async function init() {
     // // await webGPU.addTextureImage('image', './../img/carmen_lyra_2_800x800.jpg', ShaderType.COMPUTE);
     // //await webGPU.addTextureImage('image', './../assets_ignore/face_coeff.jpg', ShaderType.COMPUTE);
 
-    // shaders = slime;
-    // const numParticles = 1024 * 2;
-    // webGPU.addUniform('numParticles', numParticles);
-    // webGPU.addStorage('particles', numParticles, 'Particle', 4);
-    // webGPU.addStorage('variables', 1, 'Variable', 1);
-    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // webGPU.addTexture2d('feedbackTexture', true);
-    // webGPU.addBindingTexture('outputTex', 'computeTexture');
+    shaders = slime;
+    const numParticles = 1024 * 2;
+    webGPU.addUniform('numParticles', numParticles);
+    webGPU.addStorage('particles', numParticles, 'Particle', 4);
+    webGPU.addStorage('variables', 1, 'Variable', 1);
+    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    webGPU.addTexture2d('feedbackTexture', true);
+    webGPU.addBindingTexture('outputTex', 'computeTexture');
 
     // shaders = slime2;
     // const numParticles = 1024 * 2;

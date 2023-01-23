@@ -1,5 +1,6 @@
 import { fnusin, fusin } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
+import { texturePosition } from '../image.js';
 
 const frag = /*wgsl*/`
 
@@ -16,6 +17,7 @@ struct Variable{
 
 ${fnusin}
 ${fusin}
+${texturePosition}
 
 @fragment
 fn main(
@@ -32,7 +34,9 @@ fn main(
     let texColor3 = textureSample(feedbackTexture, feedbackSampler, uv + vec2(.001,1));
 
     // fix to width and height ratio  is uv / ratio
-    let texColorCompute = textureSample(computeTexture, feedbackSampler, uv / ratio * vec2(1,-1));
+    //let texColorCompute = textureSample(computeTexture, feedbackSampler, uv / ratio * vec2(1,-1));
+    let startPosition = vec2(0.);
+    let texColorCompute = texturePosition(computeTexture, startPosition, uv, false);
 
     let particle = particles[0];
     let pc: ptr<storage, f32, read_write> = &variables.particlesCreated;
