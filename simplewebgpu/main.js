@@ -242,9 +242,9 @@ async function init() {
     webGPU.addLayers(1, ShaderType.COMPUTE);
     webGPU.addBindingTexture('outputTex', 'computeTexture');
     webGPU.addSampler('feedbackSampler', null);
-    //await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.COMPUTE);
-    //await webGPU.addTextureImage('image', './../assets_ignore/pmw_800x800.jpg', ShaderType.COMPUTE);
-    await webGPU.addTextureImage('image', './../img/carmen_lyra_2_800x800.jpg', ShaderType.COMPUTE);
+    await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.COMPUTE);
+    // await webGPU.addTextureImage('image', './../assets_ignore/pmw_800x800.jpg', ShaderType.COMPUTE);
+    // await webGPU.addTextureImage('image', './../img/carmen_lyra_2_800x800.jpg', ShaderType.COMPUTE);
 
     // shaders = noisecircle1;
     // const numPoints = 128;

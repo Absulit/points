@@ -88,7 +88,8 @@ fn main(
 
 
                 let pointP = &layers[0][pointIndex];
-                let rgba = textureSampleLevel(image,feedbackSampler, uv * vec2(1,-1),  0.0).rgba;
+                // TODO: create a texturePosition for compute shader
+                let rgba = textureSampleLevel(image,feedbackSampler, uv,  0.0).rgba;
                 (*pointP) = rgba;
 
                 let positionU = vec2<u32>(ux,uy);

@@ -33,8 +33,8 @@ fn main(
     ) -> @location(0) vec4<f32> {
 
     let startPosition = vec2(0.);
-    let rgbaFeedbackTexture = texturePosition(feedbackTexture, startPosition, uv, false); // * .998046;
-    let rgbaCT = texturePosition(computeTexture, startPosition, uv, false);
+    let rgbaFeedbackTexture = texturePosition(feedbackTexture, startPosition, uv / params.sliderA, false); // * .998046;
+    let rgbaCT = texturePosition(computeTexture, startPosition, uv / params.sliderA, false);
 
     var c = 1.;
 
