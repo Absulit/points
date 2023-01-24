@@ -230,21 +230,21 @@ async function init() {
     // webGPU.addBindingTexture('outputTex', 'computeTexture');
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
 
-    // shaders = noise3;
-    // const numPoints = 1024;
-    // const lineAmount = 16;
-    // webGPU.addUniform('numPoints', numPoints);
-    // webGPU.addUniform('initializeAgain', 0);
-    // webGPU.addUniform('lineAmount', lineAmount);
-    // webGPU.addStorage('points', numPoints, 'Point', 4);
-    // webGPU.addStorage('variables', 1, 'Variable', 3, ShaderType.COMPUTE);
-    // webGPU.addTexture2d('feedbackTexture', true, ShaderType.FRAGMENT);
-    // webGPU.addLayers(1, ShaderType.COMPUTE);
-    // webGPU.addBindingTexture('outputTex', 'computeTexture');
-    // webGPU.addSampler('feedbackSampler', null);
-    // //await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.COMPUTE);
-    // //await webGPU.addTextureImage('image', './../assets_ignore/pmw_800x800.jpg', ShaderType.COMPUTE);
-    // await webGPU.addTextureImage('image', './../img/carmen_lyra_2_800x800.jpg', ShaderType.COMPUTE);
+    shaders = noise3;
+    const numPoints = 1024;
+    const lineAmount = 16;
+    webGPU.addUniform('numPoints', numPoints);
+    webGPU.addUniform('initializeAgain', 0);
+    webGPU.addUniform('lineAmount', lineAmount);
+    webGPU.addStorage('points', numPoints, 'Point', 4);
+    webGPU.addStorage('variables', 1, 'Variable', 3, ShaderType.COMPUTE);
+    webGPU.addTexture2d('feedbackTexture', true, ShaderType.FRAGMENT);
+    webGPU.addLayers(1, ShaderType.COMPUTE);
+    webGPU.addBindingTexture('outputTex', 'computeTexture');
+    webGPU.addSampler('feedbackSampler', null);
+    //await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.COMPUTE);
+    //await webGPU.addTextureImage('image', './../assets_ignore/pmw_800x800.jpg', ShaderType.COMPUTE);
+    await webGPU.addTextureImage('image', './../img/carmen_lyra_2_800x800.jpg', ShaderType.COMPUTE);
 
     // shaders = noisecircle1;
     // const numPoints = 128;
@@ -285,13 +285,13 @@ async function init() {
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
     // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
-    shaders = random1;
-    webGPU.addUniform('randNumber', 0);
-    webGPU.addUniform('randNumber2', 0);
-    webGPU.addStorage('stars', 800*800, 'Star', 4);
-    webGPU.addSampler('feedbackSampler');
-    webGPU.addTexture2d('feedbackTexture', true);
-    webGPU.addBindingTexture('outputTex', 'computeTexture');
+    // shaders = random1;
+    // webGPU.addUniform('randNumber', 0);
+    // webGPU.addUniform('randNumber2', 0);
+    // webGPU.addStorage('stars', 800*800, 'Star', 4);
+    // webGPU.addSampler('feedbackSampler');
+    // webGPU.addTexture2d('feedbackTexture', true);
+    // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
     // shaders = random2;
     // webGPU.addUniform('randNumber', 0);

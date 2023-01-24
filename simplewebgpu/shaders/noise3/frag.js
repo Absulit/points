@@ -3,6 +3,7 @@ import { fnusin, sdfLine, sdfLine2, sdfSegment } from '../defaultFunctions.js';
 import { snoise } from '../noise2d.js';
 import { rand } from '../random.js';
 import { RGBAFromHSV } from '../color.js';
+import { texturePosition } from '../image.js';
 
 const frag = /*wgsl*/`
 
@@ -20,6 +21,7 @@ ${sdfSegment}
 ${sdfLine}
 ${sdfLine2}
 ${RGBAFromHSV}
+${texturePosition}
 
 @fragment
 fn main(
@@ -30,8 +32,9 @@ fn main(
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
-    let rgbaFeedbackTexture = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1)); //* .998046;
-    let rgbaCT = textureSample(computeTexture, feedbackSampler, uv * vec2(1,-1));
+    let startPosition = vec2(0.);
+    let rgbaFeedbackTexture = texturePosition(feedbackTexture, startPosition, uv, false); // * .998046;
+    let rgbaCT = texturePosition(computeTexture, startPosition, uv, false);
 
     var c = 1.;
 
