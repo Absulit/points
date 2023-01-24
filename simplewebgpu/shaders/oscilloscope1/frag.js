@@ -1,5 +1,6 @@
 import defaultStructs from '../defaultStructs.js';
 import { fnusin, fusin, sdfCircle, sdfLine, sdfSegment } from '../defaultFunctions.js';
+import { texturePosition } from '../image.js';
 
 const frag = /*wgsl*/`
 
@@ -14,6 +15,7 @@ ${fusin}
 ${sdfCircle}
 ${sdfSegment}
 ${sdfLine}
+${texturePosition}
 
 fn f2(speed:f32, substract:f32)->f32{
     return (sin((params.utime - substract) * speed) + 1) * .5;
@@ -30,7 +32,8 @@ fn main(
 
     //let n1 = snoise(uv);
 
-    let rgbaFeedbackTexture = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1) / ratio); //* .998046;
+    let startPosition = vec2(0.);
+    let rgbaFeedbackTexture = texturePosition(feedbackTexture, startPosition, uv / ratio, false); //* .998046;
 
 
     let pointPosition = vec2(f2(10 * params.sliderA, 0.), f2(10 * params.sliderB, 0.));

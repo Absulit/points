@@ -129,10 +129,10 @@ async function init() {
     // await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
     // //await webGPU.addTextureImage('kernel', './../assets_ignore/ftt_mask_800x800.jpg', ShaderType.FRAGMENT);
 
-    // shaders = oscilloscope1;
-    // webGPU.addTexture2d('feedbackTexture', true, ShaderType.FRAGMENT);
-    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // webGPU.addStorage('variables', 1, 'Variable', 2, ShaderType.FRAGMENT);
+    shaders = oscilloscope1;
+    webGPU.addTexture2d('feedbackTexture', true, ShaderType.FRAGMENT);
+    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    webGPU.addStorage('variables', 1, 'Variable', 2, ShaderType.FRAGMENT);
 
     // shaders = imagetexture1;
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
@@ -193,13 +193,13 @@ async function init() {
     // //await webGPU.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
     // await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
 
-    shaders = videotexture1;
-    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    //await webGPU.addTextureImage('oldking', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
-    //await webGPU.addTextureImage('oldking', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
-    await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
-    await webGPU.addTextureVideo('video', './../assets_ignore/Black and White Clouds - Time lapse (480p_30fps_H264-128kbit_AAC).mp4', ShaderType.COMPUTE)
-    webGPU.addBindingTexture('outputTex', 'computeTexture');
+    // shaders = videotexture1;
+    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    // //await webGPU.addTextureImage('oldking', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
+    // //await webGPU.addTextureImage('oldking', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
+    // await webGPU.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
+    // await webGPU.addTextureVideo('video', './../assets_ignore/Black and White Clouds - Time lapse (480p_30fps_H264-128kbit_AAC).mp4', ShaderType.COMPUTE)
+    // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
     // shaders = flowfieldsanimated;
     // const lineAmount = 1024;
