@@ -306,10 +306,10 @@ async function init() {
     // webGPU.addTexture2d('feedbackTexture', true);
     // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
-    // shaders = random3;
-    // webGPU.addSampler('feedbackSampler');
-    // webGPU.addTexture2d('feedbackTexture', true);
-    // webGPU.addBindingTexture('outputTex', 'computeTexture');
+    shaders = random3;
+    webGPU.addSampler('feedbackSampler');
+    webGPU.addTexture2d('feedbackTexture', true);
+    webGPU.addBindingTexture('outputTex', 'computeTexture');
 
     // shaders = planets;
     // webGPU.addStorage('planets', 8, 'Planet', 5);
@@ -379,14 +379,14 @@ async function init() {
     // webGPU.addTexture2d('feedbackTexture', true);
     // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
-    shaders = slime2;
-    const numParticles = 1024 * 2;
-    webGPU.addUniform('numParticles', numParticles)
-    webGPU.addStorage('particles', numParticles, 'Particle', 4);
-    webGPU.addStorage('variables', 1, 'Variable', 1);
-    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    webGPU.addTexture2d('feedbackTexture', true);
-    webGPU.addBindingTexture('outputTex', 'computeTexture');
+    // shaders = slime2;
+    // const numParticles = 1024 * 2;
+    // webGPU.addUniform('numParticles', numParticles)
+    // webGPU.addStorage('particles', numParticles, 'Particle', 4);
+    // webGPU.addStorage('variables', 1, 'Variable', 1);
+    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    // webGPU.addTexture2d('feedbackTexture', true);
+    // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
     // shaders = slime3;
     // const numParticles = 1024 * 2;
