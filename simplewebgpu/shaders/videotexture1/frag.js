@@ -1,6 +1,7 @@
 import defaultStructs from '../defaultStructs.js';
 import { brightness, fnusin, fusin, polar, sdfCircle, sdfLine, sdfSegment } from '../defaultFunctions.js';
 import { snoise } from '../noise2d.js';
+import { texturePosition } from '../image.js';
 
 const videotexture1Frag = /*wgsl*/`
 
@@ -14,6 +15,7 @@ ${sdfLine}
 ${brightness}
 ${polar}
 ${snoise}
+${texturePosition}
 
 
 @fragment
@@ -33,7 +35,8 @@ fn main(
     let imageUV = uv * vec2(1,-1 * dimsRatio) * ratio.y / params.sliderA;
     //let oldKingUVClamp = uv * vec2(1,1 * dimsRatio) * ratio.x;
     let lines = sin( uv.x*(uv.x + 3 * fnusin(1))  ) ;
-    let rgbaImage = textureSample(image, feedbackSampler, imageUV * lines); //* .998046;
+    let startPosition = vec2(0.);
+    let rgbaImage = texturePosition(image, startPosition, imageUV * lines, false); //* .998046;
 
     // let videoDims = textureDimensions(video);
     // let videoDimsRatio = f32(videoDims.x) / f32(videoDims.y);
@@ -41,7 +44,7 @@ fn main(
 
     // let half_texel = vec2(0.5) / vec2<f32>(textureDimensions(video));
     // let rgbaVideo = textureSampleBaseClampToEdge(video, videoSampler, videoUV * lines);
-    let rgbaCT = textureSample(computeTexture, feedbackSampler, uv * vec2(1,-1) / params.sliderA);
+    let rgbaCT = texturePosition(computeTexture, startPosition, uv / params.sliderA, false);
 
 
 
