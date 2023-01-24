@@ -388,25 +388,25 @@ async function init() {
     // webGPU.addTexture2d('feedbackTexture', true);
     // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
-    // shaders = slime3;
-    // const numParticles = 1024 * 2;
-    // webGPU.addUniform('numParticles', numParticles);
-    // webGPU.addStorage('particles', numParticles, 'Particle', 4, ShaderType.COMPUTE);
-    // webGPU.addStorage('variables', 1, 'Variable', 1);
-    // ////webGPU.addStorage('layer0', 1, 'Color', 4);
-    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // webGPU.addTexture2d('feedbackTexture', true);
-    // webGPU.addBindingTexture('outputTex', 'computeTexture');
+    shaders = slime3;
+    const numParticles = 1024 * 2;
+    webGPU.addUniform('numParticles', numParticles);
+    webGPU.addStorage('particles', numParticles, 'Particle', 4, ShaderType.COMPUTE);
+    webGPU.addStorage('variables', 1, 'Variable', 1);
+    ////webGPU.addStorage('layer0', 1, 'Color', 4);
+    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    webGPU.addTexture2d('feedbackTexture', true);
+    webGPU.addBindingTexture('outputTex', 'computeTexture');
 
     // shaders = blur1;
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
     // webGPU.addTexture2d('feedbackTexture', true);
     // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
-    shaders = circleblur;
-    webGPU.addSampler('feedbackSampler');
-    webGPU.addTexture2d('feedbackTexture', true);
-    webGPU.addBindingTexture('outputTex', 'computeTexture');
+    // shaders = circleblur;
+    // webGPU.addSampler('feedbackSampler');
+    // webGPU.addTexture2d('feedbackTexture', true);
+    // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
     await webGPU.init(shaders.vert, shaders.compute, shaders.frag);
     await update();

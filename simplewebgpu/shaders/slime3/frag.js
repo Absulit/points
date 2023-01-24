@@ -1,5 +1,6 @@
 import { fusin } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
+import { texturePosition } from '../image.js';
 
 const frag = /*wgsl*/`
 
@@ -16,6 +17,7 @@ struct Particle{
 }
 
 ${fusin}
+${texturePosition}
 
 @fragment
 fn main(
@@ -27,11 +29,12 @@ fn main(
     ) -> @location(0) vec4<f32> {
 
     //let texColor = textureSample(myTexture, mySampler, uv * 1.0 + .1 * fnusin(2));
-    let texColor = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1));
-    let texColor2 = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1) + vec2(-.001,1));
-    let texColor3 = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1) + vec2(.001,1));
+    let startPosition = vec2(0.);
+    let texColor = texturePosition(feedbackTexture, startPosition, uv, false);
+    let texColor2 = texturePosition(feedbackTexture, startPosition, uv + vec2(-.001,1), false);
+    let texColor3 = texturePosition(feedbackTexture, startPosition, uv + vec2(.001,1), false);
 
-    let texColorCompute = textureSample(computeTexture, feedbackSampler, uv * vec2(1,-1));
+    let texColorCompute = texturePosition(computeTexture, startPosition, uv, false);
 
     //let particle = particles[0];
     let pc: ptr<storage, f32, read_write> = &variables.particlesCreated;
