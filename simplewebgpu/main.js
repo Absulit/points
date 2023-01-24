@@ -285,13 +285,13 @@ async function init() {
     // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
     // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
-    // shaders = random1;
-    // webGPU.addUniform('randNumber', 0);
-    // webGPU.addUniform('randNumber2', 0);
-    // webGPU.addStorage('stars', 800*800, 'Star', 4);
-    // webGPU.addSampler('feedbackSampler');
-    // webGPU.addTexture2d('feedbackTexture', true);
-    // webGPU.addBindingTexture('outputTex', 'computeTexture');
+    shaders = random1;
+    webGPU.addUniform('randNumber', 0);
+    webGPU.addUniform('randNumber2', 0);
+    webGPU.addStorage('stars', 800*800, 'Star', 4);
+    webGPU.addSampler('feedbackSampler');
+    webGPU.addTexture2d('feedbackTexture', true);
+    webGPU.addBindingTexture('outputTex', 'computeTexture');
 
     // shaders = random2;
     // webGPU.addUniform('randNumber', 0);
@@ -306,10 +306,10 @@ async function init() {
     // webGPU.addTexture2d('feedbackTexture', true);
     // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
-    shaders = random3;
-    webGPU.addSampler('feedbackSampler');
-    webGPU.addTexture2d('feedbackTexture', true);
-    webGPU.addBindingTexture('outputTex', 'computeTexture');
+    // shaders = random3;
+    // webGPU.addSampler('feedbackSampler');
+    // webGPU.addTexture2d('feedbackTexture', true);
+    // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
     // shaders = planets;
     // webGPU.addStorage('planets', 8, 'Planet', 5);
