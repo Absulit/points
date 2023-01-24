@@ -32,3 +32,9 @@ fn texturePosition(texture:texture_2d<f32>, position:vec2<f32>, uv:vec2<f32>, cr
     return rgbaImage3;
 }
 `;
+
+export const flipTextureUV = /*wgsl*/`
+fn flipTextureUV(uv:vec2<f32>) -> vec2<f32>{
+    return uv * vec2(1,-1) + vec2(0,1);
+}
+`;

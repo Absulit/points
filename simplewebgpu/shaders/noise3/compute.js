@@ -1,6 +1,7 @@
 import { PI } from '../defaultConstants.js';
 import { brightness, fnusin, polar } from '../defaultFunctions.js';
 import defaultStructs from '../defaultStructs.js';
+import { flipTextureUV } from '../image.js';
 import { snoise } from '../noise2d.js';
 import { rand } from '../random.js';
 
@@ -25,6 +26,7 @@ ${polar}
 ${PI}
 ${snoise}
 ${fnusin}
+${flipTextureUV}
 
 const workgroupSize = 8;
 
@@ -88,8 +90,8 @@ fn main(
 
 
                 let pointP = &layers[0][pointIndex];
-                // TODO: create a texturePosition for compute shader
-                let rgba = textureSampleLevel(image,feedbackSampler, uv,  0.0).rgba;
+
+                let rgba = textureSampleLevel(image,feedbackSampler, flipTextureUV(uv),  0.0).rgba;
                 (*pointP) = rgba;
 
                 let positionU = vec2<u32>(ux,uy);
