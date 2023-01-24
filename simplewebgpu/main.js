@@ -398,15 +398,15 @@ async function init() {
     // webGPU.addTexture2d('feedbackTexture', true);
     // webGPU.addBindingTexture('outputTex', 'computeTexture');
 
-    shaders = blur1;
-    webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    webGPU.addTexture2d('feedbackTexture', true);
-    webGPU.addBindingTexture('outputTex', 'computeTexture');
-
-    // shaders = circleblur;
-    // webGPU.addSampler('feedbackSampler');
+    // shaders = blur1;
+    // webGPU.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
     // webGPU.addTexture2d('feedbackTexture', true);
     // webGPU.addBindingTexture('outputTex', 'computeTexture');
+
+    shaders = circleblur;
+    webGPU.addSampler('feedbackSampler');
+    webGPU.addTexture2d('feedbackTexture', true);
+    webGPU.addBindingTexture('outputTex', 'computeTexture');
 
     await webGPU.init(shaders.vert, shaders.compute, shaders.frag);
     await update();
