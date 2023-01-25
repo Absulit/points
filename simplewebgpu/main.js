@@ -46,8 +46,6 @@ import imagescale1 from './shaders/imagescale1/index.js';
 import twistedtoroid1 from './shaders/twistedtoroid1/index.js';
 
 
-
-
 /***************/
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -64,25 +62,12 @@ let capturer = new CCapture({
 const points = new Points('gl-canvas');
 points.useTexture = false;
 
-let utime = 0;
-let epoch = 0;
-let mouseX = 0;
-let mouseY = 0;
-
 
 const sliders = { 'a': 0, 'b': 0, 'c': 0 }
 
 let shaders;
 
 async function init() {
-
-
-    points.addUniform('utime', 0);
-    points.addUniform('epoch', 0);
-    points.addUniform('screenWidth', 0);
-    points.addUniform('screenHeight', 0);
-    points.addUniform('mouseX', 0);
-    points.addUniform('mouseY', 0);
     points.addUniform('sliderA', 0);
     points.addUniform('sliderB', 0);
     points.addUniform('sliderC', 0);
@@ -95,7 +80,7 @@ async function init() {
     // computeShader = defaultCompute;
     // fragmentShader = test1Frag;
 
-    shaders = twistedtoroid1;
+    //shaders = twistedtoroid1;
 
     // shaders = imagescale1;
     // points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
@@ -416,17 +401,8 @@ async function init() {
 
 async function update() {
     stats.begin();
-    utime += 0.016666666666666666;//1 / 60;
-    epoch = new Date() / 1000;
 
     // code here
-
-    points.updateUniform('utime', utime);
-    points.updateUniform('epoch', epoch);
-    points.updateUniform('screenWidth', points.canvas.width);
-    points.updateUniform('screenHeight', points.canvas.height);
-    points.updateUniform('mouseX', mouseX);
-    points.updateUniform('mouseY', mouseY);
 
     points.updateUniform('sliderA', sliders.a);
     points.updateUniform('sliderB', sliders.b);
@@ -505,10 +481,6 @@ sliderC.addEventListener('change', e => print(e.target.value));
 
 // window.addEventListener('resize', resizeViewport, false);
 
-document.onmousemove = function (e) {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-}
 
 const statsBtn = document.getElementById('statsBtn');
 let statsVisible = (localStorage.getItem('stats-visible') === 'true') || false;
