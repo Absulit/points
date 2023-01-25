@@ -1,7 +1,7 @@
 'use strict';
 import Coordinate from './coordinate.js';
 import { print } from '../../js/utils.js';
-import RGBAColor from './../webgpu/js/color.js';
+import RGBAColor from '../webgpu/js/color.js';
 import defaultVert from './shaders/base/vert.js';
 import defaultFrag from './shaders/base/frag.js';
 import defaultCompute from './shaders/base/compute.js';
@@ -50,7 +50,7 @@ export class VertexBufferInfo {
     }
 }
 
-export default class WebGPU {
+export default class Points {
     constructor(canvasId) {
         this._canvasId = canvasId;
         this._canvas = null;
