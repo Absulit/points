@@ -4,3 +4,7 @@ body{
     overflow: hidden;
     font-family: 'Open Sans', sans-serif;
 }
+
+label{
+    color:white;
+}

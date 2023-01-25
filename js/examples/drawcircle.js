@@ -18,31 +18,31 @@ class DrawCircle {
 
 
     }
-    update(u_time) {
+    update({utime}) {
         if (++this._rowCounter >= this._screen.numRows) {
             this._rowCounter = 0;
         }
 
         this._screen.clearMix(this._clearMixColor, 1.1);
-        let xMovement = Math.sin(u_time) * 20;
+        let xMovement = Math.sin(utime) * 20;
 
         this._screen.drawCircle(this._screen.numColumns / 2 + xMovement, this._screen.numRows / 2,
-            (this._screen.numColumns * .6) * Math.cos(u_time),
+            (this._screen.numColumns * .6) * Math.cos(utime),
             1, 0, 0);
     }
 
-    update2(u_time) {
+    update2({utime}) {
         if (++this._rowCounter >= this._screen.numRows) {
             this._rowCounter = 0;
         }
 
         this._screen.clearMix(this._clearMixColor, 1.1);
-        let xMovement = Math.sin(u_time) * 20;
+        let xMovement = Math.sin(utime) * 20;
 
-        let rColor = Math.sin(this._rowCounter) * Math.cos(u_time);
+        let rColor = Math.sin(this._rowCounter) * Math.cos(utime);
 
         this._screen.drawCircleOnAngle(this._screen.center.x + xMovement, this._screen.center.y,
-            (this._screen.numColumns * .6) * Math.cos(u_time),
+            (this._screen.numColumns * .6) * Math.cos(utime),
             point => {
                 rColor = Math.random();
                 point.setColor(rColor, rColor, rColor);

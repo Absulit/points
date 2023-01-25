@@ -1,12 +1,18 @@
 import RGBColor from './color.js';
 import Coordinate from './coordinate.js';
+import Screen from './screen.js';
 
 class Point {
     static pointSizeFull = 1.0;
-    constructor() {
+    /**
+     * 
+     * @param {Screen} screen 
+     */
+    constructor(screen) {
         this._color = new RGBColor(0, 0, 0);
         this._position = new Coordinate(0, 0, 0);
         this._coordinates = new Coordinate(0, 0, 0);
+        this._normalPosition = new Coordinate(0, 0, 0);
         this._modified = false;
         this._layer = 0;
         this._size = 1.0;
@@ -16,47 +22,43 @@ class Point {
         // minimum value the color is so dim
         // it's no longer visible
         this._minimunVisibleValue = 0.01;
+
+        this._screen = screen;
     }
 
     get color() {
         return this._color;
     }
 
+    /**
+     * @deprecated to be deprecated in favor of `modifyColor`
+     * @param {*} value
+     */
     set color(value) {
+
         this._color = value;
         this._modified = true;
         this._layer.setColor(this._coordinates, this._color);
     }
 
-    setColor(r, g, b, a = 1) {
-        this._color.set(r, g, b, a);
+    /**
+     * To modify directly each color
+     * @param {function(RGBAColor):void} lambda with `Color` parameter
+     */
+    modifyColor(lambda) {
+        let result = lambda(this._color);
         this._modified = true;
-        this._layer.setColor(this._coordinates, this._color);
-    }
+        //this._layer.setColor(this._coordinates, this._color);
 
-    setRGBAColor(value) {
-        if(value){
-            const { r, g, b, a } = value;
-            this._color.set(r, g, b, a);
-            this._modified = true;
-            this._layer.setColor(this._coordinates, this._color);
-        }
-    }
+        const startPosition = (this._coordinates.x + (this._coordinates.y * this._screen.numColumns)) * 4;
+        //console.log(startPosition); debugger;
+        const offset = this._screen.numColumns * this._screen.numRows * this._screen.layerIndex * 4;
+        this._screen._colors[offset + startPosition] = this._color.r;
+        this._screen._colors[offset + startPosition + 1] = this._color.g
+        this._screen._colors[offset + startPosition + 2] = this._color.b;
+        this._screen._colors[offset + startPosition + 3] = this._color.a;
 
-    setBrightness(value) {
-        this._color.brightness = value;
-        this._modified = true;
-        this._layer.setColor(this._coordinates, this._color);
-    }
-
-    getBrightness() {
-        return this._color.brightness;
-    }
-
-    addColor(color) {
-        this._color.add(color);
-        this._modified = true;
-        this._layer.setColor(this._coordinates, this._color);
+        return result;
     }
 
     get position() {
@@ -121,6 +123,20 @@ class Point {
         this._layer.setVertex(this._coordinates, this._position);
     }
 
+    get normalPosition() {
+        return this._normalPosition;
+    }
+
+    set normalPosition(value) {
+        this._normalPosition = value;
+    }
+
+    setNormalPosition(x, y, z) {
+        this._normalPosition.x = x;
+        this._normalPosition.y = y;
+        this._normalPosition.z = z;
+    }
+
     get layer() {
         return this._layer;
     }
@@ -142,7 +158,7 @@ class Point {
      * Sets the size not in a scalar way, but in a relative way to the full size of what a `Point` can have.
      * @param {Number} percentage percentage of the point from 0..1
      */
-    setSize(percentage){
+    setSize(percentage) {
         const size = Point.pointSizeFull * percentage;
         this._size = size;
         this._layer.setPointSize(this._coordinates, this._size)

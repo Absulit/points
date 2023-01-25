@@ -63,7 +63,7 @@ class ImageLoader {
         let b = this._imageData[pixelBlockIndex + 2] / 255;
         let a = this._imageData[pixelBlockIndex + 3] / 255;
 
-        point.setColor(r, g, b, a);
+        point.modifyColor(color => color.set(r, g, b, a));
     }
 
     /**
@@ -90,7 +90,7 @@ class ImageLoader {
         let b = dataRow[pixelBlock + 2] / 255;
         let a = dataRow[pixelBlock + 3] / 255;
 
-        point.setColor(r, g, b, a);
+        point.modifyColor(color => color.set(r, g, b, a));
 
     }
     /**
@@ -110,7 +110,7 @@ class ImageLoader {
         let b = this._imageData[pixelJump + 2] / 255;
         let a = this._imageData[pixelJump + 3] / 255;
 
-        point.setColor(r, g, b, a);
+        point.modifyColor(color => color.set(r, g, b, a));
     }
 
     /**

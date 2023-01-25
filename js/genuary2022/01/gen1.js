@@ -9,12 +9,12 @@ export default class Gen1 {
         if (!is10K) {
             throw ('this demo needs 10K items, so the recommended side should be 100')
         }
-        if(screen._numMargin != 1){
+        if (screen._numMargin != 1) {
             throw ('this demo needs 1px margin')
         }
     }
 
-    update(usin, ucos, side, utime) {
+    update({usin, ucos, side, utime}) {
         const screen = this._screen
 
         screen.points.forEach(point => {
@@ -22,7 +22,8 @@ export default class Gen1 {
             const { x, y, z } = point.coordinates;
             //console.log(point.coordinates, point.position);debugger
             //console.log(point.position, point.coordinates);
-            point.setColor(x/side, y/side, ucos)
+            //point.setColor(x/side, y/side, ucos)
+            point.modifyColor(color => color.set(x / side, y / side, ucos));
         });
     }
 }

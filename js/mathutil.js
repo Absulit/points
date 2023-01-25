@@ -49,6 +49,57 @@ class MathUtil {
         let t = MathUtil.saturate((x - a) / (b - a));
         return t * t * (3.0 - (2.0 * t));
     }
+
+    /**
+     * Linear Interpolation
+     * @param {Number} a Initial value
+     * @param {Number} b Final value
+     * @param {Number} n % between A and B
+     * @returns a value between A and B
+     */
+    static lerp(a, b, n) {
+        return (1 - n) * a + n * b;
+    }
+
+    static lerp2(a, b, t) {
+        return a + t * (b - a);
+    }
+
+    static xlerp(mMin, mMax, mFactor) {
+        const a = mMax - mMin;
+        return a * mFactor * mFactor + mMin;
+    }
+
+    /**
+     * 
+     * @param {Number} value 
+     * @returns fraction
+     */
+    static fract(value) {
+        return value % 1;
+    }
+
+    static smoothstep(edge0, edge1, x) {
+        if (x < edge0)
+            return 0;
+
+        if (x >= edge1)
+            return 1;
+
+        // Scale/bias into [0..1] range
+        x = (x - edge0) / (edge1 - edge0);
+
+        return x * x * (3 - 2 * x);
+    }
+
+    /**
+     * Fraction of a Float number
+     * @param {Number} value number with a decimal fraction
+     * @returns the value beyond the point `.`
+     */
+    static fraction(value) {
+        return value % 1
+    }
 }
 
 export default MathUtil;

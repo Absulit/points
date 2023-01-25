@@ -6,11 +6,12 @@ class ChromaSpiral {
     constructor(screen) {
         this._screen = screen;
         this._effects = new Effects(screen);
+        this._clearMixColor = new RGBAColor(0, 0, 0);
 
         this._constant = screen.numColumns / 200;
     }
 
-    update(usin, ucos, side, utime) {
+    update({usin, ucos, side}) {
         let x = this._screen.center.x, y = this._screen.center.y, radius = 10;
         let pointFromCenter, point, radians, angle, lastModifiedPoint;
 
@@ -40,7 +41,8 @@ class ChromaSpiral {
             //point = this._screen.getPointAt(Math.round( Math.sin( (pointFromCenter.x + x) / 40 * utime) * 80), Math.round(pointFromCenter.y + y));
             //point = this._screen.getPointAt(Math.round( Math.sin( (pointFromCenter.x + x) / 40 * usin) + 80), Math.round(  Math.cos(pointFromCenter.y + y) + 80 ));
             if (point && (point != lastModifiedPoint)) {
-                point.setBrightness(1);
+                //point.setBrightness(1);
+                point.modifyColor(color => color.brightness = 1);
                 lastModifiedPoint = point;
             }
         }
@@ -49,13 +51,13 @@ class ChromaSpiral {
         //this._effects.chromaticAberration(.2, 5);
         this._effects.soften2(3);
         //this._effects.antialias();
-        this._screen.clearMix(new RGBAColor(0,0,0), 1.1);
+        //this._screen.clearMix(this._clearMixColor, 1.1);
         //this._screen.clearAlpha(1.1);
 
 
     }
 
-    update2(usin, ucos, side, utime) {
+    update2({usin, ucos, side}) {
         let x = this._screen.center.x, y = this._screen.center.y, radius = 10;
         let pointFromCenter, point, radians, angle, lastModifiedPoint;
 
@@ -74,7 +76,7 @@ class ChromaSpiral {
         }
         this._effects.chromaticAberration(.05, 2);
         this._effects.soften2(3);
-        this._screen.clearMix(new RGBAColor(0,0,0), 1.1);
+        this._screen.clearMix(this._clearMixColor, 1.1);
     }
 }
 

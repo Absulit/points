@@ -128,12 +128,12 @@ export default class Gen17_2 {
     }
 
 
-    update(usin, ucos, side, utime) {
+    update({usin, ucos, side, utime, nusin}) {
         const screen = this._screen;
 
         screen.layerIndex = 0;//--------------------------- LAYER 0
 
-        if (!this._imageParsed && this._imageLoader.isLoaded) {
+        //if (!this._imageParsed && this._imageLoader.isLoaded) {
             this._imageLoader.loadToLayer();
 
             const squareSide = 3;
@@ -204,9 +204,10 @@ export default class Gen17_2 {
             //------------------------------- CUSTOM DITHERING 4
             //https://stackoverflow.com/questions/15149290/ordered-dithering-to-256-colours
             // large threshold_map https://bisqwit.iki.fi/story/howto/dither/jy/
-            //const depth = Math.abs(Math.ceil(68 * usin));
+            const depth = Math.abs(Math.ceil(68 * nusin));
 
-            this._effects.orderedDithering();
+            //console.log(depth);
+            this._effects.orderedDithering(depth);
 
             //screen.layerIndex = 2;//--------------------------- LAYER 0
             screen.points.forEach(point => {
@@ -214,7 +215,7 @@ export default class Gen17_2 {
             });
 
             this._imageParsed = true;
-        }
+        //}
 
 
         //screen.layerIndex = 1;//--------------------------- LAYER 1

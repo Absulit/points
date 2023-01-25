@@ -47,7 +47,7 @@ export default class Gen28 {
 
     }
 
-    update(usin, ucos, side, utime) {
+    update({usin, ucos, side, utime}) {
         const screen = this._screen;
 
 

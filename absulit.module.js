@@ -19,7 +19,7 @@ export function initWebGL(canvasId, depth) {
 }
 
 export function setClearColor(color) {
-    gl.clearColor(color[0], color[1], color[2], 1);
+    gl.clearColor(color[0], color[1], color[2], color[3]);
 }
 
 export function clearScreen() {
@@ -36,6 +36,14 @@ export function getBuffer(size) {
 
 export function getBuffer2(vs) {
     const bufferId = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, bufferId);
+    //gl.bufferData(gl.ARRAY_BUFFER, flatten(vs), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, vs, gl.STATIC_DRAW);
+    return bufferId;
+}
+
+export function getBuffer3(bufferId, vs) {
+    bufferId = bufferId || gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, bufferId);
     gl.bufferData(gl.ARRAY_BUFFER, flatten(vs), gl.STATIC_DRAW);
     //gl.bufferData(gl.ARRAY_BUFFER, vs, gl.STATIC_DRAW);
@@ -58,6 +66,10 @@ export function shaderVariableToBuffer(name, vectorLen) {
     gl.vertexAttribPointer(shaderVar, vectorLen, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(shaderVar);
     return shaderVar;
+}
+
+export function shaderUniformToBuffer(name, value){
+    return gl.uniform1f(gl.getUniformLocation(program, name), value);
 }
 
 export function drawTriangles() {
@@ -208,16 +220,43 @@ export function generateBuffers(meshRes) {
 const dimension4 = 4;
 const dimension3 = 3;
 const dimension1 = 1;
+
+let verticesBufferId;
+let colorBufferId;
+let pointSizesBufferId;
+let atlasIdsBufferId;
 export function printPoints(vertices, colors, pointsizes, atlasids) {
     //vertices = flatten(vertices);
     const vBuffer = getBuffer2(vertices);
+    //getBuffer3(verticesBufferId, vertices);
     shaderVariableToBuffer("vPosition", dimension3);
 
     //colors = flatten(colors); // TODO: test if call is required
     getBuffer2(colors);
+    //getBuffer3(colorBufferId, colors);
     shaderVariableToBuffer("vColor", dimension4);
 
     //pointsizes = pointsizes;
+    getBuffer2(pointsizes);
+    //getBuffer3(pointSizesBufferId, pointsizes);
+    shaderVariableToBuffer("vPointSize", dimension1);
+
+    //atlasids = atlasids;
+    getBuffer2(atlasids);
+    //getBuffer3(atlasIdsBufferId, atlasids);
+    shaderVariableToBuffer("vAtlasId", dimension1);
+
+    drawPoints2(vBuffer, vertices, dimension3);
+    //drawPoints2(verticesBufferId, vertices, dimension3);
+}
+
+export function printTriangles(vertices, colors, pointsizes, atlasids){
+    const vBuffer = getBuffer2(vertices);
+    shaderVariableToBuffer("vPosition", dimension3);
+
+    getBuffer2(colors);
+    shaderVariableToBuffer("vColor", dimension4);
+
     getBuffer2(pointsizes);
     shaderVariableToBuffer("vPointSize", dimension1);
 
@@ -225,7 +264,10 @@ export function printPoints(vertices, colors, pointsizes, atlasids) {
     getBuffer2(atlasids);
     shaderVariableToBuffer("vAtlasId", dimension1);
 
-    drawPoints2(vBuffer, vertices, dimension3);
+
+
+
+    drawTriangles2(vBuffer, vertices, dimension3);
 }
 
 function printPoint(point) {

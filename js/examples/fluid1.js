@@ -12,7 +12,7 @@ export default class Fluid1 {
         this._effects = new Effects(screen);
     };
 
-    update(u_time) {
+    update({utime}) {
         const screen = this._screen;
         screen.layerIndex = 0;
 
@@ -25,7 +25,7 @@ export default class Fluid1 {
         let distance = 1;
         screen.currentLayer.shufflePoints();
         screen.currentLayer.shuffledPoints.forEach((point, index) => {
-            let brightness = point.getBrightness();
+            let brightness = point.color.brightness;
             //point.setBrightness(brightness);
             let pointTo = null;
             if (brightness > .8) {

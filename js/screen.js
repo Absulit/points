@@ -25,14 +25,18 @@ class Screen {
         this._layerIndex = 0;
 
         this._pointSize = 1;
-        this._init();
 
         this._dimension = 3;
-        this._vertices = [];
-        this._colors = [];
-        this._pointsizes = [];
-        this._atlasids = [];
+        //this._vertices = [];
+        this._vertices = new Float32Array();
+        //this._colors = [];
+        this._colors = new Float32Array();
+        //this._pointsizes = [];
+        this._pointsizes = new Float32Array();
+        //this._atlasids = [];
+        this._atlasids = new Int32Array();
 
+        this._init();
 
     }
 
@@ -59,7 +63,7 @@ class Screen {
         for (let yCoordinate = 0; yCoordinate < this._numRows; yCoordinate++) {
             row = [];
             for (let xCoordinate = 0; xCoordinate < this._numColumns; xCoordinate++) {
-                point = new Point();
+                point = new Point(this);
                 point.layer = layer;
                 point.position.set((xCoordinate * this._pointSizeFull) + this._pointSizeHalf, (yCoordinate * this._pointSizeFull) + this._pointSizeHalf, zDepth);
                 //point.setColor(Math.random(), 1, Math.random(), 1);
@@ -73,6 +77,7 @@ class Screen {
                 }
 
                 point.setCoordinates(xCoordinate, yCoordinate, 0);
+                point.setNormalPosition(xCoordinate / this._numColumns, yCoordinate / this._numRows, 0)
                 point.color.a = 0;
                 point.size = this._pointSize;
 
@@ -90,7 +95,16 @@ class Screen {
 
     _createLayers() {
         for (let layerIndex = 0; layerIndex < this._numLayers; layerIndex++) {
-            this._layers.push(this._createLayer(((layerIndex) / this._numLayers) * -1));
+            const layer = this._createLayer(((layerIndex) / this._numLayers) * -1);
+            //this._vertices = this._vertices.concat(layer.vertices);
+            this._vertices = new Float32Array([...this._vertices, ...layer.vertices]);
+            //this._colors =  this._colors.concat(layer.colors);
+            this._colors = new Float32Array([...this._colors, ...layer.colors]);// this._colors.concat(layer.colors);
+            //this._pointsizes = this._pointsizes.concat(layer.pointsizes);
+            this._pointsizes = new Float32Array([...this._pointsizes, ...layer.pointsizes]);
+            //this._atlasids = this._atlasids.concat(layer.atlasIds);
+            this._atlasids = new Int32Array([...this._atlasids, ...layer.atlasIds]);
+            this._layers.push(layer);
         }
         this._currentLayer = this._layers[this._layerIndex];
     }
@@ -150,15 +164,20 @@ class Screen {
         }
     }
 
-    _groupLayers() {
-        for (let layerIndex = 0; layerIndex < this._layers.length; layerIndex++) {
-            const layer = this._layers[layerIndex];
-            this._vertices = this._vertices.concat(layer.vertices);
-            this._colors = this._colors.concat(layer.colors);
-            this._pointsizes = this._pointsizes.concat(layer.pointsizes);
-            this._atlasids = this._atlasids.concat(layer.atlasIds);
-        }
-    }
+    // _groupLayers() {
+    //     for (let layerIndex = 0; layerIndex < this._layers.length; layerIndex++) {
+    //         const layer = this._layers[layerIndex];
+    //         this._vertices = this._vertices.concat(layer.vertices);
+    //         this._colors = this._colors.concat(layer.colors);
+    //         this._pointsizes = this._pointsizes.concat(layer.pointsizes);
+    //         this._atlasids = this._atlasids.concat(layer.atlasIds);
+
+    //         // layer.vertices.forEach(i => this._vertices.push(i));
+    //         // layer.colors.forEach(i => this._colors.push(i));
+    //         // layer.pointsizes.forEach(i => this._pointsizes.push(i));
+    //         // layer.atlasIds.forEach(i => this._atlasids.push(i));
+    //     }
+    // }
 
     get numColumns() {
         return this._numColumns;
@@ -171,6 +190,9 @@ class Screen {
         return this._currentLayer.rows;
     }
 
+    /**
+     * @return {Array<Point>}
+     */
     get points() {
         return this._currentLayer.points;
     }
@@ -320,8 +342,8 @@ class Screen {
     /**
      * Retrieves a list of `Point` around a point.
      * Directly around, in a square, so just 8 Points.
-     * @param {*} point
-     * @param {*} distance
+     * @param {Point} point
+     * @param {Int} distance int
      * @returns
      */
     getPointsAround(point, distance = 1) {
@@ -393,45 +415,49 @@ class Screen {
     }
 
 
-    clear(color = null) {
-        this._currentLayer.rows.forEach(row => {
-            row.forEach(point => {
-                if (color) {
-                    // TODO: check why point.color = color does not work
-                    point.setRGBAColor(color);
-                } else {
-                    point.setColor(0, 0, 0, 0);
-                }
-            });
-        });
-    }
-
-    clearMix(color, level = 2) {
-        let pointColor = null;
-        //this._currentLayer.rows.forEach(row => {
+    clear(color = null, alphaAmount = .1) {
         const rowsLength = this._currentLayer.rows.length;
         let rowLength;
         for (let index = 0; index < rowsLength; index++) {
             const row = this._currentLayer.rows[index];
             rowLength = row.length
             for (let i = 0; i < rowLength; i++) {
-                //row.forEach(point => {
                 const point = row[i];
-                if (point.modified) {
-                    pointColor = point.color;
-                    point.setColor(
+
+                point.modified && point.color.a > alphaAmount && (
+                    color && point.modifyColor(c => {
+                        c.setColor(color);
+                    }) || color && point.modifyColor(c => {
+                        c.set(0, 0, 0, 0);
+                    }));
+            }
+        }
+    }
+
+    clearMix(color, level = 2) {
+
+        const rowsLength = this._currentLayer.rows.length;
+        let rowLength;
+        for (let index = 0; index < rowsLength; index++) {
+            const row = this._currentLayer.rows[index];
+            rowLength = row.length
+            for (let i = 0; i < rowLength; i++) {
+                const point = row[i];
+
+                point.modified && point.modifyColor(pointColor => {
+                    pointColor.set(
                         (pointColor.r + color.r) / level,
                         (pointColor.g + color.g) / level,
                         (pointColor.b + color.b) / level,
                         (pointColor.a + color.a)
                     );
-                }
+                });
                 if (point.size < this._pointSize) {
                     point.size = this._pointSize;
                 }
-                //});
+
             }
-            //});
+
         }
     }
 
@@ -447,13 +473,11 @@ class Screen {
                 //row.forEach(point => {
                 const point = row[i];
                 if (point.modified) {
-                    pointColor = point.color;
-                    point.setColor(
-                        (pointColor.r),
-                        (pointColor.g),
-                        (pointColor.b),
-                        (pointColor.a) / level
-                    );
+
+                    point.modifyColor(color => {
+                        color.set(color.r, color.g, color.b, (color.a) / level);
+                    });
+
                 }
                 if (point.size < this._pointSize) {
                     point.size = this._pointSize;
@@ -501,11 +525,7 @@ class Screen {
      */
     movePointTo(point, columnIndex, rowIndex) {
         let pointToReplace = this.getPointAt(columnIndex, rowIndex);
-        if (pointToReplace) {
-            const { r, g, b, a } = point.color;
-            pointToReplace.setColor(r, g, b, a);
-            //pointToReplace.color = new RGBAColor(1,0,0);
-        }
+        pointToReplace && pointToReplace.modifyColor(color => color.setColor(point.color));
         return pointToReplace;
     }
 
@@ -514,8 +534,9 @@ class Screen {
      * and uses the first point color to color the line.
      * @param {Point} pointA
      * @param {Point} pointB
+     * @param {Function} modifyColorFunction works as Point.modifyColor
      */
-    drawLineWithPoints(pointA, pointB) {
+    drawLineWithPoints(pointA, pointB, modifyColorFunction = null) {
         let x0 = pointA.coordinates.x;
         let y0 = pointA.coordinates.y;
 
@@ -525,15 +546,15 @@ class Screen {
 
         if (Math.abs(y1 - y0) < Math.abs(x1 - x0)) {
             if (x0 > x1) {
-                this._plotLineLow(x1, y1, x0, y0, color);
+                this._plotLineLow(x1, y1, x0, y0, color, modifyColorFunction);
             } else {
-                this._plotLineLow(x0, y0, x1, y1, color);
+                this._plotLineLow(x0, y0, x1, y1, color, modifyColorFunction);
             }
         } else {
             if (y0 > y1) {
-                this._plotLineHigh(x1, y1, x0, y0, color);
+                this._plotLineHigh(x1, y1, x0, y0, color, modifyColorFunction);
             } else {
-                this._plotLineHigh(x0, y0, x1, y1, color);
+                this._plotLineHigh(x0, y0, x1, y1, color, modifyColorFunction);
             }
         }
     }
@@ -567,7 +588,7 @@ class Screen {
         return finalPoint;
     }
 
-    _plotLineLow(x0, y0, x1, y1, color) {
+    _plotLineLow(x0, y0, x1, y1, color, modifyColorFunction = null) {
         let dx = x1 - x0
         let dy = y1 - y0
         let yi = 1
@@ -580,9 +601,10 @@ class Screen {
 
         for (let x = x0; x < x1; x++) {
             let point = this.getPointAt(x, y);
-            if (point) {
-                point.setColor(color.r, color.g, color.b, color.a);
-            }
+
+            point && modifyColorFunction && point.modifyColor(modifyColorFunction);
+            point && !modifyColorFunction && point.modifyColor(c => c.setColor(color));
+
             if (D > 0) {
                 y = y + yi
                 D = D + (2 * (dy - dx))
@@ -592,7 +614,7 @@ class Screen {
         }
     }
 
-    _plotLineHigh(x0, y0, x1, y1, color) {
+    _plotLineHigh(x0, y0, x1, y1, color, modifyColorFunction = null) {
         let dx = x1 - x0;
         let dy = y1 - y0;
         let xi = 1;
@@ -605,9 +627,10 @@ class Screen {
 
         for (let y = y0; y < y1; y++) {
             let point = this.getPointAt(x, y);
-            if (point) {
-                point.setColor(color.r, color.g, color.b, color.a);
-            }
+
+            point && modifyColorFunction && point.modifyColor(modifyColorFunction);
+            point && !modifyColorFunction && point.modifyColor(c => c.setColor(color));
+
             if (D > 0) {
                 x = x + xi;
                 D = D + (2 * (dx - dy));
@@ -624,7 +647,7 @@ class Screen {
             pointFromCenter = MathUtil.vector(radius, radians);
             point = this.getPointAt(Math.round(pointFromCenter.x + x), Math.round(pointFromCenter.y + y));
             if (point && (point !== lastModifiedPoint)) {
-                point.setColor(r, g, b, a);
+                point.modifyColor(color => color.set(r, g, b, a));
                 lastModifiedPoint = point;
             }
         }
@@ -721,9 +744,7 @@ class Screen {
 
             for (let currentY = y; currentY < finalY; currentY++) {
                 point = this.getPointAt(currentX, currentY);
-                if (point) {
-                    point.setColor(r, g, b);
-                }
+                point && point.modifyColor(color => color.set(r, g, b));
             }
 
         }
@@ -756,9 +777,9 @@ class Screen {
         this._atlasids = this._mainLayer.atlasIds;
     };
 
-    moveColorToLayer(layerIndex){
+    moveColorToLayer(layerIndex) {
         this._currentLayer.points.forEach((point, index) => {
-            if(point.color.a > 0){
+            if (point.color.a > 0) {
                 const pointInLayer = this._layers[layerIndex].points[index];
                 pointInLayer.setRGBAColor(point.color);
             }

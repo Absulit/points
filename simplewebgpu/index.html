@@ -1,0 +1,26 @@
+<html>
+    <head>
+        <title></title>
+
+        <link rel="stylesheet" type="text/css" href="style.css">
+    </head>
+    <body>
+        <canvas id="gl-canvas" width="800" height="800">
+            Oops ... your browser doesn't support the HTML5 canvas element
+        </canvas>
+
+        <script src="../stats.js"></script>
+        <script src="../js/ccapture/CCapture.all.min.js"></script>
+        <script src="main.js" type="module"></script>
+        <button id="downloadBtn">START CAPTURE</button>
+        <button id="statsBtn">stats</button>
+        <div>
+            <label for="slider-a">A</label>
+            <input type="range" id="slider-a" name="slider-a" min="0" max="1" step=".0001" value="0">
+            <label for="slider-a">B</label>
+            <input type="range" id="slider-b" name="slider-b" min="0" max="1" step=".0001" value="0">
+            <label for="slider-a">C</label>
+            <input type="range" id="slider-c" name="slider-c" min="0" max="1" step=".0001" value="0">
+        </div>
+    </body>
+</html>

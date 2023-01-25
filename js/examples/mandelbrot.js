@@ -91,7 +91,7 @@ export default class Mandelbrot {
 
     }
 
-    update(usin, ucos, side, utime) {
+    update({usin, ucos, side, utime}) {
         const screen = this._screen;
 
 
@@ -122,11 +122,19 @@ export default class Mandelbrot {
                 // in the set
                 //point.setBrightness(1);
                 //point.setRGBAColor(this._palette[iteration]);
-                point.setColor(percentageIteration, percentageIteration * row / screen.numRows * usin, percentageIteration * col / screen.numColumns)
+                //point.setColor(percentageIteration, percentageIteration * row / screen.numRows * usin, percentageIteration * col / screen.numColumns)
+
+                point.modifyColor(color => {
+                    color.set(percentageIteration, percentageIteration * row / screen.numRows * usin, percentageIteration * col / screen.numColumns, 1);
+                });
+
             } else {
                 // not in the set
                 //point.setBrightness(0);
-                point.setColor(percentageIteration, percentageIteration * row / screen.numRows, 1 - percentageIteration * col / screen.numColumns)
+                //point.setColor(percentageIteration, percentageIteration * row / screen.numRows, 1 - percentageIteration * col / screen.numColumns)
+                point.modifyColor(color => {
+                    color.set(percentageIteration, percentageIteration * row / screen.numRows, 1 - percentageIteration * col / screen.numColumns, 1);
+                });
             }
 
         });

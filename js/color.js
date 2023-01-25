@@ -64,12 +64,17 @@ class RGBAColor {
         this._value = [value, value, value, 1];
     }
 
-    set(r, g, b, a) {
+    set(r, g, b, a = 1) {
         this._value = [r, g, b, a]
     }
 
     setColor(color) {
         this._value = [color.r, color.g, color.b, color.a];
+    }
+
+    clone() {
+        let [r, g, b, a] = this._value;
+        return new RGBAColor(r, g, b, a);
     }
 
     add(color) {
@@ -116,16 +121,21 @@ class RGBAColor {
     }
 
 
+    /**
+     * Averages `RGBAColor` into one
+     * @param {Array<RGBAColor>} colors 
+     * @returns RGBAColor
+     */
     static average(colors) {
         // https://sighack.com/post/averaging-rgb-colors-the-right-way
         let r = 0, g = 0, b = 0, a = 0;
         for (let index = 0; index < colors.length; index++) {
             const color = colors[index];
             //if (!color.isNull()) {
-                r += color.r * color.r;
-                g += color.g * color.g;
-                b += color.b * color.b;
-                //a += color.a * color.a;
+            r += color.r * color.r;
+            g += color.g * color.g;
+            b += color.b * color.b;
+            //a += color.a * color.a;
             //}
         }
         return new RGBAColor(
@@ -140,7 +150,7 @@ class RGBAColor {
         let r = 0;
         let g = 0;
         let b = 0;
-        if(c1 && !c1.isNull() && c2 && !c2.isNull()){
+        if (c1 && !c1.isNull() && c2 && !c2.isNull()) {
             const { r: r1, g: g1, b: b1 } = c1;
             const { r: r2, g: g2, b: b2 } = c2;
             r = r1 - r2;
@@ -175,8 +185,8 @@ class RGBAColor {
     }
 
     static getClosestColorInPalette(color, palette) {
-        if(!palette){
-            throw('Palette should be an array of `RGBA`s')
+        if (!palette) {
+            throw ('Palette should be an array of `RGBA`s')
         }
         let distance = 100;
         let selectedColor = null;
@@ -189,6 +199,34 @@ class RGBAColor {
         })
         return selectedColor;
     }
+
+    // made from this answer: https://stackoverflow.com/questions/2348597/why-doesnt-this-javascript-rgb-to-hsl-code-work
+    /**
+     * Create RGBAColor from hsv values
+     * @param {Number} h Hue
+     * @param {Number} s Saturation
+     * @param {Number} v Value
+     * @returns {RGBAColor} `RGBAColor`
+     */
+    static fromHSV(h, s, v) {
+        return new RGBAColor(hsvAux(h, s, v, 5), hsvAux(h, s, v, 3), hsvAux(h, s, v, 1), 1);
+    }
+
+    toHSV() {
+        const [r, g, b, a] = this._value
+        const v = Math.max(r, g, b), c = v - Math.min(r, g, b);
+        const h = c && ((v == r) ? (g - b) / c : ((v == g) ? 2 + (b - r) / c : 4 + (r - g) / c));
+        return { h: 60 * (h < 0 ? h + 6 : h)/360, s: v && c / v, v: v };
+    }
+}
+
+const hsvAux = (h, s, v, n) => {
+    const k = (n + h * 6) % 6
+    return v - v * s * Math.max(Math.min(k, 4 - k, 1), 0)
+};
+
+export function RGBFromHSV(h, s, v) {
+    return {r: hsvAux(h, s, v, 5), g: hsvAux(h, s, v, 3), b: hsvAux(h, s, v, 1)};
 }
 
 export default RGBAColor;
