@@ -21,11 +21,14 @@ fn main(
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
-    let uv2 = uv * mat2x2f(cos(params.utime), -sin(params.utime), sin(params.utime), cos(params.utime));
+    // + vec2(-.5) (or  - vec2(.5)  ) to fix the camera looking at uv0,0
+    let uv2 = (uv - vec2(.5)) * mat2x2f(cos(params.utime * .015), -sin(params.utime * .015), sin(params.utime * .015), cos(params.utime * .015));
 
     let ro = vec3(0., 0., -1.);
-    let lookat =  mix(vec3(-1, 0, -1),  vec3(0.), sin(params.utime*1.56)*.5+.5 );
-    let zoom = mix(.2, .7, sin(params.utime)*.5+.5);
+    let lookat =  mix(vec3(-1, 0, -1),  vec3(0.), sin(params.utime*.56)*.5+.5 );
+    // let lookat =  vec3(0.);
+    let zoom = mix(.2, .7, sin(params.utime * .0123)*.5+.5);
+    // let zoom = .1;
 
     let f = normalize(lookat - ro);
     let r = normalize(cross(vec3(0., 1., 0.), f));
@@ -35,7 +38,7 @@ fn main(
     let i = c + uv2.x * r + uv2.y * u;
     let rd = normalize(i - ro); // ray direction
 
-    let radius = mix(.3, 1.5, sin(params.utime*.4) * .5+.5);
+    let radius = mix(.3, 1.5, sin(params.utime*.04) * .5+.5);
     var dS = 0.; // distance to surface
     var dO = 0.; // distance to origin
     var p = vec3(0.);
@@ -64,8 +67,6 @@ fn main(
         m += max(0, waves * .3 * b2);
         col += mix(m, 1-m, smoothstep(-.3, .3, sin(x+params.utime)));
     }
-
-
 
     return vec4(col,1);
 }
