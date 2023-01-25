@@ -72,8 +72,6 @@ let mouseY = 0;
 
 const sliders = { 'a': 0, 'b': 0, 'c': 0 }
 
-let canvas = document.getElementById('gl-canvas');
-
 let shaders;
 
 async function init() {
@@ -425,10 +423,11 @@ async function update() {
 
     points.updateUniform('utime', utime);
     points.updateUniform('epoch', epoch);
-    points.updateUniform('screenWidth', canvas.width);
-    points.updateUniform('screenHeight', canvas.height);
+    points.updateUniform('screenWidth', points.canvas.width);
+    points.updateUniform('screenHeight', points.canvas.height);
     points.updateUniform('mouseX', mouseX);
     points.updateUniform('mouseY', mouseY);
+
     points.updateUniform('sliderA', sliders.a);
     points.updateUniform('sliderB', sliders.b);
     points.updateUniform('sliderC', sliders.c);
@@ -451,7 +450,7 @@ async function update() {
 
     stats.end();
 
-    capturer.capture(canvas);
+    capturer.capture(points.canvas);
     requestAnimationFrame(update);
 }
 
