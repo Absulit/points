@@ -68,11 +68,6 @@ async function init() {
     // await points.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
     // //await points.addTextureImage('kernel', './../assets_ignore/ftt_mask_800x800.jpg', ShaderType.FRAGMENT);
 
-    // shaders = oscilloscope1;
-    // points.addTexture2d('feedbackTexture', true, ShaderType.FRAGMENT);
-    // points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // points.addStorage('variables', 1, 'Variable', 2, ShaderType.FRAGMENT);
-
     // shaders = imagetexture1;
     // points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
     // //await points.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
@@ -145,11 +140,11 @@ async function init() {
     // points.addUniform('numPoints', numPoints);
     // points.addStorage('points', numPoints, 'vec2<f32>', 2);
 
-    shaders = layers1;
-    const numPoints = 800*800;
-    points.addUniform('numPoints', numPoints);
-    points.addStorage('points', numPoints, 'vec4<f32>', 4);
-    points.addLayers(2, ShaderType.COMPUTE);
+    // shaders = layers1;
+    // const numPoints = 800*800;
+    // points.addUniform('numPoints', numPoints);
+    // points.addStorage('points', numPoints, 'vec4<f32>', 4);
+    // points.addLayers(2, ShaderType.COMPUTE);
 
     // shaders = shapes1;
     // const numPoints = 128;
@@ -189,26 +184,16 @@ async function init() {
     // points.addTexture2d('feedbackTexture', true);
     // points.addBindingTexture('outputTex', 'computeTexture');
 
-    // shaders = reactiondiffusion;
-    // const numPoints = 800*800;
-    // points.addUniform('numPoints', numPoints);
-    // points.addStorage('chemicals', numPoints, 'Chemical', 2);
-    // points.addStorage('chemicals2', numPoints, 'Chemical', 2);
-    // points.addStorage('variables', 1, 'Variable', 1);
-    // points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // points.addTexture2d('feedbackTexture', true, ShaderType.COMPUTE);
-    // points.addBindingTexture('outputTex', 'computeTexture');
-
     // shaders = circleblur;
     // points.addSampler('feedbackSampler');
     // points.addTexture2d('feedbackTexture', true);
     // points.addBindingTexture('outputTex', 'computeTexture');
 
     await points.init(shaders.vert, shaders.compute, shaders.frag);
-    await update();
+    update();
 }
 
-async function update() {
+function update() {
     stats.begin();
 
     // code here
