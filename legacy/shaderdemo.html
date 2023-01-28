@@ -1,0 +1,87 @@
+<html>
+    <head>
+        <title></title>
+
+
+        <script id="vertex-shader" type="x-shader/x-vertex">
+            attribute vec4 vPosition;
+            varying vec4 fPosition;
+
+            attribute float vPointSize;
+            uniform float u_pointsize;
+
+            attribute vec4 vColor;
+            varying vec4 fColor;
+
+            attribute float vAtlasId;
+            varying float fAtlasId;
+
+
+            void main() {
+                fColor = vColor;
+                fPosition = vPosition;
+                fAtlasId = vAtlasId;
+                //gl_Position = uRotation * vPosition;
+                gl_Position = vPosition;
+
+                //gl_PointSize = u_pointsize;
+                //gl_PointSize = vColor.r * u_pointsize; // cool!
+                gl_PointSize = vPointSize;
+            }
+        </script>
+        <script id="fragment-shader" type="x-shader/x-fragment">
+            precision mediump float;
+
+            uniform float u_time;
+            varying vec4 fColor;
+            varying vec4 fPosition;
+            varying float fAtlasId;
+
+            uniform sampler2D textureAtlas;  // texture we are drawing
+            uniform vec2 textureAtlasSize;  // eg 64x32
+            uniform vec2 imageSize;         // eg 16x16
+
+
+            void main() {
+                vec4 finalColor;
+
+                if(fAtlasId > -1.0){
+                    float numColumns = floor(textureAtlasSize.x / imageSize.x); // 128/64 = 1 images horizontal
+                    float x = mod(fAtlasId,numColumns);
+                    float y = floor(fAtlasId/numColumns);
+
+                    vec2 imageCoord = vec2(x*imageSize.x,y*imageSize.y);
+                    vec2 uv = (imageCoord + imageSize * gl_PointCoord) / textureAtlasSize;
+                    finalColor = texture2D(textureAtlas, uv);
+                }else{
+                    finalColor = fColor;
+                }
+
+
+                //gl_FragColor = vec4( 1. - fPosition.x, 1. - fPosition.y, fPosition.z, 1.0);
+
+
+                gl_FragColor = finalColor;
+
+            }
+        </script>
+        <script type="text/javascript" src="Common/webgl-utils.js"></script>
+        <script type="text/javascript" src="Common/initShaders.js"></script>
+        <script type="text/javascript" src="Common/flatten.js"></script>
+
+        <link rel="stylesheet" type="text/css" href="style.css">
+    </head>
+    <body>
+        <canvas id="gl-canvas" width="800" height="800">
+            Oops ... your browser doesn't support the HTML5 canvas element
+        </canvas>
+
+        <script src="stats.js"></script>
+        <script src="js/ccapture/CCapture.all.min.js"></script>
+        <script src="absulit.module.js" type="module"></script>
+        <!-- <script src="js/screen.js" type="module"></script> -->
+        <!-- <script src="https://unpkg.com/gpu.js@latest/dist/gpu-browser.min.js"></script> -->
+        <script src="shaderdemo.js" type="module"></script>
+        <button id="downloadBtn">START CAPTURE</button>
+    </body>
+</html>
