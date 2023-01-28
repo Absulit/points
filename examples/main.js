@@ -3,47 +3,25 @@ import { print } from '../legacy/js/utils.js';
 import Points, { ShaderType } from '../src/absulit.points.module.js';
 import base from '../src/shaders/base/index.js';
 import bloom1 from './bloom1/index.js';
-import oscilloscope1 from './oscilloscope1/index.js';
+import circleblur from './circleblur/index.js';
+import demo6 from './demo_6/index.js';
+import dithering1 from './dithering1/index.js';
+import dithering2 from './dithering2/index.js';
+import dithering3 from './dithering3/index.js';
+import dithering4 from './dithering4/index.js';
+import imagescale1 from './imagescale1/index.js';
 import imagetexture1 from './imagetexture1/index.js';
 import imagetexture2 from './imagetexture2/index.js';
 import imagetexture3 from './imagetexture3/index.js';
-import dithering1 from './dithering1/index.js';
-import dithering2 from './dithering2/index.js';
-import videotexture1 from './videotexture1/index.js';
-import flowfieldsanimated from './flowfieldsanimated/index.js';
-import noise1 from './noise1/index.js';
-import noise2 from './noise2/index.js';
-import noise3 from './noise3/index.js';
-import noisecircle1 from './noisecircle1/index.js';
 import layers1 from './layers1/index.js';
-import twigl1 from './twigl1/index.js';
-import kaleidoscope1 from './kaleidoscope1/index.js';
-import chromaspiral from './chromaspiral/index.js';
-import chromaspiral2 from './chromaspiral2/index.js';
-import shapes1 from './shapes1/index.js';
-import shapes2 from './shapes2/index.js';
+import noise1 from './noise1/index.js';
+import noisecircle1 from './noisecircle1/index.js';
 import random1 from './random1/index.js';
 import random2 from './random2/index.js';
 import random3 from './random3/index.js';
-import planets from './planets/index.js';
-import planets2 from './planets2/index.js';
-import planets3 from './planets3/index.js';
-import planetsblur from './planetsblur/index.js';
-import planetsblur2 from './planetsblur2/index.js';
-import reactiondiffusion from './reactiondiffusion/index.js';
-import reactiondiffusion1 from './reactiondiffusion1/index.js';
-import slime from './slime/index.js';
-import slime2 from './slime2/index.js';
-import slime3 from './slime3/index.js';
-import blur1 from './blur1/index.js';
-import circleblur from './circleblur/index.js';
-import demo6 from './demo_6/index.js';
-import dithering3 from './dithering3/index.js';
-import dithering4 from './dithering4/index.js';
-import poisson1 from './poisson1/index.js';
-import costarica_map1 from './costarica_map1/index.js';
-import imagescale1 from './imagescale1/index.js';
-import twistedtoroid1 from './twistedtoroid1/index.js';
+import shapes1 from './shapes1/index.js';
+import shapes2 from './shapes2/index.js';
+import videotexture1 from './videotexture1/index.js';
 
 
 /***************/
@@ -76,37 +54,12 @@ async function init() {
 
     //shaders = demo6;
 
-    // vertexShader = defaultVert;
-    // computeShader = defaultCompute;
-    // fragmentShader = test1Frag;
-
-    //shaders = twistedtoroid1;
 
     // shaders = imagescale1;
     // points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
     // await points.addTextureImage('image1', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
     // await points.addTextureImage('image2', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
     // await points.addTextureImage('image3', './../img/unnamed_horror_100x100.png', ShaderType.FRAGMENT);
-
-    // shaders = poisson1;
-    // const r = 10;
-    // const k = 30;
-    // const w = r / Math.sqrt(2);
-    // const rows = Math.floor(points.canvas.width / w);
-    // const columns = Math.floor(points.canvas.height / w);;
-    // points.addUniform('r', r);
-    // points.addUniform('k', k);
-    // points.addUniform('rows', rows);
-    // points.addUniform('columns', columns);
-
-    // const numPoints = 4096;
-    // points.addUniform('numPoints', numPoints);
-    // points.addStorage('points', numPoints, 'Point', 4);
-
-    // points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // await points.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.COMPUTE);
-    // points.addBindingTexture('outputTex', 'computeTexture');
-    // points.addStorage('variables', 1, 'Variable', 3, ShaderType.COMPUTE);
 
     // shaders = bloom1;
     // points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
@@ -137,13 +90,6 @@ async function init() {
     // //await points.addTextureImage('oldking', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
     // //await points.addTextureImage('oldking', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
     // await points.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
-
-    // shaders = costarica_map1;
-    // points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // //await points.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
-    // //await points.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
-    // await points.addTextureImage('image', './../assets_ignore/costa_rica_map.png', ShaderType.FRAGMENT);
-    // await points.addTextureImage('mask', './../assets_ignore/costa_rica_map_mask.png', ShaderType.FRAGMENT);
 
     // shaders = dithering1;
     // points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
@@ -187,78 +133,23 @@ async function init() {
     // await points.addTextureVideo('video', './../assets_ignore/Black and White Clouds - Time lapse (480p_30fps_H264-128kbit_AAC).mp4', ShaderType.COMPUTE)
     // points.addBindingTexture('outputTex', 'computeTexture');
 
-    // shaders = flowfieldsanimated;
-    // const lineAmount = 1024;
-    // points.addUniform('flowfields_lineAmount', lineAmount);
-    // points.addUniform('flowfields_numSteps', 10);
-    // points.addUniform('flowfields_stepLength', 10);
-    // points.addUniform('flowfields_radians', Math.PI * 2); // angle
-    // points.addStorage('flowfields_startPositions', lineAmount, 'StartPosition', 2, ShaderType.COMPUTE);
-    // points.addStorage('variables', 1, 'Variable', 2, ShaderType.COMPUTE);
-    // points.addLayers(2, ShaderType.COMPUTE);
-
     // shaders = noise1;
     // const numPoints = 800*800;
     // points.addUniform('value_noise_data_length', numPoints);
     // points.addStorage('value_noise_data', numPoints, 'f32', 1, ShaderType.COMPUTE);
     // points.addStorage('variables', 1, 'Variable', 1, ShaderType.COMPUTE);
 
-    // shaders = noise2;
-    // const numPoints = 1024;
-    // const lineAmount = 16;
-    // points.addUniform('numPoints', numPoints);
-    // points.addUniform('initializeAgain', 0);
-    // points.addUniform('lineAmount', lineAmount);
-    // points.addStorage('points', numPoints, 'Point', 4);
-    // points.addStorage('variables', 1, 'Variable', 3, ShaderType.COMPUTE);
-    // points.addTexture2d('feedbackTexture', true, ShaderType.FRAGMENT);
-    // points.addLayers(1, ShaderType.COMPUTE);
-    // points.addBindingTexture('outputTex', 'computeTexture');
-    // points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-
-    // shaders = noise3;
-    // const numPoints = 1024;
-    // const lineAmount = 16;
-    // points.addUniform('numPoints', numPoints);
-    // points.addUniform('initializeAgain', 0);
-    // points.addUniform('lineAmount', lineAmount);
-    // points.addStorage('points', numPoints, 'Point', 4);
-    // points.addStorage('variables', 1, 'Variable', 3, ShaderType.COMPUTE);
-    // points.addTexture2d('feedbackTexture', true, ShaderType.FRAGMENT);
-    // points.addLayers(1, ShaderType.COMPUTE);
-    // points.addBindingTexture('outputTex', 'computeTexture');
-    // points.addSampler('feedbackSampler', null);
-    // // await points.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.COMPUTE);
-    // // await points.addTextureImage('image', './../assets_ignore/pmw_800x800.jpg', ShaderType.COMPUTE);
-    // await points.addTextureImage('image', './../img/carmen_lyra_2_800x800.jpg', ShaderType.COMPUTE);
-    // // await points.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.COMPUTE);
 
     // shaders = noisecircle1;
     // const numPoints = 128;
     // points.addUniform('numPoints', numPoints);
     // points.addStorage('points', numPoints, 'vec2<f32>', 2);
 
-    // shaders = layers1;
-    // const numPoints = 800*800;
-    // points.addUniform('numPoints', numPoints);
-    // points.addStorage('points', numPoints, 'vec4<f32>', 4);
-    // points.addLayers(2, ShaderType.COMPUTE);
-
-    // shaders = twigl1;
-
-    // shaders = kaleidoscope1;
-
-    // shaders = chromaspiral;
-    // points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // points.addBindingTexture('outputTex', 'computeTexture');
-    // points.addLayers(1, ShaderType.COMPUTE);
-
-    // shaders = chromaspiral2;
-    // const numPoints = 800*800;
-    // points.addUniform('numPoints', numPoints);
-    // points.addStorage('points', numPoints, 'vec4<f32>', 4);
-    // points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // points.addBindingTexture('outputTex', 'computeTexture');
+    shaders = layers1;
+    const numPoints = 800*800;
+    points.addUniform('numPoints', numPoints);
+    points.addStorage('points', numPoints, 'vec4<f32>', 4);
+    points.addLayers(2, ShaderType.COMPUTE);
 
     // shaders = shapes1;
     // const numPoints = 128;
@@ -298,39 +189,6 @@ async function init() {
     // points.addTexture2d('feedbackTexture', true);
     // points.addBindingTexture('outputTex', 'computeTexture');
 
-    // shaders = planets;
-    // points.addStorage('planets', 8, 'Planet', 5);
-    // points.addStorage('variables', 1, 'Variable', 1);
-
-    // shaders = planets2;
-    // points.addStorage('planets', 8, 'Planet', 5);
-    // points.addStorage('variables', 1, 'Variable', 1);
-
-    // shaders = planets3;
-    // const numParticles = 1024 * 4;
-    // points.addUniform('numParticles', numParticles);
-    // points.addStorage('planets', numParticles, 'Planet', 3);
-    // points.addStorage('variables', 1, 'Variable', 1);
-    // points.addSampler('feedbackSampler');
-    // points.addTexture2d('feedbackTexture', true);
-    // points.addBindingTexture('outputTex', 'computeTexture');
-
-    // shaders = planetsblur;
-    // const numParticles = 8;
-    // points.addUniform('numParticles', numParticles);
-    // points.addStorage('planets', numParticles, 'Planet', 5);
-    // points.addStorage('variables', 1, 'Variable', 1);
-    // points.addSampler('feedbackSampler');
-    // points.addTexture2d('feedbackTexture', true);
-
-    // shaders = planetsblur2;
-    // const numParticles = 8;
-    // points.addUniform('numParticles', numParticles);
-    // points.addStorage('planets', numParticles, 'Planet', 5);
-    // points.addStorage('variables', 1, 'Variable', 1);
-    // points.addSampler('feedbackSampler');
-    // points.addTexture2d('feedbackTexture', true);
-
     // shaders = reactiondiffusion;
     // const numPoints = 800*800;
     // points.addUniform('numPoints', numPoints);
@@ -339,55 +197,6 @@ async function init() {
     // points.addStorage('variables', 1, 'Variable', 1);
     // points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
     // points.addTexture2d('feedbackTexture', true, ShaderType.COMPUTE);
-    // points.addBindingTexture('outputTex', 'computeTexture');
-
-    // shaders = reactiondiffusion1;
-    // const numPoints = 800*800*2;
-    // points.addUniform('numPoints', numPoints);
-    // points.addStorage('chemicals', numPoints, 'Chemical', 2);
-    // points.addStorage('chemicals2', numPoints, 'Chemical', 2);
-    // points.addStorage('variables', 1, 'Variable', 2);
-    // points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // //points.addTexture2d('feedbackTexture', true, ShaderType.COMPUTE);
-    // points.addBindingTexture('outputTex', 'computeTexture');
-    // await points.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.COMPUTE);
-    // // await points.addTextureImage('image', './../assets_ignore/sunset_800x800_20220604_173907.jpg', ShaderType.COMPUTE);
-    // // await points.addTextureImage('image', './../assets_ignore/tucan_jcvp_800x800.jpg', ShaderType.COMPUTE);
-    // // await points.addTextureImage('image', './../assets_ignore/pmw_800x800.jpg', ShaderType.COMPUTE);
-    // // await points.addTextureImage('image', './../img/carmen_lyra_2_800x800.jpg', ShaderType.COMPUTE);
-    // //await points.addTextureImage('image', './../assets_ignore/face_coeff.jpg', ShaderType.COMPUTE);
-
-    // shaders = slime;
-    // const numParticles = 1024 * 2;
-    // points.addUniform('numParticles', numParticles);
-    // points.addStorage('particles', numParticles, 'Particle', 4);
-    // points.addStorage('variables', 1, 'Variable', 1);
-    // points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // points.addTexture2d('feedbackTexture', true);
-    // points.addBindingTexture('outputTex', 'computeTexture');
-
-    // shaders = slime2;
-    // const numParticles = 1024 * 2;
-    // points.addUniform('numParticles', numParticles)
-    // points.addStorage('particles', numParticles, 'Particle', 4);
-    // points.addStorage('variables', 1, 'Variable', 1);
-    // points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // points.addTexture2d('feedbackTexture', true);
-    // points.addBindingTexture('outputTex', 'computeTexture');
-
-    // shaders = slime3;
-    // const numParticles = 1024 * 2;
-    // points.addUniform('numParticles', numParticles);
-    // points.addStorage('particles', numParticles, 'Particle', 4, ShaderType.COMPUTE);
-    // points.addStorage('variables', 1, 'Variable', 1);
-    // ////points.addStorage('layer0', 1, 'Color', 4);
-    // points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // points.addTexture2d('feedbackTexture', true);
-    // points.addBindingTexture('outputTex', 'computeTexture');
-
-    // shaders = blur1;
-    // points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // points.addTexture2d('feedbackTexture', true);
     // points.addBindingTexture('outputTex', 'computeTexture');
 
     // shaders = circleblur;
