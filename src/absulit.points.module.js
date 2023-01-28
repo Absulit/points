@@ -193,6 +193,9 @@ export default class Points {
      * @param {GPUSamplerDescriptor} descriptor
      */
     addSampler(name, descriptor, shaderType) {
+        if ('sampler' == name) {
+            throw '`name` can not be sampler since is a WebGPU keyword';
+        }
         // Create a sampler with linear filtering for smooth interpolation.
         descriptor = descriptor || {
             addressModeU: 'clamp-to-edge',
