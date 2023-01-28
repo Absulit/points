@@ -36,7 +36,7 @@ fn main(
     //let oldKingUVClamp = uv * vec2(1,1 * dimsRatio) * ratio.x;
     let lines = sin( uv.x*(uv.x + 3 * fnusin(1))  ) ;
     let startPosition = vec2(0.);
-    let rgbaImage = texturePosition(image, startPosition, imageUV * lines, false); //* .998046;
+    let rgbaImage = texturePosition(image, feedbackSampler, startPosition, imageUV * lines, false); //* .998046;
 
     // let videoDims = textureDimensions(video);
     // let videoDimsRatio = f32(videoDims.x) / f32(videoDims.y);

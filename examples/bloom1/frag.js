@@ -32,7 +32,7 @@ fn main(
     ) -> @location(0) vec4<f32> {
 
     let startPosition = vec2(0.,0.);
-    let rgbaImage = texturePosition(image, startPosition, uv / params.sliderA, true); //* .998046;
+    let rgbaImage = texturePosition(image, feedbackSampler, startPosition, uv / params.sliderA, true); //* .998046;
 
     let input = rgbaImage.r;
     let bloomVal = bloom(input, 2, params.sliderB);

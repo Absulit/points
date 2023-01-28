@@ -26,11 +26,11 @@ fn main(
 
     //let texColor = textureSample(myTexture, mySampler, uv * 1.0 + .1 * fnusin(2));
     let startPosition = vec2(0.);
-    let texColor = texturePosition(feedbackTexture, startPosition, uv, false);
-    let texColor2 = texturePosition(feedbackTexture, startPosition, uv + vec2(-.001,1), false);
-    let texColor3 = texturePosition(feedbackTexture, startPosition, uv + vec2(.001,1), false);
+    let texColor = texturePosition(feedbackTexture, feedbackSampler, startPosition, uv, false);
+    let texColor2 = texturePosition(feedbackTexture, feedbackSampler, startPosition, uv + vec2(-.001,1), false);
+    let texColor3 = texturePosition(feedbackTexture, feedbackSampler, startPosition, uv + vec2(.001,1), false);
 
-    let texColorCompute = texturePosition(computeTexture, startPosition, uv, false);
+    let texColorCompute = texturePosition(computeTexture, feedbackSampler, startPosition, uv, false);
 
     let d = distance(uv, vec2(.5 + .1 * fusin(2), .5  + .1 * fusin(4.123)));
     var c = 1.;

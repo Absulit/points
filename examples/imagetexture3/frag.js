@@ -36,7 +36,7 @@ fn main(
     //let oldKingUVClamp = uv * vec2(1,1 * dimsRatio) * ratio.x;
     let lines = sin( uv.x*(uv.x + 3 * fnusin(1))  ) ;
     let startPosition = vec2(0.);
-    let rgbaImage = texturePosition(image, startPosition, uv * lines / params.sliderA, false); //* .998046;
+    let rgbaImage = texturePosition(image, feedbackSampler, startPosition, uv * lines / params.sliderA, false); //* .998046;
     
     let b = brightness(rgbaImage);
     let d = distance(uv, rgbaImage.xy);

@@ -6,7 +6,7 @@
  * @param {bool} crop `bool`
  */
 export const texturePosition = /*wgsl*/`
-fn texturePosition(texture:texture_2d<f32>, position:vec2<f32>, uv:vec2<f32>, crop:bool) -> vec4<f32> {
+fn texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>, uv:vec2<f32>, crop:bool) -> vec4<f32> {
     let startPosition = position;
     let flipTexture = vec2(1.,-1.);
     let flipTextureCoordinates = vec2(-1.,1.);
@@ -20,7 +20,7 @@ fn texturePosition(texture:texture_2d<f32>, position:vec2<f32>, uv:vec2<f32>, cr
         imageUV3 = fract(imageUV3);
     }
 
-    var rgbaImage3 = textureSample(texture, feedbackSampler, imageUV3);
+    var rgbaImage3 = textureSample(texture, aSampler, imageUV3);
 
     let isBeyondImageRight = uv.x > startPosition.x + imageRatio3;
     let isBeyondImageLeft = uv.x < startPosition.x;

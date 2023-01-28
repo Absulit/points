@@ -20,9 +20,9 @@ fn main(
     ) -> @location(0) vec4<f32> {
 
     let startPosition = vec2(0.,0.);
-    let rgbaImage1 = texturePosition(image1, startPosition, uv, true);
-    let rgbaImage2 = texturePosition(image2, startPosition, uv, true);
-    let rgbaImage3 = texturePosition(image3, startPosition, uv, true);
+    let rgbaImage1 = texturePosition(image1, feedbackSampler, startPosition, uv, true);
+    let rgbaImage2 = texturePosition(image2, feedbackSampler, startPosition, uv, true);
+    let rgbaImage3 = texturePosition(image3, feedbackSampler, startPosition, uv, true);
 
     var finalColor:vec4<f32> = layer(rgbaImage2, rgbaImage3);
     finalColor = layer(rgbaImage1, finalColor);

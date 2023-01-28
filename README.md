@@ -1,7 +1,7 @@
 # POINTS
 
 
-POINTS es ia library that uses WebGPU and allows you to create shaders without worrying too much about the setup.
+POINTS is a library that uses WebGPU and allows you to create shaders without worrying too much about the setup.
 
 You can code freely without the use of any support module (effects, noise, image, math) or you can use them and have a little bit less of code in the shader. You can of course create your own modules and import them in the same way.
 
@@ -199,8 +199,7 @@ async function init() {
 ```rust
 // frag.js
     let startPosition = vec2(.0);
-    // TODO: fix sampler as param in texturePosition example
-    let rgbaImage = texturePosition(image, startPosition, uv / params.sliderA, false);
+    let rgbaImage = texturePosition(image, aSampler, startPosition, uv / params.sliderA, false);
 ```
 
 ## Storage
