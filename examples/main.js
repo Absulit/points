@@ -145,11 +145,11 @@ async function init() {
     // points.addUniform('numPoints', numPoints);
     // points.addStorage('points', numPoints, 'vec2<f32>', 2);
 
-    shaders = layers1;
-    const numPoints = 800*800;
-    points.addUniform('numPoints', numPoints);
-    points.addStorage('points', numPoints, 'vec4<f32>', 4);
-    points.addLayers(2, ShaderType.COMPUTE);
+    // shaders = layers1;
+    // const numPoints = 800*800;
+    // points.addUniform('numPoints', numPoints);
+    // points.addStorage('points', numPoints, 'vec4<f32>', 4);
+    // points.addLayers(2, ShaderType.COMPUTE);
 
     // shaders = shapes1;
     // const numPoints = 128;
@@ -205,10 +205,10 @@ async function init() {
     // points.addBindingTexture('outputTex', 'computeTexture');
 
     await points.init(shaders.vert, shaders.compute, shaders.frag);
-    await update();
+    update();
 }
 
-async function update() {
+function update() {
     stats.begin();
 
     // code here
