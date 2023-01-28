@@ -241,7 +241,7 @@ async function init() {
 }
 ```
 ```rust
-// declare struct referenced here: 
+// declare struct referenced here:
 //points.addStorage('variables', 1, 'Variable', 1, ShaderType.COMPUTE);
 struct Variable{
     isCreated:f32,
@@ -297,7 +297,8 @@ You can load and play a video in the same fashion as a texture
 // main.js
 async function init() {
     shaders = base;
-    points.addUniform('myKeyName', 0);
+    // ShaderType tells you in which shader the variable will be created
+    await points.addTextureVideo('video', './../assets_ignore/VIDEO0244.mp4', ShaderType.FRAGMENT);
 
     // more init code
     await points.init(shaders.vert, shaders.compute, shaders.frag);
@@ -307,23 +308,19 @@ async function init() {
 
 ```rust
 // frag.js
-
-let aValue = params.myKeyName;
+let rgbaVideo = textureSampleBaseClampToEdge(video, feedbackSampler, fract(uv));
 ```
 
 ## Webcam
 
 You can load and play a webcam in the same fashion as a texture
 
-## Layers
-
-A layer is basically a Storage but premade with the exact same dimension of the canvas, this for potentially create multilayered effects and require a type of temporary storage and swap values between them.
-
 ```js
 // main.js
 async function init() {
     shaders = base;
-    points.addUniform('myKeyName', 0);
+    // ShaderType tells you in which shader the variable will be created
+    await points.addTextureWebcam('video', ShaderType.FRAGMENT);
 
     // more init code
     await points.init(shaders.vert, shaders.compute, shaders.frag);
@@ -333,33 +330,78 @@ async function init() {
 
 ```rust
 // frag.js
-
-let aValue = params.myKeyName;
+let rgbaVideo = textureSampleBaseClampToEdge(video, feedbackSampler, fract(uv));
 ```
 
 
 
+## Layers
 
+A layer is basically a Storage but premade with the exact same dimension of the canvas, this for potentially create multilayered effects and require a type of temporary storage and swap values between them. All items are `vec4<f32>`
+
+To access a layer the first bracket of the array is the layerIndex and
+
+```js
+// main.js
+async function init() {
+    shaders = base;
+    // ShaderType tells you in which shader the variable will be created
+    points.addLayers(2, ShaderType.COMPUTE);
+
+    // more init code
+    await points.init(shaders.vert, shaders.compute, shaders.frag);
+    update();
+}
+```
+
+```rust
+// compute.js
+
+let point = layers[layerIndex][itemIndex];
+```
 
 
 # I want to update data sent to the shaders (in the update method)
 
+In the same fashion as the `add*` methods, there are a couple of `update*` methods for now
+
+`points.updateUniform();`
+
+and
+
+`points.updateStorageMap();`
+
+**WARNING**: updateStorage tends to slow the application if the data to update is too big, so be aware.
+
 
 ```js
 // main.js
+let myKeyNameValue = 10;
+
 async function init() {
     shaders = base;
-    points.addUniform('myKeyName', 0);
+    // myKeyName value 10
+    points.addUniform('myKeyName', myKeyNameValue); 
 
     // more init code
     await points.init(shaders.vert, shaders.compute, shaders.frag);
     update();
 }
+
+function update() {
+    myKeyNameValue += 1;
+     // updated myKeyName value increases on each frame
+    points.updateUniform('myKeyName', myKeyNameValue);
+
+    // more update code
+    points.update();
+    requestAnimationFrame(update);
+}
 ```
 
 ```rust
 // frag.js
-
+// value is read the same way, but will vary per frame
 let aValue = params.myKeyName;
 ```
 
