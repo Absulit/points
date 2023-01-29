@@ -42,6 +42,16 @@ https://gpuweb.github.io/gpuweb/
 WGSL reference:
 https://gpuweb.github.io/gpuweb/wgsl/
 
+## Syntax highlight and IDE
+
+We use VSCode with [WGSL Literal](https://marketplace.visualstudio.com/items?itemName=ggsimm.wgsl-literal); if you have a different IDE with WGSL hightlight go for it.
+
+---
+> You might have notice or will notice the modules are actually JavaScript modules and imported to vert.js, compute.js, and frag.js which are then again JavaScript files, no WGSL files. This is based on a [recommendation by Brandon Jones from Google](https://toji.github.io/webgpu-best-practices/dynamic-shader-construction.html), so we take advantage of the power of the JavaScript string interpolation, instead of creating fetch calls to import wgsl files, so we can just simply interpolate the modules in our projects. Also, there's currently no way to create or import WGSL modules in other files.
+>
+> The simpler route we took is just to declare a single function, struct or constant as a JavaScript export, and then import them as you do, and then interpolate the reference with the same name.
+---
+
 # Workflow
 
 Currently, we have a workflow of data setup from JavaScript and then 3 shaders:
@@ -155,7 +165,7 @@ struct Params {
 let utime = params.utime;
 ```
 ---
-> **Note:** `Params` is by default referenced inside `compute.js` in the `base` demo. It's technically referenced in the others too (`defaultVertexBody()` in compute and `fnusin()` in frag have a reference inside) and you have to declare them in your projects too because a declared variable/parameter from the JavaScript side is required to have a call in the shader. Since these values are default you have to invoke it, at least one property. 
+> **Note:** `Params` is by default referenced inside `compute.js` in the `base` demo. It's technically referenced in the others too (`defaultVertexBody()` in compute and `fnusin()` in frag have a reference inside) and you have to declare them in your projects too because a declared variable/parameter from the JavaScript side is required to have a call in the shader. Since these values are default you have to invoke it, at least one property.
 ---
 
 You can use the [WGSL phony assignment](https://gpuweb.github.io/gpuweb/wgsl/#phony-assignment-section) for this
@@ -179,7 +189,59 @@ _ = params.utime;
 
 ## Parameters in vert.js to frag.js
 
+### vert.js
 
+The vertex shader has this set of parameters set in the main function: position, color, uv, vertex_index.
+
+```rust
+@vertex
+fn main(
+    @location(0) position: vec4<f32>,       // position of the current vertex
+    @location(1) color: vec4<f32>,          // vertex color
+    @location(2) uv: vec2<f32>,             // uv coordinate
+    @builtin(vertex_index) VertexIndex: u32 // index of the vertex
+) -> Fragment {
+
+    return defaultVertexBody(position, color, uv);
+}
+```
+
+The `defaultVertexBody` returns a `Fragment` struct that provides the parameters for `frag.js`, it adds a ratio parameter with the ratio of the width and height of the canvas, and the mouse position as a `vec2<f32>`. The mouse position is different from the `params.mouseX` and `params.mouseY`, but it uses its values to calculate them in the UV space. The uv is ratio corrected, meaning that if your canvas is wider than taller, a portion of the uv will be out of bounds to mantain the aspect ratio. This might change later to a new uv[some name] to differentiate them, and still have the regular uv space to calculate the screen. Right now if you need to do that in a different canvas size rather than a 1:1 dimension, you have to use ratio to deconstruct the original value.
+
+```rust
+// defaultStructs.js
+struct Fragment {
+    @builtin(position) Position: vec4<f32>,
+    @location(0) Color: vec4<f32>,
+    @location(1) uv: vec2<f32>,
+    @location(2) ratio: vec2<f32>,
+    @location(3) mouse: vec2<f32>
+}
+```
+
+### frag.js
+
+The parameters are then received in the same order as the `Fragment` set them up
+
+```rust
+@fragment
+fn main(
+        @location(0) Color: vec4<f32>,
+        @location(1) uv: vec2<f32>,
+        @location(2) ratio: vec2<f32>,
+        @location(3) mouse: vec2<f32>,
+        @builtin(position) position: vec4<f32>
+    ) -> @location(0) vec4<f32> {
+
+    let finalColor:vec4<f32> = vec4(1., 0., 0., 1.);
+
+    return finalColor;
+}
+```
+
+---
+> **Note:** you can modify these values if you need to. Currently, I don't feel the need to add more, but this might change later.
+---
 
 # Send data into the shaders
 
@@ -205,7 +267,6 @@ async function init() {
 // frag.js
 let aValue = params.myKeyName;
 ```
-
 
 ## Sampler - addSampler
 
@@ -325,8 +386,6 @@ struct Variable {
 }
 ```
 
-
-
 ```rust
 // compute.js
 
@@ -336,7 +395,29 @@ let b = value_noise_data[0];
 // size 1 Storage, you can access struct property
 variables.isCreated = 1;
 ```
+## StorageMap - addStorageMap
 
+Creates a Storage in the same way as a `addStorage` does, except it can be set with data from the start of the application.
+
+```js
+// main.js
+async function init() {
+    shaders = base;
+
+    points.addStorageMap('values', [1.0, 99.0], 'f32');
+
+    // more init code
+    await points.init(shaders.vert, shaders.compute, shaders.frag);
+    update();
+}
+```
+
+```rust
+// compute.js
+
+// we retrieve the 99.0 value
+let c = values[1];
+```
 
 ## BindingTexture - addBindingTexture
 
@@ -365,7 +446,6 @@ textureStore(outputTex, vec2<u32>(0,0), vec4(1,0,0,1));
 // frag.js
 let rgba = textureSample(computeTexture, feedbackSampler, uv);
 ```
-
 
 ## Video - addTextureVideo
 
@@ -410,8 +490,6 @@ async function init() {
 // frag.js
 let rgbaWebcam = textureSampleBaseClampToEdge(webcam, feedbackSampler, fract(uv));
 ```
-
-
 
 ## Layers - addLayers
 
@@ -486,7 +564,39 @@ let aValue = params.myKeyName;
 ```
 ## updateStorageMap
 
+Used in conjunction with `addStorageMap()`, but if the amount of data is way too large, then this is a performance bottleneck.
 
+```js
+// main.js
+async function init() {
+    shaders = base;
+
+    // this is before any GPU calculation, so it's ok
+    let data = [];
+    for (let k = 0; k < 800*800; k++) {
+        data.push(Math.random());
+    }
+    // it doesn't require size because uses the data to size it
+    points.addStorageMap('rands', data, 'f32');
+
+    // more init code
+    await points.init(shaders.vert, shaders.compute, shaders.frag);
+    update();
+}
+
+function update() {
+    // this is a processor hog
+    let data = [];
+    for (let k = 0; k < 800*800; k++) {
+        data.push(Math.random());
+    }
+    points.updateStorageMap('rands', data);
+
+    // more update code
+    points.update();
+    requestAnimationFrame(update);
+}
+```
 
 # Retrieve data from the shaders
 
