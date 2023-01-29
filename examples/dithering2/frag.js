@@ -2,6 +2,7 @@ import defaultStructs from '../../src/shaders/defaultStructs.js';
 import { brightness, fnusin, fusin } from '../../src/shaders/defaultFunctions.js';
 import { snoise } from '../../src/shaders/noise2d.js';
 import { getClosestColorInPalette, orderedDithering, orderedDithering_threshold_map } from '../../src/shaders/effects.js';
+import { texturePosition } from '../../src/shaders/image.js';
 
 const frag = /*wgsl*/`
 
@@ -13,6 +14,7 @@ ${brightness}
 ${snoise}
 ${getClosestColorInPalette}
 ${orderedDithering}
+${texturePosition}
 
 ${orderedDithering_threshold_map}
 
@@ -54,34 +56,17 @@ fn main(
     let n1 = snoise(uv * 2 + 2 * fnusin(1/3));
 
     let dims: vec2<u32> = textureDimensions(image, 0);
-    var dimsRatio = f32(dims.x) / f32(dims.y);
-    let imageUV = uv * vec2(1,-1 * dimsRatio) * ratio.y / params.sliderA;
-    var rgbaImage = textureSample(image, feedbackSampler, imageUV); //* .998046;
+    var rgbaImage = texturePosition(image, feedbackSampler, vec2(0.), uv, false); //* .998046;
     let br = brightness(rgbaImage);
-
-    //let dimsVideo = textureDimensions(video, 0);
-    let dimsVideo = vec2(854.,480.);
-    var dimsVideoRatio = f32(dimsVideo.x) / f32(dimsVideo.y);
-    let videoUV = uv * vec2(1,-1 * dimsVideoRatio) * ratio.y / params.sliderA;
-    var rgbaVideo = textureSampleBaseClampToEdge(video, feedbackSampler, fract(videoUV)); //* .998046;
-    let brv = brightness(rgbaVideo);
-
-
-
-
-
-
-
 
     // from 8 to 40
     //let depth = floor(8 + 32. * fnusin(1));
     let depth = floor(8 + 32. * params.sliderB);
 
-    rgbaVideo = getClosestColorInPalette(rgbaVideo, u32(numPaletteItems * brv * params.sliderB) + 2, params.sliderC);
-    //rgbaVideo = orderedDithering(rgbaVideo, depth, dims, imageUV); // ⬆⬇ swap these lines or uncomment
+    rgbaImage = getClosestColorInPalette(rgbaImage, u32(numPaletteItems * br * params.sliderB) + 2, params.sliderC);
+    //rgbaImage = orderedDithering(rgbaImage, depth, dims, uv); // ⬆⬇ swap these lines or uncomment
 
-
-    return rgbaVideo;
+    return rgbaImage;
 }
 `;
 

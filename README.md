@@ -7,7 +7,19 @@ You can code freely without the use of any support module (effects, noise, image
 
 # Examples
 
-[videos]
+<div>
+    <img src="./docs/base_demo.png" alt="base demo image" width="200"/>
+    <img src="./docs/bloom1.png" alt="image with bloom" width="200"/>
+    <img src="./docs/imagetexture2.png" alt="image with effect" width="200"/>
+    <img src="./docs/imagetexture3.png" alt="image with distortion" width="200"/>
+</div>
+<div>
+    <img src="./docs/dithering1.png" alt="image with dithering effect 1" width="200"/>
+    <img src="./docs/dithering2.png" alt="image with dithering effect 2" width="200"/>
+    <img src="./docs/dithering3.png" alt="image with dithering effect 2" width="200"/>
+    <img src="./docs/noise1.png" alt="image with noise layered" width="200"/>
+</div>
+
 
 # Main Audience
 
