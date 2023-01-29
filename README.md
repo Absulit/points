@@ -27,14 +27,6 @@ The library is for Generative Art, so in general for Creative Coders, for Progra
 
 People who just want to create nice live graphics and use mathematics to achieve this.
 
-# Workflow
-
-Currently, we have a workflow of data setup from JavaScript and then 3 shaders:
-
-JavaScript setup and Data → Vertex Shader → Compute Shader → Fragment Shader
-
-This data can be accessed safely in all shaders across the pipeline. In the future there will be an option to add more shaders but now this is the basic setup.
-
 # Requirements
 
 ## A compatible WebGPU browser since it's currently in development
@@ -43,6 +35,22 @@ So far Chrome Canary seems to have the best support
 
 More info:
 https://developer.chrome.com/docs/web-platform/webgpu/
+
+WebGPU API reference (JavaScript):
+https://gpuweb.github.io/gpuweb/
+
+WGSL reference:
+https://gpuweb.github.io/gpuweb/wgsl/
+
+# Workflow
+
+Currently, we have a workflow of data setup from JavaScript and then 3 shaders:
+
+JavaScript setup and Data → Vertex Shader → Compute Shader → Fragment Shader
+
+This data can be accessed safely in all shaders across the pipeline. In the future there will be an option to add more shaders but now this is the basic setup.
+
+
 
 
 # Setup
@@ -98,9 +106,9 @@ init();
 
 # Create your custom Shader project
 
-- Copy the `/src/shaders/base/` and place it where you want to store your project
-- rename folder
-- rename the project inside `base/index.js`, that's the name going to be used in the main.js import and then assigned to the shaders variable.
+1. Copy the `/src/shaders/base/` and place it where you want to store your project
+2. rename folder
+3. rename the project inside `base/index.js`, that's the name going to be used in the main.js import and then assigned to the shaders variable.
 
 ```js
 import vert from './vert.js';
@@ -116,7 +124,60 @@ export default base; // <--- change the name `base` to anything
 ```
 
 
-- change whatever you want inside `vert.js`, `compute.js`, `frag.js`
+4. change whatever you want inside `vert.js`, `compute.js`, `frag.js`
+
+# Default data available to read
+
+Globally there's a uniform struct called `Params` and its instance called `params` that has a few valuable properties to read by default. These values are initialized by the `Points` class and also updated in the `Points.update()` method.
+
+```rust
+struct Params {
+    utime:f32,
+    epoch:f32,
+    screenWidth:f32,
+    screenHeight:f32,
+    mouseX:f32,
+    mouseY:f32,
+}
+```
+
+| Name          | Description                               | ex. value     |
+| ------------- |:-------------                             | -----:        |
+| utime  (*)    | seconds since the app started             | 10.11         |
+| epoch         | seconds since jan 1s 1970 UTC             | 1674958734.777|
+| screenWidth   | pixels in x dimension                     |    800        |
+| screenHeight  | pixels in y dimension                     |    600        |
+| mouseX        | mouse x coordinate from 0..1 in uv space  |    .5685      |
+| mouseY        | mouse y coordinate from 0..1 in uv space  |    .1553      |
+
+(*) `utime`: this name might change to `time`. I have an old mental reference to utime since in means uniform time from the legacy project.
+
+```rust
+// frag.js
+// reading params in the fragment shader
+let utime = params.utime;
+```
+
+**Note** Params is by default referenced `compute.js` in the `base` demo. Is technically referenced in the others too and you have to declare them in your projects too because a declared variable/parameter from the JavaScript side is required to have a call in the shader. Since these values are default you have to invoke it, at least one property. 
+
+You can use the [WGSL phony assignment](https://gpuweb.github.io/gpuweb/wgsl/#phony-assignment-section) for this
+
+
+Quote from the link:
+
+> A phony-assignment is useful for:
+>
+> Calling a function that returns a value, but clearly expressing that the resulting value is not needed.
+>
+> Statically accessing a variable, thus establishing it as a part of the shader’s resource interface.
+
+The last point is the reason, declaring a variable and not using it is against the spect. So if we declare it, we use it, and since `params` is there by default, we have to reference it.
+
+```rust
+// frag.js
+// reading params in the fragment shader
+_ = params.utime;
+```
 
 # I want to send data into the shaders
 
@@ -144,7 +205,7 @@ let aValue = params.myKeyName;
 ```
 
 
-## Sampler
+## Sampler - addSampler
 
 A sampler for textures is sometimes required, and you need to explicitly reference it.
 
@@ -168,7 +229,7 @@ async function init() {
 let rgba = textureSample(texture, mySampler, uv);
 ```
 
-## Texture
+## Texture - addTexture2d
 
 You can create an empty texture, which is not very useful on its own, but if you set the second parameter to true, after the Fragment Shader is printed out to screen, and it saves the output value and you can use it in the next update, so basically you can sample the value from the previous frame.
 
@@ -190,7 +251,7 @@ async function init() {
 let rgba = textureSampleLevel(feedbackTexture, feedbackSampler, vec2<f32>(0,0),  0.0);
 ```
 
-## TextureImage
+## TextureImage - addTextureImage
 
 With texture you can pass an image and sample it with the Sampler you just added.
 
@@ -214,7 +275,7 @@ async function init() {
     let rgbaImage = texturePosition(image, aSampler, startPosition, uv / params.sliderA, false);
 ```
 
-## Storage
+## Storage - addStorage
 
 A storage is a large array with the same data type and this data can be modified at runtime inside the shaders, so in principle this is different to any other data type here where you can only send data and not modify it in the shaders, or as the uniforms where the data can only be updated from the JavaScript side. You can allocate this space and use it in the shaders and the data will remain in the next update/frame call.
 
@@ -272,7 +333,7 @@ variables.isCreated = 1;
 ```
 
 
-## BindingTexture
+## BindingTexture - addBindingTexture
 
 If you require to send data as a texture from the Compute Shader to the Fragment shader and you do not want to use a Storage, you can use a addBindingTexture(), then in the compute shader a variable will exist where you can write colors to it, and in the Fragment Shader will exist a variable to read data from it.
 
@@ -300,7 +361,7 @@ let rgba = textureSample(computeTexture, feedbackSampler, uv);
 ```
 
 
-## Video
+## Video - addTextureVideo
 
 You can load and play a video in the same fashion as a texture
 
@@ -322,7 +383,7 @@ async function init() {
 let rgbaVideo = textureSampleBaseClampToEdge(video, feedbackSampler, fract(uv));
 ```
 
-## Webcam
+## Webcam - addTextureWebcam
 
 You can load and play a webcam in the same fashion as a texture
 
@@ -346,7 +407,7 @@ let rgbaVideo = textureSampleBaseClampToEdge(video, feedbackSampler, fract(uv));
 
 
 
-## Layers
+## Layers - addLayers
 
 A layer is basically a Storage but pre-made with the exact same dimension of the canvas, this for potentially create multilayered effects and require a type of temporary storage and swap values between them. All items are `vec4<f32>`
 
