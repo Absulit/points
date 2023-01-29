@@ -66,7 +66,7 @@ fn main(
     var dimsRatio = f32(dims.x) / f32(dims.y);
     let imageUV = uv * vec2(1,-1 * dimsRatio) * ratio.y / params.sliderA;
     let startPosition = vec2(0.);
-    var rgbaImage = texturePosition(image, startPosition, uv, true); //* .998046;
+    var rgbaImage = texturePosition(image, feedbackSampler, startPosition, uv, true); //* .998046;
     //var rgbaImage = pixelateTexture(image, feedbackSampler, 10,10, imageUV);
     let b = brightness(rgbaImage);
     var newBrightness = 0.;
@@ -79,16 +79,16 @@ fn main(
 
     let texelSize = imageUV / dimsF;
 
-    let rgbaImageRight = texturePosition(image, startPosition, uv + vec2(texelSize.x, 0), true);
+    let rgbaImageRight = texturePosition(image, feedbackSampler, startPosition, uv + vec2(texelSize.x, 0), true);
     let bRight = brightness(rgbaImageRight) + (.5 * quant_error);
 
-    let rgbaImageLeft = texturePosition(image, startPosition, uv + vec2(-texelSize.x, 0), true);
+    let rgbaImageLeft = texturePosition(image, feedbackSampler, startPosition, uv + vec2(-texelSize.x, 0), true);
     let bLeft = brightness(rgbaImageLeft) + (.5 * quant_error);
 
-    let rgbaImageTop = texturePosition(image, startPosition, uv + vec2(0, -texelSize.y), true);
+    let rgbaImageTop = texturePosition(image, feedbackSampler, startPosition, uv + vec2(0, -texelSize.y), true);
     let bTop = brightness(rgbaImageTop) + (.5 * quant_error);
 
-    let rgbaImageBottom = texturePosition(image, startPosition, uv + vec2(0, texelSize.y), true);
+    let rgbaImageBottom = texturePosition(image, feedbackSampler, startPosition, uv + vec2(0, texelSize.y), true);
     let bBottom = brightness(rgbaImageBottom) + (.5 * quant_error);
 
     let fb = (b + bRight + bLeft + bTop + bBottom) / 5 * params.sliderC;

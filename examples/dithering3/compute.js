@@ -53,8 +53,8 @@ fn main(
 
                 let pointIndex = i32(y + (x * numColumns));
 
-                //var point = textureLoad(image, vec2<i32>(ix,iy), 0); // image
-                var point = textureLoad(image, vec2<i32>(ix,iy)); // video
+                var point = textureLoad(image, vec2<i32>(ix,iy), 0); // image
+                //var point = textureLoad(image, vec2<i32>(ix,iy)); // video
                 layers[0][pointIndex] = point;
                 layers[1][pointIndex] = point;
             }

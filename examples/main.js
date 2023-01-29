@@ -92,23 +92,21 @@ async function init() {
     // //await points.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
     // await points.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
 
-    // shaders = dithering2;
-    // points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // //await points.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
-    // //await points.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
-    // await points.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
-    // //await points.addTextureVideo('video', './../assets_ignore/VIDEO0244.mp4', ShaderType.FRAGMENT);
-    // await points.addTextureWebcam('video', ShaderType.FRAGMENT);
+    shaders = dithering2;
+    points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    //await points.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
+    //await points.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
+    await points.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
 
     // shaders = dithering3;
     // points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
     // // await points.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
     // // await points.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
-    // //await points.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.COMPUTE);
+    // await points.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.COMPUTE);
     // // await points.addTextureVideo('image', './../assets_ignore/Black and White Clouds - Time lapse (480p_30fps_H264-128kbit_AAC).mp4', ShaderType.COMPUTE);
     // // await points.addTextureVideo('image', './../assets_ignore/weird_4_2_noaudio.mp4', ShaderType.COMPUTE);
     // // await points.addTextureVideo('image', './../assets_ignore/VID_57840514_190415.mp4', ShaderType.COMPUTE);
-    // await points.addTextureWebcam('image', ShaderType.COMPUTE);
+    // // await points.addTextureWebcam('image', ShaderType.COMPUTE);
     // // await points.addTextureImage('image', './../img/angel_600x600.jpg', ShaderType.COMPUTE);
     // points.addBindingTexture('outputTex', 'computeTexture');
     // points.addLayers(2, ShaderType.COMPUTE);
@@ -133,7 +131,6 @@ async function init() {
     // points.addUniform('value_noise_data_length', numPoints);
     // points.addStorage('value_noise_data', numPoints, 'f32', 1, ShaderType.COMPUTE);
     // points.addStorage('variables', 1, 'Variable', 1, ShaderType.COMPUTE);
-
 
     // shaders = noisecircle1;
     // const numPoints = 128;
@@ -226,19 +223,19 @@ function update() {
 
 init();
 
-const downloadBtn = document.getElementById('downloadBtn');
+const ccaptureBtn = document.getElementById('ccaptureBtn');
 let started = false;
-downloadBtn.addEventListener('click', onClickDownloadButton);
-let buttonTitle = downloadBtn.textContent;
-function onClickDownloadButton(e) {
+ccaptureBtn.addEventListener('click', onClickCCaptureButton);
+let buttonTitle = ccaptureBtn.textContent;
+function onClickCCaptureButton(e) {
     started = !started;
     if (started) {
         // start
         capturer.start();
         //points.videoRecordStart();
-        downloadBtn.textContent = 'RECORDING (STOP)';
+        ccaptureBtn.textContent = 'RECORDING (STOP)';
     } else {
-        downloadBtn.textContent = buttonTitle;
+        ccaptureBtn.textContent = buttonTitle;
         // stop and download
         capturer.stop();
         // default save, will download automatically a file called {name}.extension (webm/gif/tar)
@@ -246,6 +243,29 @@ function onClickDownloadButton(e) {
         //points.videoRecordStop();
     }
 }
+
+const liveCaptureBtn = document.getElementById('liveCaptureBtn');
+let started2 = false;
+liveCaptureBtn.addEventListener('click', onClickLiveCaptureButton);
+let buttonTitle2 = liveCaptureBtn.textContent;
+function onClickLiveCaptureButton(e) {
+    started2 = !started2;
+    if (started2) {
+        // start
+        //capturer.start();
+        points.videoRecordStart();
+        liveCaptureBtn.textContent = 'RECORDING (STOP)';
+    } else {
+        liveCaptureBtn.textContent = buttonTitle2;
+        // stop and download
+        //capturer.stop();
+        // default save, will download automatically a file called {name}.extension (webm/gif/tar)
+        //capturer.save();
+        points.videoRecordStop();
+    }
+}
+
+
 
 const sliderA = document.getElementById('slider-a');
 const sliderB = document.getElementById('slider-b');

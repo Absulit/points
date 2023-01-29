@@ -59,7 +59,7 @@ fn main(
     let dims: vec2<u32> = textureDimensions(image, 0);
     var dimsRatio = f32(dims.x) / f32(dims.y);
     let imageUV = uv * vec2(1,-1 * dimsRatio) * ratio.y / params.sliderA;
-    var rgbaImage = texturePosition(image, vec2(0.), uv / params.sliderA, false); //* .998046;
+    var rgbaImage = texturePosition(image, feedbackSampler, vec2(0.), uv / params.sliderA, false); //* .998046;
     //var rgbaImage = pixelateTexture(image, feedbackSampler, 10,10, imageUV);
     let br = brightness(rgbaImage);
 
