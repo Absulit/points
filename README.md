@@ -1,13 +1,25 @@
 # POINTS
 
 
-POINTS es ia library that uses WebGPU and allows you to create shaders without worrying too much about the setup.
+POINTS is a library that uses WebGPU and allows you to create shaders without worrying too much about the setup.
 
 You can code freely without the use of any support module (effects, noise, image, math) or you can use them and have a little bit less of code in the shader. You can of course create your own modules and import them in the same way.
 
 # Examples
 
-[videos]
+<div>
+    <img src="./docs/base_demo.png" alt="base demo image" width="200"/>
+    <img src="./docs/bloom1.png" alt="image with bloom" width="200"/>
+    <img src="./docs/imagetexture2.png" alt="image with effect" width="200"/>
+    <img src="./docs/imagetexture3.png" alt="image with distortion" width="200"/>
+</div>
+<div>
+    <img src="./docs/dithering1.png" alt="image with dithering effect 1" width="200"/>
+    <img src="./docs/dithering2.png" alt="image with dithering effect 2" width="200"/>
+    <img src="./docs/dithering3.png" alt="image with dithering effect 2" width="200"/>
+    <img src="./docs/noise1.png" alt="image with noise layered" width="200"/>
+</div>
+
 
 # Main Audience
 
@@ -17,9 +29,9 @@ People who just want to create nice live graphics and use mathematics to achieve
 
 # Workflow
 
-Currently we have a workflow of data setup from Javascript and then 3 shaders:
+Currently, we have a workflow of data setup from JavaScript and then 3 shaders:
 
-Javascript setup and Data -> Vertex Shader -> Compute Shader -> Fragment Shader
+JavaScript setup and Data → Vertex Shader → Compute Shader → Fragment Shader
 
 This data can be accessed safely in all shaders across the pipeline. In the future there will be an option to add more shaders but now this is the basic setup.
 
@@ -112,7 +124,7 @@ You can call one of the following methods, you pair the data with a `key` name, 
 
 ## Uniforms - addUniform
 
-Uniforms are sent separately in the `main.js` file and they are all combined in the shaders in a struct called `params`. Currently all values are `f32`. Uniforms can not be modified at runtime inside the shaders, they can only receive data from the Javascript side.
+Uniforms are sent separately in the `main.js` file and they are all combined in the shaders in a struct called `params`. Currently all values are `f32`. Uniforms can not be modified at runtime inside the shaders, they can only receive data from the JavaScript side.
 
 ```js
 // main.js
@@ -199,13 +211,12 @@ async function init() {
 ```rust
 // frag.js
     let startPosition = vec2(.0);
-    // TODO: fix sampler as param in texturePosition example
-    let rgbaImage = texturePosition(image, startPosition, uv / params.sliderA, false);
+    let rgbaImage = texturePosition(image, aSampler, startPosition, uv / params.sliderA, false);
 ```
 
 ## Storage
 
-A storage is a large array with the same data type and this data can be modified at runtime inside the shaders, so in principle this is different to any other data type here where you can only send data and not modify it in the shaders, or as the uniforms where the data can only be updated from the Javascript side. You can allocate this space and use it in the shaders and the data will remain in the next update/frame call.
+A storage is a large array with the same data type and this data can be modified at runtime inside the shaders, so in principle this is different to any other data type here where you can only send data and not modify it in the shaders, or as the uniforms where the data can only be updated from the JavaScript side. You can allocate this space and use it in the shaders and the data will remain in the next update/frame call.
 
 Common uses:
 
@@ -215,15 +226,15 @@ Common uses:
 - Store colors
 - Store results from a heavy calculation
 
-Note: This method is one with tricky parameters, it's fully documented in the module, but heres an overview
+Note: This method is one with tricky parameters, it's fully documented in the module, but here is an overview
 
 - name - name this property/variable will have inside the shader
 - size - number of items will allocate
-- structName - You can use one of the default structs/types like f32, i32m u32, but if you use a more complex one you have to pair it propertly with structSize. If it's a custom struct it has to be declared in the shader or it will throw an error.
+- structName - You can use one of the default structs/types like f32, i32m u32, but if you use a more complex one you have to pair it property with structSize. If it's a custom struct it has to be declared in the shader or it will throw an error.
 - structSize - if the structName you reference in `structName` has 4 properties then you have to add 4. If it's only a f32 then here you should place 1
 shaderType - Into what shader the property/variable will be added.
 
-Note: if the size of the storage is greater than `1` it's created as an array in the shader and you have to acces it's items like an array, but if size is just `1` you can access it's properties directly. Please check the following example for reference.
+Note: if the size of the storage is greater than `1` it's created as an array in the shader and you have to access it's items like an array, but if size is just `1` you can access its properties directly. Please check the following example for reference.
 
 ```js
 // main.js
@@ -337,7 +348,7 @@ let rgbaVideo = textureSampleBaseClampToEdge(video, feedbackSampler, fract(uv));
 
 ## Layers
 
-A layer is basically a Storage but premade with the exact same dimension of the canvas, this for potentially create multilayered effects and require a type of temporary storage and swap values between them. All items are `vec4<f32>`
+A layer is basically a Storage but pre-made with the exact same dimension of the canvas, this for potentially create multilayered effects and require a type of temporary storage and swap values between them. All items are `vec4<f32>`
 
 To access a layer the first bracket of the array is the layerIndex and
 
@@ -381,7 +392,7 @@ let myKeyNameValue = 10;
 async function init() {
     shaders = base;
     // myKeyName value 10
-    points.addUniform('myKeyName', myKeyNameValue); 
+    points.addUniform('myKeyName', myKeyNameValue);
 
     // more init code
     await points.init(shaders.vert, shaders.compute, shaders.frag);
@@ -422,4 +433,4 @@ A function was created to flip the image and place it in the right coordinate in
 
 # Legacy
 
-It was originally a grid made in Javascript with a bit of WebGL but it's very slow, it still has value so it's stored in the Legacy folder. It's now used as reference for effects and is also useful for learning purposes.
+It was originally a grid made in JavaScript with a bit of WebGL but it's very slow, it still has value so it's stored in the Legacy folder. It's now used as reference for effects and is also useful for learning purposes.

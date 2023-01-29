@@ -33,7 +33,7 @@ fn main(
 
     let startPosition = vec2(0.);
     _ = textureSample(feedbackTexture, feedbackSampler, uv);
-    let texColorCompute = texturePosition(computeTexture, startPosition, uv, false);
+    let texColorCompute = texturePosition(computeTexture, feedbackSampler, startPosition, uv, false);
 
 
 
