@@ -3,7 +3,7 @@
 
 POINTS is a library that uses WebGPU and allows you to create shaders without worrying too much about the setup.
 
-You can code freely without the use of any support module (effects, noise, image, math) or you can use them and have a little bit less of code in the shader. You can of course create your own modules and import them in the same way.
+You can code freely without the use of any provided support module (effects, noise, image, math) or you can use them and have a little bit less of code in the shader. You can of course create your own modules and import them in the same way.
 
 # Examples
 
@@ -42,16 +42,23 @@ https://gpuweb.github.io/gpuweb/
 WGSL reference:
 https://gpuweb.github.io/gpuweb/wgsl/
 
+## Syntax highlight and IDE
+
+We use VSCode with [WGSL Literal](https://marketplace.visualstudio.com/items?itemName=ggsimm.wgsl-literal); if you have a different IDE with WGSL hightlight go for it.
+
+---
+> You might have notice or will notice the modules are actually JavaScript modules and imported to vert.js, compute.js, and frag.js which are then again JavaScript files, no WGSL files. This is based on a [recommendation by Brandon Jones from Google](https://toji.github.io/webgpu-best-practices/dynamic-shader-construction.html), so we take advantage of the power of the JavaScript string interpolation, instead of creating fetch calls to import wgsl files, so we can just simply interpolate the modules in our projects. Also, there's currently no way to create or import WGSL modules in other files.
+>
+> The simpler route we took is just to declare a single function, struct or constant as a JavaScript export, and then import them as you do, and then interpolate the reference with the same name.
+---
+
 # Workflow
 
 Currently, we have a workflow of data setup from JavaScript and then 3 shaders:
 
-JavaScript setup and Data → Vertex Shader → Compute Shader → Fragment Shader
+JavaScript setup and Data → Vertex Shader → Compute Shader → Fragment Shader → Screen Output
 
 This data can be accessed safely in all shaders across the pipeline. In the future there will be an option to add more shaders but now this is the basic setup.
-
-
-
 
 # Setup
 
@@ -76,7 +83,6 @@ import base from '../src/shaders/base/index.js';
 // reference the canvas in the constructor
 const points = new Points('gl-canvas');
 ```
-
 
 ```js
 async function init() {
@@ -106,9 +112,9 @@ init();
 
 # Create your custom Shader project
 
-1. Copy the `/src/shaders/base/` and place it where you want to store your project
-2. rename folder
-3. rename the project inside `base/index.js`, that's the name going to be used in the main.js import and then assigned to the shaders variable.
+1. Copy the `/src/shaders/base/` and place it where you want to store your project.
+2. Rename folder.
+3. Rename the project inside `base/index.js`, that's the name going to be used in the main.js import and then assigned to the shaders variable.
 
 ```js
 import vert from './vert.js';
@@ -123,10 +129,11 @@ const base = { // <--- change the name `base` to anything
 export default base; // <--- change the name `base` to anything
 ```
 
-
-4. change whatever you want inside `vert.js`, `compute.js`, `frag.js`
+4. Change whatever you want inside `vert.js`, `compute.js`, `frag.js`.
 
 # Default data available to read
+
+## Params Uniform
 
 Globally there's a uniform struct called `Params` and its instance called `params` that has a few valuable properties to read by default. These values are initialized by the `Points` class and also updated in the `Points.update()` method.
 
@@ -150,15 +157,16 @@ struct Params {
 | mouseX        | mouse x coordinate from 0..1 in uv space  |    .5685      |
 | mouseY        | mouse y coordinate from 0..1 in uv space  |    .1553      |
 
-(*) `utime`: this name might change to `time`. I have an old mental reference to utime since in means uniform time from the legacy project.
+(*) `utime`: this name might change to `time`. I have an old mental reference to utime since it means uniform-time from the legacy project.
 
 ```rust
 // frag.js
 // reading params in the fragment shader
 let utime = params.utime;
 ```
-
-**Note** Params is by default referenced `compute.js` in the `base` demo. Is technically referenced in the others too and you have to declare them in your projects too because a declared variable/parameter from the JavaScript side is required to have a call in the shader. Since these values are default you have to invoke it, at least one property. 
+---
+> **Note:** `Params` is by default referenced inside `compute.js` in the `base` demo. It's technically referenced in the others too (`defaultVertexBody()` in compute and `fnusin()` in frag have a reference inside) and you have to declare them in your projects too because a declared variable/parameter from the JavaScript side is required to have a call in the shader. Since these values are default you have to invoke it, at least one property.
+---
 
 You can use the [WGSL phony assignment](https://gpuweb.github.io/gpuweb/wgsl/#phony-assignment-section) for this
 
@@ -171,7 +179,7 @@ Quote from the link:
 >
 > Statically accessing a variable, thus establishing it as a part of the shader’s resource interface.
 
-The last point is the reason, declaring a variable and not using it is against the spect. So if we declare it, we use it, and since `params` is there by default, we have to reference it.
+The last point is the reason, declaring a variable and not using it is against the spec. So if we declare it, we use it, and since `params` is there by default, we have to reference it.
 
 ```rust
 // frag.js
@@ -179,13 +187,69 @@ The last point is the reason, declaring a variable and not using it is against t
 _ = params.utime;
 ```
 
-# I want to send data into the shaders
+## Parameters in vert.js to frag.js
+
+### vert.js
+
+The vertex shader has this set of parameters set in the main function: position, color, uv, vertex_index.
+
+```rust
+@vertex
+fn main(
+    @location(0) position: vec4<f32>,       // position of the current vertex
+    @location(1) color: vec4<f32>,          // vertex color
+    @location(2) uv: vec2<f32>,             // uv coordinate
+    @builtin(vertex_index) VertexIndex: u32 // index of the vertex
+) -> Fragment {
+
+    return defaultVertexBody(position, color, uv);
+}
+```
+
+The `defaultVertexBody` returns a `Fragment` struct that provides the parameters for `frag.js`, it adds a ratio parameter with the ratio of the width and height of the canvas, and the mouse position as a `vec2<f32>`. The mouse position is different from the `params.mouseX` and `params.mouseY`, but it uses its values to calculate them in the UV space. The uv is ratio corrected, meaning that if your canvas is wider than taller, a portion of the uv will be out of bounds to mantain the aspect ratio. This might change later to a new uv[some name] to differentiate them, and still have the regular uv space to calculate the screen. Right now if you need to do that in a different canvas size rather than a 1:1 dimension, you have to use ratio to deconstruct the original value.
+
+```rust
+// defaultStructs.js
+struct Fragment {
+    @builtin(position) Position: vec4<f32>,
+    @location(0) Color: vec4<f32>,
+    @location(1) uv: vec2<f32>,
+    @location(2) ratio: vec2<f32>,
+    @location(3) mouse: vec2<f32>
+}
+```
+
+### frag.js
+
+The parameters are then received in the same order as the `Fragment` set them up
+
+```rust
+@fragment
+fn main(
+        @location(0) Color: vec4<f32>,
+        @location(1) uv: vec2<f32>,
+        @location(2) ratio: vec2<f32>,
+        @location(3) mouse: vec2<f32>,
+        @builtin(position) position: vec4<f32>
+    ) -> @location(0) vec4<f32> {
+
+    let finalColor:vec4<f32> = vec4(1., 0., 0., 1.);
+
+    return finalColor;
+}
+```
+
+---
+> **Note:** you can modify these values if you need to. Currently, I don't feel the need to add more, but this might change later.
+---
+
+# Send data into the shaders
 
 You can call one of the following methods, you pair the data with a `key` name, and this name is the one you will reference inside the shader:
 
 ## Uniforms - addUniform
 
-Uniforms are sent separately in the `main.js` file and they are all combined in the shaders in a struct called `params`. Currently all values are `f32`. Uniforms can not be modified at runtime inside the shaders, they can only receive data from the JavaScript side.
+Uniforms are sent separately in the `main.js` file and they are all combined in the shaders in the struct called `params`. Currently, by default, all values are `f32`. Uniforms can not be modified at runtime inside the shaders, they can only receive data from the JavaScript side.
 
 ```js
 // main.js
@@ -204,12 +268,11 @@ async function init() {
 let aValue = params.myKeyName;
 ```
 
-
 ## Sampler - addSampler
 
 A sampler for textures is sometimes required, and you need to explicitly reference it.
 
-Don't name it just `sampler`, because that's the data type inside WebGPU. It will throw an exception if you do.
+Don't name it just `sampler`, because that's the data type inside WGSL. POINTS will throw an exception if you do.
 
 ```js
 // main.js
@@ -231,7 +294,7 @@ let rgba = textureSample(texture, mySampler, uv);
 
 ## Texture - addTexture2d
 
-You can create an empty texture, which is not very useful on its own, but if you set the second parameter to true, after the Fragment Shader is printed out to screen, and it saves the output value and you can use it in the next update, so basically you can sample the value from the previous frame.
+You can create an empty texture, which is not very useful on its own, but if you set the second parameter to true, after the Fragment Shader is printed out to screen, it saves the output value to this texture and you can use it in the next update call, so basically you can sample the value from the previous frame.
 
 ```js
 // main.js
@@ -253,7 +316,7 @@ let rgba = textureSampleLevel(feedbackTexture, feedbackSampler, vec2<f32>(0,0), 
 
 ## TextureImage - addTextureImage
 
-With texture you can pass an image and sample it with the Sampler you just added.
+With `addTextureImage` you can pass an image and sample it with the Sampler you just added.
 
 ```js
 // main.js
@@ -272,7 +335,7 @@ async function init() {
 ```rust
 // frag.js
     let startPosition = vec2(.0);
-    let rgbaImage = texturePosition(image, aSampler, startPosition, uv / params.sliderA, false);
+    let rgbaImage = texturePosition(image, mySampler, startPosition, uv, false);
 ```
 
 ## Storage - addStorage
@@ -285,18 +348,19 @@ Common uses:
 - Store variables
 - Store positions
 - Store colors
-- Store results from a heavy calculation
+- Store results from a heavy calculation in the compute shader
 
-Note: This method is one with tricky parameters, it's fully documented in the module, but here is an overview
-
-- name - name this property/variable will have inside the shader
-- size - number of items will allocate
-- structName - You can use one of the default structs/types like f32, i32m u32, but if you use a more complex one you have to pair it property with structSize. If it's a custom struct it has to be declared in the shader or it will throw an error.
-- structSize - if the structName you reference in `structName` has 4 properties then you have to add 4. If it's only a f32 then here you should place 1
-shaderType - Into what shader the property/variable will be added.
-
-Note: if the size of the storage is greater than `1` it's created as an array in the shader and you have to access it's items like an array, but if size is just `1` you can access its properties directly. Please check the following example for reference.
-
+---
+> **Note:** This method is one with tricky parameters, it's fully documented in the module, but here is an overview:
+>
+> - name - name this property/variable will have inside the shader
+> - size - number of items it will allocate
+> - structName - You can use one of the default structs/types like `f32`, `i32`, `u32`, but if you use a more complex one you have to pair it properly with structSize. If it's a custom `struct` it has to be declared in the shader or it will throw an error.
+> - structSize - if the `struct` you reference in `structName` has 4 properties then you have to add `4`. If it's only a f32 then here you should place `1`.
+> - shaderType - Into what shader the property/variable will be added.
+---
+> **Note:** if the size of the storage is greater than `1` then it's created as an array in the shader and you have to access its items like an array, but if size is just `1` you can access its properties directly. Please check the following example for reference.
+---
 ```js
 // main.js
 async function init() {
@@ -313,14 +377,14 @@ async function init() {
 }
 ```
 ```rust
+// compute.js outside the main function in the shader
+
 // declare struct referenced here:
-//points.addStorage('variables', 1, 'Variable', 1, ShaderType.COMPUTE);
-struct Variable{
-    isCreated:f32,
+// points.addStorage('variables', 1, 'Variable', 1, ShaderType.COMPUTE);
+struct Variable {
+    isCreated:f32
 }
 ```
-
-
 
 ```rust
 // compute.js
@@ -331,17 +395,40 @@ let b = value_noise_data[0];
 // size 1 Storage, you can access struct property
 variables.isCreated = 1;
 ```
+## StorageMap - addStorageMap
 
+Creates a Storage in the same way as a `addStorage` does, except it can be set with data from the start of the application.
+
+```js
+// main.js
+async function init() {
+    shaders = base;
+
+    points.addStorageMap('values', [1.0, 99.0], 'f32');
+
+    // more init code
+    await points.init(shaders.vert, shaders.compute, shaders.frag);
+    update();
+}
+```
+
+```rust
+// compute.js
+
+// we retrieve the 99.0 value
+let c = values[1];
+```
 
 ## BindingTexture - addBindingTexture
 
-If you require to send data as a texture from the Compute Shader to the Fragment shader and you do not want to use a Storage, you can use a addBindingTexture(), then in the compute shader a variable will exist where you can write colors to it, and in the Fragment Shader will exist a variable to read data from it.
+If you require to send data as a texture from the Compute Shader to the Fragment shader and you do not want to use a Storage, you can use a `addBindingTexture()`, then in the compute shader a variable will exist where you can write colors to it, and in the Fragment Shader will exist a variable to read data from it.
 
 ```js
 // main.js
 async function init() {
     shaders = base;
     // Method without `ShaderType`
+    // First parameter goes to Compute Shader, second to Fragment Shader
     points.addBindingTexture('outputTex', 'computeTexture');
 
     // more init code
@@ -360,10 +447,9 @@ textureStore(outputTex, vec2<u32>(0,0), vec4(1,0,0,1));
 let rgba = textureSample(computeTexture, feedbackSampler, uv);
 ```
 
-
 ## Video - addTextureVideo
 
-You can load and play a video in the same fashion as a texture
+You can load and play a video in the same fashion as a texture. The video is updated with a new value every frame.
 
 ```js
 // main.js
@@ -385,14 +471,14 @@ let rgbaVideo = textureSampleBaseClampToEdge(video, feedbackSampler, fract(uv));
 
 ## Webcam - addTextureWebcam
 
-You can load and play a webcam in the same fashion as a texture
+You can load and play a webcam in the same fashion as a texture. The webcam is updated with a new value every frame.
 
 ```js
 // main.js
 async function init() {
     shaders = base;
     // ShaderType tells you in which shader the variable will be created
-    await points.addTextureWebcam('video', ShaderType.FRAGMENT);
+    await points.addTextureWebcam('webcam', ShaderType.FRAGMENT);
 
     // more init code
     await points.init(shaders.vert, shaders.compute, shaders.frag);
@@ -402,16 +488,14 @@ async function init() {
 
 ```rust
 // frag.js
-let rgbaVideo = textureSampleBaseClampToEdge(video, feedbackSampler, fract(uv));
+let rgbaWebcam = textureSampleBaseClampToEdge(webcam, feedbackSampler, fract(uv));
 ```
-
-
 
 ## Layers - addLayers
 
-A layer is basically a Storage but pre-made with the exact same dimension of the canvas, this for potentially create multilayered effects and require a type of temporary storage and swap values between them. All items are `vec4<f32>`
+A layer is basically a Storage but pre-made with the exact same dimension of the canvas, this for potentially create multi-layered effects that require a type of temporary storage and swap values between them. All items are `vec4<f32>`
 
-To access a layer the first bracket of the array is the layerIndex and
+To access a layer the first bracket of the array is the layer index and the second is the index of the `vec4<f32>` item you want to access.
 
 ```js
 // main.js
@@ -432,8 +516,7 @@ async function init() {
 let point = layers[layerIndex][itemIndex];
 ```
 
-
-# I want to update data sent to the shaders (in the update method)
+# Update data sent to the shaders (in the update method)
 
 In the same fashion as the `add*` methods, there are a couple of `update*` methods for now
 
@@ -443,8 +526,11 @@ and
 
 `points.updateStorageMap();`
 
-**WARNING**: updateStorage tends to slow the application if the data to update is too big, so be aware.
+---
+> **WARNING**: updateStorage tends to slow the application if the data to update is too big, so be aware.
+---
 
+## updateUniform
 
 ```js
 // main.js
@@ -476,10 +562,43 @@ function update() {
 // value is read the same way, but will vary per frame
 let aValue = params.myKeyName;
 ```
+## updateStorageMap
 
+Used in conjunction with `addStorageMap()`, but if the amount of data is way too large, then this is a performance bottleneck.
 
+```js
+// main.js
+async function init() {
+    shaders = base;
 
-# I want to retrieve data from the shaders
+    // this is before any GPU calculation, so it's ok
+    let data = [];
+    for (let k = 0; k < 800*800; k++) {
+        data.push(Math.random());
+    }
+    // it doesn't require size because uses the data to size it
+    points.addStorageMap('rands', data, 'f32');
+
+    // more init code
+    await points.init(shaders.vert, shaders.compute, shaders.frag);
+    update();
+}
+
+function update() {
+    // this is a processor hog
+    let data = [];
+    for (let k = 0; k < 800*800; k++) {
+        data.push(Math.random());
+    }
+    points.updateStorageMap('rands', data);
+
+    // more update code
+    points.update();
+    requestAnimationFrame(update);
+}
+```
+
+# Retrieve data from the shaders
 
 Currently not available, but it will in the future.
 
@@ -492,6 +611,6 @@ If you load your image and is not showing, it's probably beyond the bottom left.
 A function was created to flip the image and place it in the right coordinate in the UV space, this function is called `texturePosition` and you can take a look at how it works in `examples/imagetexture1/frag.js` where it works as a `textureSample` function on steroids, just to fix the coordinates and crop it.
 
 
-# Legacy
+# Legacy folder (original project)
 
-It was originally a grid made in JavaScript with a bit of WebGL but it's very slow, it still has value so it's stored in the Legacy folder. It's now used as reference for effects and is also useful for learning purposes.
+The project was originally a grid made in JavaScript with a bit of WebGL but it's very slow, it still has value so it's stored in the Legacy folder. It's now used as reference for effects and is also useful for learning purposes.
