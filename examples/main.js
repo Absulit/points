@@ -134,7 +134,6 @@ async function init() {
     // points.addStorage('value_noise_data', numPoints, 'f32', 1, ShaderType.COMPUTE);
     // points.addStorage('variables', 1, 'Variable', 1, ShaderType.COMPUTE);
 
-
     // shaders = noisecircle1;
     // const numPoints = 128;
     // points.addUniform('numPoints', numPoints);

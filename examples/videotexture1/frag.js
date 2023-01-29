@@ -44,7 +44,7 @@ fn main(
 
     // let half_texel = vec2(0.5) / vec2<f32>(textureDimensions(video));
     // let rgbaVideo = textureSampleBaseClampToEdge(video, videoSampler, videoUV * lines);
-    let rgbaCT = texturePosition(computeTexture, startPosition, uv / params.sliderA, false);
+    let rgbaCT = texturePosition(computeTexture, feedbackSampler, startPosition, uv / params.sliderA, false);
 
 
 
