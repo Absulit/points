@@ -3,8 +3,6 @@ import { fnusin } from '../defaultFunctions.js';
 
 const frag = /*wgsl*/`
 
-${defaultStructs}
-
 ${fnusin}
 
 @fragment
