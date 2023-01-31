@@ -1,4 +1,3 @@
-import defaultStructs from '../defaultStructs.js';
 import { fnusin } from '../defaultFunctions.js';
 
 const frag = /*wgsl*/`

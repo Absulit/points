@@ -1,5 +1,3 @@
-import defaultStructs from '../defaultStructs.js';
-
 const compute = /*wgsl*/`
 
 @compute @workgroup_size(8,8,1)
