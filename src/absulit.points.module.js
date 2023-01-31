@@ -5,6 +5,7 @@ import defaultVert from './shaders/base/vert.js';
 import defaultFrag from './shaders/base/frag.js';
 import defaultCompute from './shaders/base/compute.js';
 import defaultStructs from './shaders/defaultStructs.js';
+import { defaultVertexBody } from './shaders/defaultFunctions.js';
 
 export class ShaderType {
     static VERTEX = '0';
@@ -459,7 +460,7 @@ export default class Points {
         dynamicGroupBindingsCompute += this._createDynamicGroupBindings(ShaderType.COMPUTE);
         dynamicGroupBindingsFragment += this._createDynamicGroupBindings(ShaderType.FRAGMENT);
 
-        colorsVertWGSL = defaultStructs + dynamicGroupBindingsVertex + colorsVertWGSL;
+        colorsVertWGSL = defaultVertexBody + defaultStructs + dynamicGroupBindingsVertex + colorsVertWGSL;
         colorsComputeWGSL = defaultStructs + dynamicGroupBindingsCompute + colorsComputeWGSL;
         colorsFragWGSL = defaultStructs + dynamicGroupBindingsFragment + colorsFragWGSL;
 

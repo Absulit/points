@@ -1,8 +1,4 @@
-import { defaultVertexBody } from '../defaultFunctions.js';
-
 const vert = /*wgsl*/`
-
-${defaultVertexBody}
 
 @vertex
 fn main(
