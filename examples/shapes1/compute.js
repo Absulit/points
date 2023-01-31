@@ -1,9 +1,6 @@
 import { fnusin, fusin } from '../../src/shaders/defaultFunctions.js';
-import defaultStructs from '../../src/shaders/defaultStructs.js';
 
 const compute = /*wgsl*/`
-
-${defaultStructs}
 
 ${fnusin}
 ${fusin}

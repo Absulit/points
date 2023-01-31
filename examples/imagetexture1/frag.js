@@ -1,12 +1,9 @@
-import defaultStructs from '../../src/shaders/defaultStructs.js';
 import { brightness, fnusin, fusin, polar, sdfCircle, sdfLine, sdfSegment } from '../../src/shaders/defaultFunctions.js';
 import { snoise } from '../../src/shaders/noise2d.js';
 import { PI } from '../../src/shaders/defaultConstants.js';
 import { texturePosition } from '../../src/shaders/image.js';
 
 const frag = /*wgsl*/`
-
-${defaultStructs}
 
 ${fnusin}
 ${fusin}

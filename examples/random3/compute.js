@@ -1,11 +1,9 @@
 import { RGBAFromHSV } from '../../src/shaders/color.js';
 import { fnusin } from '../../src/shaders/defaultFunctions.js';
-import defaultStructs from '../../src/shaders/defaultStructs.js';
 import { rand, random } from '../../src/shaders/random.js';
 
 const compute = /*wgsl*/`
 
-${defaultStructs}
 ${random}
 ${rand}
 ${RGBAFromHSV}

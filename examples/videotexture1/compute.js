@@ -1,8 +1,4 @@
-import defaultStructs from '../../src/shaders/defaultStructs.js';
-
 const compute = /*wgsl*/`
-
-${defaultStructs}
 
 const workgroupSize = 8;
 

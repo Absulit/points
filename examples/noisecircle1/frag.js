@@ -1,10 +1,7 @@
-import defaultStructs from '../../src/shaders/defaultStructs.js';
 import { fnusin, polar, rotateVector, sdfCircle, sdfLine, sdfLine2, sdfSegment, sdfSquare } from '../../src/shaders/defaultFunctions.js';
 import { snoise } from '../../src/shaders/noise2d.js';
 
 const frag = /*wgsl*/`
-
-${defaultStructs}
 
 ${fnusin}
 ${sdfSegment}
@@ -31,7 +28,7 @@ fn main(
     let point = points[0];
 
     var circle = sdfCircle(vec2(.5,.5) * ratio, .2, .1, uv);
-    
+
     var n1 = (snoise(uv * 5.14 + 200 * fract(utime * -.01))+1)*.5;
     //var n2 = (snoise(uv * 15.14 + 200 * fract(utime * -.01))+1)*.5;
     let skewMask = vec2(1, 1.1);

@@ -1,11 +1,8 @@
-import defaultStructs from '../../src/shaders/defaultStructs.js';
 import { brightness, fnusin, fusin, polar, sdfCircle, sdfLine, sdfSegment } from '../../src/shaders/defaultFunctions.js';
 import { snoise } from '../../src/shaders/noise2d.js';
 import { texturePosition } from '../../src/shaders/image.js';
 
 const videotexture1Frag = /*wgsl*/`
-
-${defaultStructs}
 
 ${fnusin}
 ${fusin}

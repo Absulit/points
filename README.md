@@ -274,12 +274,24 @@ A sampler for textures is sometimes required, and you need to explicitly referen
 
 Don't name it just `sampler`, because that's the data type inside WGSL. POINTS will throw an exception if you do.
 
+A descripttor is assigned by default, if you want to sample your image in a different way, you can take a look at [GPUObjectDescriptorBase](https://gpuweb.github.io/gpuweb/#texture-creation) in the WGSL docs.
+
 ```js
 // main.js
 async function init() {
     shaders = base;
+
+    let descriptor = {
+        addressModeU: 'clamp-to-edge',
+        addressModeV: 'clamp-to-edge',
+        magFilter: 'nearest',
+        minFilter: 'nearest',
+        mipmapFilter: 'nearest',
+        //maxAnisotropy: 10,
+    }
+
     // ShaderType tells you in which shader the variable will be created
-    points.addSampler('mySampler', null, ShaderType.FRAGMENT);
+    points.addSampler('mySampler', descriptor, ShaderType.FRAGMENT);
 
     // more init code
     await points.init(shaders.vert, shaders.compute, shaders.frag);
