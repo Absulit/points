@@ -1,9 +1,6 @@
 import { clearAlpha, sdfCircle, sdfLine2, sdfSegment, soften4, soften8 } from '../../src/shaders/defaultFunctions.js';
-import defaultStructs from '../../src/shaders/defaultStructs.js';
 
 const compute = /*wgsl*/`
-
-${defaultStructs}
 
 ${soften8}
 ${soften4}

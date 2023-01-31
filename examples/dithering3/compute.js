@@ -1,9 +1,6 @@
 import { brightness } from '../../src/shaders/defaultFunctions.js';
-import defaultStructs from '../../src/shaders/defaultStructs.js';
 
 const compute = /*wgsl*/`
-
-${defaultStructs}
 
 struct Variable{
     init: i32

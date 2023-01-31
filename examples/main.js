@@ -13,6 +13,7 @@ import imagescale1 from './imagescale1/index.js';
 import imagetexture1 from './imagetexture1/index.js';
 import imagetexture2 from './imagetexture2/index.js';
 import imagetexture3 from './imagetexture3/index.js';
+import imagetexture4 from './imagetexture4/index.js';
 import layers1 from './layers1/index.js';
 import noise1 from './noise1/index.js';
 import noisecircle1 from './noisecircle1/index.js';
@@ -52,8 +53,7 @@ async function init() {
 
     shaders = base;
 
-    //shaders = demo6;
-
+    // shaders = demo6;
 
     // shaders = imagescale1;
     // points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
@@ -85,6 +85,24 @@ async function init() {
     // //await points.addTextureImage('oldking', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
     // //await points.addTextureImage('oldking', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
     // await points.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
+
+    // shaders = imagetexture4;
+    // /**
+    //  * @type {GPUObjectDescriptorBase}
+    //  */
+    // let descriptor = {
+    //     addressModeU: 'clamp-to-edge',
+    //     addressModeV: 'clamp-to-edge',
+    //     magFilter: 'nearest',
+    //     minFilter: 'nearest',
+    //     mipmapFilter: 'nearest',
+    //     //maxAnisotropy: 10,
+    // }
+
+    // points.addSampler('feedbackSampler', descriptor, ShaderType.FRAGMENT);
+    // //await points.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
+    // await points.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
+    // //await points.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
 
     // shaders = dithering1;
     // points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);

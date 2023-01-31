@@ -1,9 +1,6 @@
-import defaultStructs from '../../src/shaders/defaultStructs.js';
 import { valueNoise } from '../../src/shaders/valuenoise.js';
 
 const compute = /*wgsl*/`
-
-${defaultStructs}
 
 struct Variable{
     valueNoiseCreated:f32,

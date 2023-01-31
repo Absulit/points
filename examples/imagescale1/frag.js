@@ -1,10 +1,7 @@
-import defaultStructs from '../../src/shaders/defaultStructs.js';
 import { texturePosition } from '../../src/shaders/image.js';
 import { layer } from '../../src/shaders/color.js';
 
 const frag = /*wgsl*/`
-
-${defaultStructs}
 
 ${texturePosition}
 ${layer}

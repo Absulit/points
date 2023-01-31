@@ -1,10 +1,7 @@
 import { fnusin, fusin } from '../../src/shaders/defaultFunctions.js';
-import defaultStructs from '../../src/shaders/defaultStructs.js';
 import { texturePosition } from '../../src/shaders/image.js';
 
 const frag = /*wgsl*/`
-${defaultStructs}
-
 
 struct Particle{
     x: f32,
