@@ -1,11 +1,4 @@
-import { defaultVertexBody } from '../../src/shaders/defaultFunctions.js';
-import defaultStructs from '../../src/shaders/defaultStructs.js';
-
 const vert = /*wgsl*/`
-
-${defaultStructs}
-${defaultVertexBody}
-
 
 struct Particle{
     x: f32,

@@ -1,10 +1,7 @@
-import defaultStructs from '../../src/shaders/defaultStructs.js';
 import { fnusin } from '../../src/shaders/defaultFunctions.js';
 import { snoise } from '../../src/shaders/noise2d.js';
 
 const frag = /*wgsl*/`
-
-${defaultStructs}
 
 ${fnusin}
 ${snoise}

@@ -53,8 +53,7 @@ async function init() {
 
     shaders = base;
 
-    //shaders = demo6;
-
+    // shaders = demo6;
 
     // shaders = imagescale1;
     // points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
@@ -100,7 +99,7 @@ async function init() {
     //     //maxAnisotropy: 10,
     // }
 
-    // points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+    // points.addSampler('feedbackSampler', descriptor, ShaderType.FRAGMENT);
     // //await points.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
     // await points.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
     // //await points.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);

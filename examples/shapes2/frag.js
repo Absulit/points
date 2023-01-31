@@ -1,9 +1,6 @@
-import defaultStructs from '../../src/shaders/defaultStructs.js';
 import { fnusin } from '../../src/shaders/defaultFunctions.js';
 
 const frag = /*wgsl*/`
-
-${defaultStructs}
 
 ${fnusin}
 

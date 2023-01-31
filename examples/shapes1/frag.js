@@ -1,9 +1,6 @@
-import defaultStructs from '../../src/shaders/defaultStructs.js';
 import { fnusin, polar, rotateVector, sdfCircle, sdfLine, sdfLine2, sdfSegment, sdfSquare } from '../../src/shaders/defaultFunctions.js';
 
 const frag = /*wgsl*/`
-
-${defaultStructs}
 
 ${fnusin}
 ${sdfSegment}
