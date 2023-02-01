@@ -74,8 +74,8 @@ export default class Points {
         this._vertexArray = [];
         this._gpuBufferFirstMatrix = [];
 
-        this._numColumns = null;
-        this._numRows = null;
+        this._numColumns = 1;
+        this._numRows = 1;
 
         this._commandsFinished = [];
 
@@ -353,7 +353,7 @@ export default class Points {
             bindingIndex += 1;
         }
 
-        this._storage.forEach( storageItem => {
+        this._storage.forEach(storageItem => {
             if (!storageItem.shaderType || storageItem.shaderType == shaderType) {
                 let T = storageItem.structName;
                 if (storageItem.array?.length) {
@@ -420,6 +420,17 @@ export default class Points {
     }
 
     /**
+     * Establishes the density of the base mesh, by default 1x1, meaning two triangles.
+     * The final number of triangles is `numColumns` * `numRows` * `2` ( 2 being the triangles )
+     * @param {Number} numColumns quads horizontally
+     * @param {Number} numRows quads vertically
+     */
+    setMeshDensity(numColumns, numRows) {
+        this._numColumns = numColumns;
+        this._numRows = numRows;
+    }
+
+    /**
      * One time function to call to initialize the shaders.
      * @param {String} vertexShader WGSL Vertex Shader in a String.
      * @param {String} computeShader WGSL Compute Shader in a String.
@@ -428,7 +439,7 @@ export default class Points {
      * @param {Number} numRows Number of rows in the base mesh.
      * @returns false | undefined
      */
-    async init(vertexShader, computeShader, fragmentShader, numColumns = 1, numRows = 1) {
+    async init(vertexShader, computeShader, fragmentShader) {
 
         // initializing internal uniforms
         this.addUniform('utime', 0);
@@ -550,15 +561,13 @@ export default class Points {
             },
         };
 
-        await this.createScreen(numColumns, numRows);
+        await this.createScreen();
     }
 
     /**
-     *
-     * @param {Number} numColumns
-     * @param {Number} numRows
+     * Adds two triangles called points per number of columns and rows
      */
-    async createScreen(numColumns = 1, numRows = 1) {
+    async createScreen() {
         let colors = [
             new RGBAColor(1, 0, 0),
             new RGBAColor(0, 1, 0),
@@ -566,11 +575,9 @@ export default class Points {
             new RGBAColor(1, 1, 0),
         ];
 
-        this._numColumns = numColumns;
-        this._numRows = numRows;
 
-        for (let xIndex = 0; xIndex < numRows; xIndex++) {
-            for (let yIndex = 0; yIndex < numColumns; yIndex++) {
+        for (let xIndex = 0; xIndex < this._numRows; xIndex++) {
+            for (let yIndex = 0; yIndex < this._numColumns; yIndex++) {
                 const coordinate = new Coordinate(xIndex * this._canvas.clientWidth / this._numColumns, yIndex * this._canvas.clientHeight / this._numRows, .3);
                 this.addPoint(coordinate, this._canvas.clientWidth / this._numColumns, this._canvas.clientHeight / this._numRows, colors);
             }
@@ -1208,13 +1215,13 @@ export default class Points {
         const { r: r2, g: g2, b: b2, a: a2 } = colors[2];
         const { r: r3, g: g3, b: b3, a: a3 } = colors[3];
         this._vertexArray.push(
-            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx+1)*.5, (+ny+1)*.5,// 0 top left
-            +nw, +ny, nz, 1, r1, g1, b1, a1, (+nw+1)*.5, (+ny+1)*.5,// 1 top right
-            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw+1)*.5, (-nh+1)*.5,// 2 bottom right
+            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * .5, (+ny + 1) * .5,// 0 top left
+            +nw, +ny, nz, 1, r1, g1, b1, a1, (+nw + 1) * .5, (+ny + 1) * .5,// 1 top right
+            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * .5, (-nh + 1) * .5,// 2 bottom right
 
-            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx+1)*.5, (+ny+1)*.5,// 3 top left
-            +nx, -nh, nz, 1, r2, g2, b2, a2, (+nx+1)*.5, (-nh+1)*.5,// 4 bottom left
-            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw+1)*.5, (-nh+1)*.5,// 5 bottom right
+            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * .5, (+ny + 1) * .5,// 3 top left
+            +nx, -nh, nz, 1, r2, g2, b2, a2, (+nx + 1) * .5, (-nh + 1) * .5,// 4 bottom left
+            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * .5, (-nh + 1) * .5,// 5 bottom right
         );
     }
 

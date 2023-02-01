@@ -54,7 +54,8 @@ async function init() {
 
     shaders = base;
 
-    shaders = mesh1;
+    // shaders = mesh1;
+    // points.setMeshDensity(20,20);
 
     // shaders = demo6;
 
@@ -207,7 +208,7 @@ async function init() {
     // points.addTexture2d('feedbackTexture', true);
     // points.addBindingTexture('outputTex', 'computeTexture');
 
-    await points.init(shaders.vert, shaders.compute, shaders.frag, 20, 20);
+    await points.init(shaders.vert, shaders.compute, shaders.frag);
     update();
 }
 
