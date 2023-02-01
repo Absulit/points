@@ -419,7 +419,16 @@ export default class Points {
         return dynamicGroupBindings;
     }
 
-    async init(vertexShader, computeShader, fragmentShader) {
+    /**
+     * One time function to call to initialize the shaders.
+     * @param {String} vertexShader WGSL Vertex Shader in a String.
+     * @param {String} computeShader WGSL Compute Shader in a String.
+     * @param {String} fragmentShader WGSL Fragment Shader in a String.
+     * @param {Number} numColumns Number of columns in the base mesh.
+     * @param {Number} numRows Number of rows in the base mesh.
+     * @returns false | undefined
+     */
+    async init(vertexShader, computeShader, fragmentShader, numColumns = 1, numRows = 1) {
 
         // initializing internal uniforms
         this.addUniform('utime', 0);
@@ -541,7 +550,7 @@ export default class Points {
             },
         };
 
-        await this.createScreen(1, 1);
+        await this.createScreen(numColumns, numRows);
     }
 
     /**
