@@ -15,6 +15,7 @@ import imagetexture2 from './imagetexture2/index.js';
 import imagetexture3 from './imagetexture3/index.js';
 import imagetexture4 from './imagetexture4/index.js';
 import layers1 from './layers1/index.js';
+import mesh1 from './mesh1/index.js';
 import noise1 from './noise1/index.js';
 import noisecircle1 from './noisecircle1/index.js';
 import random1 from './random1/index.js';
@@ -52,6 +53,8 @@ async function init() {
     points.addUniform('sliderC', 0);
 
     shaders = base;
+
+    // shaders = mesh1;
 
     // shaders = demo6;
 

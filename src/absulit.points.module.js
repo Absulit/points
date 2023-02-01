@@ -1185,7 +1185,7 @@ export default class Points {
      * @param {Array<RGBAColor>} colors one color per corner
      * @param {Boolean} useTexture
      */
-    addPoint(coordinate, width, height, colors, useTexture = false) {
+    addPoint(coordinate, width, height, colors) {
         const { x, y, z } = coordinate;
         const nx = this._getWGSLCoordinate(x, this._canvas.width);
         const ny = this._getWGSLCoordinate(y, this._canvas.height, true);
@@ -1199,13 +1199,13 @@ export default class Points {
         const { r: r2, g: g2, b: b2, a: a2 } = colors[2];
         const { r: r3, g: g3, b: b3, a: a3 } = colors[3];
         this._vertexArray.push(
-            +nx, +ny, nz, 1, r0, g0, b0, a0, 0, 1,// 0 top left
-            +nw, +ny, nz, 1, r1, g1, b1, a1, 1, 1,// 1 top right
-            +nw, -nh, nz, 1, r3, g3, b3, a3, 1, 0,// 2 bottom right
+            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx+1)*.5, (+ny+1)*.5,// 0 top left
+            +nw, +ny, nz, 1, r1, g1, b1, a1, (+nw+1)*.5, (+ny+1)*.5,// 1 top right
+            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw+1)*.5, (-nh+1)*.5,// 2 bottom right
 
-            +nx, +ny, nz, 1, r0, g0, b0, a0, 0, 1,// 3 top left
-            +nx, -nh, nz, 1, r2, g2, b2, a2, 0, 0,// 4 bottom left
-            +nw, -nh, nz, 1, r3, g3, b3, a3, 1, 0,// 5 bottom right
+            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx+1)*.5, (+ny+1)*.5,// 3 top left
+            +nx, -nh, nz, 1, r2, g2, b2, a2, (+nx+1)*.5, (-nh+1)*.5,// 4 bottom left
+            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw+1)*.5, (-nh+1)*.5,// 5 bottom right
         );
     }
 
@@ -1267,7 +1267,7 @@ export default class Points {
             chunks.push(e.data);
         };
         this.mediaRecorder.onstop = function (e) {
-            const blob = new Blob(chunks, { 'type': 'video/mp4' });
+            const blob = new Blob(chunks, { 'type': 'video/webm' });
             chunks = [];
             let videoURL = URL.createObjectURL(blob);
             video.src = videoURL;
