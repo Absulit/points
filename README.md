@@ -528,6 +528,16 @@ async function init() {
 let point = layers[layerIndex][itemIndex];
 ```
 
+## Increase mesh resolution - setMeshDensity
+
+By default the screen is covered by only two triangles. To display 2d data like the shaders do you don't need a lot of triangles, but if you want to make an effect that manipulates the triangles via `vert.js` you can increase the resolution of the mesh by calling `setMeshDensity`. The following example shows how to increase the mesh density, and `vert.js` manipulates its vertices.
+
+```js
+// check example/mesh1
+shaders = mesh1;
+points.setMeshDensity(20,20);
+```
+
 # Update data sent to the shaders (in the update method)
 
 In the same fashion as the `add*` methods, there are a couple of `update*` methods for now
