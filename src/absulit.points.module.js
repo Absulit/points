@@ -426,6 +426,9 @@ export default class Points {
      * @param {Number} numRows quads vertically
      */
     setMeshDensity(numColumns, numRows) {
+        if(numColumns == 0 || numRows == 0){
+            throw 'Parameters should be greater than 0';
+        }
         this._numColumns = numColumns;
         this._numRows = numRows;
     }
