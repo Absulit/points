@@ -55,159 +55,30 @@ async function init() {
     shaders = base;
 
     // shaders = mesh1;
-    // points.setMeshDensity(20,20);
-
     // shaders = demo6;
-
     // shaders = imagescale1;
-    // points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // await points.addTextureImage('image1', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
-    // await points.addTextureImage('image2', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
-    // await points.addTextureImage('image3', './../img/unnamed_horror_100x100.png', ShaderType.FRAGMENT);
-
     // shaders = bloom1;
-    // points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // //await points.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
-    // //await points.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
-    // await points.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
-    // //await points.addTextureImage('kernel', './../assets_ignore/ftt_mask_800x800.jpg', ShaderType.FRAGMENT);
-
     // shaders = imagetexture1;
-    // points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // //await points.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
-    // //await points.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
-    // await points.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
-
     // shaders = imagetexture2;
-    // points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // //await points.addTextureImage('oldking', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
-    // //await points.addTextureImage('oldking', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
-    // await points.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
-
     // shaders = imagetexture3;
-    // points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // //await points.addTextureImage('oldking', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
-    // //await points.addTextureImage('oldking', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
-    // await points.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
-
     // shaders = imagetexture4;
-    // /**
-    //  * @type {GPUObjectDescriptorBase}
-    //  */
-    // let descriptor = {
-    //     addressModeU: 'clamp-to-edge',
-    //     addressModeV: 'clamp-to-edge',
-    //     magFilter: 'nearest',
-    //     minFilter: 'nearest',
-    //     mipmapFilter: 'nearest',
-    //     //maxAnisotropy: 10,
-    // }
-
-    // points.addSampler('feedbackSampler', descriptor, ShaderType.FRAGMENT);
-    // //await points.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
-    // await points.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
-    // //await points.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
-
     // shaders = dithering1;
-    // points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // //await points.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
-    // //await points.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
-    // await points.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
-
     // shaders = dithering2;
-    // points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // //await points.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
-    // //await points.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
-    // await points.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
-
     // shaders = dithering3;
-    // points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // // await points.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
-    // // await points.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
-    // await points.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.COMPUTE);
-    // // await points.addTextureVideo('image', './../assets_ignore/Black and White Clouds - Time lapse (480p_30fps_H264-128kbit_AAC).mp4', ShaderType.COMPUTE);
-    // // await points.addTextureVideo('image', './../assets_ignore/weird_4_2_noaudio.mp4', ShaderType.COMPUTE);
-    // // await points.addTextureVideo('image', './../assets_ignore/VID_57840514_190415.mp4', ShaderType.COMPUTE);
-    // // await points.addTextureWebcam('image', ShaderType.COMPUTE);
-    // // await points.addTextureImage('image', './../img/angel_600x600.jpg', ShaderType.COMPUTE);
-    // points.addBindingTexture('outputTex', 'computeTexture');
-    // points.addLayers(2, ShaderType.COMPUTE);
-    // points.addStorage('variables', 1, 'Variable', 2, ShaderType.COMPUTE);
-
     // shaders = dithering4;
-    // points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // //await points.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
-    // //await points.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
-    // await points.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
-
     // shaders = videotexture1;
-    // points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // //await points.addTextureImage('oldking', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
-    // //await points.addTextureImage('oldking', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
-    // await points.addTextureImage('image', './../assets_ignore/absulit_800x800.jpg', ShaderType.FRAGMENT);
-    // await points.addTextureVideo('video', './../assets_ignore/Black and White Clouds - Time lapse (480p_30fps_H264-128kbit_AAC).mp4', ShaderType.COMPUTE)
-    // points.addBindingTexture('outputTex', 'computeTexture');
-
     // shaders = noise1;
-    // const numPoints = 800*800;
-    // points.addUniform('value_noise_data_length', numPoints);
-    // points.addStorage('value_noise_data', numPoints, 'f32', 1, ShaderType.COMPUTE);
-    // points.addStorage('variables', 1, 'Variable', 1, ShaderType.COMPUTE);
-
     // shaders = noisecircle1;
-    // const numPoints = 128;
-    // points.addUniform('numPoints', numPoints);
-    // points.addStorage('points', numPoints, 'vec2<f32>', 2);
-
     // shaders = layers1;
-    // const numPoints = 800*800;
-    // points.addUniform('numPoints', numPoints);
-    // points.addStorage('points', numPoints, 'vec4<f32>', 4);
-    // points.addLayers(2, ShaderType.COMPUTE);
-
     // shaders = shapes1;
-    // const numPoints = 128;
-    // points.addUniform('numPoints', numPoints);
-    // points.addStorage('points', numPoints, 'vec2<f32>', 2);
-
     // shaders = shapes2;
-    // const numPoints = 800*800;
-    // points.addUniform('numPoints', numPoints);
-    // points.addStorage('points', numPoints, 'vec4<f32>', 4);
-    // points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
-    // points.addBindingTexture('outputTex', 'computeTexture');
-
     // shaders = random1;
-    // points.addUniform('randNumber', 0);
-    // points.addUniform('randNumber2', 0);
-    // points.addStorage('stars', 800*800, 'Star', 4);
-    // points.addSampler('feedbackSampler');
-    // points.addTexture2d('feedbackTexture', true);
-    // points.addBindingTexture('outputTex', 'computeTexture');
-
     // shaders = random2;
-    // points.addUniform('randNumber', 0);
-    // points.addUniform('randNumber2', 0);
-    // points.addStorage('stars', 800*800, 'Star', 4);
-    // let data = [];
-    // for (let k = 0; k < 800*800; k++) {
-    //     data.push(Math.random());
-    // }
-    // points.addStorageMap('rands', [0,0], 'f32');
-    // points.addSampler('feedbackSampler');
-    // points.addTexture2d('feedbackTexture', true);
-    // points.addBindingTexture('outputTex', 'computeTexture');
-
     // shaders = random3;
-    // points.addSampler('feedbackSampler');
-    // points.addTexture2d('feedbackTexture', true);
-    // points.addBindingTexture('outputTex', 'computeTexture');
-
     // shaders = circleblur;
-    // points.addSampler('feedbackSampler');
-    // points.addTexture2d('feedbackTexture', true);
-    // points.addBindingTexture('outputTex', 'computeTexture');
 
+
+    await shaders.init(points);
     await points.init(shaders.vert, shaders.compute, shaders.frag);
     update();
 }
@@ -221,18 +92,7 @@ function update() {
     points.updateUniform('sliderB', sliders.b);
     points.updateUniform('sliderC', sliders.c);
 
-
-    // points.updateUniform('randNumber', Math.random()); // random1
-    // points.updateUniform('randNumber2', Math.random()); // random1
-
-    // points.updateUniform('randNumber', Math.random()); // random2
-    // points.updateUniform('randNumber2', Math.random()); // random2
-    // let data = [];
-    // for (let k = 0; k < 800*800; k++) {
-    //     data.push(Math.random());
-    // }
-    // points.updateStorageMap('rands', data);// random2
-
+    shaders.update(points);
     points.update();
 
     //

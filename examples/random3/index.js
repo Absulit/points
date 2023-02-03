@@ -4,7 +4,15 @@ import frag from './frag.js';
 const random3 = {
     vert,
     compute,
-    frag
+    frag,
+    init: async (points) => {
+        points.addSampler('feedbackSampler');
+        points.addTexture2d('feedbackTexture', true);
+        points.addBindingTexture('outputTex', 'computeTexture');
+    },
+    update: (points) => {
+
+    }
 }
 
 export default random3;
