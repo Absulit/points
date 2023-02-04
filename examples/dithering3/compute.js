@@ -1,4 +1,4 @@
-import { brightness } from '../../src/shaders/defaultFunctions.js';
+import { brightness } from '../../src/core/defaultFunctions.js';
 
 const compute = /*wgsl*/`
 

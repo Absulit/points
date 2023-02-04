@@ -1,8 +1,8 @@
-import { brightness, fnusin, fusin, polar, sdfCircle, sdfLine, sdfSegment } from '../../src/shaders/defaultFunctions.js';
-import { snoise } from '../../src/shaders/noise2d.js';
-import { PI } from '../../src/shaders/defaultConstants.js';
-import { texturePosition } from '../../src/shaders/image.js';
-import { bloom } from '../../src/shaders/color.js';
+import { brightness, fnusin, fusin, polar, sdfCircle, sdfLine, sdfSegment } from '../../src/core/defaultFunctions.js';
+import { snoise } from '../../src/core/noise2d.js';
+import { PI } from '../../src/core/defaultConstants.js';
+import { texturePosition } from '../../src/core/image.js';
+import { bloom } from '../../src/core/color.js';
 
 const frag = /*wgsl*/`
 

@@ -1,4 +1,4 @@
-import { fnusin } from '../../src/shaders/defaultFunctions.js';
+import { fnusin } from '../../src/core/defaultFunctions.js';
 
 const frag = /*wgsl*/`
 

@@ -1,5 +1,5 @@
-import { fnusin } from '../../src/shaders/defaultFunctions.js';
-import { snoise } from '../../src/shaders/noise2d.js';
+import { fnusin } from '../../src/core/defaultFunctions.js';
+import { snoise } from '../../src/core/noise2d.js';
 
 const frag = /*wgsl*/`
 

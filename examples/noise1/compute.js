@@ -1,4 +1,4 @@
-import { valueNoise } from '../../src/shaders/valuenoise.js';
+import { valueNoise } from '../../src/core/valuenoise.js';
 
 const compute = /*wgsl*/`
 

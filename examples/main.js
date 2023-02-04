@@ -40,7 +40,7 @@ let stats2 = { 'visible': statsVisible };
 gui.add(stats2, 'visible').name('Show Stats').onChange(value => setStatsVisibility(value));
 
 const shaderProjects = [
-    { name: 'Base', path: '../src/shaders/base/index.js' },
+    { name: 'Base', path: '../src/core/base/index.js' },
     { name: 'Bloom1', path: './bloom1/index.js' },
     { name: 'Circle Blur', path: './circleblur/index.js' },
     { name: 'Demo 6', path: './demo_6/index.js' },

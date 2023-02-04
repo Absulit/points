@@ -1,6 +1,6 @@
-import { RGBAFromHSV } from '../../src/shaders/color.js';
-import { fnusin } from '../../src/shaders/defaultFunctions.js';
-import { rand, random } from '../../src/shaders/random.js';
+import { RGBAFromHSV } from '../../src/core/color.js';
+import { fnusin } from '../../src/core/defaultFunctions.js';
+import { rand, random } from '../../src/core/random.js';
 
 const compute = /*wgsl*/`
 

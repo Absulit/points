@@ -1,7 +1,7 @@
-import { brightness, fnusin, fusin, pixelateTexture } from '../../src/shaders/defaultFunctions.js';
-import { snoise } from '../../src/shaders/noise2d.js';
-import { getClosestColorInPalette, orderedDithering, orderedDithering_threshold_map } from '../../src/shaders/effects.js';
-import { texturePosition } from '../../src/shaders/image.js';
+import { brightness, fnusin, fusin, pixelateTexture } from '../../src/core/defaultFunctions.js';
+import { snoise } from '../../src/core/noise2d.js';
+import { getClosestColorInPalette, orderedDithering, orderedDithering_threshold_map } from '../../src/core/effects.js';
+import { texturePosition } from '../../src/core/image.js';
 
 const frag = /*wgsl*/`
 

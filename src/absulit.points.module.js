@@ -1,11 +1,11 @@
 'use strict';
 import Coordinate from './coordinate.js';
 import RGBAColor from './color.js';
-import defaultVert from './shaders/base/vert.js';
-import defaultFrag from './shaders/base/frag.js';
-import defaultCompute from './shaders/base/compute.js';
-import defaultStructs from './shaders/defaultStructs.js';
-import { defaultVertexBody } from './shaders/defaultFunctions.js';
+import defaultVert from './core/base/vert.js';
+import defaultFrag from './core/base/frag.js';
+import defaultCompute from './core/base/compute.js';
+import defaultStructs from './core/defaultStructs.js';
+import { defaultVertexBody } from './core/defaultFunctions.js';
 
 export class ShaderType {
     static VERTEX = '0';

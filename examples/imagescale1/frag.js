@@ -1,5 +1,5 @@
-import { texturePosition } from '../../src/shaders/image.js';
-import { layer } from '../../src/shaders/color.js';
+import { texturePosition } from '../../src/core/image.js';
+import { layer } from '../../src/core/color.js';
 
 const frag = /*wgsl*/`
 

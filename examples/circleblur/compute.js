@@ -1,4 +1,4 @@
-import { clearMix } from '../../src/shaders/defaultFunctions.js';
+import { clearMix } from '../../src/core/defaultFunctions.js';
 
 const compute = /*wgsl*/`
 
