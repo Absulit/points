@@ -1,4 +1,5 @@
 import { fnusin, fusin } from '../../src/shaders/defaultFunctions.js';
+import { texturePosition } from './../../src/shaders/image.js';
 
 const frag = /*wgsl*/`
 
@@ -16,6 +17,7 @@ struct Star{
 
 ${fnusin}
 ${fusin}
+${texturePosition}
 
 @fragment
 fn main(
@@ -29,8 +31,9 @@ fn main(
     let star = stars[0];
     let rand = rands[0];
 
-    let texColor = textureSample(feedbackTexture, feedbackSampler, uv * vec2(1,-1));
-    let texColorCompute = textureSample(computeTexture, feedbackSampler, uv * vec2(1,-1));
+    let startPosition = vec2(0.,0.);
+    let texColor = texturePosition(feedbackTexture, feedbackSampler, startPosition, uv * vec2(1,-1), false);
+    let texColorCompute = texturePosition(computeTexture, feedbackSampler, startPosition, uv * vec2(1,-1), false);
 
 
     let d = distance(uv, vec2(.5 + .1 * fusin(2), .5  + .1 * fusin(4.123)));

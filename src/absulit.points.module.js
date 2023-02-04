@@ -74,8 +74,8 @@ export default class Points {
         this._vertexArray = [];
         this._gpuBufferFirstMatrix = [];
 
-        this._numColumns = null;
-        this._numRows = null;
+        this._numColumns = 1;
+        this._numRows = 1;
 
         this._commandsFinished = [];
 
@@ -353,7 +353,7 @@ export default class Points {
             bindingIndex += 1;
         }
 
-        this._storage.forEach( storageItem => {
+        this._storage.forEach(storageItem => {
             if (!storageItem.shaderType || storageItem.shaderType == shaderType) {
                 let T = storageItem.structName;
                 if (storageItem.array?.length) {
@@ -419,6 +419,29 @@ export default class Points {
         return dynamicGroupBindings;
     }
 
+    /**
+     * Establishes the density of the base mesh, by default 1x1, meaning two triangles.
+     * The final number of triangles is `numColumns` * `numRows` * `2` ( 2 being the triangles )
+     * @param {Number} numColumns quads horizontally
+     * @param {Number} numRows quads vertically
+     */
+    setMeshDensity(numColumns, numRows) {
+        if(numColumns == 0 || numRows == 0){
+            throw 'Parameters should be greater than 0';
+        }
+        this._numColumns = numColumns;
+        this._numRows = numRows;
+    }
+
+    /**
+     * One time function to call to initialize the shaders.
+     * @param {String} vertexShader WGSL Vertex Shader in a String.
+     * @param {String} computeShader WGSL Compute Shader in a String.
+     * @param {String} fragmentShader WGSL Fragment Shader in a String.
+     * @param {Number} numColumns Number of columns in the base mesh.
+     * @param {Number} numRows Number of rows in the base mesh.
+     * @returns false | undefined
+     */
     async init(vertexShader, computeShader, fragmentShader) {
 
         // initializing internal uniforms
@@ -541,15 +564,13 @@ export default class Points {
             },
         };
 
-        await this.createScreen(1, 1);
+        await this.createScreen();
     }
 
     /**
-     *
-     * @param {Number} numColumns
-     * @param {Number} numRows
+     * Adds two triangles called points per number of columns and rows
      */
-    async createScreen(numColumns = 1, numRows = 1) {
+    async createScreen() {
         let colors = [
             new RGBAColor(1, 0, 0),
             new RGBAColor(0, 1, 0),
@@ -557,11 +578,9 @@ export default class Points {
             new RGBAColor(1, 1, 0),
         ];
 
-        this._numColumns = numColumns;
-        this._numRows = numRows;
 
-        for (let xIndex = 0; xIndex < numRows; xIndex++) {
-            for (let yIndex = 0; yIndex < numColumns; yIndex++) {
+        for (let xIndex = 0; xIndex < this._numRows; xIndex++) {
+            for (let yIndex = 0; yIndex < this._numColumns; yIndex++) {
                 const coordinate = new Coordinate(xIndex * this._canvas.clientWidth / this._numColumns, yIndex * this._canvas.clientHeight / this._numRows, .3);
                 this.addPoint(coordinate, this._canvas.clientWidth / this._numColumns, this._canvas.clientHeight / this._numRows, colors);
             }
@@ -1185,7 +1204,7 @@ export default class Points {
      * @param {Array<RGBAColor>} colors one color per corner
      * @param {Boolean} useTexture
      */
-    addPoint(coordinate, width, height, colors, useTexture = false) {
+    addPoint(coordinate, width, height, colors) {
         const { x, y, z } = coordinate;
         const nx = this._getWGSLCoordinate(x, this._canvas.width);
         const ny = this._getWGSLCoordinate(y, this._canvas.height, true);
@@ -1199,13 +1218,13 @@ export default class Points {
         const { r: r2, g: g2, b: b2, a: a2 } = colors[2];
         const { r: r3, g: g3, b: b3, a: a3 } = colors[3];
         this._vertexArray.push(
-            +nx, +ny, nz, 1, r0, g0, b0, a0, 0, 1,// 0 top left
-            +nw, +ny, nz, 1, r1, g1, b1, a1, 1, 1,// 1 top right
-            +nw, -nh, nz, 1, r3, g3, b3, a3, 1, 0,// 2 bottom right
+            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * .5, (+ny + 1) * .5,// 0 top left
+            +nw, +ny, nz, 1, r1, g1, b1, a1, (+nw + 1) * .5, (+ny + 1) * .5,// 1 top right
+            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * .5, (-nh + 1) * .5,// 2 bottom right
 
-            +nx, +ny, nz, 1, r0, g0, b0, a0, 0, 1,// 3 top left
-            +nx, -nh, nz, 1, r2, g2, b2, a2, 0, 0,// 4 bottom left
-            +nw, -nh, nz, 1, r3, g3, b3, a3, 1, 0,// 5 bottom right
+            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * .5, (+ny + 1) * .5,// 3 top left
+            +nx, -nh, nz, 1, r2, g2, b2, a2, (+nx + 1) * .5, (-nh + 1) * .5,// 4 bottom left
+            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * .5, (-nh + 1) * .5,// 5 bottom right
         );
     }
 
@@ -1248,12 +1267,6 @@ export default class Points {
     videoStream = null;
     mediaRecorder = null;
     videoRecordStart() {
-        let video = document.getElementById('videorecord') || document.createElement('video');
-        video.id = 'videorecord';
-        video.width = 100;
-        video.height = 100;
-        document.body.appendChild(video);
-
         const options = {
             audioBitsPerSecond: 128000,
             videoBitsPerSecond: 6000000,
@@ -1267,11 +1280,10 @@ export default class Points {
             chunks.push(e.data);
         };
         this.mediaRecorder.onstop = function (e) {
-            const blob = new Blob(chunks, { 'type': 'video/mp4' });
+            const blob = new Blob(chunks, { 'type': 'video/webm' });
             chunks = [];
             let videoURL = URL.createObjectURL(blob);
-            video.src = videoURL;
-            video.play();
+            window.open(videoURL);
         };
         this.mediaRecorder.ondataavailable = function (e) {
             chunks.push(e.data);
