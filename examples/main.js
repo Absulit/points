@@ -81,8 +81,57 @@ async function loadShaderByIndex(index) {
     await init();
 }
 
-
 examples.onChange(loadShaderByIndex);
+
+//---
+const recordingFolder = gui.addFolder('Recording');
+recordingFolder.open();
+
+const recordingOptions = [
+    {
+        nameStopped: 'CCapture (slow/HQ)',
+        nameStarted: 'RECORDING (STOP)',
+        fn: function (e) {
+            this.started = !this.started;
+            console.log(e, this);
+
+            if (this.started) {
+                this.controller.name(this.nameStarted);
+                capturer.start();
+            } else {
+                this.controller.name(this.nameStopped);
+                // stop and download
+                capturer.stop();
+                // default save, will download automatically a file called {name}.extension (webm/gif/tar)
+                capturer.save();
+            }
+        },
+        started: false,
+        controller: null
+    },
+    {
+        nameStopped: 'Live Capture (fast/LQ)',
+        nameStarted: 'RECORDING (STOP)',
+        fn: function (e) {
+            this.started = !this.started;
+            console.log(e, this);
+
+            if (this.started) {
+                this.controller.name(this.nameStarted);
+                points.videoRecordStart();
+            } else {
+                this.controller.name(this.nameStopped);
+                points.videoRecordStop();
+            }
+        },
+        started: false,
+        controller: null
+    },
+];
+
+recordingOptions.forEach(recordingOption => {
+    recordingOption.controller = recordingFolder.add(recordingOption, 'fn').name(recordingOption.nameStopped)
+});
 
 /***************/
 
@@ -128,50 +177,6 @@ function update() {
     animationFrameId = requestAnimationFrame(update);
 }
 
-//init();
-
-const ccaptureBtn = document.getElementById('ccaptureBtn');
-let started = false;
-ccaptureBtn.addEventListener('click', onClickCCaptureButton);
-let buttonTitle = ccaptureBtn.textContent;
-function onClickCCaptureButton(e) {
-    started = !started;
-    if (started) {
-        // start
-        capturer.start();
-        //points.videoRecordStart();
-        ccaptureBtn.textContent = 'RECORDING (STOP)';
-    } else {
-        ccaptureBtn.textContent = buttonTitle;
-        // stop and download
-        capturer.stop();
-        // default save, will download automatically a file called {name}.extension (webm/gif/tar)
-        capturer.save();
-        //points.videoRecordStop();
-    }
-}
-
-const liveCaptureBtn = document.getElementById('liveCaptureBtn');
-let started2 = false;
-liveCaptureBtn.addEventListener('click', onClickLiveCaptureButton);
-let buttonTitle2 = liveCaptureBtn.textContent;
-function onClickLiveCaptureButton(e) {
-    started2 = !started2;
-    if (started2) {
-        // start
-        //capturer.start();
-        points.videoRecordStart();
-        liveCaptureBtn.textContent = 'RECORDING (STOP)';
-    } else {
-        liveCaptureBtn.textContent = buttonTitle2;
-        // stop and download
-        //capturer.stop();
-        // default save, will download automatically a file called {name}.extension (webm/gif/tar)
-        //capturer.save();
-        points.videoRecordStop();
-    }
-}
-
 //
 // var resizeViewport = function () {
 //     let aspect = window.innerWidth / window.innerHeight;
@@ -180,4 +185,3 @@ function onClickLiveCaptureButton(e) {
 // }
 
 // window.addEventListener('resize', resizeViewport, false);
-
