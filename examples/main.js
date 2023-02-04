@@ -1,4 +1,5 @@
 'use strict';
+import * as dat from './../src/vendor/datgui/dat.gui.module.js';
 import { print } from '../legacy/js/utils.js';
 import Points, { ShaderType } from '../src/absulit.points.module.js';
 import base from '../src/shaders/base/index.js';
@@ -36,6 +37,33 @@ let capturer = new CCapture({
     //timeLimit: 10,
     verbose: true
 });
+
+const gui = new dat.GUI({name: 'My GUI'});
+const slidersFolder = gui.addFolder('Sliders');
+console.log(slidersFolder.getSaveObject());
+
+slidersFolder.open();
+
+const sliders = { 'a': 0, 'b': 0, 'c': 0 }
+
+sliders.a = Number(localStorage.getItem('slider-a')) || 0;
+sliders.b = Number(localStorage.getItem('slider-b')) || 0;
+sliders.c = Number(localStorage.getItem('slider-c')) || 0;
+
+
+slidersFolder.add(sliders, 'a', -1, 1, .0001).onFinishChange(() => localStorage.setItem('slider-a', sliders.a));
+slidersFolder.add(sliders, 'b', -1, 1, .0001).onFinishChange(() => localStorage.setItem('slider-b', sliders.b));
+slidersFolder.add(sliders, 'c', -1, 1, .0001).onFinishChange(() => localStorage.setItem('slider-c', sliders.c));
+
+let statsVisible = (localStorage.getItem('stats-visible') === 'true') || false;
+statsVisible && (stats.dom.style.display = 'block');
+!statsVisible && (stats.dom.style.display = 'none');
+gui.add({'stats': ()=>{
+    statsVisible = !statsVisible;
+    statsVisible && (stats.dom.style.display = 'block');
+    !statsVisible && (stats.dom.style.display = 'none');
+    localStorage.setItem('stats-visible', statsVisible)
+}}, 'stats')
 /***************/
 
 
@@ -43,7 +71,6 @@ const points = new Points('gl-canvas');
 points.useTexture = false;
 
 
-const sliders = { 'a': 0, 'b': 0, 'c': 0 }
 
 let shaders;
 
@@ -147,27 +174,6 @@ function onClickLiveCaptureButton(e) {
     }
 }
 
-
-
-const sliderA = document.getElementById('slider-a');
-const sliderB = document.getElementById('slider-b');
-const sliderC = document.getElementById('slider-c');
-
-sliders.a = sliderA.value = localStorage.getItem('slider-a') || 0;
-sliders.b = sliderB.value = localStorage.getItem('slider-b') || 0;
-sliders.c = sliderC.value = localStorage.getItem('slider-c') || 0;
-
-sliderA.addEventListener('input', e => sliders.a = e.target.value);
-sliderB.addEventListener('input', e => sliders.b = e.target.value);
-sliderC.addEventListener('input', e => sliders.c = e.target.value);
-
-sliderA.addEventListener('change', e => localStorage.setItem('slider-a', e.target.value));
-sliderB.addEventListener('change', e => localStorage.setItem('slider-b', e.target.value));
-sliderC.addEventListener('change', e => localStorage.setItem('slider-c', e.target.value));
-
-sliderA.addEventListener('change', e => print(e.target.value));
-sliderB.addEventListener('change', e => print(e.target.value));
-sliderC.addEventListener('change', e => print(e.target.value));
 //
 // var resizeViewport = function () {
 //     let aspect = window.innerWidth / window.innerHeight;
@@ -177,17 +183,3 @@ sliderC.addEventListener('change', e => print(e.target.value));
 
 // window.addEventListener('resize', resizeViewport, false);
 
-
-const statsBtn = document.getElementById('statsBtn');
-let statsVisible = (localStorage.getItem('stats-visible') === 'true') || false;
-statsBtn.onclick = () => {
-    console.log('---- statsBtn.onclick', statsVisible);
-    statsVisible = !statsVisible;
-    console.log('---- statsBtn.onclick', statsVisible);
-    statsVisible && (stats.dom.style.display = 'block');
-    !statsVisible && (stats.dom.style.display = 'none');
-    localStorage.setItem('stats-visible', statsVisible)
-
-};
-statsVisible && (stats.dom.style.display = 'block');
-!statsVisible && (stats.dom.style.display = 'none');
