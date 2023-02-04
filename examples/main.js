@@ -13,7 +13,7 @@ let capturer = new CCapture({
     verbose: true
 });
 
-const gui = new dat.GUI({ name: 'My GUI' });
+const gui = new dat.GUI({ name: 'Points GUI' });
 const slidersFolder = gui.addFolder('Sliders');
 
 slidersFolder.open();
@@ -39,34 +39,34 @@ setStatsVisibility(statsVisible);
 let stats2 = { 'visible': statsVisible };
 gui.add(stats2, 'visible').name('Show Stats').onChange(value => setStatsVisibility(value));
 
-const shaderPaths = [
-    { name: 'Base', shader: '../src/shaders/base/index.js' },
-    { name: 'Bloom1', shader: './bloom1/index.js' },
-    { name: 'Circle Blur', shader: './circleblur/index.js' },
-    { name: 'Demo 6', shader: './demo_6/index.js' },
-    { name: 'Dithering 1', shader: './dithering1/index.js' },
-    { name: 'Dithering 2', shader: './dithering2/index.js' },
-    { name: 'Dithering 3', shader: './dithering3/index.js' },
-    { name: 'Dithering 4', shader: './dithering4/index.js' },
-    { name: 'Image Scale 1', shader: './imagescale1/index.js' },
-    { name: 'Image Texture 1', shader: './imagetexture1/index.js' },
-    { name: 'Image Texture 2', shader: './imagetexture2/index.js' },
-    { name: 'Image Texture 3', shader: './imagetexture3/index.js' },
-    { name: 'Image Texture 4', shader: './imagetexture4/index.js' },
-    { name: 'Layers 1', shader: './layers1/index.js' },
-    { name: 'Mesh 1', shader: './mesh1/index.js' },
-    { name: 'Noise 1', shader: './noise1/index.js' },
-    { name: 'Noise Circle 1', shader: './noisecircle1/index.js' },
-    { name: 'Random 1', shader: './random1/index.js' },
-    { name: 'Random 2', shader: './random2/index.js' },
-    { name: 'Random 3', shader: './random3/index.js' },
-    { name: 'Shapes 1', shader: './shapes1/index.js' },
-    { name: 'Shapes 2', shader: './shapes2/index.js' },
-    { name: 'Video Texture 1', shader: './videotexture1/index.js' },
+const shaderProjects = [
+    { name: 'Base', path: '../src/shaders/base/index.js' },
+    { name: 'Bloom1', path: './bloom1/index.js' },
+    { name: 'Circle Blur', path: './circleblur/index.js' },
+    { name: 'Demo 6', path: './demo_6/index.js' },
+    { name: 'Dithering 1', path: './dithering1/index.js' },
+    { name: 'Dithering 2', path: './dithering2/index.js' },
+    { name: 'Dithering 3', path: './dithering3/index.js' },
+    { name: 'Dithering 4', path: './dithering4/index.js' },
+    { name: 'Image Scale 1', path: './imagescale1/index.js' },
+    { name: 'Image Texture 1', path: './imagetexture1/index.js' },
+    { name: 'Image Texture 2', path: './imagetexture2/index.js' },
+    { name: 'Image Texture 3', path: './imagetexture3/index.js' },
+    { name: 'Image Texture 4', path: './imagetexture4/index.js' },
+    { name: 'Layers 1', path: './layers1/index.js' },
+    { name: 'Mesh 1', path: './mesh1/index.js' },
+    { name: 'Noise 1', path: './noise1/index.js' },
+    { name: 'Noise Circle 1', path: './noisecircle1/index.js' },
+    { name: 'Random 1', path: './random1/index.js' },
+    { name: 'Random 2', path: './random2/index.js' },
+    { name: 'Random 3', path: './random3/index.js' },
+    { name: 'Shapes 1', path: './shapes1/index.js' },
+    { name: 'Shapes 2', path: './shapes2/index.js' },
+    { name: 'Video Texture 1', path: './videotexture1/index.js' },
 ]
 
 const shaderNames = {};
-shaderPaths.forEach((item, index) => {
+shaderProjects.forEach((item, index) => {
     shaderNames[item.name] = index;
 });
 
@@ -75,7 +75,8 @@ let selectedShader = { index: 0 }
 let examples = gui.add(selectedShader, 'index', shaderNames).name('Examples');
 
 async function loadShaderByIndex(index) {
-    let shaderPath = shaderPaths[index].shader;
+    console.clear();
+    let shaderPath = shaderProjects[index].path;
     shaders = (await import(shaderPath)).default;
     await init();
 }
