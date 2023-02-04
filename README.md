@@ -139,7 +139,7 @@ Globally there's a uniform struct called `Params` and its instance called `param
 
 ```rust
 struct Params {
-    utime:f32,
+    time:f32,
     epoch:f32,
     screenWidth:f32,
     screenHeight:f32,
@@ -150,19 +150,18 @@ struct Params {
 
 | Name          | Description                               | ex. value     |
 | ------------- |:-------------                             | -----:        |
-| utime  (*)    | seconds since the app started             | 10.11         |
+| time          | seconds since the app started             | 10.11         |
 | epoch         | seconds since jan 1s 1970 UTC             | 1674958734.777|
 | screenWidth   | pixels in x dimension                     |    800        |
 | screenHeight  | pixels in y dimension                     |    600        |
 | mouseX        | mouse x coordinate from 0..1 in uv space  |    .5685      |
 | mouseY        | mouse y coordinate from 0..1 in uv space  |    .1553      |
 
-(*) `utime`: this name might change to `time`. I have an old mental reference to utime since it means uniform-time from the legacy project.
 
 ```rust
 // frag.js
 // reading params in the fragment shader
-let utime = params.utime;
+let time = params.time;
 ```
 ---
 > **Note:** `Params` is by default referenced inside `compute.js` in the `base` demo. It's technically referenced in the others too (`defaultVertexBody()` in compute and `fnusin()` in frag have a reference inside) and you have to declare them in your projects too because a declared variable/parameter from the JavaScript side is required to have a call in the shader. Since these values are default you have to invoke it, at least one property.
@@ -184,7 +183,7 @@ The last point is the reason, declaring a variable and not using it is against t
 ```rust
 // frag.js
 // reading params in the fragment shader
-_ = params.utime;
+_ = params.time;
 ```
 
 ## Parameters in vert.js to frag.js
