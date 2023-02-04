@@ -24,13 +24,13 @@ fn main(
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
-    let utime = params.utime;
+    let time = params.time;
     let point = points[0];
 
     var circle = sdfCircle(vec2(.5,.5) * ratio, .2, .1, uv);
 
-    var n1 = (snoise(uv * 5.14 + 200 * fract(utime * -.01))+1)*.5;
-    //var n2 = (snoise(uv * 15.14 + 200 * fract(utime * -.01))+1)*.5;
+    var n1 = (snoise(uv * 5.14 + 200 * fract(time * -.01))+1)*.5;
+    //var n2 = (snoise(uv * 15.14 + 200 * fract(time * -.01))+1)*.5;
     let skewMask = vec2(1, 1.1);
     var mask = (1-sdfCircle(vec2(.5,.5) * ratio, .0999, .5, uv * skewMask ));
     let result = mask * n1 * circle + circle;

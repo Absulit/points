@@ -18,7 +18,7 @@ fn defaultVertexBody(position: vec4<f32>, color: vec4<f32>, uv: vec2<f32>) -> Fr
 export const fnusin = /*wgsl*/`
 
 fn fnusin(speed: f32) -> f32{
-    return (sin(params.utime * speed) + 1) * .5;
+    return (sin(params.time * speed) + 1) * .5;
 }
 
 `;
@@ -26,7 +26,7 @@ fn fnusin(speed: f32) -> f32{
 export const fusin = /*wgsl*/`
 
 fn fusin(speed: f32) -> f32{
-    return sin(params.utime * speed);
+    return sin(params.time * speed);
 }
 
 `;
@@ -34,7 +34,7 @@ fn fusin(speed: f32) -> f32{
 export const fucos = /*wgsl*/`
 
 fn fucos(speed: f32) -> f32{
-    return cos(params.utime * speed);
+    return cos(params.time * speed);
 }
 
 `;
