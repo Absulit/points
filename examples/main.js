@@ -40,7 +40,6 @@ let capturer = new CCapture({
 
 const gui = new dat.GUI({name: 'My GUI'});
 const slidersFolder = gui.addFolder('Sliders');
-console.log(slidersFolder.getSaveObject());
 
 slidersFolder.open();
 
@@ -50,20 +49,20 @@ sliders.a = Number(localStorage.getItem('slider-a')) || 0;
 sliders.b = Number(localStorage.getItem('slider-b')) || 0;
 sliders.c = Number(localStorage.getItem('slider-c')) || 0;
 
-
-slidersFolder.add(sliders, 'a', -1, 1, .0001).onFinishChange(() => localStorage.setItem('slider-a', sliders.a));
-slidersFolder.add(sliders, 'b', -1, 1, .0001).onFinishChange(() => localStorage.setItem('slider-b', sliders.b));
-slidersFolder.add(sliders, 'c', -1, 1, .0001).onFinishChange(() => localStorage.setItem('slider-c', sliders.c));
+slidersFolder.add(sliders, 'a', -1, 1, .0001).name('params.sliderA').onFinishChange(() => localStorage.setItem('slider-a', sliders.a));
+slidersFolder.add(sliders, 'b', -1, 1, .0001).name('params.sliderB').onFinishChange(() => localStorage.setItem('slider-b', sliders.b));
+slidersFolder.add(sliders, 'c', -1, 1, .0001).name('params.sliderC').onFinishChange(() => localStorage.setItem('slider-c', sliders.c));
 
 let statsVisible = (localStorage.getItem('stats-visible') === 'true') || false;
-statsVisible && (stats.dom.style.display = 'block');
-!statsVisible && (stats.dom.style.display = 'none');
-gui.add({'stats': ()=>{
-    statsVisible = !statsVisible;
-    statsVisible && (stats.dom.style.display = 'block');
-    !statsVisible && (stats.dom.style.display = 'none');
-    localStorage.setItem('stats-visible', statsVisible)
-}}, 'stats')
+function setStatsVisibility(value){
+    value && (stats.dom.style.display = 'block');
+    !value && (stats.dom.style.display = 'none');
+    localStorage.setItem('stats-visible', value);
+}
+setStatsVisibility(statsVisible);
+
+let stats2 = {'visible': statsVisible};
+gui.add(stats2, 'visible').name('Show Stats').onChange(value => setStatsVisibility(value));
 /***************/
 
 
