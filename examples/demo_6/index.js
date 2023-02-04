@@ -4,7 +4,12 @@ import frag from './frag.js';
 const demo6 = {
     vert,
     compute,
-    frag
+    frag,
+    init: async (points) => {
+    },
+    update: (points) => {
+
+    }
 }
 
 export default demo6;
