@@ -70,11 +70,12 @@ shaderProjects.forEach((item, index) => {
     shaderNames[item.name] = index;
 });
 
-let selectedShader = { index: 0 }
+let selectedShader = { index: Number(localStorage.getItem('selected-shader')) || 0 }
 
 let examples = gui.add(selectedShader, 'index', shaderNames).name('Examples');
 
 async function loadShaderByIndex(index) {
+    localStorage.setItem('selected-shader', index);
     console.clear();
     let shaderPath = shaderProjects[index].path;
     shaders = (await import(shaderPath)).default;
@@ -135,7 +136,7 @@ let points;
 
 let shaders;
 let animationFrameId = null;
-await loadShaderByIndex(0);
+await loadShaderByIndex(selectedShader.index);
 
 async function init() {
     if (animationFrameId) {
