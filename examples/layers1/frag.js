@@ -18,11 +18,11 @@ fn main(
     //_ = layers.layer0[0];
 
     let cellSize = 20. + 10. * fnusin(1.);
-    let a = sin(uv.x  * cellSize) * sin(uv.y * cellSize);
-    let b = sin(uv.x * uv.y * 10. * 9.1 * .25 );
-    let c = fnusin(uv.x * uv.y * 10.);
+    let a = sin(uvr.x  * cellSize) * sin(uvr.y * cellSize);
+    let b = sin(uvr.x * uvr.y * 10. * 9.1 * .25 );
+    let c = fnusin(uvr.x * uvr.y * 10.);
     let d = distance(a,b);
-    let f = d * uv.x * uv.y;
+    let f = d * uvr.x * uvr.y;
     let finalColor:vec4<f32> = vec4(a*d,f*c*a,f, 1.);
 
     return finalColor;

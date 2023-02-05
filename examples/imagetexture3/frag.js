@@ -34,15 +34,15 @@ fn main(
     //let oldKingUVClamp = uv * vec2(1,1 * dimsRatio) * ratio.x;
     let lines = sin( uv.x*(uv.x + 3 * fnusin(1))  ) ;
     let startPosition = vec2(0.);
-    let rgbaImage = texturePosition(image, feedbackSampler, startPosition, uv * lines / params.sliderA, false); //* .998046;
-    
+    let rgbaImage = texturePosition(image, feedbackSampler, startPosition, uvr * lines / params.sliderA, false); //* .998046;
+
     let b = brightness(rgbaImage);
     let d = distance(uv, rgbaImage.xy);
 
     //let finalColor:vec4<f32> = mix(  vec4(1,0,0,1)   , vec4(1,1,0,1) , b) * fnusin(d);
     //let finalColor:vec4<f32> = rgbaImage;
     //let finalColor:vec4<f32> = vec4(b);
-    let finalColor:vec4<f32> = vec4( b  );
+    let finalColor:vec4<f32> = vec4(b);
 
 
     return finalColor;

@@ -17,10 +17,10 @@ fn main(
     ) -> @location(0) vec4<f32> {
 
     _ = points[0];
-    let texColorCompute = textureSample(computeTexture, feedbackSampler, uv);
+    let texColorCompute = textureSample(computeTexture, feedbackSampler, uvr);
 
-    let texColorComputeR = textureSample(computeTexture, feedbackSampler, uv + vec2(CHROMATIC_DISPLACEMENT, 0.)).r;
-    let texColorComputeB = textureSample(computeTexture, feedbackSampler, uv - vec2(CHROMATIC_DISPLACEMENT, 0.)).b;
+    let texColorComputeR = textureSample(computeTexture, feedbackSampler, uvr + vec2(CHROMATIC_DISPLACEMENT, 0.)).r;
+    let texColorComputeB = textureSample(computeTexture, feedbackSampler, uvr - vec2(CHROMATIC_DISPLACEMENT, 0.)).b;
 
 
     return (texColorCompute + vec4(texColorComputeR,0,0,1) + vec4(0,0,texColorComputeB,1));

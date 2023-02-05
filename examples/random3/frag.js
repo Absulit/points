@@ -30,8 +30,8 @@ fn main(
     ) -> @location(0) vec4<f32> {
 
     let startPosition = vec2(0.);
-    _ = textureSample(feedbackTexture, feedbackSampler, uv);
-    let texColorCompute = texturePosition(computeTexture, feedbackSampler, startPosition, uv, false);
+    _ = textureSample(feedbackTexture, feedbackSampler, uvr);
+    let texColorCompute = texturePosition(computeTexture, feedbackSampler, startPosition, uvr, false);
 
 
 

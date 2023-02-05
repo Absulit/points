@@ -32,11 +32,11 @@ fn main(
     let star = stars[0];
 
     let startPosition = vec2(0.);
-    let texColor = texturePosition(feedbackTexture, feedbackSampler, startPosition, uv, false);
-    let texColorCompute = texturePosition(computeTexture, feedbackSampler, startPosition, uv, false);
+    let texColor = texturePosition(feedbackTexture, feedbackSampler, startPosition, uvr, false);
+    let texColorCompute = texturePosition(computeTexture, feedbackSampler, startPosition, uvr, false);
 
 
-    let d = distance(uv, vec2(.5 + .1 * fusin(2), .5  + .1 * fusin(4.123)));
+    let d = distance(uvr, vec2(.5 + .1 * fusin(2), .5  + .1 * fusin(4.123)));
     var c = 1.;
     if(d > .1){
         c = 0;

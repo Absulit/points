@@ -37,7 +37,7 @@ fn main(
     //let imageUV = uv * vec2(1,-1 * dimsRatio) * ratio.x / params.sliderA;
     //let oldKingUVClamp = uv * vec2(1,1 * dimsRatio) * ratio.x;
     let startPosition = vec2(.0);
-    let rgbaImage = texturePosition(image, feedbackSampler, startPosition, uv / params.sliderA, false); //* .998046;
+    let rgbaImage = texturePosition(image, feedbackSampler, startPosition, uvr / params.sliderA, false); //* .998046;
 
 
     //let finalColor:vec4<f32> = vec4(brightness(rgbaImage));

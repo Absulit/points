@@ -13,7 +13,7 @@ fn main(
 ) -> Fragment {
 
     var modifiedPosition = position;
-    modifiedPosition.w = modifiedPosition.w + sin(f32(VertexIndex) * (params.time) * .01) * .1;
+    modifiedPosition.w = modifiedPosition.w + sin(f32(vertexIndex) * (params.time) * .01) * .1;
 
     return defaultVertexBody(modifiedPosition, color, uv);
 }

@@ -8,7 +8,7 @@ fn main(
 
     let time = params.time;
 
-    return Color;
+    return color;
 }
 `;
 
