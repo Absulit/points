@@ -1,8 +1,8 @@
-import { brightness, fnusin, fusin, polar, sdfCircle, sdfLine, sdfSegment } from '../../src/shaders/defaultFunctions.js';
-import { snoise } from '../../src/shaders/noise2d.js';
-import { PI } from '../../src/shaders/defaultConstants.js';
-import { texturePosition } from '../../src/shaders/image.js';
-import { bloom } from '../../src/shaders/color.js';
+import { brightness, fnusin, fusin, polar, sdfCircle, sdfLine, sdfSegment } from '../../src/core/defaultFunctions.js';
+import { snoise } from '../../src/core/noise2d.js';
+import { PI } from '../../src/core/defaultConstants.js';
+import { texturePosition } from '../../src/core/image.js';
+import { bloom } from '../../src/core/color.js';
 
 const frag = /*wgsl*/`
 
@@ -21,15 +21,16 @@ ${bloom}
 
 @fragment
 fn main(
-        @location(0) Color: vec4<f32>,
+        @location(0) color: vec4<f32>,
         @location(1) uv: vec2<f32>,
         @location(2) ratio: vec2<f32>,
-        @location(3) mouse: vec2<f32>,
+        @location(3) uvr: vec2<f32>,
+        @location(4) mouse: vec2<f32>,
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
     let startPosition = vec2(0.,0.);
-    let rgbaImage = texturePosition(image, feedbackSampler, startPosition, uv / params.sliderA, true); //* .998046;
+    let rgbaImage = texturePosition(image, feedbackSampler, startPosition, uvr / params.sliderA, true); //* .998046;
 
     let input = rgbaImage.r;
     let bloomVal = bloom(input, 2, params.sliderB);

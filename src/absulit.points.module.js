@@ -1,11 +1,11 @@
 'use strict';
 import Coordinate from './coordinate.js';
 import RGBAColor from './color.js';
-import defaultVert from './shaders/base/vert.js';
-import defaultFrag from './shaders/base/frag.js';
-import defaultCompute from './shaders/base/compute.js';
-import defaultStructs from './shaders/defaultStructs.js';
-import { defaultVertexBody } from './shaders/defaultFunctions.js';
+import defaultVert from './core/base/vert.js';
+import defaultFrag from './core/base/frag.js';
+import defaultCompute from './core/base/compute.js';
+import defaultStructs from './core/defaultStructs.js';
+import { defaultVertexBody } from './core/defaultFunctions.js';
 
 export class ShaderType {
     static VERTEX = '0';
@@ -93,7 +93,7 @@ export default class Points {
 
         this._canvas = document.getElementById(this._canvasId);
 
-        this._utime = 0;
+        this._time = 0;
         this._epoch = 0;
         this._mouseX = 0;
         this._mouseY = 0;
@@ -445,7 +445,7 @@ export default class Points {
     async init(vertexShader, computeShader, fragmentShader) {
 
         // initializing internal uniforms
-        this.addUniform('utime', 0);
+        this.addUniform('time', 0);
         this.addUniform('epoch', 0);
         this.addUniform('screenWidth', 0);
         this.addUniform('screenHeight', 0);
@@ -1066,9 +1066,9 @@ export default class Points {
         if (!this._device) return;
 
         //--------------------------------------------
-        this._utime += 0.016666666666666666;//1 / 60; TODO: change to delta
+        this._time += 0.016666666666666666;//1 / 60; TODO: change to delta
         this._epoch = new Date() / 1000;
-        this.updateUniform('utime', this._utime);
+        this.updateUniform('time', this._time);
         this.updateUniform('epoch', this._epoch);
         this.updateUniform('screenWidth', this._canvas.width);
         this.updateUniform('screenHeight', this._canvas.height);

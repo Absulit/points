@@ -1,6 +1,6 @@
-import { RGBAFromHSV } from '../../src/shaders/color.js';
-import { fnusin } from '../../src/shaders/defaultFunctions.js';
-import { rand, random } from '../../src/shaders/random.js';
+import { RGBAFromHSV } from '../../src/core/color.js';
+import { fnusin } from '../../src/core/defaultFunctions.js';
+import { rand, random } from '../../src/core/random.js';
 
 const compute = /*wgsl*/`
 
@@ -24,7 +24,7 @@ fn main(
     @builtin(workgroup_id) WorkGroupID: vec3<u32>,
     @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
 ) {
-    let utime = params.utime;
+    let time = params.time;
 
     // let dims: vec2<u32> = textureDimensions(feedbackTexture, 0);
     _ = textureSampleLevel(feedbackTexture, feedbackSampler, vec2(0),  0.0).rgba;

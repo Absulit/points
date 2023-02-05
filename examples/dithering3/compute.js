@@ -1,4 +1,4 @@
-import { brightness } from '../../src/shaders/defaultFunctions.js';
+import { brightness } from '../../src/core/defaultFunctions.js';
 
 const compute = /*wgsl*/`
 
@@ -16,7 +16,7 @@ fn main(
     @builtin(workgroup_id) WorkGroupID: vec3<u32>,
     @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
 ) {
-    _ = params.utime;
+    _ = params.time;
 
 
 

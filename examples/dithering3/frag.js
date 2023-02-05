@@ -1,7 +1,7 @@
-import { brightness, fnusin, fusin, pixelateTexture } from '../../src/shaders/defaultFunctions.js';
-import { snoise } from '../../src/shaders/noise2d.js';
-import { getClosestColorInPalette, orderedDithering, orderedDithering_threshold_map } from '../../src/shaders/effects.js';
-import { texturePosition } from '../../src/shaders/image.js';
+import { brightness, fnusin, fusin, pixelateTexture } from '../../src/core/defaultFunctions.js';
+import { snoise } from '../../src/core/noise2d.js';
+import { getClosestColorInPalette, orderedDithering, orderedDithering_threshold_map } from '../../src/core/effects.js';
+import { texturePosition } from '../../src/core/image.js';
 
 const frag = /*wgsl*/`
 
@@ -44,10 +44,11 @@ const getClosestColorInPalette_palette = array< vec4<f32>, numPaletteItems>(
 
 @fragment
 fn main(
-        @location(0) Color: vec4<f32>,
+        @location(0) color: vec4<f32>,
         @location(1) uv: vec2<f32>,
         @location(2) ratio: vec2<f32>,
-        @location(3) mouse: vec2<f32>,
+        @location(3) uvRatio: vec2<f32>,
+        @location(4) mouse: vec2<f32>,
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 

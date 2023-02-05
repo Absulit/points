@@ -1,4 +1,4 @@
-import { clearAlpha, sdfCircle, sdfLine2, sdfSegment, soften4, soften8 } from '../../src/shaders/defaultFunctions.js';
+import { clearAlpha, sdfCircle, sdfLine2, sdfSegment, soften4, soften8 } from '../../src/core/defaultFunctions.js';
 
 const compute = /*wgsl*/`
 
@@ -56,7 +56,7 @@ fn main(
     @builtin(workgroup_id) WorkGroupID: vec3<u32>,
     @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
 ) {
-    let utime = params.utime;
+    let time = params.time;
 
     let numColumns:f32 = params.screenWidth;
     let numRows:f32 = params.screenHeight;
@@ -101,7 +101,7 @@ fn main(
 
             let uIndex = getPointsIndex(positionU);
             // let rgba = &points[uIndex];
-            // let a = sin(uv.x * params.utime);
+            // let a = sin(uv.x * params.time);
             // (*rgba) = vec4(a * uv.x, 1-uv.y, a, 1);
 
             rgba = points[uIndex];
