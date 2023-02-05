@@ -1,5 +1,5 @@
-import { fnusin, fusin } from '../../src/shaders/defaultFunctions.js';
-import { texturePosition } from './../../src/shaders/image.js';
+import { fnusin, fusin } from '../../src/core/defaultFunctions.js';
+import { texturePosition } from './../../src/core/image.js';
 
 const frag = /*wgsl*/`
 
@@ -21,10 +21,11 @@ ${texturePosition}
 
 @fragment
 fn main(
-        @location(0) Color: vec4<f32>,
+        @location(0) color: vec4<f32>,
         @location(1) uv: vec2<f32>,
         @location(2) ratio: vec2<f32>,
-        @location(3) mouse: vec2<f32>,
+        @location(3) uvr: vec2<f32>,
+        @location(4) mouse: vec2<f32>,
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
@@ -32,11 +33,11 @@ fn main(
     let rand = rands[0];
 
     let startPosition = vec2(0.,0.);
-    let texColor = texturePosition(feedbackTexture, feedbackSampler, startPosition, uv * vec2(1,-1), false);
-    let texColorCompute = texturePosition(computeTexture, feedbackSampler, startPosition, uv * vec2(1,-1), false);
+    let texColor = texturePosition(feedbackTexture, feedbackSampler, startPosition, uvr, false);
+    let texColorCompute = texturePosition(computeTexture, feedbackSampler, startPosition, uvr, false);
 
 
-    let d = distance(uv, vec2(.5 + .1 * fusin(2), .5  + .1 * fusin(4.123)));
+    let d = distance(uvr, vec2(.5 + .1 * fusin(2), .5  + .1 * fusin(4.123)));
     var c = 1.;
     if(d > .1){
         c = 0;

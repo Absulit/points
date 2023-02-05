@@ -1,4 +1,4 @@
-import { valueNoise } from '../../src/shaders/valuenoise.js';
+import { valueNoise } from '../../src/core/valuenoise.js';
 
 const compute = /*wgsl*/`
 
@@ -15,7 +15,7 @@ fn main(
     @builtin(workgroup_id) WorkGroupID: vec3<u32>,
     @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
 ) {
-    let utime = params.utime;
+    let time = params.time;
 
     if(variables.valueNoiseCreated != 1){
 

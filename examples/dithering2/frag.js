@@ -1,7 +1,7 @@
-import { brightness, fnusin, fusin } from '../../src/shaders/defaultFunctions.js';
-import { snoise } from '../../src/shaders/noise2d.js';
-import { getClosestColorInPalette, orderedDithering, orderedDithering_threshold_map } from '../../src/shaders/effects.js';
-import { texturePosition } from '../../src/shaders/image.js';
+import { brightness, fnusin, fusin } from '../../src/core/defaultFunctions.js';
+import { snoise } from '../../src/core/noise2d.js';
+import { getClosestColorInPalette, orderedDithering, orderedDithering_threshold_map } from '../../src/core/effects.js';
+import { texturePosition } from '../../src/core/image.js';
 
 const frag = /*wgsl*/`
 
@@ -43,17 +43,18 @@ const getClosestColorInPalette_palette = array< vec4<f32>, numPaletteItems>(
 
 @fragment
 fn main(
-        @location(0) Color: vec4<f32>,
+        @location(0) color: vec4<f32>,
         @location(1) uv: vec2<f32>,
         @location(2) ratio: vec2<f32>,
-        @location(3) mouse: vec2<f32>,
+        @location(3) uvr: vec2<f32>,
+        @location(4) mouse: vec2<f32>,
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
     let n1 = snoise(uv * 2 + 2 * fnusin(1/3));
 
     let dims: vec2<u32> = textureDimensions(image, 0);
-    var rgbaImage = texturePosition(image, feedbackSampler, vec2(0.), uv, false); //* .998046;
+    var rgbaImage = texturePosition(image, feedbackSampler, vec2(0.), uvr / params.sliderA, false); //* .998046;
     let br = brightness(rgbaImage);
 
     // from 8 to 40

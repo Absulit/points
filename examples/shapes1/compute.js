@@ -1,4 +1,4 @@
-import { fnusin, fusin } from '../../src/shaders/defaultFunctions.js';
+import { fnusin, fusin } from '../../src/core/defaultFunctions.js';
 
 const compute = /*wgsl*/`
 
@@ -13,7 +13,7 @@ fn main(
     @builtin(workgroup_id) WorkGroupID: vec3<u32>,
     @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
 ) {
-    let utime = params.utime;
+    let time = params.time;
     let numPoints = u32(params.numPoints);
 
     // list of points for the sine wave
@@ -21,7 +21,7 @@ fn main(
         let fk = f32(k);
         let point = &points[k];
         (*point).x = fk / params.numPoints;
-        (*point).y = sin(  ((*point).x * 32) + utime) * .1;
+        (*point).y = sin(  ((*point).x * 32) + time) * .1;
     }
 
 }

@@ -1,6 +1,6 @@
-import { brightness, fnusin, fusin, polar, sdfCircle, sdfLine, sdfSegment } from '../../src/shaders/defaultFunctions.js';
-import { snoise } from '../../src/shaders/noise2d.js';
-import { texturePosition } from '../../src/shaders/image.js';
+import { brightness, fnusin, fusin, polar, sdfCircle, sdfLine, sdfSegment } from '../../src/core/defaultFunctions.js';
+import { snoise } from '../../src/core/noise2d.js';
+import { texturePosition } from '../../src/core/image.js';
 
 const videotexture1Frag = /*wgsl*/`
 
@@ -17,10 +17,11 @@ ${texturePosition}
 
 @fragment
 fn main(
-        @location(0) Color: vec4<f32>,
+        @location(0) color: vec4<f32>,
         @location(1) uv: vec2<f32>,
         @location(2) ratio: vec2<f32>,
-        @location(3) mouse: vec2<f32>,
+        @location(3) uvr: vec2<f32>,
+        @location(4) mouse: vec2<f32>,
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
