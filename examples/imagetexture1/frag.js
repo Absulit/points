@@ -31,10 +31,10 @@ fn main(
 
     let n1 = snoise(uv * fnusin(1));
 
-    // let dims: vec2<u32> = textureDimensions(image, 0);
-    // var dimsRatio = f32(dims.x) / f32(dims.y);
+    let dims: vec2<u32> = textureDimensions(image, 0);
+    var dimsRatio = f32(dims.x) / f32(dims.y);
 
-    //let imageUV = uv * vec2(1,-1 * dimsRatio) * ratio.x / params.sliderA;
+    let imageUV = uvr * vec2(1,dimsRatio);
     //let oldKingUVClamp = uv * vec2(1,1 * dimsRatio) * ratio.x;
     let startPosition = vec2(.0);
     let rgbaImage = texturePosition(image, feedbackSampler, startPosition, uvr / params.sliderA, false); //* .998046;

@@ -10,26 +10,28 @@ fn texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>
     let startPosition = position;
     let flipTexture = vec2(1.,-1.);
     let flipTextureCoordinates = vec2(-1.,1.);
-    let dims3: vec2<u32> = textureDimensions(texture, 0);
-    let imageRatio3 = f32(dims3.x) / params.screenWidth;
+    let dims: vec2<u32> = textureDimensions(texture, 0);
+    let imageRatio = f32(dims.x) / params.screenWidth;
+    var dimsRatio = f32(dims.x) / f32(dims.y);
 
-    let displaceImagePosition = vec2(startPosition.x, startPosition.y + imageRatio3) * flipTextureCoordinates;
+    let displaceImagePosition = vec2(startPosition.x, startPosition.y + imageRatio) * flipTextureCoordinates;
 
-    var imageUV3 = (uv * flipTexture + displaceImagePosition) / imageRatio3;
+    var imageUV = uv * vec2(1,dimsRatio);
+    imageUV = (imageUV * flipTexture + displaceImagePosition) / imageRatio;
     if(!crop){
-        imageUV3 = fract(imageUV3);
+        imageUV = fract(imageUV);
     }
 
-    var rgbaImage3 = textureSample(texture, aSampler, imageUV3);
+    var rgbaImage = textureSample(texture, aSampler, imageUV);
 
-    let isBeyondImageRight = uv.x > startPosition.x + imageRatio3;
+    let isBeyondImageRight = uv.x > startPosition.x + imageRatio;
     let isBeyondImageLeft = uv.x < startPosition.x;
-    let isBeyondTop = uv.y > startPosition.y +  imageRatio3;
+    let isBeyondTop = uv.y > startPosition.y +  imageRatio;
     let isBeyondBottom = uv.y < startPosition.y;
     if(crop && (isBeyondTop || isBeyondBottom || isBeyondImageLeft || isBeyondImageRight)){
-        rgbaImage3 = vec4(0);
+        rgbaImage = vec4(0);
     }
-    return rgbaImage3;
+    return rgbaImage;
 }
 `;
 
