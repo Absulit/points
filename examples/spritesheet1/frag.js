@@ -2,6 +2,7 @@ import { brightness, fnusin, fusin, polar, sdfCircle, sdfLine, sdfSegment } from
 import { snoise } from '../../src/core/noise2d.js';
 import { PI } from '../../src/core/defaultConstants.js';
 import { texturePosition } from '../../src/core/image.js';
+import { showDebugCross } from '../../src/core/debug.js';
 
 const frag = /*wgsl*/`
 
@@ -15,12 +16,9 @@ ${polar}
 ${snoise}
 ${PI}
 ${texturePosition}
+${showDebugCross}
 
-fn showDebugCross(position:vec2<f32>, color:vec4<f32>, uv:vec2<f32>) -> vec4<f32>{
-    let horizontal = sdfLine(vec2(0, position.y), vec2(1, position.y), .5, uv) * color;
-    let vertical = sdfLine(vec2(position.x, 0), vec2(position.x, 1), .5, uv) * color;
-    return vertical + horizontal;
-}
+
 
 fn sprite(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>, uv:vec2<f32>, cell:vec4<f32>) -> vec4<f32> {
     var startPosition = position;
@@ -29,16 +27,18 @@ fn sprite(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>, uv:vec2
     let dims: vec2<u32> = textureDimensions(texture, 0);
     let dimsF32 = vec2<f32>(f32(dims.x), f32(dims.y));
     let imageRatio = dimsF32.x / params.screenWidth;
+    var dimsRatio = dimsF32.x / dimsF32.y;
     var cellPos = cell.xy / dimsF32;
     let cellDim = cell.zw / dimsF32;
 
     //startPosition.x -= cell.x;
     //startPosition.y = startPosition.y - dimsF32.y/params.screenHeight;
     let distanceFromOrigin = (dimsF32.y/params.screenHeight-(cell.w/params.screenHeight)) ;
-    let displaceImagePosition = vec2(startPosition.x - cellPos.x, startPosition.y - distanceFromOrigin - cellPos.y  + imageRatio) * flipTextureCoordinates;
+    let displaceImagePosition = vec2(startPosition.x - cellPos.x, startPosition.y * dimsRatio - distanceFromOrigin - cellPos.y  + imageRatio) * flipTextureCoordinates;
     //startPosition.y = startPosition.y + dimsF32.y/params.screenHeight;
 
-    var imageUV = (uv * flipTexture + displaceImagePosition) / imageRatio;
+    var imageUV = uv * vec2(1,dimsRatio);
+    imageUV = (imageUV * flipTexture + displaceImagePosition) / imageRatio;
     var rgbaImage3 = textureSample(texture, aSampler, imageUV);
 
 
@@ -81,8 +81,8 @@ fn main(
     //let imageUV = uv * vec2(1,-1 * dimsRatio) * ratio.x / params.sliderA;
     //let oldKingUVClamp = uv * vec2(1,1 * dimsRatio) * ratio.x;
     let startPosition = mouse;//vec2(.0);
-    //let rgbaImage = texturePosition(image, feedbackSampler, startPosition, uvr / params.sliderA, false); //* .998046;
-    let rgbaImage = sprite(image, feedbackSampler, startPosition, uvr / params.sliderA, vec4(32 * 2,0,32,32)); //* .998046;
+    let rgbaImage = texturePosition(image, feedbackSampler, startPosition, uvr / params.sliderA, true); //* .998046;
+    //let rgbaImage = sprite(image, feedbackSampler, startPosition, uvr, vec4(32 * 0,0,32,32)); //* .998046;
 
 
     //let finalColor:vec4<f32> = vec4(brightness(rgbaImage));
