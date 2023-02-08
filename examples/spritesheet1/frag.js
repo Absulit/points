@@ -3,6 +3,7 @@ import { snoise } from '../../src/core/noise2d.js';
 import { PI } from '../../src/core/defaultConstants.js';
 import { texturePosition } from '../../src/core/image.js';
 import { showDebugCross } from '../../src/core/debug.js';
+import { layer } from './../../src/core/color.js';
 
 const frag = /*wgsl*/`
 
@@ -17,6 +18,7 @@ ${snoise}
 ${PI}
 ${texturePosition}
 ${showDebugCross}
+${layer}
 
 
 
@@ -80,8 +82,8 @@ fn main(
 
     //let imageUV = uv * vec2(1,-1 * dimsRatio) * ratio.x / params.sliderA;
     //let oldKingUVClamp = uv * vec2(1,1 * dimsRatio) * ratio.x;
-    let startPosition = mouse;//vec2(.0);
-    let rgbaImage = texturePosition(image, feedbackSampler, startPosition, uvr / params.sliderA, true); //* .998046;
+    let startPosition = mouse * ratio;//vec2(.0);
+    let rgbaImage = texturePosition(image, feedbackSampler, startPosition, uvr, true); //* .998046;
     //let rgbaImage = sprite(image, feedbackSampler, startPosition, uvr, vec4(32 * 0,0,32,32)); //* .998046;
 
 
