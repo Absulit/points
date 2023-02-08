@@ -13,6 +13,15 @@ export class ShaderType {
     static FRAGMENT = '2';
 }
 
+class UniformKeys{
+    static TIME = 'time';
+    static EPOCH = 'epoch';
+    static SCREEN_WIDTH = 'screenWidth';
+    static SCREEN_HEIGHT = 'screenHeight';
+    static MOUSE_X = 'mouseX';
+    static MOUSE_Y = 'mouseY';
+}
+
 export class VertexBufferInfo {
     /**
      * Along with the vertexArray it calculates some info like offsets required for the pipeline.
@@ -445,12 +454,12 @@ export default class Points {
     async init(vertexShader, computeShader, fragmentShader) {
 
         // initializing internal uniforms
-        this.addUniform('time', 0);
-        this.addUniform('epoch', 0);
-        this.addUniform('screenWidth', 0);
-        this.addUniform('screenHeight', 0);
-        this.addUniform('mouseX', 0);
-        this.addUniform('mouseY', 0);
+        this.addUniform(UniformKeys.TIME, 0);
+        this.addUniform(UniformKeys.EPOCH, 0);
+        this.addUniform(UniformKeys.SCREEN_WIDTH, 0);
+        this.addUniform(UniformKeys.SCREEN_HEIGHT, 0);
+        this.addUniform(UniformKeys.MOUSE_X, 0);
+        this.addUniform(UniformKeys.MOUSE_Y, 0);
 
         //
         let colorsVertWGSL = vertexShader || defaultVert;
@@ -1068,12 +1077,12 @@ export default class Points {
         //--------------------------------------------
         this._time += 0.016666666666666666;//1 / 60; TODO: change to delta
         this._epoch = new Date() / 1000;
-        this.updateUniform('time', this._time);
-        this.updateUniform('epoch', this._epoch);
-        this.updateUniform('screenWidth', this._canvas.width);
-        this.updateUniform('screenHeight', this._canvas.height);
-        this.updateUniform('mouseX', this._mouseX);
-        this.updateUniform('mouseY', this._mouseY);
+        this.updateUniform(UniformKeys.TIME, this._time);
+        this.updateUniform(UniformKeys.EPOCH, this._epoch);
+        this.updateUniform(UniformKeys.SCREEN_WIDTH, this._canvas.width);
+        this.updateUniform(UniformKeys.SCREEN_HEIGHT, this._canvas.height);
+        this.updateUniform(UniformKeys.MOUSE_X, this._mouseX);
+        this.updateUniform(UniformKeys.MOUSE_Y, this._mouseY);
         //--------------------------------------------
 
         this._createParametersUniforms();
