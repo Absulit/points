@@ -55,6 +55,7 @@ const shaderProjects = [
     { name: 'Image Texture 4', path: './imagetexture4/index.js' },
     { name: 'Layers 1', path: './layers1/index.js' },
     { name: 'Mesh 1', path: './mesh1/index.js' },
+    { name: 'Mouse 1', path: './mouse1/index.js' },
     { name: 'Noise 1', path: './noise1/index.js' },
     { name: 'Noise Circle 1', path: './noisecircle1/index.js' },
     { name: 'Random 1', path: './random1/index.js' },
