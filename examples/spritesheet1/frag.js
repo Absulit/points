@@ -20,16 +20,16 @@ ${texturePosition}
 ${showDebugCross}
 ${layer}
 
-const RED = vec4(1,0,0,1);
-const GREEN = vec4(0,1,0,1);
-const BLUE = vec4(0,0,1,1);
+const RED = vec4(1.,0.,0.,1.);
+const GREEN = vec4(0.,1.,0.,1.);
+const BLUE = vec4(0.,0.,1.,1.);
 
-const YELLOW = vec4(1,1,0,1);
-const CYAN = vec4(0,1,1,1);
-const MAGENTA = vec4(1,0,1,1);
+const YELLOW = vec4(1.,1.,0.,1.);
+const CYAN = vec4(0.,1.,1.,1.);
+const MAGENTA = vec4(1.,0.,1.,1.);
 
-const WHITE = vec4(1,1,1,1);
-const BLACK = vec4(0,0,0,1);
+const WHITE = vec4(1.,1.,1.,1.);
+const BLACK = vec4(0.,0.,0.,1.);
 
 fn sprite(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>, uv:vec2<f32>, cell:vec4<f32>) -> vec4<f32> {
     let flipTexture = vec2(1.,-1.);
@@ -40,22 +40,31 @@ fn sprite(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>, uv:vec2
     let minScreenSize = min(params.screenHeight, params.screenWidth);
     let imageRatio = dimsF32 / minScreenSize;
 
-    let displaceImagePosition = position * flipTextureCoordinates / imageRatio + vec2(0, 1);
+    let cellIndex = cell.xy + vec2(0,1);
+    let cellSizePixels = cell.zw;
+
+    let cellSize = cellSizePixels/minScreenSize;
+    let cellSizeInImage = cellSize / imageRatio;
+    // vec2(0, cellSizePixels.y / 800. ) / imageRatio
+    let displaceImagePosition = position * flipTextureCoordinates / imageRatio + cellIndex * cellSizeInImage;
     let top = position + vec2(0, imageRatio.y);
 
     let imageUV = uv / imageRatio * flipTexture + displaceImagePosition;
     var rgbaImage = textureSample(texture, aSampler, imageUV);
 
-    let isBeyondImageRight = uv.x > position.x + imageRatio.x;
+    let isBeyondImageRight = uv.x > position.x + cellSize.x;
     let isBeyondImageLeft = uv.x < position.x;
-    let isBeyondTop =  uv.y > top.y ;
+    let isBeyondTop =  uv.y > position.y + cellSize.y ;
     let isBeyondBottom = uv.y < position.y;
-    let crop = false;
+    let crop = true;
     if(crop && (isBeyondTop || isBeyondBottom || isBeyondImageLeft || isBeyondImageRight)){
         rgbaImage = vec4(0);
     }
 
-    return rgbaImage;
+    let debugTop = showDebugCross(position + cellSize, YELLOW, uv);
+    let debugBottom = showDebugCross(position, RED, uv);
+
+    return rgbaImage + debugBottom + debugTop;
 }
 
 
@@ -72,15 +81,9 @@ fn main(
     ) -> @location(0) vec4<f32> {
 
     let n1 = snoise(uv * fnusin(1));
-
-    // let dims: vec2<u32> = textureDimensions(image, 0);
-    // var dimsRatio = f32(dims.x) / f32(dims.y);
-
-    //let imageUV = uv * vec2(1,-1 * dimsRatio) * ratio.x / params.sliderA;
-    //let oldKingUVClamp = uv * vec2(1,1 * dimsRatio) * ratio.x;
-    let startPosition = mouse * ratio;//vec2(.0);
+    let startPosition = mouse * ratio;
     //let rgbaImage = texturePosition(image, feedbackSampler, startPosition, uvr, true); //* .998046;
-    let rgbaImage = sprite(image, feedbackSampler, startPosition, uvr, vec4(32 * 0,0,32,32)); //* .998046;
+    let rgbaImage = sprite(image, feedbackSampler, startPosition, uvr, vec4(2,5,32,32)); //* .998046;
 
 
     //let finalColor:vec4<f32> = vec4(brightness(rgbaImage));

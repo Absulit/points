@@ -1,3 +1,8 @@
+/**
+ * @param position
+ * @param color
+ * @param uv
+ */
 export const showDebugCross = /*wgsl*/`
 fn showDebugCross(position:vec2<f32>, color:vec4<f32>, uv:vec2<f32>) -> vec4<f32>{
     let horizontal = sdfLine(vec2(0, position.y), vec2(10, position.y), 1., uv) * color;
@@ -6,6 +11,10 @@ fn showDebugCross(position:vec2<f32>, color:vec4<f32>, uv:vec2<f32>) -> vec4<f32
 }
 `;
 
+/**
+ * @param color
+ * @param uv
+ */
 export const showDebugFrame = /*wgsl*/`
 fn showDebugFrame(color:vec4<f32>, uv:vec2<f32>) -> vec4<f32> {
     let ratioX = params.screenWidth / params.screenHeight;
