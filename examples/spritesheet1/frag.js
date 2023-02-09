@@ -20,46 +20,42 @@ ${texturePosition}
 ${showDebugCross}
 ${layer}
 
+const RED = vec4(1,0,0,1);
+const GREEN = vec4(0,1,0,1);
+const BLUE = vec4(0,0,1,1);
 
+const YELLOW = vec4(1,1,0,1);
+const CYAN = vec4(0,1,1,1);
+const MAGENTA = vec4(1,0,1,1);
+
+const WHITE = vec4(1,1,1,1);
+const BLACK = vec4(0,0,0,1);
 
 fn sprite(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>, uv:vec2<f32>, cell:vec4<f32>) -> vec4<f32> {
-    var startPosition = position;
     let flipTexture = vec2(1.,-1.);
     let flipTextureCoordinates = vec2(-1.,1.);
     let dims: vec2<u32> = textureDimensions(texture, 0);
     let dimsF32 = vec2<f32>(f32(dims.x), f32(dims.y));
-    let imageRatio = dimsF32.x / params.screenWidth;
-    var dimsRatio = dimsF32.x / dimsF32.y;
-    var cellPos = cell.xy / dimsF32;
-    let cellDim = cell.zw / dimsF32;
 
-    //startPosition.x -= cell.x;
-    //startPosition.y = startPosition.y - dimsF32.y/params.screenHeight;
-    let distanceFromOrigin = (dimsF32.y/params.screenHeight-(cell.w/params.screenHeight)) ;
-    let displaceImagePosition = vec2(startPosition.x - cellPos.x, startPosition.y * dimsRatio - distanceFromOrigin - cellPos.y  + imageRatio) * flipTextureCoordinates;
-    //startPosition.y = startPosition.y + dimsF32.y/params.screenHeight;
+    let minScreenSize = min(params.screenHeight, params.screenWidth);
+    let imageRatio = dimsF32 / minScreenSize;
 
-    var imageUV = uv * vec2(1,dimsRatio);
-    imageUV = (imageUV * flipTexture + displaceImagePosition) / imageRatio;
-    var rgbaImage3 = textureSample(texture, aSampler, imageUV);
+    let displaceImagePosition = position * flipTextureCoordinates / imageRatio + vec2(0, 1);
+    let top = position + vec2(0, imageRatio.y);
 
+    let imageUV = uv / imageRatio * flipTexture + displaceImagePosition;
+    var rgbaImage = textureSample(texture, aSampler, imageUV);
 
-    //cellPos.y = 1 - cellPos.y - cellDim.y;
-
-
-    let positionCross = showDebugCross(position, vec4(1,0,0,1), uv);
-    let displaceCross = showDebugCross(displaceImagePosition, vec4(1,1,0,1), uv);
-    let dfoCross = showDebugCross(vec2(0,distanceFromOrigin), vec4(1,0,1,1), uv);
-
-    let isBeyondImageRight = uv.x > startPosition.x + cellDim.x;
-    let isBeyondImageLeft = uv.x < startPosition.x;
-    let isBeyondTop = uv.y > displaceImagePosition.y;
-    let isBeyondBottom = uv.y < startPosition.y;
-    let crop = true;
+    let isBeyondImageRight = uv.x > position.x + imageRatio.x;
+    let isBeyondImageLeft = uv.x < position.x;
+    let isBeyondTop =  uv.y > top.y ;
+    let isBeyondBottom = uv.y < position.y;
+    let crop = false;
     if(crop && (isBeyondTop || isBeyondBottom || isBeyondImageLeft || isBeyondImageRight)){
-        rgbaImage3 = vec4(0);
+        rgbaImage = vec4(0);
     }
-    return rgbaImage3 + positionCross + displaceCross + dfoCross;
+
+    return rgbaImage;
 }
 
 
@@ -83,8 +79,8 @@ fn main(
     //let imageUV = uv * vec2(1,-1 * dimsRatio) * ratio.x / params.sliderA;
     //let oldKingUVClamp = uv * vec2(1,1 * dimsRatio) * ratio.x;
     let startPosition = mouse * ratio;//vec2(.0);
-    let rgbaImage = texturePosition(image, feedbackSampler, startPosition, uvr, true); //* .998046;
-    //let rgbaImage = sprite(image, feedbackSampler, startPosition, uvr, vec4(32 * 0,0,32,32)); //* .998046;
+    //let rgbaImage = texturePosition(image, feedbackSampler, startPosition, uvr, true); //* .998046;
+    let rgbaImage = sprite(image, feedbackSampler, startPosition, uvr, vec4(32 * 0,0,32,32)); //* .998046;
 
 
     //let finalColor:vec4<f32> = vec4(brightness(rgbaImage));

@@ -13,7 +13,7 @@ export class ShaderType {
     static FRAGMENT = '2';
 }
 
-class UniformKeys{
+class UniformKeys {
     static TIME = 'time';
     static EPOCH = 'epoch';
     static SCREEN_WIDTH = 'screenWidth';
@@ -435,7 +435,7 @@ export default class Points {
      * @param {Number} numRows quads vertically
      */
     setMeshDensity(numColumns, numRows) {
-        if(numColumns == 0 || numRows == 0){
+        if (numColumns == 0 || numRows == 0) {
             throw 'Parameters should be greater than 0';
         }
         this._numColumns = numColumns;
