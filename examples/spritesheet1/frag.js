@@ -80,16 +80,47 @@ fn main(
     ) -> @location(0) vec4<f32> {
 
     let n1 = snoise(uv * fnusin(1));
-    let startPosition = vec2(.5,.5) * ratio;
+    let startPosition = mouse * ratio;
     //let rgbaImage = texturePosition(image, feedbackSampler, startPosition, uvr, true); //* .998046;
     let cell = vec4(2,5,32.,32.);
-    let rgbaImage = sprite(image, feedbackSampler, startPosition, uvr, 27, vec2(32,32)); //* .998046;
+    let size = vec2(32u,32u);
+    let cellRatio = vec2(cell.z/params.screenWidth,cell.w/params.screenHeight)*ratio;
+
+    let displaceInX = vec2(cellRatio.x, 0);
+
+    var digits = vec4(0.);
+    var numberToDecode = params.mouseX;
+    let itemsLength = 2;
+    for (var index = 0; index < 3; index++) {
+        let number = u32(numberToDecode % 10.);
+        numberToDecode = floor(numberToDecode / 10.);
+        var finalNumber = 25 + number;
+        if(number == 0){
+            finalNumber = 35;
+        }
+        digits += sprite(image, feedbackSampler, startPosition + displaceInX * f32(2-index), uvr, finalNumber, size);
+    }
+    // -----------------------------------------------
+    var digits2 = vec4(0.);
+    numberToDecode = params.mouseY;
+    let startPosition2 = startPosition - vec2(0, cell.w/params.screenHeight)*ratio;
+    for (var index = 0; index < 3; index++) {
+        let number = u32(numberToDecode % 10.);
+        numberToDecode = floor(numberToDecode / 10.);
+        var finalNumber = 25 + number;
+        if(number == 0){
+            finalNumber = 35;
+        }
+        digits2 += sprite(image, feedbackSampler, startPosition2 + displaceInX * f32(2-index), uvr, finalNumber, size);
+    }
+
+
 
     let debugTop = showDebugCross(startPosition + vec2(cell.z/params.screenWidth,cell.w/params.screenHeight)*ratio, YELLOW, uv);
     let debugBottom = showDebugCross(startPosition, RED, uv);
 
     //let finalColor:vec4<f32> = vec4(brightness(rgbaImage));
-    let finalColor:vec4<f32> = rgbaImage + debugBottom + debugTop;
+    let finalColor:vec4<f32> = digits.g * RED + digits2 * GREEN + debugBottom + debugTop;
 
 
     return finalColor;
