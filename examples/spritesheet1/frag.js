@@ -34,7 +34,7 @@ const BLACK = vec4(0.,0.,0.,1.);
 fn sprite(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>, uv:vec2<f32>, cell:vec4<f32>) -> vec4<f32> {
     let flipTexture = vec2(1.,-1.);
     let flipTextureCoordinates = vec2(-1.,1.);
-    let dims: vec2<u32> = textureDimensions(texture, 0);
+    let dims:vec2<u32> = textureDimensions(texture, 0);
     let dimsF32 = vec2<f32>(f32(dims.x), f32(dims.y));
 
     let minScreenSize = min(params.screenHeight, params.screenWidth);
@@ -43,9 +43,9 @@ fn sprite(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>, uv:vec2
     let cellIndex = cell.xy + vec2(0,1);
     let cellSizePixels = cell.zw;
 
-    let cellSize = cellSizePixels/minScreenSize;
+    let cellSize = cellSizePixels / minScreenSize;
     let cellSizeInImage = cellSize / imageRatio;
-    // vec2(0, cellSizePixels.y / 800. ) / imageRatio
+
     let displaceImagePosition = position * flipTextureCoordinates / imageRatio + cellIndex * cellSizeInImage;
     let top = position + vec2(0, imageRatio.y);
 
@@ -54,17 +54,13 @@ fn sprite(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>, uv:vec2
 
     let isBeyondImageRight = uv.x > position.x + cellSize.x;
     let isBeyondImageLeft = uv.x < position.x;
-    let isBeyondTop =  uv.y > position.y + cellSize.y ;
+    let isBeyondTop =  uv.y > position.y + cellSize.y;
     let isBeyondBottom = uv.y < position.y;
-    let crop = true;
-    if(crop && (isBeyondTop || isBeyondBottom || isBeyondImageLeft || isBeyondImageRight)){
+    if(isBeyondTop || isBeyondBottom || isBeyondImageLeft || isBeyondImageRight){
         rgbaImage = vec4(0);
     }
 
-    let debugTop = showDebugCross(position + cellSize, YELLOW, uv);
-    let debugBottom = showDebugCross(position, RED, uv);
-
-    return rgbaImage + debugBottom + debugTop;
+    return rgbaImage;
 }
 
 
@@ -82,12 +78,15 @@ fn main(
 
     let n1 = snoise(uv * fnusin(1));
     let startPosition = mouse * ratio;
-    //let rgbaImage = texturePosition(image, feedbackSampler, startPosition, uvr, true); //* .998046;
-    let rgbaImage = sprite(image, feedbackSampler, startPosition, uvr, vec4(2,5,32,32)); //* .998046;
+    let rgbaImage = texturePosition(image, feedbackSampler, startPosition, uvr, true); //* .998046;
+    let cell = vec4(2,5,32.,32.);
+    //let rgbaImage = sprite(image, feedbackSampler, startPosition, uvr, cell); //* .998046;
 
+    let debugTop = showDebugCross((mouse + vec2(cell.z/params.screenWidth,cell.w/params.screenHeight))*ratio, YELLOW, uv);
+    let debugBottom = showDebugCross(startPosition, RED, uv);
 
     //let finalColor:vec4<f32> = vec4(brightness(rgbaImage));
-    let finalColor:vec4<f32> = rgbaImage;
+    let finalColor:vec4<f32> = rgbaImage + debugBottom + debugTop;
 
 
     return finalColor;
