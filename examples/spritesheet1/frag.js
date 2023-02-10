@@ -31,19 +31,25 @@ const MAGENTA = vec4(1.,0.,1.,1.);
 const WHITE = vec4(1.,1.,1.,1.);
 const BLACK = vec4(0.,0.,0.,1.);
 
-fn sprite(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>, uv:vec2<f32>, cell:vec4<f32>) -> vec4<f32> {
+fn sprite(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>, uv:vec2<f32>, index:u32, size:vec2<u32>) -> vec4<f32> {
     let flipTexture = vec2(1.,-1.);
     let flipTextureCoordinates = vec2(-1.,1.);
     let dims:vec2<u32> = textureDimensions(texture, 0);
-    let dimsF32 = vec2<f32>(f32(dims.x), f32(dims.y));
+    let dimsF32 = vec2<f32>(dims);
+    let sizeF32 = vec2<f32>(size);
 
     let minScreenSize = min(params.screenHeight, params.screenWidth);
     let imageRatio = dimsF32 / minScreenSize;
 
-    let cellIndex = cell.xy + vec2(0,1);
-    let cellSizePixels = cell.zw;
+    let numColumns = (dims.x) / (size.x);
 
-    let cellSize = cellSizePixels / minScreenSize;
+    let x = f32(index % numColumns);
+    let y = f32(index / numColumns);
+    let cell = vec2(x, y);
+
+    let cellIndex = cell + vec2(0,1);
+
+    let cellSize = sizeF32 / minScreenSize;
     let cellSizeInImage = cellSize / imageRatio;
 
     let displaceImagePosition = position * flipTextureCoordinates / imageRatio + cellIndex * cellSizeInImage;
@@ -63,9 +69,6 @@ fn sprite(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>, uv:vec2
     return rgbaImage;
 }
 
-
-const N = 2.;
-
 @fragment
 fn main(
         @location(0) color: vec4<f32>,
@@ -77,12 +80,12 @@ fn main(
     ) -> @location(0) vec4<f32> {
 
     let n1 = snoise(uv * fnusin(1));
-    let startPosition = mouse * ratio;
-    let rgbaImage = texturePosition(image, feedbackSampler, startPosition, uvr, true); //* .998046;
+    let startPosition = vec2(.5,.5) * ratio;
+    //let rgbaImage = texturePosition(image, feedbackSampler, startPosition, uvr, true); //* .998046;
     let cell = vec4(2,5,32.,32.);
-    //let rgbaImage = sprite(image, feedbackSampler, startPosition, uvr, cell); //* .998046;
+    let rgbaImage = sprite(image, feedbackSampler, startPosition, uvr, 27, vec2(32,32)); //* .998046;
 
-    let debugTop = showDebugCross((mouse + vec2(cell.z/params.screenWidth,cell.w/params.screenHeight))*ratio, YELLOW, uv);
+    let debugTop = showDebugCross(startPosition + vec2(cell.z/params.screenWidth,cell.w/params.screenHeight)*ratio, YELLOW, uv);
     let debugBottom = showDebugCross(startPosition, RED, uv);
 
     //let finalColor:vec4<f32> = vec4(brightness(rgbaImage));
