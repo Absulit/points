@@ -38,3 +38,43 @@ fn flipTextureUV(uv:vec2<f32>) -> vec2<f32>{
     return uv * vec2(1,-1) + vec2(0,1);
 }
 `;
+
+export const sprite = /*wgsl*/`
+fn sprite(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>, uv:vec2<f32>, index:u32, size:vec2<u32>) -> vec4<f32> {
+    let flipTexture = vec2(1.,-1.);
+    let flipTextureCoordinates = vec2(-1.,1.);
+    let dims:vec2<u32> = textureDimensions(texture, 0);
+    let dimsF32 = vec2<f32>(dims);
+    let sizeF32 = vec2<f32>(size);
+
+    let minScreenSize = min(params.screenHeight, params.screenWidth);
+    let imageRatio = dimsF32 / minScreenSize;
+
+    let numColumns = (dims.x) / (size.x);
+
+    let x = f32(index % numColumns);
+    let y = f32(index / numColumns);
+    let cell = vec2(x, y);
+
+    let cellIndex = cell + vec2(0,1);
+
+    let cellSize = sizeF32 / minScreenSize;
+    let cellSizeInImage = cellSize / imageRatio;
+
+    let displaceImagePosition = position * flipTextureCoordinates / imageRatio + cellIndex * cellSizeInImage;
+    let top = position + vec2(0, imageRatio.y);
+
+    let imageUV = uv / imageRatio * flipTexture + displaceImagePosition;
+    var rgbaImage = textureSample(texture, aSampler, imageUV);
+
+    let isBeyondImageRight = uv.x > position.x + cellSize.x;
+    let isBeyondImageLeft = uv.x < position.x;
+    let isBeyondTop =  uv.y > position.y + cellSize.y;
+    let isBeyondBottom = uv.y < position.y;
+    if(isBeyondTop || isBeyondBottom || isBeyondImageLeft || isBeyondImageRight){
+        rgbaImage = vec4(0);
+    }
+
+    return rgbaImage;
+}
+`;

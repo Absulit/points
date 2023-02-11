@@ -1,7 +1,7 @@
 import { brightness, fnusin, fusin, polar, sdfCircle, sdfLine, sdfSegment } from '../../src/core/defaultFunctions.js';
 import { snoise } from '../../src/core/noise2d.js';
 import { PI } from '../../src/core/defaultConstants.js';
-import { texturePosition } from '../../src/core/image.js';
+import { sprite, texturePosition } from '../../src/core/image.js';
 import { showDebugCross } from '../../src/core/debug.js';
 import { layer } from './../../src/core/color.js';
 
@@ -19,6 +19,7 @@ ${PI}
 ${texturePosition}
 ${showDebugCross}
 ${layer}
+${sprite}
 
 const RED = vec4(1.,0.,0.,1.);
 const GREEN = vec4(0.,1.,0.,1.);
@@ -31,43 +32,7 @@ const MAGENTA = vec4(1.,0.,1.,1.);
 const WHITE = vec4(1.,1.,1.,1.);
 const BLACK = vec4(0.,0.,0.,1.);
 
-fn sprite(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>, uv:vec2<f32>, index:u32, size:vec2<u32>) -> vec4<f32> {
-    let flipTexture = vec2(1.,-1.);
-    let flipTextureCoordinates = vec2(-1.,1.);
-    let dims:vec2<u32> = textureDimensions(texture, 0);
-    let dimsF32 = vec2<f32>(dims);
-    let sizeF32 = vec2<f32>(size);
 
-    let minScreenSize = min(params.screenHeight, params.screenWidth);
-    let imageRatio = dimsF32 / minScreenSize;
-
-    let numColumns = (dims.x) / (size.x);
-
-    let x = f32(index % numColumns);
-    let y = f32(index / numColumns);
-    let cell = vec2(x, y);
-
-    let cellIndex = cell + vec2(0,1);
-
-    let cellSize = sizeF32 / minScreenSize;
-    let cellSizeInImage = cellSize / imageRatio;
-
-    let displaceImagePosition = position * flipTextureCoordinates / imageRatio + cellIndex * cellSizeInImage;
-    let top = position + vec2(0, imageRatio.y);
-
-    let imageUV = uv / imageRatio * flipTexture + displaceImagePosition;
-    var rgbaImage = textureSample(texture, aSampler, imageUV);
-
-    let isBeyondImageRight = uv.x > position.x + cellSize.x;
-    let isBeyondImageLeft = uv.x < position.x;
-    let isBeyondTop =  uv.y > position.y + cellSize.y;
-    let isBeyondBottom = uv.y < position.y;
-    if(isBeyondTop || isBeyondBottom || isBeyondImageLeft || isBeyondImageRight){
-        rgbaImage = vec4(0);
-    }
-
-    return rgbaImage;
-}
 
 @fragment
 fn main(
@@ -82,9 +47,10 @@ fn main(
     let n1 = snoise(uv * fnusin(1));
     let startPosition = mouse * ratio;
     //let rgbaImage = texturePosition(image, feedbackSampler, startPosition, uvr, true); //* .998046;
-    let cell = vec4(2,5,32.,32.);
-    let size = vec2(32u,32u);
-    let cellRatio = vec2(cell.z/params.screenWidth,cell.w/params.screenHeight)*ratio;
+    //let cell = vec4(2,5,32.,32.);
+    let size = vec2(64u,64u);
+    let sizeF32 = vec2(f32(size.x),f32(size.y));
+    let cellRatio = vec2(sizeF32.x/params.screenWidth,sizeF32.y/params.screenHeight)*ratio;
 
     let displaceInX = vec2(cellRatio.x, 0);
 
@@ -94,29 +60,29 @@ fn main(
     for (var index = 0; index < 3; index++) {
         let number = u32(numberToDecode % 10.);
         numberToDecode = floor(numberToDecode / 10.);
-        var finalNumber = 25 + number;
-        if(number == 0){
-            finalNumber = 35;
-        }
+        var finalNumber = 10 + number;
+        // if(number == 0){
+        //     finalNumber = 35;
+        // }
         digits += sprite(image, feedbackSampler, startPosition + displaceInX * f32(2-index), uvr, finalNumber, size);
     }
     // -----------------------------------------------
     var digits2 = vec4(0.);
     numberToDecode = params.mouseY;
-    let startPosition2 = startPosition - vec2(0, cell.w/params.screenHeight)*ratio;
+    let startPosition2 = startPosition - vec2(0, sizeF32.x/params.screenHeight)*ratio;
     for (var index = 0; index < 3; index++) {
         let number = u32(numberToDecode % 10.);
         numberToDecode = floor(numberToDecode / 10.);
-        var finalNumber = 25 + number;
-        if(number == 0){
-            finalNumber = 35;
-        }
+        var finalNumber = 10 + number;
+        // if(number == 0){
+        //     finalNumber = 35;
+        // }
         digits2 += sprite(image, feedbackSampler, startPosition2 + displaceInX * f32(2-index), uvr, finalNumber, size);
     }
 
 
 
-    let debugTop = showDebugCross(startPosition + vec2(cell.z/params.screenWidth,cell.w/params.screenHeight)*ratio, YELLOW, uv);
+    let debugTop = showDebugCross(startPosition + vec2(sizeF32.x/params.screenWidth,sizeF32.y/params.screenHeight)*ratio, YELLOW, uv);
     let debugBottom = showDebugCross(startPosition, RED, uv);
 
     //let finalColor:vec4<f32> = vec4(brightness(rgbaImage));
