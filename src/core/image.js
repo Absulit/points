@@ -98,11 +98,11 @@ fn decodeNumberSprite(
 
     var digits = vec4(0.);
     var numberToDecode = value;
-    for (var index = 0; index < 3; index++) {
+    for (var index = 0; numberToDecode >= 1.; index++) {
         let number = u32(numberToDecode % 10.);
-        numberToDecode = floor(numberToDecode / 10.);
+        numberToDecode = numberToDecode / 10.;
         let finalNumber = index0Char + number;
-        digits += sprite(image, imageSampler, position + displaceInX * f32(2-index), uv, finalNumber, size);
+        digits += sprite(image, imageSampler, position + displaceInX * f32(-index), uv, finalNumber, size);
     }
     return digits;
 }

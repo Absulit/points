@@ -1,4 +1,4 @@
-import { fnusin, sdfLine, sdfSegment } from '../../src/core/defaultFunctions.js';
+import { fnusin, rotateVector, sdfLine, sdfSegment, sdfSquare } from '../../src/core/defaultFunctions.js';
 import { snoise } from '../../src/core/noise2d.js';
 import { PI } from '../../src/core/defaultConstants.js';
 import { decodeNumberSprite, sprite, texturePosition } from '../../src/core/image.js';
@@ -17,6 +17,8 @@ ${showDebugCross}
 ${layer}
 ${sprite}
 ${sdfSmooth}
+${rotateVector}
+${sdfSquare}
 ${decodeNumberSprite}
 ${RED}
 ${GREEN}
@@ -32,7 +34,7 @@ fn main(
     ) -> @location(0) vec4<f32> {
 
     let n1 = snoise(uv * fnusin(1) * params.sliderB);
-    let startPosition = mouse * ratio * params.sliderA;
+    let startPosition = vec2(.5, .5) * ratio * .25;
     //let rgbaImage = texturePosition(image, imageSampler, startPosition, uvr, true); //* .998046;
 
     // let size = vec2(64u,64u);
@@ -53,13 +55,26 @@ fn main(
 
 
     //let debugTop = showDebugCross(startPosition + cellRatio, YELLOW, uvr);
-    let debugBottom = showDebugCross(startPosition, RED, uvr * params.sliderA);
+    let debugPosition = mouse * ratio;
+    let debugBottom = showDebugCross(debugPosition, RED, uvr);
 
     var finalColor:vec4<f32> = layer(layer(digits, digits2), debugBottom);
 
     finalColor = sdfSmooth(finalColor);
+    // -----------------------------------------------
+    var scaleAnim = 8.;
+    var positionAnim = mouse*ratio / scaleAnim;
+    var indexAnim:u32 = u32(4 * fnusin(4));
+    let animColor = sprite(bobbles, imageSampler, positionAnim, uvr / scaleAnim, indexAnim, vec2<u32>(24,24));
+    // -----------------------------------------------
+    scaleAnim = 10.;
+    positionAnim = (mouse+vec2(.1,0))*ratio / scaleAnim;
+    indexAnim = u32(51 * fract(params.time * .15));
+    let animPenguin = sprite(penguin, imageSampler, (mouse+vec2(.1,0))*ratio / scaleAnim, uvr / scaleAnim, indexAnim, vec2<u32>(32,32));
 
-    return finalColor;
+    let square = sdfSquare( (mouse+vec2(.3,0.14)) * ratio, .14, 0., 0., uvr) * .5;
+
+    return finalColor + animColor + layer(square, animPenguin);
 }
 `;
 

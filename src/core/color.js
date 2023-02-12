@@ -81,9 +81,9 @@ fn sdfSmooth(color:vec4<f32>) -> vec4<f32> {
     spread = max(spread * .75, .001);
     finalColor.a = smoothstep(.5 - spread, .5 + spread, finalColor.a);
 
-    if(finalColor.a <= 0.){
-        discard;
-    }
+    // if(finalColor.a <= 0.){
+    //     discard;
+    // }
     return finalColor;
 }
 `;
