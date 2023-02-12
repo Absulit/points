@@ -78,3 +78,33 @@ fn sprite(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>, uv:vec2
     return rgbaImage;
 }
 `;
+
+export const decodeNumberSprite = /*wgsl*/`
+fn decodeNumberSprite(
+    value:f32,
+    index0Char:u32,
+    image:texture_2d<f32>,
+    imageSampler:sampler,
+    position:vec2<f32>,
+    uv:vec2<f32>,
+    ratio:vec2<f32>,
+    size:vec2<u32>
+) -> vec4<f32> {
+
+    let sizeF32 = vec2(f32(size.x),f32(size.y));
+    let cellRatio = vec2(sizeF32.x/params.screenWidth,sizeF32.y/params.screenHeight)*ratio;
+
+    let displaceInX = vec2(cellRatio.x, 0);
+
+    var digits = vec4(0.);
+    var numberToDecode = value;
+    for (var index = 0; index < 3; index++) {
+        let number = u32(numberToDecode % 10.);
+        numberToDecode = floor(numberToDecode / 10.);
+        let finalNumber = index0Char + number;
+        digits += sprite(image, imageSampler, position + displaceInX * f32(2-index), uv, finalNumber, size);
+    }
+    return digits;
+}
+
+`;

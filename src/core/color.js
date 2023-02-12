@@ -1,3 +1,35 @@
+export const RED = /*wgsl*/`
+const RED = vec4(1.,0.,0.,1.);
+`;
+
+export const GREEN = /*wgsl*/`
+const GREEN = vec4(0.,1.,0.,1.);
+`;
+
+export const BLUE = /*wgsl*/`
+const BLUE = vec4(0.,0.,1.,1.);
+`;
+
+export const YELLOW = /*wgsl*/`
+const YELLOW = vec4(1.,1.,0.,1.);
+`;
+
+export const CYAN = /*wgsl*/`
+const CYAN = vec4(0.,1.,1.,1.);
+`;
+
+export const MAGENTA = /*wgsl*/`
+const MAGENTA = vec4(1.,0.,1.,1.);
+`;
+
+export const WHITE = /*wgsl*/`
+const WHITE = vec4(1.,1.,1.,1.);
+`;
+
+export const BLACK = /*wgsl*/`
+const BLACK = vec4(0.,0.,0.,1.);
+`;
+
 /**
  * Layers two colors by cropping the color in the back
  * @param {vec4<f32>} back `vec4<f32>`
@@ -39,5 +71,19 @@ fn bloom(input:f32, iterations:i32, intensity:f32) -> f32 {
         }
     }
     return output;
+}
+`;
+
+export const sdfSmooth = /*wgsl*/`
+fn sdfSmooth(color:vec4<f32>) -> vec4<f32> {
+    var finalColor = color;
+    var spread = fwidth(finalColor.a);
+    spread = max(spread * .75, .001);
+    finalColor.a = smoothstep(.5 - spread, .5 + spread, finalColor.a);
+
+    if(finalColor.a <= 0.){
+        discard;
+    }
+    return finalColor;
 }
 `;
