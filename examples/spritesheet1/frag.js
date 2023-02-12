@@ -34,7 +34,8 @@ fn main(
     ) -> @location(0) vec4<f32> {
 
     let n1 = snoise(uv * fnusin(1) * params.sliderB);
-    let startPosition = vec2(.5, .5) * ratio * .25;
+    let scaleDigits = .25;
+    let startPosition = vec2(.5, .5) * ratio * scaleDigits;
     //let rgbaImage = texturePosition(image, imageSampler, startPosition, uvr, true); //* .998046;
 
     // let size = vec2(64u,64u);
@@ -47,11 +48,11 @@ fn main(
 
     var numberToDecode = params.mouseX;
 
-    let digits = RED * decodeNumberSprite(numberToDecode, start0char, image, imageSampler, startPosition, uvr * params.sliderA, ratio, size).r;
+    let digits = RED * decodeNumberSprite(numberToDecode, start0char, image, imageSampler, startPosition, uvr * scaleDigits, ratio, size).r;
     // -----------------------------------------------
     numberToDecode = params.mouseY;
     let startPosition2 = startPosition - vec2(0, sizeF32.x/params.screenHeight)*ratio;
-    let digits2 = GREEN * decodeNumberSprite(numberToDecode, start0char, image, imageSampler, startPosition2, uvr * params.sliderA, ratio, size).r;
+    let digits2 = GREEN * decodeNumberSprite(numberToDecode, start0char, image, imageSampler, startPosition2, uvr * scaleDigits, ratio, size).r;
 
 
     //let debugTop = showDebugCross(startPosition + cellRatio, YELLOW, uvr);
