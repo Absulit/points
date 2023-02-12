@@ -2,6 +2,7 @@ import { brightness, fnusin, fusin, polar, sdfCircle, sdfLine, sdfSegment } from
 import { snoise } from '../../src/core/noise2d.js';
 import { PI } from '../../src/core/defaultConstants.js';
 import { texturePosition } from '../../src/core/image.js';
+import { showDebugCross, showDebugFrame } from '../../src/core/debug.js';
 
 const frag = /*wgsl*/`
 
@@ -15,9 +16,9 @@ ${polar}
 ${snoise}
 ${PI}
 ${texturePosition}
+${showDebugCross}
+${showDebugFrame}
 
-
-const N = 2.;
 
 @fragment
 fn main(
@@ -31,17 +32,20 @@ fn main(
 
     let n1 = snoise(uv * fnusin(1));
 
-    let dims: vec2<u32> = textureDimensions(image, 0);
-    var dimsRatio = f32(dims.x) / f32(dims.y);
+    // let dims: vec2<u32> = textureDimensions(image, 0);
+    // var dimsRatio = f32(dims.x) / f32(dims.y);
 
-    let imageUV = uvr * vec2(1,dimsRatio);
+    //let imageUV = uv * vec2(1,-1 * dimsRatio) * ratio.x / params.sliderA;
     //let oldKingUVClamp = uv * vec2(1,1 * dimsRatio) * ratio.x;
-    let startPosition = vec2(.0);
-    let rgbaImage = texturePosition(image, feedbackSampler, startPosition, uvr / params.sliderA, false); //* .998046;
+    let startPosition = mouse * ratio;//vec2(.0);
 
+    let positionCross = showDebugCross(startPosition, vec4(1,0,0,1), uv * ratio);
+
+    let frame = showDebugFrame(vec4(1,0,0,1), uvr);
 
     //let finalColor:vec4<f32> = vec4(brightness(rgbaImage));
-    let finalColor:vec4<f32> = rgbaImage;
+    let finalColor:vec4<f32> = positionCross + frame;
+
 
 
     return finalColor;

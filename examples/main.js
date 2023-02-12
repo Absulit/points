@@ -55,6 +55,7 @@ const shaderProjects = [
     { name: 'Image Texture 4', path: './imagetexture4/index.js' },
     { name: 'Layers 1', path: './layers1/index.js' },
     { name: 'Mesh 1', path: './mesh1/index.js' },
+    { name: 'Mouse 1', path: './mouse1/index.js' },
     { name: 'Noise 1', path: './noise1/index.js' },
     { name: 'Noise Circle 1', path: './noisecircle1/index.js' },
     { name: 'Random 1', path: './random1/index.js' },
@@ -62,6 +63,7 @@ const shaderProjects = [
     { name: 'Random 3', path: './random3/index.js' },
     { name: 'Shapes 1', path: './shapes1/index.js' },
     { name: 'Shapes 2', path: './shapes2/index.js' },
+    { name: 'Spritesheet 1', path: './spritesheet1/index.js' },
     { name: 'UVs 1', path: './uvs1/index.js' },
     { name: 'Video Texture 1', path: './videotexture1/index.js' },
 ]
