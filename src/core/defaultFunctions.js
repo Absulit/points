@@ -1,4 +1,4 @@
-export const defaultVertexBody = /*wgsl*/`;
+export const defaultVertexBody = /*wgsl*/`
 fn defaultVertexBody(position: vec4<f32>, color: vec4<f32>, uv: vec2<f32>) -> Fragment {
     var result: Fragment;
 
@@ -17,38 +17,30 @@ fn defaultVertexBody(position: vec4<f32>, color: vec4<f32>, uv: vec2<f32>) -> Fr
 `;
 
 export const fnusin = /*wgsl*/`
-
 fn fnusin(speed: f32) -> f32{
     return (sin(params.time * speed) + 1) * .5;
 }
-
 `;
 
 export const fusin = /*wgsl*/`
-
 fn fusin(speed: f32) -> f32{
     return sin(params.time * speed);
 }
-
 `;
 
 export const fucos = /*wgsl*/`
-
 fn fucos(speed: f32) -> f32{
     return cos(params.time * speed);
 }
-
 `;
 
 export const polar = /*wgsl*/`
-
 fn polar(distance: f32, radians: f32) -> vec2<f32> {
     return vec2<f32>(distance * cos(radians), distance * sin(radians));
 }
-
 `;
 
-export const clearMix = /*wgsl*/`;
+export const clearMix = /*wgsl*/`
 //const clearMixlevel = 1.81;//1.01
 fn clearMix(color:vec4<f32>, level:f32) -> vec4<f32> {
     let rr = color.r / level;
@@ -62,7 +54,7 @@ fn clearMix(color:vec4<f32>, level:f32) -> vec4<f32> {
 }
 `;
 
-export const clearAlpha = /*wgsl*/`;
+export const clearAlpha = /*wgsl*/`
 // level 2.
 fn clearAlpha(currentColor:vec4<f32>, level:f32) -> vec4<f32>{
     var ar = currentColor.a / level;
@@ -73,7 +65,7 @@ fn clearAlpha(currentColor:vec4<f32>, level:f32) -> vec4<f32>{
 }
 `;
 
-export const getColorsAroundTexture = /*wgsl*/`;
+export const getColorsAroundTexture = /*wgsl*/`
 fn getColorsAroundTexture(texture:texture_2d<f32>, position: vec2<i32>, distance: i32) -> array<  vec4<f32>, 8  > {
     return array< vec4<f32>,8 >(
         textureLoad(texture, vec2<i32>( position.x-distance, position.y-distance  ),  0).rgba,
@@ -88,7 +80,7 @@ fn getColorsAroundTexture(texture:texture_2d<f32>, position: vec2<i32>, distance
 }
 `;
 
-export const getColorsAround4Texture = /*wgsl*/`;
+export const getColorsAround4Texture = /*wgsl*/`
 fn getColorsAround4Texture(texture:texture_2d<f32>, position: vec2<i32>, distance: i32) -> array<  vec4<f32>, 4  > {
     return array< vec4<f32>, 4 >(
         //textureLoad(texture, vec2<i32>( position.x-distance, position.y-distance  ),  0).rgba,
@@ -103,14 +95,14 @@ fn getColorsAround4Texture(texture:texture_2d<f32>, position: vec2<i32>, distanc
 }
 `;
 
-// export const getColorsAroundBuffer = /*wgsl*/`;
+// export const getColorsAroundBuffer = /*wgsl*/`
 
 // fn getColorsAroundBuffer(bufferPointer: ptr<function, array<vec4<f32>> >, position: vec2<i32>, distance: i32) -> array<  vec4<f32>, 8  >{
 
 // }
 // `;
 
-export const soften8 = /*wgsl*/`;
+export const soften8 = /*wgsl*/`
 fn soften8(color:vec4<f32>, colorsAround:array<vec4<f32>, 8>, colorPower:f32) -> vec4<f32> {
     var newColor:vec4<f32> = color;
     for (var indexColors = 0u; indexColors < 8u; indexColors++) {
@@ -130,7 +122,7 @@ fn soften8(color:vec4<f32>, colorsAround:array<vec4<f32>, 8>, colorPower:f32) ->
 }
 `;
 
-export const soften4 = /*wgsl*/`;
+export const soften4 = /*wgsl*/`
 fn soften4(color:vec4<f32>, colorsAround:array<vec4<f32>, 4>, colorPower:f32) -> vec4<f32> {
     var newColor:vec4<f32> = color;
     for (var indexColors = 0u; indexColors < 4u; indexColors++) {
@@ -148,7 +140,7 @@ fn blur8(color:vec4<f32>, colorsAround:array<vec4<f32>, 8>, amount:f32) -> {
 }
 `;
 
-export const sdfSegment = /*wgsl*/`;
+export const sdfSegment = /*wgsl*/`
 fn sdfSegment(p:vec2<f32>, a:vec2<f32>, b:vec2<f32> ) -> f32{
     let pa = p-a;
     let ba = b-a;
@@ -175,7 +167,7 @@ fn sdfLine(p1:vec2<f32>, p2:vec2<f32>, pixelStroke:f32, uv:vec2<f32>)->f32{
  * @param {f32} feather
  * @param {vec2<f32>} uv
  */
-export const sdfCircle = /*wgsl*/`;
+export const sdfCircle = /*wgsl*/`
 fn sdfCircle(position:vec2<f32>, radius: f32, feather: f32, uv:vec2<f32>) -> vec4<f32> {
     let d = distance(uv, position);
     let st = 1 - smoothstep(radius, radius + feather, d);
@@ -183,7 +175,7 @@ fn sdfCircle(position:vec2<f32>, radius: f32, feather: f32, uv:vec2<f32>) -> vec
 }
 `;
 
-export const rotateVector = /*wgsl*/`;
+export const rotateVector = /*wgsl*/`
 fn rotateVector(p:vec2<f32>, rads:f32 ) -> vec2<f32> {
     let s = sin(rads);
     let c = cos(rads);
@@ -193,7 +185,7 @@ fn rotateVector(p:vec2<f32>, rads:f32 ) -> vec2<f32> {
 }
 `;
 
-export const sdfSquare = /*wgsl*/`;
+export const sdfSquare = /*wgsl*/`
 fn sdfSquare(position:vec2<f32>, radius:f32, feather:f32, rotationRads: f32, uv:vec2<f32>) -> vec4<f32> {
     let positionRotated = rotateVector(position, rotationRads);
     let uvRotated = rotateVector(uv, rotationRads);
@@ -208,7 +200,7 @@ fn sdfSquare(position:vec2<f32>, radius:f32, feather:f32, rotationRads: f32, uv:
 }
 `;
 
-export const sdfLine2 = /*wgsl*/`;
+export const sdfLine2 = /*wgsl*/`
 fn sdfLine2(p1:vec2<f32>, p2:vec2<f32>, feather:f32, uv:vec2<f32>)->f32{
     let d = sdfSegment(uv, p1, p2);
     var s = smoothstep(0, feather,  d);
@@ -224,7 +216,7 @@ fn sdfLine2(p1:vec2<f32>, p2:vec2<f32>, feather:f32, uv:vec2<f32>)->f32{
  * @param {f32} pixelsHeight `f32`
  * @param {vec2<f32>} uv `vec2<f32>`
  */
-export const pixelateTexture = /*wgsl*/`;
+export const pixelateTexture = /*wgsl*/`
 fn pixelateTexture(texture:texture_2d<f32>, textureSampler:sampler, pixelsWidth:f32, pixelsHeight:f32, uv:vec2<f32>) -> vec4<f32> {
     let dx = pixelsWidth * (1. / params.screenWidth);
     let dy = pixelsHeight * (1. / params.screenHeight);

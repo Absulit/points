@@ -43,7 +43,7 @@ fn layer(back:vec4<f32>, front: vec4<f32>) -> vec4<f32> {
 }
 `;
 
-export const RGBAFromHSV = /*wgsl*/`;
+export const RGBAFromHSV = /*wgsl*/`
 fn hsvAux(h:f32, s:f32, v:f32, n:f32) -> f32 {
     let k:f32 = (n + h * 6.) % 6.;
     return v - v * s * max(      min(min(k, 4. - k), 1.), 0.);
