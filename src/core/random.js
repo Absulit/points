@@ -16,7 +16,7 @@ fn random() -> f32 {
 
 `;
 
-export const rand = /*wgsl*/`;
+export const rand = /*wgsl*/`
 var<private> rand_seed : vec2<f32>;
 
 fn rand() -> f32 {
@@ -26,7 +26,7 @@ fn rand() -> f32 {
 }
 `;
 
-export const rand2 = /*wgsl*/`;
+export const rand2 = /*wgsl*/`
 fn rand2(co: vec2<f32>) -> f32 {
     return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
 }

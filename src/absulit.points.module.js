@@ -316,7 +316,16 @@ export default class Points {
         });
     }
 
-    addBindingTexture(computeName, fragmentName) {
+    /**
+     * Adds a texture to the compute and fragment shader, in the compute you can
+     * write to the texture, and in the fragment you can read the texture, so is
+     * a one way communication method.
+     * @param {string} computeName name of the variable in the compute shader
+     * @param {string} fragmentName name of the variable in the fragment shader
+     * @param {Array<number, 2>} size dimensions of the texture, by default screen
+     * size
+     */
+    addBindingTexture(computeName, fragmentName, size) {
         this._bindingTextures.push({
             compute: {
                 name: computeName,
@@ -326,7 +335,8 @@ export default class Points {
                 name: fragmentName,
                 shaderType: ShaderType.FRAGMENT
             },
-            texture: null
+            texture: null,
+            size: size
         });
     }
 
@@ -720,7 +730,7 @@ export default class Points {
         //--------------------------------------------
         this._bindingTextures.forEach(bindingTexture => {
             bindingTexture.texture = this._device.createTexture({
-                size: this._presentationSize,
+                size: bindingTexture.size || this._presentationSize,
                 format: 'rgba8unorm',
                 usage: GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
             });
