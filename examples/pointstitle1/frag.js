@@ -1,10 +1,19 @@
-import { fnusin } from '../../src/core/defaultFunctions.js';
+import { RED } from '../../src/core/color.js';
+import { showDebugFrame } from '../../src/core/debug.js';
+import { fnusin, sdfCircle, sdfLine, sdfSegment } from '../../src/core/defaultFunctions.js';
 import { texturePosition } from './../../src/core/image.js';
 
 const frag = /*wgsl*/`
 
 ${fnusin}
 ${texturePosition}
+${sdfSegment}
+${sdfLine}
+${sdfCircle}
+${RED}
+
+// debug
+${showDebugFrame}
 
 @fragment
 fn main(
@@ -25,8 +34,11 @@ fn main(
     let fontPosition = vec2(.5,.5);
     let fontColor = texturePosition(font, imageSampler, fontPosition, uvr, false);
 
-    let finalColor:vec4<f32> = subuvColor;
-    return finalColor;
+    let circlePosition = vec2(.5, .5);
+    let circleColor = sdfCircle(circlePosition, .4, 0.1, subuv);
+
+    let finalColor:vec4<f32> = subuvColor + circleColor;
+    return finalColor + showDebugFrame(RED, uvr);
 }
 `;
 
