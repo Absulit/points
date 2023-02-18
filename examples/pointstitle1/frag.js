@@ -16,14 +16,16 @@ fn main(
     @builtin(position) position: vec4<f32>
 ) -> @location(0) vec4<f32> {
 
+    let subuv = fract(uvr * 20);
+    let subuvColor = vec4(subuv, 0, 1);
+
     let imagePosition = vec2(.0,.0);
     let imageColor = texturePosition(image, imageSampler, imagePosition, uvr, false);
-    
+
     let fontPosition = vec2(.5,.5);
     let fontColor = texturePosition(font, imageSampler, fontPosition, uvr, false);
 
-    let finalColor:vec4<f32> = imageColor + fontColor;
-
+    let finalColor:vec4<f32> = subuvColor;
     return finalColor;
 }
 `;
