@@ -59,6 +59,7 @@ const shaderProjects = [
     { name: 'Mouse Click and Scroll 1', path: './mouseclickscroll1/index.js' },
     { name: 'Noise 1', path: './noise1/index.js' },
     { name: 'Noise Circle 1', path: './noisecircle1/index.js' },
+    { name: 'Points Title 1', path: './pointstitle1/index.js' },
     { name: 'Random 1', path: './random1/index.js' },
     { name: 'Random 2 (⚠ SLOW)', path: './random2/index.js' },
     { name: 'Random 3', path: './random3/index.js' },
