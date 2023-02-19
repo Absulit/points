@@ -1,6 +1,6 @@
 import { RED } from '../../src/core/color.js';
 import { showDebugFrame } from '../../src/core/debug.js';
-import { fnusin, sdfCircle, sdfLine, sdfSegment } from '../../src/core/defaultFunctions.js';
+import { fnusin, sdfCircle, sdfLine, sdfSegment, brightness } from '../../src/core/defaultFunctions.js';
 import { texturePosition } from './../../src/core/image.js';
 
 const frag = /*wgsl*/`
@@ -10,6 +10,7 @@ ${texturePosition}
 ${sdfSegment}
 ${sdfLine}
 ${sdfCircle}
+${brightness}
 ${RED}
 
 // debug
@@ -25,19 +26,29 @@ fn main(
     @builtin(position) position: vec4<f32>
 ) -> @location(0) vec4<f32> {
 
-    let subuv = fract(uvr * 20);
+    let numColumns = 20.;
+    let numRows = 20.;
+    let subuv = fract(uvr * numColumns);
     let subuvColor = vec4(subuv, 0, 1);
+
+    let pixelsWidth = params.screenWidth / numColumns;
+    let pixelsHeight = params.screenHeight / numRows;
+    let dx = pixelsWidth * (1. / params.screenWidth);
+    let dy = pixelsHeight * (1. / params.screenHeight);
+    let pixeleduv = vec2(dx*floor( uvr.x / dx), dy * floor( uvr.y / dy));
+    let pixeleduvColor = vec4(pixeleduv, 0, 1);
 
     let imagePosition = vec2(.0,.0);
     let imageColor = texturePosition(image, imageSampler, imagePosition, uvr, false);
+    let b = brightness(imageColor);
 
     let fontPosition = vec2(.5,.5);
     let fontColor = texturePosition(font, imageSampler, fontPosition, uvr, false);
 
     let circlePosition = vec2(.5, .5);
-    let circleColor = sdfCircle(circlePosition, .4, 0.1, subuv);
+    let circleColor = sdfCircle(circlePosition, .4 * b, 0.1, subuv);
 
-    let finalColor:vec4<f32> = subuvColor + circleColor;
+    let finalColor:vec4<f32> = pixeleduvColor;
     return finalColor + showDebugFrame(RED, uvr);
 }
 `;
