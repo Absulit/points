@@ -20,6 +20,11 @@ class UniformKeys {
     static SCREEN_HEIGHT = 'screenHeight';
     static MOUSE_X = 'mouseX';
     static MOUSE_Y = 'mouseY';
+    static MOUSE_CLICK = 'mouseClick';
+    static MOUSE_DOWN = 'mouseDown';
+    static MOUSE_WHEEL = 'mouseWheel';
+    static MOUSE_DELTA_X = 'mouseDeltaX';
+    static MOUSE_DELTA_Y = 'mouseDeltaY';
 }
 
 export class VertexBufferInfo {
@@ -106,7 +111,31 @@ export default class Points {
         this._epoch = 0;
         this._mouseX = 0;
         this._mouseY = 0;
-        document.onmousemove = this._onMouseMove;
+        this._mouseDown = false;
+        this._mouseClick = false;
+        this._mouseWheel = false;
+        this._mouseDeltaX = 0;
+        this._mouseDeltaY = 0;
+
+        this._canvas.addEventListener('click', e => {
+            this._mouseClick = true;
+        });
+        this._canvas.addEventListener('mousemove', e => {
+            this._mouseX = e.clientX;
+            this._mouseY = e.clientY;
+        });
+        this._canvas.addEventListener('mousedown', e => {
+            this._mouseDown = true;
+        });
+        this._canvas.addEventListener('mouseup', e => {
+            this._mouseDown = false;
+        });
+
+        this._canvas.addEventListener('wheel', e => {
+            this._mouseWheel = true;
+            this._mouseDeltaX = e.deltaX;
+            this._mouseDeltaY = e.deltaY;
+        });
     }
 
     _onMouseMove = e => {
@@ -123,6 +152,7 @@ export default class Points {
      * @param {Number} value Number will be converted to `f32`
      */
     addUniform(name, value) {
+        // TODO: add a third parameter with a type, so a struct can be defined and pass things like booleans
         this._uniforms.push({
             name: name,
             value: value,
@@ -316,7 +346,16 @@ export default class Points {
         });
     }
 
-    addBindingTexture(computeName, fragmentName) {
+    /**
+     * Adds a texture to the compute and fragment shader, in the compute you can
+     * write to the texture, and in the fragment you can read the texture, so is
+     * a one way communication method.
+     * @param {string} computeName name of the variable in the compute shader
+     * @param {string} fragmentName name of the variable in the fragment shader
+     * @param {Array<number, 2>} size dimensions of the texture, by default screen
+     * size
+     */
+    addBindingTexture(computeName, fragmentName, size) {
         this._bindingTextures.push({
             compute: {
                 name: computeName,
@@ -326,7 +365,8 @@ export default class Points {
                 name: fragmentName,
                 shaderType: ShaderType.FRAGMENT
             },
-            texture: null
+            texture: null,
+            size: size
         });
     }
 
@@ -454,12 +494,17 @@ export default class Points {
     async init(vertexShader, computeShader, fragmentShader) {
 
         // initializing internal uniforms
-        this.addUniform(UniformKeys.TIME, 0);
-        this.addUniform(UniformKeys.EPOCH, 0);
+        this.addUniform(UniformKeys.TIME, this._time);
+        this.addUniform(UniformKeys.EPOCH, this._epoch);
         this.addUniform(UniformKeys.SCREEN_WIDTH, 0);
         this.addUniform(UniformKeys.SCREEN_HEIGHT, 0);
-        this.addUniform(UniformKeys.MOUSE_X, 0);
-        this.addUniform(UniformKeys.MOUSE_Y, 0);
+        this.addUniform(UniformKeys.MOUSE_X, this._mouseX);
+        this.addUniform(UniformKeys.MOUSE_Y, this._mouseY);
+        this.addUniform(UniformKeys.MOUSE_CLICK, this._mouseClick);
+        this.addUniform(UniformKeys.MOUSE_DOWN, this._mouseDown);
+        this.addUniform(UniformKeys.MOUSE_WHEEL, this._mouseWheel);
+        this.addUniform(UniformKeys.MOUSE_DELTA_X, this._mouseDeltaX);
+        this.addUniform(UniformKeys.MOUSE_DELTA_Y, this._mouseDeltaY);
 
         //
         let colorsVertWGSL = vertexShader || defaultVert;
@@ -720,7 +765,7 @@ export default class Points {
         //--------------------------------------------
         this._bindingTextures.forEach(bindingTexture => {
             bindingTexture.texture = this._device.createTexture({
-                size: this._presentationSize,
+                size: bindingTexture.size || this._presentationSize,
                 format: 'rgba8unorm',
                 usage: GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
             });
@@ -1083,6 +1128,11 @@ export default class Points {
         this.updateUniform(UniformKeys.SCREEN_HEIGHT, this._canvas.height);
         this.updateUniform(UniformKeys.MOUSE_X, this._mouseX);
         this.updateUniform(UniformKeys.MOUSE_Y, this._mouseY);
+        this.updateUniform(UniformKeys.MOUSE_CLICK, this._mouseClick);
+        this.updateUniform(UniformKeys.MOUSE_DOWN, this._mouseDown);
+        this.updateUniform(UniformKeys.MOUSE_WHEEL, this._mouseWheel);
+        this.updateUniform(UniformKeys.MOUSE_DELTA_X, this._mouseDeltaX);
+        this.updateUniform(UniformKeys.MOUSE_DELTA_Y, this._mouseDeltaY);
         //--------------------------------------------
 
         this._createParametersUniforms();
@@ -1197,6 +1247,12 @@ export default class Points {
 
         //
         //this._vertexArray = [];
+
+        // reset mouse values because it doesn't happen by itself
+        this._mouseClick = false;
+        this._mouseWheel = false;
+        this._mouseDeltaX = 0;
+        this._mouseDeltaY = 0;
     }
 
     _getWGSLCoordinate(value, side, invert = false) {
