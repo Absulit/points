@@ -27,8 +27,8 @@ fn main(
 ) -> @location(0) vec4<f32> {
 
     let numColumns = 20.;
-    let numRows = 20.;
-    let subuv = fract(uvr * numColumns);
+    let numRows = 400.;
+    let subuv = fract(uvr * vec2(numColumns, numRows));
     let subuvColor = vec4(subuv, 0, 1);
 
     let pixelsWidth = params.screenWidth / numColumns;
@@ -39,7 +39,7 @@ fn main(
     let pixeleduvColor = vec4(pixeleduv, 0, 1);
 
     let imagePosition = vec2(.0,.0);
-    let imageColor = texturePosition(image, imageSampler, imagePosition, uvr, false);
+    let imageColor = texturePosition(image, imageSampler, imagePosition, pixeleduv, false);
     let b = brightness(imageColor);
 
     let fontPosition = vec2(.5,.5);
@@ -48,7 +48,7 @@ fn main(
     let circlePosition = vec2(.5, .5);
     let circleColor = sdfCircle(circlePosition, .4 * b, 0.1, subuv);
 
-    let finalColor:vec4<f32> = pixeleduvColor;
+    let finalColor:vec4<f32> = circleColor;
     return finalColor + showDebugFrame(RED, uvr);
 }
 `;
