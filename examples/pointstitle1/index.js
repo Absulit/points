@@ -24,7 +24,7 @@ const pointstitle1 = {
             mipmapFilter: 'nearest',
             //maxAnisotropy: 10,
         }
-        points.addSampler('imageSampler', descriptor, ShaderType.FRAGMENT);
+        points.addSampler('imageSampler', null, ShaderType.FRAGMENT);
 
     },
     update: points => {
