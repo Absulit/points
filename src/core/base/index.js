@@ -7,10 +7,10 @@ const base = {
     vert,
     compute,
     frag,
-    init: async (points) => {
+    init: async points => {
 
     },
-    update: (points) => {
+    update: points => {
 
     }
 }
