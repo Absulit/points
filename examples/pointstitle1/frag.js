@@ -31,9 +31,9 @@ fn main(
     @builtin(position) position: vec4<f32>
 ) -> @location(0) vec4<f32> {
 
-    let n1 = snoise(uvr * 2 + 2 * fnusin(1/3));
+    let n1 = snoise(uvr * 100 * params.sliderA + params.time * .1);
 
-    let numColumns = 400. * 0.2662; // params.sliderB;
+    let numColumns = 400. * 0.2662 * n1; // params.sliderB;
     let numRows = 400. * 0.3765; // params.sliderC;
     let subuv = fract(uvr * vec2(numColumns, numRows));
     let subuvColor = vec4(subuv, 0, 1);
