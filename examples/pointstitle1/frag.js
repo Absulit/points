@@ -17,6 +17,8 @@ ${RED}
 // debug
 ${showDebugFrame}
 
+const NUMCHARS = 6;
+
 @fragment
 fn main(
     @location(0) color: vec4<f32>,
@@ -27,8 +29,8 @@ fn main(
     @builtin(position) position: vec4<f32>
 ) -> @location(0) vec4<f32> {
 
-    let numColumns = 80.;
-    let numRows = 80.;
+    let numColumns = 40.;
+    let numRows = 40.;
     let subuv = fract(uvr * vec2(numColumns, numRows));
     let subuvColor = vec4(subuv, 0, 1);
 
@@ -41,18 +43,28 @@ fn main(
 
     let imagePosition = vec2(.0,.0);
     let imageColor = texturePosition(image, imageSampler, imagePosition, pixeleduv, false);
-    let b = brightness(imageColor);
+    
 
     let fontPosition = vec2(0.,0.);
     let charSize = vec2(8u,22u);
-    let charSizeF32 = vec2(f32(charSize.x), f32(charSize.y));
+    let charSizeF32 = vec2(f32(charSize.x) / params.screenWidth, f32(charSize.y) / params.screenHeight);
+    let charAIndex = 33u; // A
+    
+    let chars = array<u32, NUMCHARS>(15,14,8,13,19,18);
     // let fontColor = texturePosition(font, imageSampler, fontPosition, uvr, false);
-    let charColor = sprite(font, imageSampler, fontPosition, uvr, 1, charSize);
+    var stringColor = vec4(0.);
+    for (var index = 0; index < NUMCHARS; index++) {
+        let charIndex = chars[index];
+        let charPosition = charSizeF32 * vec2(f32(index), 0);
+        let space = .001 * vec2(f32(index), 0);
+        stringColor += sprite(font, imageSampler, space + fontPosition + charPosition, uvr / 20, charAIndex + charIndex, charSize);
+    }
+    let b = brightness(stringColor);
 
     let circlePosition = vec2(.5, .5);
     let circleColor = sdfCircle(circlePosition, .4 * b, 0.1, subuv);
 
-    let finalColor:vec4<f32> = charColor;
+    let finalColor:vec4<f32> = circleColor;
     return finalColor + showDebugFrame(RED, uvr);
 }
 `;
