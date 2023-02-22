@@ -66,7 +66,7 @@ fn main(
     }
     let b = brightness(stringColor);
 
-    let cdv = vec2(params.sliderC, 0.);
+    let cdv = vec2(.332, 0.);
     let circlePosition = vec2(.5, .5);
     let circleColor = sdfCircle(circlePosition, .4 * b, 0.1, subuv);
     let circleColorR = sdfCircle(circlePosition, .4 * b, 0.1, subuv + cdv);
