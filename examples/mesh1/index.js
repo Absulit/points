@@ -5,10 +5,10 @@ const mesh1 = {
     vert,
     compute,
     frag,
-    init: async (points) => {
+    init: async points => {
         points.setMeshDensity(20,20);
     },
-    update: (points) => {
+    update: points => {
 
     }
 }
