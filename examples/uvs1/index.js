@@ -7,10 +7,10 @@ const uvs1 = {
     vert,
     compute,
     frag,
-    init: async (points) => {
+    init: async points => {
         ShaderType
     },
-    update: (points) => {
+    update: points => {
 
     }
 }

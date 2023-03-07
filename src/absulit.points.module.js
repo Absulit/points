@@ -537,9 +537,9 @@ export default class Points {
         dynamicGroupBindingsCompute += this._createDynamicGroupBindings(ShaderType.COMPUTE);
         dynamicGroupBindingsFragment += this._createDynamicGroupBindings(ShaderType.FRAGMENT);
 
-        colorsVertWGSL = defaultVertexBody + defaultStructs + dynamicGroupBindingsVertex + colorsVertWGSL;
-        colorsComputeWGSL = defaultStructs + dynamicGroupBindingsCompute + colorsComputeWGSL;
-        colorsFragWGSL = defaultStructs + dynamicGroupBindingsFragment + colorsFragWGSL;
+        colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + defaultVertexBody  + colorsVertWGSL;
+        colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + colorsComputeWGSL;
+        colorsFragWGSL = dynamicGroupBindingsFragment + defaultStructs + colorsFragWGSL;
 
         console.groupCollapsed('VERTEX');
         console.log(colorsVertWGSL);

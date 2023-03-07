@@ -66,13 +66,13 @@ fn main(
     }
     let b = brightness(stringColor);
 
-    let cdv = vec2(params.sliderC, 0.);
+    let cdv = vec2(.332, 0.);
     let circlePosition = vec2(.5, .5);
     let circleColor = sdfCircle(circlePosition, .4 * b, 0.1, subuv);
     let circleColorR = sdfCircle(circlePosition, .4 * b, 0.1, subuv + cdv);
     let circleColorB = sdfCircle(circlePosition, .4 * b, 0.1, subuv - cdv);
 
-    let finalColor:vec4<f32> = circleColor + vec4(circleColorR.r, 0, circleColorB.b, 1);
+    let finalColor:vec4<f32> = vec4(circleColorR, circleColor, circleColorB, 1);
     return finalColor + showDebugFrame(RED, uvr);
 }
 `;

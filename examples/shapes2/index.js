@@ -6,14 +6,14 @@ const shapes2 = {
     vert,
     compute,
     frag,
-    init: async (points) => {
+    init: async points => {
         const numPoints = 800*800;
         points.addUniform('numPoints', numPoints);
         points.addStorage('points', numPoints, 'vec4<f32>', 4);
         points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
         points.addBindingTexture('outputTex', 'computeTexture');
     },
-    update: (points) => {
+    update: points => {
 
     }
 }

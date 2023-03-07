@@ -34,7 +34,7 @@ fn main(
     //var n2 = (snoise(uvr * 15.14 + 200 * fract(time * -.01))+1)*.5;
     let skewMask = vec2(1, 1.1);
     var mask = (1-sdfCircle(vec2(.5,.5) * ratio, .0999, .5, uvr * skewMask ));
-    let result = mask * n1 * circle + circle;
+    let result = vec4(1) * mask * n1 * circle + circle;
 
 
 
