@@ -20,6 +20,7 @@ ${RED}
 ${showDebugFrame}
 
 const NUMCHARS = 6;
+const CHROMATICDISPLACEMENT = 0.003695;
 
 @fragment
 fn main(
@@ -31,7 +32,7 @@ fn main(
     @builtin(position) position: vec4<f32>
 ) -> @location(0) vec4<f32> {
 
-    let n1 = snoise(uvr * 100 * params.sliderA + params.time * .1);
+    let n1 = snoise(uvr * 100 * 0.0016 /*params.sliderA*/ + params.time * .1);
 
     let numColumns = 400. * 0.2662 * n1; // params.sliderB;
     let numRows = 400. * 0.3765; // params.sliderC;
@@ -65,10 +66,13 @@ fn main(
     }
     let b = brightness(stringColor);
 
+    let cdv = vec2(.332, 0.);
     let circlePosition = vec2(.5, .5);
-    let circleColor = vec4(1.) * sdfCircle(circlePosition, .4 * b, 0.1, subuv);
+    let circleColor = sdfCircle(circlePosition, .4 * b, 0.1, subuv);
+    let circleColorR = sdfCircle(circlePosition, .4 * b, 0.1, subuv + cdv);
+    let circleColorB = sdfCircle(circlePosition, .4 * b, 0.1, subuv - cdv);
 
-    let finalColor:vec4<f32> = circleColor;
+    let finalColor:vec4<f32> = vec4(circleColorR, circleColor, circleColorB, 1);
     return finalColor + showDebugFrame(RED, uvr);
 }
 `;
