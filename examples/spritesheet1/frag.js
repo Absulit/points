@@ -75,7 +75,7 @@ fn main(
 
     let square = sdfSquare( (mouse+vec2(.3,0.14)) * ratio, .14, 0., 0., uvr) * .5;
 
-    return finalColor + animColor + layer(square, animPenguin);
+    return finalColor + animColor + layer(vec4(square), animPenguin);
 }
 `;
 

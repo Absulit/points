@@ -168,10 +168,10 @@ fn sdfLine(p1:vec2<f32>, p2:vec2<f32>, pixelStroke:f32, uv:vec2<f32>)->f32{
  * @param {vec2<f32>} uv
  */
 export const sdfCircle = /*wgsl*/`
-fn sdfCircle(position:vec2<f32>, radius: f32, feather: f32, uv:vec2<f32>) -> vec4<f32> {
+fn sdfCircle(position:vec2<f32>, radius: f32, feather: f32, uv:vec2<f32>) -> f32 {
     let d = distance(uv, position);
     let st = 1 - smoothstep(radius, radius + feather, d);
-    return vec4(st);
+    return st;
 }
 `;
 
@@ -186,7 +186,7 @@ fn rotateVector(p:vec2<f32>, rads:f32 ) -> vec2<f32> {
 `;
 
 export const sdfSquare = /*wgsl*/`
-fn sdfSquare(position:vec2<f32>, radius:f32, feather:f32, rotationRads: f32, uv:vec2<f32>) -> vec4<f32> {
+fn sdfSquare(position:vec2<f32>, radius:f32, feather:f32, rotationRads: f32, uv:vec2<f32>) -> f32 {
     let positionRotated = rotateVector(position, rotationRads);
     let uvRotated = rotateVector(uv, rotationRads);
 
@@ -196,8 +196,12 @@ fn sdfSquare(position:vec2<f32>, radius:f32, feather:f32, rotationRads: f32, uv:
     d = distance(uvRotated.y,  positionRotated.y);
     s += smoothstep(radius, radius + feather,  d);
     s = clamp(0,1, s);
-    return vec4(1-s);
+    return 1-s;
 }
+`;
+
+export const sdfRectangle = /*wgsl*/`
+
 `;
 
 export const sdfLine2 = /*wgsl*/`

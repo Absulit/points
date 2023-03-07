@@ -66,7 +66,7 @@ fn main(
     let b = brightness(stringColor);
 
     let circlePosition = vec2(.5, .5);
-    let circleColor = sdfCircle(circlePosition, .4 * b, 0.1, subuv);
+    let circleColor = vec4(1.) * sdfCircle(circlePosition, .4 * b, 0.1, subuv);
 
     let finalColor:vec4<f32> = circleColor;
     return finalColor + showDebugFrame(RED, uvr);
