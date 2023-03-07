@@ -5,9 +5,9 @@ const demo6 = {
     vert,
     compute,
     frag,
-    init: async (points) => {
+    init: async points => {
     },
-    update: (points) => {
+    update: points => {
 
     }
 }

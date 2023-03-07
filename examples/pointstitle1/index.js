@@ -11,10 +11,10 @@ const pointstitle1 = {
 
         await points.addTextureImage(
             'image',
-            './../../assets_ignore/absulit_800x800.jpg',
+            './../../img/gratia_800x800.jpg',
             ShaderType.FRAGMENT
         );
-        await points.addTextureImage('font', './../assets_ignore/inconsolata_regular_8x22.png', ShaderType.FRAGMENT);
+        await points.addTextureImage('font', './../img/inconsolata_regular_8x22.png', ShaderType.FRAGMENT);
 
         let descriptor = {
             addressModeU: 'clamp-to-edge',
