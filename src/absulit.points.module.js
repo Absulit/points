@@ -573,10 +573,9 @@ export default class Points {
         if (this._canvas === null) return false;
         this._context = this._canvas.getContext('webgpu');
 
-        const devicePixelRatio = window.devicePixelRatio || 1;
         this._presentationSize = [
-            this._canvas.clientWidth * devicePixelRatio,
-            this._canvas.clientHeight * devicePixelRatio,
+            this._canvas.clientWidth,
+            this._canvas.clientHeight,
         ];
         //this._presentationFormat = this._context.getPreferredFormat(adapter);
         this._presentationFormat = navigator.gpu.getPreferredCanvasFormat();
