@@ -178,12 +178,3 @@ function update() {
     capturer.capture(points.canvas);
     animationFrameId = requestAnimationFrame(update);
 }
-
-//
-// var resizeViewport = function () {
-//     let aspect = window.innerWidth / window.innerHeight;
-//     canvas.width = window.innerWidth;
-//     canvas.height = window.innerHeight;
-// }
-
-// window.addEventListener('resize', resizeViewport, false);

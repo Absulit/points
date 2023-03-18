@@ -136,6 +136,41 @@ export default class Points {
             this._mouseDeltaX = e.deltaX;
             this._mouseDeltaY = e.deltaY;
         });
+
+        window.addEventListener('resize', this._resizeViewport, false);
+    }
+
+    _resizeViewport = () => {
+        this._canvas.width = window.innerWidth;
+        this._canvas.height = window.innerHeight;
+        this._setScreenSize();
+
+    }
+
+    _setScreenSize = () => {
+        this._presentationSize = [
+            this._canvas.clientWidth,
+            this._canvas.clientHeight,
+        ];
+
+        this._context.configure({
+            device: this._device,
+            format: this._presentationFormat,
+            //size: this._presentationSize,
+            width: this._canvas.clientWidth,
+            height: this._canvas.clientHeight,
+            alphaMode: 'premultiplied',
+
+            // Specify we want both RENDER_ATTACHMENT and COPY_SRC since we
+            // will copy out of the swapchain texture.
+            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
+        });
+
+        this._depthTexture = this._device.createTexture({
+            size: this._presentationSize,
+            format: 'depth24plus',
+            usage: GPUTextureUsage.RENDER_ATTACHMENT,
+        });
     }
 
     _onMouseMove = e => {
@@ -573,31 +608,11 @@ export default class Points {
         if (this._canvas === null) return false;
         this._context = this._canvas.getContext('webgpu');
 
-        this._presentationSize = [
-            this._canvas.clientWidth,
-            this._canvas.clientHeight,
-        ];
-        //this._presentationFormat = this._context.getPreferredFormat(adapter);
         this._presentationFormat = navigator.gpu.getPreferredCanvasFormat();
 
-        this._context.configure({
-            device: this._device,
-            format: this._presentationFormat,
-            //size: this._presentationSize,
-            width: this._canvas.clientWidth,
-            height: this._canvas.clientHeight,
-            alphaMode: 'premultiplied',
+        // this._setScreenSize();
 
-            // Specify we want both RENDER_ATTACHMENT and COPY_SRC since we
-            // will copy out of the swapchain texture.
-            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
-        });
-
-        this._depthTexture = this._device.createTexture({
-            size: this._presentationSize,
-            format: 'depth24plus',
-            usage: GPUTextureUsage.RENDER_ATTACHMENT,
-        });
+        this._resizeViewport();
 
         this._renderPassDescriptor = {
             colorAttachments: [
