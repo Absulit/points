@@ -39,6 +39,15 @@ setStatsVisibility(statsVisible);
 let stats2 = { 'visible': statsVisible };
 gui.add(stats2, 'visible').name('Show Stats').onChange(value => setStatsVisibility(value));
 
+let isFullscreen = (localStorage.getItem('fullscreen-enabled') === 'true') || false;
+let isFullscreenData = { 'isFullscreen': isFullscreen };
+let fullscreenCheck = gui.add(isFullscreenData, 'isFullscreen').name('Fullscreen').onChange(value => points.fullscreen = value);
+document.addEventListener("fullscreenchange", e => {
+    let isFullscreen = window.innerWidth == screen.width && window.innerHeight == screen.height;
+    isFullscreenData.isFullscreen = isFullscreen;
+    fullscreenCheck.updateDisplay();
+});
+
 const shaderProjects = [
     { name: 'Base', path: '../src/core/base/index.js' },
     { name: 'Bloom1', path: './bloom1/index.js' },

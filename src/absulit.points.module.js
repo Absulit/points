@@ -137,6 +137,8 @@ export default class Points {
             this._mouseDeltaY = e.deltaY;
         });
 
+        this._fullscreen = false;
+
         window.addEventListener('resize', this._resizeViewport, false);
     }
 
@@ -572,7 +574,7 @@ export default class Points {
         dynamicGroupBindingsCompute += this._createDynamicGroupBindings(ShaderType.COMPUTE);
         dynamicGroupBindingsFragment += this._createDynamicGroupBindings(ShaderType.FRAGMENT);
 
-        colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + defaultVertexBody  + colorsVertWGSL;
+        colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + defaultVertexBody + colorsVertWGSL;
         colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + colorsComputeWGSL;
         colorsFragWGSL = dynamicGroupBindingsFragment + defaultStructs + colorsFragWGSL;
 
@@ -1340,6 +1342,22 @@ export default class Points {
 
     get pipeline() {
         return this._pipeline;
+    }
+
+    get fullscreen() {
+        return this._fullscreen;
+    }
+
+    set fullscreen(value) {
+        if (value) {
+            this._canvas.requestFullscreen().catch(err => {
+                throw `Error attempting to enable fullscreen mode: ${err.message} (${err.name})`;
+            });
+            this._fullscreen = true;
+        } else {
+            document.exitFullscreen();
+            this._fullscreen = false;
+        }
     }
 
     // -----------------------------
