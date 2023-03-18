@@ -39,13 +39,19 @@ setStatsVisibility(statsVisible);
 let stats2 = { 'visible': statsVisible };
 gui.add(stats2, 'visible').name('Show Stats').onChange(value => setStatsVisibility(value));
 
-let isFullscreen = (localStorage.getItem('fullscreen-enabled') === 'true') || false;
-let isFullscreenData = { 'isFullscreen': isFullscreen };
+let isFullscreenData = { 'isFullscreen': false };
 let fullscreenCheck = gui.add(isFullscreenData, 'isFullscreen').name('Fullscreen').onChange(value => points.fullscreen = value);
 document.addEventListener("fullscreenchange", e => {
     let isFullscreen = window.innerWidth == screen.width && window.innerHeight == screen.height;
     isFullscreenData.isFullscreen = isFullscreen;
     fullscreenCheck.updateDisplay();
+});
+
+let isFitWindow = (localStorage.getItem('fitwindow-enabled') === 'true') || false;
+let isFitWindowData = { 'isFitWindow': isFitWindow };
+gui.add(isFitWindowData, 'isFitWindow').name('Fit Window').onChange(value => {
+    points.fitWindow = value;
+    localStorage.setItem('fitwindow-enabled', value);
 });
 
 const shaderProjects = [
@@ -165,6 +171,8 @@ async function init() {
 
     await shaders.init(points);
     await points.init(shaders.vert, shaders.compute, shaders.frag);
+    points.fitWindow = isFitWindow;
+
     update();
 }
 

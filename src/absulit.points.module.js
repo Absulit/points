@@ -138,15 +138,31 @@ export default class Points {
         });
 
         this._fullscreen = false;
+        this._fitWindow = false;
+        this._originalCanvasWidth = this._canvas.clientWidth;
+        this._originalCanvasHeigth = this._canvas.clientHeight;
 
-        window.addEventListener('resize', this._resizeViewport, false);
+        window.addEventListener('resize', this._resizeCanvasToFitWindow, false);
+
+        document.addEventListener("fullscreenchange", e => {
+            let isFullscreen = window.innerWidth == screen.width && window.innerHeight == screen.height;
+            this._fullscreen = isFullscreen;
+            if(!isFullscreen && !this._fitWindow){
+                this._resizeCanvasToDefault();
+            }
+        });
     }
 
-    _resizeViewport = () => {
+    _resizeCanvasToFitWindow = () => {
         this._canvas.width = window.innerWidth;
         this._canvas.height = window.innerHeight;
         this._setScreenSize();
+    }
 
+    _resizeCanvasToDefault = () => {
+        this._canvas.width = this._originalCanvasWidth;
+        this._canvas.height = this._originalCanvasHeigth;
+        this._setScreenSize();
     }
 
     _setScreenSize = () => {
@@ -612,9 +628,11 @@ export default class Points {
 
         this._presentationFormat = navigator.gpu.getPreferredCanvasFormat();
 
-        // this._setScreenSize();
-
-        this._resizeViewport();
+        if (this._fitWindow) {
+            this._resizeCanvasToFitWindow();
+        } else {
+            this._resizeCanvasToDefault();
+        }
 
         this._renderPassDescriptor = {
             colorAttachments: [
@@ -1357,6 +1375,23 @@ export default class Points {
         } else {
             document.exitFullscreen();
             this._fullscreen = false;
+            this._resizeCanvasToDefault();
+        }
+    }
+
+    get fitWindow() {
+        return this._fitWindow;
+    }
+
+    set fitWindow(value) {
+        if(!this._context){
+            throw 'fitWindow must be assigned after Points.init() call';
+        }
+        this._fitWindow = value;
+        if (this._fitWindow) {
+            this._resizeCanvasToFitWindow();
+        } else {
+            this._resizeCanvasToDefault();
         }
     }
 
