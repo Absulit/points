@@ -249,11 +249,12 @@ export default class Points {
         });
     }
 
-    addStorageMap(name, arrayData, structName) {
+    addStorageMap(name, arrayData, structName, shaderType) {
         this._storage.push({
             mapped: true,
             name: name,
             structName: structName,
+            shaderType: shaderType,
             array: arrayData,
             buffer: null
         });
@@ -458,11 +459,13 @@ export default class Points {
         this._storage.forEach(storageItem => {
             if (!storageItem.shaderType || storageItem.shaderType == shaderType) {
                 let T = storageItem.structName;
-                if (storageItem.array?.length) {
-                    storageItem.size = storageItem.array.length;
-                }
-                if (storageItem.size > 1) {
-                    T = `array<${storageItem.structName}>`;
+                if(!storageItem.mapped){
+                    if (storageItem.array?.length) {
+                        storageItem.size = storageItem.array.length;
+                    }
+                    if (storageItem.size > 1) {
+                        T = `array<${storageItem.structName}>`;
+                    }
                 }
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, read_write> ${storageItem.name}: ${T};\n`
                 bindingIndex += 1;

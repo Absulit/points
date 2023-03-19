@@ -8,6 +8,11 @@ struct CustomFragment {
     @location(1) uv: vec2<f32>
 }
 
+struct Matrix {
+    size : vec2<f32>,
+    numbers: array<f32>,
+}
+
 @vertex
 fn main(
     @location(0) position: vec4<f32>,

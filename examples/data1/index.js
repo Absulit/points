@@ -1,6 +1,11 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
+import { ShaderType } from './../../src/absulit.points.module.js';
+
+
+let resultMatrixBufferSize = null;
+
 const data1 = {
     vert,
     compute,
@@ -13,7 +18,7 @@ const data1 = {
             5, 6, 7, 8
         ];
 
-        points.addStorageMap('firstMatrix', firstMatrix, 'f32');
+        points.addStorageMap('firstMatrix', firstMatrix, 'Matrix', ShaderType.COMPUTE);
 
         const secondMatrix = [
             4 /* rows */, 2 /* columns */,
@@ -23,7 +28,10 @@ const data1 = {
             7, 8
         ];
 
-        points.addStorageMap('secondMatrix', secondMatrix, 'f32');
+        points.addStorageMap('secondMatrix', secondMatrix, 'Matrix', ShaderType.COMPUTE);
+
+        resultMatrixBufferSize = Float32Array.BYTES_PER_ELEMENT * (2 + firstMatrix[0] * secondMatrix[1]);
+        points.addStorage('resultMatrix', 1, 'Matrix', resultMatrixBufferSize, ShaderType.COMPUTE);
 
     },
     update: points => {
