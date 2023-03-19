@@ -136,6 +136,59 @@ export default class Points {
             this._mouseDeltaX = e.deltaX;
             this._mouseDeltaY = e.deltaY;
         });
+
+        this._fullscreen = false;
+        this._fitWindow = false;
+        this._originalCanvasWidth = this._canvas.clientWidth;
+        this._originalCanvasHeigth = this._canvas.clientHeight;
+
+        window.addEventListener('resize', this._resizeCanvasToFitWindow, false);
+
+        document.addEventListener("fullscreenchange", e => {
+            let isFullscreen = window.innerWidth == screen.width && window.innerHeight == screen.height;
+            this._fullscreen = isFullscreen;
+            if(!isFullscreen && !this._fitWindow){
+                this._resizeCanvasToDefault();
+            }
+        });
+    }
+
+    _resizeCanvasToFitWindow = () => {
+        this._canvas.width = window.innerWidth;
+        this._canvas.height = window.innerHeight;
+        this._setScreenSize();
+    }
+
+    _resizeCanvasToDefault = () => {
+        this._canvas.width = this._originalCanvasWidth;
+        this._canvas.height = this._originalCanvasHeigth;
+        this._setScreenSize();
+    }
+
+    _setScreenSize = () => {
+        this._presentationSize = [
+            this._canvas.clientWidth,
+            this._canvas.clientHeight,
+        ];
+
+        this._context.configure({
+            device: this._device,
+            format: this._presentationFormat,
+            //size: this._presentationSize,
+            width: this._canvas.clientWidth,
+            height: this._canvas.clientHeight,
+            alphaMode: 'premultiplied',
+
+            // Specify we want both RENDER_ATTACHMENT and COPY_SRC since we
+            // will copy out of the swapchain texture.
+            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
+        });
+
+        this._depthTexture = this._device.createTexture({
+            size: this._presentationSize,
+            format: 'depth24plus',
+            usage: GPUTextureUsage.RENDER_ATTACHMENT,
+        });
     }
 
     _onMouseMove = e => {
@@ -537,7 +590,7 @@ export default class Points {
         dynamicGroupBindingsCompute += this._createDynamicGroupBindings(ShaderType.COMPUTE);
         dynamicGroupBindingsFragment += this._createDynamicGroupBindings(ShaderType.FRAGMENT);
 
-        colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + defaultVertexBody  + colorsVertWGSL;
+        colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + defaultVertexBody + colorsVertWGSL;
         colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + colorsComputeWGSL;
         colorsFragWGSL = dynamicGroupBindingsFragment + defaultStructs + colorsFragWGSL;
 
@@ -573,31 +626,13 @@ export default class Points {
         if (this._canvas === null) return false;
         this._context = this._canvas.getContext('webgpu');
 
-        this._presentationSize = [
-            this._canvas.clientWidth,
-            this._canvas.clientHeight,
-        ];
-        //this._presentationFormat = this._context.getPreferredFormat(adapter);
         this._presentationFormat = navigator.gpu.getPreferredCanvasFormat();
 
-        this._context.configure({
-            device: this._device,
-            format: this._presentationFormat,
-            //size: this._presentationSize,
-            width: this._canvas.clientWidth,
-            height: this._canvas.clientHeight,
-            alphaMode: 'premultiplied',
-
-            // Specify we want both RENDER_ATTACHMENT and COPY_SRC since we
-            // will copy out of the swapchain texture.
-            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
-        });
-
-        this._depthTexture = this._device.createTexture({
-            size: this._presentationSize,
-            format: 'depth24plus',
-            usage: GPUTextureUsage.RENDER_ATTACHMENT,
-        });
+        if (this._fitWindow) {
+            this._resizeCanvasToFitWindow();
+        } else {
+            this._resizeCanvasToDefault();
+        }
 
         this._renderPassDescriptor = {
             colorAttachments: [
@@ -1325,6 +1360,39 @@ export default class Points {
 
     get pipeline() {
         return this._pipeline;
+    }
+
+    get fullscreen() {
+        return this._fullscreen;
+    }
+
+    set fullscreen(value) {
+        if (value) {
+            this._canvas.requestFullscreen().catch(err => {
+                throw `Error attempting to enable fullscreen mode: ${err.message} (${err.name})`;
+            });
+            this._fullscreen = true;
+        } else {
+            document.exitFullscreen();
+            this._fullscreen = false;
+            this._resizeCanvasToDefault();
+        }
+    }
+
+    get fitWindow() {
+        return this._fitWindow;
+    }
+
+    set fitWindow(value) {
+        if(!this._context){
+            throw 'fitWindow must be assigned after Points.init() call';
+        }
+        this._fitWindow = value;
+        if (this._fitWindow) {
+            this._resizeCanvasToFitWindow();
+        } else {
+            this._resizeCanvasToDefault();
+        }
     }
 
     // -----------------------------
