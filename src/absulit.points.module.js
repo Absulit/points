@@ -148,7 +148,7 @@ export default class Points {
         document.addEventListener("fullscreenchange", e => {
             let isFullscreen = window.innerWidth == screen.width && window.innerHeight == screen.height;
             this._fullscreen = isFullscreen;
-            if(!isFullscreen && !this._fitWindow){
+            if (!isFullscreen && !this._fitWindow) {
                 this._resizeCanvasToDefault();
             }
         });
@@ -253,6 +253,16 @@ export default class Points {
             array: arrayData,
             buffer: null
         });
+
+        if (read) {
+            let storageItem = {
+                name: name,
+                size: structSize
+            }
+            this._readStorage.push(storageItem);
+        }
+
+
     }
 
     addStorageMap(name, arrayData, structName, shaderType) {
@@ -274,13 +284,17 @@ export default class Points {
         variable.array = arrayData;
     }
 
-    readStorage(name, size){
-        let storageItem = {
-            name: name,
-            size: size
-        }
-        this._readStorage.push(storageItem);
-        return storageItem;
+    async readStorage(name) {
+        // let storageItem = {
+        //     name: name,
+        //     size: size
+        // }
+        // this._readStorage.push(storageItem);
+        // return storageItem;
+        let storageItem = this._storage.find(storageItem => storageItem.name === name);
+        await storageItem.buffer.mapAsync(GPUMapMode.READ)
+        const arrayBuffer = storageItem.buffer.getMappedRange();
+        return new Float32Array(arrayBuffer);
     }
 
     addLayers(numLayers, shaderType) {
@@ -474,7 +488,7 @@ export default class Points {
         this._storage.forEach(storageItem => {
             if (!storageItem.shaderType || storageItem.shaderType == shaderType) {
                 let T = storageItem.structName;
-                if(!storageItem.mapped){
+                if (!storageItem.mapped) {
                     if (storageItem.array?.length) {
                         storageItem.size = storageItem.array.length;
                     }
@@ -756,7 +770,7 @@ export default class Points {
                 storageItem.buffer = this._createAndMapBuffer(values, GPUBufferUsage.STORAGE);
             } else {
                 let usage = GPUBufferUsage.STORAGE;
-                if(storageItem.read){
+                if (storageItem.read) {
                     usage = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC;
                 }
                 storageItem.buffer = this._createBuffer(storageItem.size * storageItem.structSize * 4, usage);
@@ -1296,7 +1310,7 @@ export default class Points {
         //     this._presentationSize
         // );
 
-        if(this._readStorage.length && !this._readStorageCopied){
+        if (this._readStorage.length && !this._readStorageCopied) {
             this._readStorage.forEach(readStorageItem => {
                 let storageItem = this._storage.find(storageItem => storageItem.name === readStorageItem.name);
 
@@ -1327,7 +1341,7 @@ export default class Points {
         this._mouseDeltaY = 0;
     }
 
-    read(){
+    read() {
 
     }
 
@@ -1426,7 +1440,7 @@ export default class Points {
     }
 
     set fitWindow(value) {
-        if(!this._context){
+        if (!this._context) {
             throw 'fitWindow must be assigned after Points.init() call';
         }
         this._fitWindow = value;

@@ -34,7 +34,7 @@ const data1 = {
         resultMatrixBufferSize = Float32Array.BYTES_PER_ELEMENT * (2 + firstMatrix[0] * secondMatrix[1]);
         points.addStorage('resultMatrix', 1, 'Matrix', resultMatrixBufferSize, ShaderType.COMPUTE, true);
 
-        storageItem = points.readStorage('resultMatrix', resultMatrixBufferSize);
+        // storageItem = points.readStorage('resultMatrix', resultMatrixBufferSize);
 
 
 
@@ -43,9 +43,11 @@ const data1 = {
 
     },
     read: async points => {
-        await storageItem.buffer.mapAsync(GPUMapMode.READ)
-        const arrayBuffer = storageItem.buffer.getMappedRange();
-        console.log(new Float32Array(arrayBuffer));
+        // await storageItem.buffer.mapAsync(GPUMapMode.READ)
+        // const arrayBuffer = storageItem.buffer.getMappedRange();
+        // console.log(new Float32Array(arrayBuffer));
+        let result = await points.readStorage('resultMatrix');
+        console.log(result);
     }
 }
 
