@@ -97,6 +97,7 @@ export default class Points {
 
         this._uniforms = [];
         this._storage = [];
+        this._readStorage = [];
         this._samplers = [];
         this._textures2d = [];
         this._texturesExternal = [];
@@ -135,6 +136,62 @@ export default class Points {
             this._mouseWheel = true;
             this._mouseDeltaX = e.deltaX;
             this._mouseDeltaY = e.deltaY;
+        });
+
+        this._fullscreen = false;
+        this._fitWindow = false;
+        this._originalCanvasWidth = this._canvas.clientWidth;
+        this._originalCanvasHeigth = this._canvas.clientHeight;
+
+        window.addEventListener('resize', this._resizeCanvasToFitWindow, false);
+
+        document.addEventListener("fullscreenchange", e => {
+            let isFullscreen = window.innerWidth == screen.width && window.innerHeight == screen.height;
+            this._fullscreen = isFullscreen;
+            if (!isFullscreen && !this._fitWindow) {
+                this._resizeCanvasToDefault();
+            }
+        });
+
+        // _readStorage should only be read once
+        this._readStorageCopied = false;
+    }
+
+    _resizeCanvasToFitWindow = () => {
+        this._canvas.width = window.innerWidth;
+        this._canvas.height = window.innerHeight;
+        this._setScreenSize();
+    }
+
+    _resizeCanvasToDefault = () => {
+        this._canvas.width = this._originalCanvasWidth;
+        this._canvas.height = this._originalCanvasHeigth;
+        this._setScreenSize();
+    }
+
+    _setScreenSize = () => {
+        this._presentationSize = [
+            this._canvas.clientWidth,
+            this._canvas.clientHeight,
+        ];
+
+        this._context.configure({
+            device: this._device,
+            format: this._presentationFormat,
+            //size: this._presentationSize,
+            width: this._canvas.clientWidth,
+            height: this._canvas.clientHeight,
+            alphaMode: 'premultiplied',
+
+            // Specify we want both RENDER_ATTACHMENT and COPY_SRC since we
+            // will copy out of the swapchain texture.
+            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
+        });
+
+        this._depthTexture = this._device.createTexture({
+            size: this._presentationSize,
+            format: 'depth24plus',
+            usage: GPUTextureUsage.RENDER_ATTACHMENT,
         });
     }
 
@@ -182,8 +239,9 @@ export default class Points {
      * shader that will be the array<structName> of the Storage
      * @param {Number} structSize this tells how many sub items the struct has
      * @param {ShaderType} shaderType this tells to what shader the storage is bound
+     * @param {boolean} read if this is going to be used to read data back
      */
-    addStorage(name, size, structName, structSize, shaderType, arrayData) {
+    addStorage(name, size, structName, structSize, shaderType, read, arrayData) {
         this._storage.push({
             mapped: !!arrayData,
             name: name,
@@ -191,16 +249,28 @@ export default class Points {
             structName: structName,
             structSize: structSize,
             shaderType: shaderType,
+            read: read,
             array: arrayData,
             buffer: null
         });
+
+        if (read) {
+            let storageItem = {
+                name: name,
+                size: structSize
+            }
+            this._readStorage.push(storageItem);
+        }
+
+
     }
 
-    addStorageMap(name, arrayData, structName) {
+    addStorageMap(name, arrayData, structName, shaderType) {
         this._storage.push({
             mapped: true,
             name: name,
             structName: structName,
+            shaderType: shaderType,
             array: arrayData,
             buffer: null
         });
@@ -212,6 +282,13 @@ export default class Points {
             throw '`updateStorageMap()` can\'t be called without first `addStorageMap()`.';
         }
         variable.array = arrayData;
+    }
+
+    async readStorage(name) {
+        let storageItem = this._readStorage.find(storageItem => storageItem.name === name);
+        await storageItem.buffer.mapAsync(GPUMapMode.READ)
+        const arrayBuffer = storageItem.buffer.getMappedRange();
+        return new Float32Array(arrayBuffer);
     }
 
     addLayers(numLayers, shaderType) {
@@ -405,11 +482,13 @@ export default class Points {
         this._storage.forEach(storageItem => {
             if (!storageItem.shaderType || storageItem.shaderType == shaderType) {
                 let T = storageItem.structName;
-                if (storageItem.array?.length) {
-                    storageItem.size = storageItem.array.length;
-                }
-                if (storageItem.size > 1) {
-                    T = `array<${storageItem.structName}>`;
+                if (!storageItem.mapped) {
+                    if (storageItem.array?.length) {
+                        storageItem.size = storageItem.array.length;
+                    }
+                    if (storageItem.size > 1) {
+                        T = `array<${storageItem.structName}>`;
+                    }
                 }
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, read_write> ${storageItem.name}: ${T};\n`
                 bindingIndex += 1;
@@ -537,7 +616,7 @@ export default class Points {
         dynamicGroupBindingsCompute += this._createDynamicGroupBindings(ShaderType.COMPUTE);
         dynamicGroupBindingsFragment += this._createDynamicGroupBindings(ShaderType.FRAGMENT);
 
-        colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + defaultVertexBody  + colorsVertWGSL;
+        colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + defaultVertexBody + colorsVertWGSL;
         colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + colorsComputeWGSL;
         colorsFragWGSL = dynamicGroupBindingsFragment + defaultStructs + colorsFragWGSL;
 
@@ -573,32 +652,13 @@ export default class Points {
         if (this._canvas === null) return false;
         this._context = this._canvas.getContext('webgpu');
 
-        const devicePixelRatio = window.devicePixelRatio || 1;
-        this._presentationSize = [
-            this._canvas.clientWidth * devicePixelRatio,
-            this._canvas.clientHeight * devicePixelRatio,
-        ];
-        //this._presentationFormat = this._context.getPreferredFormat(adapter);
         this._presentationFormat = navigator.gpu.getPreferredCanvasFormat();
 
-        this._context.configure({
-            device: this._device,
-            format: this._presentationFormat,
-            //size: this._presentationSize,
-            width: this._canvas.clientWidth,
-            height: this._canvas.clientHeight,
-            alphaMode: 'premultiplied',
-
-            // Specify we want both RENDER_ATTACHMENT and COPY_SRC since we
-            // will copy out of the swapchain texture.
-            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
-        });
-
-        this._depthTexture = this._device.createTexture({
-            size: this._presentationSize,
-            format: 'depth24plus',
-            usage: GPUTextureUsage.RENDER_ATTACHMENT,
-        });
+        if (this._fitWindow) {
+            this._resizeCanvasToFitWindow();
+        } else {
+            this._resizeCanvasToDefault();
+        }
 
         this._renderPassDescriptor = {
             colorAttachments: [
@@ -703,8 +763,19 @@ export default class Points {
                 const values = new Float32Array(storageItem.array);
                 storageItem.buffer = this._createAndMapBuffer(values, GPUBufferUsage.STORAGE);
             } else {
-                storageItem.buffer = this._createBuffer(storageItem.size * storageItem.structSize * 4, GPUBufferUsage.STORAGE);
+                let usage = GPUBufferUsage.STORAGE;
+                if (storageItem.read) {
+                    usage = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC;
+                }
+                storageItem.buffer = this._createBuffer(storageItem.size * storageItem.structSize * 4, usage);
             }
+        });
+        //--------------------------------------------
+        this._readStorage.forEach(readStorageItem => {
+            readStorageItem.buffer = this._device.createBuffer({
+                size: readStorageItem.size,
+                usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
+            });
         });
         //--------------------------------------------
         if (this._layers.length) {
@@ -1168,16 +1239,8 @@ export default class Points {
         passEncoder.dispatchWorkgroups(8, 8, 1);
         passEncoder.end();
 
-
-        // commandEncoder.copyBufferToBuffer(
-        //     this._layer0Buffer /* source buffer */,
-        //     0 /* source offset */,
-        //     this._buffer /* destination buffer */,
-        //     0 /* destination offset */,
-        //     this._layer0BufferSize /* size */
-        // );
-
         // ---------------------
+
 
         this._renderPassDescriptor.colorAttachments[0].view = this._context.getCurrentTexture().createView();
         this._renderPassDescriptor.depthStencilAttachment.view = this._depthTexture.createView();
@@ -1241,6 +1304,23 @@ export default class Points {
         //     this._presentationSize
         // );
 
+        if (this._readStorage.length && !this._readStorageCopied) {
+            this._readStorage.forEach(readStorageItem => {
+                let storageItem = this._storage.find(storageItem => storageItem.name === readStorageItem.name);
+
+                commandEncoder.copyBufferToBuffer(
+                    storageItem.buffer /* source buffer */,
+                    0 /* source offset */,
+                    readStorageItem.buffer /* destination buffer */,
+                    0 /* destination offset */,
+                    readStorageItem.size /* size */
+                );
+            });
+            this._readStorageCopied = true;
+        }
+
+        // ---------------------
+
         this._commandsFinished.push(commandEncoder.finish());
         this._device.queue.submit(this._commandsFinished);
         this._commandsFinished = [];
@@ -1253,6 +1333,10 @@ export default class Points {
         this._mouseWheel = false;
         this._mouseDeltaX = 0;
         this._mouseDeltaY = 0;
+    }
+
+    read() {
+
     }
 
     _getWGSLCoordinate(value, side, invert = false) {
@@ -1326,6 +1410,39 @@ export default class Points {
 
     get pipeline() {
         return this._pipeline;
+    }
+
+    get fullscreen() {
+        return this._fullscreen;
+    }
+
+    set fullscreen(value) {
+        if (value) {
+            this._canvas.requestFullscreen().catch(err => {
+                throw `Error attempting to enable fullscreen mode: ${err.message} (${err.name})`;
+            });
+            this._fullscreen = true;
+        } else {
+            document.exitFullscreen();
+            this._fullscreen = false;
+            this._resizeCanvasToDefault();
+        }
+    }
+
+    get fitWindow() {
+        return this._fitWindow;
+    }
+
+    set fitWindow(value) {
+        if (!this._context) {
+            throw 'fitWindow must be assigned after Points.init() call';
+        }
+        this._fitWindow = value;
+        if (this._fitWindow) {
+            this._resizeCanvasToFitWindow();
+        } else {
+            this._resizeCanvasToDefault();
+        }
     }
 
     // -----------------------------
