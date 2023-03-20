@@ -97,6 +97,7 @@ export default class Points {
 
         this._uniforms = [];
         this._storage = [];
+        this._readStorage = [];
         this._samplers = [];
         this._textures2d = [];
         this._texturesExternal = [];
@@ -147,10 +148,13 @@ export default class Points {
         document.addEventListener("fullscreenchange", e => {
             let isFullscreen = window.innerWidth == screen.width && window.innerHeight == screen.height;
             this._fullscreen = isFullscreen;
-            if(!isFullscreen && !this._fitWindow){
+            if (!isFullscreen && !this._fitWindow) {
                 this._resizeCanvasToDefault();
             }
         });
+
+        // _readStorage should only be read once
+        this._readStorageCopied = false;
     }
 
     _resizeCanvasToFitWindow = () => {
@@ -235,8 +239,9 @@ export default class Points {
      * shader that will be the array<structName> of the Storage
      * @param {Number} structSize this tells how many sub items the struct has
      * @param {ShaderType} shaderType this tells to what shader the storage is bound
+     * @param {boolean} read if this is going to be used to read data back
      */
-    addStorage(name, size, structName, structSize, shaderType, arrayData) {
+    addStorage(name, size, structName, structSize, shaderType, read, arrayData) {
         this._storage.push({
             mapped: !!arrayData,
             name: name,
@@ -244,16 +249,28 @@ export default class Points {
             structName: structName,
             structSize: structSize,
             shaderType: shaderType,
+            read: read,
             array: arrayData,
             buffer: null
         });
+
+        if (read) {
+            let storageItem = {
+                name: name,
+                size: structSize
+            }
+            this._readStorage.push(storageItem);
+        }
+
+
     }
 
-    addStorageMap(name, arrayData, structName) {
+    addStorageMap(name, arrayData, structName, shaderType) {
         this._storage.push({
             mapped: true,
             name: name,
             structName: structName,
+            shaderType: shaderType,
             array: arrayData,
             buffer: null
         });
@@ -265,6 +282,13 @@ export default class Points {
             throw '`updateStorageMap()` can\'t be called without first `addStorageMap()`.';
         }
         variable.array = arrayData;
+    }
+
+    async readStorage(name) {
+        let storageItem = this._readStorage.find(storageItem => storageItem.name === name);
+        await storageItem.buffer.mapAsync(GPUMapMode.READ)
+        const arrayBuffer = storageItem.buffer.getMappedRange();
+        return new Float32Array(arrayBuffer);
     }
 
     addLayers(numLayers, shaderType) {
@@ -458,11 +482,13 @@ export default class Points {
         this._storage.forEach(storageItem => {
             if (!storageItem.shaderType || storageItem.shaderType == shaderType) {
                 let T = storageItem.structName;
-                if (storageItem.array?.length) {
-                    storageItem.size = storageItem.array.length;
-                }
-                if (storageItem.size > 1) {
-                    T = `array<${storageItem.structName}>`;
+                if (!storageItem.mapped) {
+                    if (storageItem.array?.length) {
+                        storageItem.size = storageItem.array.length;
+                    }
+                    if (storageItem.size > 1) {
+                        T = `array<${storageItem.structName}>`;
+                    }
                 }
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, read_write> ${storageItem.name}: ${T};\n`
                 bindingIndex += 1;
@@ -737,8 +763,19 @@ export default class Points {
                 const values = new Float32Array(storageItem.array);
                 storageItem.buffer = this._createAndMapBuffer(values, GPUBufferUsage.STORAGE);
             } else {
-                storageItem.buffer = this._createBuffer(storageItem.size * storageItem.structSize * 4, GPUBufferUsage.STORAGE);
+                let usage = GPUBufferUsage.STORAGE;
+                if (storageItem.read) {
+                    usage = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC;
+                }
+                storageItem.buffer = this._createBuffer(storageItem.size * storageItem.structSize * 4, usage);
             }
+        });
+        //--------------------------------------------
+        this._readStorage.forEach(readStorageItem => {
+            readStorageItem.buffer = this._device.createBuffer({
+                size: readStorageItem.size,
+                usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
+            });
         });
         //--------------------------------------------
         if (this._layers.length) {
@@ -1202,16 +1239,8 @@ export default class Points {
         passEncoder.dispatchWorkgroups(8, 8, 1);
         passEncoder.end();
 
-
-        // commandEncoder.copyBufferToBuffer(
-        //     this._layer0Buffer /* source buffer */,
-        //     0 /* source offset */,
-        //     this._buffer /* destination buffer */,
-        //     0 /* destination offset */,
-        //     this._layer0BufferSize /* size */
-        // );
-
         // ---------------------
+
 
         this._renderPassDescriptor.colorAttachments[0].view = this._context.getCurrentTexture().createView();
         this._renderPassDescriptor.depthStencilAttachment.view = this._depthTexture.createView();
@@ -1275,6 +1304,23 @@ export default class Points {
         //     this._presentationSize
         // );
 
+        if (this._readStorage.length && !this._readStorageCopied) {
+            this._readStorage.forEach(readStorageItem => {
+                let storageItem = this._storage.find(storageItem => storageItem.name === readStorageItem.name);
+
+                commandEncoder.copyBufferToBuffer(
+                    storageItem.buffer /* source buffer */,
+                    0 /* source offset */,
+                    readStorageItem.buffer /* destination buffer */,
+                    0 /* destination offset */,
+                    readStorageItem.size /* size */
+                );
+            });
+            this._readStorageCopied = true;
+        }
+
+        // ---------------------
+
         this._commandsFinished.push(commandEncoder.finish());
         this._device.queue.submit(this._commandsFinished);
         this._commandsFinished = [];
@@ -1287,6 +1333,10 @@ export default class Points {
         this._mouseWheel = false;
         this._mouseDeltaX = 0;
         this._mouseDeltaY = 0;
+    }
+
+    read() {
+
     }
 
     _getWGSLCoordinate(value, side, invert = false) {
@@ -1384,7 +1434,7 @@ export default class Points {
     }
 
     set fitWindow(value) {
-        if(!this._context){
+        if (!this._context) {
             throw 'fitWindow must be assigned after Points.init() call';
         }
         this._fitWindow = value;
