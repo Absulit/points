@@ -20,9 +20,9 @@ fn main(
     // _ = firstMatrix.size;
     // _ = secondMatrix.size;
 
-    // resultMatrix.numbers[0] = 0.;
-
     resultMatrix.size = vec2(firstMatrix.size.x, secondMatrix.size.y);
+    resultMatrix.numbers[0] = 111.;
+
 }
 `;
 

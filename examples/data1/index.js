@@ -5,6 +5,7 @@ import { ShaderType } from './../../src/absulit.points.module.js';
 
 
 let resultMatrixBufferSize = null;
+let storageItem = null;
 
 const data1 = {
     vert,
@@ -31,11 +32,20 @@ const data1 = {
         points.addStorageMap('secondMatrix', secondMatrix, 'Matrix', ShaderType.COMPUTE);
 
         resultMatrixBufferSize = Float32Array.BYTES_PER_ELEMENT * (2 + firstMatrix[0] * secondMatrix[1]);
-        points.addStorage('resultMatrix', 1, 'Matrix', resultMatrixBufferSize, ShaderType.COMPUTE);
+        points.addStorage('resultMatrix', 1, 'Matrix', resultMatrixBufferSize, ShaderType.COMPUTE, true);
+
+        storageItem = points.readStorage('resultMatrix', resultMatrixBufferSize);
+
+
 
     },
-    update: points => {
+    update: async points => {
 
+    },
+    read: async points => {
+        await storageItem.buffer.mapAsync(GPUMapMode.READ)
+        const arrayBuffer = storageItem.buffer.getMappedRange();
+        console.log(new Float32Array(arrayBuffer));
     }
 }
 
