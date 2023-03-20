@@ -1,3 +1,6 @@
+// original article on compute shaders
+// https://developer.chrome.com/articles/gpu-compute/
+
 const compute = /*wgsl*/`
 
 struct Matrix {

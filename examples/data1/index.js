@@ -1,11 +1,10 @@
+// original article on compute shaders
+// https://developer.chrome.com/articles/gpu-compute/
+
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
 import { ShaderType } from './../../src/absulit.points.module.js';
-
-
-let resultMatrixBufferSize = null;
-let storageItem = null;
 
 const data1 = {
     vert,
@@ -31,7 +30,7 @@ const data1 = {
 
         points.addStorageMap('secondMatrix', secondMatrix, 'Matrix', ShaderType.COMPUTE);
 
-        resultMatrixBufferSize = Float32Array.BYTES_PER_ELEMENT * (2 + firstMatrix[0] * secondMatrix[1]);
+        let resultMatrixBufferSize = Float32Array.BYTES_PER_ELEMENT * (2 + firstMatrix[0] * secondMatrix[1]);
         points.addStorage('resultMatrix', 1, 'Matrix', resultMatrixBufferSize, ShaderType.COMPUTE, true);
     },
     update: async points => {
