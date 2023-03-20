@@ -17,11 +17,19 @@ fn main(
     }
 
     let time = params.time;
-    // _ = firstMatrix.size;
-    // _ = secondMatrix.size;
 
     resultMatrix.size = vec2(firstMatrix.size.x, secondMatrix.size.y);
-    resultMatrix.numbers[0] = 111.;
+
+    let resultCell = vec2(GlobalId.x, GlobalId.y);
+    var result = 0.0;
+    for (var i = 0u; i < u32(firstMatrix.size.y); i = i + 1u) {
+      let a = i + resultCell.x * u32(firstMatrix.size.y);
+      let b = resultCell.y + i * u32(secondMatrix.size.y);
+      result = result + firstMatrix.numbers[a] * secondMatrix.numbers[b];
+    }
+
+    let index = resultCell.y + resultCell.x * u32(secondMatrix.size.y);
+    resultMatrix.numbers[index] = result;
 
 }
 `;
