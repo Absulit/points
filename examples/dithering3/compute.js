@@ -59,7 +59,7 @@ fn main(
 
 
 
-        //variables.init = 1;
+        // variables.init = 1;
     }else{
         layerIndex = 1;
     }
@@ -67,7 +67,6 @@ fn main(
 
 
     //--------------------------------------------------
-    // workgroupBarrier();
 
     for (var indexColumns:i32 = 0; indexColumns < numColumnsPiece; indexColumns++) {
         let x:f32 = f32(WorkGroupID.x) * f32(numColumnsPiece) + f32(indexColumns);
@@ -100,66 +99,28 @@ fn main(
             let pointP = &layers[layerIndex][pointIndex];
             (*pointP) = point;
 
-            //let positionU = vec2<u32>(ux,uy);
-            //textureStore(outputTex, positionU, point);
 
-            //color.brightness = rightPoint.color.brightness + (.5 * quant_error)
-            // if( (ix+distance) < numColumnsPiece){
-                let pointIndexC = i32(y + ((x+distanceF) * numColumns));
-                var rightPoint = layers[layerIndex][pointIndexC];
-                rightPoint = vec4(brightness(rightPoint) + (.5 * quant_error));
+            let pointIndexC = i32(y + ((x+distanceF) * numColumns));
+            var rightPoint = layers[layerIndex][pointIndexC];
+            rightPoint = vec4(brightness(rightPoint) + (.5 * quant_error));
 
-                let pointPC = &layers[layerIndex][pointIndexC];
-                (*pointPC) = rightPoint;
-                //textureStore(outputTex, positionU + vec2(distanceU,0), rightPoint);
+            let pointPC = &layers[layerIndex][pointIndexC];
+            (*pointPC) = rightPoint;
 
-            // }
 
-            // if( (iy+distance) < numRowsPiece ){
-                let pointIndexR = i32((y+distanceF) + (x * numColumns));
-                var bottomPoint = layers[layerIndex][pointIndexR];
-                bottomPoint = vec4(brightness(bottomPoint) + (.5 * quant_error));
+            let pointIndexR = i32((y+distanceF) + (x * numColumns));
+            var bottomPoint = layers[layerIndex][pointIndexR];
+            bottomPoint = vec4(brightness(bottomPoint) + (.5 * quant_error));
 
-                let pointPR = &layers[layerIndex][pointIndexR];
-                (*pointPR) = bottomPoint;
-                //textureStore(outputTex, positionU + vec2(0,distanceU), bottomPoint);
-            // }
+            let pointPR = &layers[layerIndex][pointIndexR];
+            (*pointPR) = bottomPoint;
 
             point = layers[layerIndex][pointIndex];
             let positionU = vec2<u32>(ux,uy);
             textureStore(outputTex, positionU, point);
-
+            storageBarrier();
         }
     }
-    //--------------------------------------------------
-    //workgroupBarrier();
-
-    // for (var indexColumns:i32 = 0; indexColumns < numColumnsPiece; indexColumns++) {
-    //     let x:f32 = f32(WorkGroupID.x) * f32(numColumnsPiece) + f32(indexColumns);
-    //     let ux = u32(x);
-    //     let ix = i32(x);
-    //     let nx = x / numColumns;
-    //     for (var indexRows:i32 = 0; indexRows < numRowsPiece; indexRows++) {
-
-    //         let y:f32 = f32(WorkGroupID.y) * f32(numRowsPiece) + f32(indexRows);
-    //         let uy = u32(y);
-    //         let iy = i32(y);
-    //         let ny = y / numRows;
-    //         let uv = vec2(nx,ny);
-
-    //         let pointIndex = i32(y + (x * numColumns));
-
-
-    //         let point = layers[0][pointIndex];
-    //         let positionU = vec2<u32>(ux,uy);
-    //         textureStore(outputTex, positionU, point);
-
-    //     }
-    // }
-
-
-
-
 
 }
 `;
