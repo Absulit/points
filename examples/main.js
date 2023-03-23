@@ -175,7 +175,9 @@ async function init() {
     points.fitWindow = isFitWindow;
 
     update();
-    await shaders.read(points);
+    
+    shaders.read && await shaders.read(points);
+    
 }
 
 function update() {
