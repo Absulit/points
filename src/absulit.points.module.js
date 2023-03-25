@@ -27,6 +27,33 @@ class UniformKeys {
     static MOUSE_DELTA_Y = 'mouseDeltaY';
 }
 
+export class RenderPass {
+    /**
+     * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
+     * This is useful for PostProcessing.
+     * @param {String} vertexShader  WGSL Vertex Shader in a String.
+     * @param {String} computeShader  WGSL Compute Shader in a String.
+     * @param {String} fragmentShader  WGSL Fragment Shader in a String.
+     */
+    constructor(vertexShader, computeShader, fragmentShader){
+        this._vertexShader = vertexShader;
+        this._computeShader = computeShader;
+        this._fragmentShader = fragmentShader;
+    }
+
+    get vertexShader(){
+        return this._vertexShader;
+    }
+
+    get computeShader(){
+        return this._computeShader;
+    }
+
+    get fragmentShader(){
+        return this._fragmentShader;
+    }
+}
+
 export class VertexBufferInfo {
     /**
      * Along with the vertexArray it calculates some info like offsets required for the pipeline.
@@ -563,14 +590,14 @@ export default class Points {
 
     /**
      * One time function to call to initialize the shaders.
-     * @param {String} vertexShader WGSL Vertex Shader in a String.
-     * @param {String} computeShader WGSL Compute Shader in a String.
-     * @param {String} fragmentShader WGSL Fragment Shader in a String.
-     * @param {Number} numColumns Number of columns in the base mesh.
-     * @param {Number} numRows Number of rows in the base mesh.
+     * @param {array<RenderPass>} renderPasses Collection of RenderPass, which contain Vertex, Compute and Fragment shaders.
      * @returns false | undefined
      */
-    async init(vertexShader, computeShader, fragmentShader) {
+    async init(renderPasses) {
+
+        let vertexShader = renderPasses[0].vertexShader;
+        let computeShader = renderPasses[0].computeShader;
+        let fragmentShader = renderPasses[0].fragmentShader;
 
         // initializing internal uniforms
         this.addUniform(UniformKeys.TIME, this._time);

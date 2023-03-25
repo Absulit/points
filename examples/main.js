@@ -1,6 +1,6 @@
 'use strict';
 import * as dat from './../src/vendor/datgui/dat.gui.module.js';
-import Points, { ShaderType } from '../src/absulit.points.module.js';
+import Points, { RenderPass, ShaderType } from '../src/absulit.points.module.js';
 
 /***************/
 const stats = new Stats();
@@ -171,13 +171,13 @@ async function init() {
 
 
     await shaders.init(points);
-    await points.init(shaders.vert, shaders.compute, shaders.frag);
+    let renderPasses = [new RenderPass(shaders.vert, shaders.compute, shaders.frag)]
+    await points.init(renderPasses);
     points.fitWindow = isFitWindow;
 
     update();
-    
+
     shaders.read && await shaders.read(points);
-    
 }
 
 function update() {
