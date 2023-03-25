@@ -99,7 +99,7 @@ export default class Points {
         this._device = null;
         this._context = null;
         this._presentationFormat = null;
-        this._useTexture = false;
+        // this._useTexture = false;
         this._shaders = null;
         this._pipeline = null;
         this._computePipeline = null;
@@ -595,9 +595,10 @@ export default class Points {
      */
     async init(renderPasses) {
 
-        let vertexShader = renderPasses[0].vertexShader;
-        let computeShader = renderPasses[0].computeShader;
-        let fragmentShader = renderPasses[0].fragmentShader;
+        let i = 0;
+        let vertexShader = renderPasses[i].vertexShader;
+        let computeShader = renderPasses[i].computeShader;
+        let fragmentShader = renderPasses[i].fragmentShader;
 
         // initializing internal uniforms
         this.addUniform(UniformKeys.TIME, this._time);
@@ -657,17 +658,13 @@ export default class Points {
         console.log(colorsFragWGSL);
         console.groupEnd();
 
-        this._shaders = {
-            false: {
+        this._shaders = [
+            {
                 vertex: colorsVertWGSL,
                 compute: colorsComputeWGSL,
                 fragment: colorsFragWGSL
-            },
-            true: {
-                vertex: defaultVert,
-                fragment: defaultFrag
             }
-        }
+        ]
 
         const adapter = await navigator.gpu.requestAdapter();
         if (!adapter) { return false; }
@@ -922,7 +919,7 @@ export default class Points {
             layout: 'auto',
             compute: {
                 module: this._device.createShaderModule({
-                    code: this._shaders[this._useTexture].compute
+                    code: this._shaders[0].compute
                 }),
                 entryPoint: "main"
             }
@@ -953,7 +950,7 @@ export default class Points {
             },
             vertex: {
                 module: this._device.createShaderModule({
-                    code: this._shaders[this._useTexture].vertex,
+                    code: this._shaders[0].vertex,
                 }),
                 entryPoint: 'main', // shader function name
 
@@ -985,7 +982,7 @@ export default class Points {
             },
             fragment: {
                 module: this._device.createShaderModule({
-                    code: this._shaders[this._useTexture].fragment,
+                    code: this._shaders[0].fragment,
                 }),
                 entryPoint: 'main', // shader function name
                 targets: [
@@ -1012,53 +1009,7 @@ export default class Points {
 
         });
 
-        if (this._useTexture) {
-            await this._createTexture();
-        }
-
         this._createParams();
-    }
-
-    async _createTexture() {
-        const samp = this._device.createSampler({ minFilter: 'linear', magFilter: 'linear' });
-        // Fetch the image and upload it into a GPUTexture.
-        //let cubeTexture: GPUTexture;
-        let cubeTexture;
-        {
-            const response = await fetch('./assets/old_king_600x600.jpg');
-            const blob = await response.blob();
-            const imageBitmap = await createImageBitmap(blob);
-
-            cubeTexture = this._device.createTexture({
-                size: [imageBitmap.width, imageBitmap.height, 1],
-                format: 'rgba8unorm',
-                usage:
-                    GPUTextureUsage.TEXTURE_BINDING |
-                    GPUTextureUsage.COPY_DST |
-                    GPUTextureUsage.RENDER_ATTACHMENT,
-            });
-            this._device.queue.copyExternalImageToTexture(
-                { source: imageBitmap },
-                { texture: cubeTexture },
-                [imageBitmap.width, imageBitmap.height]
-            );
-        }
-
-        console.log(cubeTexture);
-
-        this._uniformBindGroup = this._device.createBindGroup({
-            layout: this._pipeline.getBindGroupLayout(0),
-            entries: [
-                {
-                    binding: 0,
-                    resource: cubeTexture.createView(),
-                },
-                {
-                    binding: 1,
-                    resource: samp,
-                }
-            ],
-        });
     }
 
     /**
