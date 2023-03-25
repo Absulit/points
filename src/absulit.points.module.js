@@ -100,7 +100,7 @@ export default class Points {
         this._context = null;
         this._presentationFormat = null;
         // this._useTexture = false;
-        this._shaders = null;
+        this._shaders = [];
         this._pipeline = null;
         this._computePipeline = null;
         this._vertexBufferInfo = null;
@@ -595,10 +595,7 @@ export default class Points {
      */
     async init(renderPasses) {
 
-        let i = 0;
-        let vertexShader = renderPasses[i].vertexShader;
-        let computeShader = renderPasses[i].computeShader;
-        let fragmentShader = renderPasses[i].fragmentShader;
+
 
         // initializing internal uniforms
         this.addUniform(UniformKeys.TIME, this._time);
@@ -613,58 +610,66 @@ export default class Points {
         this.addUniform(UniformKeys.MOUSE_DELTA_X, this._mouseDeltaX);
         this.addUniform(UniformKeys.MOUSE_DELTA_Y, this._mouseDeltaY);
 
-        //
-        let colorsVertWGSL = vertexShader || defaultVert;
-        let colorsComputeWGSL = computeShader || defaultCompute;
-        let colorsFragWGSL = fragmentShader || defaultFrag;
+        renderPasses.forEach(renderPass => {
+            // let i = 0;
+            let vertexShader = renderPass.vertexShader;
+            let computeShader = renderPass.computeShader;
+            let fragmentShader = renderPass.fragmentShader;
 
-        let dynamicGroupBindingsVertex = '';
-        let dynamicGroupBindingsCompute = '';
-        let dynamicGroupBindingsFragment = '';
+            let colorsVertWGSL = vertexShader || defaultVert;
+            let colorsComputeWGSL = computeShader || defaultCompute;
+            let colorsFragWGSL = fragmentShader || defaultFrag;
+
+            let dynamicGroupBindingsVertex = '';
+            let dynamicGroupBindingsCompute = '';
+            let dynamicGroupBindingsFragment = '';
 
 
-        let dynamicStructParams = '';
-        this._uniforms.forEach((variable, index) => {
-            dynamicStructParams += /*wgsl*/`${variable.name}:f32, \n\t\t\t\t\t`;
-        });
+            let dynamicStructParams = '';
+            this._uniforms.forEach((variable, index) => {
+                dynamicStructParams += /*wgsl*/`${variable.name}:f32, \n\t\t\t\t\t`;
+            });
 
-        if (this._uniforms.length) {
-            dynamicStructParams = /*wgsl*/`
-                struct Params {
-                    ${dynamicStructParams}
-                }
-            \n`;
-        }
-
-        dynamicGroupBindingsVertex += dynamicStructParams;
-        dynamicGroupBindingsCompute += dynamicStructParams;
-        dynamicGroupBindingsFragment += dynamicStructParams;
-
-        dynamicGroupBindingsVertex += this._createDynamicGroupBindings(ShaderType.VERTEX);
-        dynamicGroupBindingsCompute += this._createDynamicGroupBindings(ShaderType.COMPUTE);
-        dynamicGroupBindingsFragment += this._createDynamicGroupBindings(ShaderType.FRAGMENT);
-
-        colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + defaultVertexBody + colorsVertWGSL;
-        colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + colorsComputeWGSL;
-        colorsFragWGSL = dynamicGroupBindingsFragment + defaultStructs + colorsFragWGSL;
-
-        console.groupCollapsed('VERTEX');
-        console.log(colorsVertWGSL);
-        console.groupEnd();
-        console.groupCollapsed('COMPUTE');
-        console.log(colorsComputeWGSL);
-        console.groupEnd();
-        console.groupCollapsed('FRAGMENT');
-        console.log(colorsFragWGSL);
-        console.groupEnd();
-
-        this._shaders = [
-            {
-                vertex: colorsVertWGSL,
-                compute: colorsComputeWGSL,
-                fragment: colorsFragWGSL
+            if (this._uniforms.length) {
+                dynamicStructParams = /*wgsl*/`
+                    struct Params {
+                        ${dynamicStructParams}
+                    }
+                \n`;
             }
-        ]
+
+            dynamicGroupBindingsVertex += dynamicStructParams;
+            dynamicGroupBindingsCompute += dynamicStructParams;
+            dynamicGroupBindingsFragment += dynamicStructParams;
+
+            dynamicGroupBindingsVertex += this._createDynamicGroupBindings(ShaderType.VERTEX);
+            dynamicGroupBindingsCompute += this._createDynamicGroupBindings(ShaderType.COMPUTE);
+            dynamicGroupBindingsFragment += this._createDynamicGroupBindings(ShaderType.FRAGMENT);
+
+            colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + defaultVertexBody + colorsVertWGSL;
+            colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + colorsComputeWGSL;
+            colorsFragWGSL = dynamicGroupBindingsFragment + defaultStructs + colorsFragWGSL;
+
+            console.groupCollapsed('VERTEX');
+            console.log(colorsVertWGSL);
+            console.groupEnd();
+            console.groupCollapsed('COMPUTE');
+            console.log(colorsComputeWGSL);
+            console.groupEnd();
+            console.groupCollapsed('FRAGMENT');
+            console.log(colorsFragWGSL);
+            console.groupEnd();
+
+            this._shaders.push(
+                {
+                    vertex: colorsVertWGSL,
+                    compute: colorsComputeWGSL,
+                    fragment: colorsFragWGSL
+                }
+            );
+        });
+        //
+
 
         const adapter = await navigator.gpu.requestAdapter();
         if (!adapter) { return false; }
