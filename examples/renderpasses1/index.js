@@ -17,7 +17,12 @@ const renderpasses1 = {
         new RenderPass(vert2, compute2, frag2),
     ],
     init: async points => {
-        ShaderType
+        // points.addSampler('imageSampler', null, ShaderType.FRAGMENT);
+        // await points.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
+        // await points.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
+        // await points.addTextureImage('image', './../img/absulit_800x800.jpg', ShaderType.FRAGMENT);
+        points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+        points.addTexture2d('feedbackTexture', true);
     },
     update: points => {
 

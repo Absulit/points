@@ -1,8 +1,10 @@
 import { fnusin } from "../../../src/core/defaultFunctions.js";
+import { texturePosition } from "../../../src/core/image.js";
 
 const frag = /*wgsl*/`
 
 ${fnusin}
+${texturePosition}
 
 @fragment
 fn main(
@@ -14,13 +16,10 @@ fn main(
     @builtin(position) position: vec4<f32>
 ) -> @location(0) vec4<f32> {
 
-    let cellSize = 20. + 10. * fnusin(1.);
-    let a = sin(uvr.x  * cellSize) * sin(uvr.y * cellSize);
-    let b = sin(uvr.x * uvr.y * 10. * 9.1 * .25 );
-    let c = fnusin(uvr.x * uvr.y * 10.);
-    let d = distance(a,b);
-    let f = d * uvr.x * uvr.y;
-    let finalColor:vec4<f32> = vec4(a*d,f*c*a,f, 1.);
+    // let imageColor = texturePosition(image, imageSampler, vec2(0,0), uvr, true);
+    _ = texturePosition(feedbackTexture, feedbackSampler, vec2(0,0), uvr, true);
+
+    let finalColor = vec4(1.,0,0,1);
 
     return finalColor;
 }
