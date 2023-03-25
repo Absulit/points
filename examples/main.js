@@ -79,6 +79,7 @@ const shaderProjects = [
     { name: 'Random 1', path: './random1/index.js' },
     { name: 'Random 2 (⚠ SLOW)', path: './random2/index.js' },
     { name: 'Random 3', path: './random3/index.js' },
+    { name: 'Render Passes 1', path: './renderpasses1/index.js' },
     { name: 'Shapes 1', path: './shapes1/index.js' },
     { name: 'Shapes 2', path: './shapes2/index.js' },
     { name: 'Spritesheet 1', path: './spritesheet1/index.js' },
@@ -171,7 +172,7 @@ async function init() {
 
 
     await shaders.init(points);
-    let renderPasses = [new RenderPass(shaders.vert, shaders.compute, shaders.frag)]
+    let renderPasses = shaders.renderPasses || [new RenderPass(shaders.vert, shaders.compute, shaders.frag)]
     await points.init(renderPasses);
     points.fitWindow = isFitWindow;
 
