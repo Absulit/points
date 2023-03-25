@@ -610,8 +610,7 @@ export default class Points {
         this.addUniform(UniformKeys.MOUSE_DELTA_X, this._mouseDeltaX);
         this.addUniform(UniformKeys.MOUSE_DELTA_Y, this._mouseDeltaY);
 
-        renderPasses.forEach(renderPass => {
-            // let i = 0;
+        renderPasses.forEach( (renderPass, index) => {
             let vertexShader = renderPass.vertexShader;
             let computeShader = renderPass.computeShader;
             let fragmentShader = renderPass.fragmentShader;
@@ -650,6 +649,7 @@ export default class Points {
             colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + colorsComputeWGSL;
             colorsFragWGSL = dynamicGroupBindingsFragment + defaultStructs + colorsFragWGSL;
 
+            console.groupCollapsed(`Render Pass ${index}`);
             console.groupCollapsed('VERTEX');
             console.log(colorsVertWGSL);
             console.groupEnd();
@@ -658,6 +658,7 @@ export default class Points {
             console.groupEnd();
             console.groupCollapsed('FRAGMENT');
             console.log(colorsFragWGSL);
+            console.groupEnd();
             console.groupEnd();
 
             this._shaders.push(
