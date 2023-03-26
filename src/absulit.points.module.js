@@ -43,6 +43,9 @@ export class RenderPass {
         this._computePipeline = null;
         this._renderPipeline = null;
 
+        this._computeBindGroups = null;
+        this._computeBindGroups2 = null;
+
         this._compiledShaders = {
             vertex: '',
             compute: '',
@@ -76,6 +79,22 @@ export class RenderPass {
 
     get renderPipeline(){
         return this._renderPipeline;
+    }
+
+    set computeBindGroups(value){
+        this._computeBindGroups = value;
+    }
+
+    get computeBindGroups(){
+        return this._computeBindGroups;
+    }
+
+    set computeBindGroups2(value){
+        this._computeBindGroups = value;
+    }
+
+    get computeBindGroups2(){
+        return this._computeBindGroups;
     }
 
     get compiledShaders(){
