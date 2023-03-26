@@ -6,7 +6,8 @@ fn main(
     @builtin(workgroup_id) WorkGroupID: vec3<u32>,
     @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
 ) {
-    let time = params.time;
+    _ = params.time;
+    _ = textureDimensions(feedbackTexture, 0);
 }
 `;
 
