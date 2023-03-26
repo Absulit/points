@@ -93,11 +93,11 @@ export class RenderPass {
     }
 
     set computeBindGroups2(value){
-        this._computeBindGroups = value;
+        this._computeBindGroups2 = value;
     }
 
     get computeBindGroups2(){
-        return this._computeBindGroups;
+        return this._computeBindGroups2;
     }
 
     set uniformBindGroup(value){
@@ -174,8 +174,8 @@ export default class Points {
         this._vertexBufferInfo = null;
         this._buffer = null;
 
-        this._uniformBindGroup = null;
-        this._computeBindGroups = null;
+        // this._uniformBindGroup = null;
+        // this._computeBindGroups = null;
         this._presentationSize = null;
         this._depthTexture = null;
         this._commandEncoder = null;
@@ -966,12 +966,12 @@ export default class Points {
     }
 
     _createComputeBindGroup() {
-        this._renderPasses.forEach(renderPass => {
+        this._renderPasses.forEach( (renderPass, index) => {
             /**
              * @type {GPUBindGroup}
              */
-            this._computeBindGroups = this._device.createBindGroup({
-                label: '_createComputeBindGroup 0',
+            renderPass.computeBindGroups = this._device.createBindGroup({
+                label: `_createComputeBindGroup 0 - ${index}`,
                 layout: renderPass.computePipeline.getBindGroupLayout(0 /* index */),
                 entries: [
                 ]
@@ -979,8 +979,8 @@ export default class Points {
 
             const entries = this._createEntries(ShaderType.COMPUTE);
             if (entries.length) {
-                this._computeBindGroups2 = this._device.createBindGroup({
-                    label: '_createComputeBindGroup 1',
+                renderPass.computeBindGroups2 = this._device.createBindGroup({
+                    label: `_createComputeBindGroup 1 - ${index}`,
                     layout: renderPass.computePipeline.getBindGroupLayout(1 /* index */),
                     entries: entries
                 });
@@ -991,12 +991,12 @@ export default class Points {
     async createPipeline() {
 
         // this._computePipeline = this._device.createComputePipeline({
-        this._renderPasses.forEach(renderPass => {
+        this._renderPasses.forEach( (renderPass, index) => {
             renderPass.computePipeline = this._device.createComputePipeline({
                 /*layout: device.createPipelineLayout({
                     bindGroupLayouts: [bindGroupLayout]
                 }),*/
-                label: 'createPipeline(): DID YOU CALL THE VARIABLE IN THE SHADER?',
+                label: `createPipeline(): DID YOU CALL THE VARIABLE IN THE SHADER? - ${index}`,
                 layout: 'auto',
                 compute: {
                     module: this._device.createShaderModule({
@@ -1233,7 +1233,7 @@ export default class Points {
 
     _createParams() {
         this._renderPasses.forEach(renderPass => {
-            this._uniformBindGroup = this._device.createBindGroup({
+            renderPass.uniformBindGroup = this._device.createBindGroup({
                 label: '_createParams() 0',
                 layout: renderPass.renderPipeline.getBindGroupLayout(0),
                 entries: [
@@ -1242,7 +1242,7 @@ export default class Points {
 
             const entries = this._createEntries(ShaderType.FRAGMENT);
             if (entries.length) {
-                this._uniformBindGroup2 = this._device.createBindGroup({
+                renderPass.uniformBindGroup2 = this._device.createBindGroup({
                     label: '_createParams() 1',
                     layout: renderPass.renderPipeline.getBindGroupLayout(1 /* index */),
                     entries: entries
@@ -1298,9 +1298,9 @@ export default class Points {
         this._renderPasses.forEach(renderPass => {
             const passEncoder = commandEncoder.beginComputePass();
             passEncoder.setPipeline(renderPass.computePipeline);
-            passEncoder.setBindGroup(0, this._computeBindGroups);
+            passEncoder.setBindGroup(0, renderPass.computeBindGroups);
             if (this._uniforms.length) {
-                passEncoder.setBindGroup(1, this._computeBindGroups2);
+                passEncoder.setBindGroup(1, renderPass.computeBindGroups2);
             }
             passEncoder.dispatchWorkgroups(8, 8, 1);
             passEncoder.end();
@@ -1329,9 +1329,9 @@ export default class Points {
             // }
 
             this._createParams();
-            passEncoder.setBindGroup(0, this._uniformBindGroup);
+            passEncoder.setBindGroup(0, renderPass.uniformBindGroup);
             if (this._uniforms.length) {
-                passEncoder.setBindGroup(1, this._uniformBindGroup2);
+                passEncoder.setBindGroup(1, renderPass.uniformBindGroup2);
             }
             passEncoder.setVertexBuffer(0, this._buffer);
 
