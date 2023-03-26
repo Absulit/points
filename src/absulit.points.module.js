@@ -39,6 +39,15 @@ export class RenderPass {
         this._vertexShader = vertexShader;
         this._computeShader = computeShader;
         this._fragmentShader = fragmentShader;
+
+        this._computePipeline = null;
+        this._renderPipeline = null;
+
+        this._compiledShaders = {
+            vertex: '',
+            compute: '',
+            fragment: '',
+        }
     }
 
     get vertexShader(){
@@ -51,6 +60,26 @@ export class RenderPass {
 
     get fragmentShader(){
         return this._fragmentShader;
+    }
+
+    set computePipeline(value){
+        this._computePipeline = value;
+    }
+
+    get computePipeline(){
+        return this._computePipeline;
+    }
+
+    set renderPipeline(value){
+        this._renderPipeline = value;
+    }
+
+    get renderPipeline(){
+        return this._renderPipeline;
+    }
+
+    get compiledShaders(){
+        return this._compiledShaders;
     }
 }
 
@@ -100,7 +129,8 @@ export default class Points {
         this._context = null;
         this._presentationFormat = null;
         // this._useTexture = false;
-        this._shaders = [];
+        // this._shaders = [];
+        this._renderPasses = null;
         this._pipeline = null;
         this._computePipeline = null;
         this._vertexBufferInfo = null;
@@ -595,7 +625,7 @@ export default class Points {
      */
     async init(renderPasses) {
 
-
+        this._renderPasses = renderPasses;
 
         // initializing internal uniforms
         this.addUniform(UniformKeys.TIME, this._time);
@@ -610,7 +640,7 @@ export default class Points {
         this.addUniform(UniformKeys.MOUSE_DELTA_X, this._mouseDeltaX);
         this.addUniform(UniformKeys.MOUSE_DELTA_Y, this._mouseDeltaY);
 
-        renderPasses.forEach( (renderPass, index) => {
+        this._renderPasses.forEach( (renderPass, index) => {
             let vertexShader = renderPass.vertexShader;
             let computeShader = renderPass.computeShader;
             let fragmentShader = renderPass.fragmentShader;
@@ -661,13 +691,17 @@ export default class Points {
             console.groupEnd();
             console.groupEnd();
 
-            this._shaders.push(
-                {
-                    vertex: colorsVertWGSL,
-                    compute: colorsComputeWGSL,
-                    fragment: colorsFragWGSL
-                }
-            );
+            // this._shaders.push(
+            //     {
+            //         vertex: colorsVertWGSL,
+            //         compute: colorsComputeWGSL,
+            //         fragment: colorsFragWGSL
+            //     }
+            // );
+
+            renderPass.compiledShaders.vertex = colorsVertWGSL;
+            renderPass.compiledShaders.compute = colorsComputeWGSL;
+            renderPass.compiledShaders.fragment = colorsFragWGSL;
         });
         //
 
@@ -900,7 +934,7 @@ export default class Points {
          */
         this._computeBindGroups = this._device.createBindGroup({
             label: '_createComputeBindGroup 0',
-            layout: this._computePipeline.getBindGroupLayout(0 /* index */),
+            layout: this._renderPasses[0].computePipeline.getBindGroupLayout(0 /* index */),
             entries: [
             ]
         });
@@ -909,7 +943,7 @@ export default class Points {
         if (entries.length) {
             this._computeBindGroups2 = this._device.createBindGroup({
                 label: '_createComputeBindGroup 1',
-                layout: this._computePipeline.getBindGroupLayout(1 /* index */),
+                layout: this._renderPasses[0].computePipeline.getBindGroupLayout(1 /* index */),
                 entries: entries
             });
         }
@@ -917,7 +951,8 @@ export default class Points {
 
     async createPipeline() {
 
-        this._computePipeline = this._device.createComputePipeline({
+        // this._computePipeline = this._device.createComputePipeline({
+        this._renderPasses[0].computePipeline = this._device.createComputePipeline({
             /*layout: device.createPipelineLayout({
                 bindGroupLayouts: [bindGroupLayout]
             }),*/
@@ -925,7 +960,7 @@ export default class Points {
             layout: 'auto',
             compute: {
                 module: this._device.createShaderModule({
-                    code: this._shaders[0].compute
+                    code: this._renderPasses[0].compiledShaders.compute
                 }),
                 entryPoint: "main"
             }
@@ -944,7 +979,7 @@ export default class Points {
         //     'triangle-list',
         //     'triangle-strip',
         // };
-        this._pipeline = this._device.createRenderPipeline({
+        this._renderPasses[0].renderPipeline = this._device.createRenderPipeline({
             layout: 'auto',
             //layout: bindGroupLayout,
             //primitive: { topology: 'triangle-strip' },
@@ -956,7 +991,7 @@ export default class Points {
             },
             vertex: {
                 module: this._device.createShaderModule({
-                    code: this._shaders[0].vertex,
+                    code: this._renderPasses[0].compiledShaders.vertex,
                 }),
                 entryPoint: 'main', // shader function name
 
@@ -988,7 +1023,7 @@ export default class Points {
             },
             fragment: {
                 module: this._device.createShaderModule({
-                    code: this._shaders[0].fragment,
+                    code: this._renderPasses[0].compiledShaders.fragment,
                 }),
                 entryPoint: 'main', // shader function name
                 targets: [
@@ -1154,7 +1189,7 @@ export default class Points {
     _createParams() {
         this._uniformBindGroup = this._device.createBindGroup({
             label: '_createParams() 0',
-            layout: this._pipeline.getBindGroupLayout(0),
+            layout: this._renderPasses[0].renderPipeline.getBindGroupLayout(0),
             entries: [
             ],
         });
@@ -1163,7 +1198,7 @@ export default class Points {
         if (entries.length) {
             this._uniformBindGroup2 = this._device.createBindGroup({
                 label: '_createParams() 1',
-                layout: this._pipeline.getBindGroupLayout(1 /* index */),
+                layout: this._renderPasses[0].renderPipeline.getBindGroupLayout(1 /* index */),
                 entries: entries
             });
         }
@@ -1215,7 +1250,7 @@ export default class Points {
 
 
         const passEncoder = commandEncoder.beginComputePass();
-        passEncoder.setPipeline(this._computePipeline);
+        passEncoder.setPipeline(this._renderPasses[0].computePipeline);
         passEncoder.setBindGroup(0, this._computeBindGroups);
         if (this._uniforms.length) {
             passEncoder.setBindGroup(1, this._computeBindGroups2);
@@ -1239,7 +1274,7 @@ export default class Points {
         {
             //---------------------------------------
             const passEncoder = commandEncoder.beginRenderPass(this._renderPassDescriptor);
-            passEncoder.setPipeline(this._pipeline);
+            passEncoder.setPipeline(this._renderPasses[0].renderPipeline);
             if (this._useTexture) {
                 passEncoder.setBindGroup(0, this._uniformBindGroup);
             }
