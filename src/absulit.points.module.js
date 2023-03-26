@@ -46,6 +46,9 @@ export class RenderPass {
         this._computeBindGroups = null;
         this._computeBindGroups2 = null;
 
+        this._uniformBindGroup = null;
+        this._uniformBindGroup2 = null;
+
         this._compiledShaders = {
             vertex: '',
             compute: '',
@@ -95,6 +98,22 @@ export class RenderPass {
 
     get computeBindGroups2(){
         return this._computeBindGroups;
+    }
+
+    set uniformBindGroup(value){
+        this._uniformBindGroup = value;
+    }
+
+    get uniformBindGroup(){
+        return this._uniformBindGroup;
+    }
+
+    set uniformBindGroup2(value){
+        this._uniformBindGroup2 = value;
+    }
+
+    get uniformBindGroup2(){
+        return this._uniformBindGroup2;
     }
 
     get compiledShaders(){
@@ -150,8 +169,8 @@ export default class Points {
         // this._useTexture = false;
         // this._shaders = [];
         this._renderPasses = null;
-        this._pipeline = null;
-        this._computePipeline = null;
+        // this._pipeline = null;
+        // this._computePipeline = null;
         this._vertexBufferInfo = null;
         this._buffer = null;
 
@@ -162,7 +181,6 @@ export default class Points {
         this._commandEncoder = null;
 
         this._vertexArray = [];
-        this._gpuBufferFirstMatrix = [];
 
         this._numColumns = 1;
         this._numRows = 1;
@@ -1294,9 +1312,9 @@ export default class Points {
             //---------------------------------------
             const passEncoder = commandEncoder.beginRenderPass(this._renderPassDescriptor);
             passEncoder.setPipeline(this._renderPasses[0].renderPipeline);
-            if (this._useTexture) {
-                passEncoder.setBindGroup(0, this._uniformBindGroup);
-            }
+            // if (this._useTexture) {
+            //     passEncoder.setBindGroup(0, this._uniformBindGroup);
+            // }
 
             this._createParams();
             passEncoder.setBindGroup(0, this._uniformBindGroup);
@@ -1435,20 +1453,20 @@ export default class Points {
         return this._buffer;
     }
 
-    /**
-     * @param {Boolean} value
-     */
-    set useTexture(value) {
-        this._useTexture = value;
-    }
+    // /**
+    //  * @param {Boolean} value
+    //  */
+    // set useTexture(value) {
+    //     this._useTexture = value;
+    // }
 
-    get useTexture() {
-        return this._useTexture;
-    }
+    // get useTexture() {
+    //     return this._useTexture;
+    // }
 
-    get pipeline() {
-        return this._pipeline;
-    }
+    // get pipeline() {
+    //     return this._pipeline;
+    // }
 
     get fullscreen() {
         return this._fullscreen;
