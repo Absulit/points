@@ -966,41 +966,45 @@ export default class Points {
     }
 
     _createComputeBindGroup() {
-        /**
-         * @type {GPUBindGroup}
-         */
-        this._computeBindGroups = this._device.createBindGroup({
-            label: '_createComputeBindGroup 0',
-            layout: this._renderPasses[0].computePipeline.getBindGroupLayout(0 /* index */),
-            entries: [
-            ]
-        });
-
-        const entries = this._createEntries(ShaderType.COMPUTE);
-        if (entries.length) {
-            this._computeBindGroups2 = this._device.createBindGroup({
-                label: '_createComputeBindGroup 1',
-                layout: this._renderPasses[0].computePipeline.getBindGroupLayout(1 /* index */),
-                entries: entries
+        this._renderPasses.forEach(renderPass => {
+            /**
+             * @type {GPUBindGroup}
+             */
+            this._computeBindGroups = this._device.createBindGroup({
+                label: '_createComputeBindGroup 0',
+                layout: renderPass.computePipeline.getBindGroupLayout(0 /* index */),
+                entries: [
+                ]
             });
-        }
+
+            const entries = this._createEntries(ShaderType.COMPUTE);
+            if (entries.length) {
+                this._computeBindGroups2 = this._device.createBindGroup({
+                    label: '_createComputeBindGroup 1',
+                    layout: renderPass.computePipeline.getBindGroupLayout(1 /* index */),
+                    entries: entries
+                });
+            }
+        });
     }
 
     async createPipeline() {
 
         // this._computePipeline = this._device.createComputePipeline({
-        this._renderPasses[0].computePipeline = this._device.createComputePipeline({
-            /*layout: device.createPipelineLayout({
-                bindGroupLayouts: [bindGroupLayout]
-            }),*/
-            label: 'createPipeline(): DID YOU CALL THE VARIABLE IN THE SHADER?',
-            layout: 'auto',
-            compute: {
-                module: this._device.createShaderModule({
-                    code: this._renderPasses[0].compiledShaders.compute
-                }),
-                entryPoint: "main"
-            }
+        this._renderPasses.forEach(renderPass => {
+            renderPass.computePipeline = this._device.createComputePipeline({
+                /*layout: device.createPipelineLayout({
+                    bindGroupLayouts: [bindGroupLayout]
+                }),*/
+                label: 'createPipeline(): DID YOU CALL THE VARIABLE IN THE SHADER?',
+                layout: 'auto',
+                compute: {
+                    module: this._device.createShaderModule({
+                        code: renderPass.compiledShaders.compute
+                    }),
+                    entryPoint: "main"
+                }
+            });
         });
 
         this._createComputeBindGroup();
@@ -1016,76 +1020,80 @@ export default class Points {
         //     'triangle-list',
         //     'triangle-strip',
         // };
-        this._renderPasses[0].renderPipeline = this._device.createRenderPipeline({
-            layout: 'auto',
-            //layout: bindGroupLayout,
-            //primitive: { topology: 'triangle-strip' },
-            primitive: { topology: 'triangle-list' },
-            depthStencil: {
-                depthWriteEnabled: true,
-                depthCompare: 'less',
-                format: 'depth24plus',
-            },
-            vertex: {
-                module: this._device.createShaderModule({
-                    code: this._renderPasses[0].compiledShaders.vertex,
-                }),
-                entryPoint: 'main', // shader function name
+        this._renderPasses.forEach(renderPass => {
 
-                buffers: [
-                    {
-                        arrayStride: this._vertexBufferInfo.vertexSize,
-                        attributes: [
-                            {
-                                // position
-                                shaderLocation: 0,
-                                offset: this._vertexBufferInfo.vertexOffset,
-                                format: 'float32x4',
-                            },
-                            {
-                                // colors
-                                shaderLocation: 1,
-                                offset: this._vertexBufferInfo.colorOffset,
-                                format: 'float32x4',
-                            },
-                            {
-                                // uv
-                                shaderLocation: 2,
-                                offset: this._vertexBufferInfo.uvOffset,
-                                format: 'float32x2',
-                            },
-                        ],
-                    },
-                ],
-            },
-            fragment: {
-                module: this._device.createShaderModule({
-                    code: this._renderPasses[0].compiledShaders.fragment,
-                }),
-                entryPoint: 'main', // shader function name
-                targets: [
-                    {
-                        format: this._presentationFormat,
+            renderPass.renderPipeline = this._device.createRenderPipeline({
+                layout: 'auto',
+                //layout: bindGroupLayout,
+                //primitive: { topology: 'triangle-strip' },
+                primitive: { topology: 'triangle-list' },
+                depthStencil: {
+                    depthWriteEnabled: true,
+                    depthCompare: 'less',
+                    format: 'depth24plus',
+                },
+                vertex: {
+                    module: this._device.createShaderModule({
+                        code: renderPass.compiledShaders.vertex,
+                    }),
+                    entryPoint: 'main', // shader function name
 
-                        blend: {
-                            alpha: {
-                                srcFactor: 'src-alpha',
-                                dstFactor: 'one-minus-src-alpha',
-                                operation: 'add'
-                            },
-                            color: {
-                                srcFactor: 'src-alpha',
-                                dstFactor: 'one-minus-src-alpha',
-                                operation: 'add'
-                            },
+                    buffers: [
+                        {
+                            arrayStride: this._vertexBufferInfo.vertexSize,
+                            attributes: [
+                                {
+                                    // position
+                                    shaderLocation: 0,
+                                    offset: this._vertexBufferInfo.vertexOffset,
+                                    format: 'float32x4',
+                                },
+                                {
+                                    // colors
+                                    shaderLocation: 1,
+                                    offset: this._vertexBufferInfo.colorOffset,
+                                    format: 'float32x4',
+                                },
+                                {
+                                    // uv
+                                    shaderLocation: 2,
+                                    offset: this._vertexBufferInfo.uvOffset,
+                                    format: 'float32x2',
+                                },
+                            ],
                         },
-                        writeMask: GPUColorWrite.ALL,
+                    ],
+                },
+                fragment: {
+                    module: this._device.createShaderModule({
+                        code: renderPass.compiledShaders.fragment,
+                    }),
+                    entryPoint: 'main', // shader function name
+                    targets: [
+                        {
+                            format: this._presentationFormat,
 
-                    },
-                ],
-            },
+                            blend: {
+                                alpha: {
+                                    srcFactor: 'src-alpha',
+                                    dstFactor: 'one-minus-src-alpha',
+                                    operation: 'add'
+                                },
+                                color: {
+                                    srcFactor: 'src-alpha',
+                                    dstFactor: 'one-minus-src-alpha',
+                                    operation: 'add'
+                                },
+                            },
+                            writeMask: GPUColorWrite.ALL,
 
+                        },
+                    ],
+                },
+
+            });
         });
+
 
         this._createParams();
     }
@@ -1224,21 +1232,23 @@ export default class Points {
     }
 
     _createParams() {
-        this._uniformBindGroup = this._device.createBindGroup({
-            label: '_createParams() 0',
-            layout: this._renderPasses[0].renderPipeline.getBindGroupLayout(0),
-            entries: [
-            ],
-        });
-
-        const entries = this._createEntries(ShaderType.FRAGMENT);
-        if (entries.length) {
-            this._uniformBindGroup2 = this._device.createBindGroup({
-                label: '_createParams() 1',
-                layout: this._renderPasses[0].renderPipeline.getBindGroupLayout(1 /* index */),
-                entries: entries
+        this._renderPasses.forEach(renderPass => {
+            this._uniformBindGroup = this._device.createBindGroup({
+                label: '_createParams() 0',
+                layout: renderPass.renderPipeline.getBindGroupLayout(0),
+                entries: [
+                ],
             });
-        }
+
+            const entries = this._createEntries(ShaderType.FRAGMENT);
+            if (entries.length) {
+                this._uniformBindGroup2 = this._device.createBindGroup({
+                    label: '_createParams() 1',
+                    layout: renderPass.renderPipeline.getBindGroupLayout(1 /* index */),
+                    entries: entries
+                });
+            }
+        });
 
     }
 
@@ -1285,15 +1295,17 @@ export default class Points {
         let commandEncoder = this._device.createCommandEncoder();
 
 
+        this._renderPasses.forEach(renderPass => {
+            const passEncoder = commandEncoder.beginComputePass();
+            passEncoder.setPipeline(renderPass.computePipeline);
+            passEncoder.setBindGroup(0, this._computeBindGroups);
+            if (this._uniforms.length) {
+                passEncoder.setBindGroup(1, this._computeBindGroups2);
+            }
+            passEncoder.dispatchWorkgroups(8, 8, 1);
+            passEncoder.end();
+        });
 
-        const passEncoder = commandEncoder.beginComputePass();
-        passEncoder.setPipeline(this._renderPasses[0].computePipeline);
-        passEncoder.setBindGroup(0, this._computeBindGroups);
-        if (this._uniforms.length) {
-            passEncoder.setBindGroup(1, this._computeBindGroups2);
-        }
-        passEncoder.dispatchWorkgroups(8, 8, 1);
-        passEncoder.end();
 
         // ---------------------
 
@@ -1308,10 +1320,10 @@ export default class Points {
 
 
         //commandEncoder = this._device.createCommandEncoder();
-        {
+        this._renderPasses.forEach(renderPass =>         {
             //---------------------------------------
             const passEncoder = commandEncoder.beginRenderPass(this._renderPassDescriptor);
-            passEncoder.setPipeline(this._renderPasses[0].renderPipeline);
+            passEncoder.setPipeline(renderPass.renderPipeline);
             // if (this._useTexture) {
             //     passEncoder.setBindGroup(0, this._uniformBindGroup);
             // }
@@ -1332,7 +1344,8 @@ export default class Points {
             //passEncoder.draw(3, 1, 0, 0);
             passEncoder.draw(this._vertexBufferInfo.vertexCount);
             passEncoder.end();
-        }
+        });
+
 
         // Copy the rendering results from the swapchain into |cubeTexture|.
 

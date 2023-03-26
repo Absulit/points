@@ -14,7 +14,7 @@ const renderpasses1 = {
      */
     renderPasses: [
         new RenderPass(vert1, compute1, frag1),
-        new RenderPass(vert2, compute2, frag2),
+        // new RenderPass(vert2, compute2, frag2),
     ],
     init: async points => {
         // points.addSampler('imageSampler', null, ShaderType.FRAGMENT);
