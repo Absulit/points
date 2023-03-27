@@ -323,7 +323,6 @@ export default class Points {
         variable.value = value;
     }
 
-
     /**
      * Creates a persistent memory buffer across every frame call.
      * @param {string} name Name that the Storage will have in the shader
@@ -355,8 +354,6 @@ export default class Points {
             }
             this._readStorage.push(storageItem);
         }
-
-
     }
 
     addStorageMap(name, arrayData, structName, shaderType) {
@@ -727,14 +724,6 @@ export default class Points {
             console.log(colorsFragWGSL);
             console.groupEnd();
             console.groupEnd();
-
-            // this._shaders.push(
-            //     {
-            //         vertex: colorsVertWGSL,
-            //         compute: colorsComputeWGSL,
-            //         fragment: colorsFragWGSL
-            //     }
-            // );
 
             renderPass.compiledShaders.vertex = colorsVertWGSL;
             renderPass.compiledShaders.compute = colorsComputeWGSL;
@@ -1363,16 +1352,6 @@ export default class Points {
             }
         })
 
-        // commandEncoder.copyTextureToTexture(
-        //     {
-        //         texture: swapChainTexture,
-        //     },
-        //     {
-        //         texture: this._feedbackLoopTexture,
-        //     },
-        //     this._presentationSize
-        // );
-
         if (this._readStorage.length && !this._readStorageCopied) {
             this._readStorage.forEach(readStorageItem => {
                 let storageItem = this._storage.find(storageItem => storageItem.name === readStorageItem.name);
@@ -1465,21 +1444,6 @@ export default class Points {
     get buffer() {
         return this._buffer;
     }
-
-    // /**
-    //  * @param {Boolean} value
-    //  */
-    // set useTexture(value) {
-    //     this._useTexture = value;
-    // }
-
-    // get useTexture() {
-    //     return this._useTexture;
-    // }
-
-    // get pipeline() {
-    //     return this._pipeline;
-    // }
 
     get fullscreen() {
         return this._fullscreen;
