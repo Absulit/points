@@ -1309,7 +1309,7 @@ export default class Points {
 
 
         //commandEncoder = this._device.createCommandEncoder();
-        this._renderPasses.forEach(renderPass =>         {
+        this._renderPasses.forEach(renderPass => {
             //---------------------------------------
             const passEncoder = commandEncoder.beginRenderPass(this._renderPassDescriptor);
             passEncoder.setPipeline(renderPass.renderPipeline);
@@ -1333,24 +1333,26 @@ export default class Points {
             //passEncoder.draw(3, 1, 0, 0);
             passEncoder.draw(this._vertexBufferInfo.vertexCount);
             passEncoder.end();
+
+            // Copy the rendering results from the swapchain into |texture2d.texture|.
+
+            this._textures2d.forEach(texture2d => {
+                if (texture2d.copyCurrentTexture) {
+                    commandEncoder.copyTextureToTexture(
+                        {
+                            texture: swapChainTexture,
+                        },
+                        {
+                            texture: texture2d.texture,
+                        },
+                        this._presentationSize
+                    );
+                }
+            });
         });
 
 
-        // Copy the rendering results from the swapchain into |cubeTexture|.
 
-        this._textures2d.forEach(texture2d => {
-            if (texture2d.copyCurrentTexture) {
-                commandEncoder.copyTextureToTexture(
-                    {
-                        texture: swapChainTexture,
-                    },
-                    {
-                        texture: texture2d.texture,
-                    },
-                    this._presentationSize
-                );
-            }
-        })
 
         if (this._readStorage.length && !this._readStorageCopied) {
             this._readStorage.forEach(readStorageItem => {
