@@ -43,8 +43,8 @@ export class RenderPass {
         this._computePipeline = null;
         this._renderPipeline = null;
 
-        this._computeBindGroups2 = null;
-        this._uniformBindGroup2 = null;
+        this._computeBindGroup = null;
+        this._uniformBindGroup = null;
 
         this._compiledShaders = {
             vertex: '',
@@ -81,20 +81,20 @@ export class RenderPass {
         return this._renderPipeline;
     }
 
-    set computeBindGroups2(value){
-        this._computeBindGroups2 = value;
+    set computeBindGroup(value){
+        this._computeBindGroup = value;
     }
 
-    get computeBindGroups2(){
-        return this._computeBindGroups2;
+    get computeBindGroup(){
+        return this._computeBindGroup;
     }
 
-    set uniformBindGroup2(value){
-        this._uniformBindGroup2 = value;
+    set uniformBindGroup(value){
+        this._uniformBindGroup = value;
     }
 
-    get uniformBindGroup2(){
-        return this._uniformBindGroup2;
+    get uniformBindGroup(){
+        return this._uniformBindGroup;
     }
 
     get compiledShaders(){
@@ -937,7 +937,7 @@ export default class Points {
                 /**
                  * @type {GPUBindGroup}
                  */
-                renderPass.computeBindGroups2 = this._device.createBindGroup({
+                renderPass.computeBindGroup = this._device.createBindGroup({
                     label: `_createComputeBindGroup 1 - ${index}`,
                     layout: renderPass.computePipeline.getBindGroupLayout(0 /* index */),
                     entries: entries
@@ -1193,7 +1193,7 @@ export default class Points {
 
             const entries = this._createEntries(ShaderType.FRAGMENT);
             if (entries.length) {
-                renderPass.uniformBindGroup2 = this._device.createBindGroup({
+                renderPass.uniformBindGroup = this._device.createBindGroup({
                     label: '_createParams() 1',
                     layout: renderPass.renderPipeline.getBindGroupLayout(0 /* index */),
                     entries: entries
@@ -1250,7 +1250,7 @@ export default class Points {
             const passEncoder = commandEncoder.beginComputePass();
             passEncoder.setPipeline(renderPass.computePipeline);
             if (this._uniforms.length) {
-                passEncoder.setBindGroup(0, renderPass.computeBindGroups2);
+                passEncoder.setBindGroup(0, renderPass.computeBindGroup);
             }
             passEncoder.dispatchWorkgroups(8, 8, 1);
             passEncoder.end();
@@ -1277,7 +1277,7 @@ export default class Points {
 
             this._createParams();
             if (this._uniforms.length) {
-                passEncoder.setBindGroup(0, renderPass.uniformBindGroup2);
+                passEncoder.setBindGroup(0, renderPass.uniformBindGroup);
             }
             passEncoder.setVertexBuffer(0, this._buffer);
 
