@@ -43,10 +43,7 @@ export class RenderPass {
         this._computePipeline = null;
         this._renderPipeline = null;
 
-        this._computeBindGroups = null;
         this._computeBindGroups2 = null;
-
-        this._uniformBindGroup = null;
         this._uniformBindGroup2 = null;
 
         this._compiledShaders = {
@@ -84,28 +81,12 @@ export class RenderPass {
         return this._renderPipeline;
     }
 
-    set computeBindGroups(value){
-        this._computeBindGroups = value;
-    }
-
-    get computeBindGroups(){
-        return this._computeBindGroups;
-    }
-
     set computeBindGroups2(value){
         this._computeBindGroups2 = value;
     }
 
     get computeBindGroups2(){
         return this._computeBindGroups2;
-    }
-
-    set uniformBindGroup(value){
-        this._uniformBindGroup = value;
-    }
-
-    get uniformBindGroup(){
-        return this._uniformBindGroup;
     }
 
     set uniformBindGroup2(value){
@@ -166,16 +147,10 @@ export default class Points {
         this._device = null;
         this._context = null;
         this._presentationFormat = null;
-        // this._useTexture = false;
-        // this._shaders = [];
         this._renderPasses = null;
-        // this._pipeline = null;
-        // this._computePipeline = null;
         this._vertexBufferInfo = null;
         this._buffer = null;
 
-        // this._uniformBindGroup = null;
-        // this._computeBindGroups = null;
         this._presentationSize = null;
         this._depthTexture = null;
         this._commandEncoder = null;
@@ -973,7 +948,6 @@ export default class Points {
 
     async createPipeline() {
 
-        // this._computePipeline = this._device.createComputePipeline({
         this._renderPasses.forEach( (renderPass, index) => {
             renderPass.computePipeline = this._device.createComputePipeline({
                 /*layout: device.createPipelineLayout({
