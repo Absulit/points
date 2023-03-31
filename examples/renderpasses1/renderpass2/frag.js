@@ -31,7 +31,7 @@ fn main(
     @builtin(position) position: vec4<f32>
 ) -> @location(0) vec4<f32> {
 
-    _ = texturePosition(image, imageSampler, vec2(0,0), uvr, true);
+    // _ = texturePosition(image, imageSampler, vec2(0,0), uvr, true);
     let feedbackColor = blur9(feedbackTexture, feedbackSampler, vec2(0.,0), uvr, vec2(100.,100.), rotateVector(vec2(.4,.0), 2 * PI * params.sliderA));
 
     let finalColor = feedbackColor;

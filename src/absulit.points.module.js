@@ -942,9 +942,12 @@ export default class Points {
                         visibility: GPUShaderStage.COMPUTE
                     }
                     bglEntry[entry.type.name] = {'type': entry.type.type};
+                    if(entry.type.format){
+                        bglEntry[entry.type.name].format = entry.type.format
+                    }
                     bglEntries.push(bglEntry);
                 });
-                // console.log(bglEntries);
+
                 renderPass.bindGroupLayout = this._device.createBindGroupLayout({entries: bglEntries});
 
                 /**
@@ -1195,7 +1198,7 @@ export default class Points {
                             resource: externalTexture.texture,
                             type: {
                                 name: 'externalTexture',
-                                type: 'write-only'
+                                // type: 'write-only'
                             }
                         }
                     );
@@ -1212,8 +1215,9 @@ export default class Points {
                             binding: bindingIndex++,
                             resource: bindingTexture.texture.createView(),
                             type: {
-                                name: 'texture',
-                                type: 'float'
+                                name: 'storageTexture',
+                                type: 'write-only',
+                                format: 'rgba8unorm'
                             }
                         }
                     );
@@ -1252,10 +1256,15 @@ export default class Points {
                         binding: index,
                         visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT
                     }
-                    bglEntry[entry.type.name] = {'type': entry.type.type};
+
+                    // apparently it throws an error if we use buffer in FRAGMENT
+                    // TODO: pre filter this in the ENTRIES array
+                    if(entry.name != 'buffer'){
+                        bglEntry[entry.type.name] = {'type': entry.type.type};
+                    }
                     bglEntries.push(bglEntry);
                 });
-                // console.log(bglEntries);
+
                 renderPass.bindGroupLayout = this._device.createBindGroupLayout({entries: bglEntries});
 
                 renderPass.uniformBindGroup = this._device.createBindGroup({
