@@ -562,11 +562,11 @@ export default class Points {
         if (!shaderType) {
             throw '`ShaderType` is required';
         }
-        const groupId = 1;
+        const groupId = 0;
         let dynamicGroupBindings = '';
         let bindingIndex = 0;
         if (this._uniforms.length) {
-            dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(0) var <uniform> params: Params;\n`;
+            dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <uniform> params: Params;\n`;
             bindingIndex += 1;
         }
 
@@ -956,21 +956,15 @@ export default class Points {
 
     _createComputeBindGroup() {
         this._renderPasses.forEach( (renderPass, index) => {
-            /**
-             * @type {GPUBindGroup}
-             */
-            renderPass.computeBindGroups = this._device.createBindGroup({
-                label: `_createComputeBindGroup 0 - ${index}`,
-                layout: renderPass.computePipeline.getBindGroupLayout(0 /* index */),
-                entries: [
-                ]
-            });
 
             const entries = this._createEntries(ShaderType.COMPUTE);
             if (entries.length) {
+                /**
+                 * @type {GPUBindGroup}
+                 */
                 renderPass.computeBindGroups2 = this._device.createBindGroup({
                     label: `_createComputeBindGroup 1 - ${index}`,
-                    layout: renderPass.computePipeline.getBindGroupLayout(1 /* index */),
+                    layout: renderPass.computePipeline.getBindGroupLayout(0 /* index */),
                     entries: entries
                 });
             }
@@ -1222,18 +1216,12 @@ export default class Points {
 
     _createParams() {
         this._renderPasses.forEach(renderPass => {
-            renderPass.uniformBindGroup = this._device.createBindGroup({
-                label: '_createParams() 0',
-                layout: renderPass.renderPipeline.getBindGroupLayout(0),
-                entries: [
-                ],
-            });
 
             const entries = this._createEntries(ShaderType.FRAGMENT);
             if (entries.length) {
                 renderPass.uniformBindGroup2 = this._device.createBindGroup({
                     label: '_createParams() 1',
-                    layout: renderPass.renderPipeline.getBindGroupLayout(1 /* index */),
+                    layout: renderPass.renderPipeline.getBindGroupLayout(0 /* index */),
                     entries: entries
                 });
             }
@@ -1287,9 +1275,8 @@ export default class Points {
         this._renderPasses.forEach(renderPass => {
             const passEncoder = commandEncoder.beginComputePass();
             passEncoder.setPipeline(renderPass.computePipeline);
-            passEncoder.setBindGroup(0, renderPass.computeBindGroups);
             if (this._uniforms.length) {
-                passEncoder.setBindGroup(1, renderPass.computeBindGroups2);
+                passEncoder.setBindGroup(0, renderPass.computeBindGroups2);
             }
             passEncoder.dispatchWorkgroups(8, 8, 1);
             passEncoder.end();
@@ -1313,14 +1300,10 @@ export default class Points {
             //---------------------------------------
             const passEncoder = commandEncoder.beginRenderPass(this._renderPassDescriptor);
             passEncoder.setPipeline(renderPass.renderPipeline);
-            // if (this._useTexture) {
-            //     passEncoder.setBindGroup(0, this._uniformBindGroup);
-            // }
 
             this._createParams();
-            passEncoder.setBindGroup(0, renderPass.uniformBindGroup);
             if (this._uniforms.length) {
-                passEncoder.setBindGroup(1, renderPass.uniformBindGroup2);
+                passEncoder.setBindGroup(0, renderPass.uniformBindGroup2);
             }
             passEncoder.setVertexBuffer(0, this._buffer);
 
