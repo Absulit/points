@@ -934,12 +934,26 @@ export default class Points {
 
             const entries = this._createEntries(ShaderType.COMPUTE);
             if (entries.length) {
+
+                let bglEntries = [];
+                entries.forEach((entry, index) => {
+                    let bglEntry = {
+                        binding: index,
+                        visibility: GPUShaderStage.COMPUTE
+                    }
+                    bglEntry[entry.type.name] = {'type': entry.type.type};
+                    bglEntries.push(bglEntry);
+                });
+                // console.log(bglEntries);
+                renderPass.bindGroupLayout = this._device.createBindGroupLayout({entries: bglEntries})
+
                 /**
                  * @type {GPUBindGroup}
                  */
                 renderPass.computeBindGroup = this._device.createBindGroup({
                     label: `_createComputeBindGroup 0 - ${index}`,
-                    layout: renderPass.computePipeline.getBindGroupLayout(0 /* index */),
+                    // layout: renderPass.computePipeline.getBindGroupLayout(0 /* index */),
+                    layout: renderPass.bindGroupLayout,
                     entries: entries
                 });
             }
@@ -948,13 +962,15 @@ export default class Points {
 
     async createPipeline() {
 
+        this._createComputeBindGroup();
+
         this._renderPasses.forEach( (renderPass, index) => {
             renderPass.computePipeline = this._device.createComputePipeline({
-                /*layout: device.createPipelineLayout({
-                    bindGroupLayouts: [bindGroupLayout]
-                }),*/
+                layout: this._device.createPipelineLayout({
+                    bindGroupLayouts: [renderPass.bindGroupLayout]
+                }),
                 label: `createPipeline(): DID YOU CALL THE VARIABLE IN THE SHADER? - ${index}`,
-                layout: 'auto',
+                // layout: 'auto',
                 compute: {
                     module: this._device.createShaderModule({
                         code: renderPass.compiledShaders.compute
@@ -964,7 +980,6 @@ export default class Points {
             });
         });
 
-        this._createComputeBindGroup();
 
         //--------------------------------------
 
@@ -1069,6 +1084,10 @@ export default class Points {
                     resource: {
                         label: 'uniform',
                         buffer: this._uniforms.buffer
+                    },
+                    type: {
+                        name: 'buffer',
+                        type: 'uniform'
                     }
                 }
             );
@@ -1083,6 +1102,10 @@ export default class Points {
                             resource: {
                                 label: 'storage',
                                 buffer: storageItem.buffer
+                            },
+                            type: {
+                                name: 'buffer',
+                                type: 'storage'
                             }
                         }
                     );
@@ -1098,6 +1121,10 @@ export default class Points {
                         resource: {
                             label: 'layer',
                             buffer: this._layers.buffer
+                        },
+                        type: {
+                            name: 'buffer',
+                            type: 'storage'
                         }
                     }
                 );
@@ -1110,7 +1137,11 @@ export default class Points {
                     entries.push(
                         {
                             binding: bindingIndex++,
-                            resource: sampler.resource
+                            resource: sampler.resource,
+                            type: {
+                                name: 'sampler',
+                                type: 'filtering'
+                            }
                         }
                     );
                 }
@@ -1124,7 +1155,11 @@ export default class Points {
                         {
                             label: 'texture storage 2d',
                             binding: bindingIndex++,
-                            resource: textureStorage2d.texture.createView()
+                            resource: textureStorage2d.texture.createView(),
+                            type: {
+                                name: 'storageTexture',
+                                type: 'write-only'
+                            }
                         }
                     );
                 }
@@ -1138,7 +1173,11 @@ export default class Points {
                         {
                             label: 'texture 2d',
                             binding: bindingIndex++,
-                            resource: texture2d.texture.createView()
+                            resource: texture2d.texture.createView(),
+                            type: {
+                                name: 'texture',
+                                type: 'float'
+                            }
                         }
                     );
                 }
@@ -1152,7 +1191,11 @@ export default class Points {
                         {
                             label: 'external texture',
                             binding: bindingIndex++,
-                            resource: externalTexture.texture
+                            resource: externalTexture.texture,
+                            type: {
+                                name: 'externalTexture',
+                                type: 'write-only'
+                            }
                         }
                     );
                 }
@@ -1166,7 +1209,11 @@ export default class Points {
                         {
                             label: 'binding texture',
                             binding: bindingIndex++,
-                            resource: bindingTexture.texture.createView()
+                            resource: bindingTexture.texture.createView(),
+                            type: {
+                                name: 'texture',
+                                type: 'float'
+                            }
                         }
                     );
                 }
@@ -1178,7 +1225,11 @@ export default class Points {
                         {
                             label: 'binding texture 2',
                             binding: bindingIndex, // this does not increase, must match the previous block
-                            resource: bindingTexture.texture.createView()
+                            resource: bindingTexture.texture.createView(),
+                            type: {
+                                name: 'texture',
+                                type: 'float'
+                            }
                         }
                     );
                 }
