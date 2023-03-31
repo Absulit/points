@@ -938,7 +938,7 @@ export default class Points {
                  * @type {GPUBindGroup}
                  */
                 renderPass.computeBindGroup = this._device.createBindGroup({
-                    label: `_createComputeBindGroup 1 - ${index}`,
+                    label: `_createComputeBindGroup 0 - ${index}`,
                     layout: renderPass.computePipeline.getBindGroupLayout(0 /* index */),
                     entries: entries
                 });
@@ -1194,7 +1194,7 @@ export default class Points {
             const entries = this._createEntries(ShaderType.FRAGMENT);
             if (entries.length) {
                 renderPass.uniformBindGroup = this._device.createBindGroup({
-                    label: '_createParams() 1',
+                    label: '_createParams() 0',
                     layout: renderPass.renderPipeline.getBindGroupLayout(0 /* index */),
                     entries: entries
                 });
