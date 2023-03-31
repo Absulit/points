@@ -945,7 +945,7 @@ export default class Points {
                     bglEntries.push(bglEntry);
                 });
                 // console.log(bglEntries);
-                renderPass.bindGroupLayout = this._device.createBindGroupLayout({entries: bglEntries})
+                renderPass.bindGroupLayout = this._device.createBindGroupLayout({entries: bglEntries});
 
                 /**
                  * @type {GPUBindGroup}
@@ -970,7 +970,6 @@ export default class Points {
                     bindGroupLayouts: [renderPass.bindGroupLayout]
                 }),
                 label: `createPipeline(): DID YOU CALL THE VARIABLE IN THE SHADER? - ${index}`,
-                // layout: 'auto',
                 compute: {
                     module: this._device.createShaderModule({
                         code: renderPass.compiledShaders.compute
@@ -984,6 +983,8 @@ export default class Points {
         //--------------------------------------
 
 
+        this._createParams();
+
         //this.createVertexBuffer(new Float32Array(this._vertexArray));
         // enum GPUPrimitiveTopology {
         //     'point-list',
@@ -995,8 +996,10 @@ export default class Points {
         this._renderPasses.forEach(renderPass => {
 
             renderPass.renderPipeline = this._device.createRenderPipeline({
-                layout: 'auto',
-                //layout: bindGroupLayout,
+                // layout: 'auto',
+                layout: this._device.createPipelineLayout({
+                    bindGroupLayouts: [renderPass.bindGroupLayout]
+                }),
                 //primitive: { topology: 'triangle-strip' },
                 primitive: { topology: 'triangle-list' },
                 depthStencil: {
@@ -1066,8 +1069,6 @@ export default class Points {
             });
         });
 
-
-        this._createParams();
     }
 
     /**
@@ -1244,9 +1245,22 @@ export default class Points {
 
             const entries = this._createEntries(ShaderType.FRAGMENT);
             if (entries.length) {
+
+                let bglEntries = [];
+                entries.forEach((entry, index) => {
+                    let bglEntry = {
+                        binding: index,
+                        visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT
+                    }
+                    bglEntry[entry.type.name] = {'type': entry.type.type};
+                    bglEntries.push(bglEntry);
+                });
+                // console.log(bglEntries);
+                renderPass.bindGroupLayout = this._device.createBindGroupLayout({entries: bglEntries});
+
                 renderPass.uniformBindGroup = this._device.createBindGroup({
                     label: '_createParams() 0',
-                    layout: renderPass.renderPipeline.getBindGroupLayout(0 /* index */),
+                    layout: renderPass.bindGroupLayout,
                     entries: entries
                 });
             }
