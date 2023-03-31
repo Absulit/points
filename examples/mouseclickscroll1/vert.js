@@ -1,5 +1,14 @@
 const vert = /*wgsl*/`
 
+// TODO: 1262 how to remove this from vertex shader
+// please check TODO: 1262
+
+struct Variable{
+    init: f32,
+    circleRadius:f32,
+    circlePosition:vec2<f32>
+}
+
 @vertex
 fn main(
     @location(0) position: vec4<f32>,

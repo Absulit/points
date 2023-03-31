@@ -1,6 +1,7 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
+import { ShaderType } from './../../src/absulit.points.module.js';
 const noisecircle1 = {
     vert,
     compute,
@@ -8,7 +9,7 @@ const noisecircle1 = {
     init: async points => {
         const numPoints = 128;
         points.addUniform('numPoints', numPoints);
-        points.addStorage('points', numPoints, 'vec2<f32>', 2);
+        points.addStorage('points', numPoints, 'vec2<f32>', 2, ShaderType.COMPUTE);
     },
     update: points => {
 

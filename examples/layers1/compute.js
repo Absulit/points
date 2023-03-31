@@ -8,8 +8,8 @@ fn main(
 ) {
     let time = params.time;
 
-    _ = points[0];
-    _ = layers[0];
+    // _ = points[0];
+    // _ = layers[0];
 }
 `;
 

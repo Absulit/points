@@ -29,7 +29,7 @@ fn main(
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
-    let star = stars[0];
+    // let star = stars[0];
 
     let startPosition = vec2(0.);
     let texColor = texturePosition(feedbackTexture, feedbackSampler, startPosition, uvr, false);

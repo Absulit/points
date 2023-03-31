@@ -1,6 +1,7 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
+import { ShaderType } from './../../src/absulit.points.module.js';
 const random1 = {
     vert,
     compute,
@@ -8,7 +9,7 @@ const random1 = {
     init: async points => {
         points.addUniform('randNumber', 0);
         points.addUniform('randNumber2', 0);
-        points.addStorage('stars', 800*800, 'Star', 4);
+        points.addStorage('stars', 800*800, 'Star', 4, ShaderType.COMPUTE);
         points.addSampler('feedbackSampler');
         points.addTexture2d('feedbackTexture', true);
         points.addBindingTexture('outputTex', 'computeTexture');

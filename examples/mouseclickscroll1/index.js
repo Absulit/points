@@ -8,7 +8,7 @@ const mouseclickscroll1 = {
     compute,
     frag,
     init: async points => {
-        points.addStorage('variables', 1, 'Variable', 4, ShaderType.FRAGMENT);
+        points.addStorage('variables', 1, 'Variable', 4);
     },
     update: points => {
 

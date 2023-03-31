@@ -9,7 +9,7 @@ const layers1 = {
     init: async points => {
         const numPoints = 800*800;
         points.addUniform('numPoints', numPoints);
-        points.addStorage('points', numPoints, 'vec4<f32>', 4);
+        // points.addStorage('points', numPoints, 'vec4<f32>', 4);
         points.addLayers(2, ShaderType.COMPUTE);
     },
     update: points => {
