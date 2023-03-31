@@ -35,7 +35,7 @@ export class RenderPass {
      * @param {String} computeShader  WGSL Compute Shader in a String.
      * @param {String} fragmentShader  WGSL Fragment Shader in a String.
      */
-    constructor(vertexShader, computeShader, fragmentShader){
+    constructor(vertexShader, computeShader, fragmentShader) {
         this._vertexShader = vertexShader;
         this._computeShader = computeShader;
         this._fragmentShader = fragmentShader;
@@ -53,51 +53,51 @@ export class RenderPass {
         }
     }
 
-    get vertexShader(){
+    get vertexShader() {
         return this._vertexShader;
     }
 
-    get computeShader(){
+    get computeShader() {
         return this._computeShader;
     }
 
-    get fragmentShader(){
+    get fragmentShader() {
         return this._fragmentShader;
     }
 
-    set computePipeline(value){
+    set computePipeline(value) {
         this._computePipeline = value;
     }
 
-    get computePipeline(){
+    get computePipeline() {
         return this._computePipeline;
     }
 
-    set renderPipeline(value){
+    set renderPipeline(value) {
         this._renderPipeline = value;
     }
 
-    get renderPipeline(){
+    get renderPipeline() {
         return this._renderPipeline;
     }
 
-    set computeBindGroup(value){
+    set computeBindGroup(value) {
         this._computeBindGroup = value;
     }
 
-    get computeBindGroup(){
+    get computeBindGroup() {
         return this._computeBindGroup;
     }
 
-    set uniformBindGroup(value){
+    set uniformBindGroup(value) {
         this._uniformBindGroup = value;
     }
 
-    get uniformBindGroup(){
+    get uniformBindGroup() {
         return this._uniformBindGroup;
     }
 
-    get compiledShaders(){
+    get compiledShaders() {
         return this._compiledShaders;
     }
 }
@@ -649,7 +649,7 @@ export default class Points {
         this.addUniform(UniformKeys.MOUSE_DELTA_X, this._mouseDeltaX);
         this.addUniform(UniformKeys.MOUSE_DELTA_Y, this._mouseDeltaY);
 
-        this._renderPasses.forEach( (renderPass, index) => {
+        this._renderPasses.forEach((renderPass, index) => {
             let vertexShader = renderPass.vertexShader;
             let computeShader = renderPass.computeShader;
             let fragmentShader = renderPass.fragmentShader;
@@ -930,7 +930,7 @@ export default class Points {
     }
 
     _createComputeBindGroup() {
-        this._renderPasses.forEach( (renderPass, index) => {
+        this._renderPasses.forEach((renderPass, index) => {
 
             const entries = this._createEntries(ShaderType.COMPUTE);
             if (entries.length) {
@@ -941,14 +941,14 @@ export default class Points {
                         binding: index,
                         visibility: GPUShaderStage.COMPUTE
                     }
-                    bglEntry[entry.type.name] = {'type': entry.type.type};
-                    if(entry.type.format){
+                    bglEntry[entry.type.name] = { 'type': entry.type.type };
+                    if (entry.type.format) {
                         bglEntry[entry.type.name].format = entry.type.format
                     }
                     bglEntries.push(bglEntry);
                 });
 
-                renderPass.bindGroupLayout = this._device.createBindGroupLayout({entries: bglEntries});
+                renderPass.bindGroupLayout = this._device.createBindGroupLayout({ entries: bglEntries });
 
                 /**
                  * @type {GPUBindGroup}
@@ -967,7 +967,7 @@ export default class Points {
 
         this._createComputeBindGroup();
 
-        this._renderPasses.forEach( (renderPass, index) => {
+        this._renderPasses.forEach((renderPass, index) => {
             renderPass.computePipeline = this._device.createComputePipeline({
                 layout: this._device.createPipelineLayout({
                     bindGroupLayouts: [renderPass.bindGroupLayout]
@@ -1254,18 +1254,25 @@ export default class Points {
                 entries.forEach((entry, index) => {
                     let bglEntry = {
                         binding: index,
-                        visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT
+                        visibility: GPUShaderStage.FRAGMENT
                     }
 
-                    // apparently it throws an error if we use buffer in FRAGMENT
-                    // TODO: pre filter this in the ENTRIES array
-                    if(entry.name != 'buffer'){
-                        bglEntry[entry.type.name] = {'type': entry.type.type};
+                    bglEntry[entry.type.name] = { 'type': entry.type.type };
+
+                    // TODO: 1262
+                    // if you remove this there's an error that I think is not explained right
+                    // it talks about a storage in index 1 but it was actually the 0
+                    // and so is to this uniform you have to change the visibility
+                    // not remove the type and leaving it empty as it seems you have to do here:
+                    // https://gpuweb.github.io/gpuweb/#bindgroup-examples
+                    if (entry.type.type == 'uniform') {
+                        bglEntry.visibility = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT
                     }
+
                     bglEntries.push(bglEntry);
                 });
 
-                renderPass.bindGroupLayout = this._device.createBindGroupLayout({entries: bglEntries});
+                renderPass.bindGroupLayout = this._device.createBindGroupLayout({ entries: bglEntries });
 
                 renderPass.uniformBindGroup = this._device.createBindGroup({
                     label: '_createParams() 0',
