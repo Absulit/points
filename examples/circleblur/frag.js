@@ -22,11 +22,10 @@ fn main(
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
-    //let texColor = textureSample(myTexture, mySampler, uv * 1.0 + .1 * fnusin(2));
     let startPosition = vec2(0.);
-    let texColor = texturePosition(feedbackTexture, feedbackSampler, startPosition, uv, false);
-    let texColor2 = texturePosition(feedbackTexture, feedbackSampler, startPosition, uv + vec2(-.001,1), false);
-    let texColor3 = texturePosition(feedbackTexture, feedbackSampler, startPosition, uv + vec2(.001,1), false);
+    let texColor = texturePosition(feedbackTexture, feedbackSampler, startPosition, uvr, false);
+    let texColor2 = texturePosition(feedbackTexture, feedbackSampler, startPosition, uvr + vec2(-.001,1), false);
+    let texColor3 = texturePosition(feedbackTexture, feedbackSampler, startPosition, uvr + vec2(.001,1), false);
 
     let texColorCompute = texturePosition(computeTexture, feedbackSampler, startPosition, uv, false);
 
@@ -40,21 +39,10 @@ fn main(
     let decayG =  texColor.g * .9;
     let decayB =  texColor.b * .9 * texColor3.b;
     let decayA =  texColor.a * .9;
-    //var finalColor:vec4<f32> = vec4(uv.x * c + decayR, uv.y * c + decayR, c + decayB, 1);
+
     var finalColor:vec4<f32> = vec4(uv.x * c, uv.y * c, c, 1);
     finalColor += vec4(decayR, decayG, decayB, 1);
     finalColor += texColorCompute;
-
-    // let cellSize = 20. + 10. * fnusin(1.);
-    // let a = sin(uv.x  * cellSize) * sin(uv.y * cellSize);
-    // let b = sin(uv.x * uv.y * 10. * 9.1 * .25 );
-    // let cc = fnusin(uv.x * uv.y * 10.);
-    // let dd = distance(a,b);
-    // let f = dd * uv.x * uv.y;
-    // finalColor = vec4(a*dd + decayR,f*cc*a+decayG,f+decayB, a*dd + decayA);
-    // finalColor += vec4(decayR, decayG, decayB, decayA) * .1;
-
-
 
     return finalColor;
 }

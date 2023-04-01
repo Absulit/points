@@ -6,10 +6,7 @@ fn main(
     @builtin(workgroup_id) WorkGroupID: vec3<u32>,
     @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
 ) {
-    let time = params.time;
-
-    // _ = points[0];
-    // _ = layers[0];
+    // compute code
 }
 `;
 

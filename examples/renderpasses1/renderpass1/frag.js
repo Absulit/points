@@ -18,6 +18,7 @@ fn main(
 ) -> @location(0) vec4<f32> {
 
     let imageColor = texturePosition(image, imageSampler, vec2(0,0), uvr, true);
+    // first render pass doesn't use the feedback texture, it's the second pass
     // _ = texturePosition(feedbackTexture, feedbackSampler, vec2(0,0), uvr, true);
 
     let d = distance(uvr, vec2(.5 + .1 * fusin(2), .5  + .1 * fusin(4.123)));

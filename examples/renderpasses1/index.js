@@ -6,7 +6,7 @@ import vert2 from './renderpass2/vert.js';
 import compute2 from './renderpass2/compute.js';
 import frag2 from './renderpass2/frag.js';
 
-import { RenderPass, ShaderType } from '../../src/absulit.points.module.js';
+import { RenderPass } from '../../src/absulit.points.module.js';
 
 const renderpasses1 = {
     /**
@@ -17,11 +17,11 @@ const renderpasses1 = {
         new RenderPass(vert2, compute2, frag2),
     ],
     init: async points => {
-        points.addSampler('imageSampler', null, ShaderType.FRAGMENT);
-        // await points.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
-        // await points.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
-        await points.addTextureImage('image', './../img/absulit_800x800.jpg', ShaderType.FRAGMENT);
-        points.addSampler('feedbackSampler', null, ShaderType.FRAGMENT);
+        points.addSampler('imageSampler', null);
+        // await points.addTextureImage('image', './../img/carmen_lyra_423x643.jpg');
+        // await points.addTextureImage('image', './../img/old_king_600x600.jpg');
+        await points.addTextureImage('image', './../img/absulit_800x800.jpg');
+        points.addSampler('feedbackSampler', null);
         points.addTexture2d('feedbackTexture', true);
     },
     update: points => {

@@ -1,4 +1,4 @@
-import { fnusin, sdfCircle } from "../../src/core/defaultFunctions.js";
+import { sdfCircle } from "../../src/core/defaultFunctions.js";
 import { GREEN, RED } from './../../src/core/color.js';
 
 const frag = /*wgsl*/`
@@ -9,7 +9,6 @@ struct Variable{
     circlePosition:vec2<f32>
 }
 
-${fnusin}
 ${sdfCircle}
 ${RED + GREEN}
 

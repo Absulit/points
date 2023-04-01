@@ -1,10 +1,5 @@
 const vert = /*wgsl*/`
 
-struct Variable{
-    particlesCreated: f32,
-}
-
-
 @vertex
 fn main(
     @location(0) position: vec4<f32>,

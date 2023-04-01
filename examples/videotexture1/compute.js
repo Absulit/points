@@ -8,16 +8,11 @@ fn main(
     @builtin(workgroup_id) WorkGroupID: vec3<u32>,
     @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
 ) {
-    let time = params.time;
-
     let videoDims = textureDimensions(video);
-
-
 
     //--------------------------------------------------
     let numColumns:f32 = f32(videoDims.x);
     let numRows:f32 = f32(videoDims.y);
-    //let constant = u32(numColumns) / 93u;
 
     let numColumnsPiece:i32 = i32(numColumns / f32(workgroupSize));
     let numRowsPiece:i32 = i32(numRows / f32(workgroupSize));
@@ -44,19 +39,6 @@ fn main(
         }
     }
     //--------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

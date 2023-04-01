@@ -1,7 +1,6 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
-import { ShaderType } from '../../src/absulit.points.module.js';
 
 const pointstitle1 = {
     vert,
@@ -9,22 +8,10 @@ const pointstitle1 = {
     frag,
     init: async points => {
 
-        await points.addTextureImage(
-            'image',
-            './../../img/gratia_800x800.jpg',
-            ShaderType.FRAGMENT
-        );
-        await points.addTextureImage('font', './../img/inconsolata_regular_8x22.png', ShaderType.FRAGMENT);
+        await points.addTextureImage('image', './../../img/gratia_800x800.jpg');
+        await points.addTextureImage('font', './../img/inconsolata_regular_8x22.png');
 
-        let descriptor = {
-            addressModeU: 'clamp-to-edge',
-            addressModeV: 'clamp-to-edge',
-            magFilter: 'nearest',
-            minFilter: 'nearest',
-            mipmapFilter: 'nearest',
-            //maxAnisotropy: 10,
-        }
-        points.addSampler('imageSampler', null, ShaderType.FRAGMENT);
+        points.addSampler('imageSampler', null);
 
     },
     update: points => {

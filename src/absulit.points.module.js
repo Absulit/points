@@ -352,8 +352,11 @@ export default class Points {
 
     async readStorage(name) {
         let storageItem = this._readStorage.find(storageItem => storageItem.name === name);
-        await storageItem.buffer.mapAsync(GPUMapMode.READ)
-        const arrayBuffer = storageItem.buffer.getMappedRange();
+        let arrayBuffer = null;
+        if(storageItem){
+            await storageItem.buffer.mapAsync(GPUMapMode.READ)
+            arrayBuffer = storageItem.buffer.getMappedRange();
+        }
         return new Float32Array(arrayBuffer);
     }
 
