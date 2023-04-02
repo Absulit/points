@@ -522,21 +522,6 @@ export default class Points {
     }
 
     /**
-     * @deprecated to be removed
-     * @param {*} computeTextureStorage2dName
-     * @param {*} fragmentTexture2dName
-     */
-    addTextureStorage2dToTexture2d(computeTextureStorage2dName, fragmentTexture2dName) {
-        this._texturesStorage2d.push({
-            name: computeTextureStorage2dName,
-            shader: ShaderType.COMPUTE,
-            texture: null
-        });
-
-        this.addTexture2d(fragmentTexture2dName, false);
-    }
-
-    /**
      *
      * @param {ShaderType} shaderType
      * @returns string with bindings
@@ -844,8 +829,6 @@ export default class Points {
                 storageItem.buffer = this._createAndMapBuffer(values, GPUBufferUsage.STORAGE);
             } else {
                 let usage = GPUBufferUsage.STORAGE;
-                // TODO: wondering why the COPY_SRC is not needed
-                console.log(storageItem.read);
                 if (storageItem.read) {
                     usage = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC;
                 }
@@ -927,33 +910,33 @@ export default class Points {
 
     _createComputeBindGroup() {
         this._renderPasses.forEach((renderPass, index) => {
+            if (renderPass.hasComputeShader) {
+                const entries = this._createEntries(ShaderType.COMPUTE);
+                if (entries.length) {
+                    let bglEntries = [];
+                    entries.forEach((entry, index) => {
+                        let bglEntry = {
+                            binding: index,
+                            visibility: GPUShaderStage.COMPUTE
+                        }
+                        bglEntry[entry.type.name] = { 'type': entry.type.type };
+                        if (entry.type.format) {
+                            bglEntry[entry.type.name].format = entry.type.format
+                        }
+                        bglEntries.push(bglEntry);
+                    });
 
-            const entries = this._createEntries(ShaderType.COMPUTE);
-            if (entries.length) {
+                    renderPass.bindGroupLayout = this._device.createBindGroupLayout({ entries: bglEntries });
 
-                let bglEntries = [];
-                entries.forEach((entry, index) => {
-                    let bglEntry = {
-                        binding: index,
-                        visibility: GPUShaderStage.COMPUTE
-                    }
-                    bglEntry[entry.type.name] = { 'type': entry.type.type };
-                    if (entry.type.format) {
-                        bglEntry[entry.type.name].format = entry.type.format
-                    }
-                    bglEntries.push(bglEntry);
-                });
-
-                renderPass.bindGroupLayout = this._device.createBindGroupLayout({ entries: bglEntries });
-
-                /**
-                 * @type {GPUBindGroup}
-                 */
-                renderPass.computeBindGroup = this._device.createBindGroup({
-                    label: `_createComputeBindGroup 0 - ${index}`,
-                    layout: renderPass.bindGroupLayout,
-                    entries: entries
-                });
+                    /**
+                     * @type {GPUBindGroup}
+                     */
+                    renderPass.computeBindGroup = this._device.createBindGroup({
+                        label: `_createComputeBindGroup 0 - ${index}`,
+                        layout: renderPass.bindGroupLayout,
+                        entries: entries
+                    });
+                }
             }
         });
     }
@@ -1204,7 +1187,7 @@ export default class Points {
         }
 
         if (this._bindingTextures.length) {
-            this._bindingTextures.forEach((bindingTexture, index) => {
+            this._bindingTextures.forEach(bindingTexture => {
                 if (bindingTexture.compute.shaderType == shaderType) {
                     entries.push(
                         {
@@ -1221,7 +1204,7 @@ export default class Points {
                 }
             });
 
-            this._bindingTextures.forEach((bindingTexture, index) => {
+            this._bindingTextures.forEach(bindingTexture => {
                 if (bindingTexture.fragment.shaderType == shaderType) {
                     entries.push(
                         {
