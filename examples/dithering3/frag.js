@@ -4,6 +4,9 @@ import { getClosestColorInPalette, orderedDithering, orderedDithering_threshold_
 import { texturePosition } from '../../src/core/image.js';
 
 const frag = /*wgsl*/`
+struct Variable{
+    init: i32
+}
 
 ${fnusin}
 ${fusin}

@@ -6,9 +6,9 @@ import compute from './compute.js';
 import frag from './frag.js';
 
 const data1 = {
-    vert,
+    // vert,
     compute,
-    frag,
+    // frag,
     init: async points => {
 
         const firstMatrix = [

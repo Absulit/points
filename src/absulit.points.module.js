@@ -52,6 +52,10 @@ export class RenderPass {
         }
 
         this._hasComputeShader = !!this._computeShader;
+        this._hasVertexShader = !!this._vertexShader;
+        this._hasFragmentShader = !!this._fragmentShader;
+
+        this._hasVertexAndFragmentShader = this._hasVertexShader && this._hasFragmentShader;
     }
 
     get vertexShader() {
@@ -104,6 +108,18 @@ export class RenderPass {
 
     get hasComputeShader() {
         return this._hasComputeShader;
+    }
+
+    get hasVertexShader() {
+        return this._hasVertexShader;
+    }
+
+    get hasFragmentShader() {
+        return this._hasFragmentShader;
+    }
+
+    get hasVertexAndFragmentShader() {
+        return this._hasVertexAndFragmentShader;
     }
 }
 
@@ -674,17 +690,17 @@ export default class Points {
                 \n`;
             }
 
-            dynamicGroupBindingsVertex += dynamicStructParams;
+            renderPass.hasVertexShader && (dynamicGroupBindingsVertex += dynamicStructParams);
             renderPass.hasComputeShader && (dynamicGroupBindingsCompute += dynamicStructParams);
-            dynamicGroupBindingsFragment += dynamicStructParams;
+            renderPass.hasFragmentShader && (dynamicGroupBindingsFragment += dynamicStructParams);
 
-            dynamicGroupBindingsVertex += this._createDynamicGroupBindings(ShaderType.VERTEX);
+            renderPass.hasVertexShader && (dynamicGroupBindingsVertex += this._createDynamicGroupBindings(ShaderType.VERTEX));
             renderPass.hasComputeShader && (dynamicGroupBindingsCompute += this._createDynamicGroupBindings(ShaderType.COMPUTE));
             dynamicGroupBindingsFragment += this._createDynamicGroupBindings(ShaderType.FRAGMENT);
 
-            colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + defaultVertexBody + colorsVertWGSL;
+            renderPass.hasVertexShader && (colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + defaultVertexBody + colorsVertWGSL);
             renderPass.hasComputeShader && (colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + colorsComputeWGSL);
-            colorsFragWGSL = dynamicGroupBindingsFragment + defaultStructs + colorsFragWGSL;
+            renderPass.hasFragmentShader && (colorsFragWGSL = dynamicGroupBindingsFragment + defaultStructs + colorsFragWGSL);
 
             console.groupCollapsed(`Render Pass ${index}`);
             console.groupCollapsed('VERTEX');
@@ -700,9 +716,9 @@ export default class Points {
             console.groupEnd();
             console.groupEnd();
 
-            renderPass.compiledShaders.vertex = colorsVertWGSL;
+            renderPass.hasVertexShader && (renderPass.compiledShaders.vertex = colorsVertWGSL);
             renderPass.hasComputeShader && (renderPass.compiledShaders.compute = colorsComputeWGSL);
-            renderPass.compiledShaders.fragment = colorsFragWGSL;
+            renderPass.hasFragmentShader && (renderPass.compiledShaders.fragment = colorsFragWGSL);
         });
         //
 
@@ -750,21 +766,26 @@ export default class Points {
      * Adds two triangles called points per number of columns and rows
      */
     async createScreen() {
-        let colors = [
-            new RGBAColor(1, 0, 0),
-            new RGBAColor(0, 1, 0),
-            new RGBAColor(0, 0, 1),
-            new RGBAColor(1, 1, 0),
-        ];
+        let hasVertexAndFragmentShader = this._renderPasses.every(renderPass => renderPass.hasVertexAndFragmentShader)
+
+        if (hasVertexAndFragmentShader) {
+            let colors = [
+                new RGBAColor(1, 0, 0),
+                new RGBAColor(0, 1, 0),
+                new RGBAColor(0, 0, 1),
+                new RGBAColor(1, 1, 0),
+            ];
 
 
-        for (let xIndex = 0; xIndex < this._numRows; xIndex++) {
-            for (let yIndex = 0; yIndex < this._numColumns; yIndex++) {
-                const coordinate = new Coordinate(xIndex * this._canvas.clientWidth / this._numColumns, yIndex * this._canvas.clientHeight / this._numRows, .3);
-                this.addPoint(coordinate, this._canvas.clientWidth / this._numColumns, this._canvas.clientHeight / this._numRows, colors);
+            for (let xIndex = 0; xIndex < this._numRows; xIndex++) {
+                for (let yIndex = 0; yIndex < this._numColumns; yIndex++) {
+                    const coordinate = new Coordinate(xIndex * this._canvas.clientWidth / this._numColumns, yIndex * this._canvas.clientHeight / this._numRows, .3);
+                    this.addPoint(coordinate, this._canvas.clientWidth / this._numColumns, this._canvas.clientHeight / this._numRows, colors);
+                }
             }
+            this.createVertexBuffer(new Float32Array(this._vertexArray));
         }
-        this.createVertexBuffer(new Float32Array(this._vertexArray));
+
         this.createComputeBuffers();
 
         await this.createPipeline();
@@ -978,78 +999,82 @@ export default class Points {
         // };
         this._renderPasses.forEach(renderPass => {
 
-            renderPass.renderPipeline = this._device.createRenderPipeline({
-                // layout: 'auto',
-                layout: this._device.createPipelineLayout({
-                    bindGroupLayouts: [renderPass.bindGroupLayout]
-                }),
-                //primitive: { topology: 'triangle-strip' },
-                primitive: { topology: 'triangle-list' },
-                depthStencil: {
-                    depthWriteEnabled: true,
-                    depthCompare: 'less',
-                    format: 'depth24plus',
-                },
-                vertex: {
-                    module: this._device.createShaderModule({
-                        code: renderPass.compiledShaders.vertex,
-                    }),
-                    entryPoint: 'main', // shader function name
+            if (renderPass.hasVertexAndFragmentShader) {
 
-                    buffers: [
-                        {
-                            arrayStride: this._vertexBufferInfo.vertexSize,
-                            attributes: [
-                                {
-                                    // position
-                                    shaderLocation: 0,
-                                    offset: this._vertexBufferInfo.vertexOffset,
-                                    format: 'float32x4',
-                                },
-                                {
-                                    // colors
-                                    shaderLocation: 1,
-                                    offset: this._vertexBufferInfo.colorOffset,
-                                    format: 'float32x4',
-                                },
-                                {
-                                    // uv
-                                    shaderLocation: 2,
-                                    offset: this._vertexBufferInfo.uvOffset,
-                                    format: 'float32x2',
-                                },
-                            ],
-                        },
-                    ],
-                },
-                fragment: {
-                    module: this._device.createShaderModule({
-                        code: renderPass.compiledShaders.fragment,
+                renderPass.renderPipeline = this._device.createRenderPipeline({
+                    // layout: 'auto',
+                    layout: this._device.createPipelineLayout({
+                        bindGroupLayouts: [renderPass.bindGroupLayout]
                     }),
-                    entryPoint: 'main', // shader function name
-                    targets: [
-                        {
-                            format: this._presentationFormat,
+                    //primitive: { topology: 'triangle-strip' },
+                    primitive: { topology: 'triangle-list' },
+                    depthStencil: {
+                        depthWriteEnabled: true,
+                        depthCompare: 'less',
+                        format: 'depth24plus',
+                    },
+                    vertex: {
+                        module: this._device.createShaderModule({
+                            code: renderPass.compiledShaders.vertex,
+                        }),
+                        entryPoint: 'main', // shader function name
 
-                            blend: {
-                                alpha: {
-                                    srcFactor: 'src-alpha',
-                                    dstFactor: 'one-minus-src-alpha',
-                                    operation: 'add'
-                                },
-                                color: {
-                                    srcFactor: 'src-alpha',
-                                    dstFactor: 'one-minus-src-alpha',
-                                    operation: 'add'
-                                },
+                        buffers: [
+                            {
+                                arrayStride: this._vertexBufferInfo.vertexSize,
+                                attributes: [
+                                    {
+                                        // position
+                                        shaderLocation: 0,
+                                        offset: this._vertexBufferInfo.vertexOffset,
+                                        format: 'float32x4',
+                                    },
+                                    {
+                                        // colors
+                                        shaderLocation: 1,
+                                        offset: this._vertexBufferInfo.colorOffset,
+                                        format: 'float32x4',
+                                    },
+                                    {
+                                        // uv
+                                        shaderLocation: 2,
+                                        offset: this._vertexBufferInfo.uvOffset,
+                                        format: 'float32x2',
+                                    },
+                                ],
                             },
-                            writeMask: GPUColorWrite.ALL,
+                        ],
+                    },
+                    fragment: {
+                        module: this._device.createShaderModule({
+                            code: renderPass.compiledShaders.fragment,
+                        }),
+                        entryPoint: 'main', // shader function name
+                        targets: [
+                            {
+                                format: this._presentationFormat,
 
-                        },
-                    ],
-                },
+                                blend: {
+                                    alpha: {
+                                        srcFactor: 'src-alpha',
+                                        dstFactor: 'one-minus-src-alpha',
+                                        operation: 'add'
+                                    },
+                                    color: {
+                                        srcFactor: 'src-alpha',
+                                        dstFactor: 'one-minus-src-alpha',
+                                        operation: 'add'
+                                    },
+                                },
+                                writeMask: GPUColorWrite.ALL,
 
-            });
+                            },
+                        ],
+                    },
+
+                });
+            }
+
         });
 
     }
@@ -1334,41 +1359,42 @@ export default class Points {
 
         //commandEncoder = this._device.createCommandEncoder();
         this._renderPasses.forEach(renderPass => {
-            //---------------------------------------
-            const passEncoder = commandEncoder.beginRenderPass(this._renderPassDescriptor);
-            passEncoder.setPipeline(renderPass.renderPipeline);
+            if (renderPass.hasVertexAndFragmentShader) {
+                const passEncoder = commandEncoder.beginRenderPass(this._renderPassDescriptor);
+                passEncoder.setPipeline(renderPass.renderPipeline);
 
-            this._createParams();
-            if (this._uniforms.length) {
-                passEncoder.setBindGroup(0, renderPass.uniformBindGroup);
-            }
-            passEncoder.setVertexBuffer(0, this._buffer);
-
-            /**
-             * vertexCount: number The number of vertices to draw
-             * instanceCount?: number | undefined The number of instances to draw
-             * firstVertex?: number | undefined Offset into the vertex buffers, in vertices, to begin drawing from
-             * firstInstance?: number | undefined First instance to draw
-             */
-            //passEncoder.draw(3, 1, 0, 0);
-            passEncoder.draw(this._vertexBufferInfo.vertexCount);
-            passEncoder.end();
-
-            // Copy the rendering results from the swapchain into |texture2d.texture|.
-
-            this._textures2d.forEach(texture2d => {
-                if (texture2d.copyCurrentTexture) {
-                    commandEncoder.copyTextureToTexture(
-                        {
-                            texture: swapChainTexture,
-                        },
-                        {
-                            texture: texture2d.texture,
-                        },
-                        this._presentationSize
-                    );
+                this._createParams();
+                if (this._uniforms.length) {
+                    passEncoder.setBindGroup(0, renderPass.uniformBindGroup);
                 }
-            });
+                passEncoder.setVertexBuffer(0, this._buffer);
+
+                /**
+                 * vertexCount: number The number of vertices to draw
+                 * instanceCount?: number | undefined The number of instances to draw
+                 * firstVertex?: number | undefined Offset into the vertex buffers, in vertices, to begin drawing from
+                 * firstInstance?: number | undefined First instance to draw
+                 */
+                //passEncoder.draw(3, 1, 0, 0);
+                passEncoder.draw(this._vertexBufferInfo.vertexCount);
+                passEncoder.end();
+
+                // Copy the rendering results from the swapchain into |texture2d.texture|.
+
+                this._textures2d.forEach(texture2d => {
+                    if (texture2d.copyCurrentTexture) {
+                        commandEncoder.copyTextureToTexture(
+                            {
+                                texture: swapChainTexture,
+                            },
+                            {
+                                texture: texture2d.texture,
+                            },
+                            this._presentationSize
+                        );
+                    }
+                });
+            }
         });
 
 
@@ -1403,10 +1429,6 @@ export default class Points {
         this._mouseWheel = false;
         this._mouseDeltaX = 0;
         this._mouseDeltaY = 0;
-    }
-
-    read() {
-
     }
 
     _getWGSLCoordinate(value, side, invert = false) {

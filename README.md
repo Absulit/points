@@ -677,7 +677,7 @@ You can send and retrieve data from the shaders the following way:
 
 First declare a storage as in `examples/data1/index.js`
 ```js
-// the last parameter as `true` means you will wuse this `Storage` to read back
+// the last parameter as `true` means you will use this `Storage` to read back
 points.addStorage('resultMatrix', 1, 'Matrix', resultMatrixBufferSize, true);
 ```
 
