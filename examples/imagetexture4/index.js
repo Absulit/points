@@ -1,7 +1,6 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
-import { ShaderType } from '../../src/absulit.points.module.js';
 const imagetexture4 = {
     vert,
     compute,
@@ -19,10 +18,10 @@ const imagetexture4 = {
             //maxAnisotropy: 10,
         }
 
-        points.addSampler('feedbackSampler', descriptor, ShaderType.FRAGMENT);
-        // await points.addTextureImage('image', './../img/carmen_lyra_423x643.jpg', ShaderType.FRAGMENT);
-        await points.addTextureImage('image', './../img/old_king_600x600.jpg', ShaderType.FRAGMENT);
-        // await points.addTextureImage('image', './../img/absulit_800x800.jpg', ShaderType.FRAGMENT);
+        points.addSampler('imageSampler', descriptor);
+        // await points.addTextureImage('image', './../img/carmen_lyra_423x643.jpg');
+        await points.addTextureImage('image', './../img/old_king_600x600.jpg');
+        // await points.addTextureImage('image', './../img/absulit_800x800.jpg');
     },
     update: points => {
 

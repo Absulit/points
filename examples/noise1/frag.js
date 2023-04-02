@@ -3,6 +3,10 @@ import { snoise } from '../../src/core/noise2d.js';
 
 const frag = /*wgsl*/`
 
+struct Variable{
+    valueNoiseCreated:f32,
+}
+
 ${fnusin}
 ${snoise}
 

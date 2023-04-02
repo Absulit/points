@@ -18,7 +18,7 @@ const data1 = {
             5, 6, 7, 8
         ];
 
-        points.addStorageMap('firstMatrix', firstMatrix, 'Matrix', ShaderType.COMPUTE);
+        points.addStorageMap('firstMatrix', firstMatrix, 'Matrix');
 
         const secondMatrix = [
             4 /* rows */, 2 /* columns */,
@@ -28,10 +28,10 @@ const data1 = {
             7, 8
         ];
 
-        points.addStorageMap('secondMatrix', secondMatrix, 'Matrix', ShaderType.COMPUTE);
+        points.addStorageMap('secondMatrix', secondMatrix, 'Matrix');
 
         let resultMatrixBufferSize = Float32Array.BYTES_PER_ELEMENT * (2 + firstMatrix[0] * secondMatrix[1]);
-        points.addStorage('resultMatrix', 1, 'Matrix', resultMatrixBufferSize, ShaderType.COMPUTE, true);
+        points.addStorage('resultMatrix', 1, 'Matrix', resultMatrixBufferSize, true);
     },
     update: async points => {
 

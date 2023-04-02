@@ -74,6 +74,9 @@ fn bloom(input:f32, iterations:i32, intensity:f32) -> f32 {
 }
 `;
 
+/**
+ * Special for letters and create an sdf version of a texture
+ */
 export const sdfSmooth = /*wgsl*/`
 fn sdfSmooth(color:vec4<f32>) -> vec4<f32> {
     var finalColor = color;

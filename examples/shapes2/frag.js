@@ -16,8 +16,7 @@ fn main(
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
-    _ = points[0];
-    let texColorCompute = textureSample(computeTexture, feedbackSampler, uvr);
+    let texColorCompute = textureSample(computeTexture, feedbackSampler, uvr).g;
 
     let texColorComputeR = textureSample(computeTexture, feedbackSampler, uvr + vec2(CHROMATIC_DISPLACEMENT, 0.)).r;
     let texColorComputeB = textureSample(computeTexture, feedbackSampler, uvr - vec2(CHROMATIC_DISPLACEMENT, 0.)).b;

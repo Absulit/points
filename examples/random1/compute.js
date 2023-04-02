@@ -1,18 +1,5 @@
 const compute = /*wgsl*/`
 
-struct Variables{
-    testValue: f32
-}
-
-struct Chemical{
-    a: f32,
-    b: f32
-}
-
-struct Particles{
-    chemicals: array<Chemical>
-}
-
 struct Star{
     a: f32,
     b: f32,
@@ -26,8 +13,6 @@ fn main(
     @builtin(workgroup_id) WorkGroupID: vec3<u32>,
     @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
 ) {
-    let time = params.time;
-
     let dims: vec2<u32> = textureDimensions(feedbackTexture, 0);
     var rgba = textureSampleLevel(feedbackTexture, feedbackSampler, vec2(0),  0.0).rgba;
 
@@ -37,8 +22,6 @@ fn main(
     let star = stars[0];
 
     textureStore(outputTex, vec2<u32>( u32(r * 800.) ,  u32(r2 * 800.) ), vec4<f32>(1, params.sliderA,0,1));
-
-    //textureStore(outputTex, vec2<u32>(0,0), rgba);
 }
 `;
 

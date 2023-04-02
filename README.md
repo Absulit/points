@@ -47,20 +47,59 @@ https://gpuweb.github.io/gpuweb/wgsl/
 We use VSCode with [WGSL Literal](https://marketplace.visualstudio.com/items?itemName=ggsimm.wgsl-literal); if you have a different IDE with WGSL hightlight go for it.
 
 ---
-> You might have notice or will notice the modules are actually JavaScript modules and imported to vert.js, compute.js, and frag.js which are then again JavaScript files, no WGSL files. This is based on a [recommendation by Brandon Jones from Google](https://toji.github.io/webgpu-best-practices/dynamic-shader-construction.html), so we take advantage of the power of the JavaScript string interpolation, instead of creating fetch calls to import wgsl files, so we can just simply interpolate the modules in our projects. Also, there's currently no way to create or import WGSL modules in other files.
+> You might have noticed or will notice the modules are actually JavaScript modules and imported to vert.js, compute.js, and frag.js which are then again JavaScript files, no WGSL files. This is based on a [recommendation by Brandon Jones from Google](https://toji.github.io/webgpu-best-practices/dynamic-shader-construction.html), so we take advantage of the power of the JavaScript string interpolation, instead of creating fetch calls to import wgsl files, so we can just simply interpolate the modules in our projects. Also, there's currently no way to create or import WGSL modules in other files.
 >
 > The simpler route we took is just to declare a single function, struct or constant as a JavaScript export, and then import them as you do, and then interpolate the reference with the same name.
 ---
 
 # Workflow
 
-Currently, we have a workflow of data setup from JavaScript and then 3 shaders:
+Currently, we have a workflow of data setup from JavaScript and then a RenderPass composed of 3 shaders:
 
-JavaScript setup and Data → Vertex Shader → Compute Shader → Fragment Shader → Screen Output
+JavaScript setup and Data → RenderPass (Vertex Shader → Compute Shader → Fragment Shader) → Screen Output
 
-This data can be accessed safely in all shaders across the pipeline. In the future there will be an option to add more shaders but now this is the basic setup.
+This data can be accessed safely in all shaders across the pipeline.
 
-# Setup
+To add more shaders you need to add a new RenderPass.
+
+# Setup 
+` as in examples/basic.html`
+
+```js
+// import the `Points` class
+
+import Points, {RenderPass} from '../src/absulit.points.module.js';
+
+// reference the canvas in the constructor
+const points = new Points('gl-canvas');
+
+// create your render pass with three shaders as follow
+const renderPasses = [
+    new RenderPass(/*wgsl*/`
+        // add @vertex string
+    `,
+    /*wgsl*/`
+        // add @compute string
+    `,
+    /*wgsl*/`
+        // add @fragment string
+    `
+    )
+];
+
+// call the POINTS init method and then the update method
+await points.init(renderPasses);
+update();
+
+// call `points.update()` methods to render a new frame
+function update() {
+    points.update();
+    requestAnimationFrame(update);
+}
+```
+
+# Setup 
+` as in (examples/index.html)`
 
 You can take a look at `/examples/main.js` and `/examples/index.html`
 
@@ -74,8 +113,9 @@ You can take a look at `/examples/main.js` and `/examples/index.html`
 ## main.js
 
 ```js
-// import the `Points` class, `ShaderType` not needed now, but you will later
-import Points, { ShaderType } from '../src/absulit.points.module.js';
+// import the `Points` class
+
+import Points from '../src/absulit.points.module.js';
 
 // import the base project
 import base from '../src/shaders/base/index.js';
@@ -87,10 +127,11 @@ const points = new Points('gl-canvas');
 ```js
 async function init() {
     // the base project in composed of the 3 shaders required
-    shaders = base;
+    await base.init(points);
+    let renderPasses = base.renderPasses || [new RenderPass(base.vert, base.compute, base.frag)]
 
-    // currently the shaders are passed separately, this might change later
-    await points.init(shaders.vert, shaders.compute, shaders.frag);
+    // we pass the array of renderPasses
+    await points.init(renderPasses);
 
     // first call to update
     update();
@@ -98,8 +139,9 @@ async function init() {
 ```
 
 ```js
-// call the `points.update()` method to render a new frame
+// call the `base.update()`, and `points.update()` methods to render a new frame
 function update() {
+    base.update();
     points.update();
     requestAnimationFrame(update);
 }
@@ -123,11 +165,42 @@ import frag from './frag.js';
 const base = { // <--- change the name `base` to anything
     vert,
     compute,
-    frag
+    frag,
+    init: async points => {
+        // ...
+    },
+    update: points => {
+        // ...
+    }
 }
 
 export default base; // <--- change the name `base` to anything
 ```
+
+You can also do as in the renderpasses1 example, where you can define the full renderpass with the `RenderPass` class:
+
+```js
+const renderpasses1 = {
+    /**
+     * Render Passes expect to have an order
+     */
+    renderPasses: [
+        new RenderPass(vert, compute, frag),
+        // new RenderPass(vert2, compute2, frag2),
+        // ...
+    ],
+    init: async points => {
+        // ...
+    },
+    update: points => {
+        // ...
+    }
+}
+
+export default renderpasses1;
+
+```
+
 
 4. Change whatever you want inside `vert.js`, `compute.js`, `frag.js`.
 
@@ -163,30 +236,10 @@ struct Params {
 // reading params in the fragment shader
 let time = params.time;
 ```
+
 ---
-> **Note:** `Params` is by default referenced inside `compute.js` in the `base` demo. It's technically referenced in the others too (`defaultVertexBody()` in compute and `fnusin()` in frag have a reference inside) and you have to declare them in your projects too because a declared variable/parameter from the JavaScript side is required to have a call in the shader. Since these values are default you have to invoke it, at least one property.
----
 
-You can use the [WGSL phony assignment](https://gpuweb.github.io/gpuweb/wgsl/#phony-assignment-section) for this
-
-
-Quote from the link:
-
-> A phony-assignment is useful for:
->
-> Calling a function that returns a value, but clearly expressing that the resulting value is not needed.
->
-> Statically accessing a variable, thus establishing it as a part of the shader’s resource interface.
-
-The last point is the reason, declaring a variable and not using it is against the spec. So if we declare it, we use it, and since `params` is there by default, we have to reference it.
-
-```rust
-// frag.js
-// reading params in the fragment shader
-_ = params.time;
-```
-
-## Parameters in vert.js to frag.js
+## Parameters in vert.js that go to frag.js
 
 ### vert.js
 
@@ -248,6 +301,10 @@ fn main(
 
 You can call one of the following methods, you pair the data with a `key` name, and this name is the one you will reference inside the shader:
 
+---
+> **Note:** all the `add*()` methods add the variables/buffers/data into all the shaders in all `RenderPass`es
+---
+
 ## Uniforms - addUniform
 
 Uniforms are sent separately in the `main.js` file and they are all combined in the shaders in the struct called `params`. Currently, by default, all values are `f32`. Uniforms can not be modified at runtime inside the shaders, they can only receive data from the JavaScript side.
@@ -255,11 +312,11 @@ Uniforms are sent separately in the `main.js` file and they are all combined in 
 ```js
 // main.js
 async function init() {
-    shaders = base;
+    let renderPasses = [shaders.vert, shaders.compute, shaders.frag];
     points.addUniform('myKeyName', 0); // 0 is your default value
 
     // more init code
-    await points.init(shaders.vert, shaders.compute, shaders.frag);
+    await points.init(renderPasses);
     update();
 }
 ```
@@ -280,7 +337,7 @@ A descripttor is assigned by default, if you want to sample your image in a diff
 ```js
 // main.js
 async function init() {
-    shaders = base;
+    let renderPasses = [shaders.vert, shaders.compute, shaders.frag];
 
     let descriptor = {
         addressModeU: 'clamp-to-edge',
@@ -291,11 +348,10 @@ async function init() {
         //maxAnisotropy: 10,
     }
 
-    // ShaderType tells you in which shader the variable will be created
-    points.addSampler('mySampler', descriptor, ShaderType.FRAGMENT);
+    points.addSampler('mySampler', descriptor);
 
     // more init code
-    await points.init(shaders.vert, shaders.compute, shaders.frag);
+    await points.init(renderPasses);
     update();
 }
 ```
@@ -312,12 +368,11 @@ You can create an empty texture, which is not very useful on its own, but if you
 ```js
 // main.js
 async function init() {
-    shaders = base;
-    // ShaderType tells you in which shader the variable will be created
-    points.addTexture2d('feedbackTexture', true, ShaderType.COMPUTE);
+    let renderPasses = [shaders.vert, shaders.compute, shaders.frag];
+    points.addTexture2d('feedbackTexture', true);
 
     // more init code
-    await points.init(shaders.vert, shaders.compute, shaders.frag);
+    await points.init(renderPasses);
     update();
 }
 ```
@@ -334,13 +389,12 @@ With `addTextureImage` you can pass an image and sample it with the Sampler you 
 ```js
 // main.js
 async function init() {
-    shaders = base;
-    // ShaderType tells you in which shader the variable will be created
+    let renderPasses = [shaders.vert, shaders.compute, shaders.frag];
     // await since the resource is async we need to wait for it to be ready
-    await points.addTextureImage('image', './../img/absulit_800x800.jpg', ShaderType.FRAGMENT);
+    await points.addTextureImage('image', './../img/absulit_800x800.jpg');
 
     // more init code
-    await points.init(shaders.vert, shaders.compute, shaders.frag);
+    await points.init(renderPasses);
     update();
 }
 ```
@@ -370,22 +424,20 @@ Common uses:
 > - size - number of items it will allocate
 > - structName - You can use one of the default structs/types like `f32`, `i32`, `u32`, but if you use a more complex one you have to pair it properly with structSize. If it's a custom `struct` it has to be declared in the shader or it will throw an error.
 > - structSize - if the `struct` you reference in `structName` has 4 properties then you have to add `4`. If it's only a f32 then here you should place `1`.
-> - shaderType - Into what shader the property/variable will be added.
 ---
 > **Note:** if the size of the storage is greater than `1` then it's created as an array in the shader and you have to access its items like an array, but if size is just `1` you can access its properties directly. Please check the following example for reference.
 ---
 ```js
 // main.js
 async function init() {
-    shaders = base;
+    let renderPasses = [shaders.vert, shaders.compute, shaders.frag];
 
     const numPoints = 800*800;
-    // ShaderType tells you in which shader the variable will be created
-    points.addStorage('value_noise_data', numPoints, 'f32', 1, ShaderType.COMPUTE); // size is 640,000
-    points.addStorage('variables', 1, 'Variable', 1, ShaderType.COMPUTE); // size is 1
+    points.addStorage('value_noise_data', numPoints, 'f32', 1); // size is 640,000
+    points.addStorage('variables', 1, 'Variable', 1); // size is 1
 
     // more init code
-    await points.init(shaders.vert, shaders.compute, shaders.frag);
+    await points.init(renderPasses);
     update();
 }
 ```
@@ -393,7 +445,7 @@ async function init() {
 // compute.js outside the main function in the shader
 
 // declare struct referenced here:
-// points.addStorage('variables', 1, 'Variable', 1, ShaderType.COMPUTE);
+// points.addStorage('variables', 1, 'Variable', 1);
 struct Variable {
     isCreated:f32
 }
@@ -415,12 +467,12 @@ Creates a Storage in the same way as a `addStorage` does, except it can be set w
 ```js
 // main.js
 async function init() {
-    shaders = base;
+    let renderPasses = [shaders.vert, shaders.compute, shaders.frag];
 
     points.addStorageMap('values', [1.0, 99.0], 'f32');
 
     // more init code
-    await points.init(shaders.vert, shaders.compute, shaders.frag);
+    await points.init(renderPasses);
     update();
 }
 ```
@@ -439,13 +491,13 @@ If you require to send data as a texture from the Compute Shader to the Fragment
 ```js
 // main.js
 async function init() {
-    shaders = base;
-    // Method without `ShaderType`
+    let renderPasses = [shaders.vert, shaders.compute, shaders.frag];
+
     // First parameter goes to Compute Shader, second to Fragment Shader
     points.addBindingTexture('outputTex', 'computeTexture');
 
     // more init code
-    await points.init(shaders.vert, shaders.compute, shaders.frag);
+    await points.init(renderPasses);
     update();
 }
 ```
@@ -467,12 +519,11 @@ You can load and play a video in the same fashion as a texture. The video is upd
 ```js
 // main.js
 async function init() {
-    shaders = base;
-    // ShaderType tells you in which shader the variable will be created
-    await points.addTextureVideo('video', './../assets_ignore/VIDEO0244.mp4', ShaderType.FRAGMENT);
+    let renderPasses = [shaders.vert, shaders.compute, shaders.frag];
+    await points.addTextureVideo('video', './../assets_ignore/VIDEO0244.mp4');
 
     // more init code
-    await points.init(shaders.vert, shaders.compute, shaders.frag);
+    await points.init(renderPasses);
     update();
 }
 ```
@@ -489,12 +540,11 @@ You can load and play a webcam in the same fashion as a texture. The webcam is u
 ```js
 // main.js
 async function init() {
-    shaders = base;
-    // ShaderType tells you in which shader the variable will be created
-    await points.addTextureWebcam('webcam', ShaderType.FRAGMENT);
+    let renderPasses = [shaders.vert, shaders.compute, shaders.frag];
+    await points.addTextureWebcam('webcam');
 
     // more init code
-    await points.init(shaders.vert, shaders.compute, shaders.frag);
+    await points.init(renderPasses);
     update();
 }
 ```
@@ -513,12 +563,11 @@ To access a layer the first bracket of the array is the layer index and the seco
 ```js
 // main.js
 async function init() {
-    shaders = base;
-    // ShaderType tells you in which shader the variable will be created
-    points.addLayers(2, ShaderType.COMPUTE);
+    let renderPasses = [shaders.vert, shaders.compute, shaders.frag];
+    points.addLayers(2);
 
     // more init code
-    await points.init(shaders.vert, shaders.compute, shaders.frag);
+    await points.init(renderPasses);
     update();
 }
 ```
@@ -560,12 +609,12 @@ and
 let myKeyNameValue = 10;
 
 async function init() {
-    shaders = base;
+    let renderPasses = [shaders.vert, shaders.compute, shaders.frag];
     // myKeyName value 10
     points.addUniform('myKeyName', myKeyNameValue);
 
     // more init code
-    await points.init(shaders.vert, shaders.compute, shaders.frag);
+    await points.init(renderPasses);
     update();
 }
 
@@ -592,7 +641,7 @@ Used in conjunction with `addStorageMap()`, but if the amount of data is way too
 ```js
 // main.js
 async function init() {
-    shaders = base;
+    let renderPasses = [shaders.vert, shaders.compute, shaders.frag];
 
     // this is before any GPU calculation, so it's ok
     let data = [];
@@ -603,7 +652,7 @@ async function init() {
     points.addStorageMap('rands', data, 'f32');
 
     // more init code
-    await points.init(shaders.vert, shaders.compute, shaders.frag);
+    await points.init(renderPasses);
     update();
 }
 
@@ -623,7 +672,20 @@ function update() {
 
 # Retrieve data from the shaders
 
-Currently not available, but it will in the future.
+You can send and retrieve data from the shaders the following way:
+
+
+First declare a storage as in `examples/data1/index.js`
+```js
+// the last parameter as `true` means you will wuse this `Storage` to read back
+points.addStorage('resultMatrix', 1, 'Matrix', resultMatrixBufferSize, true);
+```
+
+Read the data back after modification
+```js
+let result = await points.readStorage('resultMatrix');
+console.log(result);
+```
 
 # UV Coordinates and Textures Considerations
 

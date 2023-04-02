@@ -14,9 +14,6 @@ fn main(
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
-    _ = points[0];
-    //_ = layers.layer0[0];
-
     let cellSize = 20. + 10. * fnusin(1.);
     let a = sin(uvr.x  * cellSize) * sin(uvr.y * cellSize);
     let b = sin(uvr.x * uvr.y * 10. * 9.1 * .25 );

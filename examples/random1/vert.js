@@ -1,10 +1,5 @@
 const vert = /*wgsl*/`
 
-struct Particle{
-    x: f32,
-    y: f32
-}
-
 struct Star{
     a: f32,
     b: f32,

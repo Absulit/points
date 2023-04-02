@@ -1,8 +1,4 @@
-import { fnusin } from '../../src/core/defaultFunctions.js';
-
 const frag = /*wgsl*/`
-
-${fnusin}
 
 @fragment
 fn main(
@@ -15,10 +11,10 @@ fn main(
     ) -> @location(0) vec4<f32> {
 
     // stretched uv if canvas dimensions are non squared
-    let uvColor:vec4<f32> = vec4( fract(uv * 10), 0,1); 
+    let uvColor:vec4<f32> = vec4( fract(uv * 10), 0,1);
 
     // always square dimensions
-    let uvrColor:vec4<f32> = vec4( fract(uvr * 20), 0,1).rbga; 
+    let uvrColor:vec4<f32> = vec4( fract(uvr * 20), 0,1).rbga;
 
     var factor = 0.;
     if(uv.x > mouse.x){
