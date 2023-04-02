@@ -7,7 +7,7 @@ const dithering3 = {
     compute,
     frag,
     init: async points => {
-        points.addSampler('feedbackSampler', null);
+        points.addSampler('imageSampler', null);
         // await points.addTextureImage('image', './../img/carmen_lyra_423x643.jpg');
         // await points.addTextureImage('image', './../img/old_king_600x600.jpg');
         // await points.addTextureWebcam('image');

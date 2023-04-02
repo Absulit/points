@@ -53,8 +53,8 @@ fn main(
     ) -> @location(0) vec4<f32> {
 
     //let imageUV = (uv / f + vec2(0, .549 ) ) * vec2(1,-1 * dimsRatio) * ratio.y / params.sliderA;
-    //var point = textureSample(computeTexture, feedbackSampler, imageUV); //* .998046;
-    var point = texturePosition(computeTexture, feedbackSampler, vec2(0.), uv / params.sliderA, false); //* .998046;
+    //var point = textureSample(computeTexture, imageSampler, imageUV); //* .998046;
+    var point = texturePosition(computeTexture, imageSampler, vec2(0.), uv / params.sliderA, false); //* .998046;
 
     return point;
 }

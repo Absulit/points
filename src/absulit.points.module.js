@@ -1,9 +1,8 @@
 'use strict';
 import Coordinate from './coordinate.js';
 import RGBAColor from './color.js';
-import defaultVert from './core/base/vert.js';
-import defaultFrag from './core/base/frag.js';
-import defaultCompute from './core/base/compute.js';
+// import defaultVert from './core/base/vert.js';
+// import defaultFrag from './core/base/frag.js';
 import defaultStructs from './core/defaultStructs.js';
 import { defaultVertexBody } from './core/defaultFunctions.js';
 
@@ -51,6 +50,8 @@ export class RenderPass {
             compute: '',
             fragment: '',
         }
+
+        this._hasComputeShader = !!this._computeShader;
     }
 
     get vertexShader() {
@@ -99,6 +100,10 @@ export class RenderPass {
 
     get compiledShaders() {
         return this._compiledShaders;
+    }
+
+    get hasComputeShader() {
+        return this._hasComputeShader;
     }
 }
 
@@ -306,10 +311,10 @@ export default class Points {
      * @param {string} structName Name of the struct already existing on the
      * shader that will be the array<structName> of the Storage
      * @param {Number} structSize this tells how many sub items the struct has
-     * @param {ShaderType} shaderType this tells to what shader the storage is bound
      * @param {boolean} read if this is going to be used to read data back
+     * @param {ShaderType} shaderType this tells to what shader the storage is bound
      */
-    addStorage(name, size, structName, structSize, shaderType, read, arrayData) {
+    addStorage(name, size, structName, structSize, read, shaderType, arrayData) {
         this._storage.push({
             mapped: !!arrayData,
             name: name,
@@ -318,7 +323,6 @@ export default class Points {
             structSize: structSize,
             shaderType: shaderType,
             read: read,
-            array: arrayData,
             buffer: null
         });
 
@@ -351,9 +355,10 @@ export default class Points {
     }
 
     async readStorage(name) {
+        // TODO: if read true add flag in addStorage
         let storageItem = this._readStorage.find(storageItem => storageItem.name === name);
         let arrayBuffer = null;
-        if(storageItem){
+        if (storageItem) {
             await storageItem.buffer.mapAsync(GPUMapMode.READ)
             arrayBuffer = storageItem.buffer.getMappedRange();
         }
@@ -652,14 +657,19 @@ export default class Points {
         this.addUniform(UniformKeys.MOUSE_DELTA_X, this._mouseDeltaX);
         this.addUniform(UniformKeys.MOUSE_DELTA_Y, this._mouseDeltaY);
 
+        let hasComputeShaders = this._renderPasses.every(renderPass => renderPass.hasComputeShader);
+        if (!hasComputeShaders && this._bindingTextures.length) {
+            throw ' `addBindingTexture` requires at least one Compute Shader in a `RenderPass`'
+        }
+
         this._renderPasses.forEach((renderPass, index) => {
             let vertexShader = renderPass.vertexShader;
             let computeShader = renderPass.computeShader;
             let fragmentShader = renderPass.fragmentShader;
 
-            let colorsVertWGSL = vertexShader || defaultVert;
-            let colorsComputeWGSL = computeShader || defaultCompute;
-            let colorsFragWGSL = fragmentShader || defaultFrag;
+            let colorsVertWGSL = vertexShader;
+            let colorsComputeWGSL = computeShader;
+            let colorsFragWGSL = fragmentShader;
 
             let dynamicGroupBindingsVertex = '';
             let dynamicGroupBindingsCompute = '';
@@ -680,31 +690,33 @@ export default class Points {
             }
 
             dynamicGroupBindingsVertex += dynamicStructParams;
-            dynamicGroupBindingsCompute += dynamicStructParams;
+            renderPass.hasComputeShader && (dynamicGroupBindingsCompute += dynamicStructParams);
             dynamicGroupBindingsFragment += dynamicStructParams;
 
             dynamicGroupBindingsVertex += this._createDynamicGroupBindings(ShaderType.VERTEX);
-            dynamicGroupBindingsCompute += this._createDynamicGroupBindings(ShaderType.COMPUTE);
+            renderPass.hasComputeShader && (dynamicGroupBindingsCompute += this._createDynamicGroupBindings(ShaderType.COMPUTE));
             dynamicGroupBindingsFragment += this._createDynamicGroupBindings(ShaderType.FRAGMENT);
 
             colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + defaultVertexBody + colorsVertWGSL;
-            colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + colorsComputeWGSL;
+            renderPass.hasComputeShader && (colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + colorsComputeWGSL);
             colorsFragWGSL = dynamicGroupBindingsFragment + defaultStructs + colorsFragWGSL;
 
             console.groupCollapsed(`Render Pass ${index}`);
             console.groupCollapsed('VERTEX');
             console.log(colorsVertWGSL);
             console.groupEnd();
-            console.groupCollapsed('COMPUTE');
-            console.log(colorsComputeWGSL);
-            console.groupEnd();
+            if (renderPass.hasComputeShader) {
+                console.groupCollapsed('COMPUTE');
+                console.log(colorsComputeWGSL);
+                console.groupEnd();
+            }
             console.groupCollapsed('FRAGMENT');
             console.log(colorsFragWGSL);
             console.groupEnd();
             console.groupEnd();
 
             renderPass.compiledShaders.vertex = colorsVertWGSL;
-            renderPass.compiledShaders.compute = colorsComputeWGSL;
+            renderPass.hasComputeShader && (renderPass.compiledShaders.compute = colorsComputeWGSL);
             renderPass.compiledShaders.fragment = colorsFragWGSL;
         });
         //
@@ -832,6 +844,8 @@ export default class Points {
                 storageItem.buffer = this._createAndMapBuffer(values, GPUBufferUsage.STORAGE);
             } else {
                 let usage = GPUBufferUsage.STORAGE;
+                // TODO: wondering why the COPY_SRC is not needed
+                console.log(storageItem.read);
                 if (storageItem.read) {
                     usage = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC;
                 }
@@ -911,27 +925,6 @@ export default class Points {
         });
     }
 
-    /**
-     *
-     * @param {Array} data
-     */
-    createWriteCopyBuffer(data) {
-        const va = new Float32Array(data)
-        const gpuWriteBuffer = this._device.createBuffer({
-            mappedAtCreation: true,
-            size: va.byteLength,
-            usage: GPUBufferUsage.MAP_WRITE | GPUBufferUsage.COPY_SRC
-        });
-        const arrayBuffer = gpuWriteBuffer.getMappedRange();
-
-        // Write bytes to buffer.
-        new Float32Array(arrayBuffer).set(va);
-
-        // Unmap buffer so that it can be used later for copy.
-        gpuWriteBuffer.unmap();
-        return gpuWriteBuffer;
-    }
-
     _createComputeBindGroup() {
         this._renderPasses.forEach((renderPass, index) => {
 
@@ -958,7 +951,6 @@ export default class Points {
                  */
                 renderPass.computeBindGroup = this._device.createBindGroup({
                     label: `_createComputeBindGroup 0 - ${index}`,
-                    // layout: renderPass.computePipeline.getBindGroupLayout(0 /* index */),
                     layout: renderPass.bindGroupLayout,
                     entries: entries
                 });
@@ -971,18 +963,20 @@ export default class Points {
         this._createComputeBindGroup();
 
         this._renderPasses.forEach((renderPass, index) => {
-            renderPass.computePipeline = this._device.createComputePipeline({
-                layout: this._device.createPipelineLayout({
-                    bindGroupLayouts: [renderPass.bindGroupLayout]
-                }),
-                label: `createPipeline(): DID YOU CALL THE VARIABLE IN THE SHADER? - ${index}`,
-                compute: {
-                    module: this._device.createShaderModule({
-                        code: renderPass.compiledShaders.compute
+            if (renderPass.hasComputeShader) {
+                renderPass.computePipeline = this._device.createComputePipeline({
+                    layout: this._device.createPipelineLayout({
+                        bindGroupLayouts: [renderPass.bindGroupLayout]
                     }),
-                    entryPoint: "main"
-                }
-            });
+                    label: `createPipeline() - ${index}`,
+                    compute: {
+                        module: this._device.createShaderModule({
+                            code: renderPass.compiledShaders.compute
+                        }),
+                        entryPoint: "main"
+                    }
+                });
+            }
         });
 
 
@@ -1331,13 +1325,15 @@ export default class Points {
 
 
         this._renderPasses.forEach(renderPass => {
-            const passEncoder = commandEncoder.beginComputePass();
-            passEncoder.setPipeline(renderPass.computePipeline);
-            if (this._uniforms.length) {
-                passEncoder.setBindGroup(0, renderPass.computeBindGroup);
+            if (renderPass.hasComputeShader) {
+                const passEncoder = commandEncoder.beginComputePass();
+                passEncoder.setPipeline(renderPass.computePipeline);
+                if (this._uniforms.length) {
+                    passEncoder.setBindGroup(0, renderPass.computeBindGroup);
+                }
+                passEncoder.dispatchWorkgroups(8, 8, 1);
+                passEncoder.end();
             }
-            passEncoder.dispatchWorkgroups(8, 8, 1);
-            passEncoder.end();
         });
 
 
