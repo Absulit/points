@@ -152,6 +152,23 @@ function update() {
 init();
 ```
 
+# RenderPass
+
+As shown before a `RenderPass` is a way to have a block of shaders to pass to your application pipeline and they will be executed in the order you pass them in the `Points.init()` method.
+
+```js
+let renderPasses = [
+    new RenderPass(vert1, compute1, frag1),
+    new RenderPass(vert2, compute2, frag2)
+];
+
+// we pass the array of renderPasses
+await points.init(renderPasses);
+```
+
+You can pass a Compute Shader only, or a Vertex and Fragment together only. This way you can have a Compute Shader without visual output, create calculations and return their response values, or a regular Render Pipeline without Compute Shader calculations.
+
+
 # Create your custom Shader project
 
 1. Copy the `/src/shaders/base/` and place it where you want to store your project.
@@ -401,8 +418,8 @@ async function init() {
 
 ```rust
 // frag.js
-    let startPosition = vec2(.0);
-    let rgbaImage = texturePosition(image, mySampler, startPosition, uv, false);
+let startPosition = vec2(.0);
+let rgbaImage = texturePosition(image, mySampler, startPosition, uv, false);
 ```
 
 ## Storage - addStorage
