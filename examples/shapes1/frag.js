@@ -1,11 +1,18 @@
-import { fnusin, polar, rotateVector, sdfCircle, sdfLine, sdfLine2, sdfSegment, sdfSquare } from '../../src/core/defaultFunctions.js';
+import {
+    fnusin,
+    rotateVector,
+    sdfCircle,
+    sdfLine,
+    sdfLine2,
+    sdfSegment,
+    sdfSquare
+} from '../../src/core/defaultFunctions.js';
 
 const frag = /*wgsl*/`
 
 ${fnusin}
 ${sdfSegment}
 ${sdfLine}
-${polar}
 ${sdfCircle}
 ${rotateVector}
 ${sdfSquare}

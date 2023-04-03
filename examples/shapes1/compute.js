@@ -1,9 +1,4 @@
-import { fnusin, fusin } from '../../src/core/defaultFunctions.js';
-
 const compute = /*wgsl*/`
-
-${fnusin}
-${fusin}
 
 const workgroupSize = 8;
 

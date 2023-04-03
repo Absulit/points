@@ -1,6 +1,6 @@
 'use strict';
 import * as dat from './../src/vendor/datgui/dat.gui.module.js';
-import Points, { ShaderType } from '../src/absulit.points.module.js';
+import Points, { RenderPass, ShaderType } from '../src/absulit.points.module.js';
 
 /***************/
 const stats = new Stats();
@@ -79,6 +79,7 @@ const shaderProjects = [
     { name: 'Random 1', path: './random1/index.js' },
     { name: 'Random 2 (⚠ SLOW)', path: './random2/index.js' },
     { name: 'Random 3', path: './random3/index.js' },
+    { name: 'Render Passes 1', path: './renderpasses1/index.js' },
     { name: 'Shapes 1', path: './shapes1/index.js' },
     { name: 'Shapes 2', path: './shapes2/index.js' },
     { name: 'Spritesheet 1', path: './spritesheet1/index.js' },
@@ -171,11 +172,15 @@ async function init() {
 
 
     await shaders.init(points);
-    await points.init(shaders.vert, shaders.compute, shaders.frag);
-    points.fitWindow = isFitWindow;
+    let renderPasses = shaders.renderPasses || [new RenderPass(shaders.vert, shaders.compute, shaders.frag)]
+    await points.init(renderPasses);
+
+    let hasVertexAndFragmentShader = renderPasses.every(renderPass => renderPass.hasVertexAndFragmentShader)
+    hasVertexAndFragmentShader && (points.fitWindow = isFitWindow);
 
     update();
-    await shaders.read(points);
+
+    shaders.read && await shaders.read(points);
 }
 
 function update() {

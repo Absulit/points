@@ -62,9 +62,6 @@ fn main(
     let numRows:f32 = params.screenHeight;
     let numColumnsPiece:i32 = i32(numColumns / f32(workgroupSize));
     let numRowsPiece:i32 = i32(numRows / f32(workgroupSize));
-    //let constant = u32(numColumns) / 93u;
-
-
 
     var x = 450.;
     var y = 450.;

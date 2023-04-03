@@ -1,5 +1,9 @@
 const vert = /*wgsl*/`
 
+struct Variable{
+    valueNoiseCreated:f32,
+}
+
 @vertex
 fn main(
     @location(0) position: vec4<f32>,

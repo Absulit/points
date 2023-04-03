@@ -1,16 +1,24 @@
-import { fnusin, rotateVector, sdfLine, sdfSegment, sdfSquare } from '../../src/core/defaultFunctions.js';
-import { snoise } from '../../src/core/noise2d.js';
 import { PI } from '../../src/core/defaultConstants.js';
-import { decodeNumberSprite, sprite, texturePosition } from '../../src/core/image.js';
 import { showDebugCross } from '../../src/core/debug.js';
 import { GREEN, layer, RED, sdfSmooth } from './../../src/core/color.js';
+import {
+    fnusin,
+    rotateVector,
+    sdfLine, sdfSegment,
+    sdfSquare
+} from '../../src/core/defaultFunctions.js';
+
+import {
+    decodeNumberSprite,
+    sprite,
+    texturePosition
+} from '../../src/core/image.js';
 
 const frag = /*wgsl*/`
 
 ${fnusin}
 ${sdfSegment}
 ${sdfLine}
-${snoise}
 ${PI}
 ${texturePosition}
 ${showDebugCross}
@@ -33,7 +41,6 @@ fn main(
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
-    let n1 = snoise(uv * fnusin(1) * params.sliderB);
     let scaleDigits = .25;
     let startPosition = vec2(.5, .5) * ratio * scaleDigits;
     //let rgbaImage = texturePosition(image, imageSampler, startPosition, uvr, true); //* .998046;

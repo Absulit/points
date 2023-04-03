@@ -3,18 +3,6 @@ import { texturePosition } from '../../src/core/image.js';
 
 const frag = /*wgsl*/`
 
-struct Particle{
-    x: f32,
-    y: f32
-}
-
-struct Star{
-    a: f32,
-    b: f32,
-    c: f32,
-    d: f32,
-}
-
 ${fnusin}
 ${fusin}
 ${texturePosition}
@@ -30,12 +18,7 @@ fn main(
     ) -> @location(0) vec4<f32> {
 
     let startPosition = vec2(0.);
-    _ = textureSample(feedbackTexture, feedbackSampler, uvr);
     let texColorCompute = texturePosition(computeTexture, feedbackSampler, startPosition, uvr, false);
-
-
-
-
     let finalColor:vec4<f32> = texColorCompute;
 
     return finalColor;

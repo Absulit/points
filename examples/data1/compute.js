@@ -19,8 +19,6 @@ fn main(
         return;
     }
 
-    let time = params.time;
-
     resultMatrix.size = vec2(firstMatrix.size.x, secondMatrix.size.y);
 
     let resultCell = vec2(GlobalId.x, GlobalId.y);
