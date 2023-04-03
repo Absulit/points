@@ -4,12 +4,11 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
-import { ShaderType } from './../../src/absulit.points.module.js';
 
 const data1 = {
-    vert,
+    // vert,
     compute,
-    frag,
+    // frag,
     init: async points => {
 
         const firstMatrix = [

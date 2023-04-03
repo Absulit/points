@@ -7,7 +7,7 @@ const dithering3 = {
     compute,
     frag,
     init: async points => {
-        points.addSampler('feedbackSampler', null);
+        points.addSampler('imageSampler', null);
         // await points.addTextureImage('image', './../img/carmen_lyra_423x643.jpg');
         // await points.addTextureImage('image', './../img/old_king_600x600.jpg');
         // await points.addTextureWebcam('image');
@@ -16,7 +16,7 @@ const dithering3 = {
         await points.addTextureImage('image', './../img/absulit_800x800.jpg');
         points.addBindingTexture('outputTex', 'computeTexture');
         points.addLayers(2);
-        points.addStorage('variables', 1, 'Variable', 2, ShaderType.COMPUTE);
+        points.addStorage('variables', 1, 'Variable', 2, false, ShaderType.COMPUTE);
     },
     update: points => {
 

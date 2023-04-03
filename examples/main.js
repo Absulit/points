@@ -174,7 +174,9 @@ async function init() {
     await shaders.init(points);
     let renderPasses = shaders.renderPasses || [new RenderPass(shaders.vert, shaders.compute, shaders.frag)]
     await points.init(renderPasses);
-    points.fitWindow = isFitWindow;
+
+    let hasVertexAndFragmentShader = renderPasses.every(renderPass => renderPass.hasVertexAndFragmentShader)
+    hasVertexAndFragmentShader && (points.fitWindow = isFitWindow);
 
     update();
 
