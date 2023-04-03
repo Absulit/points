@@ -208,40 +208,42 @@ export default class Points {
         this._mouseDeltaX = 0;
         this._mouseDeltaY = 0;
 
-        this._canvas.addEventListener('click', e => {
-            this._mouseClick = true;
-        });
-        this._canvas.addEventListener('mousemove', e => {
-            this._mouseX = e.clientX;
-            this._mouseY = e.clientY;
-        });
-        this._canvas.addEventListener('mousedown', e => {
-            this._mouseDown = true;
-        });
-        this._canvas.addEventListener('mouseup', e => {
-            this._mouseDown = false;
-        });
+        if (this._canvasId) {
+            this._canvas.addEventListener('click', e => {
+                this._mouseClick = true;
+            });
+            this._canvas.addEventListener('mousemove', e => {
+                this._mouseX = e.clientX;
+                this._mouseY = e.clientY;
+            });
+            this._canvas.addEventListener('mousedown', e => {
+                this._mouseDown = true;
+            });
+            this._canvas.addEventListener('mouseup', e => {
+                this._mouseDown = false;
+            });
 
-        this._canvas.addEventListener('wheel', e => {
-            this._mouseWheel = true;
-            this._mouseDeltaX = e.deltaX;
-            this._mouseDeltaY = e.deltaY;
-        });
+            this._canvas.addEventListener('wheel', e => {
+                this._mouseWheel = true;
+                this._mouseDeltaX = e.deltaX;
+                this._mouseDeltaY = e.deltaY;
+            });
+            this._originalCanvasWidth = this._canvas.clientWidth;
+            this._originalCanvasHeigth = this._canvas.clientHeight;
+            window.addEventListener('resize', this._resizeCanvasToFitWindow, false);
+
+            document.addEventListener("fullscreenchange", e => {
+                let isFullscreen = window.innerWidth == screen.width && window.innerHeight == screen.height;
+                this._fullscreen = isFullscreen;
+                if (!isFullscreen && !this._fitWindow) {
+                    this._resizeCanvasToDefault();
+                }
+            });
+        }
 
         this._fullscreen = false;
         this._fitWindow = false;
-        this._originalCanvasWidth = this._canvas.clientWidth;
-        this._originalCanvasHeigth = this._canvas.clientHeight;
 
-        window.addEventListener('resize', this._resizeCanvasToFitWindow, false);
-
-        document.addEventListener("fullscreenchange", e => {
-            let isFullscreen = window.innerWidth == screen.width && window.innerHeight == screen.height;
-            this._fullscreen = isFullscreen;
-            if (!isFullscreen && !this._fitWindow) {
-                this._resizeCanvasToDefault();
-            }
-        });
 
         // _readStorage should only be read once
         this._readStorageCopied = false;
@@ -730,15 +732,16 @@ export default class Points {
             console.log(info);
         });
 
-        if (this._canvas === null) return false;
-        this._context = this._canvas.getContext('webgpu');
+        if (this._canvas !== null) this._context = this._canvas.getContext('webgpu');
 
         this._presentationFormat = navigator.gpu.getPreferredCanvasFormat();
 
-        if (this._fitWindow) {
-            this._resizeCanvasToFitWindow();
-        } else {
-            this._resizeCanvasToDefault();
+        if(this._canvasId){
+            if (this._fitWindow) {
+                this._resizeCanvasToFitWindow();
+            } else {
+                this._resizeCanvasToDefault();
+            }
         }
 
         this._renderPassDescriptor = {
@@ -1353,8 +1356,6 @@ export default class Points {
 
 
         const swapChainTexture = this._context.getCurrentTexture();
-        // prettier-ignore
-        //this._renderPassDescriptor.colorAttachments[0].view = swapChainTexture.createView();
 
 
         //commandEncoder = this._device.createCommandEncoder();
@@ -1512,7 +1513,7 @@ export default class Points {
 
     set fitWindow(value) {
         if (!this._context) {
-            throw 'fitWindow must be assigned after Points.init() call';
+            throw 'fitWindow must be assigned after Points.init() call or you don\'t have a Canvas assigned in the constructor';
         }
         this._fitWindow = value;
         if (this._fitWindow) {
