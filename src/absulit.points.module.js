@@ -250,9 +250,11 @@ export default class Points {
     }
 
     _resizeCanvasToFitWindow = () => {
-        this._canvas.width = window.innerWidth;
-        this._canvas.height = window.innerHeight;
-        this._setScreenSize();
+        if(this._fitWindow){
+            this._canvas.width = window.innerWidth;
+            this._canvas.height = window.innerHeight;
+            this._setScreenSize();
+        }
     }
 
     _resizeCanvasToDefault = () => {
