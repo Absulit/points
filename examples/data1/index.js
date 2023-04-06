@@ -1,14 +1,10 @@
 // original article on compute shaders
 // https://developer.chrome.com/articles/gpu-compute/
 
-import vert from './vert.js';
 import compute from './compute.js';
-import frag from './frag.js';
 
 const data1 = {
-    // vert,
     compute,
-    // frag,
     init: async points => {
 
         const firstMatrix = [
