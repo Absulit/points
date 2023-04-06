@@ -19,7 +19,6 @@ fn main(
     ) -> @location(0) vec4<f32> {
 
     let time = params.time;
-    // let point = points[0];
 
     var circle = sdfCircle(vec2(.5,.5) * ratio, .2, .1, uvr);
 

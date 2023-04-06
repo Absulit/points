@@ -62,8 +62,8 @@ fn main(
     let br = brightness(rgbaImage);
 
     // from 8 to 40
-    //let depth = floor(8 + 32. * fnusin(1));
-    let depth = floor(8 + 32. * params.sliderB);
+    let depth = floor(8 + 32. * fnusin(1));
+    // let depth = floor(8 + 32. * params.sliderB);
 
     //rgbaImage = getClosestColorInPalette(rgbaImage, u32(numPaletteItems * br * params.sliderB * fnusin(1)) + 2, params.sliderC);
     rgbaImage = orderedDithering(rgbaImage, depth, dims, uv); // ⬆⬇ swap these lines or uncomment
