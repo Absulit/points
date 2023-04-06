@@ -1,10 +1,8 @@
 import vert from './vert.js';
-import compute from './compute.js';
 import frag from './frag.js';
 
 const pointstitle1 = {
     vert,
-    compute,
     frag,
     init: async points => {
 

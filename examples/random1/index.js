@@ -9,9 +9,7 @@ const random1 = {
     init: async points => {
         points.addUniform('randNumber', 0);
         points.addUniform('randNumber2', 0);
-        points.addStorage('stars', 800*800, 'Star', 4);
-        points.addSampler('feedbackSampler');
-        points.addTexture2d('feedbackTexture', true);
+        points.addSampler('computeTextureSampler');
         points.addBindingTexture('outputTex', 'computeTexture');
     },
     update: points => {

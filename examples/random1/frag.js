@@ -3,13 +3,6 @@ import { texturePosition } from '../../src/core/image.js';
 
 const frag = /*wgsl*/`
 
-struct Star {
-    a: f32,
-    b: f32,
-    c: f32,
-    d: f32,
-}
-
 ${fnusin}
 ${fusin}
 ${texturePosition}
@@ -26,8 +19,7 @@ fn main(
 
 
     let startPosition = vec2(0.);
-    let texColor = texturePosition(feedbackTexture, feedbackSampler, startPosition, uvr, false);
-    let texColorCompute = texturePosition(computeTexture, feedbackSampler, startPosition, uvr, false);
+    let texColorCompute = texturePosition(computeTexture, computeTextureSampler, startPosition, uvr, false);
 
 
     let d = distance(uvr, vec2(.5 + .1 * fusin(2), .5  + .1 * fusin(4.123)));

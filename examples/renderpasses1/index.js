@@ -1,9 +1,7 @@
 import vert1 from './renderpass1/vert.js';
-import compute1 from './renderpass1/compute.js';
 import frag1 from './renderpass1/frag.js';
 
 import vert2 from './renderpass2/vert.js';
-import compute2 from './renderpass2/compute.js';
 import frag2 from './renderpass2/frag.js';
 
 import { RenderPass } from '../../src/absulit.points.module.js';

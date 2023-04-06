@@ -1,4 +1,3 @@
-import { PI } from '../../src/core/defaultConstants.js';
 import { showDebugCross } from '../../src/core/debug.js';
 import { GREEN, layer, RED, sdfSmooth } from './../../src/core/color.js';
 import {
@@ -8,19 +7,13 @@ import {
     sdfSquare
 } from '../../src/core/defaultFunctions.js';
 
-import {
-    decodeNumberSprite,
-    sprite,
-    texturePosition
-} from '../../src/core/image.js';
+import { decodeNumberSprite, sprite } from '../../src/core/image.js';
 
 const frag = /*wgsl*/`
 
 ${fnusin}
 ${sdfSegment}
 ${sdfLine}
-${PI}
-${texturePosition}
 ${showDebugCross}
 ${layer}
 ${sprite}
@@ -43,9 +36,7 @@ fn main(
 
     let scaleDigits = .25;
     let startPosition = vec2(.5, .5) * ratio * scaleDigits;
-    //let rgbaImage = texturePosition(image, imageSampler, startPosition, uvr, true); //* .998046;
 
-    // let size = vec2(64u,64u);
     let size = vec2(8u,22u);
     let sizeF32 = vec2(f32(size.x),f32(size.y));
     let cellRatio = vec2(sizeF32.x/params.screenWidth,sizeF32.y/params.screenHeight)*ratio;
@@ -78,9 +69,9 @@ fn main(
     scaleAnim = 10.;
     positionAnim = (mouse+vec2(.1,0))*ratio / scaleAnim;
     indexAnim = u32(51 * fract(params.time * .15));
-    let animPenguin = sprite(penguin, imageSampler, (mouse+vec2(.1,0))*ratio / scaleAnim, uvr / scaleAnim, indexAnim, vec2<u32>(32,32));
+    let animPenguin = sprite(penguin, imageSampler, positionAnim, uvr / scaleAnim, indexAnim, vec2<u32>(32,32));
 
-    let square = sdfSquare( (mouse+vec2(.3,0.14)) * ratio, .14, 0., 0., uvr) * .5;
+    let square = sdfSquare( (mouse*ratio+vec2(.3,0.14)), .14, 0., 0., uvr) * .5;
 
     return finalColor + animColor + layer(vec4(square), animPenguin);
 }

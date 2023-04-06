@@ -30,7 +30,7 @@ fn main(
     ) -> @location(0) vec4<f32> {
 
     let startPosition = vec2(0.,0.);
-    let texColor = texturePosition(feedbackTexture, feedbackSampler, startPosition, uvr, false);
+    // let texColor = texturePosition(feedbackTexture, feedbackSampler, startPosition, uvr, false);
     let texColorCompute = texturePosition(computeTexture, feedbackSampler, startPosition, uvr, false);
 
 
@@ -39,7 +39,6 @@ fn main(
     if(d > .1){
         c = 0;
     }
-
 
     let finalColor:vec4<f32> = vec4(c) + texColorCompute;
 
