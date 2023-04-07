@@ -1,10 +1,10 @@
-import { fnusin } from '../../src/core/defaultFunctions.js';
-import { texturePosition } from '../../src/core/image.js';
+import { fnusin } from '../../src/core/animation.js';
+import { textureExternalPosition } from '../../src/core/image.js';
 
 const videotexture1Frag = /*wgsl*/`
 
 ${fnusin}
-${texturePosition}
+${textureExternalPosition}
 
 
 @fragment
@@ -17,15 +17,10 @@ fn main(
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
-    let dims: vec2<u32> = textureDimensions(image, 0);
-    var dimsRatio = f32(dims.x) / f32(dims.y);
-
-    let imageUV = uv * vec2(1,-1 * dimsRatio) * ratio.y / params.sliderA;
-    let lines = sin( uv.x*(uv.x + 3 * fnusin(1))  ) ;
     let startPosition = vec2(0.);
-    let rgbaImage = texturePosition(image, feedbackSampler, startPosition, imageUV, false); //* .998046;
 
-    let rgbaCT = texturePosition(computeTexture, feedbackSampler, startPosition, uv / params.sliderA, false);
+    let rgbaCT = textureExternalPosition(video, feedbackSampler, startPosition, uvr / params.sliderA, true);
+    // let rgbaCT = textureSampleBaseClampToEdge(video, feedbackSampler, uv);
 
     return rgbaCT;
 }

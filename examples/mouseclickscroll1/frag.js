@@ -1,4 +1,4 @@
-import { sdfCircle } from "../../src/core/defaultFunctions.js";
+import { sdfCircle } from '../../src/core/sdf.js';
 import { GREEN, RED } from './../../src/core/color.js';
 
 const frag = /*wgsl*/`

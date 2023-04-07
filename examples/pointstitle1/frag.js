@@ -1,6 +1,6 @@
-import { RED } from '../../src/core/color.js';
+import { RED, brightness } from '../../src/core/color.js';
 import { showDebugFrame } from '../../src/core/debug.js';
-import { sdfCircle, sdfLine, sdfSegment, brightness } from '../../src/core/defaultFunctions.js';
+import { sdfCircle, sdfLine, sdfSegment } from '../../src/core/sdf.js';
 import { sprite, texturePosition } from './../../src/core/image.js';
 import { snoise } from './../../src/core/noise2d.js';
 

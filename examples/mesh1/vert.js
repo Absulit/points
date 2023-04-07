@@ -1,5 +1,4 @@
-import { fnusin } from '../../src/core/defaultFunctions.js';
-
+import { fnusin } from './../../src/core/animation.js';
 const vert = /*wgsl*/`
 
 ${fnusin}

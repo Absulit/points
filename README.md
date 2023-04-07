@@ -118,7 +118,7 @@ You can take a look at `/examples/main.js` and `/examples/index.html`
 import Points from '../src/absulit.points.module.js';
 
 // import the base project
-import base from '../src/shaders/base/index.js';
+import base from '../examples/base/index.js';
 
 // reference the canvas in the constructor
 const points = new Points('gl-canvas');
@@ -171,7 +171,7 @@ You can pass a Compute Shader only, or a Vertex and Fragment together only. This
 
 # Create your custom Shader project
 
-1. Copy the `/src/shaders/base/` and place it where you want to store your project.
+1. Copy the `/examples/base/` and place it where you want to store your project.
 2. Rename folder.
 3. Rename the project inside `base/index.js`, that's the name going to be used in the main.js import and then assigned to the shaders variable.
 

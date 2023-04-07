@@ -1,13 +1,9 @@
 import { showDebugCross } from '../../src/core/debug.js';
-import { GREEN, layer, RED, sdfSmooth } from './../../src/core/color.js';
-import {
-    fnusin,
-    rotateVector,
-    sdfLine, sdfSegment,
-    sdfSquare
-} from '../../src/core/defaultFunctions.js';
-
+import { GREEN, layer, RED } from './../../src/core/color.js';
 import { decodeNumberSprite, sprite } from '../../src/core/image.js';
+import { sdfLine, sdfSegment, sdfSmooth, sdfSquare } from '../../src/core/sdf.js';
+import { rotateVector } from '../../src/core/math.js';
+import { fnusin } from '../../src/core/animation.js';
 
 const frag = /*wgsl*/`
 

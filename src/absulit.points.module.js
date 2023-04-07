@@ -1,8 +1,6 @@
 'use strict';
 import Coordinate from './coordinate.js';
 import RGBAColor from './color.js';
-// import defaultVert from './core/base/vert.js';
-// import defaultFrag from './core/base/frag.js';
 import defaultStructs from './core/defaultStructs.js';
 import { defaultVertexBody } from './core/defaultFunctions.js';
 
@@ -250,7 +248,7 @@ export default class Points {
     }
 
     _resizeCanvasToFitWindow = () => {
-        if(this._fitWindow){
+        if (this._fitWindow) {
             this._canvas.width = window.innerWidth;
             this._canvas.height = window.innerHeight;
             this._setScreenSize();
@@ -738,7 +736,7 @@ export default class Points {
 
         this._presentationFormat = navigator.gpu.getPreferredCanvasFormat();
 
-        if(this._canvasId){
+        if (this._canvasId) {
             if (this._fitWindow) {
                 this._resizeCanvasToFitWindow();
             } else {
@@ -1328,6 +1326,10 @@ export default class Points {
             externalTexture.texture = this._device.importExternalTexture({
                 source: externalTexture.video
             });
+
+            if ('requestVideoFrameCallback' in externalTexture.video) {
+                externalTexture.video.requestVideoFrameCallback(() => { });
+            }
         });
 
 
