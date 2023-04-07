@@ -1,8 +1,6 @@
 'use strict';
 import Coordinate from './coordinate.js';
 import RGBAColor from './color.js';
-// import defaultVert from './core/base/vert.js';
-// import defaultFrag from './core/base/frag.js';
 import defaultStructs from './core/defaultStructs.js';
 import { defaultVertexBody } from './core/defaultFunctions.js';
 
