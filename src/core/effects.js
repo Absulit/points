@@ -79,3 +79,106 @@ fn orderedDithering(color:vec4<f32>, depth:f32, dims:vec2<u32>, uv:vec2<f32>) ->
     return ditheredImage;
 }
 `;
+
+export const clearMix = /*wgsl*/`
+//const clearMixlevel = 1.81;//1.01
+fn clearMix(color:vec4<f32>, level:f32) -> vec4<f32> {
+    let rr = color.r / level;
+    let gr = color.g / level;
+    let br = color.b / level;
+    var ar = color.a / level;
+    if(ar <= .09){
+        ar = 0.;
+    }
+    return vec4<f32>(rr, gr, br, ar);
+}
+`;
+
+export const clearAlpha = /*wgsl*/`
+// level 2.
+fn clearAlpha(currentColor:vec4<f32>, level:f32) -> vec4<f32>{
+    var ar = currentColor.a / level;
+    if(ar <= .09){
+        ar = 0.;
+    }
+    return vec4<f32>(currentColor.rgb, ar);
+}
+`;
+
+
+export const getColorsAroundTexture = /*wgsl*/`
+fn getColorsAroundTexture(texture:texture_2d<f32>, position: vec2<i32>, distance: i32) -> array<  vec4<f32>, 8  > {
+    return array< vec4<f32>,8 >(
+        textureLoad(texture, vec2<i32>( position.x-distance, position.y-distance  ),  0).rgba,
+        textureLoad(texture, vec2<i32>( position.x, position.y-distance  ),  0).rgba,
+        textureLoad(texture, vec2<i32>( position.x+distance, position.y-distance  ),  0).rgba,
+        textureLoad(texture, vec2<i32>( position.x-distance, position.y  ),  0).rgba,
+        textureLoad(texture, vec2<i32>( position.x+distance, position.y  ),  0).rgba,
+        textureLoad(texture, vec2<i32>( position.x-distance, position.y+distance  ),  0).rgba,
+        textureLoad(texture, vec2<i32>( position.x, position.y+distance  ),  0).rgba,
+        textureLoad(texture, vec2<i32>( position.x+distance, position.y+distance  ),  0).rgba,
+    );
+}
+`;
+
+export const getColorsAround4Texture = /*wgsl*/`
+fn getColorsAround4Texture(texture:texture_2d<f32>, position: vec2<i32>, distance: i32) -> array<  vec4<f32>, 4  > {
+    return array< vec4<f32>, 4 >(
+        //textureLoad(texture, vec2<i32>( position.x-distance, position.y-distance  ),  0).rgba,
+        textureLoad(texture, vec2<i32>( position.x, position.y-distance  ),  0).rgba,
+        //textureLoad(texture, vec2<i32>( position.x+distance, position.y-distance  ),  0).rgba,
+        textureLoad(texture, vec2<i32>( position.x-distance, position.y  ),  0).rgba,
+        textureLoad(texture, vec2<i32>( position.x+distance, position.y  ),  0).rgba,
+        //textureLoad(texture, vec2<i32>( position.x-distance, position.y+distance  ),  0).rgba,
+        //textureLoad(texture, vec2<i32>( position.x, position.y+distance  ),  0).rgba,
+        textureLoad(texture, vec2<i32>( position.x+distance, position.y+distance  ),  0).rgba,
+    );
+}
+`;
+
+// export const getColorsAroundBuffer = /*wgsl*/`
+
+// fn getColorsAroundBuffer(bufferPointer: ptr<function, array<vec4<f32>> >, position: vec2<i32>, distance: i32) -> array<  vec4<f32>, 8  >{
+
+// }
+// `;
+
+export const soften4 = /*wgsl*/`
+fn soften4(color:vec4<f32>, colorsAround:array<vec4<f32>, 4>, colorPower:f32) -> vec4<f32> {
+    var newColor:vec4<f32> = color;
+    for (var indexColors = 0u; indexColors < 4u; indexColors++) {
+        var colorAround = colorsAround[indexColors];
+        colorAround = (color + colorAround * colorPower) / (colorPower + 1.);
+        newColor += colorAround;
+    }
+    return newColor * .2;
+}
+`;
+
+export const soften8 = /*wgsl*/`
+fn soften8(color:vec4<f32>, colorsAround:array<vec4<f32>, 8>, colorPower:f32) -> vec4<f32> {
+    var newColor:vec4<f32> = color;
+    for (var indexColors = 0u; indexColors < 8u; indexColors++) {
+        var colorAround = colorsAround[indexColors];
+        // colorAround.r = (color.r + colorAround.r * colorPower) / (colorPower + 1.);
+        // colorAround.g = (color.g + colorAround.g * colorPower) / (colorPower + 1.);
+        // colorAround.b = (color.b + colorAround.b * colorPower) / (colorPower + 1.);
+        // colorAround.a = (color.a + colorAround.a * colorPower) / (colorPower + 1.);
+
+        colorAround = (color + colorAround * colorPower) / (colorPower + 1.);
+
+
+
+        newColor += colorAround;
+    }
+    return newColor * .2;
+}
+`;
+
+
+
+export const blur8 = /*wgsl*/`
+fn blur8(color:vec4<f32>, colorsAround:array<vec4<f32>, 8>, amount:f32) -> {
+
+}
+`;

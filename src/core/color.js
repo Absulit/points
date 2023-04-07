@@ -74,19 +74,28 @@ fn bloom(input:f32, iterations:i32, intensity:f32) -> f32 {
 }
 `;
 
-/**
- * Special for letters and create an sdf version of a texture
- */
-export const sdfSmooth = /*wgsl*/`
-fn sdfSmooth(color:vec4<f32>) -> vec4<f32> {
-    var finalColor = color;
-    var spread = fwidth(finalColor.a);
-    spread = max(spread * .75, .001);
-    finalColor.a = smoothstep(.5 - spread, .5 + spread, finalColor.a);
 
-    // if(finalColor.a <= 0.){
-    //     discard;
-    // }
-    return finalColor;
+
+export const brightness = /*wgsl*/`
+fn brightness(color:vec4<f32>) -> f32 {
+    // #Standard
+    // LuminanceA = (0.2126*R) + (0.7152*G) + (0.0722*B)
+    // #Percieved A
+    // LuminanceB = (0.299*R + 0.587*G + 0.114*B)
+    // #Perceived B, slower to calculate
+    // LuminanceC = sqrt(0.299*(R**2) + 0.587*(G**2) + 0.114*(B**2))
+    return (0.2126 * color.r) + (0.7152 * color.g) + (0.0722 * color.b);
+}
+`;
+
+export const brightnessB = /*wgsl*/`
+fn brightnessB(color:vec4<f32>) -> f32 {
+    return (0.299 * color.r) + (0.587 * color.g) + (0.114 * color.b);
+}
+`;
+
+export const brightnessC = /*wgsl*/`
+fn brightnessC(color:vec4<f32>) -> f32 {
+    return (0.2126 * pow(color.r, 2.)) + (0.7152 * pow(color.g, 2.)) + (0.0722 * pow(color.b, 2.));
 }
 `;
