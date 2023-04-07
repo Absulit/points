@@ -1,6 +1,6 @@
-import { rotateVector } from "../../../src/core/defaultFunctions.js";
 import { texturePosition } from "../../../src/core/image.js";
 import { PI } from '../../../src/core/defaultConstants.js';
+import { rotateVector } from "../../../src/core/math.js";
 
 const frag = /*wgsl*/`
 

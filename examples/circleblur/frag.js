@@ -1,4 +1,4 @@
-import { fnusin, fusin } from '../../src/core/defaultFunctions.js';
+import { fnusin, fusin } from '../../src/core/animation.js';
 import { texturePosition } from '../../src/core/image.js';
 
 const frag = /*wgsl*/`

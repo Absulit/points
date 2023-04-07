@@ -1,4 +1,5 @@
-import { brightness, fnusin } from '../../src/core/defaultFunctions.js';
+import { fnusin } from '../../src/core/animation.js';
+import { brightness } from '../../src/core/color.js';
 import { texturePosition } from '../../src/core/image.js';
 
 const frag = /*wgsl*/`

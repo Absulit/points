@@ -1,4 +1,4 @@
-import { sdfCircle } from '../../src/core/defaultFunctions.js';
+import { sdfCircle } from '../../src/core/sdf.js';
 import { snoise } from '../../src/core/noise2d.js';
 
 const frag = /*wgsl*/`

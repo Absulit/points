@@ -1,12 +1,12 @@
-import { brightness, fnusin, fusin, pixelateTexture } from '../../src/core/defaultFunctions.js';
 import { snoise } from '../../src/core/noise2d.js';
 import { getClosestColorInPalette, orderedDithering, orderedDithering_threshold_map } from '../../src/core/effects.js';
-import { texturePosition } from '../../src/core/image.js';
+import { pixelateTexture, texturePosition } from '../../src/core/image.js';
+import { brightness } from './../../src/core/color.js';
+import { fnusin } from '../../src/core/animation.js';
 
 const frag = /*wgsl*/`
 
 ${fnusin}
-${fusin}
 ${brightness}
 ${snoise}
 ${getClosestColorInPalette}

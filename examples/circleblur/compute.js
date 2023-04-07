@@ -1,15 +1,8 @@
-import { clearMix } from '../../src/core/defaultFunctions.js';
 
+import { clearMix } from './../../src/core/effects.js';
 const compute = /*wgsl*/`
 
-struct Variables{
-    testValue: f32
-}
-
-
 ${clearMix}
-
-var<workgroup> tile : array<array<vec3<f32>, 128>, 4>;
 
 const workgroupSize = 8;
 

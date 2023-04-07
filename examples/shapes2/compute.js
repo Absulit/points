@@ -1,4 +1,5 @@
-import { clearAlpha, sdfCircle, sdfLine2, sdfSegment, soften4, soften8 } from '../../src/core/defaultFunctions.js';
+import { clearAlpha, soften4, soften8 } from '../../src/core/effects.js';
+import { sdfCircle, sdfLine2, sdfSegment } from '../../src/core/sdf.js';
 
 const compute = /*wgsl*/`
 

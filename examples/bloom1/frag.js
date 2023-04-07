@@ -1,8 +1,10 @@
-import { brightness, fnusin, fusin, polar, sdfCircle, sdfLine, sdfSegment } from '../../src/core/defaultFunctions.js';
 import { snoise } from '../../src/core/noise2d.js';
 import { PI } from '../../src/core/defaultConstants.js';
 import { texturePosition } from '../../src/core/image.js';
-import { bloom } from '../../src/core/color.js';
+import { bloom, brightness } from '../../src/core/color.js';
+import { sdfCircle, sdfLine, sdfSegment } from '../../src/core/sdf.js';
+import { fnusin, fusin } from '../../src/core/animation.js';
+import { polar } from '../../src/core/math.js';
 
 const frag = /*wgsl*/`
 

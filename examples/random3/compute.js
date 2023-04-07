@@ -1,5 +1,5 @@
+import { fnusin } from '../../src/core/animation.js';
 import { RGBAFromHSV } from '../../src/core/color.js';
-import { fnusin } from '../../src/core/defaultFunctions.js';
 import { rand, random } from '../../src/core/random.js';
 
 const compute = /*wgsl*/`

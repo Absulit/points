@@ -1,10 +1,7 @@
-import { fnusin, fusin } from '../../src/core/defaultFunctions.js';
 import { texturePosition } from '../../src/core/image.js';
 
 const frag = /*wgsl*/`
 
-${fnusin}
-${fusin}
 ${texturePosition}
 
 @fragment
