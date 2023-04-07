@@ -1,4 +1,4 @@
-import { fnusin } from '../defaultFunctions.js';
+import { fnusin } from "../animation.js";
 
 const frag = /*wgsl*/`
 

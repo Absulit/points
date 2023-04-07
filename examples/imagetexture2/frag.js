@@ -1,14 +1,12 @@
-import { brightness, fnusin, fusin, polar, sdfCircle, sdfLine, sdfSegment } from '../../src/core/defaultFunctions.js';
+import { fnusin } from '../../src/core/animation.js';
+import { brightness } from '../../src/core/color.js';
+import { polar } from '../../src/core/math.js';
 import { snoise } from '../../src/core/noise2d.js';
 import { texturePosition } from './../../src/core/image.js';
 
 const frag = /*wgsl*/`
 
 ${fnusin}
-${fusin}
-${sdfCircle}
-${sdfSegment}
-${sdfLine}
 ${brightness}
 ${polar}
 ${snoise}

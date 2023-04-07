@@ -1,18 +1,17 @@
+/**
+ * video: Big Beak Bird on a Tree Branch // Costa Rica
+ * author: https://www.pexels.com/@shubh-haque-3142953/
+ * https://www.pexels.com/video/big-beak-bird-on-a-tree-branch-4746616/
+ */
+
 import vert from './vert.js';
-import compute from './compute.js';
 import frag from './frag.js';
 const videotexture1 = {
     vert,
-    compute,
     frag,
     init: async points => {
         points.addSampler('feedbackSampler', null);
-        // await points.addTextureImage('oldking', './../img/carmen_lyra_423x643.jpg');
-        await points.addTextureImage('image', './../img/old_king_600x600.jpg');
-        // await points.addTextureImage('image', './../img/absulit_800x800.jpg');
-        await points.addTextureVideo('video', './../img/61c6eeaf-87cf5e18.mp4')
-        points.addBindingTexture('outputTex', 'computeTexture');
-
+        await points.addTextureVideo('video', './../img/pexels-shubh-haque-4746616-960x540-30fps.mp4')
     },
     update: points => {
 

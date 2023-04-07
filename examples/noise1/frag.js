@@ -1,4 +1,4 @@
-import { fnusin } from '../../src/core/defaultFunctions.js';
+import { fnusin } from '../../src/core/animation.js';
 import { snoise } from '../../src/core/noise2d.js';
 
 const frag = /*wgsl*/`

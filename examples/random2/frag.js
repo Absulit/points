@@ -1,21 +1,9 @@
-import { fnusin, fusin } from '../../src/core/defaultFunctions.js';
+import { fusin } from '../../src/core/animation.js';
 import { texturePosition } from './../../src/core/image.js';
 
 const frag = /*wgsl*/`
 
-struct Particle{
-    x: f32,
-    y: f32
-}
 
-struct Star{
-    a: f32,
-    b: f32,
-    c: f32,
-    d: f32,
-}
-
-${fnusin}
 ${fusin}
 ${texturePosition}
 
