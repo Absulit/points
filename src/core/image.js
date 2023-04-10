@@ -1,6 +1,7 @@
 /**
  * places texture in a position
  * @param {texture_2d<f32>} texture `texture_2d<f32>`
+ * @param {sampler} aSampler `sampler`
  * @param {vec2<f32>} position `vec2<f32>`
  * @param {vec2<f32>} uv `vec2<f32>`
  * @param {bool} crop `bool`
@@ -36,6 +37,7 @@ fn texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>
 /**
  * places texture_external in a position
  * @param {texture_external} texture `texture_external`
+ * @param {sampler} aSampler `sampler`
  * @param {vec2<f32>} position `vec2<f32>`
  * @param {vec2<f32>} uv `vec2<f32>`
  * @param {bool} crop `bool`

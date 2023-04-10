@@ -16,7 +16,7 @@
             // import the `Points` class
 
             import Points, {RenderPass} from '../src/absulit.points.module.js';
-            import { fnusin } from '../src/core/defaultFunctions.js';
+            import { fnusin } from '../src/core/animation.js';
 
             // reference the canvas in the constructor
             const points = new Points('gl-canvas');
@@ -34,17 +34,6 @@
 
                     return defaultVertexBody(position, color, uv);
                 }`,
-                /*wgsl*/`
-
-                @compute @workgroup_size(8,8,1)
-                fn main(
-                    @builtin(global_invocation_id) GlobalId: vec3<u32>,
-                    @builtin(workgroup_id) WorkGroupID: vec3<u32>,
-                    @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
-                ) {
-                    let time = params.time;
-                }
-                `,
                 /*wgsl*/`
                 ${fnusin}
                 @fragment
@@ -67,7 +56,18 @@
 
                     return finalColor;
                 }
-                `
+                `,
+                /*wgsl*/`
+
+                @compute @workgroup_size(8,8,1)
+                fn main(
+                    @builtin(global_invocation_id) GlobalId: vec3<u32>,
+                    @builtin(workgroup_id) WorkGroupID: vec3<u32>,
+                    @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
+                ) {
+                    let time = params.time;
+                }
+                `,
                 )
             ];
 

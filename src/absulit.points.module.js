@@ -29,10 +29,10 @@ export class RenderPass {
      * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
      * This is useful for PostProcessing.
      * @param {String} vertexShader  WGSL Vertex Shader in a String.
-     * @param {String} computeShader  WGSL Compute Shader in a String.
      * @param {String} fragmentShader  WGSL Fragment Shader in a String.
+     * @param {String} computeShader  WGSL Compute Shader in a String.
      */
-    constructor(vertexShader, computeShader, fragmentShader) {
+    constructor(vertexShader, fragmentShader, computeShader) {
         this._vertexShader = vertexShader;
         this._computeShader = computeShader;
         this._fragmentShader = fragmentShader;

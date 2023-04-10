@@ -172,7 +172,7 @@ async function init() {
 
 
     await shaders.init(points);
-    let renderPasses = shaders.renderPasses || [new RenderPass(shaders.vert, shaders.compute, shaders.frag)]
+    let renderPasses = shaders.renderPasses || [new RenderPass(shaders.vert, shaders.frag, shaders.compute)]
     await points.init(renderPasses);
 
     let hasVertexAndFragmentShader = renderPasses.every(renderPass => renderPass.hasVertexAndFragmentShader)

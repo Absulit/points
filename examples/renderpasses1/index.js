@@ -11,8 +11,8 @@ const renderpasses1 = {
      * Render Passes expect to have an order
      */
     renderPasses: [
-        new RenderPass(vert1, null, frag1),
-        new RenderPass(vert2, null, frag2),
+        new RenderPass(vert1, frag1),
+        new RenderPass(vert2, frag2),
     ],
     init: async points => {
         points.addSampler('imageSampler', null);
