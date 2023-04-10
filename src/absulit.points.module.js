@@ -1578,6 +1578,9 @@ export default class Points {
      * @param {Object} params
      */
     async addPostRenderPass(renderPassId, params) {
+        if(this._renderPasses?.length){
+            throw '`addPostRenderPass` should be called prior `Points.init()`';
+        }
         let renderPass = RenderPasses._LIST[renderPassId];
         this._postRenderPasses.push(new RenderPass(renderPass.vertexShader, renderPass.fragmentShader, renderPass.computeShader))
         await renderPass.init(this, params)
