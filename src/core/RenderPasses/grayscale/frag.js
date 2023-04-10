@@ -1,11 +1,12 @@
 import { texturePosition } from '../../image.js';
-import { fnusin } from './../../animation.js';
-import { YELLOW } from './../../color.js';
+import { fnusin } from '../../animation.js';
+import { brightness, WHITE } from '../../color.js';
 const frag = /*wgsl*/`
 
 ${fnusin}
 ${texturePosition}
-${YELLOW}
+${brightness}
+${WHITE}
 
 @fragment
 fn main(
@@ -17,8 +18,8 @@ fn main(
     @builtin(position) position: vec4<f32>
 ) -> @location(0) vec4<f32> {
 
-    let imageColor = texturePosition(yellow_feedbackTexture, yellow_feedbackSampler, vec2(0,0), uvr, true);
-    let finalColor:vec4<f32> = (imageColor + YELLOW) * params.yellow_blendAmount;
+    let imageColor = texturePosition(grayscale_feedbackTexture, grayscale_feedbackSampler, vec2(0,0), uvr, true);
+    let finalColor:vec4<f32> = brightness(imageColor) * WHITE;
 
     return finalColor;
 }

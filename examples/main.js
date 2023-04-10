@@ -1,6 +1,6 @@
 'use strict';
 import * as dat from './../src/vendor/datgui/dat.gui.module.js';
-import Points, { RenderPass, ShaderType } from '../src/absulit.points.module.js';
+import Points, { RenderPass, RenderPasses, ShaderType } from '../src/absulit.points.module.js';
 
 /***************/
 const stats = new Stats();
@@ -175,6 +175,7 @@ async function init() {
     await shaders.init(points);
     let renderPasses = shaders.renderPasses || [new RenderPass(shaders.vert, shaders.frag, shaders.compute)];
     await points.init(renderPasses);
+    // await points.addRenderPass(RenderPasses.YELLOW, {blendAmount: .5});
 
     let hasVertexAndFragmentShader = renderPasses.every(renderPass => renderPass.hasVertexAndFragmentShader)
     hasVertexAndFragmentShader && (points.fitWindow = isFitWindow);
