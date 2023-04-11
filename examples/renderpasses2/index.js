@@ -26,7 +26,8 @@ const renderpasses1 = {
 
         await points.addPostRenderPass(RenderPasses.GRAYSCALE);
         await points.addPostRenderPass(RenderPasses.CHROMATIC_ABERRATION, {distance: .02});
-        await points.addPostRenderPass(RenderPasses.COLOR, {color:[.5,1,0,1], blendAmount: .5});
+        // await points.addPostRenderPass(RenderPasses.COLOR, {color:[.5,1,0,1], blendAmount: .5});
+        await points.addPostRenderPass(RenderPasses.PIXELATE, {pixelsWidth:10, pixelsHeight: 10});
 
 
     },
