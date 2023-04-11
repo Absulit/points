@@ -3,8 +3,9 @@ import Coordinate from './coordinate.js';
 import RGBAColor from './color.js';
 import defaultStructs from './core/defaultStructs.js';
 import { defaultVertexBody } from './core/defaultFunctions.js';
-import yellow from './core/RenderPasses/yellow/index.js';
+import color from './core/RenderPasses/color/index.js';
 import grayscale from './core/RenderPasses/grayscale/index.js';
+import chromaticAberration from './core/RenderPasses/chromaticAberration/index.js';
 
 export class ShaderType {
     static VERTEX = '0';
@@ -27,12 +28,14 @@ class UniformKeys {
 }
 
 export class RenderPasses {
-    static YELLOW = 'yellow';
+    static COLOR = 'color';
     static GRAYSCALE = 'grayscale';
+    static CHROMATIC_ABERRATION = 'chromaticAberration';
 
     static _LIST = {
-        'yellow': yellow,
+        'color': color,
         'grayscale': grayscale,
+        'chromaticAberration': chromaticAberration,
     }
 }
 
@@ -314,6 +317,9 @@ export default class Points {
      * @param {Number} value Number will be converted to `f32`
      */
     addUniform(name, value) {
+        if(this._nameExists(this._uniforms, name)){
+            return;
+        }
         // TODO: add a third parameter with a type, so a struct can be defined and pass things like booleans
         this._uniforms.push({
             name: name,
@@ -346,6 +352,9 @@ export default class Points {
      * @param {ShaderType} shaderType this tells to what shader the storage is bound
      */
     addStorage(name, size, structName, structSize, read, shaderType, arrayData) {
+        if(this._nameExists(this._storage, name)){
+            return;
+        }
         this._storage.push({
             mapped: !!arrayData,
             name: name,
@@ -367,6 +376,9 @@ export default class Points {
     }
 
     addStorageMap(name, arrayData, structName, shaderType) {
+        if(this._nameExists(this._storage, name)){
+            return;
+        }
         this._storage.push({
             mapped: true,
             name: name,
@@ -410,6 +422,10 @@ export default class Points {
         }
     }
 
+    _nameExists(arrayOfObjects, name){
+        return arrayOfObjects.some(obj => obj.name == name);
+    }
+
     /**
      * Creates a `sampler` to be sent to the shaders.
      * @param {string} name Name of the `sampler` to be called in the shaders.
@@ -419,6 +435,11 @@ export default class Points {
         if ('sampler' == name) {
             throw '`name` can not be sampler since is a WebGPU keyword';
         }
+
+        if(this._nameExists(this._samplers, name)){
+            return;
+        }
+
         // Create a sampler with linear filtering for smooth interpolation.
         descriptor = descriptor || {
             addressModeU: 'clamp-to-edge',
@@ -443,6 +464,9 @@ export default class Points {
      * @param {boolean} copyCurrentTexture If you want the fragment output to be copied here.
      */
     addTexture2d(name, copyCurrentTexture, shaderType) {
+        if(this._nameExists(this._textures2d, name)){
+            return;
+        }
         this._textures2d.push({
             name: name,
             copyCurrentTexture: copyCurrentTexture,
@@ -458,6 +482,10 @@ export default class Points {
      * @param {ShaderType} shaderType
      */
     async addTextureImage(name, path, shaderType) {
+        if(this._nameExists(this._textures2d, name)){
+            return;
+        }
+
         const response = await fetch(path);
         const blob = await response.blob();
         const imageBitmap = await createImageBitmap(blob);
@@ -480,6 +508,9 @@ export default class Points {
      * @param {ShaderType} shaderType
      */
     async addTextureVideo(name, path, shaderType) {
+        if(this._nameExists(this._texturesExternal, name)){
+            return;
+        }
         const video = document.createElement('video');
         video.loop = true;
         video.autoplay = true;
@@ -495,6 +526,9 @@ export default class Points {
     }
 
     async addTextureWebcam(name, shaderType) {
+        if(this._nameExists(this._texturesExternal, name)){
+            return;
+        }
         const video = document.createElement('video');
         //video.loop = true;
         //video.autoplay = true;
@@ -521,6 +555,9 @@ export default class Points {
 
     //
     addTextureStorage2d(name, shaderType) {
+        if(this._nameExists(this._texturesStorage2d, name)){
+            return;
+        }
         this._texturesStorage2d.push({
             name: name,
             shaderType: shaderType,

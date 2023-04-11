@@ -1,12 +1,7 @@
 import { texturePosition } from '../../image.js';
-import { fnusin } from '../../animation.js';
-import { brightness, WHITE } from '../../color.js';
 const frag = /*wgsl*/`
 
-${fnusin}
 ${texturePosition}
-${brightness}
-${WHITE}
 
 @fragment
 fn main(
@@ -19,7 +14,15 @@ fn main(
 ) -> @location(0) vec4<f32> {
 
     let imageColor = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0,0), uvr, true);
-    let finalColor:vec4<f32> = brightness(imageColor) * WHITE;
+
+
+    // --------- chromatic displacement vector
+    let cdv = vec2(params.chromaticAberration_distance, 0.);
+    let imageColorR = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * ratio, uvr + cdv, true).r;
+    let imageColorG = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * ratio, uvr, true).g;
+    let imageColorB = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * ratio, uvr - cdv, true).b;
+
+    let finalColor:vec4<f32> = vec4(imageColorR, imageColorG, imageColorB, 1);
 
     return finalColor;
 }
