@@ -7,7 +7,8 @@ const lensDistortion = {
     init: async (points, params) => {
         points.addSampler('renderpass_feedbackSampler', null);
         points.addTexture2d('renderpass_feedbackTexture', true);
-        points.addUniform('lensDistortion_amount', params.amount)
+        points.addUniform('lensDistortion_amount', params?.amount || .4)
+        points.addUniform('lensDistortion_distance', params?.distance || .01);
     },
     update: async points => {
 

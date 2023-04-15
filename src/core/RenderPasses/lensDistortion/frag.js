@@ -66,9 +66,26 @@ fn main(
         nuv = uvr;
     }
 
-    let imageColor = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, imagePosition, nuv, false);
+    // let imageColor = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, imagePosition, nuv, false);
 
-    let finalColor = imageColor;
+
+    // Chromatic Aberration --
+    // --------- chromatic displacement vector
+    let cdv = vec2(params.lensDistortion_distance, 0.);
+    // let dis = distance(vec2(.5,.5), uvr);
+    let imageColorR = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * ratio, nuv + cdv * params.lensDistortion_amount , true).r;
+    let imageColorG = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * ratio, nuv, true).g;
+    let imageColorB = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * ratio, nuv - cdv * params.lensDistortion_amount , true).b;
+
+    let chromaticAberration:vec4<f32> = vec4(imageColorR, imageColorG, imageColorB, 1);
+    // -- Chromatic Aberration
+
+
+
+
+
+
+    let finalColor = chromaticAberration;
     // let finalColor = vec4(nuv,0,1) * WHITE;
 
     return finalColor;

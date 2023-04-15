@@ -18,9 +18,10 @@ fn main(
 
     // --------- chromatic displacement vector
     let cdv = vec2(params.chromaticAberration_distance, 0.);
-    let imageColorR = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * ratio, uvr + cdv, true).r;
+    let d = distance(vec2(.5,.5), uvr);
+    let imageColorR = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * ratio, uvr + cdv * d, true).r;
     let imageColorG = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * ratio, uvr, true).g;
-    let imageColorB = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * ratio, uvr - cdv, true).b;
+    let imageColorB = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * ratio, uvr - cdv * d, true).b;
 
     let finalColor:vec4<f32> = vec4(imageColorR, imageColorG, imageColorB, 1);
 

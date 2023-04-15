@@ -323,7 +323,7 @@ export default class Points {
      * @param {Number} value Number will be converted to `f32`
      */
     addUniform(name, value) {
-        if(this._nameExists(this._uniforms, name)){
+        if (this._nameExists(this._uniforms, name)) {
             return;
         }
         // TODO: add a third parameter with a type, so a struct can be defined and pass things like booleans
@@ -358,7 +358,7 @@ export default class Points {
      * @param {ShaderType} shaderType this tells to what shader the storage is bound
      */
     addStorage(name, size, structName, structSize, read, shaderType, arrayData) {
-        if(this._nameExists(this._storage, name)){
+        if (this._nameExists(this._storage, name)) {
             return;
         }
         this._storage.push({
@@ -382,7 +382,7 @@ export default class Points {
     }
 
     addStorageMap(name, arrayData, structName, shaderType) {
-        if(this._nameExists(this._storage, name)){
+        if (this._nameExists(this._storage, name)) {
             return;
         }
         this._storage.push({
@@ -428,7 +428,7 @@ export default class Points {
         }
     }
 
-    _nameExists(arrayOfObjects, name){
+    _nameExists(arrayOfObjects, name) {
         return arrayOfObjects.some(obj => obj.name == name);
     }
 
@@ -442,7 +442,7 @@ export default class Points {
             throw '`name` can not be sampler since is a WebGPU keyword';
         }
 
-        if(this._nameExists(this._samplers, name)){
+        if (this._nameExists(this._samplers, name)) {
             return;
         }
 
@@ -470,7 +470,7 @@ export default class Points {
      * @param {boolean} copyCurrentTexture If you want the fragment output to be copied here.
      */
     addTexture2d(name, copyCurrentTexture, shaderType) {
-        if(this._nameExists(this._textures2d, name)){
+        if (this._nameExists(this._textures2d, name)) {
             return;
         }
         this._textures2d.push({
@@ -488,7 +488,7 @@ export default class Points {
      * @param {ShaderType} shaderType
      */
     async addTextureImage(name, path, shaderType) {
-        if(this._nameExists(this._textures2d, name)){
+        if (this._nameExists(this._textures2d, name)) {
             return;
         }
 
@@ -514,7 +514,7 @@ export default class Points {
      * @param {ShaderType} shaderType
      */
     async addTextureVideo(name, path, shaderType) {
-        if(this._nameExists(this._texturesExternal, name)){
+        if (this._nameExists(this._texturesExternal, name)) {
             return;
         }
         const video = document.createElement('video');
@@ -532,7 +532,7 @@ export default class Points {
     }
 
     async addTextureWebcam(name, shaderType) {
-        if(this._nameExists(this._texturesExternal, name)){
+        if (this._nameExists(this._texturesExternal, name)) {
             return;
         }
         const video = document.createElement('video');
@@ -561,7 +561,7 @@ export default class Points {
 
     //
     addTextureStorage2d(name, shaderType) {
-        if(this._nameExists(this._texturesStorage2d, name)){
+        if (this._nameExists(this._texturesStorage2d, name)) {
             return;
         }
         this._texturesStorage2d.push({
@@ -1621,7 +1621,7 @@ export default class Points {
      * @param {Object} params
      */
     async addPostRenderPass(renderPassId, params) {
-        if(this._renderPasses?.length){
+        if (this._renderPasses?.length) {
             throw '`addPostRenderPass` should be called prior `Points.init()`';
         }
         let renderPass = RenderPasses._LIST[renderPassId];
