@@ -7,6 +7,7 @@ import color from './core/RenderPasses/color/index.js';
 import grayscale from './core/RenderPasses/grayscale/index.js';
 import chromaticAberration from './core/RenderPasses/chromaticAberration/index.js';
 import pixelate from './core/RenderPasses/pixelate/index.js';
+import lensDistortion from './core/RenderPasses/lensDistortion/index.js';
 
 export class ShaderType {
     static VERTEX = '0';
@@ -33,12 +34,14 @@ export class RenderPasses {
     static GRAYSCALE = 'grayscale';
     static CHROMATIC_ABERRATION = 'chromaticAberration';
     static PIXELATE = 'pixelate';
+    static LENS_DISTORTION = 'lensDistortion';
 
     static _LIST = {
         'color': color,
         'grayscale': grayscale,
         'chromaticAberration': chromaticAberration,
         'pixelate': pixelate,
+        'lensDistortion': lensDistortion,
     }
 }
 
