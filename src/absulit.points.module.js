@@ -8,6 +8,7 @@ import grayscale from './core/RenderPasses/grayscale/index.js';
 import chromaticAberration from './core/RenderPasses/chromaticAberration/index.js';
 import pixelate from './core/RenderPasses/pixelate/index.js';
 import lensDistortion from './core/RenderPasses/lensDistortion/index.js';
+import filmgrain from './core/RenderPasses/filmgrain/index.js';
 
 export class ShaderType {
     static VERTEX = '0';
@@ -35,6 +36,7 @@ export class RenderPasses {
     static CHROMATIC_ABERRATION = 'chromaticAberration';
     static PIXELATE = 'pixelate';
     static LENS_DISTORTION = 'lensDistortion';
+    static FILM_GRAIN = 'filmgrain';
 
     static _LIST = {
         'color': color,
@@ -42,6 +44,7 @@ export class RenderPasses {
         'chromaticAberration': chromaticAberration,
         'pixelate': pixelate,
         'lensDistortion': lensDistortion,
+        'filmgrain': filmgrain,
     }
 }
 
@@ -1616,9 +1619,9 @@ export default class Points {
     }
 
     /**
-     *
-     * @param {RenderPasses} renderPassId
-     * @param {Object} params
+     * Add a `RenderPass` from the `RenderPasses` list
+     * @param {RenderPasses} renderPassId Select a static property from `RenderPasses`
+     * @param {Object} params An object with the params needed by the `RenderPass`
      */
     async addPostRenderPass(renderPassId, params) {
         if (this._renderPasses?.length) {
