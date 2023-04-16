@@ -24,14 +24,14 @@ const renderpasses1 = {
 
 
 
-        await points.addPostRenderPass(RenderPasses.GRAYSCALE);
+        // await points.addPostRenderPass(RenderPasses.GRAYSCALE);
         // await points.addPostRenderPass(RenderPasses.CHROMATIC_ABERRATION, {distance: .02});
         // await points.addPostRenderPass(RenderPasses.COLOR, {color:[.5,1,0,1], blendAmount: .5});
         // await points.addPostRenderPass(RenderPasses.PIXELATE, {pixelsWidth:10, pixelsHeight: 10});
-        await points.addPostRenderPass(RenderPasses.LENS_DISTORTION, { amount: .4, distance: .01 });
-        await points.addPostRenderPass(RenderPasses.FILM_GRAIN, { amount: .4, distance: .01 });
-        await points.addPostRenderPass(RenderPasses.BLOOM, { amount: .5 });
-        await points.addPostRenderPass(RenderPasses.BLUR, { amount: .5 });
+        // await points.addPostRenderPass(RenderPasses.LENS_DISTORTION, { amount: .4, distance: .01 });
+        // await points.addPostRenderPass(RenderPasses.FILM_GRAIN, { amount: .4, distance: .01 });
+        // await points.addPostRenderPass(RenderPasses.BLOOM, { amount: .5 });
+        await points.addPostRenderPass(RenderPasses.BLUR, { resolution: [100,100], direction: [.4,0], radians: 0.0});
 
 
     },

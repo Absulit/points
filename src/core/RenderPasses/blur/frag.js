@@ -26,8 +26,8 @@ fn main(
         renderpass_feedbackSampler,
         vec2(0.,0),
         uvr,
-        vec2(100.,100.), // resolution
-        rotateVector(vec2(.4,.0), 2 * PI * params.sliderA) // direction
+        vec2(params.blur_resolution_x, params.blur_resolution_y), // resolution
+        rotateVector(vec2(params.blur_direction_x, params.blur_direction_y), params.blur_radians) // direction
     );
 
     let finalColor = feedbackColor;
