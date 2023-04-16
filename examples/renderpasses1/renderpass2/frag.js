@@ -1,25 +1,16 @@
 import { texturePosition } from "../../../src/core/image.js";
 import { PI } from '../../../src/core/defaultConstants.js';
 import { rotateVector } from "../../../src/core/math.js";
+import { blur9 } from "../../../src/core/effects.js";
 
 const frag = /*wgsl*/`
 
 ${texturePosition}
 ${rotateVector}
 ${PI}
+${blur9}
 
-// TODO: move to effect module and add reference
-fn blur9(image: texture_2d<f32>, imageSampler:sampler, position:vec2<f32>, uv:vec2<f32>, resolution: vec2<f32>, direction: vec2<f32>) -> vec4<f32> {
-    var color = vec4(0.0);
-    let off1 = vec2(1.3846153846) * direction;
-    let off2 = vec2(3.2307692308) * direction;
-    color += texturePosition(image, imageSampler, position, uv, true) * 0.2270270270;
-    color += texturePosition(image, imageSampler, position, uv + (off1 / resolution), true) * 0.3162162162;
-    color += texturePosition(image, imageSampler, position, uv - (off1 / resolution), true) * 0.3162162162;
-    color += texturePosition(image, imageSampler, position, uv + (off2 / resolution), true) * 0.0702702703;
-    color += texturePosition(image, imageSampler, position, uv - (off2 / resolution), true) * 0.0702702703;
-    return color;
-}
+
 
 @fragment
 fn main(

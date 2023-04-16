@@ -9,6 +9,8 @@ import chromaticAberration from './core/RenderPasses/chromaticAberration/index.j
 import pixelate from './core/RenderPasses/pixelate/index.js';
 import lensDistortion from './core/RenderPasses/lensDistortion/index.js';
 import filmgrain from './core/RenderPasses/filmgrain/index.js';
+import bloom from './core/RenderPasses/bloom/index.js';
+import blur from './core/RenderPasses/blur/index.js';
 
 export class ShaderType {
     static VERTEX = '0';
@@ -37,6 +39,8 @@ export class RenderPasses {
     static PIXELATE = 'pixelate';
     static LENS_DISTORTION = 'lensDistortion';
     static FILM_GRAIN = 'filmgrain';
+    static BLOOM = 'bloom';
+    static BLUR = 'blur';
 
     static _LIST = {
         'color': color,
@@ -45,6 +49,8 @@ export class RenderPasses {
         'pixelate': pixelate,
         'lensDistortion': lensDistortion,
         'filmgrain': filmgrain,
+        'bloom': bloom,
+        'blur': blur,
     }
 }
 
