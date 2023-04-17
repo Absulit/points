@@ -31,7 +31,8 @@ const renderpasses1 = {
         // await points.addPostRenderPass(RenderPasses.LENS_DISTORTION, { amount: .4, distance: .01 });
         // await points.addPostRenderPass(RenderPasses.FILM_GRAIN, { amount: .4, distance: .01 });
         // await points.addPostRenderPass(RenderPasses.BLOOM, { amount: .5 });
-        await points.addPostRenderPass(RenderPasses.BLUR, { resolution: [100,100], direction: [.4,0], radians: 0.0});
+        // await points.addPostRenderPass(RenderPasses.BLUR, { resolution: [100,100], direction: [.4,0], radians: 0.0});
+        await points.addPostRenderPass(RenderPasses.WAVES, { scale: .05, intensity: .03});
 
 
     },

@@ -11,11 +11,12 @@ import lensDistortion from './core/RenderPasses/lensDistortion/index.js';
 import filmgrain from './core/RenderPasses/filmgrain/index.js';
 import bloom from './core/RenderPasses/bloom/index.js';
 import blur from './core/RenderPasses/blur/index.js';
+import waves from './core/RenderPasses/waves/index.js';
 
 export class ShaderType {
-    static VERTEX = '0';
-    static COMPUTE = '1';
-    static FRAGMENT = '2';
+    static VERTEX = 1;
+    static COMPUTE = 2;
+    static FRAGMENT = 3;
 }
 
 class UniformKeys {
@@ -41,6 +42,7 @@ export class RenderPasses {
     static FILM_GRAIN = 'filmgrain';
     static BLOOM = 'bloom';
     static BLUR = 'blur';
+    static WAVES = 'waves';
 
     static _LIST = {
         'color': color,
@@ -51,6 +53,7 @@ export class RenderPasses {
         'filmgrain': filmgrain,
         'bloom': bloom,
         'blur': blur,
+        'waves': waves,
     }
 }
 

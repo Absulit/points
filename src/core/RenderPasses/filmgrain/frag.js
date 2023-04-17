@@ -17,28 +17,15 @@ fn main(
     @builtin(position) position: vec4<f32>
 ) -> @location(0) vec4<f32> {
 
-    // noise = noise * intensity_value
-    // noise = noise * 2 - 1
-    // color = color + color * noise
-
-    if(init == 0.){
-        // rand_seed = uvr;
-        init = 1.;
-    }
 
     let imageColor = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0,0), uvr, true);
 
-
     rand_seed = uvr + params.time;
-
-    // let n1 = snoise(uv * 1000 * params.time);
 
     var noise = rand();
     noise = noise;
     noise = noise * .5 + .5;
     let finalColor = (imageColor + imageColor * noise)  * .5;
-
-    // let finalColor:vec4<f32> = vec4(rand_seed,0, 1);
 
     return finalColor;
 }
