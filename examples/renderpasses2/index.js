@@ -1,9 +1,8 @@
 import vert1 from './renderpass1/vert.js';
 import frag1 from './renderpass1/frag.js';
 
-import { RenderPass, RenderPasses } from '../../src/absulit.points.module.js';
-// import yellow from '../../src/core/RenderPasses/yellow/index.js';
-
+import { RenderPass } from '../../src/absulit.points.module.js';
+import { RenderPasses } from "../../src/RenderPasses.js";
 
 const renderpasses1 = {
     /**
@@ -23,17 +22,15 @@ const renderpasses1 = {
         points.addTexture2d('feedbackTexture', true);
 
 
-
-        // await points.addPostRenderPass(RenderPasses.GRAYSCALE);
-        // await points.addPostRenderPass(RenderPasses.CHROMATIC_ABERRATION, {distance: .02});
-        // await points.addPostRenderPass(RenderPasses.COLOR, {color:[.5,1,0,1], blendAmount: .5});
-        // await points.addPostRenderPass(RenderPasses.PIXELATE, {pixelsWidth:10, pixelsHeight: 10});
-        // await points.addPostRenderPass(RenderPasses.LENS_DISTORTION, { amount: .4, distance: .01 });
-        // await points.addPostRenderPass(RenderPasses.FILM_GRAIN, { amount: .4, distance: .01 });
-        // await points.addPostRenderPass(RenderPasses.BLOOM, { amount: .5 });
-        // await points.addPostRenderPass(RenderPasses.BLUR, { resolution: [100,100], direction: [.4,0], radians: 0.0});
-        await points.addPostRenderPass(RenderPasses.WAVES, { scale: .05, intensity: .03});
-
+        RenderPasses.grayscale(points);
+        RenderPasses.chromaticAberration(points, { distance: .02 });
+        RenderPasses.color(points, { color: [.5, 1, 0, 1], blendAmount: .5 });
+        RenderPasses.pixelate(points, { pixelsWidth: 10, pixelsHeight: 10 });
+        RenderPasses.lensDistortion(points, { amount: .4, distance: .01 });
+        RenderPasses.filmgrain(points, { amount: .4, distance: .01 });
+        RenderPasses.bloom(points, { amount: .5 });
+        RenderPasses.blur(points, { resolution: [100, 100], direction: [.4, 0], radians: 0.0 });
+        RenderPasses.waves(points, { scale: .05, intensity: .03 });
 
     },
     update: points => {

@@ -3,15 +3,6 @@ import Coordinate from './coordinate.js';
 import RGBAColor from './color.js';
 import defaultStructs from './core/defaultStructs.js';
 import { defaultVertexBody } from './core/defaultFunctions.js';
-import color from './core/RenderPasses/color/index.js';
-import grayscale from './core/RenderPasses/grayscale/index.js';
-import chromaticAberration from './core/RenderPasses/chromaticAberration/index.js';
-import pixelate from './core/RenderPasses/pixelate/index.js';
-import lensDistortion from './core/RenderPasses/lensDistortion/index.js';
-import filmgrain from './core/RenderPasses/filmgrain/index.js';
-import bloom from './core/RenderPasses/bloom/index.js';
-import blur from './core/RenderPasses/blur/index.js';
-import waves from './core/RenderPasses/waves/index.js';
 
 export class ShaderType {
     static VERTEX = 1;
@@ -31,30 +22,6 @@ class UniformKeys {
     static MOUSE_WHEEL = 'mouseWheel';
     static MOUSE_DELTA_X = 'mouseDeltaX';
     static MOUSE_DELTA_Y = 'mouseDeltaY';
-}
-
-export class RenderPasses {
-    static COLOR = 'color';
-    static GRAYSCALE = 'grayscale';
-    static CHROMATIC_ABERRATION = 'chromaticAberration';
-    static PIXELATE = 'pixelate';
-    static LENS_DISTORTION = 'lensDistortion';
-    static FILM_GRAIN = 'filmgrain';
-    static BLOOM = 'bloom';
-    static BLUR = 'blur';
-    static WAVES = 'waves';
-
-    static _LIST = {
-        'color': color,
-        'grayscale': grayscale,
-        'chromaticAberration': chromaticAberration,
-        'pixelate': pixelate,
-        'lensDistortion': lensDistortion,
-        'filmgrain': filmgrain,
-        'bloom': bloom,
-        'blur': blur,
-        'waves': waves,
-    }
 }
 
 export class RenderPass {
@@ -1627,17 +1594,4 @@ export default class Points {
         this.mediaRecorder.stop();
     }
 
-    /**
-     * Add a `RenderPass` from the `RenderPasses` list
-     * @param {RenderPasses} renderPassId Select a static property from `RenderPasses`
-     * @param {Object} params An object with the params needed by the `RenderPass`
-     */
-    async addPostRenderPass(renderPassId, params) {
-        if (this._renderPasses?.length) {
-            throw '`addPostRenderPass` should be called prior `Points.init()`';
-        }
-        let renderPass = RenderPasses._LIST[renderPassId];
-        this._postRenderPasses.push(new RenderPass(renderPass.vertexShader, renderPass.fragmentShader, renderPass.computeShader))
-        await renderPass.init(this, params)
-    }
 }
