@@ -5,9 +5,9 @@ import defaultStructs from './core/defaultStructs.js';
 import { defaultVertexBody } from './core/defaultFunctions.js';
 
 export class ShaderType {
-    static VERTEX = '0';
-    static COMPUTE = '1';
-    static FRAGMENT = '2';
+    static VERTEX = 1;
+    static COMPUTE = 2;
+    static FRAGMENT = 3;
 }
 
 class UniformKeys {
@@ -29,10 +29,10 @@ export class RenderPass {
      * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
      * This is useful for PostProcessing.
      * @param {String} vertexShader  WGSL Vertex Shader in a String.
-     * @param {String} computeShader  WGSL Compute Shader in a String.
      * @param {String} fragmentShader  WGSL Fragment Shader in a String.
+     * @param {String} computeShader  WGSL Compute Shader in a String.
      */
-    constructor(vertexShader, computeShader, fragmentShader) {
+    constructor(vertexShader, fragmentShader, computeShader) {
         this._vertexShader = vertexShader;
         this._computeShader = computeShader;
         this._fragmentShader = fragmentShader;
@@ -167,6 +167,7 @@ export default class Points {
         this._context = null;
         this._presentationFormat = null;
         this._renderPasses = null;
+        this._postRenderPasses = [];
         this._vertexBufferInfo = null;
         this._buffer = null;
 
@@ -301,6 +302,9 @@ export default class Points {
      * @param {Number} value Number will be converted to `f32`
      */
     addUniform(name, value) {
+        if (this._nameExists(this._uniforms, name)) {
+            return;
+        }
         // TODO: add a third parameter with a type, so a struct can be defined and pass things like booleans
         this._uniforms.push({
             name: name,
@@ -333,6 +337,9 @@ export default class Points {
      * @param {ShaderType} shaderType this tells to what shader the storage is bound
      */
     addStorage(name, size, structName, structSize, read, shaderType, arrayData) {
+        if (this._nameExists(this._storage, name)) {
+            return;
+        }
         this._storage.push({
             mapped: !!arrayData,
             name: name,
@@ -354,6 +361,9 @@ export default class Points {
     }
 
     addStorageMap(name, arrayData, structName, shaderType) {
+        if (this._nameExists(this._storage, name)) {
+            return;
+        }
         this._storage.push({
             mapped: true,
             name: name,
@@ -397,6 +407,10 @@ export default class Points {
         }
     }
 
+    _nameExists(arrayOfObjects, name) {
+        return arrayOfObjects.some(obj => obj.name == name);
+    }
+
     /**
      * Creates a `sampler` to be sent to the shaders.
      * @param {string} name Name of the `sampler` to be called in the shaders.
@@ -406,6 +420,11 @@ export default class Points {
         if ('sampler' == name) {
             throw '`name` can not be sampler since is a WebGPU keyword';
         }
+
+        if (this._nameExists(this._samplers, name)) {
+            return;
+        }
+
         // Create a sampler with linear filtering for smooth interpolation.
         descriptor = descriptor || {
             addressModeU: 'clamp-to-edge',
@@ -430,6 +449,9 @@ export default class Points {
      * @param {boolean} copyCurrentTexture If you want the fragment output to be copied here.
      */
     addTexture2d(name, copyCurrentTexture, shaderType) {
+        if (this._nameExists(this._textures2d, name)) {
+            return;
+        }
         this._textures2d.push({
             name: name,
             copyCurrentTexture: copyCurrentTexture,
@@ -445,6 +467,10 @@ export default class Points {
      * @param {ShaderType} shaderType
      */
     async addTextureImage(name, path, shaderType) {
+        if (this._nameExists(this._textures2d, name)) {
+            return;
+        }
+
         const response = await fetch(path);
         const blob = await response.blob();
         const imageBitmap = await createImageBitmap(blob);
@@ -467,6 +493,9 @@ export default class Points {
      * @param {ShaderType} shaderType
      */
     async addTextureVideo(name, path, shaderType) {
+        if (this._nameExists(this._texturesExternal, name)) {
+            return;
+        }
         const video = document.createElement('video');
         video.loop = true;
         video.autoplay = true;
@@ -482,6 +511,9 @@ export default class Points {
     }
 
     async addTextureWebcam(name, shaderType) {
+        if (this._nameExists(this._texturesExternal, name)) {
+            return;
+        }
         const video = document.createElement('video');
         //video.loop = true;
         //video.autoplay = true;
@@ -508,6 +540,9 @@ export default class Points {
 
     //
     addTextureStorage2d(name, shaderType) {
+        if (this._nameExists(this._texturesStorage2d, name)) {
+            return;
+        }
         this._texturesStorage2d.push({
             name: name,
             shaderType: shaderType,
@@ -638,6 +673,63 @@ export default class Points {
         this._numRows = numRows;
     }
 
+    _compileRenderPass = (renderPass, index) => {
+        let vertexShader = renderPass.vertexShader;
+        let computeShader = renderPass.computeShader;
+        let fragmentShader = renderPass.fragmentShader;
+
+        let colorsVertWGSL = vertexShader;
+        let colorsComputeWGSL = computeShader;
+        let colorsFragWGSL = fragmentShader;
+
+        let dynamicGroupBindingsVertex = '';
+        let dynamicGroupBindingsCompute = '';
+        let dynamicGroupBindingsFragment = '';
+
+        let dynamicStructParams = '';
+        this._uniforms.forEach(variable => {
+            dynamicStructParams += /*wgsl*/`${variable.name}:f32, \n\t\t\t\t\t`;
+        });
+
+        if (this._uniforms.length) {
+            dynamicStructParams = /*wgsl*/`
+                struct Params {
+                    ${dynamicStructParams}
+                }
+            \n`;
+        }
+
+        renderPass.hasVertexShader && (dynamicGroupBindingsVertex += dynamicStructParams);
+        renderPass.hasComputeShader && (dynamicGroupBindingsCompute += dynamicStructParams);
+        renderPass.hasFragmentShader && (dynamicGroupBindingsFragment += dynamicStructParams);
+
+        renderPass.hasVertexShader && (dynamicGroupBindingsVertex += this._createDynamicGroupBindings(ShaderType.VERTEX));
+        renderPass.hasComputeShader && (dynamicGroupBindingsCompute += this._createDynamicGroupBindings(ShaderType.COMPUTE));
+        dynamicGroupBindingsFragment += this._createDynamicGroupBindings(ShaderType.FRAGMENT);
+
+        renderPass.hasVertexShader && (colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + defaultVertexBody + colorsVertWGSL);
+        renderPass.hasComputeShader && (colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + colorsComputeWGSL);
+        renderPass.hasFragmentShader && (colorsFragWGSL = dynamicGroupBindingsFragment + defaultStructs + colorsFragWGSL);
+
+        console.groupCollapsed(`Render Pass ${index}`);
+        console.groupCollapsed('VERTEX');
+        console.log(colorsVertWGSL);
+        console.groupEnd();
+        if (renderPass.hasComputeShader) {
+            console.groupCollapsed('COMPUTE');
+            console.log(colorsComputeWGSL);
+            console.groupEnd();
+        }
+        console.groupCollapsed('FRAGMENT');
+        console.log(colorsFragWGSL);
+        console.groupEnd();
+        console.groupEnd();
+
+        renderPass.hasVertexShader && (renderPass.compiledShaders.vertex = colorsVertWGSL);
+        renderPass.hasComputeShader && (renderPass.compiledShaders.compute = colorsComputeWGSL);
+        renderPass.hasFragmentShader && (renderPass.compiledShaders.fragment = colorsFragWGSL);
+    }
+
     /**
      * One time function to call to initialize the shaders.
      * @param {array<RenderPass>} renderPasses Collection of RenderPass, which contain Vertex, Compute and Fragment shaders.
@@ -645,7 +737,7 @@ export default class Points {
      */
     async init(renderPasses) {
 
-        this._renderPasses = renderPasses;
+        this._renderPasses = renderPasses.concat(this._postRenderPasses);
 
         // initializing internal uniforms
         this.addUniform(UniformKeys.TIME, this._time);
@@ -665,63 +757,7 @@ export default class Points {
             throw ' `addBindingTexture` requires at least one Compute Shader in a `RenderPass`'
         }
 
-        this._renderPasses.forEach((renderPass, index) => {
-            let vertexShader = renderPass.vertexShader;
-            let computeShader = renderPass.computeShader;
-            let fragmentShader = renderPass.fragmentShader;
-
-            let colorsVertWGSL = vertexShader;
-            let colorsComputeWGSL = computeShader;
-            let colorsFragWGSL = fragmentShader;
-
-            let dynamicGroupBindingsVertex = '';
-            let dynamicGroupBindingsCompute = '';
-            let dynamicGroupBindingsFragment = '';
-
-
-            let dynamicStructParams = '';
-            this._uniforms.forEach((variable, index) => {
-                dynamicStructParams += /*wgsl*/`${variable.name}:f32, \n\t\t\t\t\t`;
-            });
-
-            if (this._uniforms.length) {
-                dynamicStructParams = /*wgsl*/`
-                    struct Params {
-                        ${dynamicStructParams}
-                    }
-                \n`;
-            }
-
-            renderPass.hasVertexShader && (dynamicGroupBindingsVertex += dynamicStructParams);
-            renderPass.hasComputeShader && (dynamicGroupBindingsCompute += dynamicStructParams);
-            renderPass.hasFragmentShader && (dynamicGroupBindingsFragment += dynamicStructParams);
-
-            renderPass.hasVertexShader && (dynamicGroupBindingsVertex += this._createDynamicGroupBindings(ShaderType.VERTEX));
-            renderPass.hasComputeShader && (dynamicGroupBindingsCompute += this._createDynamicGroupBindings(ShaderType.COMPUTE));
-            dynamicGroupBindingsFragment += this._createDynamicGroupBindings(ShaderType.FRAGMENT);
-
-            renderPass.hasVertexShader && (colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + defaultVertexBody + colorsVertWGSL);
-            renderPass.hasComputeShader && (colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + colorsComputeWGSL);
-            renderPass.hasFragmentShader && (colorsFragWGSL = dynamicGroupBindingsFragment + defaultStructs + colorsFragWGSL);
-
-            console.groupCollapsed(`Render Pass ${index}`);
-            console.groupCollapsed('VERTEX');
-            console.log(colorsVertWGSL);
-            console.groupEnd();
-            if (renderPass.hasComputeShader) {
-                console.groupCollapsed('COMPUTE');
-                console.log(colorsComputeWGSL);
-                console.groupEnd();
-            }
-            console.groupCollapsed('FRAGMENT');
-            console.log(colorsFragWGSL);
-            console.groupEnd();
-            console.groupEnd();
-
-            renderPass.hasVertexShader && (renderPass.compiledShaders.vertex = colorsVertWGSL);
-            renderPass.hasComputeShader && (renderPass.compiledShaders.compute = colorsComputeWGSL);
-            renderPass.hasFragmentShader && (renderPass.compiledShaders.fragment = colorsFragWGSL);
-        });
+        this._renderPasses.forEach(this._compileRenderPass);
         //
 
 
@@ -751,15 +787,14 @@ export default class Points {
                     clearValue: { r: 0.0, g: 0.0, b: 0.0, a: 1.0 },
                     loadOp: 'clear',
                     storeOp: 'store',
-                },
-
+                }
             ],
             depthStencilAttachment: {
                 //view: this._depthTexture.createView(),
                 depthClearValue: 1.0,
                 depthLoadOp: 'clear',
-                depthStoreOp: 'store',
-            },
+                depthStoreOp: 'store'
+            }
         };
 
         await this.createScreen();
@@ -778,7 +813,6 @@ export default class Points {
                 new RGBAColor(0, 0, 1),
                 new RGBAColor(1, 1, 0),
             ];
-
 
             for (let xIndex = 0; xIndex < this._numRows; xIndex++) {
                 for (let yIndex = 0; yIndex < this._numColumns; yIndex++) {
@@ -1559,4 +1593,5 @@ export default class Points {
     videoRecordStop() {
         this.mediaRecorder.stop();
     }
+
 }
