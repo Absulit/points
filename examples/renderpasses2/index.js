@@ -23,14 +23,14 @@ const renderpasses1 = {
 
 
         RenderPasses.grayscale(points);
-        RenderPasses.chromaticAberration(points, { distance: .02 });
-        RenderPasses.color(points, { color: [.5, 1, 0, 1], blendAmount: .5 });
-        RenderPasses.pixelate(points, { pixelsWidth: 10, pixelsHeight: 10 });
-        RenderPasses.lensDistortion(points, { amount: .4, distance: .01 });
-        RenderPasses.filmgrain(points, { amount: .4, distance: .01 });
-        RenderPasses.bloom(points, { amount: .5 });
-        RenderPasses.blur(points, { resolution: [100, 100], direction: [.4, 0], radians: 0.0 });
-        RenderPasses.waves(points, { scale: .05, intensity: .03 });
+        RenderPasses.chromaticAberration(points, .02);
+        RenderPasses.color(points, [.5, 1, 0, 1], .5);
+        RenderPasses.pixelate(points, 10, 10);
+        RenderPasses.lensDistortion(points, .4, .01);
+        RenderPasses.filmgrain(points, .4, .01);
+        RenderPasses.bloom(points, .5);
+        RenderPasses.blur(points, [100, 100], [.4, 0], 0.0);
+        RenderPasses.waves(points, .05, .03);
 
     },
     update: points => {

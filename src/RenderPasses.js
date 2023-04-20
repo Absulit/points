@@ -51,31 +51,31 @@ export class RenderPasses {
         await renderPass.init(points, params)
     }
 
-    static async color(points, params) {
-        return await RenderPasses.add(points, RenderPasses.COLOR, params);
+    static async color(points, color, blendAmount) {
+        return await RenderPasses.add(points, RenderPasses.COLOR, { color, blendAmount });
     }
-    static async grayscale(points, params) {
-        return await RenderPasses.add(points, RenderPasses.GRAYSCALE, params);
+    static async grayscale(points) {
+        return await RenderPasses.add(points, RenderPasses.GRAYSCALE);
     }
-    static async chromaticAberration(points, params) {
-        return await RenderPasses.add(points, RenderPasses.CHROMATIC_ABERRATION, params);
+    static async chromaticAberration(points, distance) {
+        return await RenderPasses.add(points, RenderPasses.CHROMATIC_ABERRATION, { distance });
     }
-    static async pixelate(points, params) {
-        return await RenderPasses.add(points, RenderPasses.PIXELATE, params);
+    static async pixelate(points, pixelsWidth, pixelsHeight) {
+        return await RenderPasses.add(points, RenderPasses.PIXELATE, { pixelsWidth, pixelsHeight });
     }
-    static async lensDistortion(points, params) {
-        return await RenderPasses.add(points, RenderPasses.LENS_DISTORTION, params);
+    static async lensDistortion(points, amount, distance) {
+        return await RenderPasses.add(points, RenderPasses.LENS_DISTORTION, { amount, distance });
     }
-    static async filmgrain(points, params) {
-        return await RenderPasses.add(points, RenderPasses.FILM_GRAIN, params);
+    static async filmgrain(points, amount, distance) {
+        return await RenderPasses.add(points, RenderPasses.FILM_GRAIN, { amount, distance });
     }
-    static async bloom(points, params) {
-        return await RenderPasses.add(points, RenderPasses.BLOOM, params);
+    static async bloom(points, amount) {
+        return await RenderPasses.add(points, RenderPasses.BLOOM, { amount });
     }
-    static async blur(points, params) {
-        return await RenderPasses.add(points, RenderPasses.BLUR, params);
+    static async blur(points, resolution, direction, radians) {
+        return await RenderPasses.add(points, RenderPasses.BLUR, { resolution, direction, radians });
     }
-    static async waves(points, params) {
-        return await RenderPasses.add(points, RenderPasses.WAVES, params);
+    static async waves(points, scale, intensity) {
+        return await RenderPasses.add(points, RenderPasses.WAVES, { scale, intensity });
     }
 }
