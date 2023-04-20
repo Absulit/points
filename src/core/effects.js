@@ -177,6 +177,22 @@ fn soften8(color:vec4<f32>, colorsAround:array<vec4<f32>, 8>, colorPower:f32) ->
 
 
 
+export const blur9 = /*wgsl*/`
+// based on https://github.com/Jam3/glsl-fast-gaussian-blur/blob/master/9.glsl
+fn blur9(image: texture_2d<f32>, imageSampler:sampler, position:vec2<f32>, uv:vec2<f32>, resolution: vec2<f32>, direction: vec2<f32>) -> vec4<f32> {
+    var color = vec4(0.0);
+    let off1 = vec2(1.3846153846) * direction;
+    let off2 = vec2(3.2307692308) * direction;
+    color += texturePosition(image, imageSampler, position, uv, true) * 0.2270270270;
+    color += texturePosition(image, imageSampler, position, uv + (off1 / resolution), true) * 0.3162162162;
+    color += texturePosition(image, imageSampler, position, uv - (off1 / resolution), true) * 0.3162162162;
+    color += texturePosition(image, imageSampler, position, uv + (off2 / resolution), true) * 0.0702702703;
+    color += texturePosition(image, imageSampler, position, uv - (off2 / resolution), true) * 0.0702702703;
+    return color;
+}
+`;
+
+
 export const blur8 = /*wgsl*/`
 fn blur8(color:vec4<f32>, colorsAround:array<vec4<f32>, 8>, amount:f32) -> {
 

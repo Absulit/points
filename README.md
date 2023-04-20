@@ -158,8 +158,8 @@ As shown before a `RenderPass` is a way to have a block of shaders to pass to yo
 
 ```js
 let renderPasses = [
-    new RenderPass(vert1, compute1, frag1),
-    new RenderPass(vert2, compute2, frag2)
+    new RenderPass(vert1, frag1, compute1),
+    new RenderPass(vert2, frag2, compute2)
 ];
 
 // we pass the array of renderPasses
@@ -202,8 +202,8 @@ const renderpasses1 = {
      * Render Passes expect to have an order
      */
     renderPasses: [
-        new RenderPass(vert, compute, frag),
-        // new RenderPass(vert2, compute2, frag2),
+        new RenderPass(vert, frag, compute),
+        // new RenderPass(vert2, frag2, compute2),
         // ...
     ],
     init: async points => {

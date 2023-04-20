@@ -1,16 +1,10 @@
+import { fusin } from "../../../src/core/animation.js";
 import { texturePosition } from "../../../src/core/image.js";
-import { PI } from '../../../src/core/defaultConstants.js';
-import { rotateVector } from "../../../src/core/math.js";
-import { blur9 } from "../../../src/core/effects.js";
 
 const frag = /*wgsl*/`
 
 ${texturePosition}
-${rotateVector}
-${PI}
-${blur9}
-
-
+${fusin}
 
 @fragment
 fn main(
@@ -22,11 +16,9 @@ fn main(
     @builtin(position) position: vec4<f32>
 ) -> @location(0) vec4<f32> {
 
-    // second pass doesn't use the image, that's the first pass
-    // _ = texturePosition(image, imageSampler, vec2(0,0), uvr, true);
-    let feedbackColor = blur9(feedbackTexture, feedbackSampler, vec2(0.,0), uvr, vec2(100.,100.), rotateVector(vec2(.4,.0), 2 * PI * params.sliderA));
+    let imageColor = texturePosition(image, imageSampler, vec2(0,0), uvr, true);
 
-    let finalColor = feedbackColor;
+    let finalColor = imageColor;
 
     return finalColor;
 }

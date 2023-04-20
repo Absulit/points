@@ -1,6 +1,7 @@
 /**
  * places texture in a position
  * @param {texture_2d<f32>} texture `texture_2d<f32>`
+ * @param {sampler} aSampler `sampler`
  * @param {vec2<f32>} position `vec2<f32>`
  * @param {vec2<f32>} uv `vec2<f32>`
  * @param {bool} crop `bool`
@@ -36,6 +37,7 @@ fn texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>
 /**
  * places texture_external in a position
  * @param {texture_external} texture `texture_external`
+ * @param {sampler} aSampler `sampler`
  * @param {vec2<f32>} position `vec2<f32>`
  * @param {vec2<f32>} uv `vec2<f32>`
  * @param {bool} crop `bool`
@@ -159,5 +161,16 @@ fn pixelateTexture(texture:texture_2d<f32>, textureSampler:sampler, pixelsWidth:
     let coord = vec2(dx*floor( uv.x / dx), dy * floor( uv.y / dy));
 
     return textureSample(texture, textureSampler, coord);
+}
+`;
+export const pixelateTexturePosition = /*wgsl*/`
+fn pixelateTexturePosition(texture:texture_2d<f32>, textureSampler:sampler, position:vec2<f32>, pixelsWidth:f32, pixelsHeight:f32, uv:vec2<f32>) -> vec4<f32> {
+    let dx = pixelsWidth * (1. / params.screenWidth);
+    let dy = pixelsHeight * (1. / params.screenHeight);
+
+    let coord = vec2(dx*floor( uv.x / dx), dy * floor( uv.y / dy));
+
+    //texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>, uv:vec2<f32>, crop:bool) -> vec4<f32> {
+    return texturePosition(texture, textureSampler, position, coord, false);
 }
 `;
