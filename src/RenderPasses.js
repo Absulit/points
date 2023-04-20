@@ -14,26 +14,26 @@ import { RenderPass } from './absulit.points.module.js';
  * List of predefined Render Passes for Post Processing.
  */
 export class RenderPasses {
-    static COLOR = 'color';
-    static GRAYSCALE = 'grayscale';
-    static CHROMATIC_ABERRATION = 'chromaticAberration';
-    static PIXELATE = 'pixelate';
-    static LENS_DISTORTION = 'lensDistortion';
-    static FILM_GRAIN = 'filmgrain';
-    static BLOOM = 'bloom';
-    static BLUR = 'blur';
-    static WAVES = 'waves';
+    static COLOR = 1;
+    static GRAYSCALE = 2;
+    static CHROMATIC_ABERRATION = 3;
+    static PIXELATE = 4;
+    static LENS_DISTORTION = 5;
+    static FILM_GRAIN = 6;
+    static BLOOM = 7;
+    static BLUR = 8;
+    static WAVES = 9;
 
     static _LIST = {
-        'color': color,
-        'grayscale': grayscale,
-        'chromaticAberration': chromaticAberration,
-        'pixelate': pixelate,
-        'lensDistortion': lensDistortion,
-        'filmgrain': filmgrain,
-        'bloom': bloom,
-        'blur': blur,
-        'waves': waves,
+        1: color,
+        2: grayscale,
+        3: chromaticAberration,
+        4: pixelate,
+        5: lensDistortion,
+        6: filmgrain,
+        7: bloom,
+        8: blur,
+        9: waves,
     };
 
     /**
