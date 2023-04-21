@@ -714,7 +714,7 @@ A function was created to flip the image and place it in the right coordinate in
 
 # RenderPasses for Post Processing
 
-You can already add render passes for postprocessing, you should add a new render pass as discussed in this section, but you can also use a set of predefined renderpasses already included in the library to add a Post Processing effect by just adding a line of code. The RenderPasses2 demo has the 9 already included render passes running all at once with a few parameter:
+You can already add render passes for postprocessing, you should add a new render pass as discussed in the [RenderPass](#renderpass) section, but you can also use a set of predefined renderpasses already included in the library to add a Post Processing effect by just adding a line of code. The RenderPasses2 demo has the 9 already included render passes running all at once with a few parameter:
 
 ```js
 RenderPasses.grayscale(points);
