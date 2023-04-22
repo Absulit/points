@@ -1,19 +1,9 @@
-import { snoise } from '../../src/core/noise2d.js';
-import { PI } from '../../src/core/defaultConstants.js';
 import { texturePosition } from '../../src/core/image.js';
-import { brightness } from '../../src/core/color.js';
-import { fnusin } from '../../src/core/animation.js';
 
 const frag = /*wgsl*/`
 
-${fnusin}
-${brightness}
-${snoise}
-${PI}
 ${texturePosition}
 
-
-const N = 2.;
 
 @fragment
 fn main(
@@ -25,20 +15,12 @@ fn main(
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
-    let n1 = snoise(uv * fnusin(1));
 
     let dims: vec2<u32> = textureDimensions(image, 0);
-    var dimsRatio = f32(dims.x) / f32(dims.y);
 
-    let imageUV = uvr * vec2(1,dimsRatio);
-    //let oldKingUVClamp = uv * vec2(1,1 * dimsRatio) * ratio.x;
     let startPosition = vec2(.0);
     let rgbaImage = texturePosition(image, feedbackSampler, startPosition, uvr / params.sliderA, false); //* .998046;
-
-
-    //let finalColor:vec4<f32> = vec4(brightness(rgbaImage));
     let finalColor:vec4<f32> = rgbaImage;
-
 
     return finalColor;
 }
