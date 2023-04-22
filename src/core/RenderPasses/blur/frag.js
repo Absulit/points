@@ -1,7 +1,6 @@
-import { PI } from '../../defaultConstants.js';
 import { blur9 } from '../../effects.js';
 import { texturePosition } from '../../image.js';
-import { rotateVector } from '../../math.js';
+import { rotateVector, PI } from '../../math.js';
 const frag = /*wgsl*/`
 
 ${texturePosition}

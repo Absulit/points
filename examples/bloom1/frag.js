@@ -1,10 +1,9 @@
 import { snoise } from '../../src/core/noise2d.js';
-import { PI } from '../../src/core/defaultConstants.js';
 import { texturePosition } from '../../src/core/image.js';
 import { bloom, brightness } from '../../src/core/color.js';
 import { sdfCircle, sdfLine, sdfSegment } from '../../src/core/sdf.js';
 import { fnusin, fusin } from '../../src/core/animation.js';
-import { polar } from '../../src/core/math.js';
+import { polar, PI } from '../../src/core/math.js';
 
 const frag = /*wgsl*/`
 
