@@ -2,10 +2,9 @@
 
 import { fnusin } from '../../animation.js';
 import { textureExternalPosition, texturePosition } from '../../image.js';
-import { rotateVector, polar } from '../../math.js';
+import { rotateVector, polar, PI } from '../../math.js';
 import { WHITE } from '../../color.js';
 import { snoise } from '../../noise2d.js';
-import { PI } from '../../defaultConstants.js';
 const frag = /*wgsl*/`
 
 ${fnusin}
