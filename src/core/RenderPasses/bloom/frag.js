@@ -1,5 +1,5 @@
 import { bloom, brightness } from '../../color.js';
-import { PI } from '../../defaultConstants.js';
+import { PI } from '../../math.js';
 import { texturePosition } from '../../image.js';
 const frag = /*wgsl*/`
 
