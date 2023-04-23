@@ -1,9 +1,8 @@
 # POINTS
 
+`POINTS` is a library that uses WebGPU and allows you to create shaders without worrying too much about the setup.
 
-POINTS is a library that uses WebGPU and allows you to create shaders without worrying too much about the setup.
-
-You can code freely without the use of any provided support module (effects, noise, image, math) or you can use them and have a little bit less of code in the shader. You can of course create your own modules and import them in the same way.
+You can code freely without the use of any of the provided [support modules (math, color, image, effects, noise, sdf, etc)](#support-modules) or you can use them and have a little bit less of code in the shader. You can of course create your own modules and import them in the same way.
 
 # Examples
 
@@ -19,7 +18,6 @@ You can code freely without the use of any provided support module (effects, noi
     <img src="./docs/dithering3.png" alt="image with dithering effect 2" width="200"/>
     <img src="./docs/noise1.png" alt="image with noise layered" width="200"/>
 </div>
-
 
 # Main Audience
 
@@ -47,47 +45,56 @@ https://gpuweb.github.io/gpuweb/wgsl/
 We use VSCode with [WGSL Literal](https://marketplace.visualstudio.com/items?itemName=ggsimm.wgsl-literal); if you have a different IDE with WGSL hightlight go for it.
 
 ---
+
 > You might have noticed or will notice the modules are actually JavaScript modules and imported to vert.js, compute.js, and frag.js which are then again JavaScript files, no WGSL files. This is based on a [recommendation by Brandon Jones from Google](https://toji.github.io/webgpu-best-practices/dynamic-shader-construction.html), so we take advantage of the power of the JavaScript string interpolation, instead of creating fetch calls to import wgsl files, so we can just simply interpolate the modules in our projects. Also, there's currently no way to create or import WGSL modules in other files.
 >
 > The simpler route we took is just to declare a single function, struct or constant as a JavaScript export, and then import them as you do, and then interpolate the reference with the same name.
+
 ---
 
 # Workflow
 
 Currently, we have a workflow of data setup from JavaScript and then a RenderPass composed of 3 shaders:
 
-JavaScript setup and Data → RenderPass (Vertex Shader → Compute Shader → Fragment Shader) → Screen Output
+JavaScript setup and Data → RenderPass (Compute Shader → Vertex Shader → Fragment Shader) → Screen Output
 
 This data can be accessed safely in all shaders across the pipeline.
 
 To add more shaders you need to add a new RenderPass.
 
-# Setup 
-` as in examples/basic.html`
+You can have a Vertex + Fragment shaders without a Compute shader, and also a Compute shader without a Vertex + Fragment shaders, so you can have a computational shader, a visual shader, or both.
+
+# Setup
+
+ ` as in examples/basic.html`
 
 ```js
 // import the `Points` class
 
-import Points, {RenderPass} from '../src/absulit.points.module.js';
+import Points, {
+    RenderPass
+} from '../src/absulit.points.module.js';
 
 // reference the canvas in the constructor
 const points = new Points('gl-canvas');
 
 // create your render pass with three shaders as follow
 const renderPasses = [
-    new RenderPass(/*wgsl*/`
+    new RenderPass( /*wgsl*/ `
         // add @vertex string
     `,
-    /*wgsl*/`
+        /*wgsl*/
+        `
         // add @compute string
     `,
-    /*wgsl*/`
+        /*wgsl*/
+        `
         // add @fragment string
     `
     )
 ];
 
-// call the POINTS init method and then the update method
+// call the `POINTS` init method and then the update method
 await points.init(renderPasses);
 update();
 
@@ -98,8 +105,9 @@ function update() {
 }
 ```
 
-# Setup 
-` as in (examples/index.html)`
+# Setup
+
+ ` as in (examples/index.html)`
 
 You can take a look at `/examples/main.js` and `/examples/index.html`
 
@@ -110,6 +118,7 @@ You can take a look at `/examples/main.js` and `/examples/index.html`
     Oops ... your browser doesn't support the HTML5 canvas element
 </canvas>
 ```
+
 ## main.js
 
 ```js
@@ -168,9 +177,7 @@ await points.init(renderPasses);
 
 You can pass a Compute Shader only, or a Vertex and Fragment together only. This way you can have a Compute Shader without visual output, create calculations and return their response values, or a regular Render Pipeline without Compute Shader calculations.
 
-
 # Create your custom Shader project
-
 1. Copy the `/examples/base/` and place it where you want to store your project.
 2. Rename folder.
 3. Rename the project inside `base/index.js`, that's the name going to be used in the main.js import and then assigned to the shaders variable.
@@ -215,12 +222,9 @@ const renderpasses1 = {
 }
 
 export default renderpasses1;
-
 ```
 
-
 4. Change whatever you want inside `vert.js`, `compute.js`, `frag.js`.
-
 # Default data available to read
 
 ## Params Uniform
@@ -241,12 +245,11 @@ struct Params {
 | Name          | Description                               | ex. value     |
 | ------------- |:-------------                             | -----:        |
 | time          | seconds since the app started             | 10.11         |
-| epoch         | seconds since jan 1s 1970 UTC             | 1674958734.777|
+| epoch         | seconds since jan 1st 1970 UTC            | 1674958734.777|
 | screenWidth   | pixels in x dimension                     |    800        |
 | screenHeight  | pixels in y dimension                     |    600        |
 | mouseX        | mouse x coordinate from 0 to screenWidth  |    100        |
 | mouseY        | mouse y coordinate from 0 to screenHeight |    150        |
-
 
 ```rust
 // frag.js
@@ -275,7 +278,7 @@ fn main(
 }
 ```
 
-The `defaultVertexBody` returns a `Fragment` struct that provides the parameters for `frag.js`, it adds a ratio parameter with the ratio of the width and height of the canvas, and the mouse position as a `vec2<f32>`. The mouse position is different from the `params.mouseX` and `params.mouseY`, but it uses its values to calculate them in the UV space. The uv is ratio corrected, meaning that if your canvas is wider than taller, a portion of the uv will be out of bounds to mantain the aspect ratio. This might change later to a new uv[some name] to differentiate them, and still have the regular uv space to calculate the screen. Right now if you need to do that in a different canvas size rather than a 1:1 dimension, you have to use ratio to deconstruct the original value.
+The `defaultVertexBody` returns a `Fragment` struct that provides the parameters for `frag.js` , it adds a ratio parameter with the ratio of the width and height of the canvas, and the mouse position as a `vec2<f32>` . The mouse position is different from the `params.mouseX` and `params.mouseY` , but it uses its values to calculate them in the UV space. The uv is ratio corrected, meaning that if your canvas is wider than taller, a portion of the uv will be out of bounds to mantain the aspect ratio. This might change later to a new uv[some name] to differentiate them, and still have the regular uv space to calculate the screen. Right now if you need to do that in a different canvas size rather than a 1:1 dimension, you have to use ratio to deconstruct the original value.
 
 ```rust
 // defaultStructs.js
@@ -311,7 +314,9 @@ fn main(
 ```
 
 ---
+
 > **Note:** you can modify these values if you need to. Currently, I don't feel the need to add more, but this might change later.
+
 ---
 
 # Send data into the shaders
@@ -319,12 +324,14 @@ fn main(
 You can call one of the following methods, you pair the data with a `key` name, and this name is the one you will reference inside the shader:
 
 ---
-> **Note:** all the `add*()` methods add the variables/buffers/data into all the shaders in all `RenderPass`es
+
+> **Note:** all the `add*()` methods add the variables/buffers/data into all the shaders in all `RenderPass` passes.
+
 ---
 
 ## Uniforms - addUniform
 
-Uniforms are sent separately in the `main.js` file and they are all combined in the shaders in the struct called `params`. Currently, by default, all values are `f32`. Uniforms can not be modified at runtime inside the shaders, they can only receive data from the JavaScript side.
+Uniforms are sent separately in the `main.js` file and they are all combined in the shaders in the struct called `params` . Currently, by default, all values are `f32` . Uniforms can not be modified at runtime inside the shaders, they can only receive data from the JavaScript side.
 
 ```js
 // main.js
@@ -347,7 +354,7 @@ let aValue = params.myKeyName;
 
 A sampler for textures is sometimes required, and you need to explicitly reference it.
 
-Don't name it just `sampler`, because that's the data type inside WGSL. POINTS will throw an exception if you do.
+Don't name it just `sampler` , because that's the data type inside WGSL. `POINTS` will throw an exception if you do.
 
 A descripttor is assigned by default, if you want to sample your image in a different way, you can take a look at [GPUObjectDescriptorBase](https://gpuweb.github.io/gpuweb/#texture-creation) in the WGSL docs.
 
@@ -428,28 +435,33 @@ A storage is a large array with the same data type and this data can be modified
 
 Common uses:
 
-- Store particles
-- Store variables
-- Store positions
-- Store colors
-- Store results from a heavy calculation in the compute shader
+* Store particles
+* Store variables
+* Store positions
+* Store colors
+* Store results from a heavy calculation in the compute shader
 
 ---
+
 > **Note:** This method is one with tricky parameters, it's fully documented in the module, but here is an overview:
 >
 > - name - name this property/variable will have inside the shader
 > - size - number of items it will allocate
-> - structName - You can use one of the default structs/types like `f32`, `i32`, `u32`, but if you use a more complex one you have to pair it properly with structSize. If it's a custom `struct` it has to be declared in the shader or it will throw an error.
-> - structSize - if the `struct` you reference in `structName` has 4 properties then you have to add `4`. If it's only a f32 then here you should place `1`.
+> - structName - You can use one of the default structs/types like `f32` , `i32` , `u32` , but if you use a more complex one you have to pair it properly with structSize. If it's a custom `struct` it has to be declared in the shader or it will throw an error.
+> - structSize - if the `struct` you reference in `structName` has 4 properties then you have to add `4` . If it's only a f32 then here you should place `1` .
+
 ---
+
 > **Note:** if the size of the storage is greater than `1` then it's created as an array in the shader and you have to access its items like an array, but if size is just `1` you can access its properties directly. Please check the following example for reference.
+
 ---
+
 ```js
 // main.js
 async function init() {
     let renderPasses = [shaders.vert, shaders.compute, shaders.frag];
 
-    const numPoints = 800*800;
+    const numPoints = 800 * 800;
     points.addStorage('value_noise_data', numPoints, 'f32', 1); // size is 640,000
     points.addStorage('variables', 1, 'Variable', 1); // size is 1
 
@@ -458,6 +470,7 @@ async function init() {
     update();
 }
 ```
+
 ```rust
 // compute.js outside the main function in the shader
 
@@ -477,6 +490,7 @@ let b = value_noise_data[0];
 // size 1 Storage, you can access struct property
 variables.isCreated = 1;
 ```
+
 ## StorageMap - addStorageMap
 
 Creates a Storage in the same way as a `addStorage` does, except it can be set with data from the start of the application.
@@ -503,7 +517,7 @@ let c = values[1];
 
 ## BindingTexture - addBindingTexture
 
-If you require to send data as a texture from the Compute Shader to the Fragment shader and you do not want to use a Storage, you can use a `addBindingTexture()`, then in the compute shader a variable will exist where you can write colors to it, and in the Fragment Shader will exist a variable to read data from it.
+If you require to send data as a texture from the Compute Shader to the Fragment shader and you do not want to use a Storage, you can use a `addBindingTexture()` , then in the compute shader a variable will exist where you can write colors to it, and in the Fragment Shader will exist a variable to read data from it.
 
 ```js
 // main.js
@@ -597,26 +611,28 @@ let point = layers[layerIndex][itemIndex];
 
 ## Increase mesh resolution - setMeshDensity
 
-By default the screen is covered by only two triangles. To display 2d data like the shaders do you don't need a lot of triangles, but if you want to make an effect that manipulates the triangles via `vert.js` you can increase the resolution of the mesh by calling `setMeshDensity`. The following example shows how to increase the mesh density, and `vert.js` manipulates its vertices.
+By default the screen is covered by only two triangles. To display 2d data like the shaders do you don't need a lot of triangles, but if you want to make an effect that manipulates the triangles via `vert.js` you can increase the resolution of the mesh by calling `setMeshDensity` . The following example shows how to increase the mesh density, and `vert.js` manipulates its vertices.
 
 ```js
 // check example/mesh1
 shaders = mesh1;
-points.setMeshDensity(20,20);
+points.setMeshDensity(20, 20);
 ```
 
 # Update data sent to the shaders (in the update method)
 
 In the same fashion as the `add*` methods, there are a couple of `update*` methods for now
 
-`points.updateUniform();`
+ `points.updateUniform();`
 
 and
 
-`points.updateStorageMap();`
+ `points.updateStorageMap();`
 
 ---
+
 > **WARNING**: updateStorage tends to slow the application if the data to update is too big, so be aware.
+
 ---
 
 ## updateUniform
@@ -637,7 +653,7 @@ async function init() {
 
 function update() {
     myKeyNameValue += 1;
-     // updated myKeyName value increases on each frame
+    // updated myKeyName value increases on each frame
     points.updateUniform('myKeyName', myKeyNameValue);
 
     // more update code
@@ -651,9 +667,10 @@ function update() {
 // value is read the same way, but will vary per frame
 let aValue = params.myKeyName;
 ```
+
 ## updateStorageMap
 
-Used in conjunction with `addStorageMap()`, but if the amount of data is way too large, then this is a performance bottleneck.
+Used in conjunction with `addStorageMap()` , but if the amount of data is way too large, then this is a performance bottleneck.
 
 ```js
 // main.js
@@ -662,7 +679,7 @@ async function init() {
 
     // this is before any GPU calculation, so it's ok
     let data = [];
-    for (let k = 0; k < 800*800; k++) {
+    for (let k = 0; k < 800 * 800; k++) {
         data.push(Math.random());
     }
     // it doesn't require size because uses the data to size it
@@ -676,7 +693,7 @@ async function init() {
 function update() {
     // this is a processor hog
     let data = [];
-    for (let k = 0; k < 800*800; k++) {
+    for (let k = 0; k < 800 * 800; k++) {
         data.push(Math.random());
     }
     points.updateStorageMap('rands', data);
@@ -691,14 +708,15 @@ function update() {
 
 You can send and retrieve data from the shaders the following way:
 
-
 First declare a storage as in `examples/data1/index.js`
+
 ```js
 // the last parameter as `true` means you will use this `Storage` to read back
 points.addStorage('resultMatrix', 1, 'Matrix', resultMatrixBufferSize, true);
 ```
 
 Read the data back after modification
+
 ```js
 let result = await points.readStorage('resultMatrix');
 console.log(result);
@@ -706,11 +724,66 @@ console.log(result);
 
 # UV Coordinates and Textures Considerations
 
-Textures as images, video and webcam are vertically flipped, this is part of the WebGPU spec. The coordinate system is UV, where the origin is bottom left. The library uses UV for almost everything, and if there's a function that is not following this spec it will later. So all ranges go from 0..1, origin (0,0) being bottom left, and 1,1 being top right.
+Textures as images, video and webcam are vertically flipped, this is part of the WebGPU spec. The coordinate system is UV, where the origin is bottom left. The library uses UV for almost everything, and if there's a function that is not following this spec it will later. So all ranges go from 0..1, origin (0, 0) being bottom left, and 1, 1 being top right.
 
 If you load your image and is not showing, it's probably beyond the bottom left.
 
 A function was created to flip the image and place it in the right coordinate in the UV space, this function is called `texturePosition` and you can take a look at how it works in `examples/imagetexture1/frag.js` where it works as a `textureSample` function on steroids, just to fix the coordinates and crop it.
+
+# Support Modules
+
+The Support Modules are not something that you entirely need but it offers a set of functions that you might find useful and that you will find all over the [/examples](/examples/) directory. The modules have WGSL code snippets wrapped in a JavaScript export string constant that you can embed in the shader string.
+
+| Name          | Description                               |
+| ------------- |:-------------                             |
+| animation.js  | Functions that use sine and `params.time` to increase and decrease a value over time             |
+| cellular2d.js | Cellular noise based on work by Stefan Gustavson (link in file)             |
+| classicnoise2d.js | Classic Perlin noise based on work by Stefan Gustavson (link in file)             |
+| color.js | Color constants and functions that work with a color (vec4<f32>) input             |
+| debug.js | Functions that show a cross (useful for mouse position) and a frame (useful to show frame border)             |
+| defaultConstants.js | Currently it has nothing but it will have default constants for `POINTS` |
+| defaultFunctions.js | Default functions for `POINTS` |
+| defaultStructs.js | Default structs used in `POINTS` |
+| defaultVertexStructs.js | Legacy code (will be removed)             |
+| effects.js | Functions used for more elaborate effects like blur             |
+| image.js | Functions that work over a texture like pixelation or sprites             |
+| math.js | A few constants like PI and E and a couple of functions for now             |
+| noise2d.js | Noise based on the work by Ian McEwan, Ashima Arts             |
+| sdf.js | A few sdf functions             |
+| valuenoise.js | // currently not working             |
+| voronoi.js | Function to create a voronoi like output             |
+
+You might want to take a look at each of the files and what they can offer:
+
+These are still a WIP so expect changes
+
+## How to use them
+
+```js
+// /src/core/math.js
+export const PI = /*wgsl*/ `const PI = 3.14159265;`;
+```
+
+```js
+// /examples/bloom`/frag.js
+import {
+    PI
+} from '../../src/core/math.js';
+
+// more js code
+
+const frag = /*wgsl*/ `
+
+// more wgsl code
+
+${PI}
+
+// more wgsl code
+
+`;
+
+export default frag;
+```
 
 # RenderPasses for Post Processing
 
@@ -727,6 +800,7 @@ RenderPasses.bloom(points, .5);
 RenderPasses.blur(points, 100, 100, .4, 0, 0.0);
 RenderPasses.waves(points, .05, .03);
 ```
+
 The render pass takes the output from your already defined shaders as a Texture and then applies a process to create an effect. It takes a few assumptions to work interchangeably between them or in a layered way, this by using the same name for the output texture and input texture.
 
 Also because JavaScript wraps and hides all of this process, I think it's better for you in the long run to just study and extract the postprocessing render pass and include it in your own render passes. Currently adding all 9 render passes seems to have no effect in the framerate, but this could be different in a larger project, so customizing your render passes is better.
