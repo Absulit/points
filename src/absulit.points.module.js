@@ -448,7 +448,7 @@ export default class Points {
      * @param {string} name Name to call the texture in the shaders.
      * @param {boolean} copyCurrentTexture If you want the fragment output to be copied here.
      */
-    addTexture2d(name, copyCurrentTexture, shaderType) {
+    addTexture2d(name, copyCurrentTexture, shaderType, renderPassIndex) {
         if (this._nameExists(this._textures2d, name)) {
             return;
         }
@@ -456,7 +456,8 @@ export default class Points {
             name: name,
             copyCurrentTexture: copyCurrentTexture,
             shaderType: shaderType,
-            texture: null
+            texture: null,
+            renderPassIndex: renderPassIndex
         });
     }
 
@@ -1397,7 +1398,7 @@ export default class Points {
 
 
         //commandEncoder = this._device.createCommandEncoder();
-        this._renderPasses.forEach(renderPass => {
+        this._renderPasses.forEach((renderPass, renderPassIndex) => {
             if (renderPass.hasVertexAndFragmentShader) {
                 const passEncoder = commandEncoder.beginRenderPass(this._renderPassDescriptor);
                 passEncoder.setPipeline(renderPass.renderPipeline);
@@ -1421,16 +1422,18 @@ export default class Points {
                 // Copy the rendering results from the swapchain into |texture2d.texture|.
 
                 this._textures2d.forEach(texture2d => {
-                    if (texture2d.copyCurrentTexture) {
-                        commandEncoder.copyTextureToTexture(
-                            {
-                                texture: swapChainTexture,
-                            },
-                            {
-                                texture: texture2d.texture,
-                            },
-                            this._presentationSize
-                        );
+                    if(texture2d.renderPassIndex == renderPassIndex || texture2d.renderPassIndex == null){
+                        if (texture2d.copyCurrentTexture) {
+                            commandEncoder.copyTextureToTexture(
+                                {
+                                    texture: swapChainTexture,
+                                },
+                                {
+                                    texture: texture2d.texture,
+                                },
+                                this._presentationSize
+                            );
+                        }
                     }
                 });
             }
