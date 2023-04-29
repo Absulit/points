@@ -752,7 +752,7 @@ export default class Points {
         this.addUniform(UniformKeys.MOUSE_DELTA_X, this._mouseDeltaX);
         this.addUniform(UniformKeys.MOUSE_DELTA_Y, this._mouseDeltaY);
 
-        let hasComputeShaders = this._renderPasses.every(renderPass => renderPass.hasComputeShader);
+        let hasComputeShaders = this._renderPasses.some(renderPass => renderPass.hasComputeShader);
         if (!hasComputeShaders && this._bindingTextures.length) {
             throw ' `addBindingTexture` requires at least one Compute Shader in a `RenderPass`'
         }
