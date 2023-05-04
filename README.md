@@ -29,10 +29,9 @@ People who just want to create nice live graphics and use mathematics to achieve
 
 ## A compatible WebGPU browser since it's currently in development
 
-So far Chrome Canary seems to have the best support
+Currently working on Chrome 113 (Windows and Mac tested)
 
-More info:
-https://developer.chrome.com/docs/web-platform/webgpu/
+There's progress on Firefox Nightly but not all is working yet.
 
 WebGPU API reference (JavaScript):
 https://gpuweb.github.io/gpuweb/
