@@ -671,7 +671,7 @@ export default class Points {
         });
 
         this._texturesExternal.forEach(externalTexture => {
-            if (!externalTexture.shaderType || externalTexture.shaderType == shaderType && externalTexture == storageItem.internal) {
+            if (!externalTexture.shaderType || externalTexture.shaderType == shaderType && internal == externalTexture.internal) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${externalTexture.name}: texture_external;\n`;
                 bindingIndex += 1;
             }
