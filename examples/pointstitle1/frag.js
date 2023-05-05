@@ -45,10 +45,6 @@ fn main(
     let pixeleduv = vec2(dx*floor( uvr.x / dx), dy * floor( uvr.y / dy));
     let pixeleduvColor = vec4(pixeleduv, 0, 1);
 
-    let imagePosition = vec2(.0,.0);
-    let imageColor = texturePosition(image, imageSampler, imagePosition, pixeleduv, false);
-
-
     let fontPosition = vec2(0.,0.);
     let charSize = vec2(8u,22u);
     let charSizeF32 = vec2(f32(charSize.x) / params.screenWidth, f32(charSize.y) / params.screenHeight);
