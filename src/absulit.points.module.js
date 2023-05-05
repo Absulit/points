@@ -611,6 +611,7 @@ export default class Points {
      * @returns string with bindings
      */
     _createDynamicGroupBindings(shaderType, internal) {
+        internal = internal || false;
         if (!shaderType) {
             throw '`ShaderType` is required';
         }
@@ -1152,6 +1153,7 @@ export default class Points {
      * @returns an array with the entries
      */
     _createEntries(shaderType, internal) {
+        internal = internal || false;
         let entries = [];
         let bindingIndex = 0;
         if (this._uniforms.length) {
