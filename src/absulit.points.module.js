@@ -608,6 +608,7 @@ export default class Points {
     /**
      *
      * @param {ShaderType} shaderType
+     * @param {boolean} internal 
      * @returns string with bindings
      */
     _createDynamicGroupBindings(shaderType, internal) {
