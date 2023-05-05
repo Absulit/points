@@ -29,10 +29,9 @@ People who just want to create nice live graphics and use mathematics to achieve
 
 ## A compatible WebGPU browser since it's currently in development
 
-So far Chrome Canary seems to have the best support
+Currently working on Chrome 113 (Windows and Mac tested)
 
-More info:
-https://developer.chrome.com/docs/web-platform/webgpu/
+There's progress on Firefox Nightly but not all is working yet.
 
 WebGPU API reference (JavaScript):
 https://gpuweb.github.io/gpuweb/
@@ -389,11 +388,13 @@ let rgba = textureSample(texture, mySampler, uv);
 
 You can create an empty texture, which is not very useful on its own, but if you set the second parameter to true, after the Fragment Shader is printed out to screen, it saves the output value to this texture and you can use it in the next update call, so basically you can sample the value from the previous frame.
 
+There's also a third parameter that signals the texture to only capture that RenderPass index from your list of renderPasses (if you have multiple), if you don't pass that parameter, the texture ( in this case named `feedbackTexture`) will be overwriten by the next `RenderPass`. Useful if you want to send that renderPass output texture to a future `RenderPass`.
+
 ```js
 // main.js
 async function init() {
     let renderPasses = [shaders.vert, shaders.compute, shaders.frag];
-    points.addTexture2d('feedbackTexture', true);
+    points.addTexture2d('feedbackTexture', true, 0);
 
     // more init code
     await points.init(renderPasses);

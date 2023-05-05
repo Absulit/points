@@ -6,7 +6,6 @@ const pointstitle1 = {
     frag,
     init: async points => {
 
-        await points.addTextureImage('image', './../../img/gratia_800x800.jpg');
         await points.addTextureImage('font', './../img/inconsolata_regular_8x22.png');
 
         points.addSampler('imageSampler', null);

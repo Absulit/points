@@ -23,7 +23,6 @@ fn main(
     rand_seed = uvr + params.time;
 
     var noise = rand();
-    noise = noise;
     noise = noise * .5 + .5;
     let finalColor = (imageColor + imageColor * noise)  * .5;
 

@@ -5,6 +5,7 @@ const color = {
     vertexShader,
     fragmentShader,
     init: async (points, params) => {
+        points._setInternal(true);
         points.addSampler('renderpass_feedbackSampler', null);
         points.addTexture2d('renderpass_feedbackTexture', true);
         points.addUniform('color_blendAmount', params?.blendAmount || .5);
@@ -12,6 +13,7 @@ const color = {
         points.addUniform('color_g', params?.color[1] || 1);
         points.addUniform('color_b', params?.color[2] || 0);
         points.addUniform('color_a', params?.color[3] || 1);
+        points._setInternal(false);
     },
     update: points => {
 
