@@ -46,9 +46,11 @@ export class RenderPasses {
         if (points._renderPasses?.length) {
             throw '`addPostRenderPass` should be called prior `Points.init()`';
         }
-        let renderPass = RenderPasses._LIST[renderPassId];
-        points._postRenderPasses.push(new RenderPass(renderPass.vertexShader, renderPass.fragmentShader, renderPass.computeShader))
-        await renderPass.init(points, params)
+        let shaders = RenderPasses._LIST[renderPassId];
+        let renderPass = new RenderPass(shaders.vertexShader, shaders.fragmentShader, shaders.computeShader);
+        renderPass.internal = true;
+        points._postRenderPasses.push(renderPass);
+        await shaders.init(points, params)
     }
 
     /**
