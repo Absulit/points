@@ -625,7 +625,8 @@ export default class Points {
         }
 
         this._storage.forEach(storageItem => {
-            if (!storageItem.shaderType || storageItem.shaderType == shaderType && internal == storageItem.internal) {
+            let internalCheck = internal == storageItem.internal;
+            if (!storageItem.shaderType && internalCheck || storageItem.shaderType == shaderType && internalCheck) {
                 let T = storageItem.structName;
                 if (!storageItem.mapped) {
                     if (storageItem.array?.length) {
@@ -650,40 +651,45 @@ export default class Points {
         }
 
         this._samplers.forEach((sampler, index) => {
-            if (!sampler.shaderType || sampler.shaderType == shaderType && internal == sampler.internal) {
+            let internalCheck = internal == sampler.internal;
+            if (!sampler.shaderType && internalCheck || sampler.shaderType == shaderType && internalCheck) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${sampler.name}: sampler;\n`;
                 bindingIndex += 1;
             }
         });
 
         this._texturesStorage2d.forEach((texture, index) => {
-            if (!texture.shaderType || texture.shaderType == shaderType && internal == texture.internal) {
+            let internalCheck = internal && texture.internal;
+            if (!texture.shaderType && internalCheck || texture.shaderType == shaderType && internalCheck) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_storage_2d<rgba8unorm, write>;\n`;
                 bindingIndex += 1;
             }
         });
 
         this._textures2d.forEach((texture, index) => {
-            if (!texture.shaderType || texture.shaderType == shaderType && internal == texture.internal) {
+            let internalCheck = internal == texture.internal;
+            if (!texture.shaderType && internalCheck || texture.shaderType == shaderType && internalCheck) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d<f32>;\n`;
                 bindingIndex += 1;
             }
         });
 
         this._texturesExternal.forEach(externalTexture => {
-            if (!externalTexture.shaderType || externalTexture.shaderType == shaderType && internal == externalTexture.internal) {
+            let internalCheck = internal == externalTexture.internal;
+            if (!externalTexture.shaderType && internalCheck || externalTexture.shaderType == shaderType && internalCheck) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${externalTexture.name}: texture_external;\n`;
                 bindingIndex += 1;
             }
         });
 
         this._bindingTextures.forEach(bindingTexture => {
-            if (bindingTexture.compute.shaderType == shaderType && internal == bindingTexture.internal) {
+            let internalCheck = internal == bindingTexture.internal;
+            if (bindingTexture.compute.shaderType == shaderType && internalCheck) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.compute.name}: texture_storage_2d<rgba8unorm, write>;\n`;
                 bindingIndex += 1;
             }
 
-            if (bindingTexture.fragment.shaderType == shaderType && internal == bindingTexture.internal) {
+            if (bindingTexture.fragment.shaderType == shaderType && internalCheck) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.fragment.name}: texture_2d<f32>;\n`;
                 bindingIndex += 1;
             }
@@ -736,8 +742,8 @@ export default class Points {
         renderPass.hasComputeShader && (dynamicGroupBindingsCompute += dynamicStructParams);
         renderPass.hasFragmentShader && (dynamicGroupBindingsFragment += dynamicStructParams);
 
-        renderPass.hasVertexShader && (dynamicGroupBindingsVertex += this._createDynamicGroupBindings(ShaderType.VERTEX));
-        renderPass.hasComputeShader && (dynamicGroupBindingsCompute += this._createDynamicGroupBindings(ShaderType.COMPUTE));
+        renderPass.hasVertexShader && (dynamicGroupBindingsVertex += this._createDynamicGroupBindings(ShaderType.VERTEX, renderPass.internal));
+        renderPass.hasComputeShader && (dynamicGroupBindingsCompute += this._createDynamicGroupBindings(ShaderType.COMPUTE, renderPass.internal));
         dynamicGroupBindingsFragment += this._createDynamicGroupBindings(ShaderType.FRAGMENT, renderPass.internal);
 
         renderPass.hasVertexShader && (colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + defaultVertexBody + colorsVertWGSL);
@@ -1175,7 +1181,8 @@ export default class Points {
 
         if (this._storage.length) {
             this._storage.forEach((storageItem, index) => {
-                if (!storageItem.shaderType || storageItem.shaderType == shaderType && internal == storageItem.internal) {
+                let internalCheck = internal == storageItem.internal;
+                if (!storageItem.shaderType && internalCheck || storageItem.shaderType == shaderType && internalCheck) {
                     entries.push(
                         {
                             binding: bindingIndex++,
@@ -1213,7 +1220,8 @@ export default class Points {
 
         if (this._samplers.length) {
             this._samplers.forEach((sampler, index) => {
-                if (!sampler.shaderType || sampler.shaderType == shaderType && internal == sampler.internal) {
+                let internalCheck = internal == sampler.internal;
+                if (!sampler.shaderType && internalCheck || sampler.shaderType == shaderType && internalCheck) {
                     entries.push(
                         {
                             binding: bindingIndex++,
@@ -1230,7 +1238,8 @@ export default class Points {
 
         if (this._texturesStorage2d.length) {
             this._texturesStorage2d.forEach((textureStorage2d, index) => {
-                if (!textureStorage2d.shaderType || textureStorage2d.shaderType == shaderType && internal == textureStorage2d.internal) {
+                let internalCheck = internal == textureStorage2d.internal;
+                if (!textureStorage2d.shaderType && internalCheck || textureStorage2d.shaderType == shaderType && internalCheck) {
                     entries.push(
                         {
                             label: 'texture storage 2d',
@@ -1248,7 +1257,8 @@ export default class Points {
 
         if (this._textures2d.length) {
             this._textures2d.forEach((texture2d, index) => {
-                if (!texture2d.shaderType || texture2d.shaderType == shaderType && internal == texture2d.internal) {
+                let internalCheck = internal == texture2d.internal;
+                if (!texture2d.shaderType && internalCheck || texture2d.shaderType == shaderType && internalCheck) {
                     entries.push(
                         {
                             label: 'texture 2d',
@@ -1266,7 +1276,8 @@ export default class Points {
 
         if (this._texturesExternal.length) {
             this._texturesExternal.forEach(externalTexture => {
-                if (!externalTexture.shaderType || externalTexture.shaderType == shaderType && internal == externalTexture.internal) {
+                let internalCheck = internal == externalTexture.internal;
+                if (!externalTexture.shaderType && internalCheck || externalTexture.shaderType == shaderType && internalCheck) {
                     entries.push(
                         {
                             label: 'external texture',
@@ -1284,7 +1295,8 @@ export default class Points {
 
         if (this._bindingTextures.length) {
             this._bindingTextures.forEach(bindingTexture => {
-                if (bindingTexture.compute.shaderType == shaderType && internal == bindingTexture.internal) {
+                let internalCheck = internal == bindingTexture.internal;
+                if (bindingTexture.compute.shaderType == shaderType && internalCheck) {
                     entries.push(
                         {
                             label: 'binding texture',
@@ -1301,7 +1313,8 @@ export default class Points {
             });
 
             this._bindingTextures.forEach(bindingTexture => {
-                if (bindingTexture.fragment.shaderType == shaderType && internal == bindingTexture.internal) {
+                let internalCheck = internal == bindingTexture.internal;
+                if (bindingTexture.fragment.shaderType == shaderType && internalCheck) {
                     entries.push(
                         {
                             label: 'binding texture 2',
