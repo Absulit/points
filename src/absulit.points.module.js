@@ -843,7 +843,7 @@ export default class Points {
      * Adds two triangles called points per number of columns and rows
      */
     async createScreen() {
-        let hasVertexAndFragmentShader = this._renderPasses.every(renderPass => renderPass.hasVertexAndFragmentShader)
+        let hasVertexAndFragmentShader = this._renderPasses.some(renderPass => renderPass.hasVertexAndFragmentShader)
 
         if (hasVertexAndFragmentShader) {
             let colors = [
