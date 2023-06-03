@@ -1,4 +1,4 @@
-import { brightness } from './../../src/core/color.js';
+import { brightness } from '../../src/core/color.js';
 
 const compute = /*wgsl*/`
 
