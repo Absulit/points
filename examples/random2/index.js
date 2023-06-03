@@ -1,10 +1,11 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
+import { RenderPass } from '../../src/absulit.points.module.js';
 const random2 = {
-    vert,
-    compute,
-    frag,
+    renderPasses: [
+        new RenderPass(vert, frag, compute, 800, 800)
+    ],
     init: async points => {
         points.addUniform('randNumber', 0);
         points.addUniform('randNumber2', 0);
