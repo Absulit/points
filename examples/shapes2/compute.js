@@ -59,12 +59,8 @@ fn main(
     @builtin(workgroup_id) WorkGroupID: vec3<u32>,
     @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
 ) {
-    let time = params.time;
-
     let numColumns:f32 = params.screenWidth;
     let numRows:f32 = params.screenHeight;
-    let numColumnsPiece:i32 = i32(numColumns / f32(workgroupSize));
-    let numRowsPiece:i32 = i32(numRows / f32(workgroupSize));
 
     var x = 450.;
     var y = 450.;
@@ -104,7 +100,6 @@ fn main(
     (*rgbaP) = clearAlpha(rgba, 1000.01);
     if(rgba.a > 0){
         rgba -= .4;
-
     }
     (*rgbaP) = rgba;
 
