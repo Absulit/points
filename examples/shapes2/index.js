@@ -1,10 +1,11 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
+import { RenderPass } from '../../src/absulit.points.module.js';
 const shapes2 = {
-    vert,
-    compute,
-    frag,
+    renderPasses: [
+        new RenderPass(vert, frag, compute, 800, 800, 1)
+    ],
     init: async points => {
         const numPoints = 800*800;
         points.addUniform('numPoints', numPoints);

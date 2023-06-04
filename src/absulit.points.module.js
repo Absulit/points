@@ -32,7 +32,7 @@ export class RenderPass {
      * @param {String} fragmentShader  WGSL Fragment Shader in a String.
      * @param {String} computeShader  WGSL Compute Shader in a String.
      */
-    constructor(vertexShader, fragmentShader, computeShader) {
+    constructor(vertexShader, fragmentShader, computeShader, workgroupCountX, workgroupCountY, workgroupCountZ) {
         this._vertexShader = vertexShader;
         this._computeShader = computeShader;
         this._fragmentShader = fragmentShader;
@@ -56,6 +56,10 @@ export class RenderPass {
         this._hasFragmentShader = !!this._fragmentShader;
 
         this._hasVertexAndFragmentShader = this._hasVertexShader && this._hasFragmentShader;
+
+        this._workgroupCountX = workgroupCountX || 8;
+        this._workgroupCountY = workgroupCountY || 8;
+        this._workgroupCountZ = workgroupCountZ || 1;
     }
 
     get internal() {
@@ -128,6 +132,18 @@ export class RenderPass {
 
     get hasVertexAndFragmentShader() {
         return this._hasVertexAndFragmentShader;
+    }
+
+    get workgroupCountX() {
+        return this._workgroupCountX;
+    }
+
+    get workgroupCountY() {
+        return this._workgroupCountY;
+    }
+
+    get workgroupCountZ() {
+        return this._workgroupCountZ;
     }
 }
 
@@ -1427,7 +1443,11 @@ export default class Points {
                 if (this._uniforms.length) {
                     passEncoder.setBindGroup(0, renderPass.computeBindGroup);
                 }
-                passEncoder.dispatchWorkgroups(8, 8, 1);
+                passEncoder.dispatchWorkgroups(
+                    renderPass.workgroupCountX,
+                    renderPass.workgroupCountY,
+                    renderPass.workgroupCountZ
+                );
                 passEncoder.end();
             }
         });

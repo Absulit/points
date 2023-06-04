@@ -176,6 +176,12 @@ await points.init(renderPasses);
 
 You can pass a Compute Shader only, or a Vertex and Fragment together only. This way you can have a Compute Shader without visual output, create calculations and return their response values, or a regular Render Pipeline without Compute Shader calculations.
 
+There's also three extra parameters in the RenderPass, these are to dispatch the workgroups for each dimension (x, y, z):
+
+```js
+new RenderPass(vert1, frag1, compute1, 800, 800, 1);
+```
+
 # Create your custom Shader project
 1. Copy the `/examples/base/` and place it where you want to store your project.
 2. Rename folder.
