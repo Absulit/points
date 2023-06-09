@@ -1334,7 +1334,7 @@ export default class Points {
                     entries.push(
                         {
                             label: 'binding texture 2',
-                            binding: bindingIndex, // this does not increase, must match the previous block
+                            binding: bindingIndex++,
                             resource: bindingTexture.texture.createView(),
                             type: {
                                 name: 'texture',
