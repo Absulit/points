@@ -259,16 +259,20 @@ export default class Points {
             window.addEventListener('resize', this._resizeCanvasToFitWindow, false);
 
             document.addEventListener("fullscreenchange", e => {
-                let isFullscreen = window.innerWidth == screen.width && window.innerHeight == screen.height;
+                let isFullscreen = !!document.fullscreenElement;
                 this._fullscreen = isFullscreen;
                 if (!isFullscreen && !this._fitWindow) {
                     this._resizeCanvasToDefault();
+                }
+                if (!isFullscreen) {
+                    this.fitWindow = this._lastFitWindow;
                 }
             });
         }
 
         this._fullscreen = false;
         this._fitWindow = false;
+        this._lastFitWindow = false;
 
 
         // _readStorage should only be read once
@@ -1603,6 +1607,8 @@ export default class Points {
 
     set fullscreen(value) {
         if (value) {
+            this._lastFitWindow = this._fitWindow;
+            this.fitWindow = value;
             this._canvas.requestFullscreen().catch(err => {
                 throw `Error attempting to enable fullscreen mode: ${err.message} (${err.name})`;
             });
