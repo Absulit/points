@@ -964,7 +964,7 @@ export default class Points {
             //let layerValues = [];
             let layersSize = 0;
             this._layers.forEach(layerItem => {
-                layersSize += layerItem.size * layerItem.structSize;
+                layersSize += layerItem.size * layerItem.structSize * 4;
             });
             this._layers.buffer = this._createBuffer(layersSize, GPUBufferUsage.STORAGE);
         }
