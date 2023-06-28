@@ -949,7 +949,7 @@ export default class Points {
                 if (storageItem.read) {
                     usage = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC;
                 }
-                storageItem.buffer = this._createBuffer(storageItem.size * storageItem.structSize * 4, usage);
+                storageItem.buffer = this._createBuffer(storageItem.size * storageItem.structSize, usage);
             }
         });
         //--------------------------------------------
@@ -964,7 +964,7 @@ export default class Points {
             //let layerValues = [];
             let layersSize = 0;
             this._layers.forEach(layerItem => {
-                layersSize += layerItem.size * layerItem.structSize * 4;
+                layersSize += layerItem.size * layerItem.structSize;
             });
             this._layers.buffer = this._createBuffer(layersSize, GPUBufferUsage.STORAGE);
         }
