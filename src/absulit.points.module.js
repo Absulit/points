@@ -274,7 +274,6 @@ export default class Points {
         this._fitWindow = false;
         this._lastFitWindow = false;
 
-
         // _readStorage should only be read once
         this._readStorageCopied = false;
     }
@@ -747,15 +746,11 @@ export default class Points {
 
         let dynamicStructParams = '';
         this._uniforms.forEach(variable => {
-            dynamicStructParams += /*wgsl*/`${variable.name}:f32, \n\t\t\t\t\t`;
+            dynamicStructParams += /*wgsl*/`${variable.name}:f32, \n\t`;
         });
 
         if (this._uniforms.length) {
-            dynamicStructParams = /*wgsl*/`
-                struct Params {
-                    ${dynamicStructParams}
-                }
-            \n`;
+            dynamicStructParams = /*wgsl*/`struct Params {\n\t${dynamicStructParams}\n}\n`;
         }
 
         renderPass.hasVertexShader && (dynamicGroupBindingsVertex += dynamicStructParams);
@@ -949,7 +944,7 @@ export default class Points {
                 if (storageItem.read) {
                     usage = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC;
                 }
-                storageItem.buffer = this._createBuffer(storageItem.size * storageItem.structSize, usage);
+                storageItem.buffer = this._createBuffer(storageItem.size * storageItem.structSize * 4, usage);
             }
         });
         //--------------------------------------------
@@ -1200,7 +1195,7 @@ export default class Points {
         }
 
         if (this._storage.length) {
-            this._storage.forEach((storageItem, index) => {
+            this._storage.forEach(storageItem => {
                 let internalCheck = internal == storageItem.internal;
                 if (!storageItem.shaderType && internalCheck || storageItem.shaderType == shaderType && internalCheck) {
                     entries.push(
