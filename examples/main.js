@@ -41,7 +41,7 @@ gui.add(stats2, 'visible').name('Show Stats').onChange(value => setStatsVisibili
 
 let isFullscreenData = { 'isFullscreen': false };
 let fullscreenCheck = gui.add(isFullscreenData, 'isFullscreen').name('Fullscreen').onChange(value => points.fullscreen = value);
-document.addEventListener("fullscreenchange", e => {
+document.addEventListener('fullscreenchange', e => {
     let isFullscreen = window.innerWidth == screen.width && window.innerHeight == screen.height;
     isFullscreenData.isFullscreen = isFullscreen;
     fullscreenCheck.updateDisplay();
@@ -147,6 +147,13 @@ const recordingOptions = [
         },
         started: false,
         controller: null
+    },
+    {
+        nameStopped: 'Download PNG Image',
+        fn: function (e) {
+            let image = document.getElementById('gl-canvas').toDataURL().replace('image/png', 'image/octet-stream');
+            window.location.href = image;
+        },
     },
 ];
 

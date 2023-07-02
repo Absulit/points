@@ -259,17 +259,20 @@ export default class Points {
             window.addEventListener('resize', this._resizeCanvasToFitWindow, false);
 
             document.addEventListener("fullscreenchange", e => {
-                let isFullscreen = window.innerWidth == screen.width && window.innerHeight == screen.height;
+                let isFullscreen = !!document.fullscreenElement;
                 this._fullscreen = isFullscreen;
                 if (!isFullscreen && !this._fitWindow) {
                     this._resizeCanvasToDefault();
+                }
+                if (!isFullscreen) {
+                    this.fitWindow = this._lastFitWindow;
                 }
             });
         }
 
         this._fullscreen = false;
         this._fitWindow = false;
-
+        this._lastFitWindow = false;
 
         // _readStorage should only be read once
         this._readStorageCopied = false;
@@ -743,15 +746,11 @@ export default class Points {
 
         let dynamicStructParams = '';
         this._uniforms.forEach(variable => {
-            dynamicStructParams += /*wgsl*/`${variable.name}:f32, \n\t\t\t\t\t`;
+            dynamicStructParams += /*wgsl*/`${variable.name}:f32, \n\t`;
         });
 
         if (this._uniforms.length) {
-            dynamicStructParams = /*wgsl*/`
-                struct Params {
-                    ${dynamicStructParams}
-                }
-            \n`;
+            dynamicStructParams = /*wgsl*/`struct Params {\n\t${dynamicStructParams}\n}\n`;
         }
 
         renderPass.hasVertexShader && (dynamicGroupBindingsVertex += dynamicStructParams);
@@ -1196,7 +1195,7 @@ export default class Points {
         }
 
         if (this._storage.length) {
-            this._storage.forEach((storageItem, index) => {
+            this._storage.forEach(storageItem => {
                 let internalCheck = internal == storageItem.internal;
                 if (!storageItem.shaderType && internalCheck || storageItem.shaderType == shaderType && internalCheck) {
                     entries.push(
@@ -1334,7 +1333,7 @@ export default class Points {
                     entries.push(
                         {
                             label: 'binding texture 2',
-                            binding: bindingIndex, // this does not increase, must match the previous block
+                            binding: bindingIndex++,
                             resource: bindingTexture.texture.createView(),
                             type: {
                                 name: 'texture',
@@ -1603,6 +1602,8 @@ export default class Points {
 
     set fullscreen(value) {
         if (value) {
+            this._lastFitWindow = this._fitWindow;
+            this.fitWindow = value;
             this._canvas.requestFullscreen().catch(err => {
                 throw `Error attempting to enable fullscreen mode: ${err.message} (${err.name})`;
             });
