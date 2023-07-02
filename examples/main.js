@@ -41,7 +41,7 @@ gui.add(stats2, 'visible').name('Show Stats').onChange(value => setStatsVisibili
 
 let isFullscreenData = { 'isFullscreen': false };
 let fullscreenCheck = gui.add(isFullscreenData, 'isFullscreen').name('Fullscreen').onChange(value => points.fullscreen = value);
-document.addEventListener("fullscreenchange", e => {
+document.addEventListener('fullscreenchange', e => {
     let isFullscreen = window.innerWidth == screen.width && window.innerHeight == screen.height;
     isFullscreenData.isFullscreen = isFullscreen;
     fullscreenCheck.updateDisplay();
@@ -62,7 +62,8 @@ const shaderProjects = [
     { name: 'Demo 6', path: './demo_6/index.js' },
     { name: 'Dithering 1', path: './dithering1/index.js' },
     { name: 'Dithering 2', path: './dithering2/index.js' },
-    { name: 'Dithering 3', path: './dithering3/index.js' },
+    { name: 'Dithering 3 - 1', path: './dithering3_1/index.js' },
+    { name: 'Dithering 3 - 2', path: './dithering3_2/index.js' },
     { name: 'Dithering 4', path: './dithering4/index.js' },
     { name: 'Image Scale 1', path: './imagescale1/index.js' },
     { name: 'Image Texture 1', path: './imagetexture1/index.js' },
@@ -146,6 +147,13 @@ const recordingOptions = [
         },
         started: false,
         controller: null
+    },
+    {
+        nameStopped: 'Download PNG Image',
+        fn: function (e) {
+            let image = document.getElementById('gl-canvas').toDataURL().replace('image/png', 'image/octet-stream');
+            window.location.href = image;
+        },
     },
 ];
 
