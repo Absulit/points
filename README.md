@@ -455,7 +455,54 @@ Common uses:
 > - name - name this property/variable will have inside the shader
 > - size - number of items it will allocate
 > - structName - You can use one of the default structs/types like `f32` , `i32` , `u32` , but if you use a more complex one you have to pair it properly with structSize. If it's a custom `struct` it has to be declared in the shader or it will throw an error.
-> - structSize - if the `struct` you reference in `structName` has 4 properties then you have to add `4` . If it's only a f32 then here you should place `1` .
+> - structSize - if the `struct` you reference in `structName` has 4 properties then you have to add `4` . If it's only a f32 then here you should place `1` . If the `struct` has vectors in it, the size of the vector counts:
+
+```rust
+// structSize: 1
+f32
+u32
+i32
+
+// structSize: 2
+vec2<f32>
+vec2<i32>
+vec2<u32>
+vec2f
+vec2i
+vec2u
+
+// structSize: 3
+vec3<f32>
+vec3<i32>
+vec3<u32>
+vec3f
+vec3i
+vec3u
+
+// structSize: 4
+vec4<f32>
+vec4<i32>
+vec4<u32>
+vec4f
+vec4i
+vec4u
+
+// CUSTOM STRUCTS
+
+// structSize: 3
+struct Variables {
+    value1: vec2f,
+    value2: f32,
+}
+
+// structSize: 5
+struct Variables2 {
+    value1: vec3f,
+    value2: i32,
+    value3: u32,
+}
+
+```
 
 ---
 
@@ -496,6 +543,13 @@ let b = value_noise_data[0];
 
 // size 1 Storage, you can access struct property
 variables.isCreated = 1;
+```
+
+You can also add a default type instead of a custom struct in `structName`:
+
+```js
+points.addStorage('myVar', 1, 'f32', 1); // size is 1
+points.addStorage('myVar2', 1, 'vec2f', 2); // size is 2
 ```
 
 ## StorageMap - addStorageMap
