@@ -7,7 +7,11 @@ const dithering3 = {
         new RenderPass(vert, frag, compute, 800, 800)
     ],
     init: async points => {
-        points.addSampler('imageSampler', null);
+        let descriptor = {
+            addressModeU: 'repeat',
+            addressModeV: 'repeat',
+        }
+        points.addSampler('imageSampler', descriptor);
         // await points.addTextureImage('image', './../img/carmen_lyra_423x643.jpg');
         // await points.addTextureImage('image', './../img/old_king_800x00.jpg');
         // await points.addTextureWebcam('image');
