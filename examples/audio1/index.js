@@ -12,7 +12,9 @@ const base = {
      * @param {Points} points
      */
     init: async points => {
-
+        let volume = 1.;
+        let loop = false;
+        points.addAudio('audio', './../../audio/generative_audio_test.ogg', volume, loop);
     },
     update: points => {
 

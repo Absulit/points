@@ -578,6 +578,48 @@ export default class Points {
         });
     }
 
+    addAudio(name, path, volume, loop) {
+        const audio = new Audio(path);
+        audio.volume = volume;
+        audio.autoplay = true;
+        audio.loop = loop;
+        audio.play();
+
+        // audio
+        const audioCtx = new AudioContext();
+        const source = audioCtx.createMediaElementSource(audio);
+        console.log(audioCtx);
+        const analyser = audioCtx.createAnalyser();
+        console.log(analyser);
+
+        analyser.fftSize = 2048;
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+        console.log(dataArray);
+        
+        analyser.getByteTimeDomainData(dataArray);
+        console.log(dataArray);
+
+        // const sliceWidth = WIDTH / bufferLength;
+        // let x = 0;
+
+        // for (let i = 0; i < bufferLength; i++) {
+        //     const v = dataArray[i] / 128.0;
+        //     const y = v * (HEIGHT / 2);
+          
+        //     if (i === 0) {
+        //       canvasCtx.moveTo(x, y);
+        //     } else {
+        //       canvasCtx.lineTo(x, y);
+        //     }
+          
+        //     x += sliceWidth;
+        //   }
+
+
+
+    }
+
     //
     addTextureStorage2d(name, shaderType) {
         if (this._nameExists(this._texturesStorage2d, name)) {
