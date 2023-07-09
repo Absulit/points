@@ -12,12 +12,18 @@ const base = {
      * @param {Points} points
      */
     init: async points => {
-        let volume = 1.;
-        let loop = false;
-        points.addAudio('audio', './../../audio/generative_audio_test.ogg', volume, loop);
-    },
-    update: points => {
+        let volume = 1;
+        let loop = true;
+        // points.addAudio('audio', './../../audio/generative_audio_test.ogg', volume, loop);
+        points.addAudio('audio', './../../audio/leaving_caladan.mp3', volume, loop);
+        // points.addAudio('audio', 'https://mdn.github.io/voice-change-o-matic/audio/concert-crowd.ogg', volume, loop);
 
+    },
+    /**
+     *
+     * @param {Points} points
+     */
+    update: points => {
     }
 }
 

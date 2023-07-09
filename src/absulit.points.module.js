@@ -276,6 +276,10 @@ export default class Points {
 
         // _readStorage should only be read once
         this._readStorageCopied = false;
+
+        // audio
+        this._analyser = null;
+        this._dataArray = null;
     }
 
     _resizeCanvasToFitWindow = () => {
@@ -588,36 +592,40 @@ export default class Points {
         // audio
         const audioCtx = new AudioContext();
         const source = audioCtx.createMediaElementSource(audio);
-        console.log(audioCtx);
-        const analyser = audioCtx.createAnalyser();
-        console.log(analyser);
 
-        analyser.fftSize = 2048;
-        const bufferLength = analyser.frequencyBinCount;
-        const dataArray = new Uint8Array(bufferLength);
-        console.log(dataArray);
-        
-        analyser.getByteTimeDomainData(dataArray);
-        console.log(dataArray);
+        // // audioCtx.createMediaStreamSource()
+        this._analyser = audioCtx.createAnalyser();
+        console.log(this._analyser);
+
+        this._analyser.fftSize = 2048;
+
+        source.connect(this._analyser);
+        this._analyser.connect(audioCtx.destination);
+
+        const bufferLength = this._analyser.fftSize;//this._analyser.frequencyBinCount;
+        // const bufferLength = this._analyser.frequencyBinCount;
+        this._dataArray = new Uint8Array(bufferLength);
+        this._analyser.getByteTimeDomainData(this._dataArray);
 
         // const sliceWidth = WIDTH / bufferLength;
         // let x = 0;
 
         // for (let i = 0; i < bufferLength; i++) {
-        //     const v = dataArray[i] / 128.0;
+        //     const v = this._dataArray[i] / 128.0;
         //     const y = v * (HEIGHT / 2);
-          
+
         //     if (i === 0) {
         //       canvasCtx.moveTo(x, y);
         //     } else {
         //       canvasCtx.lineTo(x, y);
         //     }
-          
+
         //     x += sliceWidth;
         //   }
 
-
-
+        // this.addStorage(name, )
+        this.addStorageMap(name, this._dataArray , `array<f32, ${bufferLength}>`);
+        this.addUniform(`${name}Length`, this._analyser.frequencyBinCount);
     }
 
     //
@@ -669,7 +677,7 @@ export default class Points {
     /**
      *
      * @param {ShaderType} shaderType
-     * @param {boolean} internal 
+     * @param {boolean} internal
      * @returns string with bindings
      */
     _createDynamicGroupBindings(shaderType, internal) {
@@ -788,7 +796,8 @@ export default class Points {
 
         let dynamicStructParams = '';
         this._uniforms.forEach(variable => {
-            dynamicStructParams += /*wgsl*/`${variable.name}:f32, \n\t`;
+            let uniformType = variable.type || 'f32';
+            dynamicStructParams += /*wgsl*/`${variable.name}:${uniformType}, \n\t`;
         });
 
         if (this._uniforms.length) {
@@ -1459,6 +1468,13 @@ export default class Points {
                 storageItem.buffer = this._createAndMapBuffer(values, GPUBufferUsage.STORAGE);
             }
         });
+
+        // AUDIO
+        // this._analyser.getByteTimeDomainData(this._dataArray);
+        this._analyser.getByteFrequencyData(this._dataArray)
+        // this.updateStorageMap('audio', this._dataArray);
+        // console.log(this._dataArray);
+        // END AUDIO
 
         this._texturesExternal.forEach(externalTexture => {
             externalTexture.texture = this._device.importExternalTexture({
