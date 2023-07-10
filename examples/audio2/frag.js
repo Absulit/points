@@ -1,8 +1,9 @@
 import { fnusin } from '../../src/core/animation.js';
 import { snoise } from '../../src/core/noise2d.js';
 import { sdfCircle } from '../../src/core/sdf.js';
-import { WHITE, RED, layer } from '../../src/core/color.js';
+import { WHITE, RED, GREEN, YELLOW, layer } from '../../src/core/color.js';
 import { audioAverage, audioAverageSegments } from '../../src/core/audio.js';
+import { texturePosition } from '../../src/core/image.js';
 
 const frag = /*wgsl*/`
 
@@ -14,6 +15,9 @@ ${audioAverage}
 ${audioAverageSegments}
 ${WHITE}
 ${RED}
+${GREEN}
+${YELLOW}
+${texturePosition}
 
 @fragment
 fn main(
@@ -25,13 +29,13 @@ fn main(
     @builtin(position) position: vec4<f32>
 ) -> @location(0) vec4<f32> {
 
-    let audioX = audio[ u32(uvr.x * params.audioLength)] / 256;
-
     let audioAverage = audioAverage();
-    let audioAverageSegments = audioAverageSegments(2);
+    // let audioAverageSegments = audioAverageSegments(2);
 
-    let segmentNum = 2;
+    let n = snoise(uvr / params.sliderA + params.time);
+    let feedbackColor = texturePosition(feedbackTexture, imageSampler, vec2(), uvr * vec2f(1, 1.01), true);
 
+    let segmentNum = 4;
     let subSegmentLength = i32(params.audioLength) / segmentNum;
 
     for (var index = 0; index < segmentNum ; index++) {
@@ -45,29 +49,18 @@ fn main(
         result[index] = audioAverage / f32(subSegmentLength);
     }
 
-    var c = vec4f(0);
 
-    c.r = audioX;
-    c.a = ceil(audioX);
-    let s = snoise(uvr / c.r);
-    // c.g = audio[ u32(uvr.y * 1024)] / 256;
-    // c.g = 1 - (c.r * uvr.y);
-    // c.a = c.r * uvr.y;
-
-    let circle = sdfCircle(vec2(.5), audioX * .4, .0, uvr);
-    
-    let audioX2 = audio[0] / 256;
-    let circle2 = sdfCircle(vec2(.5), audioAverage * .5, audioAverage * .5, uvr);
-    
-    let circle3 = sdfCircle(vec2(.5), result[0] * .4, .0, uvr);
-    let circle4 = sdfCircle(vec2(.5), result[1] * .4, .0, uvr);
+    let circle1 = sdfCircle(vec2(.5), result[0] * .4, .0, uvr) * WHITE;
+    let circle2 = sdfCircle(vec2(.5), result[1] * .4, .0, uvr) * GREEN;
+    let circle3 = sdfCircle(vec2(.5), result[2] * .4, .0, uvr) * YELLOW;
+    let circle4 = sdfCircle(vec2(.5), result[3] * .4, .0, uvr) * RED;
 
 
     // return c;
     // return layer(circle2 * WHITE, c + circle);
     // return c + circle - circle2;
 
-    return layer(circle3 * WHITE, circle4 * RED);
+    return  layer(feedbackColor * .9, layer(circle1, layer(circle2, layer(circle3, circle4))));
 }
 `;
 
