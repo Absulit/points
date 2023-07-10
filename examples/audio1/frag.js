@@ -1,10 +1,19 @@
 import { fnusin } from '../../src/core/animation.js';
 import { snoise } from './../../src/core/noise2d.js';
+import { sdfCircle } from './../../src/core/sdf.js';
+import { WHITE, RED, layer } from './../../src/core/color.js';
+import { audioAverage, audioAverageSegments } from '../../src/core/audio.js';
 
 const frag = /*wgsl*/`
 
 ${fnusin}
 ${snoise}
+${sdfCircle}
+${layer}
+${audioAverage}
+${audioAverageSegments}
+${WHITE}
+${RED}
 
 @fragment
 fn main(
@@ -16,17 +25,12 @@ fn main(
     @builtin(position) position: vec4<f32>
 ) -> @location(0) vec4<f32> {
 
+    let audioX = audio[ u32(uvr.x * params.audioLength)] / 256;
+
+
     var c = vec4f(0);
-    c.a = 1;
-    
-    c.r = audio[ u32(uvr.x * params.audioLength)] / 256;
-    let s = snoise(uvr / c.r);
-    // c.g = audio[ u32(uvr.y * 1024)] / 256;
-    // c.g = 1 - (c.r * uvr.y);
-    // c.a = c.r * uvr.y;
-
-
-
+    c.r = audioX;
+    c.a = 1.;
 
     return c;
 }

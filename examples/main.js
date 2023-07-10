@@ -57,6 +57,7 @@ gui.add(isFitWindowData, 'isFitWindow').name('Fit Window').onChange(value => {
 const shaderProjects = [
     { name: 'Base', path: './base/index.js' },
     { name: 'Audio 1', path: './audio1/index.js' },
+    { name: 'Audio 2', path: './audio2/index.js' },
     { name: 'Bloom1', path: './bloom1/index.js' },
     { name: 'Circle Blur', path: './circleblur/index.js' },
     { name: 'Data 1', path: './data1/index.js' },

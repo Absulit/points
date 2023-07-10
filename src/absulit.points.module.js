@@ -278,6 +278,7 @@ export default class Points {
         this._readStorageCopied = false;
 
         // audio
+        this._audio = null;
         this._analyser = null;
         this._dataArray = null;
     }
@@ -583,20 +584,18 @@ export default class Points {
     }
 
     addAudio(name, path, volume, loop) {
-        const audio = new Audio(path);
-        audio.volume = volume;
-        audio.autoplay = true;
-        audio.loop = loop;
-        audio.play();
+        this._audio = new Audio(path);
+        this._audio.volume = volume;
+        this._audio.autoplay = true;
+        this._audio.loop = loop;
+        this._audio.play();
 
         // audio
         const audioCtx = new AudioContext();
-        const source = audioCtx.createMediaElementSource(audio);
+        const source = audioCtx.createMediaElementSource(this._audio);
 
         // // audioCtx.createMediaStreamSource()
         this._analyser = audioCtx.createAnalyser();
-        console.log(this._analyser);
-
         this._analyser.fftSize = 2048;
 
         source.connect(this._analyser);
@@ -605,25 +604,9 @@ export default class Points {
         const bufferLength = this._analyser.fftSize;//this._analyser.frequencyBinCount;
         // const bufferLength = this._analyser.frequencyBinCount;
         this._dataArray = new Uint8Array(bufferLength);
-        this._analyser.getByteTimeDomainData(this._dataArray);
+        // this._analyser.getByteTimeDomainData(this._dataArray);
+        this._analyser.getByteFrequencyData(this._dataArray);
 
-        // const sliceWidth = WIDTH / bufferLength;
-        // let x = 0;
-
-        // for (let i = 0; i < bufferLength; i++) {
-        //     const v = this._dataArray[i] / 128.0;
-        //     const y = v * (HEIGHT / 2);
-
-        //     if (i === 0) {
-        //       canvasCtx.moveTo(x, y);
-        //     } else {
-        //       canvasCtx.lineTo(x, y);
-        //     }
-
-        //     x += sliceWidth;
-        //   }
-
-        // this.addStorage(name, )
         this.addStorageMap(name, this._dataArray , `array<f32, ${bufferLength}>`);
         this.addUniform(`${name}Length`, this._analyser.frequencyBinCount);
     }
@@ -1471,9 +1454,7 @@ export default class Points {
 
         // AUDIO
         // this._analyser.getByteTimeDomainData(this._dataArray);
-        this._analyser.getByteFrequencyData(this._dataArray)
-        // this.updateStorageMap('audio', this._dataArray);
-        // console.log(this._dataArray);
+        this._analyser?.getByteFrequencyData(this._dataArray);
         // END AUDIO
 
         this._texturesExternal.forEach(externalTexture => {
