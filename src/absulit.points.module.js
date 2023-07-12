@@ -615,7 +615,10 @@ export default class Points {
         analyser.getByteFrequencyData(data);
 
         // storage that will have the data on WGSL
-        this.addStorageMap(name, data , `array<f32, ${bufferLength}>`);
+        this.addStorageMap(name, data,
+            // `array<f32, ${bufferLength}>`
+            'Sound' // custom struct in defaultStructs.js
+            );
         // uniform that will have the data length as a quick reference
         this.addUniform(`${name}Length`, analyser.frequencyBinCount);
 

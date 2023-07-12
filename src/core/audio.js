@@ -1,8 +1,8 @@
 export const audioAverage = /*wgsl*/`
-fn audioAverage() -> f32 {
+fn audioAverage(sound:Sound) -> f32 {
     var audioAverage = 0.;
     for (var index = 0; index < i32(params.audioLength); index++) {
-        let audioValue = audio[index] / 256;
+        let audioValue = sound.data[index] / 256;
         audioAverage += audioValue;
     }
     return audioAverage / params.audioLength;

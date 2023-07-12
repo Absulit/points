@@ -25,10 +25,10 @@ fn main(
     @builtin(position) position: vec4<f32>
 ) -> @location(0) vec4<f32> {
 
-    let audioX = audio[ u32(uvr.x * params.audioLength)] / 256;
+    let audioX = audio.data[ u32(uvr.x * params.audioLength)] / 256;
 
 
-    var c = vec4f(0);
+    var c = vec4f();
     c.r = audioX;
     c.a = 1.;
 
