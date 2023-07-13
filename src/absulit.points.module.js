@@ -389,7 +389,7 @@ export default class Points {
         if (read) {
             let storageItem = {
                 name: name,
-                size: structSize
+                size: structSize * size
             }
             this._readStorage.push(storageItem);
         }
@@ -1000,7 +1000,7 @@ export default class Points {
         //--------------------------------------------
         this._readStorage.forEach(readStorageItem => {
             readStorageItem.buffer = this._device.createBuffer({
-                size: readStorageItem.size,
+                size: readStorageItem.size * 4,
                 usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
             });
         });
@@ -1574,7 +1574,7 @@ export default class Points {
                     0 /* source offset */,
                     readStorageItem.buffer /* destination buffer */,
                     0 /* destination offset */,
-                    readStorageItem.size /* size */
+                    readStorageItem.buffer.size /* size */
                 );
             });
             this._readStorageCopied = true;
