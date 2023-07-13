@@ -422,11 +422,14 @@ export default class Points {
         // TODO: if read true add flag in addStorage
         let storageItem = this._readStorage.find(storageItem => storageItem.name === name);
         let arrayBuffer = null;
+        let arrayBufferCopy = null;
         if (storageItem) {
             await storageItem.buffer.mapAsync(GPUMapMode.READ)
             arrayBuffer = storageItem.buffer.getMappedRange();
+            arrayBufferCopy = new Float32Array(arrayBuffer.slice(0));
+            storageItem.buffer.unmap();
         }
-        return new Float32Array(arrayBuffer);
+        return arrayBufferCopy;
     }
 
     addLayers(numLayers, shaderType) {

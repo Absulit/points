@@ -191,11 +191,9 @@ async function init() {
     hasVertexAndFragmentShader && (points.fitWindow = isFitWindow);
 
     update();
-
-    shaders.read && await shaders.read(points);
 }
 
-function update() {
+async function update() {
     stats.begin();
 
     // code here
@@ -207,6 +205,7 @@ function update() {
     shaders.update(points);
     points.update();
 
+    await shaders?.read(points);
     //
 
     stats.end();
