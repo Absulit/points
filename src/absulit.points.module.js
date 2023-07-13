@@ -274,9 +274,6 @@ export default class Points {
         this._fitWindow = false;
         this._lastFitWindow = false;
 
-        // _readStorage should only be read once
-        this._readStorageCopied = false;
-
         // audio
         this._sounds = [];
     }
@@ -1568,7 +1565,7 @@ export default class Points {
 
 
 
-        if (this._readStorage.length && !this._readStorageCopied) {
+        if (this._readStorage.length) {
             this._readStorage.forEach(readStorageItem => {
                 let storageItem = this._storage.find(storageItem => storageItem.name === readStorageItem.name);
 
@@ -1580,7 +1577,6 @@ export default class Points {
                     readStorageItem.buffer.size /* size */
                 );
             });
-            this._readStorageCopied = true;
         }
 
         // ---------------------
