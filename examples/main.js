@@ -204,7 +204,7 @@ async function update() {
     points.updateUniform('sliderC', sliders.c);
 
     shaders.update(points);
-    points.update();
+    await points.update();
 
     shaders.read && await shaders.read(points);
     //

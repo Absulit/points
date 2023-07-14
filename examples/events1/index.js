@@ -15,6 +15,11 @@ const base = {
         points.addStorage('variables', 1, 'Variable', 4);
 
         points.addStorage('event', 1, 'array<f32>', 4096, true);
+
+        let id = 32;
+        points.addEventListener(id, e => {
+            console.log(e);
+        });
     },
     /**
      *
@@ -28,10 +33,10 @@ const base = {
      * @param {Points} points
      */
     read: async points => {
-        let event = await points.readStorage('event');
+        // let event = await points.readStorage('event');
         // console.clear();
         // console.log(event);
-        console.log(event[0], event[1], event[2]);
+        // console.log(event[0], event[1], event[2]);
     }
 }
 

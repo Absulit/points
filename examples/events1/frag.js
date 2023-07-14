@@ -44,12 +44,13 @@ fn main(
         }
     }
 
-    resetEvent();
+    // resetEvent();
+    event[0] = -1;
     if(params.mouseClick == 1.){
         variables.circlePosition = mouse * ratio;
         // dispatch(1, params.time);
 
-        event[0] = 1;
+        event[0] = 32;
         event[1] = params.time;
         event[2] = 3;
     }

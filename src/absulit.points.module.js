@@ -276,6 +276,8 @@ export default class Points {
 
         // audio
         this._sounds = [];
+
+        this._events = {};
     }
 
     _resizeCanvasToFitWindow = () => {
@@ -618,7 +620,7 @@ export default class Points {
         this.addStorageMap(name, data,
             // `array<f32, ${bufferLength}>`
             'Sound' // custom struct in defaultStructs.js
-            );
+        );
         // uniform that will have the data length as a quick reference
         this.addUniform(`${name}Length`, analyser.frequencyBinCount);
 
@@ -663,6 +665,15 @@ export default class Points {
             size: size,
             internal: this._internal
         });
+    }
+
+    /**
+     * Listen for an event dispatched from WGSL code
+     * @param {Number} id Number that represents an event Id
+     * @param {Function} callback function to be called when the event occurs
+     */
+    addEventListener(id, callback) {
+        this._events[id] = callback;
     }
 
     /**
@@ -1438,7 +1449,7 @@ export default class Points {
 
     }
 
-    update() {
+    async update() {
         if (!this._canvas) return;
         if (!this._device) return;
 
@@ -1471,7 +1482,6 @@ export default class Points {
         // AUDIO
         // this._analyser.getByteTimeDomainData(this._dataArray);
         this._sounds.forEach(sound => {
-            
             sound.analyser?.getByteFrequencyData(sound.data);
         })
         // END AUDIO
@@ -1593,6 +1603,19 @@ export default class Points {
         this._mouseWheel = false;
         this._mouseDeltaX = 0;
         this._mouseDeltaY = 0;
+
+        await this.read();
+    }
+
+    async read() {
+        let eventRead = await this.readStorage('event');
+        let id = eventRead[0];
+        if(id != -1){
+            // console.log(id);
+            let callback = this._events[id];
+            console.log(callback);
+            callback(eventRead.slice(1, -1));
+        }
     }
 
     _getWGSLCoordinate(value, side, invert = false) {
