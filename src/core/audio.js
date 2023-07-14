@@ -11,7 +11,7 @@ fn audioAverage(sound:Sound) -> f32 {
 
 export const audioAverageSegments = /*wgsl*/`
 fn audioAverageSegments(segmentNum:i32) -> f32{
-    // arrayLength
+    // arrayLength(&array)
     return .0;
 }
 `;

@@ -67,6 +67,7 @@ const shaderProjects = [
     { name: 'Dithering 3 - 1', path: './dithering3_1/index.js' },
     { name: 'Dithering 3 - 2', path: './dithering3_2/index.js' },
     { name: 'Dithering 4', path: './dithering4/index.js' },
+    { name: 'Events 1', path: './events1/index.js' },
     { name: 'Image Scale 1', path: './imagescale1/index.js' },
     { name: 'Image Texture 1', path: './imagetexture1/index.js' },
     { name: 'Image Texture 2', path: './imagetexture2/index.js' },
@@ -205,7 +206,7 @@ async function update() {
     shaders.update(points);
     points.update();
 
-    await shaders?.read(points);
+    shaders.read && await shaders.read(points);
     //
 
     stats.end();
