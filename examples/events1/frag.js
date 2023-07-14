@@ -12,16 +12,6 @@ struct Variable{
 ${sdfCircle}
 ${RED + GREEN}
 
-struct Event {
-    id: f32,
-    data:array<f32>
-}
-
-// fn dispatch(eventId:f32, data:array<f32>){
-//     event.id = eventId;
-//     event.data = data;
-// }
-
 fn resetEvent() {
     let eventLength = arrayLength(&event);
     for (var index = 0u; index < eventLength ; index++) {
@@ -54,9 +44,6 @@ fn main(
         }
     }
 
-    // dispatch(0, 0);
-    // event[0] = 0;
-    // event[1] = 0;
     resetEvent();
     if(params.mouseClick == 1.){
         variables.circlePosition = mouse * ratio;
