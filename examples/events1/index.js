@@ -14,11 +14,11 @@ const base = {
     init: async points => {
         points.addStorage('variables', 1, 'Variable', 4);
 
-        points.addStorage('event', 1, 'array<f32>', 4096, true);
+        points.addStorage('event', 1, 'array<f32>', 4, true);
 
         let id = 32;
-        points.addEventListener(id, e => {
-            console.log(e);
+        points.addEventListener(id, data => {
+            console.log(data[0], data[1]);
         });
     },
     /**

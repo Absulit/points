@@ -1610,10 +1610,8 @@ export default class Points {
     async read() {
         let eventRead = await this.readStorage('event');
         let id = eventRead[0];
-        if(id != -1){
-            // console.log(id);
+        if (id != 0) {
             let callback = this._events[id];
-            console.log(callback);
             callback(eventRead.slice(1, -1));
         }
     }
