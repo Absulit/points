@@ -12,13 +12,6 @@ struct Variable{
 ${sdfCircle}
 ${WHITE + RED + GREEN + BLUE + YELLOW}
 
-// fn resetEvent() {
-//     let eventLength = arrayLength(&event);
-//     for (var index = 0u; index < eventLength ; index++) {
-//         event[index] = 0;
-//     }
-// }
-
 @fragment
 fn main(
         @location(0) color: vec4<f32>,
@@ -44,15 +37,13 @@ fn main(
         }
     }
 
-    // resetEvent();
-    // event[0] = 0;
-    click[0] = 0;
     if(params.mouseClick == 1.){
         variables.circlePosition = mouse * ratio;
 
-        click[0] = 32;
-        click[1] = params.time;
-        click[2] = 3;
+        click.data[0] = 32;
+        click.data[1] = params.time;
+        click.data[2] = 3;
+        click.updated = 1;
     }
 
     let circleValue = sdfCircle(variables.circlePosition, variables.circleRadius, 0., uvr);
@@ -68,18 +59,19 @@ fn main(
     var circle1Radius = .01;
     var circle2Radius = .01;
 
-    left_blink[0] = 0;
     if(params.time % 1 == 0){
         circle1Radius = .1;
-        left_blink[0] = 1;
-        left_blink[1] = 1;
+        left_blink.data[0] = 1;
+        left_blink.data[1] = 1;
+        left_blink.updated = 1;
 
     }
-    right_blink[0] = 0;
+
     if(params.time % 2 == 0){
         circle2Radius = .1;
-        right_blink[0] = 2;
-        right_blink[1] = 2;
+        right_blink.data[0] = 2;
+        right_blink.data[1] = 2;
+        right_blink.updated = 1;
     }
 
     let circleValue1 = sdfCircle(vec2f(.2,.5), circle1Radius, 0., uvr);

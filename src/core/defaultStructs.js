@@ -16,6 +16,11 @@ struct Sound {
     //duration
     //currentPosition
 }
+
+struct Event {
+    updated: u32,
+    data: array<f32>
+}
 `;
 
 export default defaultStructs;

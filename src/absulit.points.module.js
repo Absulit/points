@@ -395,7 +395,7 @@ export default class Points {
         }
     }
 
-    addStorageMap(name, arrayData, structName, shaderType) {
+    addStorageMap(name, arrayData, structName, read, shaderType) {
         if (this._nameExists(this._storage, name)) {
             return;
         }
@@ -406,8 +406,17 @@ export default class Points {
             shaderType: shaderType,
             array: arrayData,
             buffer: null,
+            read: read,
             internal: this._internal
         });
+
+        if (read) {
+            let storageItem = {
+                name: name,
+                size: arrayData.length,
+            }
+            this._readStorage.push(storageItem);
+        }
     }
 
     updateStorageMap(name, arrayData) {
@@ -673,7 +682,9 @@ export default class Points {
      * @param {Function} callback function to be called when the event occurs
      */
     addEventListener(name, callback, structSize) {
-        this.addStorage(name, 1, 'array<f32>', structSize, true);
+        // this extra 1 is for the boolean flag in the Event struct
+        let data = Array(structSize + 1).fill(0);
+        this.addStorageMap(name, data, 'Event', true);
         this._events.set(this._events_ids,
             {
                 id: this._events_ids,
@@ -1006,14 +1017,15 @@ export default class Points {
         this._createParametersUniforms();
         //--------------------------------------------
         this._storage.forEach(storageItem => {
+            let usage = GPUBufferUsage.STORAGE;
+            if (storageItem.read) {
+                usage = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC;
+            }
+            storageItem.usage = usage;
             if (storageItem.mapped) {
                 const values = new Float32Array(storageItem.array);
-                storageItem.buffer = this._createAndMapBuffer(values, GPUBufferUsage.STORAGE);
+                storageItem.buffer = this._createAndMapBuffer(values, usage);
             } else {
-                let usage = GPUBufferUsage.STORAGE;
-                if (storageItem.read) {
-                    usage = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC;
-                }
                 storageItem.buffer = this._createBuffer(storageItem.size * storageItem.structSize * 4, usage);
             }
         });
@@ -1484,7 +1496,7 @@ export default class Points {
         this._storage.forEach(storageItem => {
             if (storageItem.mapped) {
                 const values = new Float32Array(storageItem.array);
-                storageItem.buffer = this._createAndMapBuffer(values, GPUBufferUsage.STORAGE);
+                storageItem.buffer = this._createAndMapBuffer(values, storageItem.usage);
             }
         });
 
@@ -1619,10 +1631,10 @@ export default class Points {
     async read() {
         for (const [key, event] of this._events) {
             let eventRead = await this.readStorage(event.name);
-            if(eventRead){
+            if (eventRead) {
                 let id = eventRead[0];
                 if (id != 0) {
-                    event.callback && event.callback(eventRead);
+                    event.callback && event.callback(eventRead.slice(1, -1));
                 }
             }
         }

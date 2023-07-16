@@ -17,7 +17,7 @@ const base = {
         // points.addStorage('event', 1, 'array<f32>', 4, true);
 
         points.addEventListener('click', data => {
-            console.log(data[0], data[1]);
+            console.log(Array.from(data));
         }, 4);
 
         points.addEventListener('left_blink', data => {
