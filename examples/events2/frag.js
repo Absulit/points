@@ -1,5 +1,5 @@
 import { sdfCircle } from '../../src/core/sdf.js';
-import { GREEN, RED } from './../../src/core/color.js';
+import { WHITE, BLUE, GREEN, RED, YELLOW } from '../../src/core/color.js';
 
 const frag = /*wgsl*/`
 
@@ -10,7 +10,7 @@ struct Variable{
 }
 
 ${sdfCircle}
-${RED + GREEN}
+${WHITE + RED + GREEN + BLUE + YELLOW}
 
 // fn resetEvent() {
 //     let eventLength = arrayLength(&event);
@@ -45,25 +45,56 @@ fn main(
     }
 
     // resetEvent();
-    event[0] = 0;
+    // event[0] = 0;
+    click[0] = 0;
     if(params.mouseClick == 1.){
         variables.circlePosition = mouse * ratio;
 
-        event[0] = 32;
-        event[1] = params.time;
-        event[2] = 3;
+        click[0] = 32;
+        click[1] = params.time;
+        click[2] = 3;
     }
 
     let circleValue = sdfCircle(variables.circlePosition, variables.circleRadius, 0., uvr);
-    var finalColor = vec4(1) * circleValue;
+    var clickCircleColor = vec4(1) * circleValue;
 
     if(params.mouseDown == 1.){
-        finalColor *= GREEN;
+        clickCircleColor *= GREEN;
     }else{
-        finalColor *= RED;
+        clickCircleColor *= RED;
     }
 
-    return finalColor;
+    // < ------------ TWO PULSATING CIRCLES
+    var circle1Radius = .01;
+    var circle2Radius = .01;
+
+    left_blink[0] = 0;
+    if(params.time % 1 == 0){
+        circle1Radius = .1;
+        left_blink[0] = 1;
+        left_blink[1] = 1;
+
+    }
+    right_blink[0] = 0;
+    if(params.time % 2 == 0){
+        circle2Radius = .1;
+        right_blink[0] = 2;
+        right_blink[1] = 2;
+    }
+
+    let circleValue1 = sdfCircle(vec2f(.2,.5), circle1Radius, 0., uvr);
+    let circleValue2 = sdfCircle(vec2f(.8,.5), circle2Radius, 0., uvr);
+
+    var circle1Color = circleValue1 * WHITE;
+    var circle2Color = circleValue2 * WHITE;
+    // > ------------ TWO PULSATING CIRCLES
+
+
+
+
+
+
+    return clickCircleColor + circle1Color + circle2Color;
 }
 `;
 

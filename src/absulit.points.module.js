@@ -277,7 +277,8 @@ export default class Points {
         // audio
         this._sounds = [];
 
-        this._events = {};
+        this._events = new Map();
+        this._events_ids = 0;
     }
 
     _resizeCanvasToFitWindow = () => {
@@ -418,12 +419,11 @@ export default class Points {
     }
 
     async readStorage(name) {
-        // TODO: if read true add flag in addStorage
         let storageItem = this._readStorage.find(storageItem => storageItem.name === name);
         let arrayBuffer = null;
         let arrayBufferCopy = null;
         if (storageItem) {
-            await storageItem.buffer.mapAsync(GPUMapMode.READ)
+            await storageItem.buffer.mapAsync(GPUMapMode.READ);
             arrayBuffer = storageItem.buffer.getMappedRange();
             arrayBufferCopy = new Float32Array(arrayBuffer.slice(0));
             storageItem.buffer.unmap();
@@ -672,8 +672,17 @@ export default class Points {
      * @param {Number} id Number that represents an event Id
      * @param {Function} callback function to be called when the event occurs
      */
-    addEventListener(id, callback) {
-        this._events[id] = callback;
+    addEventListener(name, callback, structSize) {
+        this.addStorage(name, 1, 'array<f32>', structSize, true);
+        this._events.set(this._events_ids,
+            {
+                id: this._events_ids,
+                name: name,
+                callback: callback,
+            }
+        );
+
+        ++this._events_ids;
     }
 
     /**
@@ -1608,11 +1617,14 @@ export default class Points {
     }
 
     async read() {
-        let eventRead = await this.readStorage('event');
-        let id = eventRead[0];
-        if (id != 0) {
-            let callback = this._events[id];
-            callback(eventRead.slice(1, -1));
+        for (const [key, event] of this._events) {
+            let eventRead = await this.readStorage(event.name);
+            if(eventRead){
+                let id = eventRead[0];
+                if (id != 0) {
+                    event.callback && event.callback(eventRead);
+                }
+            }
         }
     }
 
