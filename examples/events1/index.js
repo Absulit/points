@@ -1,7 +1,7 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
-import Points from './../../src/absulit.points.module.js';
+import Points from '../../src/absulit.points.module.js';
 
 const base = {
     vert,
@@ -12,14 +12,19 @@ const base = {
      * @param {Points} points
      */
     init: async points => {
-        points.addStorage('variables', 1, 'Variable', 4);
+        // points.addStorage('event', 1, 'array<f32>', 4, true);
 
-        points.addStorage('event', 1, 'array<f32>', 4, true);
+        points.addEventListener('left_blink', data => {
+            console.log('---- Left Circle');
+        }, 4);
 
-        let id = 32;
-        points.addEventListener(id, data => {
-            console.log(data[0], data[1]);
-        });
+        points.addEventListener(
+            'right_blink', // name of the event (and name of a storage)
+            data => { // data returned after the event and callback
+                console.log('---- Right Circle');
+            },
+            4 // size of the data to return
+        );
     },
     /**
      *

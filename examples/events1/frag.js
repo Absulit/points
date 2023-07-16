@@ -1,23 +1,10 @@
 import { sdfCircle } from '../../src/core/sdf.js';
-import { GREEN, RED } from './../../src/core/color.js';
+import { WHITE, BLUE, GREEN, RED, YELLOW } from '../../src/core/color.js';
 
 const frag = /*wgsl*/`
 
-struct Variable{
-    init: f32,
-    circleRadius:f32,
-    circlePosition:vec2<f32>
-}
-
 ${sdfCircle}
-${RED + GREEN}
-
-// fn resetEvent() {
-//     let eventLength = arrayLength(&event);
-//     for (var index = 0u; index < eventLength ; index++) {
-//         event[index] = 0;
-//     }
-// }
+${WHITE + RED + GREEN + BLUE + YELLOW}
 
 @fragment
 fn main(
@@ -29,41 +16,32 @@ fn main(
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
-    if(variables.init == 0){
-        variables.circleRadius = .1;
-        variables.circlePosition = vec2(.5, .5) * ratio;
+    // < ------------ TWO PULSATING CIRCLES
+    var circle1Radius = .01;
+    var circle2Radius = .01;
 
-        variables.init = 1;
+    if(params.time % 1 == 0){
+        circle1Radius = .1;
+        left_blink.data[0] = 1;
+        left_blink.data[1] = 1;
+        left_blink.updated = 1;
     }
 
-    if(params.mouseWheel == 1.){
-        if(params.mouseDeltaY > 0){
-            variables.circleRadius += .0001;
-        }else{
-            variables.circleRadius -= .0001;
-        }
+    if(params.time % 2 == 0){
+        circle2Radius = .1;
+        right_blink.data[0] = 2;
+        right_blink.data[1] = 2;
+        right_blink.updated = 1;
     }
 
-    // resetEvent();
-    event[0] = 0;
-    if(params.mouseClick == 1.){
-        variables.circlePosition = mouse * ratio;
+    let circleValue1 = sdfCircle(vec2f(.2,.5), circle1Radius, 0., uvr);
+    let circleValue2 = sdfCircle(vec2f(.8,.5), circle2Radius, 0., uvr);
 
-        event[0] = 32;
-        event[1] = params.time;
-        event[2] = 3;
-    }
+    var circle1Color = circleValue1 * WHITE;
+    var circle2Color = circleValue2 * WHITE;
+    // > ------------ TWO PULSATING CIRCLES
 
-    let circleValue = sdfCircle(variables.circlePosition, variables.circleRadius, 0., uvr);
-    var finalColor = vec4(1) * circleValue;
-
-    if(params.mouseDown == 1.){
-        finalColor *= GREEN;
-    }else{
-        finalColor *= RED;
-    }
-
-    return finalColor;
+    return circle1Color + circle2Color;
 }
 `;
 
