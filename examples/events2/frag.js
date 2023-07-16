@@ -3,12 +3,6 @@ import { WHITE, BLUE, GREEN, RED, YELLOW } from '../../src/core/color.js';
 
 const frag = /*wgsl*/`
 
-struct Variable{
-    init: f32,
-    circleRadius:f32,
-    circlePosition:vec2<f32>
-}
-
 ${sdfCircle}
 ${WHITE + RED + GREEN + BLUE + YELLOW}
 
@@ -22,39 +16,6 @@ fn main(
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
-    if(variables.init == 0){
-        variables.circleRadius = .1;
-        variables.circlePosition = vec2(.5, .5) * ratio;
-
-        variables.init = 1;
-    }
-
-    if(params.mouseWheel == 1.){
-        if(params.mouseDeltaY > 0){
-            variables.circleRadius += .0001;
-        }else{
-            variables.circleRadius -= .0001;
-        }
-    }
-
-    if(params.mouseClick == 1.){
-        variables.circlePosition = mouse * ratio;
-
-        click.data[0] = 32;
-        click.data[1] = params.time;
-        click.data[2] = 3;
-        click.updated = 1;
-    }
-
-    let circleValue = sdfCircle(variables.circlePosition, variables.circleRadius, 0., uvr);
-    var clickCircleColor = vec4(1) * circleValue;
-
-    if(params.mouseDown == 1.){
-        clickCircleColor *= GREEN;
-    }else{
-        clickCircleColor *= RED;
-    }
-
     // < ------------ TWO PULSATING CIRCLES
     var circle1Radius = .01;
     var circle2Radius = .01;
@@ -64,7 +25,6 @@ fn main(
         left_blink.data[0] = 1;
         left_blink.data[1] = 1;
         left_blink.updated = 1;
-
     }
 
     if(params.time % 2 == 0){
@@ -81,12 +41,7 @@ fn main(
     var circle2Color = circleValue2 * WHITE;
     // > ------------ TWO PULSATING CIRCLES
 
-
-
-
-
-
-    return clickCircleColor + circle1Color + circle2Color;
+    return circle1Color + circle2Color;
 }
 `;
 
