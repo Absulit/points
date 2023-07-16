@@ -636,6 +636,8 @@ export default class Points {
         sound.analyser = analyser;
         sound.data = data;
         this._sounds.push(sound);
+
+        return audio;
     }
 
     //

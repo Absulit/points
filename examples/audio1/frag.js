@@ -27,6 +27,10 @@ fn main(
 
     let audioX = audio.data[ u32(uvr.x * params.audioLength)] / 256;
 
+    if(params.mouseClick == 1.){
+        click_event.updated = 1;
+    }
+
 
     var c = vec4f();
     c.r = audioX;

@@ -14,11 +14,14 @@ const base = {
     init: async points => {
         let volume = 1;
         let loop = true;
-        // points.addAudio('audio', './../../audio/generative_audio_test.ogg', volume, loop);
-        // points.addAudio('audio', './../../audio/leaving_caladan.mp3', volume, loop);
-        points.addAudio('audio', './../../audio/cognitive_dissonance.mp3', volume, loop, false);
+        // let audio = points.addAudio('audio', './../../audio/generative_audio_test.ogg', volume, loop);
+        let audio = points.addAudio('audio', './../../audio/cognitive_dissonance.mp3', volume, loop, false);
+        points.addEventListener('click_event', data => {
+            console.log(audio);
+            audio.play();
+        }, 2);
         // points.addAudio('audio', 'https://mdn.github.io/voice-change-o-matic/audio/concert-crowd.ogg', volume, loop);
-        points.addStorage('result',10, 'f32', 1);
+        points.addStorage('result', 10, 'f32', 1);
     },
     /**
      *

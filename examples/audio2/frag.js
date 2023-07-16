@@ -29,7 +29,11 @@ fn main(
     @builtin(position) position: vec4<f32>
 ) -> @location(0) vec4<f32> {
 
-    let audioAverage = audioAverage();
+    if(params.mouseClick == 1.){
+        click_event.updated = 1;
+    }
+
+    // let audioAverage = audioAverage(audio);
     // let audioAverageSegments = audioAverageSegments(2);
 
     let n = snoise(uvr / params.sliderA + params.time);
@@ -43,7 +47,7 @@ fn main(
         for (var index2 = 0; index2 < subSegmentLength; index2++) {
             let audioIndex = index2 * index;
 
-            let audioValue = audio[audioIndex] / 256;
+            let audioValue = audio.data[audioIndex] / 256;
             audioAverage += audioValue;
         }
         result[index] = audioAverage / f32(subSegmentLength);
