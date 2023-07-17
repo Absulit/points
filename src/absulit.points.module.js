@@ -609,15 +609,21 @@ export default class Points {
         // this._audio.play();
 
         // audio
-        const audioCtx = new AudioContext();
-        const source = audioCtx.createMediaElementSource(audio);
+        const audioContext = new AudioContext();
+        let resume = _ => { audioContext.resume() }
+        if (audioContext.state === 'suspended') {
+            document.body.addEventListener('touchend', resume, false);
+            document.body.addEventListener('click', resume, false);
+        }
 
-        // // audioCtx.createMediaStreamSource()
-        const analyser = audioCtx.createAnalyser();
+        const source = audioContext.createMediaElementSource(audio);
+
+        // // audioContext.createMediaStreamSource()
+        const analyser = audioContext.createAnalyser();
         analyser.fftSize = 2048;
 
         source.connect(analyser);
-        analyser.connect(audioCtx.destination);
+        analyser.connect(audioContext.destination);
 
         const bufferLength = analyser.fftSize;//analyser.frequencyBinCount;
         // const bufferLength = analyser.frequencyBinCount;
