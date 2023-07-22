@@ -646,6 +646,30 @@ async function init() {
 let rgbaWebcam = textureSampleBaseClampToEdge(webcam, feedbackSampler, fract(uv));
 ```
 
+## Audio - addAudio
+
+You can load audio and use its data for visualization.
+
+```js
+// index.js
+let audio = points.addAudio('myAudio', './../../audio/cognitive_dissonance.mp3', volume, loop, false);
+```
+
+
+With the `myAudio` name, a `Sound` type named `myAudio` is created. In the future it will have more information but now it only has the `data` property. `data` is an `array<f32, 2048>`, but it's not completely filled with data, it's only filled up to `params.myAudioLength`, (`myAudio` used as prefix for each different audio) and then each of these values has a max of 256, so if you want something like a percentage, you have to divide the value at a certain index between 256
+```rust
+let audioX = audio.data[ u32(uvr.x * params.audioLength)] / 256;
+
+```
+
+
+---
+
+> **Note:** The `points.addAudio` method returns a `new Audio` reference, you are responsible to start and stop the audio from the JavaScript side, if you require to start and stop a sound by creating a call from the shaders, please check the `Events - addEventListener` section
+
+---
+
+
 ## Layers - addLayers
 
 A layer is basically a Storage but pre-made with the exact same dimension of the canvas, this for potentially create multi-layered effects that require a type of temporary storage and swap values between them. All items are `vec4<f32>`
