@@ -56,6 +56,8 @@ gui.add(isFitWindowData, 'isFitWindow').name('Fit Window').onChange(value => {
 
 const shaderProjects = [
     { name: 'Base', path: './base/index.js' },
+    { name: 'Audio 1', path: './audio1/index.js' },
+    { name: 'Audio 2', path: './audio2/index.js' },
     { name: 'Bloom1', path: './bloom1/index.js' },
     { name: 'Circle Blur', path: './circleblur/index.js' },
     { name: 'Data 1', path: './data1/index.js' },
@@ -65,6 +67,7 @@ const shaderProjects = [
     { name: 'Dithering 3 - 1', path: './dithering3_1/index.js' },
     { name: 'Dithering 3 - 2', path: './dithering3_2/index.js' },
     { name: 'Dithering 4', path: './dithering4/index.js' },
+    { name: 'Events 1', path: './events1/index.js' },
     { name: 'Image Scale 1', path: './imagescale1/index.js' },
     { name: 'Image Texture 1', path: './imagetexture1/index.js' },
     { name: 'Image Texture 2', path: './imagetexture2/index.js' },
@@ -102,6 +105,7 @@ async function loadShaderByIndex(index) {
     localStorage.setItem('selected-shader', index);
     console.clear();
     let shaderPath = shaderProjects[index].path;
+    shaders?.remove?.();
     shaders = (await import(shaderPath)).default;
     await init();
 }
@@ -189,11 +193,9 @@ async function init() {
     hasVertexAndFragmentShader && (points.fitWindow = isFitWindow);
 
     update();
-
-    shaders.read && await shaders.read(points);
 }
 
-function update() {
+async function update() {
     stats.begin();
 
     // code here
@@ -203,8 +205,9 @@ function update() {
     points.updateUniform('sliderC', sliders.c);
 
     shaders.update(points);
-    points.update();
+    await points.update();
 
+    await shaders.read?.(points);
     //
 
     stats.end();

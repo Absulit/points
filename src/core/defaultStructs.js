@@ -8,6 +8,19 @@ struct Fragment {
     @location(3) uvr: vec2<f32>,
     @location(4) mouse: vec2<f32>
 }
+
+struct Sound {
+    data: array<f32, 2048>,
+    //play
+    //dataLength
+    //duration
+    //currentPosition
+}
+
+struct Event {
+    updated: u32,
+    data: array<f32>
+}
 `;
 
 export default defaultStructs;

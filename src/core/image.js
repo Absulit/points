@@ -11,7 +11,7 @@ fn texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>
     let flipTexture = vec2(1.,-1.);
     let flipTextureCoordinates = vec2(-1.,1.);
     let dims: vec2<u32> = textureDimensions(texture, 0);
-    let dimsF32 = vec2<f32>(f32(dims.x), f32(dims.y));
+    let dimsF32 = vec2<f32>(dims);
 
     let minScreenSize = min(params.screenHeight, params.screenWidth);
     let imageRatio = dimsF32 / minScreenSize;
@@ -171,6 +171,6 @@ fn pixelateTexturePosition(texture:texture_2d<f32>, textureSampler:sampler, posi
     let coord = vec2(dx*floor( uv.x / dx), dy * floor( uv.y / dy));
 
     //texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>, uv:vec2<f32>, crop:bool) -> vec4<f32> {
-    return texturePosition(texture, textureSampler, position, coord, false);
+    return texturePosition(texture, textureSampler, position, coord, true);
 }
 `;

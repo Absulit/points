@@ -8,7 +8,7 @@ const circleblur = {
         new RenderPass(vert, frag, null, 8, 1, 1)
     ],
     init: async points => {
-        points.addSampler('feedbackSampler');
+        points.addSampler('feedbackSampler', null);
         points.addTexture2d('feedbackTexture', true);
         points.addBindingTexture('outputTex', 'computeTexture');
     },

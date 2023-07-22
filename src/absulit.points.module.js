@@ -274,8 +274,11 @@ export default class Points {
         this._fitWindow = false;
         this._lastFitWindow = false;
 
-        // _readStorage should only be read once
-        this._readStorageCopied = false;
+        // audio
+        this._sounds = [];
+
+        this._events = new Map();
+        this._events_ids = 0;
     }
 
     _resizeCanvasToFitWindow = () => {
@@ -386,13 +389,13 @@ export default class Points {
         if (read) {
             let storageItem = {
                 name: name,
-                size: structSize
+                size: structSize * size
             }
             this._readStorage.push(storageItem);
         }
     }
 
-    addStorageMap(name, arrayData, structName, shaderType) {
+    addStorageMap(name, arrayData, structName, read, shaderType) {
         if (this._nameExists(this._storage, name)) {
             return;
         }
@@ -403,8 +406,17 @@ export default class Points {
             shaderType: shaderType,
             array: arrayData,
             buffer: null,
+            read: read,
             internal: this._internal
         });
+
+        if (read) {
+            let storageItem = {
+                name: name,
+                size: arrayData.length,
+            }
+            this._readStorage.push(storageItem);
+        }
     }
 
     updateStorageMap(name, arrayData) {
@@ -416,14 +428,16 @@ export default class Points {
     }
 
     async readStorage(name) {
-        // TODO: if read true add flag in addStorage
         let storageItem = this._readStorage.find(storageItem => storageItem.name === name);
         let arrayBuffer = null;
+        let arrayBufferCopy = null;
         if (storageItem) {
-            await storageItem.buffer.mapAsync(GPUMapMode.READ)
+            await storageItem.buffer.mapAsync(GPUMapMode.READ);
             arrayBuffer = storageItem.buffer.getMappedRange();
+            arrayBufferCopy = new Float32Array(arrayBuffer.slice(0));
+            storageItem.buffer.unmap();
         }
-        return new Float32Array(arrayBuffer);
+        return arrayBufferCopy;
     }
 
     addLayers(numLayers, shaderType) {
@@ -578,6 +592,60 @@ export default class Points {
         });
     }
 
+    addAudio(name, path, volume, loop, autoplay) {
+        const audio = new Audio(path);
+        audio.volume = volume;
+        audio.autoplay = autoplay;
+        audio.loop = loop;
+
+        const sound = {
+            name: name,
+            path: path,
+            audio: audio,
+            analyser: null,
+            data: null
+        }
+
+        // this._audio.play();
+
+        // audio
+        const audioContext = new AudioContext();
+        let resume = _ => { audioContext.resume() }
+        if (audioContext.state === 'suspended') {
+            document.body.addEventListener('touchend', resume, false);
+            document.body.addEventListener('click', resume, false);
+        }
+
+        const source = audioContext.createMediaElementSource(audio);
+
+        // // audioContext.createMediaStreamSource()
+        const analyser = audioContext.createAnalyser();
+        analyser.fftSize = 2048;
+
+        source.connect(analyser);
+        analyser.connect(audioContext.destination);
+
+        const bufferLength = analyser.fftSize;//analyser.frequencyBinCount;
+        // const bufferLength = analyser.frequencyBinCount;
+        const data = new Uint8Array(bufferLength);
+        // analyser.getByteTimeDomainData(data);
+        analyser.getByteFrequencyData(data);
+
+        // storage that will have the data on WGSL
+        this.addStorageMap(name, data,
+            // `array<f32, ${bufferLength}>`
+            'Sound' // custom struct in defaultStructs.js
+        );
+        // uniform that will have the data length as a quick reference
+        this.addUniform(`${name}Length`, analyser.frequencyBinCount);
+
+        sound.analyser = analyser;
+        sound.data = data;
+        this._sounds.push(sound);
+
+        return audio;
+    }
+
     //
     addTextureStorage2d(name, shaderType) {
         if (this._nameExists(this._texturesStorage2d, name)) {
@@ -617,6 +685,26 @@ export default class Points {
     }
 
     /**
+     * Listen for an event dispatched from WGSL code
+     * @param {Number} id Number that represents an event Id
+     * @param {Function} callback function to be called when the event occurs
+     */
+    addEventListener(name, callback, structSize) {
+        // this extra 1 is for the boolean flag in the Event struct
+        let data = Array(structSize + 1).fill(0);
+        this.addStorageMap(name, data, 'Event', true);
+        this._events.set(this._events_ids,
+            {
+                id: this._events_ids,
+                name: name,
+                callback: callback,
+            }
+        );
+
+        ++this._events_ids;
+    }
+
+    /**
      * for internal use:
      * to flag add* methods and variables as part of the RenderPasses
      */
@@ -627,7 +715,7 @@ export default class Points {
     /**
      *
      * @param {ShaderType} shaderType
-     * @param {boolean} internal 
+     * @param {boolean} internal
      * @returns string with bindings
      */
     _createDynamicGroupBindings(shaderType, internal) {
@@ -746,7 +834,8 @@ export default class Points {
 
         let dynamicStructParams = '';
         this._uniforms.forEach(variable => {
-            dynamicStructParams += /*wgsl*/`${variable.name}:f32, \n\t`;
+            let uniformType = variable.type || 'f32';
+            dynamicStructParams += /*wgsl*/`${variable.name}:${uniformType}, \n\t`;
         });
 
         if (this._uniforms.length) {
@@ -936,21 +1025,22 @@ export default class Points {
         this._createParametersUniforms();
         //--------------------------------------------
         this._storage.forEach(storageItem => {
+            let usage = GPUBufferUsage.STORAGE;
+            if (storageItem.read) {
+                usage = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC;
+            }
+            storageItem.usage = usage;
             if (storageItem.mapped) {
                 const values = new Float32Array(storageItem.array);
-                storageItem.buffer = this._createAndMapBuffer(values, GPUBufferUsage.STORAGE);
+                storageItem.buffer = this._createAndMapBuffer(values, usage);
             } else {
-                let usage = GPUBufferUsage.STORAGE;
-                if (storageItem.read) {
-                    usage = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC;
-                }
                 storageItem.buffer = this._createBuffer(storageItem.size * storageItem.structSize * 4, usage);
             }
         });
         //--------------------------------------------
         this._readStorage.forEach(readStorageItem => {
             readStorageItem.buffer = this._device.createBuffer({
-                size: readStorageItem.size,
+                size: readStorageItem.size * 4,
                 usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
             });
         });
@@ -1388,7 +1478,7 @@ export default class Points {
 
     }
 
-    update() {
+    async update() {
         if (!this._canvas) return;
         if (!this._device) return;
 
@@ -1414,9 +1504,16 @@ export default class Points {
         this._storage.forEach(storageItem => {
             if (storageItem.mapped) {
                 const values = new Float32Array(storageItem.array);
-                storageItem.buffer = this._createAndMapBuffer(values, GPUBufferUsage.STORAGE);
+                storageItem.buffer = this._createAndMapBuffer(values, storageItem.usage);
             }
         });
+
+        // AUDIO
+        // this._analyser.getByteTimeDomainData(this._dataArray);
+        this._sounds.forEach(sound => {
+            sound.analyser?.getByteFrequencyData(sound.data);
+        })
+        // END AUDIO
 
         this._texturesExternal.forEach(externalTexture => {
             externalTexture.texture = this._device.importExternalTexture({
@@ -1507,7 +1604,7 @@ export default class Points {
 
 
 
-        if (this._readStorage.length && !this._readStorageCopied) {
+        if (this._readStorage.length) {
             this._readStorage.forEach(readStorageItem => {
                 let storageItem = this._storage.find(storageItem => storageItem.name === readStorageItem.name);
 
@@ -1516,10 +1613,9 @@ export default class Points {
                     0 /* source offset */,
                     readStorageItem.buffer /* destination buffer */,
                     0 /* destination offset */,
-                    readStorageItem.size /* size */
+                    readStorageItem.buffer.size /* size */
                 );
             });
-            this._readStorageCopied = true;
         }
 
         // ---------------------
@@ -1536,6 +1632,20 @@ export default class Points {
         this._mouseWheel = false;
         this._mouseDeltaX = 0;
         this._mouseDeltaY = 0;
+
+        await this.read();
+    }
+
+    async read() {
+        for (const [key, event] of this._events) {
+            let eventRead = await this.readStorage(event.name);
+            if (eventRead) {
+                let id = eventRead[0];
+                if (id != 0) {
+                    event.callback && event.callback(eventRead.slice(1, -1));
+                }
+            }
+        }
     }
 
     _getWGSLCoordinate(value, side, invert = false) {
