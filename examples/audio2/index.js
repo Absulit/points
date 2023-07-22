@@ -4,6 +4,8 @@ import frag from './frag.js';
 import Points from '../../src/absulit.points.module.js';
 import { RenderPasses } from './../../src/RenderPasses.js';
 
+let audio = null;
+
 const base = {
     vert,
     compute,
@@ -16,11 +18,10 @@ const base = {
         let volume = 1;
         let loop = true;
         // let audio = points.addAudio('audio', './../../audio/generative_audio_test.ogg', volume, loop);
-        let audio = points.addAudio('audio', './../../audio/cognitive_dissonance.mp3', volume, loop, false);
-        // let audio = points.addAudio('audio', 'https://mdn.github.io/voice-change-o-matic/audio/concert-crowd.ogg', volume, loop);
+        audio = points.addAudio('audio', './../../audio/cognitive_dissonance.mp3', volume, loop, false);
+        // audio = points.addAudio('audio', 'https://mdn.github.io/voice-change-o-matic/audio/concert-crowd.ogg', volume, loop);
 
         points.addEventListener('click_event', data => {
-            console.log(audio);
             audio.play();
         }, 2);
 
@@ -40,6 +41,11 @@ const base = {
      * @param {Points} points
      */
     update: points => {
+    },
+
+    remove: _ => {
+        audio.pause();
+        audio.remove();
     }
 }
 

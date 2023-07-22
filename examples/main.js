@@ -105,6 +105,7 @@ async function loadShaderByIndex(index) {
     localStorage.setItem('selected-shader', index);
     console.clear();
     let shaderPath = shaderProjects[index].path;
+    shaders?.remove?.();
     shaders = (await import(shaderPath)).default;
     await init();
 }
@@ -206,7 +207,7 @@ async function update() {
     shaders.update(points);
     await points.update();
 
-    shaders.read && await shaders.read(points);
+    await shaders.read?.(points);
     //
 
     stats.end();
