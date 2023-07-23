@@ -9,61 +9,114 @@ import { defaultVertexBody } from './core/defaultFunctions.js';
 
 export default class Points {
     constructor(canvasId) {
+        /** @private */
         this._canvasId = canvasId;
-        this._canvas = null;
+        /** @private */
+        this._canvas = document.getElementById(this._canvasId);
+        /** @private */
         this._device = null;
+        /** @private */
         this._context = null;
+        /** @private */
         this._presentationFormat = null;
+        /** @private */
         this._renderPasses = null;
+        /** @private */
         this._postRenderPasses = [];
+        /** @private */
         this._vertexBufferInfo = null;
+        /** @private */
         this._buffer = null;
+        /** @private */
         this._internal = false;
 
+        /** @private */
         this._presentationSize = null;
+        /** @private */
         this._depthTexture = null;
+        /** @private */
         this._commandEncoder = null;
 
+        /** @private */
         this._vertexArray = [];
 
+        /** @private */
         this._numColumns = 1;
+        /** @private */
         this._numRows = 1;
 
+        /** @private */
         this._commandsFinished = [];
 
+        /** @private */
         this._renderPassDescriptor = null;
 
+        /** @private */
         this._uniforms = [];
+        /** @private */
         this._storage = [];
+        /** @private */
         this._readStorage = [];
+        /** @private */
         this._samplers = [];
+        /** @private */
         this._textures2d = [];
+        /** @private */
         this._texturesExternal = [];
+        /** @private */
         this._texturesStorage2d = [];
+        /** @private */
         this._bindingTextures = [];
 
+        /** @private */
         this._layers = [];
 
-        this._canvas = document.getElementById(this._canvasId);
+        /** @private */
+        this._originalCanvasWidth = null;
+        /** @private */
+        this._originalCanvasHeigth = null;
 
+
+        /** @private */
         this._time = 0;
+        /** @private */
         this._epoch = 0;
+        /** @private */
         this._mouseX = 0;
+        /** @private */
         this._mouseY = 0;
+        /** @private */
         this._mouseDown = false;
+        /** @private */
         this._mouseClick = false;
+        /** @private */
         this._mouseWheel = false;
+        /** @private */
         this._mouseDeltaX = 0;
+        /** @private */
         this._mouseDeltaY = 0;
+
+        /** @private */
+        this._fullscreen = false;
+        /** @private */
+        this._fitWindow = false;
+        /** @private */
+        this._lastFitWindow = false;
+
+        // audio
+        /** @private */
+        this._sounds = [];
+
+        /** @private */
+        this._events = new Map();
+        /** @private */
+        this._events_ids = 0;
 
         if (this._canvasId) {
             this._canvas.addEventListener('click', e => {
                 this._mouseClick = true;
             });
-            this._canvas.addEventListener('mousemove', e => {
-                this._mouseX = e.clientX;
-                this._mouseY = e.clientY;
-            });
+            this._canvas.addEventListener('mousemove', this._onMouseMove);
             this._canvas.addEventListener('mousedown', e => {
                 this._mouseDown = true;
             });
@@ -92,17 +145,12 @@ export default class Points {
             });
         }
 
-        this._fullscreen = false;
-        this._fitWindow = false;
-        this._lastFitWindow = false;
 
-        // audio
-        this._sounds = [];
-
-        this._events = new Map();
-        this._events_ids = 0;
     }
 
+    /**
+     * @private
+     */
     _resizeCanvasToFitWindow = () => {
         if (this._fitWindow) {
             this._canvas.width = window.innerWidth;
@@ -111,12 +159,18 @@ export default class Points {
         }
     }
 
+    /**
+     * @private
+     */
     _resizeCanvasToDefault = () => {
         this._canvas.width = this._originalCanvasWidth;
         this._canvas.height = this._originalCanvasHeigth;
         this._setScreenSize();
     }
 
+    /**
+     * @private
+     */
     _setScreenSize = () => {
         this._presentationSize = [
             this._canvas.clientWidth,
@@ -143,6 +197,9 @@ export default class Points {
         });
     }
 
+    /**
+     * @private
+     */
     _onMouseMove = e => {
         this._mouseX = e.clientX;
         this._mouseY = e.clientY;
@@ -277,6 +334,9 @@ export default class Points {
         }
     }
 
+    /**
+     * @private
+     */
     _nameExists(arrayOfObjects, name) {
         return arrayOfObjects.some(obj => obj.name == name);
     }
@@ -468,7 +528,7 @@ export default class Points {
         return audio;
     }
 
-    //
+    // TODO: verify this method
     addTextureStorage2d(name, shaderType) {
         if (this._nameExists(this._texturesStorage2d, name)) {
             return;
@@ -527,6 +587,7 @@ export default class Points {
     }
 
     /**
+     * @private
      * for internal use:
      * to flag add* methods and variables as part of the RenderPasses
      */
@@ -535,7 +596,7 @@ export default class Points {
     }
 
     /**
-     *
+     * @private
      * @param {ShaderType} shaderType
      * @param {boolean} internal
      * @returns string with bindings
@@ -641,6 +702,9 @@ export default class Points {
         this._numRows = numRows;
     }
 
+    /**
+     * @private
+     */
     _compileRenderPass = (renderPass, index) => {
         let vertexShader = renderPass.vertexShader;
         let computeShader = renderPass.computeShader;
@@ -785,26 +849,26 @@ export default class Points {
                     this.addPoint(coordinate, this._canvas.clientWidth / this._numColumns, this._canvas.clientHeight / this._numRows, colors);
                 }
             }
-            this.createVertexBuffer(new Float32Array(this._vertexArray));
+            this._createVertexBuffer(new Float32Array(this._vertexArray));
         }
 
-        this.createComputeBuffers();
+        this._createComputeBuffers();
 
-        await this.createPipeline();
+        await this._createPipeline();
     }
 
     /**
-     *
+     * @private
      * @param {Float32Array} vertexArray
      * @returns buffer
      */
-    createVertexBuffer(vertexArray) {
+    _createVertexBuffer(vertexArray) {
         this._vertexBufferInfo = new VertexBufferInfo(vertexArray);
         this._buffer = this._createAndMapBuffer(vertexArray, GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST);
     }
 
     /**
-     *
+     * @private
      * @param {Float32Array} data
      * @param {GPUBufferUsageFlags} usage
      * @param {Boolean} mappedAtCreation
@@ -824,6 +888,7 @@ export default class Points {
 
 
     /**
+     * @private
      * It creates with size, no with data, so it's empty
      * @param {Number} size numItems * instanceByteSize ;
      * @param {GPUBufferUsageFlags} usage
@@ -837,12 +902,18 @@ export default class Points {
         return buffer
     }
 
+    /**
+     * @private
+     */
     _createParametersUniforms() {
         const values = new Float32Array(this._uniforms.map(v => v.value));
         this._uniforms.buffer = this._createAndMapBuffer(values, GPUBufferUsage.UNIFORM);
     }
 
-    createComputeBuffers() {
+    /**
+     * @private
+     */
+    _createComputeBuffers() {
         //--------------------------------------------
         this._createParametersUniforms();
         //--------------------------------------------
@@ -932,6 +1003,9 @@ export default class Points {
         });
     }
 
+    /**
+     * @private
+     */
     _createComputeBindGroup() {
         this._renderPasses.forEach((renderPass, index) => {
             if (renderPass.hasComputeShader) {
@@ -965,7 +1039,10 @@ export default class Points {
         });
     }
 
-    async createPipeline() {
+    /**
+     * @private
+     */
+    async _createPipeline() {
 
         this._createComputeBindGroup();
 
@@ -975,7 +1052,7 @@ export default class Points {
                     layout: this._device.createPipelineLayout({
                         bindGroupLayouts: [renderPass.bindGroupLayout]
                     }),
-                    label: `createPipeline() - ${index}`,
+                    label: `_createPipeline() - ${index}`,
                     compute: {
                         module: this._device.createShaderModule({
                             code: renderPass.compiledShaders.compute
@@ -1083,6 +1160,7 @@ export default class Points {
     }
 
     /**
+     * @private
      * Creates the entries for the pipeline
      * @returns an array with the entries
      */
@@ -1260,6 +1338,9 @@ export default class Points {
         return entries;
     }
 
+    /**
+     * @private
+     */
     _createParams() {
         this._renderPasses.forEach(renderPass => {
 
@@ -1470,6 +1551,9 @@ export default class Points {
         }
     }
 
+    /**
+     * @private
+     */
     _getWGSLCoordinate(value, side, invert = false) {
         const direction = invert ? -1 : 1;
         const p = value / side;
@@ -1570,7 +1654,7 @@ export default class Points {
         const options = {
             audioBitsPerSecond: 128000,
             videoBitsPerSecond: 6000000,
-            mimeType: "video/webm",
+            mimeType: 'video/webm',
         };
         this.videoStream = this._canvas.captureStream(60);
         this.mediaRecorder = new MediaRecorder(this.videoStream, options);
