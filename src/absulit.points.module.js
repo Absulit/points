@@ -148,9 +148,7 @@ export default class Points {
 
     }
 
-    /**
-     * @private
-     */
+    /** @private */
     _resizeCanvasToFitWindow = () => {
         if (this._fitWindow) {
             this._canvas.width = window.innerWidth;
@@ -159,18 +157,14 @@ export default class Points {
         }
     }
 
-    /**
-     * @private
-     */
+    /** @private */
     _resizeCanvasToDefault = () => {
         this._canvas.width = this._originalCanvasWidth;
         this._canvas.height = this._originalCanvasHeigth;
         this._setScreenSize();
     }
 
-    /**
-     * @private
-     */
+    /** @private */
     _setScreenSize = () => {
         this._presentationSize = [
             this._canvas.clientWidth,
@@ -197,9 +191,7 @@ export default class Points {
         });
     }
 
-    /**
-     * @private
-     */
+    /** @private */
     _onMouseMove = e => {
         this._mouseX = e.clientX;
         this._mouseY = e.clientY;
@@ -334,9 +326,7 @@ export default class Points {
         }
     }
 
-    /**
-     * @private
-     */
+    /** @private */
     _nameExists(arrayOfObjects, name) {
         return arrayOfObjects.some(obj => obj.name == name);
     }
@@ -702,9 +692,7 @@ export default class Points {
         this._numRows = numRows;
     }
 
-    /**
-     * @private
-     */
+    /** @private */
     _compileRenderPass = (renderPass, index) => {
         let vertexShader = renderPass.vertexShader;
         let computeShader = renderPass.computeShader;
@@ -902,17 +890,13 @@ export default class Points {
         return buffer
     }
 
-    /**
-     * @private
-     */
+    /** @private */
     _createParametersUniforms() {
         const values = new Float32Array(this._uniforms.map(v => v.value));
         this._uniforms.buffer = this._createAndMapBuffer(values, GPUBufferUsage.UNIFORM);
     }
 
-    /**
-     * @private
-     */
+    /** @private */
     _createComputeBuffers() {
         //--------------------------------------------
         this._createParametersUniforms();
@@ -1003,9 +987,7 @@ export default class Points {
         });
     }
 
-    /**
-     * @private
-     */
+    /** @private */
     _createComputeBindGroup() {
         this._renderPasses.forEach((renderPass, index) => {
             if (renderPass.hasComputeShader) {
@@ -1039,9 +1021,7 @@ export default class Points {
         });
     }
 
-    /**
-     * @private
-     */
+    /** @private */
     async _createPipeline() {
 
         this._createComputeBindGroup();
@@ -1338,9 +1318,7 @@ export default class Points {
         return entries;
     }
 
-    /**
-     * @private
-     */
+    /** @private */
     _createParams() {
         this._renderPasses.forEach(renderPass => {
 
@@ -1551,9 +1529,7 @@ export default class Points {
         }
     }
 
-    /**
-     * @private
-     */
+    /** @private */
     _getWGSLCoordinate(value, side, invert = false) {
         const direction = invert ? -1 : 1;
         const p = value / side;
