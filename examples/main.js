@@ -1,6 +1,8 @@
 'use strict';
 import * as dat from './../src/vendor/datgui/dat.gui.module.js';
-import Points, { RenderPass, ShaderType } from '../src/absulit.points.module.js';
+import Points from '../src/absulit.points.module.js';
+import ShaderType from '../src/ShaderType.js';
+import RenderPass from '../src/RenderPass.js';
 
 /***************/
 const stats = new Stats();

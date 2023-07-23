@@ -8,12 +8,13 @@ import filmgrain from './core/RenderPasses/filmgrain/index.js';
 import bloom from './core/RenderPasses/bloom/index.js';
 import blur from './core/RenderPasses/blur/index.js';
 import waves from './core/RenderPasses/waves/index.js';
-import Points, { RenderPass } from './absulit.points.module.js';
+import Points from './absulit.points.module.js';
+import RenderPass from './RenderPass.js';
 
 /**
  * List of predefined Render Passes for Post Processing.
  */
-export class RenderPasses {
+export default class RenderPasses {
     static COLOR = 1;
     static GRAYSCALE = 2;
     static CHROMATIC_ABERRATION = 3;
