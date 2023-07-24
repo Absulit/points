@@ -1,247 +1,122 @@
 'use strict';
+import UniformKeys from './UniformKeys.js';
+import VertexBufferInfo from './VertexBufferInfo.js';
+import ShaderType from './ShaderType.js';
 import Coordinate from './coordinate.js';
 import RGBAColor from './color.js';
 import defaultStructs from './core/defaultStructs.js';
 import { defaultVertexBody } from './core/defaultFunctions.js';
 
-export class ShaderType {
-    static VERTEX = 1;
-    static COMPUTE = 2;
-    static FRAGMENT = 3;
-}
-
-class UniformKeys {
-    static TIME = 'time';
-    static EPOCH = 'epoch';
-    static SCREEN_WIDTH = 'screenWidth';
-    static SCREEN_HEIGHT = 'screenHeight';
-    static MOUSE_X = 'mouseX';
-    static MOUSE_Y = 'mouseY';
-    static MOUSE_CLICK = 'mouseClick';
-    static MOUSE_DOWN = 'mouseDown';
-    static MOUSE_WHEEL = 'mouseWheel';
-    static MOUSE_DELTA_X = 'mouseDeltaX';
-    static MOUSE_DELTA_Y = 'mouseDeltaY';
-}
-
-export class RenderPass {
-    /**
-     * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
-     * This is useful for PostProcessing.
-     * @param {String} vertexShader  WGSL Vertex Shader in a String.
-     * @param {String} fragmentShader  WGSL Fragment Shader in a String.
-     * @param {String} computeShader  WGSL Compute Shader in a String.
-     */
-    constructor(vertexShader, fragmentShader, computeShader, workgroupCountX, workgroupCountY, workgroupCountZ) {
-        this._vertexShader = vertexShader;
-        this._computeShader = computeShader;
-        this._fragmentShader = fragmentShader;
-
-        this._computePipeline = null;
-        this._renderPipeline = null;
-
-        this._computeBindGroup = null;
-        this._uniformBindGroup = null;
-
-        this._internal = false;
-
-        this._compiledShaders = {
-            vertex: '',
-            compute: '',
-            fragment: '',
-        }
-
-        this._hasComputeShader = !!this._computeShader;
-        this._hasVertexShader = !!this._vertexShader;
-        this._hasFragmentShader = !!this._fragmentShader;
-
-        this._hasVertexAndFragmentShader = this._hasVertexShader && this._hasFragmentShader;
-
-        this._workgroupCountX = workgroupCountX || 8;
-        this._workgroupCountY = workgroupCountY || 8;
-        this._workgroupCountZ = workgroupCountZ || 1;
-    }
-
-    get internal() {
-        return this._internal;
-    }
-
-    set internal(value) {
-        this._internal = value;
-    }
-
-    get vertexShader() {
-        return this._vertexShader;
-    }
-
-    get computeShader() {
-        return this._computeShader;
-    }
-
-    get fragmentShader() {
-        return this._fragmentShader;
-    }
-
-    set computePipeline(value) {
-        this._computePipeline = value;
-    }
-
-    get computePipeline() {
-        return this._computePipeline;
-    }
-
-    set renderPipeline(value) {
-        this._renderPipeline = value;
-    }
-
-    get renderPipeline() {
-        return this._renderPipeline;
-    }
-
-    set computeBindGroup(value) {
-        this._computeBindGroup = value;
-    }
-
-    get computeBindGroup() {
-        return this._computeBindGroup;
-    }
-
-    set uniformBindGroup(value) {
-        this._uniformBindGroup = value;
-    }
-
-    get uniformBindGroup() {
-        return this._uniformBindGroup;
-    }
-
-    get compiledShaders() {
-        return this._compiledShaders;
-    }
-
-    get hasComputeShader() {
-        return this._hasComputeShader;
-    }
-
-    get hasVertexShader() {
-        return this._hasVertexShader;
-    }
-
-    get hasFragmentShader() {
-        return this._hasFragmentShader;
-    }
-
-    get hasVertexAndFragmentShader() {
-        return this._hasVertexAndFragmentShader;
-    }
-
-    get workgroupCountX() {
-        return this._workgroupCountX;
-    }
-
-    get workgroupCountY() {
-        return this._workgroupCountY;
-    }
-
-    get workgroupCountZ() {
-        return this._workgroupCountZ;
-    }
-}
-
-export class VertexBufferInfo {
-    /**
-     * Along with the vertexArray it calculates some info like offsets required for the pipeline.
-     * @param {Float32Array} vertexArray array with vertex, color and uv data
-     * @param {Number} triangleDataLength how many items does a triangle row has in vertexArray
-     * @param {Number} vertexOffset index where the vertex data starts in a row of `triangleDataLength` items
-     * @param {Number} colorOffset index where the color data starts in a row of `triangleDataLength` items
-     * @param {Number} uvOffset index where the uv data starts in a row of `triangleDataLength` items
-     */
-    constructor(vertexArray, triangleDataLength = 10, vertexOffset = 0, colorOffset = 4, uvOffset = 8) {
-        this._vertexSize = vertexArray.BYTES_PER_ELEMENT * triangleDataLength; // Byte size of ONE triangle data (vertex, color, uv). (one row)
-        this._vertexOffset = vertexArray.BYTES_PER_ELEMENT * vertexOffset;
-        this._colorOffset = vertexArray.BYTES_PER_ELEMENT * colorOffset; // Byte offset of triangle vertex color attribute.
-        this._uvOffset = vertexArray.BYTES_PER_ELEMENT * uvOffset;
-        this._vertexCount = vertexArray.byteLength / this._vertexSize;
-    }
-
-    get vertexSize() {
-        return this._vertexSize
-    }
-
-    get vertexOffset() {
-        return this._vertexOffset;
-    }
-
-    get colorOffset() {
-        return this._colorOffset;
-    }
-
-    get uvOffset() {
-        return this._uvOffset;
-    }
-
-    get vertexCount() {
-        return this._vertexCount;
-    }
-}
-
 export default class Points {
     constructor(canvasId) {
+        /** @private */
         this._canvasId = canvasId;
-        this._canvas = null;
+        /** @private */
+        this._canvas = document.getElementById(this._canvasId);
+        /** @private */
         this._device = null;
+        /** @private */
         this._context = null;
+        /** @private */
         this._presentationFormat = null;
+        /** @private */
         this._renderPasses = null;
+        /** @private */
         this._postRenderPasses = [];
+        /** @private */
         this._vertexBufferInfo = null;
+        /** @private */
         this._buffer = null;
+        /** @private */
         this._internal = false;
 
+        /** @private */
         this._presentationSize = null;
+        /** @private */
         this._depthTexture = null;
+        /** @private */
         this._commandEncoder = null;
 
+        /** @private */
         this._vertexArray = [];
 
+        /** @private */
         this._numColumns = 1;
+        /** @private */
         this._numRows = 1;
 
+        /** @private */
         this._commandsFinished = [];
 
+        /** @private */
         this._renderPassDescriptor = null;
 
+        /** @private */
         this._uniforms = [];
+        /** @private */
         this._storage = [];
+        /** @private */
         this._readStorage = [];
+        /** @private */
         this._samplers = [];
+        /** @private */
         this._textures2d = [];
+        /** @private */
         this._texturesExternal = [];
+        /** @private */
         this._texturesStorage2d = [];
+        /** @private */
         this._bindingTextures = [];
 
+        /** @private */
         this._layers = [];
 
-        this._canvas = document.getElementById(this._canvasId);
+        /** @private */
+        this._originalCanvasWidth = null;
+        /** @private */
+        this._originalCanvasHeigth = null;
 
+
+        /** @private */
         this._time = 0;
+        /** @private */
         this._epoch = 0;
+        /** @private */
         this._mouseX = 0;
+        /** @private */
         this._mouseY = 0;
+        /** @private */
         this._mouseDown = false;
+        /** @private */
         this._mouseClick = false;
+        /** @private */
         this._mouseWheel = false;
+        /** @private */
         this._mouseDeltaX = 0;
+        /** @private */
         this._mouseDeltaY = 0;
+
+        /** @private */
+        this._fullscreen = false;
+        /** @private */
+        this._fitWindow = false;
+        /** @private */
+        this._lastFitWindow = false;
+
+        // audio
+        /** @private */
+        this._sounds = [];
+
+        /** @private */
+        this._events = new Map();
+        /** @private */
+        this._events_ids = 0;
 
         if (this._canvasId) {
             this._canvas.addEventListener('click', e => {
                 this._mouseClick = true;
             });
-            this._canvas.addEventListener('mousemove', e => {
-                this._mouseX = e.clientX;
-                this._mouseY = e.clientY;
-            });
+            this._canvas.addEventListener('mousemove', this._onMouseMove);
             this._canvas.addEventListener('mousedown', e => {
                 this._mouseDown = true;
             });
@@ -270,17 +145,10 @@ export default class Points {
             });
         }
 
-        this._fullscreen = false;
-        this._fitWindow = false;
-        this._lastFitWindow = false;
 
-        // audio
-        this._sounds = [];
-
-        this._events = new Map();
-        this._events_ids = 0;
     }
 
+    /** @private */
     _resizeCanvasToFitWindow = () => {
         if (this._fitWindow) {
             this._canvas.width = window.innerWidth;
@@ -289,12 +157,14 @@ export default class Points {
         }
     }
 
+    /** @private */
     _resizeCanvasToDefault = () => {
         this._canvas.width = this._originalCanvasWidth;
         this._canvas.height = this._originalCanvasHeigth;
         this._setScreenSize();
     }
 
+    /** @private */
     _setScreenSize = () => {
         this._presentationSize = [
             this._canvas.clientWidth,
@@ -321,6 +191,7 @@ export default class Points {
         });
     }
 
+    /** @private */
     _onMouseMove = e => {
         this._mouseX = e.clientX;
         this._mouseY = e.clientY;
@@ -357,6 +228,20 @@ export default class Points {
             throw '`updateUniform()` can\'t be called without first `addUniform()`.';
         }
         variable.value = value;
+    }
+
+    /**
+     * 
+     * @param {Array} arr 
+     */
+    updateUniforms(arr) {
+        arr.forEach(uniform => {
+            const variable = this._uniforms.find(v => v.name === uniform.name);
+            if (!variable) {
+                throw '`updateUniform()` can\'t be called without first `addUniform()`.';
+            }
+            variable.value = uniform.value;
+        })
     }
 
     /**
@@ -455,6 +340,7 @@ export default class Points {
         }
     }
 
+    /** @private */
     _nameExists(arrayOfObjects, name) {
         return arrayOfObjects.some(obj => obj.name == name);
     }
@@ -646,7 +532,7 @@ export default class Points {
         return audio;
     }
 
-    //
+    // TODO: verify this method
     addTextureStorage2d(name, shaderType) {
         if (this._nameExists(this._texturesStorage2d, name)) {
             return;
@@ -705,6 +591,7 @@ export default class Points {
     }
 
     /**
+     * @private
      * for internal use:
      * to flag add* methods and variables as part of the RenderPasses
      */
@@ -713,7 +600,7 @@ export default class Points {
     }
 
     /**
-     *
+     * @private
      * @param {ShaderType} shaderType
      * @param {boolean} internal
      * @returns string with bindings
@@ -819,6 +706,7 @@ export default class Points {
         this._numRows = numRows;
     }
 
+    /** @private */
     _compileRenderPass = (renderPass, index) => {
         let vertexShader = renderPass.vertexShader;
         let computeShader = renderPass.computeShader;
@@ -963,26 +851,26 @@ export default class Points {
                     this.addPoint(coordinate, this._canvas.clientWidth / this._numColumns, this._canvas.clientHeight / this._numRows, colors);
                 }
             }
-            this.createVertexBuffer(new Float32Array(this._vertexArray));
+            this._createVertexBuffer(new Float32Array(this._vertexArray));
         }
 
-        this.createComputeBuffers();
+        this._createComputeBuffers();
 
-        await this.createPipeline();
+        await this._createPipeline();
     }
 
     /**
-     *
+     * @private
      * @param {Float32Array} vertexArray
      * @returns buffer
      */
-    createVertexBuffer(vertexArray) {
+    _createVertexBuffer(vertexArray) {
         this._vertexBufferInfo = new VertexBufferInfo(vertexArray);
         this._buffer = this._createAndMapBuffer(vertexArray, GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST);
     }
 
     /**
-     *
+     * @private
      * @param {Float32Array} data
      * @param {GPUBufferUsageFlags} usage
      * @param {Boolean} mappedAtCreation
@@ -1002,6 +890,7 @@ export default class Points {
 
 
     /**
+     * @private
      * It creates with size, no with data, so it's empty
      * @param {Number} size numItems * instanceByteSize ;
      * @param {GPUBufferUsageFlags} usage
@@ -1015,12 +904,14 @@ export default class Points {
         return buffer
     }
 
+    /** @private */
     _createParametersUniforms() {
         const values = new Float32Array(this._uniforms.map(v => v.value));
         this._uniforms.buffer = this._createAndMapBuffer(values, GPUBufferUsage.UNIFORM);
     }
 
-    createComputeBuffers() {
+    /** @private */
+    _createComputeBuffers() {
         //--------------------------------------------
         this._createParametersUniforms();
         //--------------------------------------------
@@ -1110,6 +1001,7 @@ export default class Points {
         });
     }
 
+    /** @private */
     _createComputeBindGroup() {
         this._renderPasses.forEach((renderPass, index) => {
             if (renderPass.hasComputeShader) {
@@ -1143,7 +1035,8 @@ export default class Points {
         });
     }
 
-    async createPipeline() {
+    /** @private */
+    async _createPipeline() {
 
         this._createComputeBindGroup();
 
@@ -1153,7 +1046,7 @@ export default class Points {
                     layout: this._device.createPipelineLayout({
                         bindGroupLayouts: [renderPass.bindGroupLayout]
                     }),
-                    label: `createPipeline() - ${index}`,
+                    label: `_createPipeline() - ${index}`,
                     compute: {
                         module: this._device.createShaderModule({
                             code: renderPass.compiledShaders.compute
@@ -1261,6 +1154,7 @@ export default class Points {
     }
 
     /**
+     * @private
      * Creates the entries for the pipeline
      * @returns an array with the entries
      */
@@ -1438,6 +1332,7 @@ export default class Points {
         return entries;
     }
 
+    /** @private */
     _createParams() {
         this._renderPasses.forEach(renderPass => {
 
@@ -1512,7 +1407,7 @@ export default class Points {
         // this._analyser.getByteTimeDomainData(this._dataArray);
         this._sounds.forEach(sound => {
             sound.analyser?.getByteFrequencyData(sound.data);
-        })
+        });
         // END AUDIO
 
         this._texturesExternal.forEach(externalTexture => {
@@ -1648,6 +1543,7 @@ export default class Points {
         }
     }
 
+    /** @private */
     _getWGSLCoordinate(value, side, invert = false) {
         const direction = invert ? -1 : 1;
         const p = value / side;
@@ -1748,7 +1644,7 @@ export default class Points {
         const options = {
             audioBitsPerSecond: 128000,
             videoBitsPerSecond: 6000000,
-            mimeType: "video/webm",
+            mimeType: 'video/webm',
         };
         this.videoStream = this._canvas.captureStream(60);
         this.mediaRecorder = new MediaRecorder(this.videoStream, options);

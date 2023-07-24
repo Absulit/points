@@ -1,7 +1,7 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
-import { ShaderType } from './../../src/absulit.points.module.js';
+import ShaderType from './../../src/absulit.points.module.js';
 const random1 = {
     vert,
     compute,

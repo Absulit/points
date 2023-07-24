@@ -4,7 +4,7 @@ import frag1 from './renderpass1/frag.js';
 import vert2 from './renderpass2/vert.js';
 import frag2 from './renderpass2/frag.js';
 
-import { RenderPass } from '../../src/absulit.points.module.js';
+import RenderPass from '../../src/RenderPass.js';
 
 const renderpasses1 = {
     /**

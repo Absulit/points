@@ -70,9 +70,8 @@ You can have a Vertex + Fragment shaders without a Compute shader, and also a Co
 ```js
 // import the `Points` class
 
-import Points, {
-    RenderPass
-} from '../src/absulit.points.module.js';
+import Points from '../src/absulit.points.module.js';
+import RenderPass from '../src/RenderPass.js';
 
 // reference the canvas in the constructor
 const points = new Points('gl-canvas');
