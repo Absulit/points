@@ -231,6 +231,20 @@ export default class Points {
     }
 
     /**
+     * 
+     * @param {Array} arr 
+     */
+    updateUniforms(arr) {
+        arr.forEach(uniform => {
+            const variable = this._uniforms.find(v => v.name === uniform.name);
+            if (!variable) {
+                throw '`updateUniform()` can\'t be called without first `addUniform()`.';
+            }
+            variable.value = uniform.value;
+        })
+    }
+
+    /**
      * Creates a persistent memory buffer across every frame call.
      * @param {string} name Name that the Storage will have in the shader
      * @param {Number} size Number of items it will have.
@@ -1393,7 +1407,7 @@ export default class Points {
         // this._analyser.getByteTimeDomainData(this._dataArray);
         this._sounds.forEach(sound => {
             sound.analyser?.getByteFrequencyData(sound.data);
-        })
+        });
         // END AUDIO
 
         this._texturesExternal.forEach(externalTexture => {
