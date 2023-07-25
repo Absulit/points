@@ -1,7 +1,7 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
-import { RenderPass } from '../../src/absulit.points.module.js';
+import RenderPass from '../../src/RenderPass.js';
 
 const random3 = {
 

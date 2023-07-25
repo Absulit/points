@@ -70,9 +70,8 @@ You can have a Vertex + Fragment shaders without a Compute shader, and also a Co
 ```js
 // import the `Points` class
 
-import Points, {
-    RenderPass
-} from '../src/absulit.points.module.js';
+import Points from '../src/absulit.points.module.js';
+import RenderPass from '../src/RenderPass.js';
 
 // reference the canvas in the constructor
 const points = new Points('gl-canvas');
@@ -455,7 +454,54 @@ Common uses:
 > - name - name this property/variable will have inside the shader
 > - size - number of items it will allocate
 > - structName - You can use one of the default structs/types like `f32` , `i32` , `u32` , but if you use a more complex one you have to pair it properly with structSize. If it's a custom `struct` it has to be declared in the shader or it will throw an error.
-> - structSize - if the `struct` you reference in `structName` has 4 properties then you have to add `4` . If it's only a f32 then here you should place `1` .
+> - structSize - if the `struct` you reference in `structName` has 4 properties then you have to add `4` . If it's only a f32 then here you should place `1` . If the `struct` has vectors in it, the size of the vector counts:
+
+```rust
+// structSize: 1
+f32
+u32
+i32
+
+// structSize: 2
+vec2<f32>
+vec2<i32>
+vec2<u32>
+vec2f
+vec2i
+vec2u
+
+// structSize: 3
+vec3<f32>
+vec3<i32>
+vec3<u32>
+vec3f
+vec3i
+vec3u
+
+// structSize: 4
+vec4<f32>
+vec4<i32>
+vec4<u32>
+vec4f
+vec4i
+vec4u
+
+// CUSTOM STRUCTS
+
+// structSize: 3
+struct Variables {
+    value1: vec2f,
+    value2: f32,
+}
+
+// structSize: 5
+struct Variables2 {
+    value1: vec3f,
+    value2: i32,
+    value3: u32,
+}
+
+```
 
 ---
 
@@ -496,6 +542,13 @@ let b = value_noise_data[0];
 
 // size 1 Storage, you can access struct property
 variables.isCreated = 1;
+```
+
+You can also add a default type instead of a custom struct in `structName`:
+
+```js
+points.addStorage('myVar', 1, 'f32', 1); // size is 1
+points.addStorage('myVar2', 1, 'vec2f', 2); // size is 2
 ```
 
 ## StorageMap - addStorageMap
@@ -591,6 +644,70 @@ async function init() {
 // frag.js
 let rgbaWebcam = textureSampleBaseClampToEdge(webcam, feedbackSampler, fract(uv));
 ```
+
+## Audio - addAudio
+
+You can load audio and use its data for visualization.
+
+```js
+// index.js
+let audio = points.addAudio('myAudio', './../../audio/cognitive_dissonance.mp3', volume, loop, false);
+```
+
+
+With the `myAudio` name, a `Sound` type named `myAudio` is created. In the future it will have more information but now it only has the `data` property. `data` is an `array<f32, 2048>`, but it's not completely filled with data, it's only filled up to `params.myAudioLength`, (`myAudio` used as prefix for each different audio) and then each of these values has a max of 256, so if you want something like a percentage, you have to divide the value at a certain index between 256
+```rust
+let audioX = audio.data[ u32(uvr.x * params.audioLength)] / 256;
+```
+
+
+---
+
+> **Note:** The `points.addAudio` method returns a `new Audio` reference, you are responsible to start and stop the audio from the JavaScript side, if you require to start and stop a sound by creating a call from the shaders, please check the `Events - addEventListener` section
+
+---
+
+## Events - addEventListener
+
+An event is an asynchronous message that can be send from the WGSL shaders to the JavaScript code. It works in a very similar way as to listen for a click in JavaScript or a screen resize, you call a `addEventListener`, but the parameters and its use change a bit. In the code below, the first parameter is the name of the event you , the event is fired by **you**, so this name currently has no predefined names like 'click', or 'mouse over', you have to define them and dispatch them.
+
+The second parameter is the data (if any) that you will send from the WGSL shaders, this data is returnes as an array, so you have to acces each item by its index.
+
+The last parameter is the amount of items in this array you are expecting. All items are `f32`.
+
+```js
+// as in examples\events1\index.js
+points.addEventListener(
+    'right_blink', // name of the event (and name of a storage)
+    data => { // data returned after the event and callback
+        console.log('---- Right Circle');
+    },
+    4 // size of the data to return
+);
+```
+
+To fire an event you first need to declare the listener. The name used in the listener is also used as storage buffer that you can manipulate to dispatch the event.
+
+The event has the following structure:
+
+```rust
+// as in src\core\defaultStructs.js
+struct Event {
+    updated: u32,
+    data: array<f32>
+}
+```
+
+To actully fire an event you have to do as follows:
+
+```rust
+right_blink.data[0] = 2; // some data
+right_blink.data[1] = 2; // some data
+right_blink.updated = 1; // update this property to something diff than `0`
+```
+
+By just simply changing the value of `updated` to a non zero, the library knows this event has been updated, and will dispatch the event immediately in JavaScript, so the `console.log` will print the text in the JavaScript Console. `updated` will be set as zero in the next frame, and if not updated the library then knows it doesn't have to do anything.
+
 
 ## Layers - addLayers
 

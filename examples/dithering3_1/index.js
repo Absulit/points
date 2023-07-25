@@ -1,13 +1,17 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
-import { ShaderType } from '../../src/absulit.points.module.js';
+import ShaderType from '../../src/absulit.points.module.js';
 const dithering3 = {
     vert,
     compute,
     frag,
     init: async points => {
-        points.addSampler('imageSampler', null);
+        let descriptor = {
+            addressModeU: 'repeat',
+            addressModeV: 'repeat',
+        }
+        points.addSampler('imageSampler', descriptor);
         // await points.addTextureImage('image', './../img/carmen_lyra_423x643.jpg');
         // await points.addTextureImage('image', './../img/old_king_600x600.jpg');
         // await points.addTextureWebcam('image');
