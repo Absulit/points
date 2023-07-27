@@ -78,17 +78,16 @@ const points = new Points('gl-canvas');
 
 // create your render pass with three shaders as follow
 const renderPasses = [
-    new RenderPass( /*wgsl*/ `
-        // add @vertex string
-    `,
-        /*wgsl*/
+    new RenderPass( 
+        /*wgsl*/ `
+            // add @vertex string
+        `,
+        /*wgsl*/`
+            // add @fragment string
+        `,
+        /*wgsl*/`
+            // add @compute string
         `
-        // add @compute string
-    `,
-        /*wgsl*/
-        `
-        // add @fragment string
-    `
     )
 ];
 
