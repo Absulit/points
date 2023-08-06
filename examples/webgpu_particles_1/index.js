@@ -9,6 +9,7 @@ import {
 import renderPass0 from './pass0/index.js';
 import renderPass1 from './pass1/index.js';
 
+
 const base = {
     renderPasses: [
         renderPass0,
