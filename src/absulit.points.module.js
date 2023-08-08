@@ -205,7 +205,7 @@ export default class Points {
      * @param {string} name name of the Param, you can invoke it later in shaders as `Params.[name]`
      * @param {Number} value Number will be converted to `f32`
      */
-    addUniform(name, value) {
+    addUniform(name, value, structName, structSize) {
         if (this._nameExists(this._uniforms, name)) {
             return;
         }
@@ -213,6 +213,8 @@ export default class Points {
         this._uniforms.push({
             name: name,
             value: value,
+            structName: structName,
+            structSize: structSize,
             internal: this._internal
         });
     }
@@ -231,8 +233,8 @@ export default class Points {
     }
 
     /**
-     * 
-     * @param {Array} arr 
+     *
+     * @param {Array} arr
      */
     updateUniforms(arr) {
         arr.forEach(uniform => {
@@ -722,7 +724,7 @@ export default class Points {
 
         let dynamicStructParams = '';
         this._uniforms.forEach(variable => {
-            let uniformType = variable.type || 'f32';
+            let uniformType = variable.structName || 'f32';
             dynamicStructParams += /*wgsl*/`${variable.name}:${uniformType}, \n\t`;
         });
 
@@ -876,12 +878,13 @@ export default class Points {
      * @param {Boolean} mappedAtCreation
      * @returns mapped buffer
      */
-    _createAndMapBuffer(data, usage, mappedAtCreation = true) {
+    _createAndMapBuffer(data, usage, mappedAtCreation = true, size) {
         const buffer = this._device.createBuffer({
             mappedAtCreation: mappedAtCreation,
-            size: data.byteLength,
+            size: size || data.byteLength,
             usage: usage,
         });
+        // console.log(buffer.size, size);
 
         new Float32Array(buffer.getMappedRange()).set(data);
         buffer.unmap();
@@ -906,8 +909,58 @@ export default class Points {
 
     /** @private */
     _createParametersUniforms() {
-        const values = new Float32Array(this._uniforms.map(v => v.value));
-        this._uniforms.buffer = this._createAndMapBuffer(values, GPUBufferUsage.UNIFORM);
+
+        let blockCounter = 0;
+        // let us = this._uniforms.slice(0);
+        let us = JSON.parse(JSON.stringify(this._uniforms));
+        // console.log('---- _uniforms', this._uniforms);
+        // console.log('---- us',us);
+        us.forEach((u, uIndex) => {
+            // console.log('---- entering?', u.value);
+            if (u.value instanceof Array) {
+                // console.log(blockCounter);
+                const valueLength = u.value.length;
+                if ((blockCounter + valueLength) % 4 != 0) {
+                    const numItems = Math.ceil(blockCounter / 4)
+                    blockCounter += numItems;
+                    // console.log(numItems);
+                    // apparently I need to fill the padding with nothing
+                    // us.splice(uIndex, 0, Array(numItems).fill(0));
+
+                    u.value.unshift(...Array(numItems).fill(99))
+
+                    // u.value = u.value.slice(0).unshift(...Array(numItems).fill(99));
+
+                    // u.value.push(Array(numItems).fill(0))
+                }
+                blockCounter += valueLength;
+            } else {
+                blockCounter++
+            }
+            // console.log('---- blockCounter FOR: ', blockCounter);
+        });
+        // console.log(this._uniforms);
+        // debugger
+
+        // console.log('---- blockCounter: ', blockCounter);
+        if (blockCounter % 2 != 0) {
+            blockCounter++;
+            us.push({value:99})
+        }
+        if (blockCounter % 4 != 0) {
+            blockCounter += 2;
+            us.push(...Array(2).fill({value:99}))
+        }
+
+        // console.log('---- blockCounter: ', blockCounter, blockCounter * 4);
+
+        const values = new Float32Array(us.map(u => u.value).flat());
+        // console.log(values.byteLength);
+        // console.log(values);debugger
+        this._uniforms.buffer = this._createAndMapBuffer(values, GPUBufferUsage.UNIFORM, true, blockCounter * 4);
+
+        // console.log(blockCounter);
+
     }
 
     /** @private */
@@ -1394,6 +1447,7 @@ export default class Points {
         //--------------------------------------------
 
         this._createParametersUniforms();
+        // debugger
 
         // TODO: create method for this
         this._storage.forEach(storageItem => {
