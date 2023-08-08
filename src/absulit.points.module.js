@@ -878,13 +878,13 @@ export default class Points {
      * @param {Boolean} mappedAtCreation
      * @returns mapped buffer
      */
-    _createAndMapBuffer(data, usage, mappedAtCreation = true, size) {
+    _createAndMapBuffer(data, usage, mappedAtCreation = true) {
         const buffer = this._device.createBuffer({
             mappedAtCreation: mappedAtCreation,
-            size: size || data.byteLength,
+            size: data.byteLength,
             usage: usage,
         });
-        // console.log(buffer.size, size);
+        // console.log(buffer.size, data.byteLength);
 
         new Float32Array(buffer.getMappedRange()).set(data);
         buffer.unmap();
@@ -921,19 +921,27 @@ export default class Points {
                 // console.log(blockCounter);
                 const valueLength = u.value.length;
                 if ((blockCounter + valueLength) % 4 != 0) {
-                    const numItems = Math.ceil(blockCounter / 4)
+                    const numItems = 4 - (blockCounter % 4);
                     blockCounter += numItems;
                     // console.log(numItems);
                     // apparently I need to fill the padding with nothing
                     // us.splice(uIndex, 0, Array(numItems).fill(0));
 
-                    u.value.unshift(...Array(numItems).fill(99))
+                    // if there's a vec4 is going to fill the whole row of 4 blocks
+                    // so it's not needed to be added now, it will be added next round
+                    if (numItems != 4) {
+                        u.value.unshift(...Array(numItems).fill(99))
+                    }
 
                     // u.value = u.value.slice(0).unshift(...Array(numItems).fill(99));
 
                     // u.value.push(Array(numItems).fill(0))
                 }
-                blockCounter += valueLength;
+                // if there's a vec4 is going to fill the whole row of 4 blocks
+                // so it's not needed to be added now, it will be added next round
+                if (valueLength != 4) {
+                    blockCounter += valueLength;
+                }
             } else {
                 blockCounter++
             }
@@ -945,19 +953,19 @@ export default class Points {
         // console.log('---- blockCounter: ', blockCounter);
         if (blockCounter % 2 != 0) {
             blockCounter++;
-            us.push({value:99})
+            us.push({ value: 99 })
         }
         if (blockCounter % 4 != 0) {
             blockCounter += 2;
-            us.push(...Array(2).fill({value:99}))
+            us.push(...Array(2).fill({ value: 99 }))
         }
 
         // console.log('---- blockCounter: ', blockCounter, blockCounter * 4);
 
         const values = new Float32Array(us.map(u => u.value).flat());
         // console.log(values.byteLength);
-        // console.log(values);debugger
-        this._uniforms.buffer = this._createAndMapBuffer(values, GPUBufferUsage.UNIFORM, true, blockCounter * 4);
+        // console.log(values); debugger
+        this._uniforms.buffer = this._createAndMapBuffer(values, GPUBufferUsage.UNIFORM, true);
 
         // console.log(blockCounter);
 
