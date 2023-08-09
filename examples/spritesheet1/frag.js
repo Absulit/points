@@ -40,11 +40,11 @@ fn main(
     let displaceInX = vec2(cellRatio.x, 0);
     let start0char = 16u;
 
-    var numberToDecode = params.mouseX;
+    var numberToDecode = params.mouse.x;
 
     let digits = RED * decodeNumberSprite(numberToDecode, start0char, image, imageSampler, startPosition, uvr * scaleDigits, ratio, size).r;
     // -----------------------------------------------
-    numberToDecode = params.mouseY;
+    numberToDecode = params.mouse.y;
     let startPosition2 = startPosition - vec2(0, sizeF32.x/params.screenHeight)*ratio;
     let digits2 = GREEN * decodeNumberSprite(numberToDecode, start0char, image, imageSampler, startPosition2, uvr * scaleDigits, ratio, size).r;
 

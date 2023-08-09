@@ -82,9 +82,7 @@ export default class Points {
         /** @private */
         this._epoch = 0;
         /** @private */
-        this._mouseX = 0;
-        /** @private */
-        this._mouseY = 0;
+        this._mouse = [0,0];
         /** @private */
         this._mouseDown = false;
         /** @private */
@@ -193,8 +191,7 @@ export default class Points {
 
     /** @private */
     _onMouseMove = e => {
-        this._mouseX = e.clientX;
-        this._mouseY = e.clientY;
+        this._mouse = [e.clientX, e.clientY];
     }
 
     /**
@@ -777,8 +774,7 @@ export default class Points {
         this.addUniform(UniformKeys.EPOCH, this._epoch);
         this.addUniform(UniformKeys.SCREEN_WIDTH, 0);
         this.addUniform(UniformKeys.SCREEN_HEIGHT, 0);
-        this.addUniform(UniformKeys.MOUSE_X, this._mouseX);
-        this.addUniform(UniformKeys.MOUSE_Y, this._mouseY);
+        this.addUniform(UniformKeys.MOUSE, this._mouse, 'vec2f');
         this.addUniform(UniformKeys.MOUSE_CLICK, this._mouseClick);
         this.addUniform(UniformKeys.MOUSE_DOWN, this._mouseDown);
         this.addUniform(UniformKeys.MOUSE_WHEEL, this._mouseWheel);
@@ -1424,8 +1420,7 @@ export default class Points {
         this.updateUniform(UniformKeys.EPOCH, this._epoch);
         this.updateUniform(UniformKeys.SCREEN_WIDTH, this._canvas.width);
         this.updateUniform(UniformKeys.SCREEN_HEIGHT, this._canvas.height);
-        this.updateUniform(UniformKeys.MOUSE_X, this._mouseX);
-        this.updateUniform(UniformKeys.MOUSE_Y, this._mouseY);
+        this.updateUniform(UniformKeys.MOUSE, this._mouse);
         this.updateUniform(UniformKeys.MOUSE_CLICK, this._mouseClick);
         this.updateUniform(UniformKeys.MOUSE_DOWN, this._mouseDown);
         this.updateUniform(UniformKeys.MOUSE_WHEEL, this._mouseWheel);
