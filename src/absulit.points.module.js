@@ -909,33 +909,23 @@ export default class Points {
 
     /** @private */
     _createParametersUniforms() {
-
+        const EMPTY = 0;
         let blockCounter = 0;
-        // let us = this._uniforms.slice(0);
+        // only way to make a non shallow copy of an array
         let us = JSON.parse(JSON.stringify(this._uniforms));
-        // console.log('---- _uniforms', this._uniforms);
-        // console.log('---- us',us);
         us.forEach((u, uIndex) => {
             // console.log('---- entering?', u.value);
             if (u.value instanceof Array) {
-                // console.log(blockCounter);
                 const valueLength = u.value.length;
                 if ((blockCounter + valueLength) % 4 != 0) {
                     const numItems = 4 - (blockCounter % 4);
                     blockCounter += numItems;
-                    // console.log(numItems);
-                    // apparently I need to fill the padding with nothing
-                    // us.splice(uIndex, 0, Array(numItems).fill(0));
-
                     // if there's a vec4 is going to fill the whole row of 4 blocks
                     // so it's not needed to be added now, it will be added next round
                     if (numItems != 4) {
-                        u.value.unshift(...Array(numItems).fill(99))
+                        // apparently I need to fill the padding with nothing
+                        u.value.unshift(...Array(numItems).fill(EMPTY))
                     }
-
-                    // u.value = u.value.slice(0).unshift(...Array(numItems).fill(99));
-
-                    // u.value.push(Array(numItems).fill(0))
                 }
                 // if there's a vec4 is going to fill the whole row of 4 blocks
                 // so it's not needed to be added now, it will be added next round
@@ -945,30 +935,19 @@ export default class Points {
             } else {
                 blockCounter++
             }
-            // console.log('---- blockCounter FOR: ', blockCounter);
         });
-        // console.log(this._uniforms);
-        // debugger
 
-        // console.log('---- blockCounter: ', blockCounter);
         if (blockCounter % 2 != 0) {
             blockCounter++;
-            us.push({ value: 99 })
+            us.push({ value: EMPTY })
         }
         if (blockCounter % 4 != 0) {
             blockCounter += 2;
-            us.push(...Array(2).fill({ value: 99 }))
+            us.push(...Array(2).fill({ value: EMPTY }))
         }
 
-        // console.log('---- blockCounter: ', blockCounter, blockCounter * 4);
-
         const values = new Float32Array(us.map(u => u.value).flat());
-        // console.log(values.byteLength);
-        // console.log(values); debugger
         this._uniforms.buffer = this._createAndMapBuffer(values, GPUBufferUsage.UNIFORM, true);
-
-        // console.log(blockCounter);
-
     }
 
     /** @private */
