@@ -82,7 +82,7 @@ export default class Points {
         /** @private */
         this._epoch = 0;
         /** @private */
-        this._mouse = [0,0];
+        this._mouse = [0, 0];
         /** @private */
         this._mouseDown = false;
         /** @private */
@@ -90,9 +90,7 @@ export default class Points {
         /** @private */
         this._mouseWheel = false;
         /** @private */
-        this._mouseDeltaX = 0;
-        /** @private */
-        this._mouseDeltaY = 0;
+        this._mouseDelta = [0, 0];
 
         /** @private */
         this._fullscreen = false;
@@ -124,8 +122,7 @@ export default class Points {
 
             this._canvas.addEventListener('wheel', e => {
                 this._mouseWheel = true;
-                this._mouseDeltaX = e.deltaX;
-                this._mouseDeltaY = e.deltaY;
+                this._mouseDelta = [e.deltaX, e.deltaY];
             });
             this._originalCanvasWidth = this._canvas.clientWidth;
             this._originalCanvasHeigth = this._canvas.clientHeight;
@@ -207,7 +204,7 @@ export default class Points {
             return;
         }
         // TODO: add a third parameter with a type, so a struct can be defined and pass things like booleans
-        this._uniforms.push({
+        this._uniforms.unshift({
             name: name,
             value: value,
             structName: structName,
@@ -772,14 +769,12 @@ export default class Points {
         // initializing internal uniforms
         this.addUniform(UniformKeys.TIME, this._time);
         this.addUniform(UniformKeys.EPOCH, this._epoch);
-        this.addUniform(UniformKeys.SCREEN_WIDTH, 0);
-        this.addUniform(UniformKeys.SCREEN_HEIGHT, 0);
-        this.addUniform(UniformKeys.MOUSE, this._mouse, 'vec2f');
         this.addUniform(UniformKeys.MOUSE_CLICK, this._mouseClick);
         this.addUniform(UniformKeys.MOUSE_DOWN, this._mouseDown);
         this.addUniform(UniformKeys.MOUSE_WHEEL, this._mouseWheel);
-        this.addUniform(UniformKeys.MOUSE_DELTA_X, this._mouseDeltaX);
-        this.addUniform(UniformKeys.MOUSE_DELTA_Y, this._mouseDeltaY);
+        this.addUniform(UniformKeys.MOUSE_DELTA, this._mouseDelta, 'vec2f');
+        this.addUniform(UniformKeys.MOUSE, this._mouse, 'vec2f');
+        this.addUniform(UniformKeys.SCREEN, [0, 0], 'vec2f');
 
         let hasComputeShaders = this._renderPasses.some(renderPass => renderPass.hasComputeShader);
         if (!hasComputeShaders && this._bindingTextures.length) {
@@ -913,6 +908,20 @@ export default class Points {
             // console.log('---- entering?', u.value);
             if (u.value instanceof Array) {
                 const valueLength = u.value.length;
+
+                // if the next block doesn't fit in two and four blocks
+                // if( ((blockCounter + valueLength) % 2 != 0)  && ((blockCounter + valueLength) % 4 != 0) ){
+                //     // calculate padding to add
+                //     const numItems = 4 - (blockCounter % 4);
+                //     // console.log('---- X:', u.value, numItems);
+                //     // if (numItems != 4) {
+                //         // apparently I need to fill the padding with nothing
+                //         u.value.unshift(...Array(numItems).fill(EMPTY));
+                //     // }
+                // }else
+
+                // if the next block to add (u.value) doesn't fit the 4 block row then
+                // we need to add padding
                 if ((blockCounter + valueLength) % 4 != 0) {
                     const numItems = 4 - (blockCounter % 4);
                     blockCounter += numItems;
@@ -920,7 +929,7 @@ export default class Points {
                     // so it's not needed to be added now, it will be added next round
                     if (numItems != 4) {
                         // apparently I need to fill the padding with nothing
-                        u.value.unshift(...Array(numItems).fill(EMPTY))
+                        u.value.unshift(...Array(numItems).fill(EMPTY));
                     }
                 }
                 // if there's a vec4 is going to fill the whole row of 4 blocks
@@ -1418,14 +1427,12 @@ export default class Points {
         this._epoch = new Date() / 1000;
         this.updateUniform(UniformKeys.TIME, this._time);
         this.updateUniform(UniformKeys.EPOCH, this._epoch);
-        this.updateUniform(UniformKeys.SCREEN_WIDTH, this._canvas.width);
-        this.updateUniform(UniformKeys.SCREEN_HEIGHT, this._canvas.height);
-        this.updateUniform(UniformKeys.MOUSE, this._mouse);
         this.updateUniform(UniformKeys.MOUSE_CLICK, this._mouseClick);
         this.updateUniform(UniformKeys.MOUSE_DOWN, this._mouseDown);
         this.updateUniform(UniformKeys.MOUSE_WHEEL, this._mouseWheel);
-        this.updateUniform(UniformKeys.MOUSE_DELTA_X, this._mouseDeltaX);
-        this.updateUniform(UniformKeys.MOUSE_DELTA_Y, this._mouseDeltaY);
+        this.updateUniform(UniformKeys.MOUSE_DELTA, this._mouseDelta);
+        this.updateUniform(UniformKeys.MOUSE, this._mouse);
+        this.updateUniform(UniformKeys.SCREEN, [this._canvas.width, this._canvas.height]);
         //--------------------------------------------
 
         this._createParametersUniforms();
@@ -1561,8 +1568,8 @@ export default class Points {
         // reset mouse values because it doesn't happen by itself
         this._mouseClick = false;
         this._mouseWheel = false;
-        this._mouseDeltaX = 0;
-        this._mouseDeltaY = 0;
+        this._mouseDelta = [0, 0];
+        // this._mouseDeltaY = 0;
 
         await this.read();
     }
