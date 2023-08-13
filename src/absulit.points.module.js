@@ -204,7 +204,7 @@ export default class Points {
             return;
         }
         // TODO: add a third parameter with a type, so a struct can be defined and pass things like booleans
-        this._uniforms.unshift({
+        this._uniforms.push({
             name: name,
             value: value,
             structName: structName,
@@ -903,12 +903,6 @@ export default class Points {
     /** @private */
     _createParametersUniforms() {
         const EMPTY = 9999999;
-        const blockColumn = {
-            0: 0,
-            1: 0,
-            2: 1,
-            3: 1,
-        }
         let blockCounter = 0;
         // only way to make a non shallow copy of an array
         let us = JSON.parse(JSON.stringify(this._uniforms));
@@ -916,9 +910,8 @@ export default class Points {
             // console.log('---- entering?', u.value);
             if (u.value instanceof Array) {
                 const valueLength = u.value.length;
-                // blockCounter = 2 // remove
-                if (blockCounter > 0) {
 
+                if (blockCounter > 0) {
                     console.log('-------------------------------');
                     console.log('---- blockCounter', blockCounter);
                     const blockIndex = (blockCounter - 1) % 4;
@@ -926,58 +919,40 @@ export default class Points {
                     // let columnOccupied = blockColumn[blockIndex];
                     let columnOccupied = (blockIndex / 3 > .5) * 1;
                     console.log('---- columnOccupied', columnOccupied);
+                    let padCount = 0;
                     if (columnOccupied == 0) {
                         const fullOccupied = blockIndex == 1;
                         console.log('---- fullOccupied', fullOccupied);
                         // add padding
-                        // let padCount = 2 - (blockCounter%2);
-                        let padCount = 0;
                         console.log('---- padCount BEFORE', padCount);
-
                         if (fullOccupied && valueLength > 2) {
-                            // u.value.unshift(...Array(2).fill(EMPTY));
-                            // padCount += 2;
                             padCount = 2 - (blockCounter % 2);
                             u.value.unshift(...Array(padCount).fill(EMPTY));
                         } else if (!fullOccupied && valueLength >= 2) {
-                            // u.value.unshift(...Array(2).fill(EMPTY));
-                            // padCount += 2;
                             padCount = 2 - (blockCounter % 2);
                             if (valueLength > 2) {
                                 padCount += 2
                             }
                             u.value.unshift(...Array(padCount).fill(EMPTY));
                         }
-
-                        console.log('---- padCount AFTER', padCount);
-                        blockCounter += padCount;
-                        blockCounter += valueLength;
-
                     } else if (columnOccupied == 1) {
                         const fullOccupied = blockIndex == 3;
                         console.log('---- fullOccupied', fullOccupied);
                         // add padding
-                        // let padCount = 2 - (blockCounter%2);
-                        let padCount = 0;
                         console.log('---- padCount BEFORE', padCount);
-
                         if (!fullOccupied && valueLength >= 2) {
                             padCount = 2 - (blockCounter % 2);
                             u.value.unshift(...Array(padCount).fill(EMPTY));
-                            // padCount += 2;
                         }
-
-                        console.log('---- padCount AFTER', padCount);
-                        blockCounter += padCount;
-                        blockCounter += valueLength;
                     }
+                    console.log('---- padCount AFTER', padCount);
+                    blockCounter += padCount + valueLength;
                     console.log('---- END blockCounter', blockCounter);
                     // debugger
                 } else {
                     blockCounter += valueLength;
                     console.log('---- ELSE, blockCounter: ', blockCounter);
                 }
-
 
             } else {
                 ++blockCounter;
@@ -986,20 +961,16 @@ export default class Points {
         });
 
         // u.value.unshift(...Array(numItems).fill(EMPTY));
+        let numItems = 0;
         if (blockCounter % 2 != 0) {
-            const numItems = 2 - (blockCounter % 2);
-            blockCounter += numItems;
-            us.push(...Array(numItems).fill({ value: EMPTY }))
+            numItems = 2 - (blockCounter % 2);
         }
         if (blockCounter % 4 != 0) {
-            const numItems = 4 - (blockCounter % 4);
-            blockCounter += numItems;
-            us.push(...Array(numItems).fill({ value: EMPTY }))
+            numItems = 4 - (blockCounter % 4);
         }
-        // if (blockCounter % 4 != 0) {
-        //     blockCounter += 2;
-        //     us.push(...Array(2).fill({ value: EMPTY }))
-        // }
+        blockCounter += numItems;
+        us.push(...Array(numItems).fill({ value: EMPTY }))
+
         console.log('---- FINAL blockCounter', blockCounter);
 
         const values = new Float32Array(us.map(u => u.value).flat());
