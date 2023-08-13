@@ -197,18 +197,19 @@ export default class Points {
      * from the outside, and unless changed it remains
      * consistent. To change it use `updateUniform()`
      * @param {string} name name of the Param, you can invoke it later in shaders as `Params.[name]`
-     * @param {Number} value Number will be converted to `f32`
+     * @param {Number | Array<Number>} value Number or Array that represents a vector like `vec3f`
+     * @param {string} structName Type or by default `f32`
      */
-    addUniform(name, value, structName, structSize) {
+    addUniform(name, value, structName) {
         if (this._nameExists(this._uniforms, name)) {
             return;
         }
-        // TODO: add a third parameter with a type, so a struct can be defined and pass things like booleans
+
         this._uniforms.push({
             name: name,
             value: value,
             structName: structName,
-            structSize: structSize,
+            structSize: null,
             internal: this._internal
         });
     }
@@ -902,21 +903,18 @@ export default class Points {
 
     /** @private */
     _createParametersUniforms() {
-        const EMPTY = 9999999;
+        const EMPTY = 0;
         let blockCounter = 0;
         // only way to make a non shallow copy of an array
-        let us = JSON.parse(JSON.stringify(this._uniforms));
-        us.forEach((u, uIndex) => {
-            // console.log('---- entering?', u.value);
+        const us = JSON.parse(JSON.stringify(this._uniforms));
+        us.forEach(u => {
             if (u.value instanceof Array) {
                 const valueLength = u.value.length;
-
                 if (blockCounter > 0) {
                     const blockIndex = (blockCounter - 1) % 4;
-                    // let columnOccupied = blockColumn[blockIndex];
-                    let columnOccupied = (blockIndex / 3 > .5) * 1;
+                    const columnOccupied = (blockIndex / 3 > .5) * 1;
                     let padCount = 0;
-                    if (columnOccupied == 0) {
+                    if (columnOccupied == 0) {// if left column
                         const fullOccupied = blockIndex == 1;
                         // add padding
                         if (fullOccupied && valueLength > 2) {
@@ -929,7 +927,7 @@ export default class Points {
                             }
                             u.value.unshift(...Array(padCount).fill(EMPTY));
                         }
-                    } else if (columnOccupied == 1) {
+                    } else {// if right column
                         const fullOccupied = blockIndex == 3;
                         // add padding
                         if (!fullOccupied && valueLength >= 2) {
@@ -938,17 +936,14 @@ export default class Points {
                         }
                     }
                     blockCounter += padCount + valueLength;
-                    // debugger
                 } else {
                     blockCounter += valueLength;
                 }
-
             } else {
                 ++blockCounter;
             }
         });
 
-        // u.value.unshift(...Array(numItems).fill(EMPTY));
         let numItems = 0;
         if (blockCounter % 2 != 0) {
             numItems = 2 - (blockCounter % 2);
@@ -959,9 +954,7 @@ export default class Points {
         blockCounter += numItems;
         us.push(...Array(numItems).fill({ value: EMPTY }))
 
-
         const values = new Float32Array(us.map(u => u.value).flat());
-        console.log(values); debugger
         this._uniforms.buffer = this._createAndMapBuffer(values, GPUBufferUsage.UNIFORM, true);
     }
 
