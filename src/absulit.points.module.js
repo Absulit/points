@@ -912,19 +912,13 @@ export default class Points {
                 const valueLength = u.value.length;
 
                 if (blockCounter > 0) {
-                    console.log('-------------------------------');
-                    console.log('---- blockCounter', blockCounter);
                     const blockIndex = (blockCounter - 1) % 4;
-                    console.log('---- blockIndex', blockIndex);
                     // let columnOccupied = blockColumn[blockIndex];
                     let columnOccupied = (blockIndex / 3 > .5) * 1;
-                    console.log('---- columnOccupied', columnOccupied);
                     let padCount = 0;
                     if (columnOccupied == 0) {
                         const fullOccupied = blockIndex == 1;
-                        console.log('---- fullOccupied', fullOccupied);
                         // add padding
-                        console.log('---- padCount BEFORE', padCount);
                         if (fullOccupied && valueLength > 2) {
                             padCount = 2 - (blockCounter % 2);
                             u.value.unshift(...Array(padCount).fill(EMPTY));
@@ -937,26 +931,20 @@ export default class Points {
                         }
                     } else if (columnOccupied == 1) {
                         const fullOccupied = blockIndex == 3;
-                        console.log('---- fullOccupied', fullOccupied);
                         // add padding
-                        console.log('---- padCount BEFORE', padCount);
                         if (!fullOccupied && valueLength >= 2) {
                             padCount = 2 - (blockCounter % 2);
                             u.value.unshift(...Array(padCount).fill(EMPTY));
                         }
                     }
-                    console.log('---- padCount AFTER', padCount);
                     blockCounter += padCount + valueLength;
-                    console.log('---- END blockCounter', blockCounter);
                     // debugger
                 } else {
                     blockCounter += valueLength;
-                    console.log('---- ELSE, blockCounter: ', blockCounter);
                 }
 
             } else {
                 ++blockCounter;
-                console.log('---- SINGLE');
             }
         });
 
@@ -971,7 +959,6 @@ export default class Points {
         blockCounter += numItems;
         us.push(...Array(numItems).fill({ value: EMPTY }))
 
-        console.log('---- FINAL blockCounter', blockCounter);
 
         const values = new Float32Array(us.map(u => u.value).flat());
         console.log(values); debugger
