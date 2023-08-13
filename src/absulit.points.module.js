@@ -898,9 +898,17 @@ export default class Points {
         return buffer
     }
 
+
+
     /** @private */
     _createParametersUniforms() {
-        const EMPTY = 0;
+        const EMPTY = 9999999;
+        const blockColumn = {
+            0: 0,
+            1: 0,
+            2: 1,
+            3: 1,
+        }
         let blockCounter = 0;
         // only way to make a non shallow copy of an array
         let us = JSON.parse(JSON.stringify(this._uniforms));
@@ -908,50 +916,94 @@ export default class Points {
             // console.log('---- entering?', u.value);
             if (u.value instanceof Array) {
                 const valueLength = u.value.length;
+                // blockCounter = 2 // remove
+                if (blockCounter > 0) {
 
-                // if the next block doesn't fit in two and four blocks
-                // if( ((blockCounter + valueLength) % 2 != 0)  && ((blockCounter + valueLength) % 4 != 0) ){
-                //     // calculate padding to add
-                //     const numItems = 4 - (blockCounter % 4);
-                //     // console.log('---- X:', u.value, numItems);
-                //     // if (numItems != 4) {
-                //         // apparently I need to fill the padding with nothing
-                //         u.value.unshift(...Array(numItems).fill(EMPTY));
-                //     // }
-                // }else
+                    console.log('-------------------------------');
+                    console.log('---- blockCounter', blockCounter);
+                    const blockIndex = (blockCounter - 1) % 4;
+                    console.log('---- blockIndex', blockIndex);
+                    // let columnOccupied = blockColumn[blockIndex];
+                    let columnOccupied = (blockIndex / 3 > .5) * 1;
+                    console.log('---- columnOccupied', columnOccupied);
+                    if (columnOccupied == 0) {
+                        const fullOccupied = blockIndex == 1;
+                        console.log('---- fullOccupied', fullOccupied);
+                        // add padding
+                        // let padCount = 2 - (blockCounter%2);
+                        let padCount = 0;
+                        console.log('---- padCount BEFORE', padCount);
 
-                // if the next block to add (u.value) doesn't fit the 4 block row then
-                // we need to add padding
-                if ((blockCounter + valueLength) % 4 != 0) {
-                    const numItems = 4 - (blockCounter % 4);
-                    blockCounter += numItems;
-                    // if there's a vec4 is going to fill the whole row of 4 blocks
-                    // so it's not needed to be added now, it will be added next round
-                    if (numItems != 4) {
-                        // apparently I need to fill the padding with nothing
-                        u.value.unshift(...Array(numItems).fill(EMPTY));
+                        if (fullOccupied && valueLength > 2) {
+                            // u.value.unshift(...Array(2).fill(EMPTY));
+                            // padCount += 2;
+                            padCount = 2 - (blockCounter % 2);
+                            u.value.unshift(...Array(padCount).fill(EMPTY));
+                        } else if (!fullOccupied && valueLength >= 2) {
+                            // u.value.unshift(...Array(2).fill(EMPTY));
+                            // padCount += 2;
+                            padCount = 2 - (blockCounter % 2);
+                            if (valueLength > 2) {
+                                padCount += 2
+                            }
+                            u.value.unshift(...Array(padCount).fill(EMPTY));
+                        }
+
+                        console.log('---- padCount AFTER', padCount);
+                        blockCounter += padCount;
+                        blockCounter += valueLength;
+
+                    } else if (columnOccupied == 1) {
+                        const fullOccupied = blockIndex == 3;
+                        console.log('---- fullOccupied', fullOccupied);
+                        // add padding
+                        // let padCount = 2 - (blockCounter%2);
+                        let padCount = 0;
+                        console.log('---- padCount BEFORE', padCount);
+
+                        if (!fullOccupied && valueLength >= 2) {
+                            padCount = 2 - (blockCounter % 2);
+                            u.value.unshift(...Array(padCount).fill(EMPTY));
+                            // padCount += 2;
+                        }
+
+                        console.log('---- padCount AFTER', padCount);
+                        blockCounter += padCount;
+                        blockCounter += valueLength;
                     }
-                }
-                // if there's a vec4 is going to fill the whole row of 4 blocks
-                // so it's not needed to be added now, it will be added next round
-                if (valueLength != 4) {
+                    console.log('---- END blockCounter', blockCounter);
+                    // debugger
+                } else {
                     blockCounter += valueLength;
+                    console.log('---- ELSE, blockCounter: ', blockCounter);
                 }
+
+
             } else {
-                blockCounter++
+                ++blockCounter;
+                console.log('---- SINGLE');
             }
         });
 
+        // u.value.unshift(...Array(numItems).fill(EMPTY));
         if (blockCounter % 2 != 0) {
-            blockCounter++;
-            us.push({ value: EMPTY })
+            const numItems = 2 - (blockCounter % 2);
+            blockCounter += numItems;
+            us.push(...Array(numItems).fill({ value: EMPTY }))
         }
         if (blockCounter % 4 != 0) {
-            blockCounter += 2;
-            us.push(...Array(2).fill({ value: EMPTY }))
+            const numItems = 4 - (blockCounter % 4);
+            blockCounter += numItems;
+            us.push(...Array(numItems).fill({ value: EMPTY }))
         }
+        // if (blockCounter % 4 != 0) {
+        //     blockCounter += 2;
+        //     us.push(...Array(2).fill({ value: EMPTY }))
+        // }
+        console.log('---- FINAL blockCounter', blockCounter);
 
         const values = new Float32Array(us.map(u => u.value).flat());
+        console.log(values); debugger
         this._uniforms.buffer = this._createAndMapBuffer(values, GPUBufferUsage.UNIFORM, true);
     }
 
