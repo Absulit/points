@@ -92,6 +92,7 @@ const shaderProjects = [
     { name: 'Spritesheet 1', path: './spritesheet1/index.js' },
     { name: 'UVs 1', path: './uvs1/index.js' },
     { name: 'Video Texture 1', path: './videotexture1/index.js' },
+    { name: 'WebGPU Particles 1', path: './webgpu_particles_1/index.js' },
 ]
 
 const shaderNames = {};
