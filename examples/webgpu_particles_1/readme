@@ -1,0 +1,6 @@
+This are the particles from this demo 
+
+https://webgpu.github.io/webgpu-samples/samples/particles
+
+this will not work since unifors are still f32, and they need to be reworked
+to support other data types
