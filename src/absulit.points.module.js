@@ -251,7 +251,7 @@ export default class Points {
      * Multiply this by number of properties in the struct if necessary.
      * @param {string} structName Name of the struct already existing on the
      * shader that will be the array<structName> of the Storage
-     * @param {Number} structSize this tells how many sub items the struct has
+     * @param {Number} structSize number of bytes used by the struct; this includes padding.
      * @param {boolean} read if this is going to be used to read data back
      * @param {ShaderType} shaderType this tells to what shader the storage is bound
      */
@@ -606,6 +606,7 @@ export default class Points {
      * @returns string with bindings
      */
     _createDynamicGroupBindings(shaderType, internal) {
+        // `internal` here is a flag for a custom pass
         internal = internal || false;
         if (!shaderType) {
             throw '`ShaderType` is required';
@@ -925,7 +926,7 @@ export default class Points {
                 const values = new Float32Array(storageItem.array);
                 storageItem.buffer = this._createAndMapBuffer(values, usage);
             } else {
-                storageItem.buffer = this._createBuffer(storageItem.size * storageItem.structSize * 4, usage);
+                storageItem.buffer = this._createBuffer(storageItem.size * storageItem.structSize, usage);
             }
         });
         //--------------------------------------------
@@ -940,7 +941,7 @@ export default class Points {
             //let layerValues = [];
             let layersSize = 0;
             this._layers.forEach(layerItem => {
-                layersSize += layerItem.size * layerItem.structSize * 4;
+                layersSize += layerItem.size * layerItem.structSize;
             });
             this._layers.buffer = this._createBuffer(layersSize, GPUBufferUsage.STORAGE);
         }

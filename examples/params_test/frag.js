@@ -1,8 +1,12 @@
 import { fnusin } from '../../src/core/animation.js';
+import { structs } from './structs.js';
+import { rand } from '../../src/core/random.js';
 
 const frag = /*wgsl*/`
 
 ${fnusin}
+${structs}
+${rand}
 
 @fragment
 fn main(
@@ -14,8 +18,17 @@ fn main(
     @builtin(position) position: vec4<f32>
 ) -> @location(0) vec4<f32> {
 
+    var finalColor:vec4<f32> = vec4();
 
-    let finalColor:vec4<f32> = test;
+    if(variables.init == 0){
+        rand_seed = uvr + params.time;
+        rand();
+        finalColor = vec4(rand_seed, 0, 1);
+        variables.init = 1;
+        variables.color = finalColor;
+    }
+    finalColor = variables.color;
+
 
     return finalColor;
 }

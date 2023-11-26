@@ -13,7 +13,8 @@ const base = {
      */
     init: async points => {
         points.addStorageMap('test', [1,0,0,.5], 'vec4f');
-        points.addStorage('test2', 1, 'vec4f', 4);
+        points.addStorage('variables', 1, 'Variable', 32);
+        points.addStorage('test2', 1, 'TestStruct', 32);
     },
     update: points => {
 
