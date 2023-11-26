@@ -932,7 +932,7 @@ export default class Points {
         //--------------------------------------------
         this._readStorage.forEach(readStorageItem => {
             readStorageItem.buffer = this._device.createBuffer({
-                size: readStorageItem.size * 4,
+                size: readStorageItem.size,
                 usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
             });
         });
