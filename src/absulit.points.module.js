@@ -332,7 +332,7 @@ export default class Points {
                 name: `layer${layerIndex}`,
                 size: this._canvas.width * this._canvas.height,
                 structName: 'vec4<f32>',
-                structSize: 4,
+                structSize: 16,
                 array: null,
                 buffer: null,
                 internal: this._internal
