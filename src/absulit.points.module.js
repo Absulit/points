@@ -576,8 +576,8 @@ export default class Points {
      * @param {Function} callback function to be called when the event occurs
      */
     addEventListener(name, callback, structSize) {
-        // this extra 1 is for the boolean flag in the Event struct
-        let data = Array(structSize + 1).fill(0);
+        // this extra 4 is for the boolean flag in the Event struct
+        let data = Array(structSize + 4).fill(0);
         this.addStorageMap(name, data, 'Event', true);
         this._events.set(this._events_ids,
             {
