@@ -9,3 +9,5 @@ export const structs = /*wgsl*/`
         value: f32,
     }
 `;
+
+

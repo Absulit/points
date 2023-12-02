@@ -205,7 +205,7 @@ export default class Points {
      * @param {string} name name of the Param, you can invoke it later in shaders as `Params.[name]`
      * @param {Number} value Number will be converted to `f32`
      */
-    addUniform(name, value) {
+    addUniform(name, value, structName, structSize) {
         if (this._nameExists(this._uniforms, name)) {
             return;
         }
@@ -213,6 +213,8 @@ export default class Points {
         this._uniforms.push({
             name: name,
             value: value,
+            type: structName,
+            size: structSize,
             internal: this._internal
         });
     }
@@ -723,6 +725,7 @@ export default class Points {
 
         let dynamicStructParams = '';
         this._uniforms.forEach(variable => {
+            // console.log(variable)
             let uniformType = variable.type || 'f32';
             dynamicStructParams += /*wgsl*/`${variable.name}:${uniformType}, \n\t`;
         });
@@ -907,8 +910,12 @@ export default class Points {
 
     /** @private */
     _createParametersUniforms() {
-        const values = new Float32Array(this._uniforms.map(v => v.value));
+        const values = new Float32Array(this._uniforms.map(v => v.value).flat(1));
+        // console.log(values)
         this._uniforms.buffer = this._createAndMapBuffer(values, GPUBufferUsage.UNIFORM);
+        // console.log(this._uniforms.buffer)
+        // debugger
+
     }
 
     /** @private */
@@ -1198,6 +1205,7 @@ export default class Points {
                     );
                 }
             });
+            // console.log(entries)
         }
 
         if (this._layers.length) {
