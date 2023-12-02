@@ -21,10 +21,20 @@ const typeSizes = {
     'vec2<i32>': size_8_align_8,
     'vec2<u32>': size_8_align_8,
 
+    // 'vec2<bool>': size_8_align_8,
+    'vec2f': size_8_align_8,
+    'vec2i': size_8_align_8,
+    'vec2u': size_8_align_8,
+
     'vec3<bool>': size_12_align_16,
     'vec3<f32>': size_12_align_16,
     'vec3<i32>': size_12_align_16,
     'vec3<u32>': size_12_align_16,
+
+    // 'vec3<bool>': size_12_align_16,
+    'vec3f': size_12_align_16,
+    'vec3i': size_12_align_16,
+    'vec3u': size_12_align_16,
 
     'vec4<bool>': size_16_align_16,
     'vec4<f32>': size_16_align_16,
@@ -39,8 +49,21 @@ const typeSizes = {
     'mat4x2<f32>': size_32_align_16,
     'mat4x3<f32>': size_64_align_16,
     'mat4x4<f32>': size_64_align_16,
-}
 
+    // 'vec4<bool>': size_16_align_16,
+    'vec4f': size_16_align_16,
+    'vec4i': size_16_align_16,
+    'vec4u': size_16_align_16,
+    'mat2x2f': size_16_align_8,
+    'mat2x3f': size_32_align_8,
+    'mat2x4f': size_32_align_8,
+    'mat3x2f': size_24_align_16,
+    'mat3x3f': size_48_align_16,
+    'mat3x4f': size_48_align_16,
+    'mat4x2f': size_32_align_16,
+    'mat4x3f': size_64_align_16,
+    'mat4x4f': size_64_align_16,
+}
 
 
 // ignore comments
