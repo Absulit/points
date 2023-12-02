@@ -37,13 +37,34 @@ const base = {
         const result = dataSize(`
         struct Variable{
             init: i32,
-            // color: vec4f,
+            color: vec4f,
             another: i32 ,
         }
 
+        struct Params {
+                sliderA:f32,
+                sliderB:f32,
+                sliderC:f32,
+                test3:vec4f,
+                time:f32,
+                epoch:f32,
+                screenWidth:f32,
+                screenHeight:f32,
+                mouseX:f32,
+                mouseY:f32,
+                mouseClick:f32,
+                mouseDown:f32,
+                mouseWheel:f32,
+                mouseDeltaX:f32,
+                mouseDeltaY:f32,
+    
+            }
+
+
         struct Variable2 {
             v: vec4f,
-            //f: i32,
+            f: i32,
+            z: i32,
         }
 
         `);

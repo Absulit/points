@@ -123,6 +123,18 @@ function getStructDataByName(value) {
     return result;
 }
 
+function addBytesToAlign(bytes, aligment){
+    const remainder = bytes % aligment
+    let result = 0;
+    if(remainder !== 0){
+        // if not multiple we obtain the diff
+        // and add it to byteCounter to make it fit the alignment
+        const multipleDiff = aligment - remainder
+        result = bytes = multipleDiff
+    }
+    return result;
+}
+
 export const dataSize = value => {
     console.log('---- dataSize', value);
 
@@ -132,13 +144,43 @@ export const dataSize = value => {
     console.log('---- dataSize', structData);
     let maxAlign = 0
     for (const [structDatumKey, structDatum] of structData) {
-        console.log(`${structDatumKey} = `, structDatum.unique_types);
+        // console.log(`${structDatumKey} = `, structDatum.unique_types);
 
+        // to obtain the higher max alignment, but this can be also calculated 
+        // in the next step
         structDatum.unique_types.forEach(ut => {
             const align = typeSizes[ut].align;
             maxAlign = align > maxAlign ? align : maxAlign;
             structDatum.maxAlign = maxAlign;
         });
+
+        console.log('START --------------------------------------')
+        let byteCounter = 0;
+        structDatum.types.forEach((t, i) => {
+            const currentType = t;
+            const nextType = structDatum.types[i + 1];
+            const currentTypeData = typeSizes[currentType]
+            const nextTypeData = typeSizes[nextType]
+
+            byteCounter += currentTypeData.size;
+            if(currentTypeData.size === structDatum.maxAlign){
+                return
+            }
+
+            if(!nextType){
+                return
+            }
+
+            if(nextTypeData.align == structDatum.maxAlign){
+                byteCounter += addBytesToAlign(byteCounter, structDatum.maxAlign);
+            }
+        });
+
+        byteCounter +=  addBytesToAlign(byteCounter, structDatum.maxAlign);
+
+        console.log('---- byteCounter', byteCounter)
+        console.log('NEXT --------------------------------------')
+
     }
 }
 
