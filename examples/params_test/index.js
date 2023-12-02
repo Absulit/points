@@ -38,6 +38,7 @@ const base = {
         struct Variable{
             init: i32,
             color: vec4f,
+            another: i32 ,
         }
 
         struct Variable2 {
