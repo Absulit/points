@@ -37,7 +37,7 @@ const base = {
         const result = dataSize(`
         struct Variable{
             init: i32,
-            color: vec4f,
+            // color: vec4f,
             another: i32 ,
         }
 

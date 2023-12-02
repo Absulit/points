@@ -98,9 +98,9 @@ function getInsideStruct(value) {
     return lines;
 }
 
-function getStructName(value) {
+function getStructDataByName(value) {
     const matches = value.matchAll(getStructNameRE);
-    let result = {};
+    let result = new Map();
     for (const match of matches) {
         const captured = match[0]
         const name = match[1];
@@ -112,25 +112,34 @@ function getStructName(value) {
             const type = right.split(',')[0].trim()
             return type;
         })
-        result[name] = {
+        result.set(name, {
             captured,
             lines,
             types,
             unique_types: [...new Set(types)]
-        }
+        });
     }
-    console.log(result);
-    // return result;
+    // console.log(result);
+    return result;
 }
 
 export const dataSize = value => {
-
     console.log('---- dataSize', value);
 
     const noCommentsValue = removeComments(value);
     console.log('---- dataSize', noCommentsValue);
-    getStructName(noCommentsValue)
+    const structData = getStructDataByName(noCommentsValue);
+    console.log('---- dataSize', structData);
+    let maxAlign = 0
+    for (const [structDatumKey, structDatum] of structData) {
+        console.log(`${structDatumKey} = `, structDatum.unique_types);
 
+        structDatum.unique_types.forEach(ut => {
+            const align = typeSizes[ut].align;
+            maxAlign = align > maxAlign ? align : maxAlign;
+            structDatum.maxAlign = maxAlign;
+        });
+    }
 }
 
 
