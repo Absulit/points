@@ -36,23 +36,40 @@ const base = {
 
         var startTime = performance.now()
         const result = dataSize(`
-        struct Ex4a {
+          struct Ex {
             velocity: vec3f,
           };
 
-          struct Ex4 {
-            orientation: vec3f,
-            size: f32,
-            direction: array<vec3f, 1>,
-            scale: f32,
-            info: Ex4a,
+          struct Ex1 {
+            direction: array<Ex, 2>,
             friction: f32,
           };
+
+          // struct Ex2 {
+          //   direction: array<Ex, 2>,
+          //   friction: f32,
+          // };
+
+          // struct Ex3 {
+          //   direction: array<Ex, 2>,
+          // };
+
+          // struct ExA {
+          //   orientation: vec3f,
+          //   size: f32,
+          //   scale: f32,
+          //   info: Ex,
+          //   direction: array<Ex, 2>,
+          //   friction: f32,
+          // };
         `);
         var endTime = performance.now()
 
         console.log(`Call to doSomething took ${endTime - startTime} milliseconds`)
-        console.log(result)
+        for(let [r,c] of result){
+          console.log(r,c.bytes)
+
+        }
 
 
         points.addStorageMap('test', [1, 0, 0, .5], 'vec4f');
