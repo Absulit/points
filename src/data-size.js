@@ -145,6 +145,15 @@ function addBytesToAlign(bytes, aligment) {
     return result;
 }
 
+/**
+ * 
+ * @param {String} value 
+ * @returns {boolean}
+ */
+function isArray(value) {
+    return value.indexOf('array') != -1;
+}
+
 export const dataSize = value => {
     const noCommentsValue = removeComments(value);
     const structData = getStructDataByName(noCommentsValue);
@@ -156,7 +165,7 @@ export const dataSize = value => {
             let maxAlign = structDatum.maxAlign || 0;
             // if it doesn't exists in typeSizes is an Array or a new Struct
             if (!typeSizes[ut]) {
-                if (ut.indexOf('array') != -1) {
+                if (isArray(ut)) {
 
                     const [d] = getArrayTypeAndAmount(ut);
                     const t = typeSizes[d.type]
@@ -202,7 +211,7 @@ export const dataSize = value => {
             if (!currentTypeData) {
 
                 if (currentType) {
-                    if (currentType.indexOf('array') != -1) {
+                    if (isArray(currentType)) {
                         const [d] = getArrayTypeAndAmount(currentType);
                         const t = typeSizes[d.type]
                         if (t) {
@@ -232,7 +241,7 @@ export const dataSize = value => {
             if (!nextTypeData) {
                 if (nextType) {
 
-                    if (nextType.indexOf('array') != -1) {
+                    if (isArray(nextType)) {
                         const [d] = getArrayTypeAndAmount(nextType);
                         const t = typeSizes[d.type]
                         if (t) {
