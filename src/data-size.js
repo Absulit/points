@@ -141,19 +141,14 @@ export const dataSize = value => {
         // to obtain the higher max alignment, but this can be also calculated
         // in the next step
         structDatum.unique_types.forEach(ut => {
-            console.log(typeSizes[ut], ut)
-
             // if it doesn't exists in typeSizes is an Array or a new Struct
             if(!typeSizes[ut]){
-                const UT = structData.get(ut)
-                console.log(UT);
+                const sd = structData.get(ut)
                 // return;
-
-                const align = UT.maxAlign;
+                const align = sd.maxAlign;
                 maxAlign = align > maxAlign ? align : maxAlign;
                 structDatum.maxAlign = maxAlign;
             }else{
-
                 const align = typeSizes[ut].align;
                 maxAlign = align > maxAlign ? align : maxAlign;
                 structDatum.maxAlign = maxAlign;
@@ -168,26 +163,26 @@ export const dataSize = value => {
             let currentTypeData = typeSizes[currentType]
             let nextTypeData = typeSizes[nextType]
 
+            // if currentTypeData or nextTypeData have no data it means
+            // it's a struct or an array
+            // if it's a struct the data is already saved in structData
+            // because it was calculated previously
+            // assuming the struct was declared previously
             if(!currentTypeData){
-                console.log(t, i, currentType);
-                const UT = structData.get(currentType)
-                console.log(UT);
-                if(UT){
-                    currentTypeData = {size: UT.bytes, align: UT.maxAlign}
+                const sd = structData.get(currentType)
+                if(sd){
+                    currentTypeData = {size: sd.bytes, align: sd.maxAlign}
                 }
             }
-
+            // read above
             if(!nextTypeData){
-                console.log(t, i, nextType);
-                const UT = structData.get(nextType)
-                console.log(UT);
-                if(UT){
-                    nextTypeData = {size: UT.bytes, align: UT.maxAlign}
+                const sd = structData.get(nextType)
+                if(sd){
+                    nextTypeData = {size: sd.bytes, align: sd.maxAlign}
                 }
             }
 
             byteCounter += currentTypeData.size;
-            console.log(nextType, nextTypeData)
             if ((currentTypeData.size === structDatum.maxAlign) || !nextType) {
                 return
             }
