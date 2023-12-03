@@ -75,6 +75,8 @@ const getStructNameRE = /struct\s+?(\w+)\s*{[^}]+}\n?/g
 // what's inside a struct:
 const insideStructRE = /struct\s+?\w+\s*{([^}]+)}\n?/g
 
+const arrayTypeAndAmountRE = /\s*<\s*([^,]+)\s*,\s*(\d+)\s*>/
+
 // you have to separete the result by splitting new lines
 
 function removeComments(value) {
