@@ -107,7 +107,7 @@ function getStructDataByName(value) {
         const lines = getInsideStruct(captured);
         const types = lines.map(l => {
             const right = l.split(':')[1];
-            const type = right.split(',')[0].trim()
+            const type = right.slice(',', -1).trim()
             return type;
         })
         result.set(name, {
@@ -137,22 +137,57 @@ export const dataSize = value => {
     const structData = getStructDataByName(noCommentsValue);
     let maxAlign = 0
     for (const [structDatumKey, structDatum] of structData) {
+
         // to obtain the higher max alignment, but this can be also calculated
         // in the next step
         structDatum.unique_types.forEach(ut => {
-            const align = typeSizes[ut].align;
-            maxAlign = align > maxAlign ? align : maxAlign;
-            structDatum.maxAlign = maxAlign;
+            console.log(typeSizes[ut], ut)
+
+            // if it doesn't exists in typeSizes is an Array or a new Struct
+            if(!typeSizes[ut]){
+                const UT = structData.get(ut)
+                console.log(UT);
+                // return;
+
+                const align = UT.maxAlign;
+                maxAlign = align > maxAlign ? align : maxAlign;
+                structDatum.maxAlign = maxAlign;
+            }else{
+
+                const align = typeSizes[ut].align;
+                maxAlign = align > maxAlign ? align : maxAlign;
+                structDatum.maxAlign = maxAlign;
+            }
+
         });
 
         let byteCounter = 0;
         structDatum.types.forEach((t, i) => {
             const currentType = t;
             const nextType = structDatum.types[i + 1];
-            const currentTypeData = typeSizes[currentType]
-            const nextTypeData = typeSizes[nextType]
+            let currentTypeData = typeSizes[currentType]
+            let nextTypeData = typeSizes[nextType]
+
+            if(!currentTypeData){
+                console.log(t, i, currentType);
+                const UT = structData.get(currentType)
+                console.log(UT);
+                if(UT){
+                    currentTypeData = {size: UT.bytes, align: UT.maxAlign}
+                }
+            }
+
+            if(!nextTypeData){
+                console.log(t, i, nextType);
+                const UT = structData.get(nextType)
+                console.log(UT);
+                if(UT){
+                    nextTypeData = {size: UT.bytes, align: UT.maxAlign}
+                }
+            }
 
             byteCounter += currentTypeData.size;
+            console.log(nextType, nextTypeData)
             if ((currentTypeData.size === structDatum.maxAlign) || !nextType) {
                 return
             }

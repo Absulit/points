@@ -36,22 +36,18 @@ const base = {
 
         var startTime = performance.now()
         const result = dataSize(`
-        struct Variable{
-            init: i32,
-            color: vec4f,
-            another: i32 ,
-        }
+        struct Ex4a {
+            velocity: vec3f,
+          };
 
-        struct Variable2 {
-            v: vec4f,
-            f: vec3f,
-            a: f32,
-            z: vec2f,
-            b: f32,
-            c: f32,
-            d: mat4x4f,
-            // vv: Variable,
-        }
+          struct Ex4 {
+            orientation: vec3f,
+            size: f32,
+            // direction: array<vec3f, 1>,
+            scale: f32,
+            info: Ex4a,
+            friction: f32,
+          };
         `);
         var endTime = performance.now()
 
