@@ -104,8 +104,6 @@ function getStructDataByName(value) {
     for (const match of matches) {
         const captured = match[0]
         const name = match[1];
-        console.log(name, captured);
-        // result += captured;
         const lines = getInsideStruct(captured);
         const types = lines.map(l => {
             const right = l.split(':')[1];
@@ -119,14 +117,13 @@ function getStructDataByName(value) {
             unique_types: [...new Set(types)]
         });
     }
-    // console.log(result);
     return result;
 }
 
-function addBytesToAlign(bytes, aligment){
+function addBytesToAlign(bytes, aligment) {
     const remainder = bytes % aligment
     let result = 0;
-    if(remainder !== 0){
+    if (remainder !== 0) {
         // if not multiple we obtain the diff
         // and add it to byteCounter to make it fit the alignment
         const multipleDiff = aligment - remainder
@@ -136,17 +133,11 @@ function addBytesToAlign(bytes, aligment){
 }
 
 export const dataSize = value => {
-    console.log('---- dataSize', value);
-
     const noCommentsValue = removeComments(value);
-    console.log('---- dataSize', noCommentsValue);
     const structData = getStructDataByName(noCommentsValue);
-    console.log('---- dataSize', structData);
     let maxAlign = 0
     for (const [structDatumKey, structDatum] of structData) {
-        // console.log(`${structDatumKey} = `, structDatum.unique_types);
-
-        // to obtain the higher max alignment, but this can be also calculated 
+        // to obtain the higher max alignment, but this can be also calculated
         // in the next step
         structDatum.unique_types.forEach(ut => {
             const align = typeSizes[ut].align;
@@ -154,7 +145,6 @@ export const dataSize = value => {
             structDatum.maxAlign = maxAlign;
         });
 
-        console.log('START --------------------------------------')
         let byteCounter = 0;
         structDatum.types.forEach((t, i) => {
             const currentType = t;
@@ -163,34 +153,17 @@ export const dataSize = value => {
             const nextTypeData = typeSizes[nextType]
 
             byteCounter += currentTypeData.size;
-            if(currentTypeData.size === structDatum.maxAlign){
+            if ((currentTypeData.size === structDatum.maxAlign) || !nextType) {
                 return
             }
 
-            if(!nextType){
-                return
-            }
-
-            if(nextTypeData.align == structDatum.maxAlign){
+            if (nextTypeData.align == structDatum.maxAlign) {
                 byteCounter += addBytesToAlign(byteCounter, structDatum.maxAlign);
             }
         });
 
-        byteCounter +=  addBytesToAlign(byteCounter, structDatum.maxAlign);
-
-        console.log('---- byteCounter', byteCounter)
-        console.log('NEXT --------------------------------------')
-
+        byteCounter += addBytesToAlign(byteCounter, structDatum.maxAlign);
+        structDatum.bytes = byteCounter
     }
+    return structData;
 }
-
-
-// // const result = re.exec(value);
-// const matches = value.matchAll(removeCommentsRE);
-// for (const match of matches) {
-//     console.log(match)
-//     const captured = match[0]
-//     const name = match[1]
-//     // console.log(name)
-//     console.log(captured)
-// }

@@ -34,6 +34,7 @@ const base = {
 
         // }`))
 
+        var startTime = performance.now()
         const result = dataSize(`
         struct Variable{
             init: i32,
@@ -41,33 +42,20 @@ const base = {
             another: i32 ,
         }
 
-        struct Params {
-                sliderA:f32,
-                sliderB:f32,
-                sliderC:f32,
-                test3:vec4f,
-                time:f32,
-                epoch:f32,
-                screenWidth:f32,
-                screenHeight:f32,
-                mouseX:f32,
-                mouseY:f32,
-                mouseClick:f32,
-                mouseDown:f32,
-                mouseWheel:f32,
-                mouseDeltaX:f32,
-                mouseDeltaY:f32,
-    
-            }
-
-
         struct Variable2 {
             v: vec4f,
-            f: i32,
-            z: i32,
+            f: vec3f,
+            a: f32,
+            z: vec2f,
+            b: f32,
+            c: f32,
+            d: mat4x4f,
+            // vv: Variable,
         }
-
         `);
+        var endTime = performance.now()
+
+        console.log(`Call to doSomething took ${endTime - startTime} milliseconds`)
         console.log(result)
 
 
