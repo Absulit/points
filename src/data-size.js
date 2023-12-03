@@ -163,37 +163,24 @@ export const dataSize = value => {
         // in the next step
         structDatum.unique_types.forEach(ut => {
             let maxAlign = structDatum.maxAlign || 0;
+            let align = 0;
             // if it doesn't exists in typeSizes is an Array or a new Struct
             if (!typeSizes[ut]) {
                 if (isArray(ut)) {
-
                     const [d] = getArrayTypeAndAmount(ut);
-                    const t = typeSizes[d.type];
-                    if (t) {
-                        const align = t.align;
-                        maxAlign = align > maxAlign ? align : maxAlign;
-                        structDatum.maxAlign = maxAlign;
-
-                    } else {
-                        const sd = structData.get(d.type);
-                        const align = sd.maxAlign;
-                        maxAlign = align > maxAlign ? align : maxAlign;
-                        structDatum.maxAlign = maxAlign;
-                    }
+                    // if it's not in tySizes is an struct,
+                    //therefore probably stored in structData
+                    const t = typeSizes[d.type] || structData.get(d.type);
+                    align = t.align || t.maxAlign;
                 } else {
                     const sd = structData.get(ut);
-                    // return;
-                    const align = sd.maxAlign;
-                    maxAlign = align > maxAlign ? align : maxAlign;
-                    structDatum.maxAlign = maxAlign;
+                    align = sd.maxAlign;
                 }
-
             } else {
-                const align = typeSizes[ut].align;
-                maxAlign = align > maxAlign ? align : maxAlign;
-                structDatum.maxAlign = maxAlign;
+                align = typeSizes[ut].align;
             }
-
+            maxAlign = align > maxAlign ? align : maxAlign;
+            structDatum.maxAlign = maxAlign;
         });
 
         let byteCounter = 0;
@@ -209,7 +196,6 @@ export const dataSize = value => {
             // because it was calculated previously
             // assuming the struct was declared previously
             if (!currentTypeData) {
-
                 if (currentType) {
                     if (isArray(currentType)) {
                         const [d] = getArrayTypeAndAmount(currentType);
@@ -225,9 +211,7 @@ export const dataSize = value => {
                                 currentTypeData = { size: sd.bytes * d.amount, align: sd.maxAlign };
                             }
                         }
-
                     } else {
-
                         const sd = structData.get(currentType);
                         if (sd) {
                             currentTypeData = { size: sd.bytes, align: sd.maxAlign };
@@ -235,12 +219,10 @@ export const dataSize = value => {
 
                     }
                 }
-
             }
             // read above
             if (!nextTypeData) {
                 if (nextType) {
-
                     if (isArray(nextType)) {
                         const [d] = getArrayTypeAndAmount(nextType);
                         const t = typeSizes[d.type];

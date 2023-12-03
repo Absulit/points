@@ -36,37 +36,44 @@ const base = {
 
         var startTime = performance.now()
         const result = dataSize(`
-          struct Ex {
-            velocity: vec3f,
-          };
+        struct Ex {
+          velocity: vec3f,
+        };
 
-          struct Ex1 {
-            direction: array<Ex, 2>,
-            friction: f32,
-          };
+        struct Ex1 {
+          direction: array<Ex, 2>,
+          friction: f32,
+        };
 
-          struct Ex2 {
-            direction: array<Ex, 2>,
-            friction: f32,
-          };
+        struct Ex2 {
+          direction: array<Ex, 2>,
+          friction: f32,
+        };
 
-          struct Ex3 {
-            direction: array<Ex, 2>,
-          };
+        struct Ex3 {
+          direction: array<Ex, 2>,
+        };
 
-          struct ExA {
-            orientation: vec3f,
-            size: f32,
-            scale: f32,
-            info: Ex,
-            friction: f32,
-            direction: array<Ex, 2>,
-            direction2: array<Ex, 10>,
-          };
+        struct ExA {
+          orientation: vec3f,
+          size: f32,
+          scale: f32,
+          info: Ex,
+          friction: f32,
+          direction: array<Ex, 2>,
+          direction2: array<Ex, 10>,
+        };
+
+        struct Event {
+          updated: u32,
+          data: array<f32,1>,
+      }
+
         `);
         var endTime = performance.now()
 
         console.log(`Call to doSomething took ${endTime - startTime} milliseconds`)
+        console.log(result);
         for(let [r,c] of result){
           console.log(r,c.bytes)
 
