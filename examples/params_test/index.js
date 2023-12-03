@@ -43,7 +43,7 @@ const base = {
           struct Ex4 {
             orientation: vec3f,
             size: f32,
-            // direction: array<vec3f, 1>,
+            direction: array<vec3f, 1>,
             scale: f32,
             info: Ex4a,
             friction: f32,
