@@ -153,11 +153,10 @@ export const dataSize = value => {
         // to obtain the higher max alignment, but this can be also calculated
         // in the next step
         structDatum.unique_types.forEach(ut => {
-            let maxAlign = 0
+            let maxAlign = structDatum.maxAlign || 0;
             // if it doesn't exists in typeSizes is an Array or a new Struct
             if (!typeSizes[ut]) {
                 if (ut.indexOf('array') != -1) {
-
 
                     const [d] = getArrayTypeAndAmount(ut);
                     const t = typeSizes[d.type]
@@ -172,9 +171,6 @@ export const dataSize = value => {
                         maxAlign = align > maxAlign ? align : maxAlign;
                         structDatum.maxAlign = maxAlign;
                     }
-
-
-
                 } else {
                     const sd = structData.get(ut)
                     // return;
@@ -207,7 +203,6 @@ export const dataSize = value => {
 
                 if (currentType) {
                     if (currentType.indexOf('array') != -1) {
-                        //TODO: here
                         const [d] = getArrayTypeAndAmount(currentType);
                         const t = typeSizes[d.type]
                         if (t) {
@@ -238,7 +233,6 @@ export const dataSize = value => {
                 if (nextType) {
 
                     if (nextType.indexOf('array') != -1) {
-                        //TODO: here
                         const [d] = getArrayTypeAndAmount(nextType);
                         const t = typeSizes[d.type]
                         if (t) {

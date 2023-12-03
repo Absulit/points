@@ -45,23 +45,24 @@ const base = {
             friction: f32,
           };
 
-          // struct Ex2 {
-          //   direction: array<Ex, 2>,
-          //   friction: f32,
-          // };
+          struct Ex2 {
+            direction: array<Ex, 2>,
+            friction: f32,
+          };
 
-          // struct Ex3 {
-          //   direction: array<Ex, 2>,
-          // };
+          struct Ex3 {
+            direction: array<Ex, 2>,
+          };
 
-          // struct ExA {
-          //   orientation: vec3f,
-          //   size: f32,
-          //   scale: f32,
-          //   info: Ex,
-          //   direction: array<Ex, 2>,
-          //   friction: f32,
-          // };
+          struct ExA {
+            orientation: vec3f,
+            size: f32,
+            scale: f32,
+            info: Ex,
+            friction: f32,
+            direction: array<Ex, 2>,
+            direction2: array<Ex, 10>,
+          };
         `);
         var endTime = performance.now()
 
