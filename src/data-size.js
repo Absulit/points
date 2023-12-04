@@ -111,7 +111,6 @@ function getStructDataByName(value) {
         const lines = getInsideStruct(captured);
         const types = lines.map(l => {
             const right = l.split(':')[1];
-            console.log(right);
             let type = '';
             if (isArray(right)) {
                 const arrayMatch = right.matchAll(arrayIntegrityRE);
@@ -121,7 +120,6 @@ function getStructDataByName(value) {
             }
             return type;
         })
-        console.log(types);
         result.set(name, {
             captured,
             lines,
@@ -178,11 +176,13 @@ export const dataSize = value => {
             if (!typeSizes[ut]) {
                 if (isArray(ut)) {
                     const [d] = getArrayTypeAndAmount(ut);
-                    console.log(d)
-                    if(!!d.amount){
+                    const t = typeSizes[d.type] || structData.get(d.type);
+                    if (!t) {
+                        throw new Error(`${d.type} type has not been declared previously`)
+                    }
+                    if (!!d.amount) {
                         // if it's not in tySizes is an struct,
                         //therefore probably stored in structData
-                        const t = typeSizes[d.type] || structData.get(d.type);
                         align = t.align || t.maxAlign;
                     }
                 } else {
@@ -212,7 +212,10 @@ export const dataSize = value => {
                 if (currentType) {
                     if (isArray(currentType)) {
                         const [d] = getArrayTypeAndAmount(currentType);
-                        if(!!d.amount){
+                        if (d.amount == 0) {
+                            throw new Error(`${currentType} has an amount of 0`);
+                        }
+                        if (!!d.amount) {
                             const t = typeSizes[d.type];
                             if (t) {
                                 // if array, the size is equal to the align
@@ -240,7 +243,10 @@ export const dataSize = value => {
                 if (nextType) {
                     if (isArray(nextType)) {
                         const [d] = getArrayTypeAndAmount(nextType);
-                        if(!!d.amount){
+                        if (d.amount == 0) {
+                            throw new Error(`${nextType} has an amount of 0`);
+                        }
+                        if (!!d.amount) {
                             const t = typeSizes[d.type];
                             if (t) {
                                 // nextTypeData = { size: t.align * d.amount, align: t.align };
@@ -262,16 +268,14 @@ export const dataSize = value => {
                 }
             }
 
-            console.log(currentTypeData, currentType);
-            if(!!currentTypeData){
+            if (!!currentTypeData) {
                 byteCounter += currentTypeData.size;
                 if ((currentTypeData.size === structDatum.maxAlign) || !nextType) {
                     return;
                 }
             }
 
-            console.log(nextTypeData, nextType);
-            if(!!nextTypeData){
+            if (!!nextTypeData) {
                 if (nextTypeData.align == structDatum.maxAlign) {
                     byteCounter += addBytesToAlign(byteCounter, structDatum.maxAlign);
                 }

@@ -36,9 +36,9 @@ const base = {
 
         var startTime = performance.now()
         const result = dataSize(`
-        // struct Ex {
-        //   velocity: vec3f ,
-        // };
+        struct Ex {
+          velocity: vec3f ,
+        };
 
         // struct Ex1 {
         //   direction: array<Ex, 2>,
@@ -66,7 +66,7 @@ const base = {
 
         struct Event {
           updated: u32,
-          data: array<f32, 0>
+          data: array<Ex>
         }
 
         `);
