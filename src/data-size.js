@@ -75,7 +75,7 @@ const getStructNameRE = /struct\s+?(\w+)\s*{[^}]+}\n?/g
 // what's inside a struct:
 const insideStructRE = /struct\s+?\w+\s*{([^}]+)}\n?/g
 
-const arrayTypeAndAmountRE = /\s*<\s*([^,]+)\s*,\s*(\d+)\s*>/g
+const arrayTypeAndAmountRE = /\s*<\s*([^,]+)\s*,?\s*(\d+)?\s*>/g
 
 const arrayIntegrityRE = /\s*(array\s*<\s*\w+\s*(?:,\s*\d+)?\s*>)\s*,?/g
 
@@ -178,10 +178,13 @@ export const dataSize = value => {
             if (!typeSizes[ut]) {
                 if (isArray(ut)) {
                     const [d] = getArrayTypeAndAmount(ut);
-                    // if it's not in tySizes is an struct,
-                    //therefore probably stored in structData
-                    const t = typeSizes[d.type] || structData.get(d.type);
-                    align = t.align || t.maxAlign;
+                    console.log(d)
+                    if(!!d.amount){
+                        // if it's not in tySizes is an struct,
+                        //therefore probably stored in structData
+                        const t = typeSizes[d.type] || structData.get(d.type);
+                        align = t.align || t.maxAlign;
+                    }
                 } else {
                     const sd = structData.get(ut);
                     align = sd.maxAlign;
@@ -209,16 +212,18 @@ export const dataSize = value => {
                 if (currentType) {
                     if (isArray(currentType)) {
                         const [d] = getArrayTypeAndAmount(currentType);
-                        const t = typeSizes[d.type];
-                        if (t) {
-                            // if array, the size is equal to the align
-                            // currentTypeData = { size: t.align * d.amount, align: t.align };
-                            currentTypeData = { size: t.size * d.amount, align: t.align };
-                            // currentTypeData = { size: 0, align: 0 };
-                        } else {
-                            const sd = structData.get(d.type);
-                            if (sd) {
-                                currentTypeData = { size: sd.bytes * d.amount, align: sd.maxAlign };
+                        if(!!d.amount){
+                            const t = typeSizes[d.type];
+                            if (t) {
+                                // if array, the size is equal to the align
+                                // currentTypeData = { size: t.align * d.amount, align: t.align };
+                                currentTypeData = { size: t.size * d.amount, align: t.align };
+                                // currentTypeData = { size: 0, align: 0 };
+                            } else {
+                                const sd = structData.get(d.type);
+                                if (sd) {
+                                    currentTypeData = { size: sd.bytes * d.amount, align: sd.maxAlign };
+                                }
                             }
                         }
                     } else {
@@ -235,15 +240,17 @@ export const dataSize = value => {
                 if (nextType) {
                     if (isArray(nextType)) {
                         const [d] = getArrayTypeAndAmount(nextType);
-                        const t = typeSizes[d.type];
-                        if (t) {
-                            // nextTypeData = { size: t.align * d.amount, align: t.align };
-                            nextTypeData = { size: t.size * d.amount, align: t.align };
-                            // nextTypeData = { size: 0, align: 0 };
-                        } else {
-                            const sd = structData.get(d.type);
-                            if (sd) {
-                                nextTypeData = { size: sd.bytes * d.amount, align: sd.maxAlign };
+                        if(!!d.amount){
+                            const t = typeSizes[d.type];
+                            if (t) {
+                                // nextTypeData = { size: t.align * d.amount, align: t.align };
+                                nextTypeData = { size: t.size * d.amount, align: t.align };
+                                // nextTypeData = { size: 0, align: 0 };
+                            } else {
+                                const sd = structData.get(d.type);
+                                if (sd) {
+                                    nextTypeData = { size: sd.bytes * d.amount, align: sd.maxAlign };
+                                }
                             }
                         }
                     } else {
@@ -255,13 +262,19 @@ export const dataSize = value => {
                 }
             }
 
-            byteCounter += currentTypeData.size;
-            if ((currentTypeData.size === structDatum.maxAlign) || !nextType) {
-                return;
+            console.log(currentTypeData, currentType);
+            if(!!currentTypeData){
+                byteCounter += currentTypeData.size;
+                if ((currentTypeData.size === structDatum.maxAlign) || !nextType) {
+                    return;
+                }
             }
 
-            if (nextTypeData.align == structDatum.maxAlign) {
-                byteCounter += addBytesToAlign(byteCounter, structDatum.maxAlign);
+            console.log(nextTypeData, nextType);
+            if(!!nextTypeData){
+                if (nextTypeData.align == structDatum.maxAlign) {
+                    byteCounter += addBytesToAlign(byteCounter, structDatum.maxAlign);
+                }
             }
         });
 
