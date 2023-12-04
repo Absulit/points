@@ -66,7 +66,7 @@ const base = {
 
         struct Event {
           updated: u32,
-          data: array<Ex>
+          data: array<f32>
         }
 
         `);

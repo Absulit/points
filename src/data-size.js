@@ -184,6 +184,12 @@ export const dataSize = value => {
                         // if it's not in tySizes is an struct,
                         //therefore probably stored in structData
                         align = t.align || t.maxAlign;
+                    } else {
+                        // check if strucData and get the align
+                        const t = structData.get(d.type)
+                        if (t) {
+                            align = t.maxAlign;
+                        }
                     }
                 } else {
                     const sd = structData.get(ut);
