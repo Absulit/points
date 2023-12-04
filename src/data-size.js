@@ -180,17 +180,11 @@ export const dataSize = value => {
                     if (!t) {
                         throw new Error(`${d.type} type has not been declared previously`)
                     }
-                    if (!!d.amount) {
-                        // if it's not in tySizes is an struct,
-                        //therefore probably stored in structData
-                        align = t.align || t.maxAlign;
-                    } else {
-                        // check if strucData and get the align
-                        const t = structData.get(d.type)
-                        if (t) {
-                            align = t.maxAlign;
-                        }
-                    }
+
+                    // if it's not in typeSizes is a struct,
+                    //therefore probably stored in structData
+                    align = t.align || t.maxAlign;
+
                 } else {
                     const sd = structData.get(ut);
                     align = sd.maxAlign;
