@@ -77,6 +77,8 @@ const insideStructRE = /struct\s+?\w+\s*{([^}]+)}\n?/g
 
 const arrayTypeAndAmountRE = /\s*<\s*([^,]+)\s*,\s*(\d+)\s*>/g
 
+const arrayIntegrityRE = /\s*(array\s*<\s*\w+\s*(?:,\s*\d+)?\s*>)\s*,?/g
+
 // you have to separete the result by splitting new lines
 
 function removeComments(value) {
@@ -109,9 +111,17 @@ function getStructDataByName(value) {
         const lines = getInsideStruct(captured);
         const types = lines.map(l => {
             const right = l.split(':')[1];
-            const type = right.slice(',', -1).trim();
+            console.log(right);
+            let type = '';
+            if (isArray(right)) {
+                const arrayMatch = right.matchAll(arrayIntegrityRE);
+                type = arrayMatch.next().value[1];
+            } else {
+                type = right.split(',')[0].trim();
+            }
             return type;
         })
+        console.log(types);
         result.set(name, {
             captured,
             lines,
