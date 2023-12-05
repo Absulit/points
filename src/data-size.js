@@ -10,7 +10,7 @@ const size_48_align_16 = { size: 48, align: 16 };
 const size_32_align_16 = { size: 32, align: 16 };
 const size_64_align_16 = { size: 64, align: 16 };
 
-const typeSizes = {
+export const typeSizes = {
     'bool': size_4_align_4,
     'f32': size_4_align_4,
     'i32': size_4_align_4,
@@ -165,8 +165,8 @@ function isArray(value) {
 export const dataSize = value => {
     const noCommentsValue = removeComments(value);
     const structData = getStructDataByName(noCommentsValue);
+    console.log('----- A: ', typeSizes[value]);
     for (const [structDatumKey, structDatum] of structData) {
-
         // to obtain the higher max alignment, but this can be also calculated
         // in the next step
         structDatum.unique_types.forEach(ut => {

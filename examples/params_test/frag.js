@@ -30,7 +30,7 @@ fn main(
     finalColor = variables.color;
 
 
-    return finalColor;
+    return params.test3;
 }
 `;
 

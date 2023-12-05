@@ -6,6 +6,7 @@ import Coordinate from './coordinate.js';
 import RGBAColor from './color.js';
 import defaultStructs from './core/defaultStructs.js';
 import { defaultVertexBody } from './core/defaultFunctions.js';
+import { dataSize, typeSizes } from './data-size.js';
 
 export default class Points {
     constructor(canvasId) {
@@ -724,10 +725,10 @@ export default class Points {
         let dynamicGroupBindingsFragment = '';
 
         let dynamicStructParams = '';
-        this._uniforms.forEach(variable => {
-            // console.log(variable)
-            let uniformType = variable.type || 'f32';
-            dynamicStructParams += /*wgsl*/`${variable.name}:${uniformType}, \n\t`;
+        this._uniforms.forEach(u => {
+            console.log(u)
+            u.type = u.type || 'f32';
+            dynamicStructParams += /*wgsl*/`${u.name}:${u.type}, \n\t`;
         });
 
         if (this._uniforms.length) {
@@ -763,6 +764,18 @@ export default class Points {
         renderPass.hasVertexShader && (renderPass.compiledShaders.vertex = colorsVertWGSL);
         renderPass.hasComputeShader && (renderPass.compiledShaders.compute = colorsComputeWGSL);
         renderPass.hasFragmentShader && (renderPass.compiledShaders.fragment = colorsFragWGSL);
+
+        renderPass.dataSize = dataSize(colorsVertWGSL + colorsComputeWGSL + colorsFragWGSL)
+        console.log(renderPass.dataSize);
+
+        // since uniforms are in a sigle struct
+        // this is only required for storage
+        this._storage.forEach(s => {
+            if (!s.mapped) {
+                const d = renderPass.dataSize.get(s.structName);
+                s.structSize = d.bytes;
+            }
+        });
     }
 
     /**
@@ -880,10 +893,12 @@ export default class Points {
      * @param {Boolean} mappedAtCreation
      * @returns mapped buffer
      */
-    _createAndMapBuffer(data, usage, mappedAtCreation = true) {
+    _createAndMapBuffer(data, usage, mappedAtCreation = true, size) {
+        // const paramsDataSize = this._renderPasses[0].dataSize.get('Params')
+        // console.log(data.byteLength, size, data);
         const buffer = this._device.createBuffer({
             mappedAtCreation: mappedAtCreation,
-            size: data.byteLength,
+            size: size || data.byteLength ,
             usage: usage,
         });
 
@@ -911,8 +926,12 @@ export default class Points {
     /** @private */
     _createParametersUniforms() {
         const values = new Float32Array(this._uniforms.map(v => v.value).flat(1));
-        // console.log(values)
-        this._uniforms.buffer = this._createAndMapBuffer(values, GPUBufferUsage.UNIFORM);
+        console.log(values)
+
+        const paramsDataSize = this._renderPasses[0].dataSize.get('Params')
+        // console.log(data.byteLength, paramsDataSize.bytes);
+        
+        this._uniforms.buffer = this._createAndMapBuffer(values, GPUBufferUsage.UNIFORM, true, paramsDataSize.bytes);
         // console.log(this._uniforms.buffer)
         // debugger
 
