@@ -726,7 +726,6 @@ export default class Points {
 
         let dynamicStructParams = '';
         this._uniforms.forEach(u => {
-            console.log(u)
             u.type = u.type || 'f32';
             dynamicStructParams += /*wgsl*/`${u.name}:${u.type}, \n\t`;
         });
@@ -898,7 +897,7 @@ export default class Points {
         // console.log(data.byteLength, size, data);
         const buffer = this._device.createBuffer({
             mappedAtCreation: mappedAtCreation,
-            size: size || data.byteLength ,
+            size: size || data.byteLength,
             usage: usage,
         });
 
@@ -925,16 +924,24 @@ export default class Points {
 
     /** @private */
     _createParametersUniforms() {
-        const values = new Float32Array(this._uniforms.map(v => v.value).flat(1));
-        console.log(values)
-
         const paramsDataSize = this._renderPasses[0].dataSize.get('Params')
-        // console.log(data.byteLength, paramsDataSize.bytes);
-        
-        this._uniforms.buffer = this._createAndMapBuffer(values, GPUBufferUsage.UNIFORM, true, paramsDataSize.bytes);
-        // console.log(this._uniforms.buffer)
-        // debugger
+        const paddings = paramsDataSize.paddings;
 
+        // we check the paddings list and add 0's to just the ones that need it
+        const values = new Float32Array(this._uniforms.map(v => {
+            const padding = paddings[v.name];
+            if (padding) {
+                if (v.value.constructor !== Array) {
+                    v.value = [v.value];
+                }
+                for (let i = 0; i < padding; i++) {
+                    v.value.push(0);
+                }
+            }
+            return v.value;
+        }).flat(1));
+
+        this._uniforms.buffer = this._createAndMapBuffer(values, GPUBufferUsage.UNIFORM, true, paramsDataSize.bytes);
     }
 
     /** @private */

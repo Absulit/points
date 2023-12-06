@@ -174,7 +174,7 @@ function isArray(value) {
 export const dataSize = value => {
     const noCommentsValue = removeComments(value);
     const structData = getStructDataByName(noCommentsValue);
-    console.log('----- A: ', typeSizes[value]);
+
     for (const [structDatumKey, structDatum] of structData) {
         // to obtain the higher max alignment, but this can be also calculated
         // in the next step

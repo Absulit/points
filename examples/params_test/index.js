@@ -2,8 +2,6 @@ import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
 import Points from '../../src/absulit.points.module.js';
-// import { wgslTypeSize } from '../../src/wgslTypeSize.js';
-import { makeShaderDataDefinitions } from './../../src/data-definitions.js';
 import { dataSize } from '../../src/data-size.js';
 
 const base = {
@@ -15,24 +13,7 @@ const base = {
      * @param {Points} points
      */
     init: async points => {
-        // console.log(makeShaderDataDefinitions(`struct Params {
-        //     sliderA:f32,
-        //     sliderB:f32,
-        //     sliderC:f32,
-        //     test3:vec4f,
-        //     time:f32,
-        //     epoch:f32,
-        //     screenWidth:f32,
-        //     screenHeight:f32,
-        //     mouseX:f32,
-        //     mouseY:f32,
-        //     mouseClick:f32,
-        //     mouseDown:f32,
-        //     mouseWheel:f32,
-        //     mouseDeltaX:f32,
-        //     mouseDeltaY:f32,
 
-        // }`))
 
         var startTime = performance.now()
         const result = dataSize(`
