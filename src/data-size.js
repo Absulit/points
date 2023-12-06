@@ -207,10 +207,13 @@ export const dataSize = value => {
 
         let byteCounter = 0;
         structDatum.types.forEach((t, i) => {
+            const name = structDatum.names[i];
             const currentType = t;
             const nextType = structDatum.types[i + 1];
             let currentTypeData = typeSizes[currentType];
             let nextTypeData = typeSizes[nextType];
+
+            structDatum.paddings = structDatum.paddings || {};
 
             // if currentTypeData or nextTypeData have no data it means
             // it's a struct or an array
@@ -286,7 +289,9 @@ export const dataSize = value => {
 
             if (!!nextTypeData) {
                 if (nextTypeData.align == structDatum.maxAlign) {
+                    const lastByteCounter = byteCounter;
                     byteCounter += addBytesToAlign(byteCounter, structDatum.maxAlign);
+                    structDatum.paddings[name] = (byteCounter - lastByteCounter) / 4;
                 }
             }
         });
