@@ -119,12 +119,21 @@ function getStructDataByName(value) {
                 type = right.split(',')[0].trim();
             }
             return type;
-        })
+        });
+
+        const names = lines.map(l => {
+            const left = l.split(':')[0];
+            let name = '';
+            name = left.split(',')[0].trim();
+            return name;
+        });
+
         result.set(name, {
             captured,
             lines,
             types,
-            unique_types: [...new Set(types)]
+            unique_types: [...new Set(types)],
+            names,
         });
     }
     return result;
