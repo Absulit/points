@@ -98,7 +98,7 @@ const base = {
         points.addStorage('variables', 1, 'Variable', 32);
         points.addStorage('test2', 1, 'TestStruct', 32);
 
-        points.addUniform('test3', [1, 0, 0, 1], 'vec4f', 16)
+        points.addUniform('test3', [1, 0, 0, 1], 'vec4f');
 
 
     },

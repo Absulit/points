@@ -204,9 +204,10 @@ export default class Points {
      * from the outside, and unless changed it remains
      * consistent. To change it use `updateUniform()`
      * @param {string} name name of the Param, you can invoke it later in shaders as `Params.[name]`
-     * @param {Number} value Number will be converted to `f32`
+     * @param {Number|Array} value Single number or a list of numbers
+     * @param {string} structName type as `f32` or a custom struct
      */
-    addUniform(name, value, structName, structSize) {
+    addUniform(name, value, structName) {
         if (this._nameExists(this._uniforms, name)) {
             return;
         }
@@ -215,7 +216,7 @@ export default class Points {
             name: name,
             value: value,
             type: structName,
-            size: structSize,
+            size: null,
             internal: this._internal
         });
     }
@@ -771,8 +772,8 @@ export default class Points {
         // this is only required for storage
         this._storage.forEach(s => {
             if (!s.mapped) {
-                const d = renderPass.dataSize.get(s.structName);
-                s.structSize = d.bytes;
+                const d = renderPass.dataSize.get(s.structName) || typeSizes[s.structName];
+                s.structSize = d.bytes || d.size;
             }
         });
     }
