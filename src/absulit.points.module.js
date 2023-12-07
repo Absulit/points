@@ -789,11 +789,7 @@ export default class Points {
         // initializing internal uniforms
         this.addUniform(UniformKeys.TIME, this._time);
         this.addUniform(UniformKeys.EPOCH, this._epoch);
-        // this.addUniform(UniformKeys.SCREEN_WIDTH, 0);
-        // this.addUniform(UniformKeys.SCREEN_HEIGHT, 0);
         this.addUniform(UniformKeys.SCREEN, [0, 0], 'vec2f');
-        // this.addUniform(UniformKeys.MOUSE_X, this._mouseX);
-        // this.addUniform(UniformKeys.MOUSE_Y, this._mouseY);
         this.addUniform(UniformKeys.MOUSE, [0, 0], 'vec2f');
         this.addUniform(UniformKeys.MOUSE_CLICK, this._mouseClick);
         this.addUniform(UniformKeys.MOUSE_DOWN, this._mouseDown);
@@ -1419,11 +1415,7 @@ export default class Points {
         this._epoch = new Date() / 1000;
         this.updateUniform(UniformKeys.TIME, this._time);
         this.updateUniform(UniformKeys.EPOCH, this._epoch);
-        // this.updateUniform(UniformKeys.SCREEN_WIDTH, this._canvas.width);
-        // this.updateUniform(UniformKeys.SCREEN_HEIGHT, this._canvas.height);
         this.updateUniform(UniformKeys.SCREEN, [this._canvas.width, this._canvas.height]);
-        // this.updateUniform(UniformKeys.MOUSE_X, this._mouseX);
-        // this.updateUniform(UniformKeys.MOUSE_Y, this._mouseY);
         this.updateUniform(UniformKeys.MOUSE, [this._mouseX, this._mouseY]);
 
         this.updateUniform(UniformKeys.MOUSE_CLICK, this._mouseClick);
