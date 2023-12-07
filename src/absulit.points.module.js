@@ -766,7 +766,6 @@ export default class Points {
         renderPass.hasFragmentShader && (renderPass.compiledShaders.fragment = colorsFragWGSL);
 
         renderPass.dataSize = dataSize(colorsVertWGSL + colorsComputeWGSL + colorsFragWGSL)
-        console.log(renderPass.dataSize);
 
         // since uniforms are in a sigle struct
         // this is only required for storage

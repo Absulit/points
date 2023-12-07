@@ -240,6 +240,9 @@ export const dataSize = value => {
                                     currentTypeData = { size: sd.bytes * d.amount, align: sd.maxAlign };
                                 }
                             }
+                        } else {
+                            // if is an array with no amount then use these default values
+                            currentTypeData = { size: 16, align: 16 };
                         }
                     } else {
                         const sd = structData.get(currentType);
