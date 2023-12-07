@@ -17,7 +17,7 @@ struct Colors{
 }
 
 fn getPointsIndex(position:vec2<u32>) -> u32{
-    return position.y + (position.x * u32(params.screenWidth));
+    return position.y + (position.x * u32(params.screen.x));
 }
 
 fn getColorAt(position:vec2<u32>) -> vec4<f32> {
@@ -59,8 +59,8 @@ fn main(
     @builtin(workgroup_id) WorkGroupID: vec3<u32>,
     @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
 ) {
-    let numColumns:f32 = params.screenWidth;
-    let numRows:f32 = params.screenHeight;
+    let numColumns:f32 = params.screen.x;
+    let numRows:f32 = params.screen.y;
 
     var x = 450.;
     var y = 450.;

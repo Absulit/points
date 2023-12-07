@@ -25,7 +25,7 @@ const CHROMATICDISPLACEMENT = 0.003695;
 fn main(
     @location(0) color: vec4<f32>,
     @location(1) uv: vec2<f32>,
-    @location(2) ratio: vec2<f32>,  // relation between params.screenWidth and params.screenHeight
+    @location(2) ratio: vec2<f32>,  // relation between params.screen.x and params.screen.y
     @location(3) uvr: vec2<f32>,    // uv with aspect ratio corrected
     @location(4) mouse: vec2<f32>,
     @builtin(position) position: vec4<f32>
@@ -38,16 +38,16 @@ fn main(
     let subuv = fract(uvr * vec2(numColumns, numRows));
     let subuvColor = vec4(subuv, 0, 1);
 
-    let pixelsWidth = params.screenWidth / numColumns;
-    let pixelsHeight = params.screenHeight / numRows;
-    let dx = pixelsWidth * (1. / params.screenWidth);
-    let dy = pixelsHeight * (1. / params.screenHeight);
+    let pixelsWidth = params.screen.x / numColumns;
+    let pixelsHeight = params.screen.y / numRows;
+    let dx = pixelsWidth * (1. / params.screen.x);
+    let dy = pixelsHeight * (1. / params.screen.y);
     let pixeleduv = vec2(dx*floor( uvr.x / dx), dy * floor( uvr.y / dy));
     let pixeleduvColor = vec4(pixeleduv, 0, 1);
 
     let fontPosition = vec2(0.,0.);
     let charSize = vec2(8u,22u);
-    let charSizeF32 = vec2(f32(charSize.x) / params.screenWidth, f32(charSize.y) / params.screenHeight);
+    let charSizeF32 = vec2(f32(charSize.x) / params.screen.x, f32(charSize.y) / params.screen.y);
     let charAIndex = 33u; // A
 
     let chars = array<u32, NUMCHARS>(15,14,8,13,19,18);

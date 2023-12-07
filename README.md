@@ -281,7 +281,7 @@ fn main(
 }
 ```
 
-The `defaultVertexBody` returns a `Fragment` struct that provides the parameters for `frag.js` , it adds a ratio parameter with the ratio of the width and height of the canvas, and the mouse position as a `vec2<f32>` . The mouse position is different from the `params.mouseX` and `params.mouseY` , but it uses its values to calculate them in the UV space. The uv is ratio corrected, meaning that if your canvas is wider than taller, a portion of the uv will be out of bounds to mantain the aspect ratio. This might change later to a new uv[some name] to differentiate them, and still have the regular uv space to calculate the screen. Right now if you need to do that in a different canvas size rather than a 1:1 dimension, you have to use ratio to deconstruct the original value.
+The `defaultVertexBody` returns a `Fragment` struct that provides the parameters for `frag.js` , it adds a ratio parameter with the ratio of the width and height of the canvas, and the mouse position as a `vec2<f32>` . The mouse position is different from the `params.mouse.x` and `params.mouse.y` , but it uses its values to calculate them in the UV space. The uv is ratio corrected, meaning that if your canvas is wider than taller, a portion of the uv will be out of bounds to mantain the aspect ratio. This might change later to a new uv[some name] to differentiate them, and still have the regular uv space to calculate the screen. Right now if you need to do that in a different canvas size rather than a 1:1 dimension, you have to use ratio to deconstruct the original value.
 
 ```rust
 // defaultStructs.js
@@ -289,7 +289,7 @@ struct Fragment {
     @builtin(position) position: vec4<f32>,
     @location(0) color: vec4<f32>,          // vertex color
     @location(1) uv: vec2<f32>,             // uv coordinate
-    @location(2) ratio: vec2<f32>,          // relation between `params.screenWidth` and `params.screenHeight`
+    @location(2) ratio: vec2<f32>,          // relation between `params.screen.x` and `params.screen.y`
     @location(3) uvr: vec2<f32>,            // uv with aspect ratio corrected using `ratio`
     @location(4) mouse: vec2<f32>           // mouse coordinates normalized between 0..1
 }

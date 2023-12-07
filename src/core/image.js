@@ -13,7 +13,7 @@ fn texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>
     let dims: vec2<u32> = textureDimensions(texture, 0);
     let dimsF32 = vec2<f32>(dims);
 
-    let minScreenSize = min(params.screenHeight, params.screenWidth);
+    let minScreenSize = min(params.screen.y, params.screen.x);
     let imageRatio = dimsF32 / minScreenSize;
 
     let displaceImagePosition = position * flipTextureCoordinates / imageRatio + vec2(0, 1);
@@ -49,7 +49,7 @@ fn textureExternalPosition(texture:texture_external, aSampler:sampler, position:
     let dims: vec2<u32> = textureDimensions(texture);
     let dimsF32 = vec2<f32>(f32(dims.x), f32(dims.y));
 
-    let minScreenSize = min(params.screenHeight, params.screenWidth);
+    let minScreenSize = min(params.screen.y, params.screen.x);
     let imageRatio = dimsF32 / minScreenSize;
 
     let displaceImagePosition = position * flipTextureCoordinates / imageRatio + vec2(0, 1);
@@ -84,7 +84,7 @@ fn sprite(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>, uv:vec2
     let dimsF32 = vec2<f32>(dims);
     let sizeF32 = vec2<f32>(size);
 
-    let minScreenSize = min(params.screenHeight, params.screenWidth);
+    let minScreenSize = min(params.screen.y, params.screen.x);
     let imageRatio = dimsF32 / minScreenSize;
 
     let numColumns = (dims.x) / (size.x);
@@ -129,7 +129,7 @@ fn decodeNumberSprite(
 ) -> vec4<f32> {
 
     let sizeF32 = vec2(f32(size.x),f32(size.y));
-    let cellRatio = vec2(sizeF32.x/params.screenWidth,sizeF32.y/params.screenHeight)*ratio;
+    let cellRatio = vec2(sizeF32.x/params.screen.x,sizeF32.y/params.screen.y)*ratio;
 
     let displaceInX = vec2(cellRatio.x, 0);
 
@@ -155,8 +155,8 @@ fn decodeNumberSprite(
  */
 export const pixelateTexture = /*wgsl*/`
 fn pixelateTexture(texture:texture_2d<f32>, textureSampler:sampler, pixelsWidth:f32, pixelsHeight:f32, uv:vec2<f32>) -> vec4<f32> {
-    let dx = pixelsWidth * (1. / params.screenWidth);
-    let dy = pixelsHeight * (1. / params.screenHeight);
+    let dx = pixelsWidth * (1. / params.screen.x);
+    let dy = pixelsHeight * (1. / params.screen.y);
 
     let coord = vec2(dx*floor( uv.x / dx), dy * floor( uv.y / dy));
 
@@ -165,8 +165,8 @@ fn pixelateTexture(texture:texture_2d<f32>, textureSampler:sampler, pixelsWidth:
 `;
 export const pixelateTexturePosition = /*wgsl*/`
 fn pixelateTexturePosition(texture:texture_2d<f32>, textureSampler:sampler, position:vec2<f32>, pixelsWidth:f32, pixelsHeight:f32, uv:vec2<f32>) -> vec4<f32> {
-    let dx = pixelsWidth * (1. / params.screenWidth);
-    let dy = pixelsHeight * (1. / params.screenHeight);
+    let dx = pixelsWidth * (1. / params.screen.x);
+    let dy = pixelsHeight * (1. / params.screen.y);
 
     let coord = vec2(dx*floor( uv.x / dx), dy * floor( uv.y / dy));
 
