@@ -936,7 +936,7 @@ export default class Points {
             if (storageItem.read) {
                 let readStorageItem = {
                     name: storageItem.name,
-                    size: storageItem.size
+                    size: storageItem.structSize
                 }
                 if (storageItem.mapped) {
                     readStorageItem = {
