@@ -255,11 +255,10 @@ export default class Points {
      * Multiply this by number of properties in the struct if necessary.
      * @param {string} structName Name of the struct already existing on the
      * shader that will be the array<structName> of the Storage
-     * @param {Number} structSize number of bytes used by the struct; this includes padding.
      * @param {boolean} read if this is going to be used to read data back
      * @param {ShaderType} shaderType this tells to what shader the storage is bound
      */
-    addStorage(name, size, structName, structSize, read, shaderType, arrayData) {
+    addStorage(name, size, structName, read, shaderType, arrayData) {
         if (this._nameExists(this._storage, name)) {
             return;
         }
@@ -268,20 +267,12 @@ export default class Points {
             name: name,
             size: size,
             structName: structName,
-            structSize: structSize,
+            // structSize: null,
             shaderType: shaderType,
             read: read,
             buffer: null,
             internal: this._internal
         });
-
-        if (read) {
-            let storageItem = {
-                name: name,
-                size: structSize * size
-            }
-            this._readStorage.push(storageItem);
-        }
     }
 
     addStorageMap(name, arrayData, structName, read, shaderType) {
@@ -298,14 +289,6 @@ export default class Points {
             read: read,
             internal: this._internal
         });
-
-        if (read) {
-            let storageItem = {
-                name: name,
-                size: arrayData.length,
-            }
-            this._readStorage.push(storageItem);
-        }
     }
 
     updateStorageMap(name, arrayData) {
@@ -949,7 +932,20 @@ export default class Points {
         //--------------------------------------------
         this._storage.forEach(storageItem => {
             let usage = GPUBufferUsage.STORAGE;
+
             if (storageItem.read) {
+                let readStorageItem = {
+                    name: storageItem.name,
+                    size: storageItem.size
+                }
+                if (storageItem.mapped) {
+                    readStorageItem = {
+                        name: storageItem.name,
+                        size: storageItem.array.length,
+                    }
+                }
+
+                this._readStorage.push(readStorageItem);
                 usage = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC;
             }
             storageItem.usage = usage;
