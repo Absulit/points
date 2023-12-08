@@ -5,18 +5,18 @@ import Points from '../../src/absulit.points.module.js';
 import { dataSize } from '../../src/data-size.js';
 
 const base = {
-    vert,
-    compute,
-    frag,
-    /**
-     *
-     * @param {Points} points
-     */
-    init: async points => {
+  vert,
+  compute,
+  frag,
+  /**
+   *
+   * @param {Points} points
+   */
+  init: async points => {
 
 
-        var startTime = performance.now()
-        const result = dataSize(`
+    var startTime = performance.now()
+    const result = dataSize(`
 
         struct Light {
           mode: u32,
@@ -82,29 +82,29 @@ const base = {
 
 
         `);
-        var endTime = performance.now()
+    var endTime = performance.now()
 
-        console.log(`Call to doSomething took ${endTime - startTime} milliseconds`)
-        console.log(result);
-        for(let [r,c] of result){
-          console.log(r,c.bytes)
-
-        }
-
-
-        points.addStorageMap('test', [1, 0, 0, .5], 'vec4f');
-
-
-        points.addStorage('variables', 1, 'Variable', 32);
-        points.addStorage('test2', 1, 'TestStruct', 32);
-
-        points.addUniform('test3', [1, 0, 0, 1], 'vec4f');
-
-
-    },
-    update: points => {
+    console.log(`Call to doSomething took ${endTime - startTime} milliseconds`)
+    console.log(result);
+    for (let [r, c] of result) {
+      console.log(r, c.bytes)
 
     }
+
+
+    points.addStorageMap('test', [0, 0, 1, .5], 'vec4f');
+
+
+    points.addStorage('variables', 1, 'Variable');
+    points.addStorage('test2', 1, 'TestStruct');
+
+    points.addUniform('test3', [1, 0, 0, 1], 'vec4f');
+
+
+  },
+  update: points => {
+
+  }
 }
 
 export default base;
