@@ -16,7 +16,7 @@ fn texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>
     let minScreenSize = min(params.screen.y, params.screen.x);
     let imageRatio = dimsF32 / minScreenSize;
 
-    let displaceImagePosition = position * flipTextureCoordinates / imageRatio + vec2(0, 1);
+    let displaceImagePosition = position * flipTextureCoordinates / imageRatio + vec2(0., 1.);
     let top = position + vec2(0, imageRatio.y);
 
     let imageUV = uv / imageRatio * flipTexture + displaceImagePosition;
@@ -27,7 +27,7 @@ fn texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>
     let isBeyondTop =  uv.y > top.y ;
     let isBeyondBottom = uv.y < position.y;
     if(crop && (isBeyondTop || isBeyondBottom || isBeyondImageLeft || isBeyondImageRight)){
-        rgbaImage = vec4(0);
+        rgbaImage = vec4(0.);
     }
 
     return rgbaImage;

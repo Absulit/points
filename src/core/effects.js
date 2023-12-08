@@ -1,9 +1,9 @@
 export const euclideanDistance = /*wgsl*/`
 fn euclideanDistance(color:vec4<f32>, distanceColor:vec4<f32>) -> f32{
     return sqrt(
-        pow(color.r - distanceColor.r, 2) +
-        pow(color.g - distanceColor.g, 2) +
-        pow(color.b - distanceColor.b, 2)
+        pow(color.r - distanceColor.r, 2.) +
+        pow(color.g - distanceColor.g, 2.) +
+        pow(color.b - distanceColor.b, 2.)
     );
 }
 `;

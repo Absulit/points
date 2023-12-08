@@ -32,7 +32,7 @@ fn sdfLine(p1:vec2<f32>, p2:vec2<f32>, pixelStroke:f32, uv:vec2<f32>)->f32{
 export const sdfCircle = /*wgsl*/`
 fn sdfCircle(position:vec2<f32>, radius: f32, feather: f32, uv:vec2<f32>) -> f32 {
     let d = distance(uv, position);
-    let st = 1 - smoothstep(radius, radius + feather, d);
+    let st = 1. - smoothstep(radius, radius + feather, d);
     return st;
 }
 `;
