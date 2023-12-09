@@ -8,6 +8,11 @@ ${fnusin}
 ${structs}
 ${rand}
 
+struct Colors{
+    // items: array< vec4<f32>, 800*800 >
+    items: array< vec4<f32>, 640000 >
+}
+
 @fragment
 fn main(
     @location(0) color: vec4<f32>,

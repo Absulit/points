@@ -12,9 +12,10 @@ ${sdfLine2}
 ${sdfCircle}
 ${fnusin}
 
-struct Colors{
-    items: array< vec4<f32>, 800*800 >
-}
+// struct Colors{
+//     // items: array< vec4<f32>, 800*800 >
+//     items: array< vec4<f32>, 640000 >
+// }
 
 fn getPointsIndex(position:vec2<u32>) -> u32{
     return position.y + (position.x * u32(params.screen.x));
