@@ -93,7 +93,7 @@ fn sprite(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>, uv:vec2
     let y = f32(index / numColumns);
     let cell = vec2(x, y);
 
-    let cellIndex = cell + vec2(0,1);
+    let cellIndex = cell + vec2(0,1.);
 
     let cellSize = sizeF32 / minScreenSize;
     let cellSizeInImage = cellSize / imageRatio;
@@ -109,7 +109,7 @@ fn sprite(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>, uv:vec2
     let isBeyondTop =  uv.y > position.y + cellSize.y;
     let isBeyondBottom = uv.y < position.y;
     if(isBeyondTop || isBeyondBottom || isBeyondImageLeft || isBeyondImageRight){
-        rgbaImage = vec4(0);
+        rgbaImage = vec4(0.);
     }
 
     return rgbaImage;

@@ -27,8 +27,8 @@ const data1 = {
 
         points.addStorageMap('secondMatrix', secondMatrix, 'Matrix');
 
-        let resultMatrixBufferSize = 2 + firstMatrix[0] * secondMatrix[1];
-        console.log(resultMatrixBufferSize);
+        // let resultMatrixBufferSize = 2 + firstMatrix[0] * secondMatrix[1];
+        // console.log(resultMatrixBufferSize);
         points.addStorage('resultMatrix', 1, 'Matrix', true);
     },
     update: async points => {

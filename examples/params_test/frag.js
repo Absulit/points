@@ -20,7 +20,7 @@ fn main(
 
     var finalColor:vec4<f32> = vec4();
 
-    if(variables.init == 0){
+    if(variables.init == 0.){
         rand_seed = uvr + params.time;
         rand();
         finalColor = vec4(rand_seed, 0, 1);

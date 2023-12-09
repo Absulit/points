@@ -22,15 +22,15 @@ fn main(
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
-    if(variables.init == 0){
+    if(variables.init == 0.){
         variables.circleRadius = .1;
         variables.circlePosition = vec2(.5, .5) * ratio;
 
-        variables.init = 1;
+        variables.init = 1.;
     }
 
     if(params.mouseWheel == 1.){
-        if(params.mouseDeltaY > 0){
+        if(params.mouseDeltaY > 0.){
             variables.circleRadius += .0001;
         }else{
             variables.circleRadius -= .0001;
@@ -42,7 +42,7 @@ fn main(
     }
 
     let circleValue = sdfCircle(variables.circlePosition, variables.circleRadius, 0., uvr);
-    var finalColor = vec4(1) * circleValue;
+    var finalColor = vec4(1.) * circleValue;
 
     if(params.mouseDown == 1.){
         finalColor *= GREEN;

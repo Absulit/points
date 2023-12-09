@@ -31,7 +31,7 @@ fn main(
     @builtin(position) position: vec4<f32>
 ) -> @location(0) vec4<f32> {
 
-    let n1 = snoise(uvr * 100 * 0.0016 /*params.sliderA*/ + params.time * .1);
+    let n1 = snoise(uvr * 100. * 0.0016 /*params.sliderA*/ + params.time * .1);
 
     let numColumns = 400. * 0.2662 * n1; // params.sliderB;
     let numRows = 400. * 0.3765; // params.sliderC;

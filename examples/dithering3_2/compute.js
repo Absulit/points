@@ -20,7 +20,7 @@ fn main(
     let dims = textureDimensions(image);
 
     var layerIndex = 0;
-    if(variables.init == 0){
+    if(variables.init == 0.){
 
         let pointIndex = i32(GlobalId.y + (GlobalId.x * dims.x));
 

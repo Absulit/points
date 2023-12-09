@@ -18,7 +18,7 @@ fn main(
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
-    let lines = sin( uv.x*(uv.x + 3 * fnusin(1))  ) ;
+    let lines = sin( uv.x*(uv.x + 3. * fnusin(1.))  ) ;
     let startPosition = vec2(0.);
     let rgbaImage = texturePosition(image, feedbackSampler, startPosition, uvr * lines / params.sliderA, false); //* .998046;
 

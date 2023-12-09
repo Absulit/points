@@ -27,7 +27,7 @@ fn main(
     let numRowsPiece:i32 = i32(numRows / f32(workgroupSize));
 
     var layerIndex = 0;
-    if(variables.init == 0){
+    if(variables.init == 0.){
 
         for (var indexColumns:i32 = 0; indexColumns < numColumnsPiece; indexColumns++) {
             let x:f32 = f32(WorkGroupID.x) * f32(numColumnsPiece) + f32(indexColumns);
