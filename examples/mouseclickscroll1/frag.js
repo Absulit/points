@@ -30,7 +30,7 @@ fn main(
     }
 
     if(params.mouseWheel == 1.){
-        if(params.mouseDeltaY > 0.){
+        if(params.mouseDelta.y > 0.){
             variables.circleRadius += .0001;
         }else{
             variables.circleRadius -= .0001;

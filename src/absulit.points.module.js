@@ -93,9 +93,7 @@ export default class Points {
         /** @private */
         this._mouseWheel = false;
         /** @private */
-        this._mouseDeltaX = 0;
-        /** @private */
-        this._mouseDeltaY = 0;
+        this._mouseDelta = [0, 0];
 
         /** @private */
         this._fullscreen = false;
@@ -127,8 +125,7 @@ export default class Points {
 
             this._canvas.addEventListener('wheel', e => {
                 this._mouseWheel = true;
-                this._mouseDeltaX = e.deltaX;
-                this._mouseDeltaY = e.deltaY;
+                this._mouseDelta = [e.deltaX, e.deltaY];
             });
             this._originalCanvasWidth = this._canvas.clientWidth;
             this._originalCanvasHeigth = this._canvas.clientHeight;
@@ -777,8 +774,7 @@ export default class Points {
         this.addUniform(UniformKeys.MOUSE_CLICK, this._mouseClick);
         this.addUniform(UniformKeys.MOUSE_DOWN, this._mouseDown);
         this.addUniform(UniformKeys.MOUSE_WHEEL, this._mouseWheel);
-        this.addUniform(UniformKeys.MOUSE_DELTA_X, this._mouseDeltaX);
-        this.addUniform(UniformKeys.MOUSE_DELTA_Y, this._mouseDeltaY);
+        this.addUniform(UniformKeys.MOUSE_DELTA, this._mouseDelta, 'vec2f');
 
         let hasComputeShaders = this._renderPasses.some(renderPass => renderPass.hasComputeShader);
         if (!hasComputeShaders && this._bindingTextures.length) {
@@ -1417,8 +1413,7 @@ export default class Points {
         this.updateUniform(UniformKeys.MOUSE_CLICK, this._mouseClick);
         this.updateUniform(UniformKeys.MOUSE_DOWN, this._mouseDown);
         this.updateUniform(UniformKeys.MOUSE_WHEEL, this._mouseWheel);
-        this.updateUniform(UniformKeys.MOUSE_DELTA_X, this._mouseDeltaX);
-        this.updateUniform(UniformKeys.MOUSE_DELTA_Y, this._mouseDeltaY);
+        this.updateUniform(UniformKeys.MOUSE_DELTA, this._mouseDelta);
         //--------------------------------------------
 
         this._createParametersUniforms();
@@ -1553,8 +1548,7 @@ export default class Points {
         // reset mouse values because it doesn't happen by itself
         this._mouseClick = false;
         this._mouseWheel = false;
-        this._mouseDeltaX = 0;
-        this._mouseDeltaY = 0;
+        this._mouseDelta = [0, 0];
 
         await this.read();
     }

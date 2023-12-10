@@ -8,6 +8,5 @@ export default class UniformKeys {
     static MOUSE_CLICK = 'mouseClick';
     static MOUSE_DOWN = 'mouseDown';
     static MOUSE_WHEEL = 'mouseWheel';
-    static MOUSE_DELTA_X = 'mouseDeltaX';
-    static MOUSE_DELTA_Y = 'mouseDeltaY';
+    static MOUSE_DELTA = 'mouseDelta';
 }
