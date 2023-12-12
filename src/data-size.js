@@ -162,12 +162,22 @@ function addBytesToAlign(bytes, aligment) {
     return result;
 }
 
+function getPadding(bytes, aligment, nextTypeDataSize) {
+    const nextMultiple = (bytes + aligment - 1) & ~(aligment - 1)
+    const needsPadding = (bytes + nextTypeDataSize) > nextMultiple;
+    let padAmount = 0
+    if (needsPadding) {
+        padAmount = nextMultiple - bytes;
+    }
+    return padAmount;
+}
+
 /**
  * Check if string has 'array' in it
  * @param {String} value
  * @returns {boolean}
  */
-function isArray(value) {
+export function isArray(value) {
     return value.indexOf('array') != -1;
 }
 
@@ -291,15 +301,20 @@ export const dataSize = value => {
             }
 
             if (!!nextTypeData) {
-                if (nextTypeData.align == structDatum.maxAlign) {
-                    const lastByteCounter = byteCounter;
-                    byteCounter += addBytesToAlign(byteCounter, structDatum.maxAlign);
-                    structDatum.paddings[name] = (byteCounter - lastByteCounter) / 4;
+                const padAmount = getPadding(byteCounter, structDatum.maxAlign, nextTypeData.size)
+                if (padAmount) {
+                    structDatum.paddings[name] = padAmount / 4;
+                    byteCounter += padAmount;
                 }
             }
         });
 
-        byteCounter += addBytesToAlign(byteCounter, structDatum.maxAlign);
+        const padAmount = getPadding(byteCounter, structDatum.maxAlign, 16)
+        if (padAmount) {
+            structDatum.paddings[''] = padAmount / 4;
+            byteCounter += padAmount;
+        }
+
         structDatum.bytes = byteCounter;
     }
     return structData;

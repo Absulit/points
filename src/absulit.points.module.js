@@ -6,7 +6,7 @@ import Coordinate from './coordinate.js';
 import RGBAColor from './color.js';
 import defaultStructs from './core/defaultStructs.js';
 import { defaultVertexBody } from './core/defaultFunctions.js';
-import { dataSize, typeSizes } from './data-size.js';
+import { dataSize, isArray, typeSizes } from './data-size.js';
 
 export default class Points {
     constructor(canvasId) {
@@ -205,6 +205,9 @@ export default class Points {
      * @param {string} structName type as `f32` or a custom struct
      */
     addUniform(name, value, structName) {
+        if(structName && isArray(structName)){
+            throw `${structName} is an array, which is currently not supported for Uniforms.`;
+        }
         if (this._nameExists(this._uniforms, name)) {
             return;
         }
@@ -870,14 +873,11 @@ export default class Points {
      * @returns mapped buffer
      */
     _createAndMapBuffer(data, usage, mappedAtCreation = true, size) {
-        // const paramsDataSize = this._renderPasses[0].dataSize.get('Params')
-        // console.log(data.byteLength, size, data);
         const buffer = this._device.createBuffer({
             mappedAtCreation: mappedAtCreation,
             size: size || data.byteLength,
             usage: usage,
         });
-
         new Float32Array(buffer.getMappedRange()).set(data);
         buffer.unmap();
         return buffer;
@@ -905,7 +905,8 @@ export default class Points {
         const paddings = paramsDataSize.paddings;
 
         // we check the paddings list and add 0's to just the ones that need it
-        const values = new Float32Array(this._uniforms.map(v => {
+
+        let arrayValues = this._uniforms.map(v => {
             const padding = paddings[v.name];
             if (padding) {
                 if (v.value.constructor !== Array) {
@@ -916,8 +917,16 @@ export default class Points {
                 }
             }
             return v.value;
-        }).flat(1));
+        }).flat(1);
 
+        const finalPadding = paddings[''];
+        if (finalPadding) {
+            for (let i = 0; i < finalPadding; i++) {
+                arrayValues.push(0);
+            }
+        }
+
+        const values = new Float32Array(arrayValues);
         this._uniforms.buffer = this._createAndMapBuffer(values, GPUBufferUsage.UNIFORM, true, paramsDataSize.bytes);
     }
 
@@ -1221,7 +1230,6 @@ export default class Points {
                     );
                 }
             });
-            // console.log(entries)
         }
 
         if (this._layers.length) {
@@ -1691,5 +1699,4 @@ export default class Points {
     videoRecordStop() {
         this.mediaRecorder.stop();
     }
-
 }
