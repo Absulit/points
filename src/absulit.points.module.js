@@ -205,7 +205,7 @@ export default class Points {
      * @param {string} structName type as `f32` or a custom struct
      */
     addUniform(name, value, structName) {
-        if(structName && isArray(structName)){
+        if (structName && isArray(structName)) {
             throw `${structName} is an array, which is currently not supported for Uniforms.`;
         }
         if (this._nameExists(this._uniforms, name)) {
@@ -747,14 +747,21 @@ export default class Points {
         renderPass.hasVertexShader && (renderPass.compiledShaders.vertex = colorsVertWGSL);
         renderPass.hasComputeShader && (renderPass.compiledShaders.compute = colorsComputeWGSL);
         renderPass.hasFragmentShader && (renderPass.compiledShaders.fragment = colorsFragWGSL);
+    }
 
-        renderPass.dataSize = dataSize(colorsVertWGSL + colorsComputeWGSL + colorsFragWGSL)
+    _generateDataSize = () => {
+        const allShaders = this._renderPasses.map(renderPass => {
+            const { vertex, compute, fragment } = renderPass.compiledShaders;
+            return vertex + compute + fragment;;
+        }).join('\n');
+
+        this._dataSize = dataSize(allShaders);
 
         // since uniforms are in a sigle struct
         // this is only required for storage
         this._storage.forEach(s => {
             if (!s.mapped) {
-                const d = renderPass.dataSize.get(s.structName) || typeSizes[s.structName];
+                const d = this._dataSize.get(s.structName) || typeSizes[s.structName];
                 s.structSize = d.bytes || d.size;
             }
         });
@@ -785,6 +792,7 @@ export default class Points {
         }
 
         this._renderPasses.forEach(this._compileRenderPass);
+        this._generateDataSize();
         //
 
 
@@ -901,7 +909,7 @@ export default class Points {
 
     /** @private */
     _createParametersUniforms() {
-        const paramsDataSize = this._renderPasses[0].dataSize.get('Params')
+        const paramsDataSize = this._dataSize.get('Params')
         const paddings = paramsDataSize.paddings;
 
         // we check the paddings list and add 0's to just the ones that need it
