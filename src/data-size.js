@@ -139,7 +139,7 @@ function getStructDataByName(value) {
     return result;
 }
 
-function getArrayTypeAndAmount(value) {
+export function getArrayTypeAndAmount(value) {
     const matches = value.matchAll(arrayTypeAndAmountRE);
     let result = [];
     for (const match of matches) {
@@ -181,6 +181,18 @@ export function isArray(value) {
     return value.indexOf('array') != -1;
 }
 
+export function getArrayAlign(structName, structData){
+    const [d] = getArrayTypeAndAmount(structName);
+    const t = typeSizes[d.type] || structData.get(d.type);
+    if (!t) {
+        throw new Error(`${d.type} type has not been declared previously`)
+    }
+
+    // if it's not in typeSizes is a struct,
+    //therefore probably stored in structData
+    return t.align || t.maxAlign;
+}
+
 export const dataSize = value => {
     const noCommentsValue = removeComments(value);
     const structData = getStructDataByName(noCommentsValue);
@@ -194,16 +206,7 @@ export const dataSize = value => {
             // if it doesn't exists in typeSizes is an Array or a new Struct
             if (!typeSizes[ut]) {
                 if (isArray(ut)) {
-                    const [d] = getArrayTypeAndAmount(ut);
-                    const t = typeSizes[d.type] || structData.get(d.type);
-                    if (!t) {
-                        throw new Error(`${d.type} type has not been declared previously`)
-                    }
-
-                    // if it's not in typeSizes is a struct,
-                    //therefore probably stored in structData
-                    align = t.align || t.maxAlign;
-
+                    align = getArrayAlign(ut, structData);
                 } else {
                     const sd = structData.get(ut);
                     align = sd.maxAlign;
