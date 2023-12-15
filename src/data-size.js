@@ -181,7 +181,7 @@ export function isArray(value) {
     return value.indexOf('array') != -1;
 }
 
-export function getArrayAlign(structName, structData){
+export function getArrayAlign(structName, structData) {
     const [d] = getArrayTypeAndAmount(structName);
     const t = typeSizes[d.type] || structData.get(d.type);
     if (!t) {
@@ -191,6 +191,30 @@ export function getArrayAlign(structName, structData){
     // if it's not in typeSizes is a struct,
     //therefore probably stored in structData
     return t.align || t.maxAlign;
+}
+
+export function getArrayTypeData(currentType, structData) {
+    const [d] = getArrayTypeAndAmount(currentType);
+    if (d.amount == 0) {
+        throw new Error(`${currentType} has an amount of 0`);
+    }
+    // if is an array with no amount then use these default values
+    let currentTypeData = { size: 16, align: 16 };
+    if (!!d.amount) {
+        const t = typeSizes[d.type];
+        if (t) {
+            // if array, the size is equal to the align
+            // currentTypeData = { size: t.align * d.amount, align: t.align };
+            currentTypeData = { size: t.size * d.amount, align: t.align };
+            // currentTypeData = { size: 0, align: 0 };
+        } else {
+            const sd = structData.get(d.type);
+            if (sd) {
+                currentTypeData = { size: sd.bytes * d.amount, align: sd.maxAlign };
+            }
+        }
+    }
+    return currentTypeData;
 }
 
 export const dataSize = value => {
@@ -236,33 +260,12 @@ export const dataSize = value => {
             if (!currentTypeData) {
                 if (currentType) {
                     if (isArray(currentType)) {
-                        const [d] = getArrayTypeAndAmount(currentType);
-                        if (d.amount == 0) {
-                            throw new Error(`${currentType} has an amount of 0`);
-                        }
-                        if (!!d.amount) {
-                            const t = typeSizes[d.type];
-                            if (t) {
-                                // if array, the size is equal to the align
-                                // currentTypeData = { size: t.align * d.amount, align: t.align };
-                                currentTypeData = { size: t.size * d.amount, align: t.align };
-                                // currentTypeData = { size: 0, align: 0 };
-                            } else {
-                                const sd = structData.get(d.type);
-                                if (sd) {
-                                    currentTypeData = { size: sd.bytes * d.amount, align: sd.maxAlign };
-                                }
-                            }
-                        } else {
-                            // if is an array with no amount then use these default values
-                            currentTypeData = { size: 16, align: 16 };
-                        }
+                        currentTypeData = getArrayTypeData(currentType, structData);
                     } else {
                         const sd = structData.get(currentType);
                         if (sd) {
                             currentTypeData = { size: sd.bytes, align: sd.maxAlign };
                         }
-
                     }
                 }
             }
@@ -270,23 +273,7 @@ export const dataSize = value => {
             if (!nextTypeData) {
                 if (nextType) {
                     if (isArray(nextType)) {
-                        const [d] = getArrayTypeAndAmount(nextType);
-                        if (d.amount == 0) {
-                            throw new Error(`${nextType} has an amount of 0`);
-                        }
-                        if (!!d.amount) {
-                            const t = typeSizes[d.type];
-                            if (t) {
-                                // nextTypeData = { size: t.align * d.amount, align: t.align };
-                                nextTypeData = { size: t.size * d.amount, align: t.align };
-                                // nextTypeData = { size: 0, align: 0 };
-                            } else {
-                                const sd = structData.get(d.type);
-                                if (sd) {
-                                    nextTypeData = { size: sd.bytes * d.amount, align: sd.maxAlign };
-                                }
-                            }
-                        }
+                        nextTypeData = getArrayTypeData(nextType, structData);
                     } else {
                         const sd = structData.get(nextType)
                         if (sd) {

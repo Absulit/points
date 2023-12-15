@@ -6,7 +6,7 @@ import Coordinate from './coordinate.js';
 import RGBAColor from './color.js';
 import defaultStructs from './core/defaultStructs.js';
 import { defaultVertexBody } from './core/defaultFunctions.js';
-import { dataSize, isArray, typeSizes } from './data-size.js';
+import { dataSize, getArrayAlign, getArrayTypeAndAmount, getArrayTypeData, isArray, typeSizes } from './data-size.js';
 
 export default class Points {
     constructor(canvasId) {
@@ -761,8 +761,13 @@ export default class Points {
         // this is only required for storage
         this._storage.forEach(s => {
             if (!s.mapped) {
-                const d = this._dataSize.get(s.structName) || typeSizes[s.structName];
-                s.structSize = d.bytes || d.size;
+                if (isArray(s.structName)) {
+                    const typeData = getArrayTypeData(s.structName, this._dataSize);
+                    s.structSize = typeData.size;
+                } else {
+                    const d = this._dataSize.get(s.structName) || typeSizes[s.structName];
+                    s.structSize = d.bytes || d.size;
+                }
             }
         });
     }
