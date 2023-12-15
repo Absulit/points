@@ -774,7 +774,7 @@ export default class Points {
 
     /**
      * One time function to call to initialize the shaders.
-     * @param {array<RenderPass>} renderPasses Collection of RenderPass, which contain Vertex, Compute and Fragment shaders.
+     * @param {Array<RenderPass>} renderPasses Collection of RenderPass, which contain Vertex, Compute and Fragment shaders.
      * @returns false | undefined
      */
     async init(renderPasses) {
