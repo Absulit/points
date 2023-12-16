@@ -265,7 +265,7 @@ export default class Points {
         this._storage.push({
             mapped: !!arrayData,
             name: name,
-            size: 1, // TODO: remove
+            // size: 1, // TODO: remove
             structName: structName,
             // structSize: null,
             shaderType: shaderType,
@@ -611,14 +611,6 @@ export default class Points {
             let internalCheck = internal == storageItem.internal;
             if (!storageItem.shaderType && internalCheck || storageItem.shaderType == shaderType && internalCheck) {
                 let T = storageItem.structName;
-                if (!storageItem.mapped) {
-                    if (storageItem.array?.length) {
-                        storageItem.size = storageItem.array.length;
-                    }
-                    if (storageItem.size > 1) {
-                        T = `array<${storageItem.structName}>`;
-                    }
-                }
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, read_write> ${storageItem.name}: ${T};\n`
                 bindingIndex += 1;
             }
@@ -972,7 +964,7 @@ export default class Points {
                 const values = new Float32Array(storageItem.array);
                 storageItem.buffer = this._createAndMapBuffer(values, usage);
             } else {
-                storageItem.buffer = this._createBuffer(storageItem.size * storageItem.structSize, usage);
+                storageItem.buffer = this._createBuffer(storageItem.structSize, usage);
             }
         });
         //--------------------------------------------
