@@ -26,7 +26,7 @@ const base = {
         }, 4);
 
 
-        points.addStorage('result', 10, 'f32', 4);
+        points.addStorage('result', 'array<f32, 10>', 4);
 
         // RenderPasses.filmgrain(points);
         // RenderPasses.bloom(points, .1);

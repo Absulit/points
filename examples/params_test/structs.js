@@ -1,6 +1,6 @@
 export const structs = /*wgsl*/`
     struct Variable{
-        init: i32,
+        init: f32,
         color: vec4f,
     }
 

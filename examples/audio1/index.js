@@ -22,7 +22,7 @@ const base = {
             audio.play();
         }, 4);
         // points.addAudio('audio', 'https://mdn.github.io/voice-change-o-matic/audio/concert-crowd.ogg', volume, loop);
-        points.addStorage('result', 10, 'f32', 4);
+        points.addStorage('result', 'f32');
     },
     /**
      *

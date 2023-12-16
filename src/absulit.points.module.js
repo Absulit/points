@@ -211,7 +211,7 @@ export default class Points {
         if (this._nameExists(this._uniforms, name)) {
             return;
         }
-        // TODO: add a third parameter with a type, so a struct can be defined and pass things like booleans
+
         this._uniforms.push({
             name: name,
             value: value,
@@ -258,14 +258,14 @@ export default class Points {
      * @param {boolean} read if this is going to be used to read data back
      * @param {ShaderType} shaderType this tells to what shader the storage is bound
      */
-    addStorage(name, size, structName, read, shaderType, arrayData) {
+    addStorage(name, structName, read, shaderType, arrayData) {
         if (this._nameExists(this._storage, name)) {
             return;
         }
         this._storage.push({
             mapped: !!arrayData,
             name: name,
-            size: size,
+            size: 1, // TODO: remove
             structName: structName,
             // structSize: null,
             shaderType: shaderType,
@@ -563,6 +563,7 @@ export default class Points {
      * @param {Function} callback function to be called when the event occurs
      */
     addEventListener(name, callback, structSize) {
+        // TODO: remove structSize
         // this extra 4 is for the boolean flag in the Event struct
         let data = Array(structSize + 4).fill(0);
         this.addStorageMap(name, data, 'Event', true);

@@ -6,8 +6,8 @@ const noise1 = {
     init: async points => {
         const numPoints = 800*800;
         points.addUniform('value_noise_data_length', numPoints);
-        points.addStorage('value_noise_data', numPoints, 'f32', 4);
-        points.addStorage('variables', 1, 'Variable', 4);
+        points.addStorage('value_noise_data', `array<f32, ${numPoints}>`);
+        points.addStorage('variables', 'Variable');
     },
     update: points => {
 

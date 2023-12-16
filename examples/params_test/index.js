@@ -95,10 +95,12 @@ const base = {
     points.addStorageMap('test', [0, 0, 1, .5], 'vec4f');
 
 
-    points.addStorage('variables', 1, 'Variable');
-    points.addStorage('test2', 1, 'TestStruct');
+    points.addStorage('variables', 'Variable');
+    points.addStorage('test2', 'TestStruct');
 
     points.addUniform('test3', [1, 0, 0, 1], 'vec4f');
+
+    points.addStorage('anim', 'array<Variable>');
 
     // points.addUniform('test4', [1, 0, 0, 1], 'array< vec4<f32>, 1 >');
     // TODO: throw error if using array in uniform?
