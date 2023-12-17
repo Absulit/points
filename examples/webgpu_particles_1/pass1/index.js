@@ -4,4 +4,4 @@ import compute from './compute.js';
 
 import RenderPass from './../../../src/RenderPass.js';
 
-export default new RenderPass(vert, frag, compute);
+export default new RenderPass(null, null, compute);

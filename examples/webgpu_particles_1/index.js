@@ -7,10 +7,12 @@ import {
 } from 'https://wgpu-matrix.org/dist/2.x/wgpu-matrix.module.js';
 
 import renderPass0 from './pass0/index.js';
+import renderPass1 from './pass1/index.js';
 
 const base = {
     renderPasses: [
-        renderPass0
+        // renderPass0,
+        renderPass1,
     ],
     /**
      *
@@ -68,15 +70,20 @@ const base = {
         points.addUniform('right', right, 'vec3<f32>');
         points.addUniform('up', up, 'vec3<f32>');
         points.addUniform('modelViewProjectionMatrix', modelViewProjectionMatrix, 'mat4x4<f32>');
-        
+
         points.addUniform('deltaTime', 0);
-        points.addUniform('seed', [0,0,0,0], 'vec4f');
+        points.addUniform('seed', [0, 0, 0, 0], 'vec4f');
 
         points.addStorage('data', 'Particles');
         await points.addTextureImage('texture', 'webgpu_particles_1/webgpu.png');
         // points.addUniform('render_params', data, 'RenderParams');
 
-        // TODO: bug, invert MOUSE_DELTA and MOUSE_WHEEL positions in addUniforms
+        points.addUniform('ubo_width', 1, 'u32');
+        // points.addStorage()
+        points.addStorage('buf_in', 'Buffer', true);
+        points.addStorage('buf_out', 'Buffer');
+
+        points.addBindingTexture('tex_out', 'tex_in')
     },
     update: points => {
 
