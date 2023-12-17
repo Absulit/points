@@ -265,7 +265,6 @@ export default class Points {
         this._storage.push({
             mapped: !!arrayData,
             name: name,
-            // size: 1, // TODO: remove
             structName: structName,
             // structSize: null,
             shaderType: shaderType,
@@ -911,8 +910,8 @@ export default class Points {
         const paddings = paramsDataSize.paddings;
 
         // we check the paddings list and add 0's to just the ones that need it
-
-        let arrayValues = this._uniforms.map(v => {
+        const uniformsClone = JSON.parse(JSON.stringify(this._uniforms));
+        let arrayValues = uniformsClone.map(v => {
             const padding = paddings[v.name];
             if (padding) {
                 if (v.value.constructor !== Array) {
