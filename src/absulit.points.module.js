@@ -758,6 +758,9 @@ export default class Points {
                     s.structSize = typeData.size;
                 } else {
                     const d = this._dataSize.get(s.structName) || typeSizes[s.structName];
+                    if(!d){
+                        throw `${s.structName} has not been defined.`
+                    }
                     s.structSize = d.bytes || d.size;
                 }
             }

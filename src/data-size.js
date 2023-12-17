@@ -215,7 +215,7 @@ export function getArrayTypeData(currentType, structData) {
         }
     } else {
         const t = typeSizes[d.type] || structData.get(d.type);
-        currentTypeData = { size: t.bytes, align: t.maxAlign };
+        currentTypeData = { size: t.size || t.bytes, align: t.maxAlign };
     }
     return currentTypeData;
 }
