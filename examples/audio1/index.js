@@ -20,9 +20,9 @@ const base = {
         audio = points.addAudio('audio', './../../audio/cognitive_dissonance.mp3', volume, loop, false);
         points.addEventListener('click_event', data => {
             audio.play();
-        }, 2);
+        }, 4);
         // points.addAudio('audio', 'https://mdn.github.io/voice-change-o-matic/audio/concert-crowd.ogg', volume, loop);
-        points.addStorage('result', 10, 'f32', 1);
+        points.addStorage('result', 'f32');
     },
     /**
      *

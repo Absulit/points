@@ -35,17 +35,17 @@ fn main(
 
     let size = vec2(8u,22u);
     let sizeF32 = vec2(f32(size.x),f32(size.y));
-    let cellRatio = vec2(sizeF32.x/params.screenWidth,sizeF32.y/params.screenHeight)*ratio;
+    let cellRatio = vec2(sizeF32.x/params.screen.x,sizeF32.y/params.screen.y)*ratio;
 
     let displaceInX = vec2(cellRatio.x, 0);
     let start0char = 16u;
 
-    var numberToDecode = params.mouseX;
+    var numberToDecode = params.mouse.x;
 
     let digits = RED * decodeNumberSprite(numberToDecode, start0char, image, imageSampler, startPosition, uvr * scaleDigits, ratio, size).r;
     // -----------------------------------------------
-    numberToDecode = params.mouseY;
-    let startPosition2 = startPosition - vec2(0, sizeF32.x/params.screenHeight)*ratio;
+    numberToDecode = params.mouse.y;
+    let startPosition2 = startPosition - vec2(0, sizeF32.x/params.screen.y)*ratio;
     let digits2 = GREEN * decodeNumberSprite(numberToDecode, start0char, image, imageSampler, startPosition2, uvr * scaleDigits, ratio, size).r;
 
 

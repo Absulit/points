@@ -18,8 +18,8 @@ fn main(
     @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
 ) {
 
-    let numColumns:f32 = params.screenWidth;
-    let numRows:f32 = params.screenHeight;
+    let numColumns:f32 = params.screen.x;
+    let numRows:f32 = params.screen.y;
 
     rand_seed.x += f32(WorkGroupID.x);
     rand_seed.y += f32(WorkGroupID.y);

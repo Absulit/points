@@ -12,8 +12,6 @@ const base = {
      * @param {Points} points
      */
     init: async points => {
-        // points.addStorage('event', 1, 'array<f32>', 4, true);
-
         points.addEventListener('left_blink', data => {
             console.log('---- Left Circle');
         }, 4);

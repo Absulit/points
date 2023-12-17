@@ -23,10 +23,10 @@ const base = {
 
         points.addEventListener('click_event', data => {
             audio.play();
-        }, 2);
+        }, 4);
 
 
-        points.addStorage('result', 10, 'f32', 1);
+        points.addStorage('result', 'array<f32, 10>', 4);
 
         // RenderPasses.filmgrain(points);
         // RenderPasses.bloom(points, .1);

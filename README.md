@@ -78,17 +78,16 @@ const points = new Points('gl-canvas');
 
 // create your render pass with three shaders as follow
 const renderPasses = [
-    new RenderPass( /*wgsl*/ `
-        // add @vertex string
-    `,
-        /*wgsl*/
+    new RenderPass(
+        /*wgsl*/ `
+            // add @vertex string
+        `,
+        /*wgsl*/`
+            // add @fragment string
+        `,
+        /*wgsl*/`
+            // add @compute string
         `
-        // add @compute string
-    `,
-        /*wgsl*/
-        `
-        // add @fragment string
-    `
     )
 ];
 
@@ -239,10 +238,12 @@ Globally there's a uniform struct called `Params` and its instance called `param
 struct Params {
     time:f32,
     epoch:f32,
-    screenWidth:f32,
-    screenHeight:f32,
-    mouseX:f32,
-    mouseY:f32,
+    screen:vec2f,
+    mouse:vec2f,
+    mouseClick:f32,
+    mouseDown:f32,
+    mouseWheel:f32,
+    mouseDelta:vec2f,
 }
 ```
 
@@ -250,10 +251,8 @@ struct Params {
 | ------------- |:-------------                             | -----:        |
 | time          | seconds since the app started             | 10.11         |
 | epoch         | seconds since jan 1st 1970 UTC            | 1674958734.777|
-| screenWidth   | pixels in x dimension                     |    800        |
-| screenHeight  | pixels in y dimension                     |    600        |
-| mouseX        | mouse x coordinate from 0 to screenWidth  |    100        |
-| mouseY        | mouse y coordinate from 0 to screenHeight |    150        |
+| screen        | pixels in x and y dimensions              |    800, 600   |
+| mouse         | mouse coordinates from (0, 0) to screen   |    100, 150   |
 
 ```rust
 // frag.js
@@ -282,7 +281,7 @@ fn main(
 }
 ```
 
-The `defaultVertexBody` returns a `Fragment` struct that provides the parameters for `frag.js` , it adds a ratio parameter with the ratio of the width and height of the canvas, and the mouse position as a `vec2<f32>` . The mouse position is different from the `params.mouseX` and `params.mouseY` , but it uses its values to calculate them in the UV space. The uv is ratio corrected, meaning that if your canvas is wider than taller, a portion of the uv will be out of bounds to mantain the aspect ratio. This might change later to a new uv[some name] to differentiate them, and still have the regular uv space to calculate the screen. Right now if you need to do that in a different canvas size rather than a 1:1 dimension, you have to use ratio to deconstruct the original value.
+The `defaultVertexBody` returns a `Fragment` struct that provides the parameters for `frag.js` , it adds a ratio parameter with the ratio of the width and height of the canvas, and the mouse position as a `vec2<f32>` . The mouse position is different from the `params.mouse.x` and `params.mouse.y` , but it uses its values to calculate them in the UV space. The uv is ratio corrected, meaning that if your canvas is wider than taller, a portion of the uv will be out of bounds to mantain the aspect ratio. This might change later to a new uv[some name] to differentiate them, and still have the regular uv space to calculate the screen. Right now if you need to do that in a different canvas size rather than a 1:1 dimension, you have to use ratio to deconstruct the original value.
 
 ```rust
 // defaultStructs.js
@@ -290,7 +289,7 @@ struct Fragment {
     @builtin(position) position: vec4<f32>,
     @location(0) color: vec4<f32>,          // vertex color
     @location(1) uv: vec2<f32>,             // uv coordinate
-    @location(2) ratio: vec2<f32>,          // relation between `params.screenWidth` and `params.screenHeight`
+    @location(2) ratio: vec2<f32>,          // relation between `params.screen.x` and `params.screen.y`
     @location(3) uvr: vec2<f32>,            // uv with aspect ratio corrected using `ratio`
     @location(4) mouse: vec2<f32>           // mouse coordinates normalized between 0..1
 }
@@ -335,13 +334,21 @@ You can call one of the following methods, you pair the data with a `key` name, 
 
 ## Uniforms - addUniform
 
-Uniforms are sent separately in the `main.js` file and they are all combined in the shaders in the struct called `params` . Currently, by default, all values are `f32` . Uniforms can not be modified at runtime inside the shaders, they can only receive data from the JavaScript side.
+Uniforms are sent separately in the `main.js` file and they are all combined in the shaders in the struct called `params` . By default, all values are `f32` if no Struct or Type is specified in the third parameter. If values have more than one dimension (`array`, `vec2f`, `vec3f`, `vec4f`...) the data has to be send as an array. Uniforms can not be modified at runtime inside the shaders, they can only receive data from the JavaScript side.
+
+---
+
+> **Note:** structs as uniform types have very basic support and it will be fixed in later updates
+
+---
 
 ```js
 // main.js
 async function init() {
     let renderPasses = [shaders.vert, shaders.compute, shaders.frag];
     points.addUniform('myKeyName', 0); // 0 is your default value
+    points.addUniform('myTestVec2', [0.2, 2.1], 'vec2f'); // array of lenght 2 as data
+    points.addUniform('myTestStruct', [99, 1, 2, 3], 'MyTestStruct'); // prop value is 99 and the rest is a vec3f
 
     // more init code
     await points.init(renderPasses);
@@ -351,7 +358,18 @@ async function init() {
 
 ```rust
 // frag.js
-let aValue = params.myKeyName;
+
+struct MyTestStruct {
+    prop: f32,
+    another_prop: vec3f
+}
+
+let aValue = params.myKeyName; // 0
+
+let bValue = params.myTestVec2; // 0.2, 2.1
+
+let cValue1 = params.myTestStruct.prop; // 99
+let cValue2 = params.myTestStruct.another_prop; // 1, 2, 3
 ```
 
 ## Sampler - addSampler
@@ -447,67 +465,6 @@ Common uses:
 * Store colors
 * Store results from a heavy calculation in the compute shader
 
----
-
-> **Note:** This method is one with tricky parameters, it's fully documented in the module, but here is an overview:
->
-> - name - name this property/variable will have inside the shader
-> - size - number of items it will allocate
-> - structName - You can use one of the default structs/types like `f32` , `i32` , `u32` , but if you use a more complex one you have to pair it properly with structSize. If it's a custom `struct` it has to be declared in the shader or it will throw an error.
-> - structSize - if the `struct` you reference in `structName` has 4 properties then you have to add `4` . If it's only a f32 then here you should place `1` . If the `struct` has vectors in it, the size of the vector counts:
-
-```rust
-// structSize: 1
-f32
-u32
-i32
-
-// structSize: 2
-vec2<f32>
-vec2<i32>
-vec2<u32>
-vec2f
-vec2i
-vec2u
-
-// structSize: 3
-vec3<f32>
-vec3<i32>
-vec3<u32>
-vec3f
-vec3i
-vec3u
-
-// structSize: 4
-vec4<f32>
-vec4<i32>
-vec4<u32>
-vec4f
-vec4i
-vec4u
-
-// CUSTOM STRUCTS
-
-// structSize: 3
-struct Variables {
-    value1: vec2f,
-    value2: f32,
-}
-
-// structSize: 5
-struct Variables2 {
-    value1: vec3f,
-    value2: i32,
-    value3: u32,
-}
-
-```
-
----
-
-> **Note:** if the size of the storage is greater than `1` then it's created as an array in the shader and you have to access its items like an array, but if size is just `1` you can access its properties directly. Please check the following example for reference.
-
----
 
 ```js
 // main.js
@@ -515,8 +472,8 @@ async function init() {
     let renderPasses = [shaders.vert, shaders.compute, shaders.frag];
 
     const numPoints = 800 * 800;
-    points.addStorage('value_noise_data', numPoints, 'f32', 1); // size is 640,000
-    points.addStorage('variables', 1, 'Variable', 1); // size is 1
+    points.addStorage('value_noise_data', `array<f32, ${numPoints}>`);
+    points.addStorage('variables', 'Variable');
 
     // more init code
     await points.init(renderPasses);
@@ -547,8 +504,8 @@ variables.isCreated = 1;
 You can also add a default type instead of a custom struct in `structName`:
 
 ```js
-points.addStorage('myVar', 1, 'f32', 1); // size is 1
-points.addStorage('myVar2', 1, 'vec2f', 2); // size is 2
+points.addStorage('myVar', 'f32');
+points.addStorage('myVar2', 'vec2f');
 ```
 
 ## StorageMap - addStorageMap
@@ -560,7 +517,7 @@ Creates a Storage in the same way as a `addStorage` does, except it can be set w
 async function init() {
     let renderPasses = [shaders.vert, shaders.compute, shaders.frag];
 
-    points.addStorageMap('values', [1.0, 99.0], 'f32');
+    points.addStorageMap('values', [1.0, 99.0], 'array<f32, 2>');
 
     // more init code
     await points.init(renderPasses);
@@ -578,6 +535,13 @@ let c = values[1];
 ## BindingTexture - addBindingTexture
 
 If you require to send data as a texture from the Compute Shader to the Fragment shader and you do not want to use a Storage, you can use a `addBindingTexture()` , then in the compute shader a variable will exist where you can write colors to it, and in the Fragment Shader will exist a variable to read data from it.
+
+---
+
+> **Note:** Currently only supporting creating a write texture on Compute shader and a read texture on Fragment shader.
+
+---
+
 
 ```js
 // main.js
@@ -803,11 +767,12 @@ async function init() {
 
     // this is before any GPU calculation, so it's ok
     let data = [];
-    for (let k = 0; k < 800 * 800; k++) {
+    let dataAmount = 800 * 800;
+    for (let k = 0; k < dataAmount k++) {
         data.push(Math.random());
     }
     // it doesn't require size because uses the data to size it
-    points.addStorageMap('rands', data, 'f32');
+    points.addStorageMap('rands', data, `array<f32, ${dataAmount}>`);
 
     // more init code
     await points.init(renderPasses);
@@ -817,7 +782,8 @@ async function init() {
 function update() {
     // this is a processor hog
     let data = [];
-    for (let k = 0; k < 800 * 800; k++) {
+    let dataAmount = 800 * 800;
+    for (let k = 0; k < dataAmount; k++) {
         data.push(Math.random());
     }
     points.updateStorageMap('rands', data);
@@ -836,7 +802,7 @@ First declare a storage as in `examples/data1/index.js`
 
 ```js
 // the last parameter as `true` means you will use this `Storage` to read back
-points.addStorage('resultMatrix', 1, 'Matrix', resultMatrixBufferSize, true);
+points.addStorage('resultMatrix', 'Matrix', true);
 ```
 
 Read the data back after modification

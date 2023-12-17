@@ -17,11 +17,11 @@ fn showDebugCross(position:vec2<f32>, color:vec4<f32>, uv:vec2<f32>) -> vec4<f32
  */
 export const showDebugFrame = /*wgsl*/`
 fn showDebugFrame(color:vec4<f32>, uv:vec2<f32>) -> vec4<f32> {
-    let ratioX = params.screenWidth / params.screenHeight;
-    let ratioY = 1 / ratioX / (params.screenHeight / params.screenWidth);
+    let ratioX = params.screen.x / params.screen.y;
+    let ratioY = 1. / ratioX / (params.screen.y / params.screen.x);
     let ratio = vec2(ratioX, ratioY);
 
-    let topRight = vec2(1, 1) * ratio;
+    let topRight = vec2(1., 1.) * ratio;
     let topLeft = vec2(0., 1.);
     let bottomLeft = vec2(0., 0.);
     let bottomRight = vec2(1., 0.) * ratio;

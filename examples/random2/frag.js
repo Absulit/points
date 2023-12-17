@@ -22,10 +22,10 @@ fn main(
     let texColorCompute = texturePosition(computeTexture, feedbackSampler, startPosition, uvr, false);
 
 
-    let d = distance(uvr, vec2(.5 + .1 * fusin(2), .5  + .1 * fusin(4.123)));
+    let d = distance(uvr, vec2(.5 + .1 * fusin(2.), .5  + .1 * fusin(4.123)));
     var c = 1.;
     if(d > .1){
-        c = 0;
+        c = 0.;
     }
 
     let finalColor:vec4<f32> = vec4(c) + texColorCompute;

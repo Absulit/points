@@ -9,7 +9,7 @@ const shapes1 = {
     init: async points => {
         const numPoints = 128;
         points.addUniform('numPoints', numPoints);
-        points.addStorage('points', numPoints, 'vec2<f32>', 2);
+        points.addStorage('points', `array<vec2<f32>, ${numPoints}>`);
     },
     update: points => {
 
