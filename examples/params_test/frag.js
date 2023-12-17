@@ -34,6 +34,8 @@ fn main(
     }
     finalColor = variables.color;
 
+    let c = values[1];
+
 
     return variables.color;
 }
