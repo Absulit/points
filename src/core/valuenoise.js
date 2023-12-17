@@ -7,8 +7,8 @@ ${rand}
 const value_noise_cellsize = 64;
 
 fn valueNoise(){
-    let width = i32(params.screenWidth);
-    let height = i32(params.screenHeight);
+    let width = i32(params.screen.x);
+    let height = i32(params.screen.y);
     let cellSize = 64;
     _ = value_noise_data[0];
     

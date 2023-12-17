@@ -10,7 +10,7 @@ ${WHITE + RED + GREEN + BLUE + YELLOW}
 fn main(
         @location(0) color: vec4<f32>,
         @location(1) uv: vec2<f32>,
-        @location(2) ratio: vec2<f32>,  // relation between params.screenWidth and params.screenHeight
+        @location(2) ratio: vec2<f32>,  // relation between params.screen.x and params.screen.y
         @location(3) uvr: vec2<f32>,    // uv with aspect ratio corrected
         @location(4) mouse: vec2<f32>,
         @builtin(position) position: vec4<f32>
@@ -20,18 +20,18 @@ fn main(
     var circle1Radius = .01;
     var circle2Radius = .01;
 
-    if(params.time % 1 == 0){
+    if(params.time % 1. == 0.){
         circle1Radius = .1;
-        left_blink.data[0] = 1;
-        left_blink.data[1] = 1;
-        left_blink.updated = 1;
+        left_blink.data[0] = 1.;
+        left_blink.data[1] = 1.;
+        left_blink.updated = 1u;
     }
 
-    if(params.time % 2 == 0){
+    if(params.time % 2. == 0.){
         circle2Radius = .1;
-        right_blink.data[0] = 2;
-        right_blink.data[1] = 2;
-        right_blink.updated = 1;
+        right_blink.data[0] = 2.;
+        right_blink.data[1] = 2.;
+        right_blink.updated = 1u;
     }
 
     let circleValue1 = sdfCircle(vec2f(.2,.5), circle1Radius, 0., uvr);

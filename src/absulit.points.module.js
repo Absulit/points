@@ -6,6 +6,7 @@ import Coordinate from './coordinate.js';
 import RGBAColor from './color.js';
 import defaultStructs from './core/defaultStructs.js';
 import { defaultVertexBody } from './core/defaultFunctions.js';
+import { dataSize, getArrayAlign, getArrayTypeAndAmount, getArrayTypeData, isArray, typeSizes } from './data-size.js';
 
 export default class Points {
     constructor(canvasId) {
@@ -92,9 +93,7 @@ export default class Points {
         /** @private */
         this._mouseWheel = false;
         /** @private */
-        this._mouseDeltaX = 0;
-        /** @private */
-        this._mouseDeltaY = 0;
+        this._mouseDelta = [0, 0];
 
         /** @private */
         this._fullscreen = false;
@@ -126,8 +125,7 @@ export default class Points {
 
             this._canvas.addEventListener('wheel', e => {
                 this._mouseWheel = true;
-                this._mouseDeltaX = e.deltaX;
-                this._mouseDeltaY = e.deltaY;
+                this._mouseDelta = [e.deltaX, e.deltaY];
             });
             this._originalCanvasWidth = this._canvas.clientWidth;
             this._originalCanvasHeigth = this._canvas.clientHeight;
@@ -203,16 +201,22 @@ export default class Points {
      * from the outside, and unless changed it remains
      * consistent. To change it use `updateUniform()`
      * @param {string} name name of the Param, you can invoke it later in shaders as `Params.[name]`
-     * @param {Number} value Number will be converted to `f32`
+     * @param {Number|Array} value Single number or a list of numbers
+     * @param {string} structName type as `f32` or a custom struct
      */
-    addUniform(name, value) {
+    addUniform(name, value, structName) {
+        if (structName && isArray(structName)) {
+            throw `${structName} is an array, which is currently not supported for Uniforms.`;
+        }
         if (this._nameExists(this._uniforms, name)) {
             return;
         }
-        // TODO: add a third parameter with a type, so a struct can be defined and pass things like booleans
+
         this._uniforms.push({
             name: name,
             value: value,
+            type: structName,
+            size: null,
             internal: this._internal
         });
     }
@@ -251,33 +255,23 @@ export default class Points {
      * Multiply this by number of properties in the struct if necessary.
      * @param {string} structName Name of the struct already existing on the
      * shader that will be the array<structName> of the Storage
-     * @param {Number} structSize this tells how many sub items the struct has
      * @param {boolean} read if this is going to be used to read data back
      * @param {ShaderType} shaderType this tells to what shader the storage is bound
      */
-    addStorage(name, size, structName, structSize, read, shaderType, arrayData) {
+    addStorage(name, structName, read, shaderType, arrayData) {
         if (this._nameExists(this._storage, name)) {
             return;
         }
         this._storage.push({
             mapped: !!arrayData,
             name: name,
-            size: size,
             structName: structName,
-            structSize: structSize,
+            // structSize: null,
             shaderType: shaderType,
             read: read,
             buffer: null,
             internal: this._internal
         });
-
-        if (read) {
-            let storageItem = {
-                name: name,
-                size: structSize * size
-            }
-            this._readStorage.push(storageItem);
-        }
     }
 
     addStorageMap(name, arrayData, structName, read, shaderType) {
@@ -294,14 +288,6 @@ export default class Points {
             read: read,
             internal: this._internal
         });
-
-        if (read) {
-            let storageItem = {
-                name: name,
-                size: arrayData.length,
-            }
-            this._readStorage.push(storageItem);
-        }
     }
 
     updateStorageMap(name, arrayData) {
@@ -332,7 +318,7 @@ export default class Points {
                 name: `layer${layerIndex}`,
                 size: this._canvas.width * this._canvas.height,
                 structName: 'vec4<f32>',
-                structSize: 4,
+                structSize: 16,
                 array: null,
                 buffer: null,
                 internal: this._internal
@@ -576,8 +562,9 @@ export default class Points {
      * @param {Function} callback function to be called when the event occurs
      */
     addEventListener(name, callback, structSize) {
-        // this extra 1 is for the boolean flag in the Event struct
-        let data = Array(structSize + 1).fill(0);
+        // TODO: remove structSize
+        // this extra 4 is for the boolean flag in the Event struct
+        let data = Array(structSize + 4).fill(0);
         this.addStorageMap(name, data, 'Event', true);
         this._events.set(this._events_ids,
             {
@@ -606,6 +593,7 @@ export default class Points {
      * @returns string with bindings
      */
     _createDynamicGroupBindings(shaderType, internal) {
+        // `internal` here is a flag for a custom pass
         internal = internal || false;
         if (!shaderType) {
             throw '`ShaderType` is required';
@@ -622,14 +610,6 @@ export default class Points {
             let internalCheck = internal == storageItem.internal;
             if (!storageItem.shaderType && internalCheck || storageItem.shaderType == shaderType && internalCheck) {
                 let T = storageItem.structName;
-                if (!storageItem.mapped) {
-                    if (storageItem.array?.length) {
-                        storageItem.size = storageItem.array.length;
-                    }
-                    if (storageItem.size > 1) {
-                        T = `array<${storageItem.structName}>`;
-                    }
-                }
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, read_write> ${storageItem.name}: ${T};\n`
                 bindingIndex += 1;
             }
@@ -721,9 +701,9 @@ export default class Points {
         let dynamicGroupBindingsFragment = '';
 
         let dynamicStructParams = '';
-        this._uniforms.forEach(variable => {
-            let uniformType = variable.type || 'f32';
-            dynamicStructParams += /*wgsl*/`${variable.name}:${uniformType}, \n\t`;
+        this._uniforms.forEach(u => {
+            u.type = u.type || 'f32';
+            dynamicStructParams += /*wgsl*/`${u.name}:${u.type}, \n\t`;
         });
 
         if (this._uniforms.length) {
@@ -761,9 +741,35 @@ export default class Points {
         renderPass.hasFragmentShader && (renderPass.compiledShaders.fragment = colorsFragWGSL);
     }
 
+    _generateDataSize = () => {
+        const allShaders = this._renderPasses.map(renderPass => {
+            const { vertex, compute, fragment } = renderPass.compiledShaders;
+            return vertex + compute + fragment;;
+        }).join('\n');
+
+        this._dataSize = dataSize(allShaders);
+
+        // since uniforms are in a sigle struct
+        // this is only required for storage
+        this._storage.forEach(s => {
+            if (!s.mapped) {
+                if (isArray(s.structName)) {
+                    const typeData = getArrayTypeData(s.structName, this._dataSize);
+                    s.structSize = typeData.size;
+                } else {
+                    const d = this._dataSize.get(s.structName) || typeSizes[s.structName];
+                    if(!d){
+                        throw `${s.structName} has not been defined.`
+                    }
+                    s.structSize = d.bytes || d.size;
+                }
+            }
+        });
+    }
+
     /**
      * One time function to call to initialize the shaders.
-     * @param {array<RenderPass>} renderPasses Collection of RenderPass, which contain Vertex, Compute and Fragment shaders.
+     * @param {Array<RenderPass>} renderPasses Collection of RenderPass, which contain Vertex, Compute and Fragment shaders.
      * @returns false | undefined
      */
     async init(renderPasses) {
@@ -773,15 +779,12 @@ export default class Points {
         // initializing internal uniforms
         this.addUniform(UniformKeys.TIME, this._time);
         this.addUniform(UniformKeys.EPOCH, this._epoch);
-        this.addUniform(UniformKeys.SCREEN_WIDTH, 0);
-        this.addUniform(UniformKeys.SCREEN_HEIGHT, 0);
-        this.addUniform(UniformKeys.MOUSE_X, this._mouseX);
-        this.addUniform(UniformKeys.MOUSE_Y, this._mouseY);
+        this.addUniform(UniformKeys.SCREEN, [0, 0], 'vec2f');
+        this.addUniform(UniformKeys.MOUSE, [0, 0], 'vec2f');
         this.addUniform(UniformKeys.MOUSE_CLICK, this._mouseClick);
         this.addUniform(UniformKeys.MOUSE_DOWN, this._mouseDown);
         this.addUniform(UniformKeys.MOUSE_WHEEL, this._mouseWheel);
-        this.addUniform(UniformKeys.MOUSE_DELTA_X, this._mouseDeltaX);
-        this.addUniform(UniformKeys.MOUSE_DELTA_Y, this._mouseDeltaY);
+        this.addUniform(UniformKeys.MOUSE_DELTA, this._mouseDelta, 'vec2f');
 
         let hasComputeShaders = this._renderPasses.some(renderPass => renderPass.hasComputeShader);
         if (!hasComputeShaders && this._bindingTextures.length) {
@@ -789,6 +792,7 @@ export default class Points {
         }
 
         this._renderPasses.forEach(this._compileRenderPass);
+        this._generateDataSize();
         //
 
 
@@ -876,13 +880,12 @@ export default class Points {
      * @param {Boolean} mappedAtCreation
      * @returns mapped buffer
      */
-    _createAndMapBuffer(data, usage, mappedAtCreation = true) {
+    _createAndMapBuffer(data, usage, mappedAtCreation = true, size) {
         const buffer = this._device.createBuffer({
             mappedAtCreation: mappedAtCreation,
-            size: data.byteLength,
+            size: size || data.byteLength,
             usage: usage,
         });
-
         new Float32Array(buffer.getMappedRange()).set(data);
         buffer.unmap();
         return buffer;
@@ -906,8 +909,33 @@ export default class Points {
 
     /** @private */
     _createParametersUniforms() {
-        const values = new Float32Array(this._uniforms.map(v => v.value));
-        this._uniforms.buffer = this._createAndMapBuffer(values, GPUBufferUsage.UNIFORM);
+        const paramsDataSize = this._dataSize.get('Params')
+        const paddings = paramsDataSize.paddings;
+
+        // we check the paddings list and add 0's to just the ones that need it
+        const uniformsClone = JSON.parse(JSON.stringify(this._uniforms));
+        let arrayValues = uniformsClone.map(v => {
+            const padding = paddings[v.name];
+            if (padding) {
+                if (v.value.constructor !== Array) {
+                    v.value = [v.value];
+                }
+                for (let i = 0; i < padding; i++) {
+                    v.value.push(0);
+                }
+            }
+            return v.value;
+        }).flat(1);
+
+        const finalPadding = paddings[''];
+        if (finalPadding) {
+            for (let i = 0; i < finalPadding; i++) {
+                arrayValues.push(0);
+            }
+        }
+
+        const values = new Float32Array(arrayValues);
+        this._uniforms.buffer = this._createAndMapBuffer(values, GPUBufferUsage.UNIFORM, true, paramsDataSize.bytes);
     }
 
     /** @private */
@@ -917,7 +945,20 @@ export default class Points {
         //--------------------------------------------
         this._storage.forEach(storageItem => {
             let usage = GPUBufferUsage.STORAGE;
+
             if (storageItem.read) {
+                let readStorageItem = {
+                    name: storageItem.name,
+                    size: storageItem.structSize
+                }
+                if (storageItem.mapped) {
+                    readStorageItem = {
+                        name: storageItem.name,
+                        size: storageItem.array.length,
+                    }
+                }
+
+                this._readStorage.push(readStorageItem);
                 usage = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC;
             }
             storageItem.usage = usage;
@@ -925,13 +966,13 @@ export default class Points {
                 const values = new Float32Array(storageItem.array);
                 storageItem.buffer = this._createAndMapBuffer(values, usage);
             } else {
-                storageItem.buffer = this._createBuffer(storageItem.size * storageItem.structSize * 4, usage);
+                storageItem.buffer = this._createBuffer(storageItem.structSize, usage);
             }
         });
         //--------------------------------------------
         this._readStorage.forEach(readStorageItem => {
             readStorageItem.buffer = this._device.createBuffer({
-                size: readStorageItem.size * 4,
+                size: readStorageItem.size,
                 usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
             });
         });
@@ -940,7 +981,7 @@ export default class Points {
             //let layerValues = [];
             let layersSize = 0;
             this._layers.forEach(layerItem => {
-                layersSize += layerItem.size * layerItem.structSize * 4;
+                layersSize += layerItem.size * layerItem.structSize;
             });
             this._layers.buffer = this._createBuffer(layersSize, GPUBufferUsage.STORAGE);
         }
@@ -1382,15 +1423,13 @@ export default class Points {
         this._epoch = new Date() / 1000;
         this.updateUniform(UniformKeys.TIME, this._time);
         this.updateUniform(UniformKeys.EPOCH, this._epoch);
-        this.updateUniform(UniformKeys.SCREEN_WIDTH, this._canvas.width);
-        this.updateUniform(UniformKeys.SCREEN_HEIGHT, this._canvas.height);
-        this.updateUniform(UniformKeys.MOUSE_X, this._mouseX);
-        this.updateUniform(UniformKeys.MOUSE_Y, this._mouseY);
+        this.updateUniform(UniformKeys.SCREEN, [this._canvas.width, this._canvas.height]);
+        this.updateUniform(UniformKeys.MOUSE, [this._mouseX, this._mouseY]);
+
         this.updateUniform(UniformKeys.MOUSE_CLICK, this._mouseClick);
         this.updateUniform(UniformKeys.MOUSE_DOWN, this._mouseDown);
         this.updateUniform(UniformKeys.MOUSE_WHEEL, this._mouseWheel);
-        this.updateUniform(UniformKeys.MOUSE_DELTA_X, this._mouseDeltaX);
-        this.updateUniform(UniformKeys.MOUSE_DELTA_Y, this._mouseDeltaY);
+        this.updateUniform(UniformKeys.MOUSE_DELTA, this._mouseDelta);
         //--------------------------------------------
 
         this._createParametersUniforms();
@@ -1525,8 +1564,7 @@ export default class Points {
         // reset mouse values because it doesn't happen by itself
         this._mouseClick = false;
         this._mouseWheel = false;
-        this._mouseDeltaX = 0;
-        this._mouseDeltaY = 0;
+        this._mouseDelta = [0, 0];
 
         await this.read();
     }
@@ -1669,5 +1707,4 @@ export default class Points {
     videoRecordStop() {
         this.mediaRecorder.stop();
     }
-
 }

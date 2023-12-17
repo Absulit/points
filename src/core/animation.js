@@ -31,6 +31,6 @@ fn fucos(speed: f32) -> f32{
  */
 export const fnusin = /*wgsl*/`
 fn fnusin(speed: f32) -> f32{
-    return (sin(params.time * speed) + 1) * .5;
+    return (sin(params.time * speed) + 1.) * .5;
 }
 `;

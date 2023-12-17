@@ -39,7 +39,7 @@ const BLACK = vec4(0.,0.,0.,1.);
 export const layer = /*wgsl*/`
 // https://stackoverflow.com/a/24501192/507186
 fn layer(back:vec4<f32>, front: vec4<f32>) -> vec4<f32> {
-    return front * front.a + back * (1 - front.a);
+    return front * front.a + back * (1. - front.a);
 }
 `;
 
@@ -50,7 +50,7 @@ fn hsvAux(h:f32, s:f32, v:f32, n:f32) -> f32 {
 };
 
 fn RGBAFromHSV(h:f32, s:f32, v:f32) ->  vec4<f32>{
-    return vec4<f32>(hsvAux(h, s, v, 5), hsvAux(h, s, v, 3), hsvAux(h, s, v, 1), 1);
+    return vec4<f32>(hsvAux(h, s, v, 5.), hsvAux(h, s, v, 3.), hsvAux(h, s, v, 1.), 1.);
 }
 `;
 
@@ -66,7 +66,7 @@ fn bloom(input:f32, iterations:i32, intensity:f32) -> f32 {
     let iterationsF32 = f32(iterations);
     for (var k = 0; k < iterations; k++) {
         for (var n = 0; n < iterations; n++) {
-            let coef = cos(2.0 * PI * f32(k) * f32(n) / iterationsF32 );
+            let coef = cos(2. * PI * f32(k) * f32(n) / iterationsF32 );
             output += input * coef * intensity;
         }
     }

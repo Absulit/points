@@ -1,9 +1,9 @@
 export const random = /*wgsl*/`
 
-var<private> a = 1664525;
-var<private> c = 1013904223;
+var<private> a:i32 = 1664525;
+var<private> c:i32 = 1013904223;
 var<private> m = pow(2, 32);
-var<private> seed = 958736;
+var<private> seed:i32 = 958736;
 
 fn nextRand() -> i32 {
     seed = (a * seed + c) % i32(m);
