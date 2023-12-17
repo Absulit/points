@@ -11,8 +11,8 @@ import renderPass1 from './pass1/index.js';
 
 const base = {
     renderPasses: [
-        // renderPass0,
-        renderPass1,
+        renderPass0,
+        // renderPass1,
     ],
     /**
      *
