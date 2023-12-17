@@ -18,4 +18,20 @@ struct VertexOutput {
     @location(1) quad_pos : vec2<f32>, // -1..+1
 }
 
+struct SimulationParams {
+    deltaTime : f32,
+    seed : vec4<f32>,
+  }
+
+struct Particle {
+    position : vec3<f32>,
+    lifetime : f32,
+    color    : vec4<f32>,
+    velocity : vec3<f32>,
+}
+
+struct Particles {
+    particles : array<Particle>,
+}
+
 `;

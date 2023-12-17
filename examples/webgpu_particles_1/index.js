@@ -68,7 +68,12 @@ const base = {
         points.addUniform('right', right, 'vec3<f32>');
         points.addUniform('up', up, 'vec3<f32>');
         points.addUniform('modelViewProjectionMatrix', modelViewProjectionMatrix, 'mat4x4<f32>');
+        
+        points.addUniform('deltaTime', 0);
+        points.addUniform('seed', [0,0,0,0], 'vec4f');
 
+        points.addStorage('data', 'Particles');
+        await points.addTextureImage('texture', 'webgpu_particles_1/webgpu.png');
         // points.addUniform('render_params', data, 'RenderParams');
 
         // TODO: bug, invert MOUSE_DELTA and MOUSE_WHEEL positions in addUniforms

@@ -213,6 +213,9 @@ export function getArrayTypeData(currentType, structData) {
                 currentTypeData = { size: sd.bytes * d.amount, align: sd.maxAlign };
             }
         }
+    } else {
+        const t = typeSizes[d.type] || structData.get(d.type);
+        currentTypeData = { size: t.bytes, align: t.maxAlign };
     }
     return currentTypeData;
 }
