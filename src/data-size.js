@@ -195,6 +195,9 @@ export function getArrayAlign(structName, structData) {
 
 export function getArrayTypeData(currentType, structData) {
     const [d] = getArrayTypeAndAmount(currentType);
+    if(!d){
+        throw `${currentType} seems to have an error, maybe a wrong amount?`;
+    }
     if (d.amount == 0) {
         throw new Error(`${currentType} has an amount of 0`);
     }
@@ -204,8 +207,8 @@ export function getArrayTypeData(currentType, structData) {
         const t = typeSizes[d.type];
         if (t) {
             // if array, the size is equal to the align
-            // currentTypeData = { size: t.align * d.amount, align: t.align };
-            currentTypeData = { size: t.size * d.amount, align: t.align };
+            currentTypeData = { size: t.align * d.amount, align: t.align };
+            // currentTypeData = { size: t.size * d.amount, align: t.align };
             // currentTypeData = { size: 0, align: 0 };
         } else {
             const sd = structData.get(d.type);
