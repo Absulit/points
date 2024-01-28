@@ -1,8 +1,8 @@
-import { snoise } from '../../src/core/noise2d.js';
-import { getClosestColorInPalette, orderedDithering, orderedDithering_threshold_map } from '../../src/core/effects.js';
-import { pixelateTexture, texturePosition } from '../../src/core/image.js';
-import { brightness } from './../../src/core/color.js';
-import { fnusin } from '../../src/core/animation.js';
+import { snoise } from 'noise2d';
+import { getClosestColorInPalette, orderedDithering, orderedDithering_threshold_map } from 'effects';
+import { pixelateTexture, texturePosition } from 'image';
+import { brightness } from 'color';
+import { fnusin } from 'animation';
 
 const frag = /*wgsl*/`
 

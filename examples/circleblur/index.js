@@ -1,7 +1,7 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
-import RenderPass from './../../src/RenderPass.js';
+import RenderPass from 'renderpass';
 const circleblur = {
     renderPasses: [
         new RenderPass(null, null, compute, 800, 800, 1),

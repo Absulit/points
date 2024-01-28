@@ -1,9 +1,9 @@
-import { snoise } from '../../src/core/noise2d.js';
-import { texturePosition } from '../../src/core/image.js';
-import { bloom, brightness } from '../../src/core/color.js';
-import { sdfCircle, sdfLine, sdfSegment } from '../../src/core/sdf.js';
-import { fnusin, fusin } from '../../src/core/animation.js';
-import { polar, PI } from '../../src/core/math.js';
+import { snoise } from 'noise2d';
+import { texturePosition } from 'image';
+import { bloom, brightness } from 'color';
+import { sdfCircle, sdfLine, sdfSegment } from 'sdf';
+import { fnusin, fusin } from 'animation';
+import { polar, PI } from 'math';
 
 const frag = /*wgsl*/`
 

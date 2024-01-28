@@ -1,5 +1,5 @@
-import { fnusin } from '../../src/core/animation.js';
-import { textureExternalPosition } from '../../src/core/image.js';
+import { fnusin } from 'animation';
+import { textureExternalPosition } from 'image';
 
 const videotexture1Frag = /*wgsl*/`
 

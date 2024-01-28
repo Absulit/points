@@ -1,6 +1,6 @@
-import { fnusin } from '../../src/core/animation.js';
-import { clearAlpha, soften4, soften8 } from '../../src/core/effects.js';
-import { sdfCircle, sdfLine2, sdfSegment } from '../../src/core/sdf.js';
+import { fnusin } from 'animation';
+import { clearAlpha, soften4, soften8 } from 'effects';
+import { sdfCircle, sdfLine2, sdfSegment } from 'sdf';
 
 const compute = /*wgsl*/`
 

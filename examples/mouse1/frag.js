@@ -1,5 +1,5 @@
-import { showDebugCross, showDebugFrame } from '../../src/core/debug.js';
-import { sdfLine, sdfSegment } from '../../src/core/sdf.js';
+import { showDebugCross, showDebugFrame } from 'debug';
+import { sdfLine, sdfSegment } from 'sdf';
 
 const frag = /*wgsl*/`
 

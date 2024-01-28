@@ -1,5 +1,5 @@
-import { sdfCircle } from '../../src/core/sdf.js';
-import { WHITE, BLUE, GREEN, RED, YELLOW } from '../../src/core/color.js';
+import { sdfCircle } from 'sdf';
+import { WHITE, BLUE, GREEN, RED, YELLOW } from 'color';
 
 const frag = /*wgsl*/`
 
