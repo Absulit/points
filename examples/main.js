@@ -1,8 +1,8 @@
 'use strict';
-import * as dat from './../src/vendor/datgui/dat.gui.module.js';
-import Points from '../src/absulit.points.module.js';
-import ShaderType from '../src/ShaderType.js';
-import RenderPass from '../src/RenderPass.js';
+import * as dat from 'datgui';
+import Points from 'Points';
+import ShaderType from 'ShaderType';
+import RenderPass from 'RenderPass';
 
 /***************/
 const stats = new Stats();
@@ -112,6 +112,7 @@ async function loadShaderByIndex(index) {
     shaders?.remove?.();
     shaders = (await import(shaderPath)).default;
     await init();
+
 }
 
 examples.onChange(loadShaderByIndex);
