@@ -1,8 +1,8 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
-import Points from '../../src/absulit.points.module.js';
-import RenderPasses from './../../src/RenderPasses.js';
+import Points from 'points';
+import RenderPasses from 'renderpasses';
 
 let audio = null;
 

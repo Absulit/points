@@ -1,5 +1,5 @@
-import { fusin } from '../../src/core/animation.js';
-import { texturePosition } from '../../src/core/image.js';
+import { fusin } from 'animation';
+import { texturePosition } from 'image';
 
 const frag = /*wgsl*/`
 

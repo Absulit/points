@@ -1,8 +1,8 @@
-import { fnusin } from '../../src/core/animation.js';
-import { snoise } from './../../src/core/noise2d.js';
-import { sdfCircle } from './../../src/core/sdf.js';
-import { WHITE, RED, layer } from './../../src/core/color.js';
-import { audioAverage, audioAverageSegments } from '../../src/core/audio.js';
+import { fnusin } from 'animation';
+import { snoise } from 'noise2d';
+import { sdfCircle } from 'sdf';
+import { WHITE, RED, layer } from 'color';
+import { audioAverage, audioAverageSegments } from 'audio';
 
 const frag = /*wgsl*/`
 

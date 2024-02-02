@@ -1,8 +1,8 @@
 import vert1 from './renderpass1/vert.js';
 import frag1 from './renderpass1/frag.js';
 
-import RenderPass from '../../src/RenderPass.js';
-import RenderPasses from './../../src/RenderPasses.js';
+import RenderPass from 'renderpass';
+import RenderPasses from 'renderpasses';
 
 const renderpasses1 = {
     /**

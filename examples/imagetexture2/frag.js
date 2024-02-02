@@ -1,8 +1,8 @@
-import { fnusin } from '../../src/core/animation.js';
-import { brightness } from '../../src/core/color.js';
-import { polar } from '../../src/core/math.js';
-import { snoise } from '../../src/core/noise2d.js';
-import { texturePosition } from './../../src/core/image.js';
+import { fnusin } from 'animation';
+import { brightness } from 'color';
+import { polar } from 'math';
+import { snoise } from 'noise2d';
+import { texturePosition } from 'image';
 
 const frag = /*wgsl*/`
 

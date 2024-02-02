@@ -1,5 +1,5 @@
-import Points from './../../src/absulit.points.module.js';
-import RenderPass from '../../src/RenderPass.js';
+import Points from 'points';
+import RenderPass from 'renderpass';
 
 import {
     vec3,

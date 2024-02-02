@@ -1,6 +1,6 @@
-import { fnusin } from '../../src/core/animation.js';
+import { fnusin } from 'animation';
 import { structs } from './structs.js';
-import { rand } from '../../src/core/random.js';
+import { rand } from 'random';
 
 const frag = /*wgsl*/`
 

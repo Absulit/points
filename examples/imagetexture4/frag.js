@@ -1,5 +1,5 @@
-import { snoise } from '../../src/core/noise2d.js';
-import { texturePosition } from '../../src/core/image.js';
+import { snoise } from 'noise2d';
+import { texturePosition } from 'image';
 
 const frag = /*wgsl*/`
 

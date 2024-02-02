@@ -1,8 +1,8 @@
-import { RED, brightness } from '../../src/core/color.js';
-import { showDebugFrame } from '../../src/core/debug.js';
-import { sdfCircle, sdfLine, sdfSegment } from '../../src/core/sdf.js';
-import { sprite, texturePosition } from './../../src/core/image.js';
-import { snoise } from './../../src/core/noise2d.js';
+import { RED, brightness } from 'color';
+import { showDebugFrame } from 'debug';
+import { sdfCircle, sdfLine, sdfSegment } from 'sdf';
+import { sprite, texturePosition } from 'image';
+import { snoise } from 'noise2d';
 
 const frag = /*wgsl*/`
 

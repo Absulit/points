@@ -1,7 +1,6 @@
-import { texturePosition } from "../../../src/core/image.js";
-import { PI } from '../../../src/core/math.js';
-import { rotateVector } from "../../../src/core/math.js";
-import { blur9 } from "../../../src/core/effects.js";
+import { texturePosition } from 'image';
+import { PI, rotateVector } from 'math';
+import { blur9 } from 'effects';
 
 const frag = /*wgsl*/`
 

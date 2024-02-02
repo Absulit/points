@@ -1,8 +1,8 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
-import Points from '../../src/absulit.points.module.js';
-import { dataSize } from '../../src/data-size.js';
+import Points from '.points';
+import { dataSize } from 'datasize';
 
 const base = {
   vert,
@@ -19,21 +19,21 @@ const base = {
     const result = dataSize(`
 
     struct Params {
-      sliderA:f32, 
-      sliderB:f32, 
-      sliderC:f32, 
-      right:vec3<f32>, 
-      up:vec3<f32>, 
-      modelViewProjectionMatrix:mat4x4<f32>, 
-      time:f32, 
-      epoch:f32, 
-      screen:vec2f, 
-      mouse:vec2f, 
-      mouseClick:f32, 
-      mouseDown:f32, 
-      mouseDelta:vec2f, 
-      mouseWheel:f32, 
-      
+      sliderA:f32,
+      sliderB:f32,
+      sliderC:f32,
+      right:vec3<f32>,
+      up:vec3<f32>,
+      modelViewProjectionMatrix:mat4x4<f32>,
+      time:f32,
+      epoch:f32,
+      screen:vec2f,
+      mouse:vec2f,
+      mouseClick:f32,
+      mouseDown:f32,
+      mouseDelta:vec2f,
+      mouseWheel:f32,
+
     }
 
 

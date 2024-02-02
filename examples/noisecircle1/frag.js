@@ -1,5 +1,5 @@
-import { sdfCircle } from '../../src/core/sdf.js';
-import { snoise } from '../../src/core/noise2d.js';
+import { sdfCircle } from 'sdf';
+import { snoise } from 'noise2d';
 
 const frag = /*wgsl*/`
 

@@ -1,6 +1,6 @@
-import { fnusin } from '../../src/core/animation.js';
-import { RGBAFromHSV } from '../../src/core/color.js';
-import { rand, random } from '../../src/core/random.js';
+import { fnusin } from 'animation';
+import { RGBAFromHSV } from 'color';
+import { rand, random } from 'random';
 
 const compute = /*wgsl*/`
 
