@@ -1,5 +1,5 @@
-import { fnusin } from '../../src/core/animation.js';
-import { snoise } from '../../src/core/noise2d.js';
+import { fnusin } from 'animation';
+import { snoise } from 'noise2d';
 
 const frag = /*wgsl*/`
 

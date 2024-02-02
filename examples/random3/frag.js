@@ -1,4 +1,4 @@
-import { texturePosition } from '../../src/core/image.js';
+import { texturePosition } from 'image';
 
 const frag = /*wgsl*/`
 

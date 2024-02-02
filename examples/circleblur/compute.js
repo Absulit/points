@@ -1,5 +1,5 @@
 
-import { clearMix } from './../../src/core/effects.js';
+import { clearMix } from 'effects';
 const compute = /*wgsl*/`
 
 ${clearMix}

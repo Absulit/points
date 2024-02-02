@@ -1,6 +1,6 @@
-import { fnusin } from '../../src/core/animation.js';
-import { rotateVector } from '../../src/core/math.js';
-import { sdfLine2, sdfCircle, sdfSquare, sdfSegment } from './../../src/core/sdf.js';
+import { fnusin } from 'animation';
+import { rotateVector } from 'math';
+import { sdfLine2, sdfCircle, sdfSquare, sdfSegment } from 'sdf';
 
 
 const frag = /*wgsl*/`

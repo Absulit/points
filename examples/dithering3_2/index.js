@@ -1,8 +1,8 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
-import RenderPass from './../../src/RenderPass.js';
-import ShaderType from './../../src/ShaderType.js';
+import RenderPass from 'renderpass';
+import ShaderType from 'shadertype';
 const dithering3 = {
     renderPasses: [
         new RenderPass(vert, frag, compute, 800, 800)
