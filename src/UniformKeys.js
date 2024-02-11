@@ -2,6 +2,7 @@
 
 export default class UniformKeys {
     static TIME = 'time';
+    static DELTA = 'delta';
     static EPOCH = 'epoch';
     static SCREEN = 'screen';
     static MOUSE = 'mouse';

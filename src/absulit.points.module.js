@@ -4,9 +4,10 @@ import VertexBufferInfo from './VertexBufferInfo.js';
 import ShaderType from './ShaderType.js';
 import Coordinate from './coordinate.js';
 import RGBAColor from './color.js';
+import Clock from './clock.js';
 import defaultStructs from './core/defaultStructs.js';
 import { defaultVertexBody } from './core/defaultFunctions.js';
-import { dataSize, getArrayAlign, getArrayTypeAndAmount, getArrayTypeData, isArray, typeSizes } from './data-size.js';
+import { dataSize, getArrayTypeData, isArray, typeSizes } from './data-size.js';
 
 export default class Points {
     constructor(canvasId) {
@@ -78,6 +79,8 @@ export default class Points {
         this._originalCanvasHeigth = null;
 
 
+        /** @private */
+        this._clock = new Clock();
         /** @private */
         this._time = 0;
         /** @private */
@@ -758,7 +761,7 @@ export default class Points {
                     s.structSize = typeData.size;
                 } else {
                     const d = this._dataSize.get(s.structName) || typeSizes[s.structName];
-                    if(!d){
+                    if (!d) {
                         throw `${s.structName} has not been defined.`
                     }
                     s.structSize = d.bytes || d.size;
@@ -778,6 +781,7 @@ export default class Points {
 
         // initializing internal uniforms
         this.addUniform(UniformKeys.TIME, this._time);
+        this.addUniform(UniformKeys.DELTA, this._delta);
         this.addUniform(UniformKeys.EPOCH, this._epoch);
         this.addUniform(UniformKeys.SCREEN, [0, 0], 'vec2f');
         this.addUniform(UniformKeys.MOUSE, [0, 0], 'vec2f');
@@ -1415,13 +1419,14 @@ export default class Points {
     }
 
     async update() {
-        if (!this._canvas) return;
-        if (!this._device) return;
+        if (!this._canvas || !this._device) return;
 
         //--------------------------------------------
-        this._time += 0.016666666666666666;//1 / 60; TODO: change to delta
+        this._delta = this._clock.getDelta();
+        this._time = this._clock.time;
         this._epoch = new Date() / 1000;
         this.updateUniform(UniformKeys.TIME, this._time);
+        this.updateUniform(UniformKeys.DELTA, this._delta);
         this.updateUniform(UniformKeys.EPOCH, this._epoch);
         this.updateUniform(UniformKeys.SCREEN, [this._canvas.width, this._canvas.height]);
         this.updateUniform(UniformKeys.MOUSE, [this._mouseX, this._mouseY]);
