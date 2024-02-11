@@ -11,11 +11,18 @@ export default class Clock {
         this._oldTime = 0;
     }
 
-    get time(){
+    /**
+     * Gets the current time, it does not calculate the time, it's calcualted
+     *  when `getDelta()` is called.
+     */
+    get time() {
         return this._time;
     }
 
-    get delta(){
+    /**
+     * Gets the last delta value, it does not calculate the delta, use `getDelta()`
+     */
+    get delta() {
         return this._delta;
     }
 
@@ -24,6 +31,10 @@ export default class Clock {
         return (typeof performance === 'undefined' ? Date : performance).now();
     }
 
+    /**
+     * Calculate time since last frame
+     * It also calculates `time`
+     */
     getDelta() {
         this._delta = 0;
         const newTime = this.now();
