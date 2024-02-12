@@ -237,6 +237,7 @@ Globally there's a uniform struct called `Params` and its instance called `param
 ```rust
 struct Params {
     time:f32,
+    delta:f32,
     epoch:f32,
     screen:vec2f,
     mouse:vec2f,
@@ -250,6 +251,7 @@ struct Params {
 | Name          | Description                               | ex. value     |
 | ------------- |:-------------                             | -----:        |
 | time          | seconds since the app started             | 10.11         |
+| delta         | milliseconds since last rendered frame    | 0.16          |
 | epoch         | seconds since jan 1st 1970 UTC            | 1674958734.777|
 | screen        | pixels in x and y dimensions              |    800, 600   |
 | mouse         | mouse coordinates from (0, 0) to screen   |    100, 150   |
