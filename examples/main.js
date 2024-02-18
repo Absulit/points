@@ -16,7 +16,8 @@ let capturer = new CCapture({
 });
 
 const gui = new dat.GUI({ name: 'Points GUI' });
-let slidersFolder = gui.addFolder('Sliders');
+const FOLDER_NAME = 'Options'
+let optionsFolder = gui.addFolder(FOLDER_NAME);
 
 let statsVisible = (localStorage.getItem('stats-visible') === 'true') || false;
 function setStatsVisibility(value) {
@@ -175,10 +176,10 @@ async function init() {
     points.addUniform('sliderB', 0);
     points.addUniform('sliderC', 0);
 
-    gui.removeFolder(slidersFolder);
-    slidersFolder = gui.addFolder('Sliders');
+    gui.removeFolder(optionsFolder);
+    optionsFolder = gui.addFolder(FOLDER_NAME);
 
-    await shaders.init(points, slidersFolder);
+    await shaders.init(points, optionsFolder);
     let renderPasses = shaders.renderPasses || [new RenderPass(shaders.vert, shaders.frag, shaders.compute)];
     // await points.addPostRenderPass(RenderPasses.GRAYSCALE);
     await points.init(renderPasses);
