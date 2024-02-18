@@ -55,14 +55,14 @@ fn main(
     let n1 = snoise(uv * 2 + 2 * fnusin(1/3));
 
     let dims: vec2<u32> = textureDimensions(image, 0);
-    var rgbaImage = texturePosition(image, feedbackSampler, vec2(0.), uvr / params.sliderA, false); //* .998046;
+    var rgbaImage = texturePosition(image, feedbackSampler, vec2(0.), uvr / params.scale, false); //* .998046;
     let br = brightness(rgbaImage);
 
     // from 8 to 40
     //let depth = floor(8 + 32. * fnusin(1));
-    let depth = floor(8 + 32. * params.sliderB);
+    let depth = floor(8 + 32. * params.depth);
 
-    rgbaImage = getClosestColorInPalette(rgbaImage, u32(numPaletteItems * br * params.sliderB) + 2, params.sliderC);
+    rgbaImage = getClosestColorInPalette(rgbaImage, u32(numPaletteItems * br * params.depth) + 2, params.distance);
     //rgbaImage = orderedDithering(rgbaImage, depth, dims, uv); // ⬆⬇ swap these lines or uncomment
 
     return rgbaImage;
