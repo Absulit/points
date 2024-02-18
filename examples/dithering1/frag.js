@@ -57,13 +57,13 @@ fn main(
     let dims: vec2<u32> = textureDimensions(image, 0);
     //var dimsRatio = f32(dims.x) / f32(dims.y);
     //let imageUV = uv * vec2(1,-1 * dimsRatio) * ratio.y / params.sliderA;
-    var rgbaImage = texturePosition(image, feedbackSampler, vec2(0.), uvr / params.sliderA, false); //* .998046;
+    var rgbaImage = texturePosition(image, feedbackSampler, vec2(0.), uvr / params.scale, false); //* .998046;
     //var rgbaImage = pixelateTexture(image, feedbackSampler, 10,10, imageUV);
     let br = brightness(rgbaImage);
 
     // from 8 to 40
     //let depth = floor(8 + 32. * fnusin(1));
-    let depth = floor(8 + 32. * params.sliderB);
+    let depth = floor(8 + 32. * params.depth);
 
     //rgbaImage = getClosestColorInPalette(rgbaImage, u32(numPaletteItems * br * params.sliderB * fnusin(1)) + 2, params.sliderC);
     rgbaImage = orderedDithering(rgbaImage, depth, dims, uv); // ⬆⬇ swap these lines or uncomment

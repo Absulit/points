@@ -172,9 +172,6 @@ async function init() {
     }
 
     points = new Points('gl-canvas');
-    points.addUniform('sliderA', 0);
-    points.addUniform('sliderB', 0);
-    points.addUniform('sliderC', 0);
 
     gui.removeFolder(optionsFolder);
     optionsFolder = gui.addFolder(FOLDER_NAME);

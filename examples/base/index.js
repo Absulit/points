@@ -25,7 +25,7 @@ const base = {
 
         // Add elements to dat gui
         // create an uniform and get value from options
-        points.addUniform('val', options.scale);
+        points.addUniform('val', options.val);
 
         // https://github.com/dataarts/dat.gui/blob/master/API.md#GUI+add
         folder.add(options, 'val', -1, 1, .0001).name('Val');
@@ -42,7 +42,6 @@ const base = {
     },
     update: points => {
         points.updateUniform('val', options.val);
-        // console.log(options.color5);
     }
 }
 
