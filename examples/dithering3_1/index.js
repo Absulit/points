@@ -5,8 +5,6 @@ import ShaderType from 'shadertype';
 
 const options = {
     scale: 1,
-    depth: 1,
-    distance: 1,
 }
 
 
