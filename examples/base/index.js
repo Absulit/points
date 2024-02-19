@@ -10,7 +10,7 @@ const options = {
     color2: [0, 128, 255], // RGB array
     color3: [0, 128, 255, 0.3], // RGB with alpha
     color4: { h: 350, s: 0.9, v: 0.3 }, // Hue, saturation, value
-    color5: { r: 115, g: 50.9, b: 20.3, a: .1 }, // Hue, saturation, value
+    color5: { r: 115, g: 50.9, b: 20.3, a: .1 }, // r, g, b object
 }
 
 const base = {
