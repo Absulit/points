@@ -20,7 +20,7 @@ fn main(
 
     let lines = sin( uv.x*(uv.x + 3. * fnusin(1.))  ) ;
     let startPosition = vec2(0.);
-    let rgbaImage = texturePosition(image, feedbackSampler, startPosition, uvr * lines / params.sliderA, false); //* .998046;
+    let rgbaImage = texturePosition(image, feedbackSampler, startPosition, uvr * lines / params.scale, false); //* .998046;
 
     let b = brightness(rgbaImage);
 
