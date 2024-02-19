@@ -1,5 +1,4 @@
 import { fnusin } from 'animation';
-import { snoise } from 'noise2d';
 import { sdfCircle } from 'sdf';
 import { WHITE, RED, GREEN, YELLOW, layer } from 'color';
 import { audioAverage, audioAverageSegments } from 'audio';
@@ -8,7 +7,6 @@ import { texturePosition } from 'image';
 const frag = /*wgsl*/`
 
 ${fnusin}
-${snoise}
 ${sdfCircle}
 ${layer}
 ${audioAverage}
@@ -36,7 +34,6 @@ fn main(
     // let audioAverage = audioAverage(audio);
     // let audioAverageSegments = audioAverageSegments(2);
 
-    let n = snoise(uvr / params.sliderA + params.time);
     let feedbackColor = texturePosition(feedbackTexture, imageSampler, vec2(), uvr * vec2f(1, 1.01), true);
 
     let segmentNum = 4;
