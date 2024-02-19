@@ -16,7 +16,6 @@ const imagetexture3 = {
 
         points.addUniform('scale', options.scale, 'f32');
 
-
         folder.add(options, 'scale', 0, 1, .0001).name('Scale');
         folder.open();
     },

@@ -20,7 +20,7 @@ fn main(
     ) -> @location(0) vec4<f32> {
 
     let startPosition = vec2(.0);
-    let rgbaImage = texturePosition(image, imageSampler, startPosition, uvr * params.sliderA, false); //* .998046;
+    let rgbaImage = texturePosition(image, imageSampler, startPosition, uvr * params.scale, false); //* .998046;
     let finalColor:vec4<f32> = rgbaImage;
 
     return finalColor;
