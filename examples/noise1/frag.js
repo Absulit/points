@@ -26,9 +26,9 @@ fn main(
     let c = fnusin(uvr.x * uvr.y * 10.);
     let d = distance(a,b);
     let f = d * uvr.x * uvr.y;
-    let n1 = snoise(uvr * 200. * params.sliderA + 10. * fnusin(.01));
-    let n2 = snoise(uvr * 200. * params.sliderB + 10. * fnusin(.02));
-    let n3 = snoise(uvr * 200. * params.sliderC + 10. * fnusin(.03));
+    let n1 = snoise(uvr * 200. * params.scale0 + 10. * fnusin(.01));
+    let n2 = snoise(uvr * 200. * params.scale1 + 10. * fnusin(.02));
+    let n3 = snoise(uvr * 200. * params.scale2 + 10. * fnusin(.03));
     //let finalColor:vec4<f32> = vec4(a*d*n2,f*c*a*n3,f * n1, 1.);
     //let finalColor = vec4(fract(n1 * n2 + n3));
     let n4 = fract(n1 * n2 + n3);

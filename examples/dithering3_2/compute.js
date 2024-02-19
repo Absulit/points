@@ -57,7 +57,7 @@ fn main(
 
     let pointIndexC = i32(GlobalId.x + ((GlobalId.y+distanceU) * dims.y));
     var rightPoint = layers[layerIndex][pointIndexC];
-    rightPoint = vec4(brightness(rightPoint) + (.5 * quant_error * params.sliderB));
+    rightPoint = vec4(brightness(rightPoint) + (.5 * quant_error * params.quantError));
 
     let pointPC = &layers[layerIndex][pointIndexC];
     (*pointPC) = rightPoint;
