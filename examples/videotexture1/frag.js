@@ -19,7 +19,7 @@ fn main(
 
     let startPosition = vec2(0.);
 
-    let rgbaCT = textureExternalPosition(video, feedbackSampler, startPosition, uvr / params.sliderA, true);
+    let rgbaCT = textureExternalPosition(video, feedbackSampler, startPosition, uvr / params.scale, true);
     // let rgbaCT = textureSampleBaseClampToEdge(video, feedbackSampler, uv);
 
     return rgbaCT;

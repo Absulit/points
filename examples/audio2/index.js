@@ -1,5 +1,4 @@
 import vert from './vert.js';
-import compute from './compute.js';
 import frag from './frag.js';
 import Points from 'points';
 import RenderPasses from 'renderpasses';
@@ -8,7 +7,7 @@ let audio = null;
 
 const base = {
     vert,
-    compute,
+    compute: null,
     frag,
     /**
      *

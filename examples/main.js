@@ -16,19 +16,8 @@ let capturer = new CCapture({
 });
 
 const gui = new dat.GUI({ name: 'Points GUI' });
-const slidersFolder = gui.addFolder('Sliders');
-
-slidersFolder.open();
-
-const sliders = { 'a': 0, 'b': 0, 'c': 0 };
-
-sliders.a = Number(localStorage.getItem('slider-a')) || 0;
-sliders.b = Number(localStorage.getItem('slider-b')) || 0;
-sliders.c = Number(localStorage.getItem('slider-c')) || 0;
-
-slidersFolder.add(sliders, 'a', -1, 1, .0001).name('params.sliderA').onFinishChange(() => localStorage.setItem('slider-a', sliders.a));
-slidersFolder.add(sliders, 'b', -1, 1, .0001).name('params.sliderB').onFinishChange(() => localStorage.setItem('slider-b', sliders.b));
-slidersFolder.add(sliders, 'c', -1, 1, .0001).name('params.sliderC').onFinishChange(() => localStorage.setItem('slider-c', sliders.c));
+const FOLDER_NAME = 'Options'
+let optionsFolder = gui.addFolder(FOLDER_NAME);
 
 let statsVisible = (localStorage.getItem('stats-visible') === 'true') || false;
 function setStatsVisibility(value) {
@@ -183,12 +172,11 @@ async function init() {
     }
 
     points = new Points('gl-canvas');
-    points.addUniform('sliderA', 0);
-    points.addUniform('sliderB', 0);
-    points.addUniform('sliderC', 0);
 
+    gui.removeFolder(optionsFolder);
+    optionsFolder = gui.addFolder(FOLDER_NAME);
 
-    await shaders.init(points);
+    await shaders.init(points, optionsFolder);
     let renderPasses = shaders.renderPasses || [new RenderPass(shaders.vert, shaders.frag, shaders.compute)];
     // await points.addPostRenderPass(RenderPasses.GRAYSCALE);
     await points.init(renderPasses);
@@ -203,10 +191,6 @@ async function update() {
     stats.begin();
 
     // code here
-
-    points.updateUniform('sliderA', sliders.a);
-    points.updateUniform('sliderB', sliders.b);
-    points.updateUniform('sliderC', sliders.c);
 
     shaders.update(points);
     await points.update();
