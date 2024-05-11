@@ -47,7 +47,7 @@ fn sdfSquare(position:vec2<f32>, radius:f32, feather:f32, rotationRads: f32, uv:
 
     d = distance(uvRotated.y,  positionRotated.y);
     s += smoothstep(radius, radius + feather,  d);
-    s = clamp(0,1, s);
+    s = clamp(0., 1., s);
     return 1-s;
 }
 `;

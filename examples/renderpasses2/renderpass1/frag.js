@@ -16,7 +16,7 @@ fn main(
     @builtin(position) position: vec4<f32>
 ) -> @location(0) vec4<f32> {
 
-    let imageColor = texturePosition(image, imageSampler, vec2(0,0), uvr, true);
+    let imageColor = texturePosition(image, imageSampler, vec2(0.,0), uvr, true);
 
     let finalColor = imageColor;
 

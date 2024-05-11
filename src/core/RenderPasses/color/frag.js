@@ -13,7 +13,7 @@ fn main(
     @builtin(position) position: vec4<f32>
 ) -> @location(0) vec4<f32> {
 
-    let imageColor = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0,0), uvr, true);
+    let imageColor = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0., 0), uvr, true);
     let colorParam = vec4(params.color_r, params.color_g, params.color_b, params.color_a);
     let finalColor:vec4<f32> = (imageColor + colorParam) * params.color_blendAmount;
 

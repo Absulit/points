@@ -59,7 +59,7 @@ fn main(
     // -----------------------------------------------
     var scaleAnim = 8.;
     var positionAnim = mouse*ratio / scaleAnim;
-    var indexAnim:u32 = u32(4 * fnusin(4));
+    var indexAnim:u32 = u32(4 * fnusin(4.));
     let animColor = sprite(bobbles, imageSampler, positionAnim, uvr / scaleAnim, indexAnim, vec2<u32>(24,24));
     // -----------------------------------------------
     scaleAnim = 10.;
@@ -67,7 +67,7 @@ fn main(
     indexAnim = u32(51 * fract(params.time * .15));
     let animPenguin = sprite(penguin, imageSampler, positionAnim, uvr / scaleAnim, indexAnim, vec2<u32>(32,32));
 
-    let square = sdfSquare( (mouse*ratio+vec2(.3,0.14)), .14, 0., 0., uvr) * .5;
+    let square = sdfSquare( (mouse*ratio+vec2(.3, 0.14)), .14, 0., 0., uvr) * .5;
 
     return finalColor + animColor + layer(vec4(square), animPenguin);
 }
