@@ -22,7 +22,7 @@ fn main(
     let n2 = (snoise(uv / scale + vec2(.3, .02) * params.time) * .5 + .5) * intensity;
     let n = n1 + n2;
 
-    let imageColor = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0,0), uvr + n2, true);
+    let imageColor = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0., 0), uvr + n2, true);
     let finalColor:vec4<f32> = imageColor;
 
     return finalColor;

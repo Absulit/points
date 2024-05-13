@@ -34,7 +34,7 @@ fn main(
     // let audioAverage = audioAverage(audio);
     // let audioAverageSegments = audioAverageSegments(2);
 
-    let feedbackColor = texturePosition(feedbackTexture, imageSampler, vec2(), uvr * vec2f(1, 1.01), true);
+    let feedbackColor = texturePosition(feedbackTexture, imageSampler, vec2(0.), uvr * vec2f(1, 1.01), true);
 
     let segmentNum = 4;
     let subSegmentLength = i32(params.audioLength) / segmentNum;

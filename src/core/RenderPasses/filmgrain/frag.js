@@ -18,7 +18,7 @@ fn main(
 ) -> @location(0) vec4<f32> {
 
 
-    let imageColor = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0,0), uvr, true);
+    let imageColor = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0., 0), uvr, true);
 
     rand_seed = uvr + params.time;
 
