@@ -1,5 +1,4 @@
 export const RED = /*wgsl*/`
-import new from './../../examples/webgpu_particles_1/pass0/index';
 const RED = vec4(1.,0.,0.,1.);
 `;
 
