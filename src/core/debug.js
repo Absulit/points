@@ -1,4 +1,7 @@
 /**
+ * @type {Screen}
+ * Draws an infinite cross.
+ * Useful to draw it where the mouse is.
  * @param position
  * @param color
  * @param uv
@@ -12,6 +15,8 @@ fn showDebugCross(position:vec2<f32>, color:vec4<f32>, uv:vec2<f32>) -> vec4<f32
 `;
 
 /**
+ * @type {Screen}
+ * Border around the screen
  * @param color
  * @param uv
  */

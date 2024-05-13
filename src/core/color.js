@@ -86,7 +86,14 @@ fn bloom(input:f32, iterations:i32, intensity:f32) -> f32 {
 `;
 
 
-
+/**
+ * @type {String}
+ * Returns the perceived brightness of a color by the eye
+ * # Standard
+ * LuminanceA = (0.2126*R) + (0.7152*G) + (0.0722*B)
+ * @param {vec4f} color
+ * @return `f32`
+ */
 export const brightness = /*wgsl*/`
 fn brightness(color:vec4<f32>) -> f32 {
     // #Standard
@@ -99,12 +106,30 @@ fn brightness(color:vec4<f32>) -> f32 {
 }
 `;
 
+/**
+ * @type {String}
+ * Returns the perceived brightness of a color by the eye
+ * # Percieved A
+ * LuminanceB = (0.299*R + 0.587*G + 0.114*B)
+ * @param {vec4f} color
+ * @return `f32`
+ */
 export const brightnessB = /*wgsl*/`
 fn brightnessB(color:vec4<f32>) -> f32 {
     return (0.299 * color.r) + (0.587 * color.g) + (0.114 * color.b);
 }
 `;
 
+/**
+ * @type {String}
+ * Returns the perceived brightness of a color by the eye
+ * # Percieved B
+ * slower to calculate
+ *
+ * LuminanceC = sqrt(0.299*(R**2) + 0.587*(G**2) + 0.114*(B**2))
+ * @param {vec4f} color
+ * @return `f32`
+ */
 export const brightnessC = /*wgsl*/`
 fn brightnessC(color:vec4<f32>) -> f32 {
     return (0.2126 * pow(color.r, 2.)) + (0.7152 * pow(color.g, 2.)) + (0.0722 * pow(color.b, 2.));

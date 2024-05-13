@@ -1,3 +1,9 @@
+/**
+ * @type {String}
+ * Single random number. 
+ * Use `seed` to change seed.
+ * @return `f32`
+ */
 export const random = /*wgsl*/`
 
 var<private> a:i32 = 1664525;
@@ -16,6 +22,12 @@ fn random() -> f32 {
 
 `;
 
+/**
+ * @type {String}
+ * Random number that returns a `vec2f`.
+ * Use `rand_seed:vec2f` to change seed.
+ * @return `f32` equivalent to `rand_seed.y` and `rand_seed` is the result.
+ */
 export const rand = /*wgsl*/`
 var<private> rand_seed : vec2<f32>;
 
@@ -26,6 +38,11 @@ fn rand() -> f32 {
 }
 `;
 
+/**
+ * @type {String}
+ * Random number from `vec2f` param
+ * @param {vec2f} co `vec2f` vector
+ */
 export const rand2 = /*wgsl*/`
 fn rand2(co: vec2<f32>) -> f32 {
     return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
