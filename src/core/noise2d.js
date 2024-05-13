@@ -1,6 +1,13 @@
 // original: Author : Ian McEwan, Ashima Arts.
 // https://github.com/ashima/webgl-noise/blob/master/src/noise2D.glsl
 
+/**
+ * @type {String}
+ * Noise
+ * @param {vec2f} v usually the uv
+ * @return `f32`
+ */
+
 export const snoise = /*wgsl*/`
 
 fn mod289_v3(x: vec3<f32>) -> vec3<f32> {

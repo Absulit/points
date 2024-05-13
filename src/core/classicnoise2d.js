@@ -1,8 +1,7 @@
 // original: Author :  Stefan Gustavson (stefan.gustavson@liu.se)
 // https://github.com/ashima/webgl-noise/blob/master/src/classicnoise2D.glsl
 
-
-export const cnoise = /*wgsl*/`
+const auxiliars = /*wgsl*/`
 fn mod289(x:vec4<f32>) -> vec4<f32> {
   return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
@@ -18,9 +17,19 @@ fn taylorInvSqrt(r:vec4<f32>) -> vec4<f32> {
 fn fade(t:vec2<f32>) -> vec2<f32> {
   return t*t*t*(t*(t*6.0-15.0)+10.0);
 }
+`;
+
+/**
+ * @type {String}
+ * Classic Perlin Noise
+ * @param {vec2f} P point
+ * @return `f32`
+ */
+export const cnoise = /*wgsl*/`
+${auxiliars}
 
 // Classic Perlin noise
-fn cnoise(P:vec2<f32>)->f32{
+fn cnoise(P:vec2<f32>) ->f32 {
     var Pi = floor(P.xyxy) + vec4(0.0, 0.0, 1.0, 1.0);
     let Pf = fract(P.xyxy) - vec4(0.0, 0.0, 1.0, 1.0);
     Pi = mod289(Pi); // To avoid truncation effects in permutation
@@ -57,6 +66,16 @@ fn cnoise(P:vec2<f32>)->f32{
     let n_xy = mix(n_x.x, n_x.y, fade_xy.y);
     return 2.3 * n_xy;
 }
+`;
+/**
+ * @type {String}
+ * Classic Perlin Noise, periodic variant
+ * @param {vec2f} P point
+ * @param {vec2f} rep point
+ * @return `f32`
+ */
+export const pnoise = /*wgsl*/`
+${auxiliars}
 
 // Classic Perlin noise, periodic variant
 fn pnoise(P:vec2<f32>, rep:vec2<f32>) -> f32 {

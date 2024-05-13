@@ -1,6 +1,12 @@
 // original: Author :  Stefan Gustavson (stefan.gustavson@liu.se)
 // https://github.com/ashima/webgl-noise/blob/master/src/cellular2D.glsl
 
+/**
+ * @type {String}
+ * Cellular noise
+ * @param {vec2f} P position
+ * @return `vec2f`
+ */
 
 export const cellular = /*wgsl*/`
 // Modulo 289 without a division (only multiplications)
@@ -84,4 +90,3 @@ fn cellular(P:vec2<f32>) -> vec2<f32> {
     return sqrt(d1.xy);
 }
 `;
-

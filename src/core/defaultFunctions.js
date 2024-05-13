@@ -1,3 +1,12 @@
+/**
+ * @type {string}
+ * Default function for the Vertex shader that takes charge of automating the
+ * creation of a few variables that are commonly used.
+ * @param {vec4f} position
+ * @param {vec4f} color
+ * @param {vec2f} uv
+ * @return {Fragment}
+ */
 export const defaultVertexBody = /*wgsl*/`
 fn defaultVertexBody(position: vec4<f32>, color: vec4<f32>, uv: vec2<f32>) -> Fragment {
     var result: Fragment;
@@ -15,6 +24,3 @@ fn defaultVertexBody(position: vec4<f32>, color: vec4<f32>, uv: vec2<f32>) -> Fr
     return result;
 }
 `;
-
-
-

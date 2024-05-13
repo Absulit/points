@@ -9,6 +9,7 @@ fn euclideanDistance(color:vec4<f32>, distanceColor:vec4<f32>) -> f32{
 `;
 
 /**
+ * @type {String}
  * From a palette declared in `getClosestColorInPalette_palette`
  * gets the closest color based on `distance`
  * @param {vec4<f32>} color `vec4<f32>` color to replace with

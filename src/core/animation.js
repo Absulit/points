@@ -3,6 +3,7 @@
  */
 
 /**
+ * @type {String}
  * Animates `sin()` over `params.time` and a provided `speed`.
  * The value is not normalized, so in the range -1..1
  * @param {f32} speed
@@ -14,6 +15,7 @@ fn fusin(speed: f32) -> f32{
 `;
 
 /**
+ * @type {String}
  * Animates `cos()` over `params.time` and a provided `speed`.
  * The value is not normalized, so in the range -1..1
  * @param {f32} speed
@@ -25,6 +27,7 @@ fn fucos(speed: f32) -> f32{
 `;
 
 /**
+ * @type {String}
  * Animates `sin()` over `params.time` and a provided `speed`.
  * The value is normalized, so in the range 0..1
  * @param {f32} speed
