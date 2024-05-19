@@ -118,7 +118,7 @@ export default class Points {
             this._canvas.addEventListener('click', e => {
                 this._mouseClick = true;
             });
-            this._canvas.addEventListener('mousemove', this._onMouseMove);
+            this._canvas.addEventListener('mousemove', this._onMouseMove, { passive: true });
             this._canvas.addEventListener('mousedown', e => {
                 this._mouseDown = true;
             });
@@ -129,7 +129,7 @@ export default class Points {
             this._canvas.addEventListener('wheel', e => {
                 this._mouseWheel = true;
                 this._mouseDelta = [e.deltaX, e.deltaY];
-            });
+            }, { passive: true });
             this._originalCanvasWidth = this._canvas.clientWidth;
             this._originalCanvasHeigth = this._canvas.clientHeight;
             window.addEventListener('resize', this._resizeCanvasToFitWindow, false);
