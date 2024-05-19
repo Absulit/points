@@ -8,3 +8,5 @@ src/vendor/* linguist-vendored
 
 # Ignore generated files
 # *.min.js linguist-generated
+
+src/core/* linguist-language=wgsl
