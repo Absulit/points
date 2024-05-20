@@ -4,20 +4,44 @@
 
 You can code freely without the use of any of the provided [support modules (math, color, image, effects, noise, sdf, etc)](#support-modules) or you can use them and have a little bit less of code in the shader. You can of course create your own modules and import them in the same way.
 
+
+# Gallery
+
+https://github.com/Absulit/points/assets/233719/c7c164be-7b69-4277-a80c-ce458e751966
+
+
 # Examples
 
 <div>
-    <img src="./docs/base_demo.png" alt="base demo image" width="200"/>
-    <img src="./docs/bloom1.png" alt="image with bloom" width="200"/>
-    <img src="./docs/imagetexture2.png" alt="image with effect" width="200"/>
-    <img src="./docs/imagetexture3.png" alt="image with distortion" width="200"/>
+    <a href="./examples/base/">
+        <img src="./docs/base_demo.png" alt="base demo image" width="200"/>
+    </a>
+    <a href="./examples/bloom1/">
+        <img src="./docs/bloom1.png" alt="image with bloom" width="200"/>
+    </a>
+    <a href="./examples/imagetexture2/">
+        <img src="./docs/imagetexture2.png" alt="image with effect" width="200"/>
+    </a>
+    <a href="./examples/imagetexture3/">
+        <img src="./docs/imagetexture3.png" alt="image with distortion" width="200"/>
+    </a>
 </div>
 <div>
-    <img src="./docs/dithering1.png" alt="image with dithering effect 1" width="200"/>
-    <img src="./docs/dithering2.png" alt="image with dithering effect 2" width="200"/>
-    <img src="./docs/dithering3.png" alt="image with dithering effect 2" width="200"/>
-    <img src="./docs/noise1.png" alt="image with noise layered" width="200"/>
+    <a href="./examples/dithering1/">
+        <img src="./docs/dithering1.png" alt="image with dithering effect 1" width="200"/>
+    </a>
+    <a href="./examples/dithering2/">
+        <img src="./docs/dithering2.png" alt="image with dithering effect 2" width="200"/>
+    </a>
+    <a href="./examples/dithering3/">
+        <img src="./docs/dithering3.png" alt="image with dithering effect 2" width="200"/>
+    </a>
+    <a href="./examples/noise1/">
+        <img src="./docs/noise1.png" alt="image with noise layered" width="200"/>
+    </a>
 </div>
+
+All examples are live here: https://absulit.github.io/points/examples/
 
 # Main Audience
 
