@@ -1,9 +1,11 @@
 import { sdfCircle } from 'sdf';
 import { WHITE, BLUE, GREEN, RED, YELLOW } from 'color';
+import { fnusin } from 'animation';
 
 const frag = /*wgsl*/`
 
 ${sdfCircle}
+${fnusin}
 ${WHITE + RED + GREEN + BLUE + YELLOW}
 
 @fragment
@@ -16,26 +18,25 @@ fn main(
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
-    // < ------------ TWO PULSATING CIRCLES
-    var circle1Radius = .01;
-    var circle2Radius = .01;
+    let f0 = fnusin(1.);
+    let f1 = fnusin(2.);
 
-    if(params.time % 1. == 0.){
-        circle1Radius = .1;
+    // < ------------ TWO PULSATING CIRCLES
+
+    if(f0 >= .9999){
         left_blink.data[0] = 1.;
         left_blink.data[1] = 1.;
         left_blink.updated = 1u;
     }
 
-    if(params.time % 2. == 0.){
-        circle2Radius = .1;
+    if(f1 >= .9999){
         right_blink.data[0] = 2.;
         right_blink.data[1] = 2.;
         right_blink.updated = 1u;
     }
 
-    let circleValue1 = sdfCircle(vec2f(.2,.5), circle1Radius, 0., uvr);
-    let circleValue2 = sdfCircle(vec2f(.8,.5), circle2Radius, 0., uvr);
+    let circleValue1 = sdfCircle(vec2f(.2,.5), .01 + f0 * .09, 0., uvr);
+    let circleValue2 = sdfCircle(vec2f(.8,.5), .01 + f1 * .09, 0., uvr);
 
     var circle1Color = circleValue1 * WHITE;
     var circle2Color = circleValue2 * WHITE;
