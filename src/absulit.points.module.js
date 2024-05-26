@@ -190,6 +190,15 @@ export default class Points {
             format: 'depth24plus',
             usage: GPUTextureUsage.RENDER_ATTACHMENT,
         });
+
+        // this is to solve an issue that requires the texture to be resized
+        // if the screen dimensions change, this for a `addTexture2d` with
+        // `copyCurrentTexture` parameter set to `true`.
+        this._textures2d.forEach(texture2d => {
+            if (!texture2d.imageTexture && texture2d.texture) {
+                this._createTextureBindingToCopy(texture2d);
+            }
+        })
     }
 
     /** @private */
@@ -1023,11 +1032,7 @@ export default class Points {
 
                 texture2d.texture = cubeTexture;
             } else {
-                texture2d.texture = this._device.createTexture({
-                    size: this._presentationSize,
-                    format: this._presentationFormat, // if 'depth24plus' throws error
-                    usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
-                });
+                this._createTextureBindingToCopy(texture2d);
             }
         });
         //--------------------------------------------
@@ -1043,6 +1048,15 @@ export default class Points {
                 format: 'rgba8unorm',
                 usage: GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
             });
+        });
+    }
+
+    /** @private */
+    _createTextureBindingToCopy(texture2d){
+        texture2d.texture = this._device.createTexture({
+            size: this._presentationSize,
+            format: this._presentationFormat, // if 'depth24plus' throws error
+            usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
         });
     }
 
