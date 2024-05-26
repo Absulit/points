@@ -38,11 +38,9 @@ document.addEventListener('fullscreenchange', e => {
     fullscreenCheck.updateDisplay();
 });
 
-let isFitWindow = (localStorage.getItem('fitwindow-enabled') === 'true') || false;
-let isFitWindowData = { 'isFitWindow': isFitWindow };
-gui.add(isFitWindowData, 'isFitWindow').name('Fit Window').onChange(value => {
+let isFitWindowData = { 'isFitWindow': false };
+gui.add(isFitWindowData, 'isFitWindow').name('Fit Window').listen().onChange(value => {
     points.fitWindow = value;
-    localStorage.setItem('fitwindow-enabled', value);
 });
 
 const shaderProjects = [
@@ -170,8 +168,11 @@ async function init() {
     if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
     }
-
+    const canvas = document.getElementById('gl-canvas');
+    canvas.width = 800;
+    canvas.height = 800;
     points = new Points('gl-canvas');
+    isFitWindowData.isFitWindow = false;
 
     gui.removeFolder(optionsFolder);
     optionsFolder = gui.addFolder(FOLDER_NAME);
@@ -182,7 +183,7 @@ async function init() {
     await points.init(renderPasses);
 
     let hasVertexAndFragmentShader = renderPasses.every(renderPass => renderPass.hasVertexAndFragmentShader)
-    hasVertexAndFragmentShader && (points.fitWindow = isFitWindow);
+    hasVertexAndFragmentShader;
 
     update();
 }
