@@ -5,7 +5,7 @@
  */
 
 const options = {
-    scale: .180,
+    scale: 1,
 }
 
 import vert from './vert.js';
