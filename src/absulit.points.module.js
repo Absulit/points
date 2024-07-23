@@ -64,6 +64,8 @@ export default class Points {
         /** @private */
         this._textures2d = [];
         /** @private */
+        this._textures2dArray = [];
+        /** @private */
         this._texturesExternal = [];
         /** @private */
         this._texturesStorage2d = [];
@@ -396,7 +398,7 @@ export default class Points {
     }
 
     /**
-     * Load an image as texture2d
+     * Load an image as texture_2d
      * @param {string} name
      * @param {string} path
      * @param {ShaderType} shaderType
@@ -419,6 +421,37 @@ export default class Points {
                 bitmap: imageBitmap
             },
             internal: this._internal
+        });
+    }
+
+    /**
+     * Load images as texture_2d_array
+     * @param {string} name
+     * @param {Array} paths
+     * @param {ShaderType} shaderType
+     */
+    async addTextureImageArray(name, paths, shaderType) {
+        if (this._nameExists(this._textures2dArray, name)) {
+            return;
+        }
+
+        const imageBitmaps = [];
+        for await (const path of paths) {
+            console.log(path);
+            const response = await fetch(path);
+            const blob = await response.blob();
+            imageBitmaps.push(await createImageBitmap(blob));
+        }
+
+        this._textures2dArray.push({
+            name: name,
+            copyCurrentTexture: false,
+            shaderType: shaderType,
+            texture: null,
+            imageTextures: {
+                bitmaps: imageBitmaps
+            },
+            internal: this._internal,
         });
     }
 
@@ -656,6 +689,14 @@ export default class Points {
             let internalCheck = internal == texture.internal;
             if (!texture.shaderType && internalCheck || texture.shaderType == shaderType && internalCheck) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d<f32>;\n`;
+                bindingIndex += 1;
+            }
+        });
+
+        this._textures2dArray.forEach((texture, index) => {
+            let internalCheck = internal == texture.internal;
+            if (!texture.shaderType && internalCheck || texture.shaderType == shaderType && internalCheck) {
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d_array<f32>;\n`;
                 bindingIndex += 1;
             }
         });
@@ -1036,6 +1077,35 @@ export default class Points {
             }
         });
         //--------------------------------------------
+        this._textures2dArray.forEach(texture2dArray => {
+            if (texture2dArray.imageTextures) {
+                let cubeTexture;
+                const imageBitmaps = texture2dArray.imageTextures.bitmaps;
+
+                cubeTexture = this._device.createTexture({
+                    size: [imageBitmaps[0].width, imageBitmaps[0].height, imageBitmaps.length],
+                    format: 'rgba8unorm',
+                    usage:
+                        GPUTextureUsage.TEXTURE_BINDING |
+                        GPUTextureUsage.COPY_DST |
+                        GPUTextureUsage.RENDER_ATTACHMENT,
+                });
+
+                imageBitmaps.forEach((imageBitmap, i) => {
+                    this._device.queue.copyExternalImageToTexture(
+                        { source: imageBitmap },
+                        { texture: cubeTexture, origin: { x: 0, y: 0, z: i } },
+                        [imageBitmap.width, imageBitmap.height, 1]
+                    );
+                })
+
+
+                texture2dArray.texture = cubeTexture;
+            } else {
+                this._createTextureBindingToCopy(texture2dArray);
+            }
+        });
+        //--------------------------------------------
         this._texturesExternal.forEach(externalTexture => {
             externalTexture.texture = this._device.importExternalTexture({
                 source: externalTexture.video
@@ -1052,7 +1122,7 @@ export default class Points {
     }
 
     /** @private */
-    _createTextureBindingToCopy(texture2d){
+    _createTextureBindingToCopy(texture2d) {
         texture2d.texture = this._device.createTexture({
             size: this._presentationSize,
             format: this._presentationFormat, // if 'depth24plus' throws error
@@ -1075,6 +1145,9 @@ export default class Points {
                         bglEntry[entry.type.name] = { 'type': entry.type.type };
                         if (entry.type.format) {
                             bglEntry[entry.type.name].format = entry.type.format
+                        }
+                        if (entry.type.viewDimension) {
+                            bglEntry[entry.type.name].viewDimension = entry.type.viewDimension
                         }
                         bglEntries.push(bglEntry);
                     });
@@ -1332,6 +1405,30 @@ export default class Points {
             });
         }
 
+        if (this._textures2dArray.length) {
+            this._textures2dArray.forEach((texture2dArray, index) => {
+                let internalCheck = internal == texture2dArray.internal;
+                if (!texture2dArray.shaderType && internalCheck || texture2dArray.shaderType == shaderType && internalCheck) {
+                    entries.push(
+                        {
+                            label: 'texture 2d array',
+                            binding: bindingIndex++,
+                            resource: texture2dArray.texture.createView({
+                                dimension: '2d-array',
+                                baseArrayLayer: 0,
+                                arrayLayerCount: texture2dArray.imageTextures.bitmaps.length
+                            }),
+                            type: {
+                                name: 'texture',
+                                type: 'float',
+                                viewDimension: '2d-array'
+                            }
+                        }
+                    );
+                }
+            });
+        }
+
         if (this._texturesExternal.length) {
             this._texturesExternal.forEach(externalTexture => {
                 let internalCheck = internal == externalTexture.internal;
@@ -1407,6 +1504,9 @@ export default class Points {
 
                     bglEntry[entry.type.name] = { 'type': entry.type.type };
 
+                    if (entry.type.viewDimension) {
+                        bglEntry[entry.type.name].viewDimension = entry.type.viewDimension
+                    }
                     // TODO: 1262
                     // if you remove this there's an error that I think is not explained right
                     // it talks about a storage in index 1 but it was actually the 0
