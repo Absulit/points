@@ -249,8 +249,8 @@ export default class Points {
     }
 
     /**
-     * 
-     * @param {Array} arr 
+     *
+     * @param {Array} arr
      */
     updateUniforms(arr) {
         arr.forEach(uniform => {
@@ -422,6 +422,42 @@ export default class Points {
             },
             internal: this._internal
         });
+    }
+
+    /**
+     * Load an image as texture_2d
+     * @param {string} name
+     * @param {string} path
+     * @param {ShaderType} shaderType
+     */
+    async updateTextureImage(name, path, shaderType) {
+        if (!this._nameExists(this._textures2d, name)) {
+            console.warn('image can not be updated')
+            return;
+        }
+
+        const response = await fetch(path);
+        const blob = await response.blob();
+        const imageBitmap = await createImageBitmap(blob);
+
+        const texture2d = this._textures2d.filter(obj => obj.name == name)[0];
+        texture2d.imageTexture.bitmap = imageBitmap;
+
+        const cubeTexture = this._device.createTexture({
+            size: [imageBitmap.width, imageBitmap.height, 1],
+            format: 'rgba8unorm',
+            usage:
+                GPUTextureUsage.TEXTURE_BINDING |
+                GPUTextureUsage.COPY_DST |
+                GPUTextureUsage.RENDER_ATTACHMENT,
+        });
+
+        this._device.queue.copyExternalImageToTexture(
+            { source: imageBitmap },
+            { texture: cubeTexture },
+            [imageBitmap.width, imageBitmap.height]
+        );
+        texture2d.texture = cubeTexture;
     }
 
     /**
