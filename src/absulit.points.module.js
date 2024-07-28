@@ -64,6 +64,8 @@ export default class Points {
         /** @private */
         this._textures2d = [];
         /** @private */
+        this._texturesToCopy = [];
+        /** @private */
         this._textures2dArray = [];
         /** @private */
         this._texturesExternal = [];
@@ -265,8 +267,6 @@ export default class Points {
     /**
      * Creates a persistent memory buffer across every frame call.
      * @param {string} name Name that the Storage will have in the shader
-     * @param {Number} size Number of items it will have.
-     * Multiply this by number of properties in the struct if necessary.
      * @param {string} structName Name of the struct already existing on the
      * shader that will be the array<structName> of the Storage
      * @param {boolean} read if this is going to be used to read data back
@@ -287,7 +287,15 @@ export default class Points {
             internal: this._internal
         });
     }
-
+    /**
+     * Creates a persistent memory buffer across every frame call that can be updated.
+     * @param {string} name Name that the Storage will have in the shader.
+     * @param {array} arrayData array with the data that must match the struct.
+     * @param {string} structName Name of the struct already existing on the
+     * shader that will be the array<structName> of the Storage.
+     * @param {boolean} read if this is going to be used to read data back.
+     * @param {ShaderType} shaderType this tells to what shader the storage is bound
+     */
     addStorageMap(name, arrayData, structName, read, shaderType) {
         if (this._nameExists(this._storage, name)) {
             return;
@@ -342,7 +350,7 @@ export default class Points {
 
     /** @private */
     _nameExists(arrayOfObjects, name) {
-        return arrayOfObjects.some(obj => obj.name == name);
+        return arrayOfObjects.find(obj => obj.name == name);
     }
 
     /**
@@ -397,6 +405,28 @@ export default class Points {
         });
     }
 
+    copyTexture(nameTextureA, nameTextureB) {
+        const texture2d_A = this._nameExists(this._textures2d, nameTextureA);
+        const texture2d_B = this._nameExists(this._textures2d, nameTextureB);
+
+        if (!(texture2d_A && texture2d_B)) {
+            console.error('One of the textures does not exist.');
+        }
+        const a = texture2d_A.texture;
+
+        const cubeTexture = this._device.createTexture({
+            size: [a.width, a.height, 1],
+            format: 'rgba8unorm',
+            usage:
+                GPUTextureUsage.TEXTURE_BINDING |
+                GPUTextureUsage.COPY_DST |
+                GPUTextureUsage.RENDER_ATTACHMENT,
+        });
+        texture2d_B.texture = cubeTexture;
+
+        this._texturesToCopy.push({ a, b:texture2d_B.texture  });
+    }
+
     /**
      * Load an image as texture_2d
      * @param {string} name
@@ -448,6 +478,7 @@ export default class Points {
             format: 'rgba8unorm',
             usage:
                 GPUTextureUsage.TEXTURE_BINDING |
+                GPUTextureUsage.COPY_SRC |
                 GPUTextureUsage.COPY_DST |
                 GPUTextureUsage.RENDER_ATTACHMENT,
         });
@@ -1093,10 +1124,12 @@ export default class Points {
                 const imageBitmap = texture2d.imageTexture.bitmap;
 
                 cubeTexture = this._device.createTexture({
+                    label: texture2d.name,
                     size: [imageBitmap.width, imageBitmap.height, 1],
                     format: 'rgba8unorm',
                     usage:
                         GPUTextureUsage.TEXTURE_BINDING |
+                        GPUTextureUsage.COPY_SRC |
                         GPUTextureUsage.COPY_DST |
                         GPUTextureUsage.RENDER_ATTACHMENT,
                 });
@@ -1108,6 +1141,7 @@ export default class Points {
                 );
 
                 texture2d.texture = cubeTexture;
+            // } else if (texture2d.copyCurrentTexture) {
             } else {
                 this._createTextureBindingToCopy(texture2d);
             }
@@ -1160,7 +1194,18 @@ export default class Points {
     /** @private */
     _createTextureBindingToCopy(texture2d) {
         texture2d.texture = this._device.createTexture({
+            label: texture2d.name,
             size: this._presentationSize,
+            format: this._presentationFormat, // if 'depth24plus' throws error
+            usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
+        });
+    }
+
+    /** @private */
+    _createTextureToSize(texture2d, width, height) {
+        texture2d.texture = this._device.createTexture({
+            label: texture2d.name,
+            size: [width, height],
             format: this._presentationFormat, // if 'depth24plus' throws error
             usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
         });
@@ -1687,6 +1732,21 @@ export default class Points {
                         }
                     }
                 });
+
+                this._texturesToCopy.forEach(texturePair => {
+                    // console.log(texturePair.a);
+                    // this._createTextureToSize(texturePair.b, texturePair.a.width, texturePair.a.height);
+                    commandEncoder.copyTextureToTexture(
+                        {
+                            texture: texturePair.a,
+                        },
+                        {
+                            texture: texturePair.b,
+                        },
+                        [texturePair.a.width, texturePair.a.height]
+                    );
+                });
+                this._texturesToCopy = [];
             }
         });
 
