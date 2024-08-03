@@ -253,13 +253,13 @@ export default class Points {
      * @param {string} structName type as `f32` or a custom struct. Default `few`
      */
     setUniform(name, value, structName = null) {
-        let isUpdate = this._nameExists(this._uniforms, name);
-        if (isUpdate && structName) {
+        let uniformToUpdate = this._nameExists(this._uniforms, name);
+        if (uniformToUpdate && structName) {
             //if name exists is an update
             throw '`setUniform()` can\'t set the structName of an already defined uniform.';
         }
-        if(isUpdate){
-            isUpdate.value = value;
+        if (uniformToUpdate) {
+            uniformToUpdate.value = value;
             return;
         }
 
@@ -457,12 +457,10 @@ export default class Points {
     }
 
     /**
-     * Load an image as texture_2d
-     * @param {string} name
-     * @param {string} path
-     * @param {ShaderType} shaderType
+     * @deprecated uset setTextureImage
      */
     async addTextureImage(name, path, shaderType) {
+        console.warn('addTextureImage is deprecated, use setTextureImage');
         if (this._nameExists(this._textures2d, name)) {
             return;
         }
@@ -484,12 +482,10 @@ export default class Points {
     }
 
     /**
-     * Load an image as texture_2d
-     * @param {string} name
-     * @param {string} path
-     * @param {ShaderType} shaderType
+     * @deprecated uset setTextureImage
      */
     async updateTextureImage(name, path, shaderType) {
+        console.warn('updateTextureImage is deprecated, use setTextureImage');
         if (!this._nameExists(this._textures2d, name)) {
             console.warn('image can not be updated')
             return;
@@ -521,12 +517,64 @@ export default class Points {
     }
 
     /**
+     * Load an image as texture_2d
+     * @param {string} name
+     * @param {string} path
+     * @param {ShaderType} shaderType
+     */
+    async setTextureImage(name, path, shaderType = null) {
+        const texture2dToUpdate = this._nameExists(this._textures2d, name);
+
+        const response = await fetch(path);
+        const blob = await response.blob();
+        const imageBitmap = await createImageBitmap(blob);
+
+        if (texture2dToUpdate) {
+            if (shaderType) {
+                throw '`setTextureImage()` the param `shaderType` should not be updated after its creation.';
+            }
+            texture2dToUpdate.imageTexture.bitmap = imageBitmap;
+
+            const cubeTexture = this._device.createTexture({
+                size: [imageBitmap.width, imageBitmap.height, 1],
+                format: 'rgba8unorm',
+                usage:
+                    GPUTextureUsage.TEXTURE_BINDING |
+                    GPUTextureUsage.COPY_SRC |
+                    GPUTextureUsage.COPY_DST |
+                    GPUTextureUsage.RENDER_ATTACHMENT,
+            });
+
+            this._device.queue.copyExternalImageToTexture(
+                { source: imageBitmap },
+                { texture: cubeTexture },
+                [imageBitmap.width, imageBitmap.height]
+            );
+            texture2dToUpdate.texture = cubeTexture;
+            return texture2dToUpdate;
+        }
+
+        const texture2d = {
+            name: name,
+            copyCurrentTexture: false,
+            shaderType: shaderType,
+            texture: null,
+            imageTexture: {
+                bitmap: imageBitmap
+            },
+            internal: this._internal
+        }
+        this._textures2d.push(texture2d);
+        return texture2d;
+    }
+
+    /**
      * Load images as texture_2d_array
      * @param {string} name
      * @param {Array} paths
      * @param {ShaderType} shaderType
      */
-    async addTextureImageArray(name, paths, shaderType) {
+    async setTextureImageArray(name, paths, shaderType) {
         if (this._nameExists(this._textures2dArray, name)) {
             return;
         }
