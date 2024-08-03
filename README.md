@@ -358,7 +358,7 @@ You can call one of the following methods, you pair the data with a `key` name, 
 
 ---
 
-## Uniforms - addUniform
+## Uniforms - setUniform
 
 Uniforms are sent separately in the `main.js` file and they are all combined in the shaders in the struct called `params` . By default, all values are `f32` if no Struct or Type is specified in the third parameter. If values have more than one dimension (`array`, `vec2f`, `vec3f`, `vec4f`...) the data has to be send as an array. Uniforms can not be modified at runtime inside the shaders, they can only receive data from the JavaScript side.
 
@@ -372,9 +372,9 @@ Uniforms are sent separately in the `main.js` file and they are all combined in 
 // main.js
 async function init() {
     let renderPasses = [shaders.vert, shaders.compute, shaders.frag];
-    points.addUniform('myKeyName', 0); // 0 is your default value
-    points.addUniform('myTestVec2', [0.2, 2.1], 'vec2f'); // array of lenght 2 as data
-    points.addUniform('myTestStruct', [99, 1, 2, 3], 'MyTestStruct'); // prop value is 99 and the rest is a vec3f
+    points.setUniform('myKeyName', 0); // 0 is your default value
+    points.setUniform('myTestVec2', [0.2, 2.1], 'vec2f'); // array of lenght 2 as data
+    points.setUniform('myTestStruct', [99, 1, 2, 3], 'MyTestStruct'); // prop value is 99 and the rest is a vec3f
 
     // more init code
     await points.init(renderPasses);
@@ -758,7 +758,7 @@ let myKeyNameValue = 10;
 async function init() {
     let renderPasses = [shaders.vert, shaders.compute, shaders.frag];
     // myKeyName value 10
-    points.addUniform('myKeyName', myKeyNameValue);
+    points.setUniform('myKeyName', myKeyNameValue);
 
     // more init code
     await points.init(renderPasses);
@@ -768,7 +768,7 @@ async function init() {
 function update() {
     myKeyNameValue += 1;
     // updated myKeyName value increases on each frame
-    points.updateUniform('myKeyName', myKeyNameValue);
+    points.setUniform('myKeyName', myKeyNameValue);
 
     // more update code
     points.update();

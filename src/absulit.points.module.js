@@ -212,15 +212,10 @@ export default class Points {
     }
 
     /**
-     * Set a param as uniform to send to all shaders.
-     * A Uniform is a value that can only be changed
-     * from the outside, and unless changed it remains
-     * consistent. To change it use `updateUniform()`
-     * @param {string} name name of the Param, you can invoke it later in shaders as `Params.[name]`
-     * @param {Number|Array} value Single number or a list of numbers
-     * @param {string} structName type as `f32` or a custom struct
+     * @deprecated use setUniform
      */
     addUniform(name, value, structName) {
+        console.warn('addUniform is deprecated, use setUniform');
         if (structName && isArray(structName)) {
             throw `${structName} is an array, which is currently not supported for Uniforms.`;
         }
@@ -238,21 +233,55 @@ export default class Points {
     }
 
     /**
-     * Update a param as uniform already existing
-     * @param {string} name name of the param to update
-     * @param {*} value Number will be converted to `f32`
+     * @deprecated use setUniform
      */
     updateUniform(name, value) {
+        console.warn('addUniform is deprecated, use setUniform');
         const variable = this._uniforms.find(v => v.name === name);
         if (!variable) {
             throw '`updateUniform()` can\'t be called without first `addUniform()`.';
         }
         variable.value = value;
     }
+    /**
+     * Set a param as uniform to send to all shaders.
+     * A Uniform is a value that can only be changed
+     * from the outside, and unless changed it remains
+     * consistent.
+     * @param {string} name name of the Param, you can invoke it later in shaders as `Params.[name]`
+     * @param {Number|Array} value Single number or a list of numbers
+     * @param {string} structName type as `f32` or a custom struct. Default `few`
+     */
+    setUniform(name, value, structName = null) {
+        let isUpdate = this._nameExists(this._uniforms, name);
+        if (isUpdate && structName) {
+            //if name exists is an update
+            throw '`setUniform()` can\'t set the structName of an already defined uniform.';
+        }
+        if(isUpdate){
+            isUpdate.value = value;
+            return;
+        }
+
+        if (structName && isArray(structName)) {
+            throw `${structName} is an array, which is currently not supported for Uniforms.`;
+        }
+
+        const uniform = {
+            name: name,
+            value: value,
+            type: structName,
+            size: null,
+            internal: this._internal
+        }
+
+        this._uniforms.push(uniform);
+        return uniform;
+    }
 
     /**
-     *
-     * @param {Array} arr
+     * Update a list of uniforms
+     * @param {Array<Object>} array object array of the type: `{name, value}`
      */
     updateUniforms(arr) {
         arr.forEach(uniform => {
@@ -424,7 +453,7 @@ export default class Points {
         });
         texture2d_B.texture = cubeTexture;
 
-        this._texturesToCopy.push({ a, b:texture2d_B.texture  });
+        this._texturesToCopy.push({ a, b: texture2d_B.texture });
     }
 
     /**
@@ -621,7 +650,7 @@ export default class Points {
             'Sound' // custom struct in defaultStructs.js
         );
         // uniform that will have the data length as a quick reference
-        this.addUniform(`${name}Length`, analyser.frequencyBinCount);
+        this.setUniform(`${name}Length`, analyser.frequencyBinCount);
 
         sound.analyser = analyser;
         sound.data = data;
@@ -897,15 +926,15 @@ export default class Points {
         this._renderPasses = renderPasses.concat(this._postRenderPasses);
 
         // initializing internal uniforms
-        this.addUniform(UniformKeys.TIME, this._time);
-        this.addUniform(UniformKeys.DELTA, this._delta);
-        this.addUniform(UniformKeys.EPOCH, this._epoch);
-        this.addUniform(UniformKeys.SCREEN, [0, 0], 'vec2f');
-        this.addUniform(UniformKeys.MOUSE, [0, 0], 'vec2f');
-        this.addUniform(UniformKeys.MOUSE_CLICK, this._mouseClick);
-        this.addUniform(UniformKeys.MOUSE_DOWN, this._mouseDown);
-        this.addUniform(UniformKeys.MOUSE_WHEEL, this._mouseWheel);
-        this.addUniform(UniformKeys.MOUSE_DELTA, this._mouseDelta, 'vec2f');
+        this.setUniform(UniformKeys.TIME, this._time);
+        this.setUniform(UniformKeys.DELTA, this._delta);
+        this.setUniform(UniformKeys.EPOCH, this._epoch);
+        this.setUniform(UniformKeys.SCREEN, [0, 0], 'vec2f');
+        this.setUniform(UniformKeys.MOUSE, [0, 0], 'vec2f');
+        this.setUniform(UniformKeys.MOUSE_CLICK, this._mouseClick);
+        this.setUniform(UniformKeys.MOUSE_DOWN, this._mouseDown);
+        this.setUniform(UniformKeys.MOUSE_WHEEL, this._mouseWheel);
+        this.setUniform(UniformKeys.MOUSE_DELTA, this._mouseDelta, 'vec2f');
 
         let hasComputeShaders = this._renderPasses.some(renderPass => renderPass.hasComputeShader);
         if (!hasComputeShaders && this._bindingTextures.length) {
@@ -1141,7 +1170,7 @@ export default class Points {
                 );
 
                 texture2d.texture = cubeTexture;
-            // } else if (texture2d.copyCurrentTexture) {
+                // } else if (texture2d.copyCurrentTexture) {
             } else {
                 this._createTextureBindingToCopy(texture2d);
             }
@@ -1620,16 +1649,16 @@ export default class Points {
         this._delta = this._clock.getDelta();
         this._time = this._clock.time;
         this._epoch = new Date() / 1000;
-        this.updateUniform(UniformKeys.TIME, this._time);
-        this.updateUniform(UniformKeys.DELTA, this._delta);
-        this.updateUniform(UniformKeys.EPOCH, this._epoch);
-        this.updateUniform(UniformKeys.SCREEN, [this._canvas.width, this._canvas.height]);
-        this.updateUniform(UniformKeys.MOUSE, [this._mouseX, this._mouseY]);
+        this.setUniform(UniformKeys.TIME, this._time);
+        this.setUniform(UniformKeys.DELTA, this._delta);
+        this.setUniform(UniformKeys.EPOCH, this._epoch);
+        this.setUniform(UniformKeys.SCREEN, [this._canvas.width, this._canvas.height]);
+        this.setUniform(UniformKeys.MOUSE, [this._mouseX, this._mouseY]);
 
-        this.updateUniform(UniformKeys.MOUSE_CLICK, this._mouseClick);
-        this.updateUniform(UniformKeys.MOUSE_DOWN, this._mouseDown);
-        this.updateUniform(UniformKeys.MOUSE_WHEEL, this._mouseWheel);
-        this.updateUniform(UniformKeys.MOUSE_DELTA, this._mouseDelta);
+        this.setUniform(UniformKeys.MOUSE_CLICK, this._mouseClick);
+        this.setUniform(UniformKeys.MOUSE_DOWN, this._mouseDown);
+        this.setUniform(UniformKeys.MOUSE_WHEEL, this._mouseWheel);
+        this.setUniform(UniformKeys.MOUSE_DELTA, this._mouseDelta);
         //--------------------------------------------
 
         this._createParametersUniforms();
