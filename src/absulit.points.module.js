@@ -215,7 +215,6 @@ export default class Points {
      * @deprecated use setUniform
      */
     addUniform(name, value, structName) {
-        console.warn('addUniform is deprecated, use setUniform');
         if (structName && isArray(structName)) {
             throw `${structName} is an array, which is currently not supported for Uniforms.`;
         }
@@ -236,7 +235,6 @@ export default class Points {
      * @deprecated use setUniform
      */
     updateUniform(name, value) {
-        console.warn('addUniform is deprecated, use setUniform');
         const variable = this._uniforms.find(v => v.name === name);
         if (!variable) {
             throw '`updateUniform()` can\'t be called without first `addUniform()`.';
@@ -294,12 +292,7 @@ export default class Points {
     }
 
     /**
-     * Creates a persistent memory buffer across every frame call.
-     * @param {string} name Name that the Storage will have in the shader
-     * @param {string} structName Name of the struct already existing on the
-     * shader that will be the array<structName> of the Storage
-     * @param {boolean} read if this is going to be used to read data back
-     * @param {ShaderType} shaderType this tells to what shader the storage is bound
+     * @deprecated use setStorage()
      */
     addStorage(name, structName, read, shaderType, arrayData) {
         if (this._nameExists(this._storage, name)) {
@@ -316,14 +309,35 @@ export default class Points {
             internal: this._internal
         });
     }
+
     /**
-     * Creates a persistent memory buffer across every frame call that can be updated.
-     * @param {string} name Name that the Storage will have in the shader.
-     * @param {array} arrayData array with the data that must match the struct.
+     * Creates a persistent memory buffer across every frame call.
+     * @param {string} name Name that the Storage will have in the shader
      * @param {string} structName Name of the struct already existing on the
-     * shader that will be the array<structName> of the Storage.
-     * @param {boolean} read if this is going to be used to read data back.
+     * shader that will be the array<structName> of the Storage
+     * @param {boolean} read if this is going to be used to read data back
      * @param {ShaderType} shaderType this tells to what shader the storage is bound
+     */
+    setStorage(name, structName, read, shaderType, arrayData) {
+        if (this._nameExists(this._storage, name)) {
+            throw `\`setStorage()\` You have already defined \`${name}\``;
+        }
+        const storage = {
+            mapped: !!arrayData,
+            name: name,
+            structName: structName,
+            // structSize: null,
+            shaderType: shaderType,
+            read: read,
+            buffer: null,
+            internal: this._internal
+        }
+        this._storage.push(storage);
+        return storage;
+    }
+
+    /**
+     * @deprecated
      */
     addStorageMap(name, arrayData, structName, read, shaderType) {
         if (this._nameExists(this._storage, name)) {
@@ -341,12 +355,44 @@ export default class Points {
         });
     }
 
+    /**
+     * @deprecated use setStorageMap
+     */
     updateStorageMap(name, arrayData) {
         const variable = this._storage.find(v => v.name === name);
         if (!variable) {
             throw '`updateStorageMap()` can\'t be called without first `addStorageMap()`.';
         }
         variable.array = arrayData;
+    }
+
+    /**
+     * Creates a persistent memory buffer across every frame call that can be updated.
+     * @param {string} name Name that the Storage will have in the shader.
+     * @param {array} arrayData array with the data that must match the struct.
+     * @param {string} structName Name of the struct already existing on the
+     * shader that will be the array<structName> of the Storage.
+     * @param {boolean} read if this is going to be used to read data back.
+     * @param {ShaderType} shaderType this tells to what shader the storage is bound
+     */
+    setStorageMap(name, arrayData, structName, read, shaderType) {
+        const storageToUpdate = this._nameExists(this._storage, name)
+        if (storageToUpdate) {
+            storageToUpdate.array = arrayData;
+            return storageToUpdate;
+        }
+        const storage = {
+            mapped: true,
+            name: name,
+            structName: structName,
+            shaderType: shaderType,
+            array: arrayData,
+            buffer: null,
+            read: read,
+            internal: this._internal
+        }
+        this._storage.push(storage);
+        return storage;
     }
 
     async readStorage(name) {
@@ -460,7 +506,6 @@ export default class Points {
      * @deprecated uset setTextureImage
      */
     async addTextureImage(name, path, shaderType) {
-        console.warn('addTextureImage is deprecated, use setTextureImage');
         if (this._nameExists(this._textures2d, name)) {
             return;
         }
@@ -485,7 +530,6 @@ export default class Points {
      * @deprecated uset setTextureImage
      */
     async updateTextureImage(name, path, shaderType) {
-        console.warn('updateTextureImage is deprecated, use setTextureImage');
         if (!this._nameExists(this._textures2d, name)) {
             console.warn('image can not be updated')
             return;
