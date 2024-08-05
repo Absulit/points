@@ -11,6 +11,7 @@ import { dataSize, getArrayTypeData, isArray, typeSizes } from './data-size.js';
 
 export default class Points {
     constructor(canvasId) {
+        // TODO: change @private and _var to #var in all uses even private methods
         /** @private */
         this._canvasId = canvasId;
         /** @private */
@@ -281,6 +282,7 @@ export default class Points {
      * Update a list of uniforms
      * @param {Array<Object>} array object array of the type: `{name, value}`
      */
+    // TODO: change to setUniforms
     updateUniforms(arr) {
         arr.forEach(uniform => {
             const variable = this._uniforms.find(v => v.name === uniform.name);
@@ -408,6 +410,7 @@ export default class Points {
         return arrayBufferCopy;
     }
 
+    // TODO: change to setLayers
     addLayers(numLayers, shaderType) {
         for (let layerIndex = 0; layerIndex < numLayers; layerIndex++) {
             this._layers.shaderType = shaderType;
@@ -433,6 +436,7 @@ export default class Points {
      * @param {string} name Name of the `sampler` to be called in the shaders.
      * @param {GPUSamplerDescriptor} descriptor
      */
+    // TODO: change to setSampler
     addSampler(name, descriptor, shaderType) {
         if ('sampler' == name) {
             throw '`name` can not be sampler since is a WebGPU keyword';
@@ -466,6 +470,7 @@ export default class Points {
      * @param {string} name Name to call the texture in the shaders.
      * @param {boolean} copyCurrentTexture If you want the fragment output to be copied here.
      */
+    // TODO: change to setTexture2d
     addTexture2d(name, copyCurrentTexture, shaderType, renderPassIndex) {
         if (this._nameExists(this._textures2d, name)) {
             return;
@@ -503,7 +508,7 @@ export default class Points {
     }
 
     /**
-     * @deprecated uset setTextureImage
+     * @deprecated use setTextureImage
      */
     async addTextureImage(name, path, shaderType) {
         if (this._nameExists(this._textures2d, name)) {
@@ -649,6 +654,7 @@ export default class Points {
      * @param {string} path
      * @param {ShaderType} shaderType
      */
+    // TODO: change to setTextureVideo
     async addTextureVideo(name, path, shaderType) {
         if (this._nameExists(this._texturesExternal, name)) {
             return;
@@ -668,6 +674,7 @@ export default class Points {
         });
     }
 
+    // TODO: change to setTextureWebcam
     async addTextureWebcam(name, shaderType) {
         if (this._nameExists(this._texturesExternal, name)) {
             return;
@@ -697,6 +704,7 @@ export default class Points {
         });
     }
 
+    // TODO: change to setAudio
     addAudio(name, path, volume, loop, autoplay) {
         const audio = new Audio(path);
         audio.volume = volume;
@@ -737,7 +745,7 @@ export default class Points {
         analyser.getByteFrequencyData(data);
 
         // storage that will have the data on WGSL
-        this.addStorageMap(name, data,
+        this.setStorageMap(name, data,
             // `array<f32, ${bufferLength}>`
             'Sound' // custom struct in defaultStructs.js
         );
@@ -752,6 +760,7 @@ export default class Points {
     }
 
     // TODO: verify this method
+    // TODO: change to setTextureStorage2d
     addTextureStorage2d(name, shaderType) {
         if (this._nameExists(this._texturesStorage2d, name)) {
             return;
@@ -773,6 +782,7 @@ export default class Points {
      * @param {Array<number, 2>} size dimensions of the texture, by default screen
      * size
      */
+    // TODO: change to setBindingTexture
     addBindingTexture(computeName, fragmentName, size) {
         this._bindingTextures.push({
             compute: {
@@ -798,7 +808,7 @@ export default class Points {
         // TODO: remove structSize
         // this extra 4 is for the boolean flag in the Event struct
         let data = Array(structSize + 4).fill(0);
-        this.addStorageMap(name, data, 'Event', true);
+        this.setStorageMap(name, data, 'Event', true);
         this._events.set(this._events_ids,
             {
                 id: this._events_ids,
