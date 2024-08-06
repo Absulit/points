@@ -50,7 +50,7 @@ export default class RenderPasses {
         let shaders = RenderPasses._LIST[renderPassId];
         let renderPass = new RenderPass(shaders.vertexShader, shaders.fragmentShader, shaders.computeShader);
         renderPass.internal = true;
-        points._postRenderPasses.push(renderPass);
+        points.addRenderPass(renderPass);
         await shaders.init(points, params)
     }
 
