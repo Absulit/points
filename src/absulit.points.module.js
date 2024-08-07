@@ -923,9 +923,14 @@ export default class Points {
      * Mainly to be used with RenderPasses.js
      * @param {RenderPass} renderPass
      */
-    addRenderPass(renderPass){
+    addRenderPass(renderPass) {
         this.#postRenderPasses.push(renderPass);
     }
+
+    get renderPasses() {
+        return this.#renderPasses;
+    }
+
     /**
      * Adds two triangles called points per number of columns and rows
      */

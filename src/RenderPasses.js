@@ -25,7 +25,7 @@ export default class RenderPasses {
     static BLUR = 8;
     static WAVES = 9;
 
-    static _LIST = {
+    static #LIST = {
         1: color,
         2: grayscale,
         3: chromaticAberration,
@@ -44,10 +44,10 @@ export default class RenderPasses {
      * @param {Object} params An object with the params needed by the `RenderPass`
      */
     static async add(points, renderPassId, params) {
-        if (points._renderPasses?.length) {
+        if (points.renderPasses?.length) {
             throw '`addPostRenderPass` should be called prior `Points.init()`';
         }
-        let shaders = RenderPasses._LIST[renderPassId];
+        let shaders = this.#LIST[renderPassId];
         let renderPass = new RenderPass(shaders.vertexShader, shaders.fragmentShader, shaders.computeShader);
         renderPass.internal = true;
         points.addRenderPass(renderPass);
