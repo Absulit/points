@@ -205,7 +205,6 @@ export default class Points {
      * Update a list of uniforms
      * @param {Array<Object>} array object array of the type: `{name, value}`
      */
-    // TODO: change to setUniforms
     updateUniforms(arr) {
         arr.forEach(uniform => {
             const variable = this.#uniforms.find(v => v.name === uniform.name);
@@ -326,8 +325,30 @@ export default class Points {
         }
         return arrayBufferCopy;
     }
-    // TODO: change to setLayers
+    /**
+     * @deprecated use setLayers
+     */
     addLayers(numLayers, shaderType) {
+        for (let layerIndex = 0; layerIndex < numLayers; layerIndex++) {
+            this.#layers.shaderType = shaderType;
+            this.#layers.push({
+                name: `layer${layerIndex}`,
+                size: this.#canvas.width * this.#canvas.height,
+                structName: 'vec4<f32>',
+                structSize: 16,
+                array: null,
+                buffer: null,
+                internal: this.#internal
+            });
+        }
+    }
+    /**
+     * Layers of data made of `vec4f`
+     * @param {Number} numLayers
+     * @param {ShaderType} shaderType
+     */
+    setLayers(numLayers, shaderType) {
+        // TODO: check what data to return
         for (let layerIndex = 0; layerIndex < numLayers; layerIndex++) {
             this.#layers.shaderType = shaderType;
             this.#layers.push({
@@ -345,12 +366,11 @@ export default class Points {
     #nameExists(arrayOfObjects, name) {
         return arrayOfObjects.find(obj => obj.name == name);
     }
+
     /**
-     * Creates a `sampler` to be sent to the shaders.
-     * @param {string} name Name of the `sampler` to be called in the shaders.
-     * @param {GPUSamplerDescriptor} descriptor
+     * @deprecated use setSampler
      */
-    // TODO: change to setSampler
+
     addSampler(name, descriptor, shaderType) {
         if ('sampler' == name) {
             throw '`name` can not be sampler since is a WebGPU keyword';
@@ -375,12 +395,45 @@ export default class Points {
             internal: this.#internal
         });
     }
+
     /**
-     * Create a `texture_2d` in the shaders.
-     * @param {string} name Name to call the texture in the shaders.
-     * @param {boolean} copyCurrentTexture If you want the fragment output to be copied here.
+     * Creates a `sampler` to be sent to the shaders.
+     * @param {string} name Name of the `sampler` to be called in the shaders.
+     * @param {GPUSamplerDescriptor} descriptor
      */
-    // TODO: change to setTexture2d
+
+    setSampler(name, descriptor, shaderType) {
+        if ('sampler' == name) {
+            throw 'setSampler: `name` can not be sampler since is a WebGPU keyword.';
+        }
+        if (this.#nameExists(this.#samplers, name)) {
+            throw `setSampler: \`${name}\` already exists.`;
+        }
+        // Create a sampler with linear filtering for smooth interpolation.
+        descriptor = descriptor || {
+            addressModeU: 'clamp-to-edge',
+            addressModeV: 'clamp-to-edge',
+            magFilter: 'linear',
+            minFilter: 'linear',
+            mipmapFilter: 'linear',
+            //maxAnisotropy: 10,
+        };
+        const sampler = {
+            name: name,
+            descriptor: descriptor,
+            shaderType: shaderType,
+            resource: null,
+            internal: this.#internal
+        };
+        this.#samplers.push(sampler);
+        return sampler;
+    }
+
+
+    /**
+     * @deprecated use setTexture2d
+     */
+
     addTexture2d(name, copyCurrentTexture, shaderType, renderPassIndex) {
         if (this.#nameExists(this.#textures2d, name)) {
             return;
@@ -394,6 +447,29 @@ export default class Points {
             internal: this.#internal
         });
     }
+
+    /**
+     * Create a `texture_2d` in the shaders.
+     * @param {string} name Name to call the texture in the shaders.
+     * @param {boolean} copyCurrentTexture If you want the fragment output to be copied here.
+     */
+    setTexture2d(name, copyCurrentTexture, shaderType, renderPassIndex) {
+        if (this.#nameExists(this.#textures2d, name)) {
+            throw `setTexture2d: \`${name}\` already exists.`;
+        }
+        const texture2d = {
+            name: name,
+            copyCurrentTexture: copyCurrentTexture,
+            shaderType: shaderType,
+            texture: null,
+            renderPassIndex: renderPassIndex,
+            internal: this.#internal
+        }
+        this.#textures2d.push(texture2d);
+        return texture2d;
+    }
+
+
     copyTexture(nameTextureA, nameTextureB) {
         const texture2d_A = this.#nameExists(this.#textures2d, nameTextureA);
         const texture2d_B = this.#nameExists(this.#textures2d, nameTextureB);
@@ -537,12 +613,9 @@ export default class Points {
         });
     }
     /**
-     * Load an video as texture2d
-     * @param {string} name
-     * @param {string} path
-     * @param {ShaderType} shaderType
+     * @deprecated use setTextureVideo
      */
-    // TODO: change to setTextureVideo
+
     async addTextureVideo(name, path, shaderType) {
         if (this.#nameExists(this.#texturesExternal, name)) {
             return;
@@ -560,7 +633,36 @@ export default class Points {
             internal: this.#internal
         });
     }
-    // TODO: change to setTextureWebcam
+
+    /**
+     * Load an video as texture2d
+     * @param {string} name
+     * @param {string} path
+     * @param {ShaderType} shaderType
+     */
+    async setTextureVideo(name, path, shaderType) {
+        if (this.#nameExists(this.#texturesExternal, name)) {
+            throw `setTextureVideo: ${name} already exists.`;
+        }
+        const video = document.createElement('video');
+        video.loop = true;
+        video.autoplay = true;
+        video.muted = true;
+        video.src = new URL(path, import.meta.url).toString();
+        await video.play();
+        const textureExternal = {
+            name: name,
+            shaderType: shaderType,
+            video: video,
+            internal: this.#internal
+        };
+        this.#texturesExternal.push(textureExternal);
+        return textureExternal;
+    }
+
+    /**
+     * @deprecated
+     */
     async addTextureWebcam(name, shaderType) {
         if (this.#nameExists(this.#texturesExternal, name)) {
             return;
@@ -587,7 +689,44 @@ export default class Points {
             internal: this.#internal
         });
     }
-    // TODO: change to setAudio
+
+    /**
+     * Load webcam as texture2d
+     * @param {string} name
+     * @param {ShaderType} shaderType
+     */
+    async setTextureWebcam(name, shaderType) {
+        if (this.#nameExists(this.#texturesExternal, name)) {
+            throw `setTextureWebcam: ${name} already exists.`;
+        }
+        const video = document.createElement('video');
+        //video.loop = true;
+        //video.autoplay = true;
+        video.muted = true;
+        //document.body.appendChild(video);
+        if (navigator.mediaDevices.getUserMedia) {
+            await navigator.mediaDevices.getUserMedia({ video: true })
+                .then(async function (stream) {
+                    video.srcObject = stream;
+                    await video.play();
+                })
+                .catch(function (err) {
+                    console.log(err);
+                });
+        }
+        const textureExternal = {
+            name: name,
+            shaderType: shaderType,
+            video: video,
+            internal: this.#internal
+        };
+        this.#texturesExternal.push(textureExternal);
+        return textureExternal;
+    }
+
+    /**
+     * @deprecated useSetAudio
+     */
     addAudio(name, path, volume, loop, autoplay) {
         const audio = new Audio(path);
         audio.volume = volume;
@@ -631,29 +770,78 @@ export default class Points {
         this.#sounds.push(sound);
         return audio;
     }
-    // TODO: verify this method
-    // TODO: change to setTextureStorage2d
-    addTextureStorage2d(name, shaderType) {
-        if (this.#nameExists(this.#texturesStorage2d, name)) {
-            return;
+
+    /**
+     * Assigns an audio FrequencyData to a StorageMap
+     * @param {string} name name of the Storage and prefix of the length variable e.g. `[name]Length`.
+     * @param {string} path
+     * @param {Number} volume
+     * @param {boolean} loop
+     * @param {boolean} autoplay
+     * @returns {Audio}
+     */
+    setAudio(name, path, volume, loop, autoplay) {
+        const audio = new Audio(path);
+        audio.volume = volume;
+        audio.autoplay = autoplay;
+        audio.loop = loop;
+        const sound = {
+            name: name,
+            path: path,
+            audio: audio,
+            analyser: null,
+            data: null
         }
-        this.#texturesStorage2d.push({
+        // this.#audio.play();
+        // audio
+        const audioContext = new AudioContext();
+        let resume = _ => { audioContext.resume() }
+        if (audioContext.state === 'suspended') {
+            document.body.addEventListener('touchend', resume, false);
+            document.body.addEventListener('click', resume, false);
+        }
+        const source = audioContext.createMediaElementSource(audio);
+        // // audioContext.createMediaStreamSource()
+        const analyser = audioContext.createAnalyser();
+        analyser.fftSize = 2048;
+        source.connect(analyser);
+        analyser.connect(audioContext.destination);
+        const bufferLength = analyser.fftSize;//analyser.frequencyBinCount;
+        // const bufferLength = analyser.frequencyBinCount;
+        const data = new Uint8Array(bufferLength);
+        // analyser.getByteTimeDomainData(data);
+        analyser.getByteFrequencyData(data);
+        // storage that will have the data on WGSL
+        this.setStorageMap(name, data,
+            // `array<f32, ${bufferLength}>`
+            'Sound' // custom struct in defaultStructs.js
+        );
+        // uniform that will have the data length as a quick reference
+        this.setUniform(`${name}Length`, analyser.frequencyBinCount);
+        sound.analyser = analyser;
+        sound.data = data;
+        this.#sounds.push(sound);
+        return audio;
+    }
+
+
+    // TODO: verify this method
+    setTextureStorage2d(name, shaderType) {
+        if (this.#nameExists(this.#texturesStorage2d, name)) {
+            throw `setTextureStorage2d: ${name} already exists.`
+        }
+        const texturesStorage2d = {
             name: name,
             shaderType: shaderType,
             texture: null,
             internal: this.#internal
-        });
+        };
+        this.#texturesStorage2d.push(texturesStorage2d);
+        return texturesStorage2d;
     }
     /**
-     * Adds a texture to the compute and fragment shader, in the compute you can
-     * write to the texture, and in the fragment you can read the texture, so is
-     * a one way communication method.
-     * @param {string} computeName name of the variable in the compute shader
-     * @param {string} fragmentName name of the variable in the fragment shader
-     * @param {Array<number, 2>} size dimensions of the texture, by default screen
-     * size
+     * @deprecated use setBindingTexture
      */
-    // TODO: change to setBindingTexture
     addBindingTexture(computeName, fragmentName, size) {
         this.#bindingTextures.push({
             compute: {
@@ -669,6 +857,36 @@ export default class Points {
             internal: this.#internal
         });
     }
+
+    /**
+     * Sets a texture to the compute and fragment shader, in the compute you can
+     * write to the texture, and in the fragment you can read the texture, so is
+     * a one way communication method.
+     * @param {string} computeName name of the variable in the compute shader
+     * @param {string} fragmentName name of the variable in the fragment shader
+     * @param {Array<number, 2>} size dimensions of the texture, by default screen
+     * size
+     * @returns
+     */
+    setBindingTexture(computeName, fragmentName, size) {
+        // TODO: validate that names don't exist already
+        const bindingTexture = {
+            compute: {
+                name: computeName,
+                shaderType: ShaderType.COMPUTE
+            },
+            fragment: {
+                name: fragmentName,
+                shaderType: ShaderType.FRAGMENT
+            },
+            texture: null,
+            size: size,
+            internal: this.#internal
+        }
+        this.#bindingTextures.push(bindingTexture);
+        return bindingTexture;
+    }
+
     /**
      * Listen for an event dispatched from WGSL code
      * @param {Number} id Number that represents an event Id
