@@ -135,7 +135,7 @@ You can take a look at `/examples/main.js` and `/examples/index.html`
 ## index.html
 
 ```html
-<canvas id="gl-canvas" width="800" height="800">
+<canvas id="canvas" width="800" height="800">
     Oops ... your browser doesn't support the HTML5 canvas element
 </canvas>
 ```
@@ -151,7 +151,7 @@ import Points from '../src/absulit.points.module.js';
 import base from '../examples/base/index.js';
 
 // reference the canvas in the constructor
-const points = new Points('gl-canvas');
+const points = new Points('canvas');
 ```
 
 ```js
