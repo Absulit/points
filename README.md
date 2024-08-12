@@ -184,7 +184,7 @@ init();
 
 # RenderPass
 
-As shown before a `RenderPass` is a way to have a block of shaders to pass to your application pipeline and they will be executed in the order you pass them in the `Points.init()` method.
+As shown before a `RenderPass` is a way to have a block of shaders to pass to your application pipeline and these render passes will be executed in the order you pass them in the `Points.init()` method.
 
 ```js
 let renderPasses = [
@@ -292,7 +292,7 @@ let time = params.time;
 
 ### vert.js
 
-The vertex shader has this set of parameters set in the main function: position, color, uv, vertex_index.
+The vertex shader has this set of parameters initialized in the main function: position, color, uv, vertex_index.
 
 ```rust
 @vertex
@@ -307,7 +307,7 @@ fn main(
 }
 ```
 
-The `defaultVertexBody` returns a `Fragment` struct that provides the parameters for `frag.js` , it adds a ratio parameter with the ratio of the width and height of the canvas, and the mouse position as a `vec2<f32>` . The mouse position is different from the `params.mouse.x` and `params.mouse.y` , but it uses its values to calculate them in the UV space. The uv is ratio corrected, meaning that if your canvas is wider than taller, a portion of the uv will be out of bounds to mantain the aspect ratio. This might change later to a new uv[some name] to differentiate them, and still have the regular uv space to calculate the screen. Right now if you need to do that in a different canvas size rather than a 1:1 dimension, you have to use ratio to deconstruct the original value.
+The `defaultVertexBody` returns a `Fragment` struct that provides the parameters for `frag.js` , it adds a ratio parameter with the ratio of the width and height of the canvas, and the mouse position as a `vec2<f32>` . The mouse position is different from the `params.mouse.x` and `params.mouse.y` , but it uses its values to calculate them in the UV space. The uvr is ratio corrected, meaning that if your canvas is wider than taller, a portion of the uv will be out of bounds to mantain the aspect ratio.
 
 ```rust
 // defaultStructs.js
@@ -354,7 +354,7 @@ You can call one of the following methods, you pair the data with a `key` name, 
 
 ---
 
-> **Note:** all the `add*()` methods add the variables/buffers/data into all the shaders in all `RenderPass` passes.
+> **Note:** all the `set*()` methods add the variables/buffers/data into all the shaders in all `RenderPass` passes.
 
 ---
 
@@ -362,11 +362,6 @@ You can call one of the following methods, you pair the data with a `key` name, 
 
 Uniforms are sent separately in the `main.js` file and they are all combined in the shaders in the struct called `params` . By default, all values are `f32` if no Struct or Type is specified in the third parameter. If values have more than one dimension (`array`, `vec2f`, `vec3f`, `vec4f`...) the data has to be send as an array. Uniforms can not be modified at runtime inside the shaders, they can only receive data from the JavaScript side.
 
----
-
-> **Note:** structs as uniform types have very basic support and it will be fixed in later updates
-
----
 
 ```js
 // main.js
@@ -398,13 +393,13 @@ let cValue1 = params.myTestStruct.prop; // 99
 let cValue2 = params.myTestStruct.another_prop; // 1, 2, 3
 ```
 
-## Sampler - addSampler
+## Sampler - setSampler
 
 A sampler for textures is sometimes required, and you need to explicitly reference it.
 
 Don't name it just `sampler` , because that's the data type inside WGSL. `POINTS` will throw an exception if you do.
 
-A descripttor is assigned by default, if you want to sample your image in a different way, you can take a look at [GPUObjectDescriptorBase](https://gpuweb.github.io/gpuweb/#texture-creation) in the WGSL docs.
+A descriptor is assigned by default, if you want to sample your image in a different way, you can take a look at [GPUTextureDescriptor](https://gpuweb.github.io/gpuweb/#texture-creation) in the WGSL docs.
 
 ```js
 // main.js
@@ -420,7 +415,7 @@ async function init() {
         //maxAnisotropy: 10,
     }
 
-    points.addSampler('mySampler', descriptor);
+    points.setSampler('mySampler', descriptor);
 
     // more init code
     await points.init(renderPasses);
@@ -433,7 +428,7 @@ async function init() {
 let rgba = textureSample(texture, mySampler, uv);
 ```
 
-## Texture - addTexture2d
+## Texture - setTexture2d
 
 You can create an empty texture, which is not very useful on its own, but if you set the second parameter to true, after the Fragment Shader is printed out to screen, it saves the output value to this texture and you can use it in the next update call, so basically you can sample the value from the previous frame.
 
@@ -443,7 +438,7 @@ There's also a third parameter that signals the texture to only capture that Ren
 // main.js
 async function init() {
     let renderPasses = [shaders.vert, shaders.compute, shaders.frag];
-    points.addTexture2d('feedbackTexture', true, 0);
+    points.setTexture2d('feedbackTexture', true, 0);
 
     // more init code
     await points.init(renderPasses);
@@ -456,16 +451,16 @@ async function init() {
 let rgba = textureSampleLevel(feedbackTexture, feedbackSampler, vec2<f32>(0,0),  0.0);
 ```
 
-## TextureImage - addTextureImage
+## TextureImage - setTextureImage
 
-With `addTextureImage` you can pass an image and sample it with the Sampler you just added.
+With `setTextureImage` you can pass an image and sample it with the Sampler you just added.
 
 ```js
 // main.js
 async function init() {
     let renderPasses = [shaders.vert, shaders.compute, shaders.frag];
     // await since the resource is async we need to wait for it to be ready
-    await points.addTextureImage('image', './../img/absulit_800x800.jpg');
+    await points.setTextureImage('image', './../img/absulit_800x800.jpg');
 
     // more init code
     await points.init(renderPasses);
@@ -479,7 +474,7 @@ let startPosition = vec2(.0);
 let rgbaImage = texturePosition(image, mySampler, startPosition, uv, false);
 ```
 
-## Storage - addStorage
+## Storage - setStorage
 
 A storage is a large array with the same data type and this data can be modified at runtime inside the shaders, so in principle this is different to any other data type here where you can only send data and not modify it in the shaders, or as the uniforms where the data can only be updated from the JavaScript side. You can allocate this space and use it in the shaders and the data will remain in the next update/frame call.
 
@@ -498,8 +493,8 @@ async function init() {
     let renderPasses = [shaders.vert, shaders.compute, shaders.frag];
 
     const numPoints = 800 * 800;
-    points.addStorage('value_noise_data', `array<f32, ${numPoints}>`);
-    points.addStorage('variables', 'Variable');
+    points.setStorage('value_noise_data', `array<f32, ${numPoints}>`);
+    points.setStorage('variables', 'Variable');
 
     // more init code
     await points.init(renderPasses);
@@ -511,7 +506,7 @@ async function init() {
 // compute.js outside the main function in the shader
 
 // declare struct referenced here:
-// points.addStorage('variables', 1, 'Variable', 1);
+// points.setStorage('variables', 1, 'Variable', 1);
 struct Variable {
     isCreated:f32
 }
@@ -530,20 +525,20 @@ variables.isCreated = 1;
 You can also add a default type instead of a custom struct in `structName`:
 
 ```js
-points.addStorage('myVar', 'f32');
-points.addStorage('myVar2', 'vec2f');
+points.setStorage('myVar', 'f32');
+points.setStorage('myVar2', 'vec2f');
 ```
 
-## StorageMap - addStorageMap
+## StorageMap - setStorageMap
 
-Creates a Storage in the same way as a `addStorage` does, except it can be set with data from the start of the application.
+Creates a Storage in the same way as a `setStorage` does, except it can be set with data from the start of the application.
 
 ```js
 // main.js
 async function init() {
     let renderPasses = [shaders.vert, shaders.compute, shaders.frag];
 
-    points.addStorageMap('values', [1.0, 99.0], 'array<f32, 2>');
+    points.setStorageMap('values', [1.0, 99.0], 'array<f32, 2>');
 
     // more init code
     await points.init(renderPasses);
@@ -558,9 +553,9 @@ async function init() {
 let c = values[1];
 ```
 
-## BindingTexture - addBindingTexture
+## BindingTexture - setBindingTexture
 
-If you require to send data as a texture from the Compute Shader to the Fragment shader and you do not want to use a Storage, you can use a `addBindingTexture()` , then in the compute shader a variable will exist where you can write colors to it, and in the Fragment Shader will exist a variable to read data from it.
+If you require to send data as a texture from the Compute Shader to the Fragment shader and you do not want to use a Storage, you can use a `setBindingTexture()` , then in the compute shader a variable will exist where you can write colors to it, and in the Fragment Shader will exist a variable to read data from it.
 
 ---
 
@@ -575,7 +570,7 @@ async function init() {
     let renderPasses = [shaders.vert, shaders.compute, shaders.frag];
 
     // First parameter goes to Compute Shader, second to Fragment Shader
-    points.addBindingTexture('outputTex', 'computeTexture');
+    points.setBindingTexture('outputTex', 'computeTexture');
 
     // more init code
     await points.init(renderPasses);
@@ -593,7 +588,7 @@ textureStore(outputTex, vec2<u32>(0,0), vec4(1,0,0,1));
 let rgba = textureSample(computeTexture, feedbackSampler, uv);
 ```
 
-## Video - addTextureVideo
+## Video - setTextureVideo
 
 You can load and play a video in the same fashion as a texture. The video is updated with a new value every frame.
 
@@ -601,7 +596,7 @@ You can load and play a video in the same fashion as a texture. The video is upd
 // main.js
 async function init() {
     let renderPasses = [shaders.vert, shaders.compute, shaders.frag];
-    await points.addTextureVideo('video', './../assets_ignore/VIDEO0244.mp4');
+    await points.setTextureVideo('video', './../assets_ignore/VIDEO0244.mp4');
 
     // more init code
     await points.init(renderPasses);
@@ -614,7 +609,7 @@ async function init() {
 let rgbaVideo = textureSampleBaseClampToEdge(video, feedbackSampler, fract(uv));
 ```
 
-## Webcam - addTextureWebcam
+## Webcam - setTextureWebcam
 
 You can load and play a webcam in the same fashion as a texture. The webcam is updated with a new value every frame.
 
@@ -622,7 +617,7 @@ You can load and play a webcam in the same fashion as a texture. The webcam is u
 // main.js
 async function init() {
     let renderPasses = [shaders.vert, shaders.compute, shaders.frag];
-    await points.addTextureWebcam('webcam');
+    await points.setTextureWebcam('webcam');
 
     // more init code
     await points.init(renderPasses);
@@ -635,13 +630,13 @@ async function init() {
 let rgbaWebcam = textureSampleBaseClampToEdge(webcam, feedbackSampler, fract(uv));
 ```
 
-## Audio - addAudio
+## Audio - setAudio
 
 You can load audio and use its data for visualization.
 
 ```js
 // index.js
-let audio = points.addAudio('myAudio', './../../audio/cognitive_dissonance.mp3', volume, loop, false);
+let audio = points.setAudio('myAudio', './../../audio/cognitive_dissonance.mp3', volume, loop, false);
 ```
 
 
@@ -653,7 +648,7 @@ let audioX = audio.data[ u32(uvr.x * params.audioLength)] / 256;
 
 ---
 
-> **Note:** The `points.addAudio` method returns a `new Audio` reference, you are responsible to start and stop the audio from the JavaScript side, if you require to start and stop a sound by creating a call from the shaders, please check the `Events - addEventListener` section
+> **Note:** The `points.setAudio` method returns a `new Audio` reference, you are responsible to start and stop the audio from the JavaScript side, if you require to start and stop a sound by creating a call from the shaders, please check the `Events - addEventListener` section
 
 ---
 
@@ -699,7 +694,7 @@ right_blink.updated = 1; // update this property to something diff than `0`
 By just simply changing the value of `updated` to a non zero, the library knows this event has been updated, and will dispatch the event immediately in JavaScript, so the `console.log` will print the text in the JavaScript Console. `updated` will be set as zero in the next frame, and if not updated the library then knows it doesn't have to do anything.
 
 
-## Layers - addLayers
+## Layers - setLayers
 
 A layer is basically a Storage but pre-made with the exact same dimension of the canvas, this for potentially create multi-layered effects that require a type of temporary storage and swap values between them. All items are `vec4<f32>`
 
@@ -709,7 +704,7 @@ To access a layer the first bracket of the array is the layer index and the seco
 // main.js
 async function init() {
     let renderPasses = [shaders.vert, shaders.compute, shaders.frag];
-    points.addLayers(2);
+    points.setLayers(2);
 
     // more init code
     await points.init(renderPasses);
