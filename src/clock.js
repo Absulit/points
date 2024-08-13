@@ -3,12 +3,11 @@
  * based on https://github.com/mrdoob/three.js/blob/master/src/core/Clock.js
  */
 export default class Clock {
-
+    #time = 0;
+    #oldTime = 0;
+    #delta = 0;
     constructor() {
-        /** @private */
-        this._time = 0;
-        /** @private */
-        this._oldTime = 0;
+
     }
 
     /**
@@ -16,18 +15,17 @@ export default class Clock {
      *  when `getDelta()` is called.
      */
     get time() {
-        return this._time;
+        return this.#time;
     }
 
     /**
      * Gets the last delta value, it does not calculate the delta, use `getDelta()`
      */
     get delta() {
-        return this._delta;
+        return this.#delta;
     }
 
-    /** @private */
-    now() {
+    #now() {
         return (typeof performance === 'undefined' ? Date : performance).now();
     }
 
@@ -36,11 +34,11 @@ export default class Clock {
      * It also calculates `time`
      */
     getDelta() {
-        this._delta = 0;
-        const newTime = this.now();
-        this._delta = (newTime - this._oldTime) / 1000;
-        this._oldTime = newTime;
-        this._time += this._delta;
-        return this._delta;
+        this.#delta = 0;
+        const newTime = this.#now();
+        this.#delta = (newTime - this.#oldTime) / 1000;
+        this.#oldTime = newTime;
+        this.#time += this.#delta;
+        return this.#delta;
     }
 }

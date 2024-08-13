@@ -1,49 +1,53 @@
 class Coordinate {
+    #x;
+    #y;
+    #z;
+    #value;
     constructor(x = 0, y = 0, z = 0) {
-        this._x = x;
-        this._y = y;
-        this._z = z;
-        this._value = [x, y, z];
+        this.#x = x;
+        this.#y = y;
+        this.#z = z;
+        this.#value = [x, y, z];
     }
 
     set x(value) {
-        this._x = value;
-        this._value[0] = value;
+        this.#x = value;
+        this.#value[0] = value;
     }
 
     set y(value) {
-        this._y = value;
-        this._value[1] = value;
+        this.#y = value;
+        this.#value[1] = value;
     }
 
     set z(value) {
-        this._z = value;
-        this._value[2] = value;
+        this.#z = value;
+        this.#value[2] = value;
     }
 
     get x() {
-        return this._x;
+        return this.#x;
     }
 
     get y() {
-        return this._y;
+        return this.#y;
     }
 
     get z() {
-        return this._z;
+        return this.#z;
     }
 
     get value() {
-        return this._value;
+        return this.#value;
     }
 
     set(x, y, z) {
-        this._x = x;
-        this._y = y;
-        this._z = z;
-        this._value[0] = x;
-        this._value[1] = y;
-        this._value[2] = z;
+        this.#x = x;
+        this.#y = y;
+        this.#z = z;
+        this.#value[0] = x;
+        this.#value[1] = y;
+        this.#value[2] = z;
     }
 }
 
