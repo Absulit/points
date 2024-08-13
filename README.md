@@ -373,7 +373,7 @@ async function init() {
     points.setUniform('myTestVec2', [0.2, 2.1], 'vec2f'); // array of lenght 2 as data
     points.setUniform('myTestStruct', [99, 1, 2, 3], 'MyTestStruct'); // prop value is 99 and the rest is a vec3f
 
-    // myKeyName value 10
+    // valueToUpdate value 10
     points.setUniform('valueToUpdate', myKeyNameValue);
 
     // more init code
@@ -551,6 +551,12 @@ points.setStorage('myVar2', 'vec2f');
 
 Creates a Storage in the same way as a `setStorage` does, except it can be set with data from the start of the application.
 
+---
+
+> **WARNING**: `setStorage` tends to slow the application if the data to update is too big, so be aware.
+
+---
+
 ```js
 // main.js
 async function init() {
@@ -559,8 +565,34 @@ async function init() {
     points.setStorageMap('values', [1.0, 99.0], 'array<f32, 2>');
 
     // more init code
+
+
+    // this is before any GPU calculation, so it's ok
+    let data = [];
+    let dataAmount = 800 * 800;
+    for (let k = 0; k < dataAmount k++) {
+        data.push(Math.random());
+    }
+    // it doesn't require size because uses the data to size it
+    points.setStorageMap('rands', data, `array<f32, ${dataAmount}>`);
+
     await points.init(renderPasses);
     update();
+}
+
+// if the amount of data is way too large, then this is a performance bottleneck.
+function update() {
+    // this is a processor hog
+    let data = [];
+    let dataAmount = 800 * 800;
+    for (let k = 0; k < dataAmount; k++) {
+        data.push(Math.random());
+    }
+    points.setStorageMap('rands', data);
+
+    // more update code
+    points.update();
+    requestAnimationFrame(update);
 }
 ```
 
@@ -569,6 +601,7 @@ async function init() {
 
 // we retrieve the 99.0 value
 let c = values[1];
+let randVal = rands[0]; // or any index between 0 and 800 * 800
 ```
 
 ## BindingTexture - setBindingTexture
@@ -746,61 +779,6 @@ shaders = mesh1;
 points.setMeshDensity(20, 20);
 ```
 
-# Update data sent to the shaders (in the update method)
-
-In the same fashion as the `add*` methods, there are a couple of `update*` methods for now
-
- `points.updateUniform();`
-
-and
-
- `points.updateStorageMap();`
-
----
-
-> **WARNING**: updateStorage tends to slow the application if the data to update is too big, so be aware.
-
----
-
-
-
-## updateStorageMap
-
-Used in conjunction with `addStorageMap()` , but if the amount of data is way too large, then this is a performance bottleneck.
-
-```js
-// main.js
-async function init() {
-    let renderPasses = [shaders.vert, shaders.compute, shaders.frag];
-
-    // this is before any GPU calculation, so it's ok
-    let data = [];
-    let dataAmount = 800 * 800;
-    for (let k = 0; k < dataAmount k++) {
-        data.push(Math.random());
-    }
-    // it doesn't require size because uses the data to size it
-    points.addStorageMap('rands', data, `array<f32, ${dataAmount}>`);
-
-    // more init code
-    await points.init(renderPasses);
-    update();
-}
-
-function update() {
-    // this is a processor hog
-    let data = [];
-    let dataAmount = 800 * 800;
-    for (let k = 0; k < dataAmount; k++) {
-        data.push(Math.random());
-    }
-    points.updateStorageMap('rands', data);
-
-    // more update code
-    points.update();
-    requestAnimationFrame(update);
-}
-```
 
 # Retrieve data from the shaders
 
@@ -810,7 +788,7 @@ First declare a storage as in `examples/data1/index.js`
 
 ```js
 // the last parameter as `true` means you will use this `Storage` to read back
-points.addStorage('resultMatrix', 'Matrix', true);
+points.setStorage('resultMatrix', 'Matrix', true);
 ```
 
 Read the data back after modification
