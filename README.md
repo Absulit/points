@@ -365,15 +365,30 @@ Uniforms are sent separately in the `main.js` file and they are all combined in 
 
 ```js
 // main.js
+let valueToUpdate = 10;
+
 async function init() {
     let renderPasses = [shaders.vert, shaders.compute, shaders.frag];
     points.setUniform('myKeyName', 0); // 0 is your default value
     points.setUniform('myTestVec2', [0.2, 2.1], 'vec2f'); // array of lenght 2 as data
     points.setUniform('myTestStruct', [99, 1, 2, 3], 'MyTestStruct'); // prop value is 99 and the rest is a vec3f
 
+    // myKeyName value 10
+    points.setUniform('valueToUpdate', myKeyNameValue);
+
     // more init code
     await points.init(renderPasses);
     update();
+}
+
+function update() {
+    valueToUpdate += 1;
+    // updated valueToUpdate value increases on each frame
+    points.setUniform('valueToUpdate', valueToUpdate);
+
+    // more update code
+    points.update();
+    requestAnimationFrame(update);
 }
 ```
 
@@ -391,6 +406,9 @@ let bValue = params.myTestVec2; // 0.2, 2.1
 
 let cValue1 = params.myTestStruct.prop; // 99
 let cValue2 = params.myTestStruct.another_prop; // 1, 2, 3
+
+// value is read the same way, but will vary per frame
+let dValue = params.valueToUpdate;
 ```
 
 ## Sampler - setSampler
@@ -744,38 +762,7 @@ and
 
 ---
 
-## updateUniform
 
-```js
-// main.js
-let myKeyNameValue = 10;
-
-async function init() {
-    let renderPasses = [shaders.vert, shaders.compute, shaders.frag];
-    // myKeyName value 10
-    points.setUniform('myKeyName', myKeyNameValue);
-
-    // more init code
-    await points.init(renderPasses);
-    update();
-}
-
-function update() {
-    myKeyNameValue += 1;
-    // updated myKeyName value increases on each frame
-    points.setUniform('myKeyName', myKeyNameValue);
-
-    // more update code
-    points.update();
-    requestAnimationFrame(update);
-}
-```
-
-```rust
-// frag.js
-// value is read the same way, but will vary per frame
-let aValue = params.myKeyName;
-```
 
 ## updateStorageMap
 
