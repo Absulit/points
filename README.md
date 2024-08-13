@@ -33,8 +33,8 @@ https://github.com/Absulit/points/assets/233719/c7c164be-7b69-4277-a80c-ce458e75
     <a href="./examples/dithering2/">
         <img src="./docs/dithering2.png" alt="image with dithering effect 2" width="200"/>
     </a>
-    <a href="./examples/dithering3/">
-        <img src="./docs/dithering3.png" alt="image with dithering effect 2" width="200"/>
+    <a href="./examples/dithering3_1/">
+        <img src="./docs/dithering3.png" alt="image with dithering effect 3" width="200"/>
     </a>
     <a href="./examples/noise1/">
         <img src="./docs/noise1.png" alt="image with noise layered" width="200"/>
