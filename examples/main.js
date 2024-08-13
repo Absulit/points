@@ -146,7 +146,7 @@ const recordingOptions = [
     {
         nameStopped: 'Download PNG Image',
         fn: function (e) {
-            let image = document.getElementById('gl-canvas').toDataURL().replace('image/png', 'image/octet-stream');
+            let image = document.getElementById('canvas').toDataURL().replace('image/png', 'image/octet-stream');
             window.location.href = image;
         },
     },
@@ -168,10 +168,10 @@ async function init() {
     if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
     }
-    const canvas = document.getElementById('gl-canvas');
+    const canvas = document.getElementById('canvas');
     canvas.width = 800;
     canvas.height = 800;
-    points = new Points('gl-canvas');
+    points = new Points('canvas');
     isFitWindowData.isFitWindow = false;
 
     gui.removeFolder(optionsFolder);
