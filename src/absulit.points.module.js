@@ -590,8 +590,11 @@ export default class Points {
      * @param {Array} paths
      * @param {ShaderType} shaderType
      */
+    // TODO: verify if this can be updated after creation
+    // TODO: return texture2dArray object
     async setTextureImageArray(name, paths, shaderType) {
         if (this.#nameExists(this.#textures2dArray, name)) {
+            // TODO: throw exception here
             return;
         }
         const imageBitmaps = [];

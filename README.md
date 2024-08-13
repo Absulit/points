@@ -492,6 +492,34 @@ let startPosition = vec2(.0);
 let rgbaImage = texturePosition(image, mySampler, startPosition, uv, false);
 ```
 
+## Texture2dArray - setTextureImageArray
+
+With `setTextureImageArray` you can send a list of images of the same dimensions to wgsl and access each one of them with an index.
+
+
+```js
+// main.js
+async function init() {
+    let renderPasses = [shaders.vert, shaders.compute, shaders.frag];
+
+    const paths = ['./image1.jpg', './image2.jpg'];
+    // await since the resource is async we need to wait for it to be ready
+    await points.setTextureImageArray('images', paths); // texture array is named `images`
+
+    // more init code
+    await points.init(renderPasses);
+    update();
+}
+```
+
+
+```rust
+// frag.js
+// 0 is the index of image1.jpg, 1 is the index of image2.jpg
+let image1Color = textureSample(images, aSampler, imageUV, 0);
+let image2Color = textureSample(images, aSampler, imageUV, 1);
+```
+
 ## Storage - setStorage
 
 A storage is a large array with the same data type and this data can be modified at runtime inside the shaders, so in principle this is different to any other data type here where you can only send data and not modify it in the shaders, or as the uniforms where the data can only be updated from the JavaScript side. You can allocate this space and use it in the shaders and the data will remain in the next update/frame call.
