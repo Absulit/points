@@ -4,6 +4,17 @@ import Points from 'points';
 import ShaderType from 'shadertype';
 import RenderPass from 'renderpass';
 
+/**
+ * Gets all the uri parts in an array.
+ */
+const uriParts = () => window.location.hash.split('#').filter(s => s.length >= 0);
+
+/**
+ * Changes uri.
+ * @param {string} uri
+ */
+function changeUri(uri) { window.history.pushState('', '', `index.html#${uri}`) };
+
 /***************/
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -44,43 +55,43 @@ gui.add(isFitWindowData, 'isFitWindow').name('Fit Window').listen().onChange(val
 });
 
 const shaderProjects = [
-    { name: 'Base', path: './base/index.js' },
-    { name: 'Audio 1', path: './audio1/index.js' },
-    { name: 'Audio 2', path: './audio2/index.js' },
-    { name: 'Bloom1', path: './bloom1/index.js' },
-    { name: 'Circle Blur', path: './circleblur/index.js' },
-    { name: 'Data 1', path: './data1/index.js' },
-    { name: 'Demo 6', path: './demo_6/index.js' },
-    { name: 'Dithering 1', path: './dithering1/index.js' },
-    { name: 'Dithering 2', path: './dithering2/index.js' },
-    { name: 'Dithering 3 - 1', path: './dithering3_1/index.js' },
-    { name: 'Dithering 3 - 2', path: './dithering3_2/index.js' },
-    { name: 'Dithering 4', path: './dithering4/index.js' },
-    { name: 'Events 1', path: './events1/index.js' },
-    { name: 'Image Scale 1', path: './imagescale1/index.js' },
-    { name: 'Image Texture 1', path: './imagetexture1/index.js' },
-    { name: 'Image Texture 2', path: './imagetexture2/index.js' },
-    { name: 'Image Texture 3', path: './imagetexture3/index.js' },
-    { name: 'Image Texture 4', path: './imagetexture4/index.js' },
-    { name: 'Layers 1', path: './layers1/index.js' },
-    { name: 'Mesh 1', path: './mesh1/index.js' },
-    { name: 'Mouse 1', path: './mouse1/index.js' },
-    { name: 'Mouse Click and Scroll 1', path: './mouseclickscroll1/index.js' },
-    { name: 'Noise 1', path: './noise1/index.js' },
-    { name: 'Noise Circle 1', path: './noisecircle1/index.js' },
-    { name: 'Points Title 1', path: './pointstitle1/index.js' },
-    { name: 'Random 1', path: './random1/index.js' },
-    { name: 'Random 2 (⚠ SLOW)', path: './random2/index.js' },
-    { name: 'Random 3', path: './random3/index.js' },
-    { name: 'Render Passes 1', path: './renderpasses1/index.js' },
-    { name: 'Render Passes 2', path: './renderpasses2/index.js' },
-    { name: 'Shapes 1', path: './shapes1/index.js' },
-    { name: 'Shapes 2', path: './shapes2/index.js' },
-    { name: 'Spritesheet 1', path: './spritesheet1/index.js' },
-    { name: 'UVs 1', path: './uvs1/index.js' },
-    { name: 'Video Texture 1', path: './videotexture1/index.js' },
-    // { name: 'PARAMS TEST', path: './params_test/index.js' },
-    // { name: 'WebGPU Particles 1', path: './webgpu_particles_1/index.js' },
+    { name: 'Base', path: './base/index.js', uri: 'base' },
+    { name: 'Audio 1', path: './audio1/index.js', uri: 'audio1' },
+    { name: 'Audio 2', path: './audio2/index.js', uri: 'audio2' },
+    { name: 'Bloom1', path: './bloom1/index.js', uri: 'bloom1' },
+    { name: 'Circle Blur', path: './circleblur/index.js', uri: 'circleblur' },
+    { name: 'Data 1', path: './data1/index.js', uri: 'data1' },
+    { name: 'Demo 6', path: './demo_6/index.js', uri: 'demo_6' },
+    { name: 'Dithering 1', path: './dithering1/index.js', uri: 'dithering1' },
+    { name: 'Dithering 2', path: './dithering2/index.js', uri: 'dithering2' },
+    { name: 'Dithering 3 - 1', path: './dithering3_1/index.js', uri: 'dithering3_1' },
+    { name: 'Dithering 3 - 2', path: './dithering3_2/index.js', uri: 'dithering3_2' },
+    { name: 'Dithering 4', path: './dithering4/index.js', uri: 'dithering4' },
+    { name: 'Events 1', path: './events1/index.js', uri: 'events1' },
+    { name: 'Image Scale 1', path: './imagescale1/index.js', uri: 'imagescale1' },
+    { name: 'Image Texture 1', path: './imagetexture1/index.js', uri: 'imagetexture1' },
+    { name: 'Image Texture 2', path: './imagetexture2/index.js', uri: 'imagetexture2' },
+    { name: 'Image Texture 3', path: './imagetexture3/index.js', uri: 'imagetexture3' },
+    { name: 'Image Texture 4', path: './imagetexture4/index.js', uri: 'imagetexture4' },
+    { name: 'Layers 1', path: './layers1/index.js', uri: 'layers1' },
+    { name: 'Mesh 1', path: './mesh1/index.js', uri: 'mesh1' },
+    { name: 'Mouse 1', path: './mouse1/index.js', uri: 'mouse1' },
+    { name: 'Mouse Click and Scroll 1', path: './mouseclickscroll1/index.js', uri: 'mouseclickscroll1' },
+    { name: 'Noise 1', path: './noise1/index.js', uri: 'noise1' },
+    { name: 'Noise Circle 1', path: './noisecircle1/index.js', uri: 'noisecircle1' },
+    { name: 'Points Title 1', path: './pointstitle1/index.js', uri: 'pointstitle1' },
+    { name: 'Random 1', path: './random1/index.js', uri: 'random1' },
+    { name: 'Random 2 (⚠ SLOW)', path: './random2/index.js', uri: 'random2' },
+    { name: 'Random 3', path: './random3/index.js', uri: 'random3' },
+    { name: 'Render Passes 1', path: './renderpasses1/index.js', uri: 'renderpasses1' },
+    { name: 'Render Passes 2', path: './renderpasses2/index.js', uri: 'renderpasses2' },
+    { name: 'Shapes 1', path: './shapes1/index.js', uri: 'shapes1' },
+    { name: 'Shapes 2', path: './shapes2/index.js', uri: 'shapes2' },
+    { name: 'Spritesheet 1', path: './spritesheet1/index.js', uri: 'spritesheet1' },
+    { name: 'UVs 1', path: './uvs1/index.js', uri: 'uvs1' },
+    { name: 'Video Texture 1', path: './videotexture1/index.js', uri: 'videotexture1' },
+    // { name: 'PARAMS TEST', path: './params_test/index.js', uri:'params_test' },
+    // { name: 'WebGPU Particles 1', path: './webgpu_particles_1/index.js', uri:'webgpu_particles_1' },
 ]
 
 const shaderNames = {};
@@ -93,12 +104,22 @@ let selectedShader = { index: Number(localStorage.getItem('selected-shader')) ||
 let examples = gui.add(selectedShader, 'index', shaderNames).name('Examples');
 
 async function loadShaderByIndex(index) {
-    localStorage.setItem('selected-shader', index);
     console.clear();
+    localStorage.setItem('selected-shader', index);
     let shaderPath = shaderProjects[index].path;
+    changeUri(shaderProjects[index].uri);
     shaders?.remove?.();
     shaders = (await import(shaderPath)).default;
     await init();
+}
+
+async function loadShaderByURI() {
+    const parts = uriParts();
+    let index = shaderProjects.findIndex(s => s.uri == parts[1]);
+    if (index == -1) {
+        index = selectedShader.index;
+    }
+    examples.setValue(shaderNames[shaderProjects[index].name]);
 }
 
 examples.onChange(loadShaderByIndex);
@@ -162,7 +183,7 @@ let points;
 
 let shaders;
 let animationFrameId = null;
-await loadShaderByIndex(selectedShader.index);
+await loadShaderByURI();
 
 async function init() {
     if (animationFrameId) {
