@@ -1,7 +1,6 @@
 'use strict';
 import * as dat from 'datgui';
 import Points from 'points';
-import ShaderType from 'shadertype';
 import RenderPass from 'renderpass';
 
 /**
@@ -102,14 +101,17 @@ shaderProjects.forEach((item, index) => {
 let selectedShader = { index: Number(localStorage.getItem('selected-shader')) || 0 }
 
 let examples = gui.add(selectedShader, 'index', shaderNames).name('Examples');
-
+const sourceBtn = document.getElementById('source_btn')
 async function loadShaderByIndex(index) {
     console.clear();
     localStorage.setItem('selected-shader', index);
-    let shaderPath = shaderProjects[index].path;
-    changeUri(shaderProjects[index].uri);
+    const shaderProject = shaderProjects[index];
+    console.log(shaderProject);
+    sourceBtn.href = `https://github.com/Absulit/points/tree/master/examples/${shaderProject.uri}`;
+
+    changeUri(shaderProject.uri);
     shaders?.remove?.();
-    shaders = (await import(shaderPath)).default;
+    shaders = (await import(shaderProject.path)).default;
     await init();
 }
 
