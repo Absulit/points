@@ -21,7 +21,7 @@ fn main(
 
     let startPosition = mouse * ratio;//vec2(.0);
 
-    let positionCross = showDebugCross(startPosition, vec4(1,0,0,1.), uv * ratio);
+    let positionCross = showDebugCross(startPosition, vec4(1,0,0,1.), uvr);
 
     let frame = showDebugFrame(vec4(1,0,0,1.), uvr);
 
