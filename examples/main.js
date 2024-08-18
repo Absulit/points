@@ -17,11 +17,12 @@ function changeUri(uri) { window.history.pushState('', '', `index.html#${uri}`) 
 /***************/
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+stats.dom.style.position = 'relative';
+stats.dom.style.display = 'inline-block';
 
 document.getElementsByClassName('right')[0].appendChild(stats.dom);
-// document.body.appendChild(stats.dom);
 
-let capturer = new CCapture({
+const capturer = new CCapture({
     format: 'webm',
     //timeLimit: 10,
     verbose: true
@@ -33,7 +34,7 @@ let optionsFolder = gui.addFolder(FOLDER_NAME);
 
 let statsVisible = (localStorage.getItem('stats-visible') === 'true') || false;
 function setStatsVisibility(value) {
-    value && (stats.dom.style.display = 'block');
+    value && (stats.dom.style.display = 'inline-block');
     !value && (stats.dom.style.display = 'none');
     localStorage.setItem('stats-visible', value);
 }
@@ -99,6 +100,7 @@ const shaderNames = {};
 const nav = document.getElementById('nav');
 const ul = nav.children[0];
 
+let lastSelected = null;
 shaderProjects.forEach((item, index) => {
     shaderNames[item.name] = index;
     const li = document.createElement('li');
@@ -106,7 +108,12 @@ shaderProjects.forEach((item, index) => {
     a.href = `#${item.uri}`;
     a.innerHTML = item.name;
     a.index = index;
-    a.addEventListener('click', e => loadShaderByIndex(e.target.index));
+    a.addEventListener('click', e => {
+        lastSelected?.classList.remove('selected');
+        e.target.classList.add('selected');
+        lastSelected = e.target;
+        loadShaderByIndex(e.target.index)
+    });
     li.appendChild(a);
     ul.appendChild(li);
 });
@@ -132,6 +139,9 @@ async function loadShaderByURI() {
     if (index == -1) {
         index = selectedShader.index;
     }
+
+    lastSelected = Array.from(document.querySelectorAll('#nav a')).filter(a => a.index == index)[0];
+    lastSelected.classList.add('selected');
 }
 
 //---
