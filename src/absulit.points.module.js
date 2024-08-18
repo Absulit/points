@@ -138,8 +138,10 @@ export default class Points {
     }
 
     #onMouseMove = e => {
-        this.#mouseX = e.clientX;
-        this.#mouseY = e.clientY;
+        // get position relative to canvas
+        const rect = this.#canvas.getBoundingClientRect();
+        this.#mouseX = e.clientX - rect.left;
+        this.#mouseY = e.clientY - rect.top;
     }
     /**
      * @deprecated use setUniform
