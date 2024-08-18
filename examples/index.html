@@ -5,9 +5,23 @@
         <link rel="stylesheet" type="text/css" href="style.css">
     </head>
     <body>
-        <canvas id="canvas" width="800" height="800">
-            Oops ... your browser doesn't support the HTML5 canvas element
-        </canvas>
+
+        <div class="main container">
+            <div class="nav column left">
+                <nav id="nav">
+                    <ul>
+                        <!-- <li><a href="#">Home</a></li> -->
+                    </ul>
+                </nav>
+            </div>
+            <div class="content column right">
+                <canvas id="canvas" width="800" height="800">
+                    Oops ... your browser doesn't support the HTML5 canvas element
+                </canvas>
+
+                <a id="source_btn" target="_blank" href title="View source code"><img src="./_files/ic_code_black_24dp.svg"></a>
+            </div>
+        </div>
 
         <script src="../src/vendor/stats.js"></script>
         <script src="../src/vendor/ccapture/CCapture.all.min.js"></script>
@@ -41,6 +55,5 @@
 
         <script src="main.js" type="module"></script>
 
-        <a id="source_btn" target="_blank" href="" title="View source code"><img src="./_files/ic_code_black_24dp.svg"></a>
     </body>
 </html>

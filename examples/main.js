@@ -17,7 +17,9 @@ function changeUri(uri) { window.history.pushState('', '', `index.html#${uri}`) 
 /***************/
 const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
-document.body.appendChild(stats.dom);
+
+document.getElementsByClassName('right')[0].appendChild(stats.dom);
+// document.body.appendChild(stats.dom);
 
 let capturer = new CCapture({
     format: 'webm',
@@ -94,19 +96,28 @@ const shaderProjects = [
 ]
 
 const shaderNames = {};
+const nav = document.getElementById('nav');
+const ul = nav.children[0];
+
 shaderProjects.forEach((item, index) => {
     shaderNames[item.name] = index;
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.href = `#${item.uri}`;
+    a.innerHTML = item.name;
+    a.index = index;
+    a.addEventListener('click', e => loadShaderByIndex(e.target.index));
+    li.appendChild(a);
+    ul.appendChild(li);
 });
 
 let selectedShader = { index: Number(localStorage.getItem('selected-shader')) || 0 }
 
-let examples = gui.add(selectedShader, 'index', shaderNames).name('Examples');
 const sourceBtn = document.getElementById('source_btn')
 async function loadShaderByIndex(index) {
     console.clear();
     localStorage.setItem('selected-shader', index);
     const shaderProject = shaderProjects[index];
-    console.log(shaderProject);
     sourceBtn.href = `https://github.com/Absulit/points/tree/master/examples/${shaderProject.uri}`;
 
     changeUri(shaderProject.uri);
@@ -121,10 +132,7 @@ async function loadShaderByURI() {
     if (index == -1) {
         index = selectedShader.index;
     }
-    examples.setValue(shaderNames[shaderProjects[index].name]);
 }
-
-examples.onChange(loadShaderByIndex);
 
 //---
 const recordingFolder = gui.addFolder('Recording');
@@ -227,3 +235,5 @@ async function update() {
     capturer.capture(points.canvas);
     animationFrameId = requestAnimationFrame(update);
 }
+
+loadShaderByIndex(selectedShader.index);
