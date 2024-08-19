@@ -10,6 +10,22 @@ body {
     position: absolute;
 }
 
+#info {
+    position      : absolute;
+    top           : 0px;
+    width         : 800px;
+    padding       : 10px;
+    box-sizing    : border-box;
+    text-align    : center;
+    user-select   : none;
+    z-index       : 1;
+    color         : white;
+    filter: drop-shadow(1px 1px 1px #0a2627);
+}
+#info a {
+    color: #488553;
+}
+
 label {
     color: white;
 }

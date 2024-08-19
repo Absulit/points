@@ -57,43 +57,43 @@ gui.add(isFitWindowData, 'isFitWindow').name('Fit Window').listen().onChange(val
 });
 
 const shaderProjects = [
-    { name: 'Base', path: './base/index.js', uri: 'base' },
-    { name: 'Audio 1', path: './audio1/index.js', uri: 'audio1' },
-    { name: 'Audio 2', path: './audio2/index.js', uri: 'audio2' },
-    { name: 'Bloom1', path: './bloom1/index.js', uri: 'bloom1' },
-    { name: 'Circle Blur', path: './circleblur/index.js', uri: 'circleblur' },
-    { name: 'Data 1', path: './data1/index.js', uri: 'data1' },
-    { name: 'Demo 6', path: './demo_6/index.js', uri: 'demo_6' },
-    { name: 'Dithering 1', path: './dithering1/index.js', uri: 'dithering1' },
-    { name: 'Dithering 2', path: './dithering2/index.js', uri: 'dithering2' },
-    { name: 'Dithering 3 - 1', path: './dithering3_1/index.js', uri: 'dithering3_1' },
-    { name: 'Dithering 3 - 2', path: './dithering3_2/index.js', uri: 'dithering3_2' },
-    { name: 'Dithering 4', path: './dithering4/index.js', uri: 'dithering4' },
-    { name: 'Events 1', path: './events1/index.js', uri: 'events1' },
-    { name: 'Image Scale 1', path: './imagescale1/index.js', uri: 'imagescale1' },
-    { name: 'Image Texture 1', path: './imagetexture1/index.js', uri: 'imagetexture1' },
-    { name: 'Image Texture 2', path: './imagetexture2/index.js', uri: 'imagetexture2' },
-    { name: 'Image Texture 3', path: './imagetexture3/index.js', uri: 'imagetexture3' },
-    { name: 'Image Texture 4', path: './imagetexture4/index.js', uri: 'imagetexture4' },
-    { name: 'Layers 1', path: './layers1/index.js', uri: 'layers1' },
-    { name: 'Mesh 1', path: './mesh1/index.js', uri: 'mesh1' },
-    { name: 'Mouse 1', path: './mouse1/index.js', uri: 'mouse1' },
-    { name: 'Mouse Click and Scroll 1', path: './mouseclickscroll1/index.js', uri: 'mouseclickscroll1' },
-    { name: 'Noise 1', path: './noise1/index.js', uri: 'noise1' },
-    { name: 'Noise Circle 1', path: './noisecircle1/index.js', uri: 'noisecircle1' },
-    { name: 'Points Title 1', path: './pointstitle1/index.js', uri: 'pointstitle1' },
-    { name: 'Random 1', path: './random1/index.js', uri: 'random1' },
-    { name: 'Random 2 (⚠ SLOW)', path: './random2/index.js', uri: 'random2' },
-    { name: 'Random 3', path: './random3/index.js', uri: 'random3' },
-    { name: 'Render Passes 1', path: './renderpasses1/index.js', uri: 'renderpasses1' },
-    { name: 'Render Passes 2', path: './renderpasses2/index.js', uri: 'renderpasses2' },
-    { name: 'Shapes 1', path: './shapes1/index.js', uri: 'shapes1' },
-    { name: 'Shapes 2', path: './shapes2/index.js', uri: 'shapes2' },
-    { name: 'Spritesheet 1', path: './spritesheet1/index.js', uri: 'spritesheet1' },
-    { name: 'UVs 1', path: './uvs1/index.js', uri: 'uvs1' },
-    { name: 'Video Texture 1', path: './videotexture1/index.js', uri: 'videotexture1' },
-    // { name: 'PARAMS TEST', path: './params_test/index.js', uri:'params_test' },
-    // { name: 'WebGPU Particles 1', path: './webgpu_particles_1/index.js', uri:'webgpu_particles_1' },
+    { name: 'Base', path: './base/index.js', uri: 'base', desc: 'Empty project to start', author: 'absulit', authlink: 'http://absulit.com' },
+    { name: 'Audio 1', path: './audio1/index.js', uri: 'audio1', desc: '', author: 'absulit', authlink: 'http://absulit.com' },
+    { name: 'Audio 2', path: './audio2/index.js', uri: 'audio2', desc: '', author: 'absulit', authlink: 'http://absulit.com' },
+    { name: 'Bloom1', path: './bloom1/index.js', uri: 'bloom1', desc: '', author: 'absulit', authlink: 'http://absulit.com' },
+    { name: 'Circle Blur', path: './circleblur/index.js', uri: 'circleblur', desc: '', author: 'absulit', authlink: 'http://absulit.com' },
+    { name: 'Data 1', path: './data1/index.js', uri: 'data1', desc: '', author: 'absulit', authlink: 'http://absulit.com' },
+    { name: 'Demo 6', path: './demo_6/index.js', uri: 'demo_6', desc: '', author: 'absulit', authlink: 'http://absulit.com' },
+    { name: 'Dithering 1', path: './dithering1/index.js', uri: 'dithering1', desc: '', author: 'absulit', authlink: 'http://absulit.com' },
+    { name: 'Dithering 2', path: './dithering2/index.js', uri: 'dithering2', desc: '', author: 'absulit', authlink: 'http://absulit.com' },
+    { name: 'Dithering 3 - 1', path: './dithering3_1/index.js', uri: 'dithering3_1', desc: '', author: 'absulit', authlink: 'http://absulit.com' },
+    { name: 'Dithering 3 - 2', path: './dithering3_2/index.js', uri: 'dithering3_2', desc: '', author: 'absulit', authlink: 'http://absulit.com' },
+    { name: 'Dithering 4', path: './dithering4/index.js', uri: 'dithering4', desc: '', author: 'absulit', authlink: 'http://absulit.com' },
+    { name: 'Events 1', path: './events1/index.js', uri: 'events1', desc: '', author: 'absulit', authlink: 'http://absulit.com' },
+    { name: 'Image Scale 1', path: './imagescale1/index.js', uri: 'imagescale1', desc: '', author: 'absulit', authlink: 'http://absulit.com' },
+    { name: 'Image Texture 1', path: './imagetexture1/index.js', uri: 'imagetexture1', desc: 'How to load a texture.', author: 'absulit', authlink: 'http://absulit.com' },
+    { name: 'Image Texture 2', path: './imagetexture2/index.js', uri: 'imagetexture2', desc: '', author: 'absulit', authlink: 'http://absulit.com' },
+    { name: 'Image Texture 3', path: './imagetexture3/index.js', uri: 'imagetexture3', desc: '', author: 'absulit', authlink: 'http://absulit.com' },
+    { name: 'Image Texture 4', path: './imagetexture4/index.js', uri: 'imagetexture4', desc: '', author: 'absulit', authlink: 'http://absulit.com' },
+    { name: 'Layers 1', path: './layers1/index.js', uri: 'layers1', desc: '', author: 'absulit', authlink: 'http://absulit.com' },
+    { name: 'Mesh 1', path: './mesh1/index.js', uri: 'mesh1', desc: '', author: 'absulit', authlink: 'http://absulit.com' },
+    { name: 'Mouse 1', path: './mouse1/index.js', uri: 'mouse1', desc: 'Mouse demo that draws a cross.', author: 'absulit', authlink: 'http://absulit.com' },
+    { name: 'Mouse Click and Scroll 1', path: './mouseclickscroll1/index.js', uri: 'mouseclickscroll1', desc: '', author: 'absulit', authlink: 'http://absulit.com' },
+    { name: 'Noise 1', path: './noise1/index.js', uri: 'noise1', desc: '', author: 'absulit', authlink: 'http://absulit.com' },
+    { name: 'Noise Circle 1', path: './noisecircle1/index.js', uri: 'noisecircle1', desc: '', author: 'absulit', authlink: 'http://absulit.com' },
+    { name: 'Points Title 1', path: './pointstitle1/index.js', uri: 'pointstitle1', desc: '', author: 'absulit', authlink: 'http://absulit.com' },
+    { name: 'Random 1', path: './random1/index.js', uri: 'random1', desc: '', author: 'absulit', authlink: 'http://absulit.com' },
+    { name: 'Random 2 (⚠ SLOW)', path: './random2/index.js', uri: 'random2', desc: '', author: 'absulit', authlink: 'http://absulit.com' },
+    { name: 'Random 3', path: './random3/index.js', uri: 'random3', desc: '', author: 'absulit', authlink: 'http://absulit.com' },
+    { name: 'Render Passes 1', path: './renderpasses1/index.js', uri: 'renderpasses1', desc: '', author: 'absulit', authlink: 'http://absulit.com' },
+    { name: 'Render Passes 2', path: './renderpasses2/index.js', uri: 'renderpasses2', desc: '', author: 'absulit', authlink: 'http://absulit.com' },
+    { name: 'Shapes 1', path: './shapes1/index.js', uri: 'shapes1', desc: '', author: 'absulit', authlink: 'http://absulit.com' },
+    { name: 'Shapes 2', path: './shapes2/index.js', uri: 'shapes2', desc: '', author: 'absulit', authlink: 'http://absulit.com' },
+    { name: 'Spritesheet 1', path: './spritesheet1/index.js', uri: 'spritesheet1', desc: '', author: 'absulit', authlink: 'http://absulit.com' },
+    { name: 'UVs 1', path: './uvs1/index.js', uri: 'uvs1', desc: '', author: 'absulit', authlink: 'http://absulit.com' },
+    { name: 'Video Texture 1', path: './videotexture1/index.js', uri: 'videotexture1', desc: '', author: 'absulit', authlink: 'http://absulit.com' },
+    // { name: 'PARAMS TEST', path: './params_test/index.js', uri:'params_test', desc:'', author: 'absulit', authlink:'http://absulit.com' },
+    // { name: 'WebGPU Particles 1', path: './webgpu_particles_1/index.js', uri:'webgpu_particles_1', desc:'', author: 'absulit', authlink:'http://absulit.com' },
 ]
 
 const shaderNames = {};
@@ -120,12 +120,22 @@ shaderProjects.forEach((item, index) => {
 
 let selectedShader = { index: Number(localStorage.getItem('selected-shader')) || 0 }
 
-const sourceBtn = document.getElementById('source_btn')
+const sourceBtn = document.getElementById('source_btn');
+const infoEl = document.getElementById('info');
+const titleInfoEl = infoEl.querySelector('#info-title');
+const descInfoEl = infoEl.querySelector('#info-desc');
+const authorInfoEl = infoEl.querySelector('#info-author');
+const authorLinkEl = infoEl.querySelector('#author-link');
 async function loadShaderByIndex(index) {
     console.clear();
     localStorage.setItem('selected-shader', index);
     const shaderProject = shaderProjects[index];
     sourceBtn.href = `https://github.com/Absulit/points/tree/master/examples/${shaderProject.uri}`;
+
+    titleInfoEl.innerHTML = shaderProject.name;
+    descInfoEl.innerHTML = shaderProject.desc;
+    authorInfoEl.innerHTML = shaderProject.author;
+    authorLinkEl.href = shaderProject.authlink;
 
     changeUri(shaderProject.uri);
     shaders?.remove?.();
