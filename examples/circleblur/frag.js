@@ -29,7 +29,7 @@ fn main(
 
     let texColorCompute = texturePosition(computeTexture, feedbackSampler, startPosition, uv, false);
 
-    let d = distance(uvr, vec2(.5 + .1 * fusin(2.), .5  + .1 * fusin(4.123)));
+    let d = distance(uvr, vec2(.5 + .1 * fusin(2.), .5  + .1 * fusin(4.123)) * ratio);
     var c = 1.;
     if(d > .1){
         c = 0.;

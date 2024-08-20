@@ -19,7 +19,7 @@ fn main(
     let dims: vec2<u32> = textureDimensions(image, 0);
 
     let startPosition = vec2(.0);
-    let rgbaImage = texturePosition(image, feedbackSampler, startPosition, uvr / params.scale, false); //* .998046;
+    let rgbaImage = texturePosition(image, feedbackSampler, startPosition, uvr / params.scale, true); //* .998046;
     let finalColor:vec4<f32> = rgbaImage;
 
     return finalColor;
