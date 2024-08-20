@@ -148,8 +148,11 @@ async function loadShaderByIndex(index) {
 async function loadShaderByURI() {
     const parts = uriParts();
     let index = shaderProjects.findIndex(s => s.uri == parts[1]);
+    
     if (index == -1) {
         index = selectedShader.index;
+    }else{
+        selectedShader.index = index;
     }
 
     lastSelected = Array.from(document.querySelectorAll('#nav a')).filter(a => a.index == index)[0];
