@@ -78,6 +78,7 @@ a:hover {
 
 ul {
     list-style-type: none;
+    padding-inline-start: 18px;
 }
 
 li {
@@ -91,4 +92,14 @@ li:active a {
 
 li a.selected {
     color: red;
+}
+
+li.menu-main{
+    margin-bottom: 10px;
+}
+
+li.menu-main a {
+    color: #00ffc6;
+    font-size: large;
+    font-weight: 600;
 }
