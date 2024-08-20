@@ -13,7 +13,7 @@ body {
 #info {
     position      : absolute;
     top           : 0px;
-    width         : 800px;
+    width         : 80%;
     padding       : 10px;
     box-sizing    : border-box;
     text-align    : center;
