@@ -25,7 +25,7 @@ const base = {
             addressModeV: 'repeat',
         }
         points.addSampler('imageSampler', descriptor);
-        await points.addTextureVideo('image', '/img/6982698-hd_1440_1080_25fps_800x800.mp4');
+        await points.addTextureVideo('image', './../img/6982698-hd_1440_1080_25fps_800x800.mp4');
         points.addBindingTexture('outputTex', 'computeTexture');
         points.addLayers(2);
         points.addStorage('variables', 'Variable', false, ShaderType.COMPUTE);
