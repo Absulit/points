@@ -11,17 +11,18 @@ body {
 }
 
 #info {
-    position      : absolute;
-    top           : 0px;
-    width         : 80%;
-    padding       : 10px;
-    box-sizing    : border-box;
-    text-align    : center;
-    user-select   : none;
-    z-index       : 1;
-    color         : white;
-    filter: drop-shadow(1px 1px 1px #0a2627);
+    position   : absolute;
+    top        : 0px;
+    width      : 80%;
+    padding    : 10px;
+    box-sizing : border-box;
+    text-align : center;
+    user-select: none;
+    z-index    : 1;
+    color      : white;
+    filter     : drop-shadow(1px 1px 1px #0a2627);
 }
+
 #info a {
     color: #488553;
 }
@@ -77,7 +78,7 @@ a:hover {
 }
 
 ul {
-    list-style-type: none;
+    list-style-type     : none;
     padding-inline-start: 18px;
 }
 
@@ -94,12 +95,19 @@ li a.selected {
     color: red;
 }
 
-li.menu-main{
+li.menu-main {
     margin-bottom: 10px;
 }
 
 li.menu-main a {
-    color: #00ffc6;
-    font-size: large;
+    color      : #00ff51;
+    font-size  : large;
     font-weight: 600;
+}
+
+h2 {
+    color               : #00ffc6;
+    font-size           : large;
+    font-weight         : 600;
+    padding-inline-start: 18px;
 }

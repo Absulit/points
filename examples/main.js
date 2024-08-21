@@ -60,24 +60,37 @@ gui.add(isFitWindowData, 'isFitWindow').name('Fit Window').listen().onChange(val
 const shaderNames = {};
 const nav = document.getElementById('nav');
 const ul = nav.children[0];
+const showcaseUl = nav.querySelector('.showcase');
+const referenceUl = nav.querySelector('.reference');
 
 let lastSelected = null;
-shaderProjects.forEach((item, index) => {
-    shaderNames[item.name] = index;
-    const li = document.createElement('li');
-    const a = document.createElement('a');
-    a.href = `#${item.uri}`;
-    a.innerHTML = item.name;
-    a.index = index;
-    a.addEventListener('click', e => {
-        lastSelected?.classList.remove('selected');
-        e.target.classList.add('selected');
-        lastSelected = e.target;
-        loadShaderByIndex(e.target.index)
+shaderProjects
+    // .filter(item => item.enabled)
+    // .filter(item => item.tax == 'showcase')
+    .forEach((item, index) => {
+        if(!item.enabled){
+            return;
+        }
+        shaderNames[item.name] = index;
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = `#${item.uri}`;
+        a.innerHTML = item.name;
+        a.index = index;
+        a.addEventListener('click', e => {
+            lastSelected?.classList.remove('selected');
+            e.target.classList.add('selected');
+            lastSelected = e.target;
+            loadShaderByIndex(e.target.index)
+        });
+        li.appendChild(a);
+        if (item.tax === 'showcase') {
+            showcaseUl.appendChild(li);
+        }
+        if (item.tax === 'reference') {
+            referenceUl.appendChild(li);
+        }
     });
-    li.appendChild(a);
-    ul.appendChild(li);
-});
 
 let selectedShader = { index: Number(localStorage.getItem('selected-shader')) || 0 }
 
