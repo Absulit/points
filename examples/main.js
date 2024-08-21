@@ -2,6 +2,7 @@
 import * as dat from 'datgui';
 import Points from 'points';
 import RenderPass from 'renderpass';
+import { shaderProjects } from './index_files/shader_projects.js';
 
 /**
  * Gets all the uri parts in an array.
@@ -56,67 +57,40 @@ gui.add(isFitWindowData, 'isFitWindow').name('Fit Window').listen().onChange(val
     points.fitWindow = value;
 });
 
-const shaderProjects = [
-    { name: 'Base', path: './base/index.js', uri: 'base', desc: 'Empty project to start.', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, },
-    { name: 'Audio 1', path: './audio1/index.js', uri: 'audio1', desc: 'Audio visualization. Click to Start audio.', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, },
-    { name: 'Audio 2', path: './audio2/index.js', uri: 'audio2', desc: 'Audio visualization. Click to Start audio.', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, },
-    { name: 'Bloom1', path: './bloom1/index.js', uri: 'bloom1', desc: '', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, },
-    { name: 'Feedback Sampling blur.', path: './circleblur/index.js', uri: 'circleblur', desc: 'Previous frame rendered used to create effect.', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, },
-    { name: 'Data 1', path: './data1/index.js', uri: 'data1', desc: 'Compute Shader example.<br>Open JavaScript console to check the output returned as Float32Array.', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, },
-    { name: 'Demo 6', path: './demo_6/index.js', uri: 'demo_6', desc: 'Display of the default vertex colors of the screen triangles.', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, },
-    { name: 'Ordered Dithering', path: './dithering1/index.js', uri: 'dithering1', desc: '', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, },
-    { name: 'Closest Color in a Palette', path: './dithering2/index.js', uri: 'dithering2', desc: '', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, },
-    { name: 'Dithering 3 - 1', path: './dithering3_1/index.js', uri: 'dithering3_1', desc: 'Failed dithering that displays workgroups.', author: 'absulit', authlink: 'http://absulit.com', fitWindow: false, },
-    { name: 'Dithering 3 - 2', path: './dithering3_2/index.js', uri: 'dithering3_2', desc: 'Better dithering that affects the entire image at once.', author: 'absulit', authlink: 'http://absulit.com', fitWindow: false, },
-    { name: 'Dithering 4', path: './dithering4/index.js', uri: 'dithering4', desc: '', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, },
-    { name: 'Events 1', path: './events1/index.js', uri: 'events1', desc: 'WGSL fires an event and is read on the JavaScript side. Visible in console.', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, },
-    { name: 'Image Scale 1', path: './imagescale1/index.js', uri: 'imagescale1', desc: 'Layering of images', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, },
-    { name: 'Image Texture 1', path: './imagetexture1/index.js', uri: 'imagetexture1', desc: 'How to load a texture.', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, },
-    { name: 'Image Texture 2', path: './imagetexture2/index.js', uri: 'imagetexture2', desc: 'Distort image colors.', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, },
-    { name: 'Image Texture 3', path: './imagetexture3/index.js', uri: 'imagetexture3', desc: 'Distort image UV.', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, },
-    { name: 'Image Texture 4', path: './imagetexture4/index.js', uri: 'imagetexture4', desc: 'Image descriptor properties `addressMode*` as `clamp-to-edge`', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, },
-    { name: 'Layers 1', path: './layers1/index.js', uri: 'layers1', desc: 'Add layers via JavaScript.', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, },
-    { name: 'Mesh 1', path: './mesh1/index.js', uri: 'mesh1', desc: 'Change the amount of triangles of the base mesh.', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, },
-    { name: 'Mouse 1', path: './mouse1/index.js', uri: 'mouse1', desc: 'Mouse demo that draws a cross.', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, },
-    { name: 'Mouse Click and Scroll 1', path: './mouseclickscroll1/index.js', uri: 'mouseclickscroll1', desc: 'Mouse events demo. Click and the screen and scroll the mouse wheel.<br>Events can be read from WGSL.', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, },
-    { name: 'Noise 1', path: './noise1/index.js', uri: 'noise1', desc: 'Noise layering.', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, },
-    { name: 'Sun Distortion', path: './noisecircle1/index.js', uri: 'noisecircle1', desc: 'Effect of the Sun distorting the atmosphere.', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, },
-    { name: 'Points Title 1', path: './pointstitle1/index.js', uri: 'pointstitle1', desc: 'POINTS library `logo`.', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, },
-    { name: 'Random 1', path: './random1/index.js', uri: 'random1', desc: 'Update uniforms with random numbers from JavaScript.', author: 'absulit', authlink: 'http://absulit.com', fitWindow: false, },
-    { name: 'Random 2 (⚠ SLOW)', path: './random2/index.js', uri: 'random2', desc: 'Update a Storage with random numbers from JavaScript.', author: 'absulit', authlink: 'http://absulit.com', fitWindow: false, },
-    { name: 'Random 3', path: './random3/index.js', uri: 'random3', desc: 'Update texture with random numbers from a Compute Shader.', author: 'absulit', authlink: 'http://absulit.com', fitWindow: false, },
-    { name: 'Render Passes 1', path: './renderpasses1/index.js', uri: 'renderpasses1', desc: 'Basic two render passes example with a blur.', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, },
-    { name: 'Render Passes 2', path: './renderpasses2/index.js', uri: 'renderpasses2', desc: '10 render passes example.', author: 'absulit', authlink: 'http://absulit.com', fitWindow: false, },
-    { name: 'Shapes 1', path: './shapes1/index.js', uri: 'shapes1', desc: 'Drawing shapes example.', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, },
-    { name: 'Shapes 2', path: './shapes2/index.js', uri: 'shapes2', desc: '', author: 'absulit', authlink: 'http://absulit.com', fitWindow: false, },
-    { name: 'Spritesheet 1', path: './spritesheet1/index.js', uri: 'spritesheet1', desc: 'Move your mouse. Animated sprite sheets follows your movements.<br> Penguin by <a rel="noopener" target="_blank" href="https://opengameart.org/users/tamashihoshi">tamashihoshi</a><br>Fishing Bobbles by <a rel="noopener" target="_blank" href="https://opengameart.org/users/nelson-yiap">Nelson Yiap</a>', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, },
-    { name: 'UVs 1', path: './uvs1/index.js', uri: 'uvs1', desc: 'Move your mouse. Displays two uvs at the same time.', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, },
-    { name: 'Video Texture 1', path: './videotexture1/index.js', uri: 'videotexture1', desc: 'Loads a video as a texture to read in WGSL and displays it.', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, },
-    // { name: 'PARAMS TEST', path: './params_test/index.js', uri:'params_test', desc:'', author: 'absulit', authlink:'http://absulit.com', fitWindow: true, },
-    // { name: 'WebGPU Particles 1', path: './webgpu_particles_1/index.js', uri:'webgpu_particles_1', desc:'', author: 'absulit', authlink:'http://absulit.com', fitWindow: true, },
-]
-
 const shaderNames = {};
 const nav = document.getElementById('nav');
 const ul = nav.children[0];
+const showcaseUl = nav.querySelector('.showcase');
+const referenceUl = nav.querySelector('.reference');
 
 let lastSelected = null;
-shaderProjects.forEach((item, index) => {
-    shaderNames[item.name] = index;
-    const li = document.createElement('li');
-    const a = document.createElement('a');
-    a.href = `#${item.uri}`;
-    a.innerHTML = item.name;
-    a.index = index;
-    a.addEventListener('click', e => {
-        lastSelected?.classList.remove('selected');
-        e.target.classList.add('selected');
-        lastSelected = e.target;
-        loadShaderByIndex(e.target.index)
+shaderProjects
+    // .filter(item => item.enabled)
+    // .filter(item => item.tax == 'showcase')
+    .forEach((item, index) => {
+        if(!item.enabled){
+            return;
+        }
+        shaderNames[item.name] = index;
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = `#${item.uri}`;
+        a.innerHTML = item.name;
+        a.index = index;
+        a.addEventListener('click', e => {
+            lastSelected?.classList.remove('selected');
+            e.target.classList.add('selected');
+            lastSelected = e.target;
+            loadShaderByIndex(e.target.index)
+        });
+        li.appendChild(a);
+        if (item.tax === 'showcase') {
+            showcaseUl.appendChild(li);
+        }
+        if (item.tax === 'reference') {
+            referenceUl.appendChild(li);
+        }
     });
-    li.appendChild(a);
-    ul.appendChild(li);
-});
 
 let selectedShader = { index: Number(localStorage.getItem('selected-shader')) || 0 }
 
@@ -148,10 +122,10 @@ async function loadShaderByIndex(index) {
 async function loadShaderByURI() {
     const parts = uriParts();
     let index = shaderProjects.findIndex(s => s.uri == parts[1]);
-    
+
     if (index == -1) {
         index = selectedShader.index;
-    }else{
+    } else {
         selectedShader.index = index;
     }
 
