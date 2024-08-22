@@ -1107,8 +1107,12 @@ export default class Points {
         this.#renderPasses.forEach(this.#compileRenderPass);
         this.#generateDataSize();
         //
-
-        const adapter = await navigator.gpu.requestAdapter();
+        let adapter = null;
+        try {
+            adapter = await navigator.gpu.requestAdapter();
+        } catch (err) {
+            console.log(err);
+        }
         if (!adapter) { return false; }
         this.#device = await adapter.requestDevice();
         this.#device.lost.then(info => {
@@ -1140,6 +1144,7 @@ export default class Points {
             }
         };
         await this.createScreen();
+        return true;
     }
 
     /**

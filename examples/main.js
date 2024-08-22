@@ -64,31 +64,38 @@ const showcaseUl = nav.querySelector('.showcase');
 const referenceUl = nav.querySelector('.reference');
 
 let lastSelected = null;
+const onClickNavItem = e => {
+    lastSelected?.classList.remove('selected');
+    e.target.classList.add('selected');
+    lastSelected = e.target;
+    loadShaderByIndex(e.target.index)
+}
+
+const createListItem = (item, index) => {
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.href = `#${item.uri}`;
+    a.innerHTML = item.name;
+    a.index = index;
+    a.addEventListener('click', onClickNavItem);
+    li.appendChild(a);
+    return li;
+}
+
 shaderProjects
     // .filter(item => item.enabled)
     // .filter(item => item.tax == 'showcase')
     .forEach((item, index) => {
-        if(!item.enabled){
+        if (!item.enabled) {
             return;
         }
         shaderNames[item.name] = index;
-        const li = document.createElement('li');
-        const a = document.createElement('a');
-        a.href = `#${item.uri}`;
-        a.innerHTML = item.name;
-        a.index = index;
-        a.addEventListener('click', e => {
-            lastSelected?.classList.remove('selected');
-            e.target.classList.add('selected');
-            lastSelected = e.target;
-            loadShaderByIndex(e.target.index)
-        });
-        li.appendChild(a);
-        if (item.tax === 'showcase') {
-            showcaseUl.appendChild(li);
+
+        if (item.tax.indexOf('showcase') !== -1) {
+            showcaseUl.appendChild(createListItem(item, index));
         }
-        if (item.tax === 'reference') {
-            referenceUl.appendChild(li);
+        if (item.tax.indexOf('reference') !== -1) {
+            referenceUl.appendChild(createListItem(item, index));
         }
     });
 
@@ -209,13 +216,13 @@ async function init() {
     await shaders.init(points, optionsFolder);
     let renderPasses = shaders.renderPasses || [new RenderPass(shaders.vert, shaders.frag, shaders.compute)];
     // await points.addPostRenderPass(RenderPasses.GRAYSCALE);
-    await points.init(renderPasses);
-    points.fitWindow = isFitWindowData.isFitWindow;
-
-    let hasVertexAndFragmentShader = renderPasses.every(renderPass => renderPass.hasVertexAndFragmentShader)
-    hasVertexAndFragmentShader;
-
-    update();
+    if (await points.init(renderPasses)) {
+        points.fitWindow = isFitWindowData.isFitWindow;
+        update();
+    } else {
+        const el = document.getElementById('nowebgpu');
+        el.classList.toggle('show');
+    }
 }
 
 async function update() {

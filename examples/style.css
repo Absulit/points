@@ -23,6 +23,7 @@ body {
     filter     : drop-shadow(1px 1px 1px #0a2627);
 }
 
+#nowebgpu a,
 #info a {
     color: #488553;
 }
@@ -110,4 +111,23 @@ h2 {
     font-size           : large;
     font-weight         : 600;
     padding-inline-start: 18px;
+}
+
+#nowebgpu {
+    display        : none;
+    position       : absolute;
+    width          : 100%;
+    height         : 800px;
+    align-items    : center;
+    justify-content: center;
+    color          : white;
+    z-index        : 100;
+}
+
+#nowebgpu>div {
+    width: 50%;
+}
+
+#nowebgpu.show {
+    display: flex;
 }
