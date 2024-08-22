@@ -68,7 +68,7 @@ shaderProjects
     // .filter(item => item.enabled)
     // .filter(item => item.tax == 'showcase')
     .forEach((item, index) => {
-        if(!item.enabled){
+        if (!item.enabled) {
             return;
         }
         shaderNames[item.name] = index;
@@ -209,13 +209,13 @@ async function init() {
     await shaders.init(points, optionsFolder);
     let renderPasses = shaders.renderPasses || [new RenderPass(shaders.vert, shaders.frag, shaders.compute)];
     // await points.addPostRenderPass(RenderPasses.GRAYSCALE);
-    await points.init(renderPasses);
-    points.fitWindow = isFitWindowData.isFitWindow;
-
-    let hasVertexAndFragmentShader = renderPasses.every(renderPass => renderPass.hasVertexAndFragmentShader)
-    hasVertexAndFragmentShader;
-
-    update();
+    if (await points.init(renderPasses)) {
+        points.fitWindow = isFitWindowData.isFitWindow;
+        update();
+    } else {
+        const el = document.getElementById('nowebgpu');
+        el.classList.toggle('show');
+    }
 }
 
 async function update() {
