@@ -131,3 +131,7 @@ h2 {
 #nowebgpu.show {
     display: flex;
 }
+
+div.dg.ac {
+    z-index: 2;
+}
