@@ -110,6 +110,10 @@ const authorLinkEl = infoEl.querySelector('#author-link');
 
 async function loadShaderByIndex(index) {
     console.clear();
+    if (index > shaderProjects.length) {
+        index = 0;
+    }
+
     localStorage.setItem('selected-shader', index);
     const shaderProject = shaderProjects[index];
     sourceBtn.href = `https://github.com/Absulit/points/tree/master/examples/${shaderProject.uri}`;
@@ -137,7 +141,7 @@ async function loadShaderByURI() {
     }
 
     lastSelected = Array.from(document.querySelectorAll('#nav a')).filter(a => a.index == index)[0];
-    lastSelected.classList.add('selected');
+    lastSelected?.classList.add('selected');
 }
 
 //---
