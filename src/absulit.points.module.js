@@ -94,8 +94,9 @@ export default class Points {
 
     #resizeCanvasToFitWindow = () => {
         if (this.#fitWindow) {
-            this.#canvas.width = window.innerWidth;
-            this.#canvas.height = window.innerHeight;
+            const {offsetWidth, offsetHeight} = this.#canvas.parentNode;
+            this.#canvas.width = offsetWidth;
+            this.#canvas.height = offsetHeight;
             this.#setScreenSize();
         }
     }
