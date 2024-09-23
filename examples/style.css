@@ -32,6 +32,25 @@ label {
     color: white;
 }
 
+#menu_btn {
+    position        : fixed;
+    bottom          : 16px;
+    left            : 16px;
+    padding         : 12px;
+    border-radius   : 50%;
+    margin-bottom   : 0px;
+    background-color: #FFF;
+    opacity         : .9;
+    z-index         : 2;
+    box-shadow      : 0 0 4px rgba(0, 0, 0, .15);
+    color           : black;
+}
+
+#menu_btn .square {
+    width : 10px;
+    height: 10px;
+}
+
 #source_btn {
     position        : fixed;
     bottom          : 16px;
@@ -66,6 +85,9 @@ label {
 
 .right {
     background-color: #030f06;
+    /* width        : 100%;
+    display         : block;
+    position        : relative; */
 }
 
 a,
@@ -134,4 +156,18 @@ h2 {
 
 div.dg.ac {
     z-index: 2;
+}
+
+
+.hide {
+    display: none;
+}
+
+.show {
+    display: block;
+}
+
+.scrollable {
+    overflow           : scroll;
+    padding            : 0 0 70px 0;
 }

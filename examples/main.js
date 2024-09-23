@@ -3,6 +3,21 @@ import * as dat from 'datgui';
 import Points from 'points';
 import RenderPass from 'renderpass';
 import { shaderProjects } from './index_files/shader_projects.js';
+import { isMobile } from './utils.js';
+
+const isM = isMobile();
+const navLeft = document.getElementsByClassName('nav column left')[0];
+if(isM){
+    const menuBtn = document.getElementById('menu_btn')
+    menuBtn.classList.toggle('hide');
+    menuBtn.addEventListener('click', e => {
+        navLeft.classList.toggle('hide');
+    });
+    navLeft.classList.toggle('scrollable');
+}
+if(!isM){
+    navLeft.classList.toggle('hide');
+}
 
 /**
  * Gets all the uri parts in an array.
@@ -65,6 +80,9 @@ const referenceUl = nav.querySelector('.reference');
 
 let lastSelected = null;
 const onClickNavItem = e => {
+    if(isM){
+        navLeft.classList.toggle('hide');
+    }
     lastSelected?.classList.remove('selected');
     e.target.classList.add('selected');
     lastSelected = e.target;
