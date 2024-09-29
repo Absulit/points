@@ -23,6 +23,11 @@ body {
     filter     : drop-shadow(1px 1px 1px #0a2627);
 }
 
+#info.mobile {
+    top  : 20px;
+    width: 100%;
+}
+
 #nowebgpu a,
 #info a {
     color: #488553;
@@ -168,6 +173,6 @@ div.dg.ac {
 }
 
 .scrollable {
-    overflow           : scroll;
-    padding            : 0 0 70px 0;
+    overflow: scroll;
+    padding : 0 0 70px 0;
 }
