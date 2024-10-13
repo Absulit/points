@@ -3,6 +3,26 @@ import * as dat from 'datgui';
 import Points from 'points';
 import RenderPass from 'renderpass';
 import { shaderProjects } from './index_files/shader_projects.js';
+import { isMobile } from './utils.js';
+
+const gui = new dat.GUI({ name: 'Points GUI' });
+const infoEl = document.getElementById('info');
+const isM = isMobile();
+const navLeft = document.getElementsByClassName('nav column left')[0];
+if (isM) {
+    const menuBtn = document.getElementById('menu_btn')
+    menuBtn.classList.toggle('hide');
+    menuBtn.addEventListener('click', e => {
+        navLeft.classList.toggle('hide');
+    });
+    navLeft.classList.toggle('scrollable');
+    gui.close();
+    infoEl.classList.toggle('mobile');
+
+}
+if (!isM) {
+    navLeft.classList.toggle('hide');
+}
 
 /**
  * Gets all the uri parts in an array.
@@ -29,7 +49,6 @@ const capturer = new CCapture({
     verbose: true
 });
 
-const gui = new dat.GUI({ name: 'Points GUI' });
 const FOLDER_NAME = 'Options'
 let optionsFolder = gui.addFolder(FOLDER_NAME);
 
@@ -65,6 +84,9 @@ const referenceUl = nav.querySelector('.reference');
 
 let lastSelected = null;
 const onClickNavItem = e => {
+    if (isM) {
+        navLeft.classList.toggle('hide');
+    }
     lastSelected?.classList.remove('selected');
     e.target.classList.add('selected');
     lastSelected = e.target;
@@ -102,7 +124,6 @@ shaderProjects
 let selectedShader = { index: Number(localStorage.getItem('selected-shader')) || 0 }
 
 const sourceBtn = document.getElementById('source_btn');
-const infoEl = document.getElementById('info');
 const titleInfoEl = infoEl.querySelector('#info-title');
 const descInfoEl = infoEl.querySelector('#info-desc');
 const authorInfoEl = infoEl.querySelector('#info-author');
