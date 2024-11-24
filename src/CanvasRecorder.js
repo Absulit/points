@@ -1,8 +1,6 @@
 export default class CanvasRecorder {
     #canvas = null;
     #options = null;
-    videoStream = null;
-    mediaRecorder = null;
 
     constructor(canvas, options) {
         this.#canvas = canvas;
@@ -14,9 +12,9 @@ export default class CanvasRecorder {
     }
 
     start() {
-        this.videoStream = this.#canvas.captureStream(60);
-        this.mediaRecorder = new MediaRecorder(this.videoStream, this.#options);
-        let chunks = [];
+        const videoStream = this.#canvas.captureStream(60);
+        const chunks = [];
+        this.mediaRecorder = new MediaRecorder(videoStream, this.#options);
         this.mediaRecorder.ondataavailable = e => chunks.push(e.data);
         this.mediaRecorder.onstop = _ => {
             const blob = new Blob(chunks, { 'type': this.#options.mimeType });
@@ -28,5 +26,10 @@ export default class CanvasRecorder {
     }
     stop() {
         this.mediaRecorder.stop();
+    }
+
+    getPNG(){
+        const image = this.#canvas.toDataURL().replace('image/png', 'image/octet-stream');
+        window.location.href = image;
     }
 }
