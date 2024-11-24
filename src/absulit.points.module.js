@@ -1991,33 +1991,4 @@ export default class Points {
             this.#resizeCanvasToDefault();
         }
     }
-    // -----------------------------
-    videoStream = null;
-    mediaRecorder = null;
-    videoRecordStart() {
-        const options = {
-            audioBitsPerSecond: 128000,
-            videoBitsPerSecond: 6000000,
-            mimeType: 'video/webm',
-        };
-        this.videoStream = this.#canvas.captureStream(60);
-        this.mediaRecorder = new MediaRecorder(this.videoStream, options);
-        let chunks = [];
-        this.mediaRecorder.ondataavailable = function (e) {
-            chunks.push(e.data);
-        };
-        this.mediaRecorder.onstop = function (e) {
-            const blob = new Blob(chunks, { 'type': 'video/webm' });
-            chunks = [];
-            let videoURL = URL.createObjectURL(blob);
-            window.open(videoURL);
-        };
-        this.mediaRecorder.ondataavailable = function (e) {
-            chunks.push(e.data);
-        };
-        this.mediaRecorder.start();
-    }
-    videoRecordStop() {
-        this.mediaRecorder.stop();
-    }
 }

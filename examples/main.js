@@ -4,8 +4,11 @@ import Points from 'points';
 import RenderPass from 'renderpass';
 import { shaderProjects } from './index_files/shader_projects.js';
 import { isMobile } from './utils.js';
+import CanvasRecorder from './../src/CanvasRecorder.js';
 
+const canvas = document.getElementById('canvas');
 const gui = new dat.GUI({ name: 'Points GUI' });
+const recorder = new CanvasRecorder(canvas);
 const infoEl = document.getElementById('info');
 const isM = isMobile();
 const navLeft = document.getElementsByClassName('nav column left')[0];
@@ -149,6 +152,7 @@ async function loadShaderByIndex(index) {
     shaders?.remove?.();
     shaders = (await import(shaderProject.path)).default;
     await init();
+
 }
 
 async function loadShaderByURI() {
@@ -196,10 +200,10 @@ const recordingOptions = [
             this.started = !this.started;
             if (this.started) {
                 this.controller.name(this.nameStarted);
-                points.videoRecordStart();
+                recorder.start();
             } else {
                 this.controller.name(this.nameStopped);
-                points.videoRecordStop();
+                recorder.stop();
             }
         },
         started: false,
@@ -207,10 +211,7 @@ const recordingOptions = [
     },
     {
         nameStopped: 'Download PNG Image',
-        fn: function (e) {
-            let image = document.getElementById('canvas').toDataURL().replace('image/png', 'image/octet-stream');
-            window.location.href = image;
-        },
+        fn: _ => recorder.getPNG(),
     },
 ];
 
@@ -230,7 +231,7 @@ async function init() {
     if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
     }
-    const canvas = document.getElementById('canvas');
+
     canvas.width = 800;
     canvas.height = 800;
     points = new Points('canvas');
