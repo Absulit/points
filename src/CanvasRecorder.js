@@ -2,6 +2,11 @@ export default class CanvasRecorder {
     #canvas = null;
     #options = null;
 
+    /**
+     * Records video from a Canvas to a file.
+     * @param {HTMLCanvasElement} canvas Canvas to record
+     * @param {Object} options `MediaRecorder` options
+     */
     constructor(canvas, options) {
         this.#canvas = canvas;
         this.#options = options || {
@@ -29,7 +34,17 @@ export default class CanvasRecorder {
     }
 
     getPNG() {
-        const image = this.#canvas.toDataURL().replace('image/png', 'image/octet-stream');
-        window.location.href = image;
+        this.#canvas.toBlob(
+            blob => {
+                const url = URL.createObjectURL(blob)
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `image_${(new Date()).getTime()}.png`;
+                a.click();
+                URL.revokeObjectURL(url);
+            },
+            'image/png',
+            0.95,
+        );
     }
 }
