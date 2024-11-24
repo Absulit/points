@@ -13,7 +13,7 @@ export default class CanvasRecorder {
 
     start() {
         const videoStream = this.#canvas.captureStream(60);
-        const chunks = [];
+        let chunks = [];
         this.mediaRecorder = new MediaRecorder(videoStream, this.#options);
         this.mediaRecorder.ondataavailable = e => chunks.push(e.data);
         this.mediaRecorder.onstop = _ => {
@@ -28,7 +28,7 @@ export default class CanvasRecorder {
         this.mediaRecorder.stop();
     }
 
-    getPNG(){
+    getPNG() {
         const image = this.#canvas.toDataURL().replace('image/png', 'image/octet-stream');
         window.location.href = image;
     }
