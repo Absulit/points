@@ -24,8 +24,9 @@ export default class CanvasRecorder {
         this.mediaRecorder.onstop = _ => {
             const blob = new Blob(chunks, { 'type': this.#options.mimeType });
             chunks = [];
-            let videoURL = URL.createObjectURL(blob);
-            window.open(videoURL);
+            const url = URL.createObjectURL(blob);
+            this.#linkToDownload(url, 'video', 'webm')
+
         };
         this.mediaRecorder.start();
     }
@@ -37,14 +38,18 @@ export default class CanvasRecorder {
         this.#canvas.toBlob(
             blob => {
                 const url = URL.createObjectURL(blob)
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `image_${(new Date()).getTime()}.png`;
-                a.click();
+                this.#linkToDownload(url, 'image', 'png')
                 URL.revokeObjectURL(url);
             },
             'image/png',
             0.95,
         );
+    }
+
+    #linkToDownload(url, prefix, ext){
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${prefix}_${(new Date()).getTime()}.${ext}`;
+        a.click();
     }
 }
