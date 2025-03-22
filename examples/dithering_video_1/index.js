@@ -27,7 +27,7 @@ const base = {
         points.setSampler('imageSampler', descriptor);
         await points.setTextureVideo('image', './../img/6982698-hd_1440_1080_25fps_800x800.mp4');
         points.setBindingTexture('outputTex', 'computeTexture');
-        points.addLayers(2);
+        points.setLayers(2);
         points.setStorage('variables', 'Variable', false, ShaderType.COMPUTE);
 
         points.setUniform('scale', options.scale);

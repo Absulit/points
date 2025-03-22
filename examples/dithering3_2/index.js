@@ -21,12 +21,12 @@ const dithering3 = {
         points.setSampler('imageSampler', descriptor);
         // await points.setTextureImage('image', './../img/carmen_lyra_423x643.jpg');
         // await points.setTextureImage('image', './../img/old_king_800x00.jpg');
-        // await points.addTextureWebcam('image');
+        // await points.setTextureWebcam('image');
         // await points.setTextureImage('image', './../img/angel_600x600.jpg');
         // await points.setTextureImage('image', './../img/gratia_800x800.jpg');
         await points.setTextureImage('image', './../img/absulit_800x800.jpg');
         points.setBindingTexture('outputTex', 'computeTexture');
-        points.addLayers(2);
+        points.setLayers(2);
         points.setStorage('variables', 'Variable', false, ShaderType.COMPUTE);
 
         points.setUniform('scale', options.scale);

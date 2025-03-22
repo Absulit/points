@@ -667,7 +667,7 @@ export default class Points {
     }
 
     /**
-     * @deprecated
+     * @deprecated use setTextureWebcam
      */
     async addTextureWebcam(name, shaderType) {
         if (this.#nameExists(this.#texturesExternal, name)) {
