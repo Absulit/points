@@ -49,21 +49,21 @@ const base = {
     }
 
 
-    points.addStorageMap('test', [0, 0, 1, .5], 'vec4f');
+    points.setStorageMap('test', [0, 0, 1, .5], 'vec4f');
 
 
-    points.addStorage('variables', 'Variable');
-    points.addStorage('test2', 'TestStruct');
+    points.setStorage('variables', 'Variable');
+    points.setStorage('test2', 'TestStruct');
 
-    points.addUniform('test3', [1, 0, 0, 1], 'vec4f');
+    points.setUniform('test3', [1, 0, 0, 1], 'vec4f');
 
-    points.addStorage('anim', 'array<Variable>');
+    points.setStorage('anim', 'array<Variable>');
 
-    points.addStorageMap('values', [1.0, 99.0], 'array<f32, 2>');
+    points.setStorageMap('values', [1.0, 99.0], 'array<f32, 2>');
 
-    // points.addUniform('test4', [1, 0, 0, 1], 'array< vec4<f32>, 1 >');
+    // points.setUniform('test4', [1, 0, 0, 1], 'array< vec4<f32>, 1 >');
     // TODO: throw error if using array in uniform?
-    // points.addUniform('test5', [1,1,1,1], 'array<f32,4>');
+    // points.setUniform('test5', [1,1,1,1], 'array<f32,4>');
 
 
   },

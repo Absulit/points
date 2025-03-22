@@ -24,22 +24,22 @@ const base = {
             addressModeU: 'repeat',
             addressModeV: 'repeat',
         }
-        points.addSampler('imageSampler', descriptor);
-        await points.addTextureVideo('image', './../img/6982698-hd_1440_1080_25fps_800x800.mp4');
-        points.addBindingTexture('outputTex', 'computeTexture');
+        points.setSampler('imageSampler', descriptor);
+        await points.setTextureVideo('image', './../img/6982698-hd_1440_1080_25fps_800x800.mp4');
+        points.setBindingTexture('outputTex', 'computeTexture');
         points.addLayers(2);
-        points.addStorage('variables', 'Variable', false, ShaderType.COMPUTE);
+        points.setStorage('variables', 'Variable', false, ShaderType.COMPUTE);
 
-        points.addUniform('scale', options.scale);
-        points.addUniform('quantError', options.quantError);
+        points.setUniform('scale', options.scale);
+        points.setUniform('quantError', options.quantError);
 
         folder.add(options, 'scale', 0, 1, .0001).name('Scale');
         folder.add(options, 'quantError', -1, 1, .0001).name('quantError');
         folder.open();
     },
     update: points => {
-        points.updateUniform('scale', options.scale);
-        points.updateUniform('quantError', options.quantError);
+        points.setUniform('scale', options.scale);
+        points.setUniform('quantError', options.quantError);
     }
 }
 

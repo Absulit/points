@@ -13,10 +13,10 @@ const imagescale1 = {
             // maxAnisotropy: 10,
             // compare: 'always',
         }
-        points.addSampler('feedbackSampler', descriptor);
-        await points.addTextureImage('image1', './../img/gratia_800x800.jpg');
-        await points.addTextureImage('image2', './../img/old_king_600x600.jpg');
-        await points.addTextureImage('image3', './../img/unnamed_horror_100x100.png');
+        points.setSampler('feedbackSampler', descriptor);
+        await points.setTextureImage('image1', './../img/gratia_800x800.jpg');
+        await points.setTextureImage('image2', './../img/old_king_600x600.jpg');
+        await points.setTextureImage('image3', './../img/unnamed_horror_100x100.png');
     },
     update: points => {
 

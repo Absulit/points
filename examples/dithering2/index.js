@@ -15,14 +15,14 @@ const dithering2 = {
             addressModeU: 'repeat',
             addressModeV: 'repeat',
         }
-        points.addSampler('feedbackSampler', descriptor);
-        // await points.addTextureImage('image', './../img/carmen_lyra_423x643.jpg');
-        // await points.addTextureImage('image', './../img/old_king_600x600.jpg');
-        await points.addTextureImage('image', './../img/absulit_800x800.jpg');
+        points.setSampler('feedbackSampler', descriptor);
+        // await points.setTextureImage('image', './../img/carmen_lyra_423x643.jpg');
+        // await points.setTextureImage('image', './../img/old_king_600x600.jpg');
+        await points.setTextureImage('image', './../img/absulit_800x800.jpg');
 
-        points.addUniform('scale', options.scale);
-        points.addUniform('depth', options.depth);
-        points.addUniform('distance', options.depth);
+        points.setUniform('scale', options.scale);
+        points.setUniform('depth', options.depth);
+        points.setUniform('distance', options.depth);
 
         folder.add(options, 'scale', 0, 1, .0001).name('Scale');
         folder.add(options, 'depth', -1, 1, .0001).name('Depth');
@@ -30,9 +30,9 @@ const dithering2 = {
         folder.open();
     },
     update: points => {
-        points.updateUniform('scale', options.scale);
-        points.updateUniform('depth', options.depth);
-        points.updateUniform('distance', options.distance);
+        points.setUniform('scale', options.scale);
+        points.setUniform('depth', options.depth);
+        points.setUniform('distance', options.distance);
     }
 }
 

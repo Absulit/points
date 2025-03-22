@@ -10,12 +10,12 @@ const circleblur = {
     ],
     /**
      *
-     * @param {Points} points 
+     * @param {Points} points
      */
     init: async points => {
-        points.addSampler('feedbackSampler', null);
-        points.addTexture2d('feedbackTexture', true);
-        points.addBindingTexture('outputTex', 'computeTexture');
+        points.setSampler('feedbackSampler', null);
+        points.setTexture2d('feedbackTexture', true);
+        points.setBindingTexture('outputTex', 'computeTexture');
     },
     update: points => {
 

@@ -731,7 +731,7 @@ export default class Points {
     }
 
     /**
-     * @deprecated useSetAudio
+     * @deprecated use setAudio
      */
     addAudio(name, path, volume, loop, autoplay) {
         const audio = new Audio(path);
