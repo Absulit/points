@@ -32,6 +32,15 @@ before actually starting points, you need to set the uniforms and other calls st
 - createScreen is called
     - Adds two triangles called points per number of columns and rows
     - the default is one point, two triangles, one quad.
+
+- #createBuffers
+    - #createParametersUniforms
+        - this is for #uniforms only
+        - with the #dataSize creates the paddings for the memory the #createAndMapBuffer needs
+    - for each of the variables arrays variables like #storage and #textures2dArray etc creates its memory buffer
+    -
+- await #createPipeline
+
 - returns true when finished
 
 

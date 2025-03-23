@@ -1141,20 +1141,20 @@ export default class Points {
         this.#renderPasses.forEach(this.#compileRenderPass);
         this.#generateDataSize();
         //
-        let adapter = null;
-
-        try {
-            adapter = await navigator.gpu.requestAdapter();
-        } catch (err) {
-            console.log(err);
+        if (!navigator.gpu) {
+            console.error('WebGPU not supported.');
+            return false;
         }
 
-        if (!adapter) { return false; }
+        const adapter = await navigator.gpu.requestAdapter();;
+
+        if (!adapter) {
+            console.error('Couldn\'t request WebGPU adapter.');
+            return false;
+        }
 
         this.#device = await adapter.requestDevice();
-        this.#device.lost.then(info => {
-            console.log(info);
-        });
+        this.#device.lost.then(info => console.log(info));
 
         if (this.#canvas !== null) this.#context = this.#canvas.getContext('webgpu');
 
@@ -1185,6 +1185,10 @@ export default class Points {
             }
         };
         await this.createScreen();
+
+        this.#createBuffers();
+        await this.#createPipeline();
+
         return true;
     }
 
@@ -1220,8 +1224,7 @@ export default class Points {
             }
             this.#createVertexBuffer(new Float32Array(this.#vertexArray));
         }
-        this.#createComputeBuffers();
-        await this.#createPipeline();
+
     }
     /**
      * @private
@@ -1292,7 +1295,7 @@ export default class Points {
         this.#uniforms.buffer = this.#createAndMapBuffer(values, GPUBufferUsage.UNIFORM, true, paramsDataSize.bytes);
     }
 
-    #createComputeBuffers() {
+    #createBuffers() {
         //--------------------------------------------
         this.#createParametersUniforms();
         //--------------------------------------------
@@ -1796,6 +1799,7 @@ export default class Points {
             }
         });
     }
+
     async update() {
         if (!this.#canvas || !this.#device) return;
         //--------------------------------------------
@@ -1914,8 +1918,6 @@ export default class Points {
             }
         });
 
-
-
         if (this.#readStorage.length) {
             this.#readStorage.forEach(readStorageItem => {
                 let storageItem = this.#storage.find(storageItem => storageItem.name === readStorageItem.name);
@@ -1940,6 +1942,7 @@ export default class Points {
         this.#mouseDelta = [0, 0];
         await this.read();
     }
+
     async read() {
         for (const [key, event] of this.#events) {
             let eventRead = await this.readStorage(event.name);
