@@ -19,19 +19,19 @@ const renderpasses1 = {
         new RenderPass(vert2, frag2),
     ],
     init: async (points, folder) => {
-        points.addSampler('imageSampler', null);
-        // await points.addTextureImage('image', './../img/carmen_lyra_423x643.jpg');
-        // await points.addTextureImage('image', './../img/old_king_600x600.jpg');
-        await points.addTextureImage('image', './../img/absulit_800x800.jpg');
-        points.addSampler('feedbackSampler', null);
-        points.addTexture2d('feedbackTexture', true);
+        points.setSampler('imageSampler', null);
+        // await points.setTextureImage('image', './../img/carmen_lyra_423x643.jpg');
+        // await points.setTextureImage('image', './../img/old_king_600x600.jpg');
+        await points.setTextureImage('image', './../img/absulit_800x800.jpg');
+        points.setSampler('feedbackSampler', null);
+        points.setTexture2d('feedbackTexture', true);
 
-        points.addUniform('rotation', options.rotation, 'f32');
+        points.setUniform('rotation', options.rotation, 'f32');
         folder.add(options, 'rotation', 0, 1, .0001).name('Rotation');
         folder.open();
     },
     update: points => {
-        points.updateUniform('rotation', options.rotation);
+        points.setUniform('rotation', options.rotation);
     }
 }
 

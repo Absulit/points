@@ -80,12 +80,11 @@ export default class Points {
             this.#originalCanvasHeigth = this.#canvas.clientHeight;
             window.addEventListener('resize', this.#resizeCanvasToFitWindow, false);
             document.addEventListener("fullscreenchange", e => {
-                let isFullscreen = !!document.fullscreenElement;
-                this.#fullscreen = isFullscreen;
-                if (!isFullscreen && !this.#fitWindow) {
+                this.#fullscreen = !!document.fullscreenElement;
+                if (!this.#fullscreen && !this.#fitWindow) {
                     this.#resizeCanvasToDefault();
                 }
-                if (!isFullscreen) {
+                if (!this.#fullscreen) {
                     this.fitWindow = this.#lastFitWindow;
                 }
             });
@@ -94,7 +93,7 @@ export default class Points {
 
     #resizeCanvasToFitWindow = () => {
         if (this.#fitWindow) {
-            const {offsetWidth, offsetHeight} = this.#canvas.parentNode;
+            const { offsetWidth, offsetHeight } = this.#canvas.parentNode;
             this.#canvas.width = offsetWidth;
             this.#canvas.height = offsetHeight;
             this.#setScreenSize();
@@ -667,7 +666,7 @@ export default class Points {
     }
 
     /**
-     * @deprecated
+     * @deprecated use setTextureWebcam
      */
     async addTextureWebcam(name, shaderType) {
         if (this.#nameExists(this.#texturesExternal, name)) {
@@ -731,7 +730,7 @@ export default class Points {
     }
 
     /**
-     * @deprecated useSetAudio
+     * @deprecated use setAudio
      */
     addAudio(name, path, volume, loop, autoplay) {
         const audio = new Audio(path);

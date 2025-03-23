@@ -67,23 +67,23 @@ const base = {
 
 
 
-        points.addUniform('right', right, 'vec3<f32>');
-        points.addUniform('up', up, 'vec3<f32>');
-        points.addUniform('modelViewProjectionMatrix', modelViewProjectionMatrix, 'mat4x4<f32>');
+        points.setUniform('right', right, 'vec3<f32>');
+        points.setUniform('up', up, 'vec3<f32>');
+        points.setUniform('modelViewProjectionMatrix', modelViewProjectionMatrix, 'mat4x4<f32>');
 
-        points.addUniform('deltaTime', 0);
-        points.addUniform('seed', [0, 0, 0, 0], 'vec4f');
+        points.setUniform('deltaTime', 0);
+        points.setUniform('seed', [0, 0, 0, 0], 'vec4f');
 
-        points.addStorage('data', 'Particles');
-        await points.addTextureImage('texture', 'webgpu_particles_1/webgpu.png');
-        // points.addUniform('render_params', data, 'RenderParams');
+        points.setStorage('data', 'Particles');
+        await points.setTextureImage('texture', 'webgpu_particles_1/webgpu.png');
+        // points.setUniform('render_params', data, 'RenderParams');
 
-        points.addUniform('ubo_width', 1, 'u32');
-        // points.addStorage()
-        points.addStorage('buf_in', 'Buffer', true);
-        points.addStorage('buf_out', 'Buffer');
+        points.setUniform('ubo_width', 1, 'u32');
+        // points.setStorage()
+        points.setStorage('buf_in', 'Buffer', true);
+        points.setStorage('buf_out', 'Buffer');
 
-        points.addBindingTexture('tex_out', 'tex_in')
+        points.setBindingTexture('tex_out', 'tex_in')
     },
     update: points => {
 

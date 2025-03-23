@@ -11,9 +11,9 @@ const pointstitle1 = {
      */
     init: async points => {
 
-        await points.addTextureImage('font', './../img/inconsolata_regular_8x22.png');
+        await points.setTextureImage('font', './../img/inconsolata_regular_8x22.png');
 
-        points.addSampler('imageSampler', null);
+        points.setSampler('imageSampler', null);
 
     },
     update: points => {
