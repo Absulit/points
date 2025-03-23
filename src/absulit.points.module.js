@@ -705,11 +705,11 @@ export default class Points {
         //document.body.appendChild(video);
         if (navigator.mediaDevices.getUserMedia) {
             await navigator.mediaDevices.getUserMedia({ video: true })
-                .then(async function (stream) {
+                .then(async stream => {
                     video.srcObject = stream;
                     await video.play();
                 })
-                .catch(function (err) {
+                .catch(err => {
                     console.log(err);
                 });
         }
@@ -737,11 +737,11 @@ export default class Points {
         //document.body.appendChild(video);
         if (navigator.mediaDevices.getUserMedia) {
             await navigator.mediaDevices.getUserMedia({ video: true })
-                .then(async function (stream) {
+                .then(async stream => {
                     video.srcObject = stream;
                     await video.play();
                 })
-                .catch(function (err) {
+                .catch(err => {
                     console.log(err);
                 });
         }
