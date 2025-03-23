@@ -62,33 +62,16 @@ export default class Points {
     constructor(canvasId) {
         this.#canvasId = canvasId;
         this.#canvas = document.getElementById(this.#canvasId);
-        if (this.#canvasId) {
-            this.#canvas.addEventListener('click', e => {
-                this.#mouseClick = true;
-            });
-            this.#canvas.addEventListener('mousemove', this.#onMouseMove, { passive: true });
-            this.#canvas.addEventListener('mousedown', e => {
-                this.#mouseDown = true;
-            });
-            this.#canvas.addEventListener('mouseup', e => {
-                this.#mouseDown = false;
-            });
-            this.#canvas.addEventListener('wheel', e => {
-                this.#mouseWheel = true;
-                this.#mouseDelta = [e.deltaX, e.deltaY];
-            }, { passive: true });
+        if (this.#canvas) {
+            this.#canvas.addEventListener('click', this.#onCanvasClick);
+            this.#canvas.addEventListener('mousemove', this.#onCanvasMouseMove, { passive: true });
+            this.#canvas.addEventListener('mousedown', this.#onCanvasMouseDown);
+            this.#canvas.addEventListener('mouseup', this.#onCanvasMouseUp);
+            this.#canvas.addEventListener('wheel', this.#onCanvasWheel, { passive: true });
             this.#originalCanvasWidth = this.#canvas.clientWidth;
             this.#originalCanvasHeigth = this.#canvas.clientHeight;
             window.addEventListener('resize', this.#resizeCanvasToFitWindow, false);
-            document.addEventListener("fullscreenchange", e => {
-                this.#fullscreen = !!document.fullscreenElement;
-                if (!this.#fullscreen && !this.#fitWindow) {
-                    this.#resizeCanvasToDefault();
-                }
-                if (!this.#fullscreen) {
-                    this.fitWindow = this.#lastFitWindow;
-                }
-            });
+            document.addEventListener('fullscreenchange', this.#onFullScreenChange);
         }
     }
 
@@ -138,12 +121,32 @@ export default class Points {
         })
     }
 
-    #onMouseMove = e => {
+    #onCanvasClick = _ => this.#mouseClick = true;
+    #onCanvasMouseDown = _ => this.#mouseDown = true;
+    #onCanvasMouseUp = _ => this.#mouseDown = false;
+
+    #onCanvasWheel = e => {
+        this.#mouseWheel = true;
+        this.#mouseDelta = [e.deltaX, e.deltaY];
+    }
+
+    #onCanvasMouseMove = e => {
         // get position relative to canvas
         const rect = this.#canvas.getBoundingClientRect();
         this.#mouseX = e.clientX - rect.left;
         this.#mouseY = e.clientY - rect.top;
     }
+
+    #onFullScreenChange = _ => {
+        this.#fullscreen = !!document.fullscreenElement;
+        if (!this.#fullscreen && !this.#fitWindow) {
+            this.#resizeCanvasToDefault();
+        }
+        if (!this.#fullscreen) {
+            this.fitWindow = this.#lastFitWindow;
+        }
+    }
+
     /**
      * @deprecated use setUniform
      */
