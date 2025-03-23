@@ -12,20 +12,20 @@ const random1 = {
     compute,
     frag,
     init: async (points, folder) => {
-        points.addUniform('randNumber', 0);
-        points.addUniform('randNumber2', 0);
-        points.addSampler('computeTextureSampler');
-        points.addBindingTexture('outputTex', 'computeTexture');
+        points.setUniform('randNumber', 0);
+        points.setUniform('randNumber2', 0);
+        points.setSampler('computeTextureSampler');
+        points.setBindingTexture('outputTex', 'computeTexture');
 
-        points.addUniform('sliderA', options.sliderA, 'f32');
+        points.setUniform('sliderA', options.sliderA, 'f32');
         folder.add(options, 'sliderA', 0, 1, .0001).name('sliderA');
         folder.open();
     },
     update: points => {
-        points.updateUniform('randNumber', Math.random());
-        points.updateUniform('randNumber2', Math.random());
+        points.setUniform('randNumber', Math.random());
+        points.setUniform('randNumber2', Math.random());
 
-        points.updateUniform('sliderA', options.sliderA);
+        points.setUniform('sliderA', options.sliderA);
     }
 }
 

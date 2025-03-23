@@ -7,9 +7,9 @@ const layers1 = {
     frag,
     init: async points => {
         const numPoints = 800*800;
-        points.addUniform('numPoints', numPoints);
-        // points.addStorage('points', numPoints, `array<vec4<f32>, ${numPoints}>`, 4);
-        points.addLayers(2);
+        points.setUniform('numPoints', numPoints);
+        // points.setStorage('points', numPoints, `array<vec4<f32>, ${numPoints}>`, 4);
+        points.setLayers(2);
     },
     update: points => {
 

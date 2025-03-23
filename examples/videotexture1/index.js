@@ -14,16 +14,16 @@ const videotexture1 = {
     vert,
     frag,
     init: async (points, folder) => {
-        points.addSampler('feedbackSampler', null);
-        await points.addTextureVideo('video', './../img/pexels-shubh-haque-4746616-960x540-30fps.mp4');
+        points.setSampler('feedbackSampler', null);
+        await points.setTextureVideo('video', './../img/pexels-shubh-haque-4746616-960x540-30fps.mp4');
 
-        points.addUniform('scale', options.scale, 'f32');
+        points.setUniform('scale', options.scale, 'f32');
 
         folder.add(options, 'scale', 0, 1, .0001).name('Scale');
         folder.open();
     },
     update: points => {
-        points.updateUniform('scale', options.scale);
+        points.setUniform('scale', options.scale);
     }
 }
 

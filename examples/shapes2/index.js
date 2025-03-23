@@ -8,10 +8,10 @@ const shapes2 = {
     ],
     init: async points => {
         const numPoints = 800*800;
-        points.addUniform('numPoints', numPoints);
-        points.addStorage('points', `array<vec4<f32>, ${numPoints}>`);
-        points.addSampler('feedbackSampler', null);
-        points.addBindingTexture('outputTex', 'computeTexture');
+        points.setUniform('numPoints', numPoints);
+        points.setStorage('points', `array<vec4<f32>, ${numPoints}>`);
+        points.setSampler('feedbackSampler', null);
+        points.setBindingTexture('outputTex', 'computeTexture');
     },
     update: points => {
 

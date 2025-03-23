@@ -21,18 +21,18 @@ const imagetexture4 = {
             //maxAnisotropy: 10,
         }
 
-        points.addSampler('imageSampler', descriptor);
-        // await points.addTextureImage('image', './../img/carmen_lyra_423x643.jpg');
-        await points.addTextureImage('image', './../img/old_king_600x600.jpg');
-        // await points.addTextureImage('image', './../img/absulit_800x800.jpg');
+        points.setSampler('imageSampler', descriptor);
+        // await points.setTextureImage('image', './../img/carmen_lyra_423x643.jpg');
+        await points.setTextureImage('image', './../img/old_king_600x600.jpg');
+        // await points.setTextureImage('image', './../img/absulit_800x800.jpg');
 
-        points.addUniform('scale', options.scale, 'f32');
+        points.setUniform('scale', options.scale, 'f32');
 
         folder.add(options, 'scale', 0, 1, .0001).name('Scale');
         folder.open();
     },
     update: points => {
-        points.updateUniform('scale', options.scale);
+        points.setUniform('scale', options.scale);
     }
 }
 

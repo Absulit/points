@@ -5,7 +5,7 @@ const mouseclickscroll1 = {
     vert,
     frag,
     init: async points => {
-        points.addStorage('variables', 'Variable');
+        points.setStorage('variables', 'Variable');
     },
     update: points => {
 
