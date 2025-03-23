@@ -945,7 +945,10 @@ export default class Points {
     _setInternal(value) {
         this.#internal = value;
     }
+
     /**
+     * Takes all the arrays with some type o variable (uniforms, storage, etc) and
+     * adds a new row to `dynamicGroupBindings`
      * @private
      * @param {ShaderType} shaderType
      * @param {boolean} internal
@@ -965,7 +968,7 @@ export default class Points {
             bindingIndex += 1;
         }
         this.#storage.forEach(storageItem => {
-            let internalCheck = internal == storageItem.internal;
+            const internalCheck = internal == storageItem.internal;
             if (!storageItem.shaderType && internalCheck || storageItem.shaderType == shaderType && internalCheck) {
                 let T = storageItem.structName;
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, read_write> ${storageItem.name}: ${T};\n`
@@ -981,42 +984,42 @@ export default class Points {
             }
         }
         this.#samplers.forEach((sampler, index) => {
-            let internalCheck = internal == sampler.internal;
+            const internalCheck = internal == sampler.internal;
             if (!sampler.shaderType && internalCheck || sampler.shaderType == shaderType && internalCheck) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${sampler.name}: sampler;\n`;
                 bindingIndex += 1;
             }
         });
         this.#texturesStorage2d.forEach((texture, index) => {
-            let internalCheck = internal && texture.internal;
+            const internalCheck = internal && texture.internal;
             if (!texture.shaderType && internalCheck || texture.shaderType == shaderType && internalCheck) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_storage_2d<rgba8unorm, write>;\n`;
                 bindingIndex += 1;
             }
         });
         this.#textures2d.forEach((texture, index) => {
-            let internalCheck = internal == texture.internal;
+            const internalCheck = internal == texture.internal;
             if (!texture.shaderType && internalCheck || texture.shaderType == shaderType && internalCheck) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d<f32>;\n`;
                 bindingIndex += 1;
             }
         });
         this.#textures2dArray.forEach((texture, index) => {
-            let internalCheck = internal == texture.internal;
+            const internalCheck = internal == texture.internal;
             if (!texture.shaderType && internalCheck || texture.shaderType == shaderType && internalCheck) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d_array<f32>;\n`;
                 bindingIndex += 1;
             }
         });
         this.#texturesExternal.forEach(externalTexture => {
-            let internalCheck = internal == externalTexture.internal;
+            const internalCheck = internal == externalTexture.internal;
             if (!externalTexture.shaderType && internalCheck || externalTexture.shaderType == shaderType && internalCheck) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${externalTexture.name}: texture_external;\n`;
                 bindingIndex += 1;
             }
         });
         this.#bindingTextures.forEach(bindingTexture => {
-            let internalCheck = internal == bindingTexture.internal;
+            const internalCheck = internal == bindingTexture.internal;
             if (bindingTexture.compute.shaderType == shaderType && internalCheck) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.compute.name}: texture_storage_2d<rgba8unorm, write>;\n`;
                 bindingIndex += 1;
@@ -1086,6 +1089,10 @@ export default class Points {
         renderPass.hasComputeShader && (renderPass.compiledShaders.compute = colorsComputeWGSL);
         renderPass.hasFragmentShader && (renderPass.compiledShaders.fragment = colorsFragWGSL);
     }
+
+    /**
+     * function that uses dataSize to get the size of each struct
+     */
     #generateDataSize = () => {
         const allShaders = this.#renderPasses.map(renderPass => {
             const { vertex, compute, fragment } = renderPass.compiledShaders;
@@ -1109,6 +1116,7 @@ export default class Points {
             }
         });
     }
+
     /**
      * One time function to call to initialize the shaders.
      * @param {Array<RenderPass>} renderPasses Collection of RenderPass, which contain Vertex, Compute and Fragment shaders.
@@ -1134,18 +1142,24 @@ export default class Points {
         this.#generateDataSize();
         //
         let adapter = null;
+
         try {
             adapter = await navigator.gpu.requestAdapter();
         } catch (err) {
             console.log(err);
         }
+
         if (!adapter) { return false; }
+
         this.#device = await adapter.requestDevice();
         this.#device.lost.then(info => {
             console.log(info);
         });
+
         if (this.#canvas !== null) this.#context = this.#canvas.getContext('webgpu');
+
         this.#presentationFormat = navigator.gpu.getPreferredCanvasFormat();
+
         if (this.#canvasId) {
             if (this.#fitWindow) {
                 this.#resizeCanvasToFitWindow();
@@ -1153,6 +1167,7 @@ export default class Points {
                 this.#resizeCanvasToDefault();
             }
         }
+
         this.#renderPassDescriptor = {
             colorAttachments: [
                 {
