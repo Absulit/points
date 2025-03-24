@@ -1184,7 +1184,7 @@ export default class Points {
                 depthStoreOp: 'store'
             }
         };
-        await this.createScreen();
+        await this.#createScreen();
 
         this.#createBuffers();
         await this.#createPipeline();
@@ -1206,8 +1206,9 @@ export default class Points {
 
     /**
      * Adds two triangles called points per number of columns and rows
+     * @private
      */
-    async createScreen() {
+    async #createScreen() {
         let hasVertexAndFragmentShader = this.#renderPasses.some(renderPass => renderPass.hasVertexAndFragmentShader)
         if (hasVertexAndFragmentShader) {
             let colors = [
