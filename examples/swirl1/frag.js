@@ -49,12 +49,16 @@ fn main(
         variables.init = 1;
     }
 
-
     let d = 1 - distance(uvr, vec2f(.5));
     let uvrRotated = rotateVector(  (uvr - vec2f(.5)) / params.scale, params.time * .1);
     let uvrTwisted = rotateVector(uvrRotated, params.rotation * 2 * PI * d);
 
-    let n = snoise(/*params.time +*/ uvrTwisted ) * .5 + .5;
+    var displaceValue = 0.;
+    if(params.displace == 1){
+        displaceValue = params.time;
+    }
+
+    let n = snoise(displaceValue + uvrTwisted ) * .5 + .5;
 
     let finalColor = vec4(paletteLerp(colors, fract(n + params.time * .01 + uvr.x)), 1);
 

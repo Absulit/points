@@ -1,19 +1,17 @@
 import vert from './vert.js';
-// import compute from './compute.js';
-import frag0 from './frag0.js';
-import frag1 from './frag1.js';
+import frag0 from './frag.js';
 import Points from 'points';
 import RenderPass from 'renderpass';
 
 const options = {
     rotation: -.866,
     scale: .090,
+    displace: false,
 }
 
 const base = {
     renderPasses: [
         new RenderPass(vert, frag0),
-        // new RenderPass(vert, frag1),
     ],
     /**
      *
@@ -25,13 +23,12 @@ const base = {
         // create an uniform and get value from options
         points.setUniform('rotation', options.rotation);
         points.setUniform('scale', options.scale);
+        points.setUniform('displace', options.displace);
 
         // https://github.com/dataarts/dat.gui/blob/master/API.md#GUI+add
         folder.add(options, 'rotation', -10, 10, .0001).name('rotation');
         folder.add(options, 'scale', 0, 1, .0001).name('scale');
-
-        // points.setSampler('imageSampler', null);
-        // points.setTexture2d('feedbackTexture', true);
+        folder.add(options, 'displace').name('displace');
 
         points.setStorage('variables', 'Variables');
         points.setStorage('colors', 'array<vec3f, 6>');
@@ -41,6 +38,7 @@ const base = {
     update: points => {
         points.setUniform('rotation', options.rotation);
         points.setUniform('scale', options.scale);
+        points.setUniform('displace', options.displace);
     }
 }
 
