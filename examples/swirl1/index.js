@@ -13,7 +13,7 @@ const options = {
 const base = {
     renderPasses: [
         new RenderPass(vert, frag0),
-        new RenderPass(vert, frag1),
+        // new RenderPass(vert, frag1),
     ],
     /**
      *
@@ -30,9 +30,11 @@ const base = {
         folder.add(options, 'rotation', -10, 10, .0001).name('rotation');
         folder.add(options, 'scale', 0, 1, .0001).name('scale');
 
-        points.setSampler('imageSampler', null);
-        points.setTexture2d('feedbackTexture', true);
+        // points.setSampler('imageSampler', null);
+        // points.setTexture2d('feedbackTexture', true);
 
+        points.setStorage('variables', 'Variables');
+        points.setStorage('colors', 'array<vec3f, 6>');
 
         folder.open();
     },

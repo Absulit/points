@@ -2,6 +2,7 @@ import { fnusin } from 'animation';
 import { PI, rotateVector } from 'math';
 import { snoise } from 'noise2d';
 import { sdfCircle } from 'sdf';
+import { structs } from './structs.js';
 
 const frag = /*wgsl*/`
 
@@ -10,6 +11,20 @@ ${sdfCircle}
 ${rotateVector}
 ${PI}
 ${snoise}
+${structs}
+
+fn paletteLerp(a:array<vec3f,6>, value:f32) -> vec3f {
+    let numElements = 6.;
+    let elementPercent = 1 / numElements;
+    let index = value / elementPercent;
+    let minIndex = i32(floor(index));
+    let maxIndex = i32(ceil(index));
+
+    let a0 = a[minIndex];
+    let a1 = a[maxIndex];
+
+    return mix(a0, a1, fract(index));
+}
 
 @fragment
 fn main(
@@ -21,14 +36,27 @@ fn main(
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
 
-    // let d = 1 - distance(uvr, vec2f(.5));
-    // let c = sdfCircle( vec2f(.5), .5, .01, uvr);
-    // let uvrRotated = rotateVector(uvr - vec2f(.5), params.rotation * 2 * PI * d);
 
-    // let n = snoise(params.time + uvrRotated / params.scale) * .5 + .5;
-    let n = snoise(params.time + uvr / params.scale) * .5 + .5;
+    if(variables.init == 0){
+        var index = 0;
+        colors[index] = vec3f(248, 208, 146) / 255; index++;
+        colors[index] = vec3f(21, 144, 151) / 255; index++;
+        colors[index] = vec3f(56, 164, 140) / 255; index++;
+        colors[index] = vec3f(26, 86, 120) / 255; index++;
+        colors[index] = vec3f(37, 36, 93) / 255; index++;
+        colors[index] = vec3f(87, 28, 86) / 255; index++;
 
-    let finalColor = mix( vec4f(.0,.1,0,1), vec4f(1,.3,.1,1), n);
+        variables.init = 1;
+    }
+
+
+    let d = 1 - distance(uvr, vec2f(.5));
+    let uvrRotated = rotateVector(  (uvr - vec2f(.5)) / params.scale, params.time * .1);
+    let uvrTwisted = rotateVector(uvrRotated, params.rotation * 2 * PI * d);
+
+    let n = snoise(/*params.time +*/ uvrTwisted ) * .5 + .5;
+
+    let finalColor = vec4(paletteLerp(colors, fract(n + params.time * .01 + uvr.x)), 1);
 
     return finalColor;
 }
