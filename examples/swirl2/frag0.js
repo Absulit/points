@@ -2,7 +2,6 @@ import { fnusin } from 'animation';
 import { texturePosition } from 'image';
 import { PI } from 'math';
 import { snoise } from 'noise2d';
-import { structs } from './structs.js';
 
 const frag = /*wgsl*/`
 
@@ -10,7 +9,6 @@ ${fnusin}
 ${snoise}
 ${texturePosition}
 ${PI}
-${structs}
 
 @fragment
 fn main(

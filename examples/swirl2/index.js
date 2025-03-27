@@ -17,7 +17,7 @@ const options = {
 const base = {
     renderPasses: [
         new RenderPass(vert, frag0),
-        // new RenderPass(vert, frag1),
+        new RenderPass(vert, frag1),
     ],
     /**
      *
@@ -36,10 +36,6 @@ const base = {
         folder.add(options, 'scale', 0, 1, .0001).name('scale');
         folder.add(options, 'displace').name('displace');
 
-        points.setStorage('variables', 'Variables');
-        points.setStorage('colors', 'array<vec3f, 6>');
-
-
         points.setUniform('sliderA', options.sliderA);
         points.setUniform('sliderB', options.sliderB);
         points.setUniform('sliderC', options.sliderC);
@@ -54,6 +50,8 @@ const base = {
 
         points.setSampler('imageSampler', descriptor);
         await points.setTextureImage('image', './../img/absulit_800x800.jpg');
+
+        points.setTexture2d('feedbackTexture', true);
 
 
         folder.open();
