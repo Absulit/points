@@ -3,7 +3,7 @@
  */
 
 export const PI = /*wgsl*/`const PI = 3.14159265;`;
-export const TAU = /*wgsl*/`const TAU = PI * 2`;
+export const TAU = /*wgsl*/`const TAU = PI * 2;`;
 export const PHI = /*wgsl*/`const PHI = 1.61803398;`;
 export const E = /*wgsl*/`const E = 2.71828182;`;
 
