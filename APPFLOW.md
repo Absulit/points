@@ -8,7 +8,7 @@ To create an application with points you need only a canvas id, meaning the canv
 
 ## setUniform, setStorage
 
-before actually starting points, you need to set the uniforms and other calls starting with `points.set`
+before actually starting points, you need to set the uniforms and other calls starting with `points.set`: # TODO: provide fix for this
 
 ## points.init
 
