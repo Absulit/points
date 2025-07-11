@@ -8,6 +8,7 @@ import Clock from './clock.js';
 import defaultStructs from './core/defaultStructs.js';
 import { defaultVertexBody } from './core/defaultFunctions.js';
 import { dataSize, getArrayTypeData, isArray, typeSizes } from './data-size.js';
+import { loadImage, strToImage } from './texture-string.js';
 
 export default class Points {
     #canvasId = null;
@@ -512,7 +513,7 @@ export default class Points {
         });
     }
     /**
-     * @deprecated uset setTextureImage
+     * @deprecated use setTextureImage
      */
     async updateTextureImage(name, path, shaderType) {
         if (!this.#nameExists(this.#textures2d, name)) {
@@ -586,6 +587,28 @@ export default class Points {
         this.#textures2d.push(texture2d);
         return texture2d;
     }
+
+    /**
+     * Loads a text string as a texture.
+     * Using an Atlas or a Spritesheet with UTF-16 chars (`path`) it will create a new texture
+     * that contains only the `text` characters.
+     * Characters in the atlas `path` must be in order of the UTF-16 chars.
+     * It can have missing characters at the end or at the start, so the `offset` is added to take account for those chars.
+     * For example, `A` is 65, but if one character is removed before the letter `A`, then offset is -1
+     * @param {String} name id of the wgsl variable in the shader
+     * @param {String} text text you want to load as texture
+     * @param {String} path atlas to grab characters from
+     * @param {{x: number, y: number}} size size of a individual character e.g.: `{x:10, y:20}`
+     * @param {Number} offset how many characters back or forward it must move to start
+     * @param {String} shaderType
+     * @returns
+     */
+    async setTextureString(name, text, path, size, offset = 0, shaderType = null){
+        const atlas = await loadImage(path);
+        const textImg = strToImage(text, atlas, size, offset);
+        return this.setTextureImage(name, textImg, shaderType);
+    }
+
     /**
      * Load images as texture_2d_array
      * @param {string} name
