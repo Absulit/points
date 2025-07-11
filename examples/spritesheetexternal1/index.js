@@ -3,14 +3,58 @@ import compute from './compute.js';
 import frag from './frag.js';
 import Points from 'points';
 
-const options = {
-    val: 0,
-    bool: false,
-    color1: '#FF0000', // CSS string
-    color2: [0, 128, 255], // RGB array
-    color3: [0, 128, 255, 0.3], // RGB with alpha
-    color4: { h: 350, s: 0.9, v: 0.3 }, // Hue, saturation, value
-    color5: { r: 115, g: 50.9, b: 20.3, a: .1 }, // r, g, b object
+
+async function loadImage(src) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.src = src;
+        img.onload = () => resolve(img);
+        img.onerror = err => reject(err);
+    });
+}
+
+function strToCodes(str) {
+    return Array.from(str).map(char => char.charCodeAt(0))
+}
+
+/**
+ *
+ * @param {Image} atlas Image atlas to parse
+ * @param {CanvasRenderingContext2D} ctx Canvas context
+ * @param {Number} index index in the atlas, so 0 is the first char
+ * @param {Object} size cell dimensions
+ * @param {Number} finalIndex final positional index in the canvas
+ */
+export function sprite(atlas, ctx, index, size, finalIndex) {
+    const { width } = atlas;
+    const numColumns = width / size.x
+
+    const x = index % numColumns;
+    const y = Math.floor(index / numColumns);
+
+    ctx.drawImage(
+        atlas,
+        x * size.x,
+        y * size.y,
+        size.x,
+        size.y,
+
+        size.x * finalIndex,
+        0,
+
+        size.x,
+        size.y);
+}
+
+function strToImage(str, atlasImg, size){
+    const chars = strToCodes(str);
+    const canvas = document.createElement('canvas');
+    canvas.width = chars.length * size.x;
+    canvas.height = size.y;
+    const ctx = canvas.getContext('2d');
+
+    chars.forEach((c, i) => sprite(atlasImg, ctx, c - 32, size, i));
+    return canvas.toDataURL('image/png');
 }
 
 const base = {
@@ -22,26 +66,25 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+        let descriptor = {
+            addressModeU: 'clamp-to-edge',
+            addressModeV: 'clamp-to-edge',
+            magFilter: 'nearest',
+            minFilter: 'nearest',
+            mipmapFilter: 'nearest',
+            //maxAnisotropy: 10,
+        }
 
-        // Add elements to dat gui
-        // create an uniform and get value from options
-        points.setUniform('val', options.val);
+        const atlas = await loadImage('./../img/inconsolata_regular_8x22.png');
+        const size = { x: 8, y: 22 };
 
-        // https://github.com/dataarts/dat.gui/blob/master/API.md#GUI+add
-        folder.add(options, 'val', -1, 1, .0001).name('Val');
-        folder.add(options, 'bool').name('Bool');
+        const textImg = strToImage('Custom Text', atlas, size);
 
-        // https://github.com/dataarts/dat.gui/blob/master/API.md#GUI+addColor
-        folder.addColor(options, 'color1');
-        folder.addColor(options, 'color2');
-        folder.addColor(options, 'color3');
-        folder.addColor(options, 'color4');
-        folder.addColor(options, 'color5');
+        points.setSampler('imageSampler', descriptor);
+        await points.setTextureImage('textImg', textImg);
 
-        folder.open();
     },
     update: points => {
-        points.setUniform('val', options.val);
     }
 }
 
