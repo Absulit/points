@@ -4,8 +4,8 @@ const imagescale1 = {
     vert,
     frag,
     init: async points => {
-        let descriptor = {
-            addressModeU: 'repeat',
+        const descriptor = {
+            addressModeU: 'clamp-to-edge',
             addressModeV: 'clamp-to-edge',
             magFilter: 'nearest',
             minFilter: 'nearest',
