@@ -8,6 +8,41 @@
 /**
  * Places texture in a position. The texture being an image loaded from the JS side.
  * @type {String}
+ * places texture
+ * @param {texture_2d<f32>} texture `texture_2d<f32>`
+ * @param {sampler} aSampler `sampler`
+ * @param {vec2<f32>} uv `vec2<f32>`
+ * @param {bool} crop `bool`
+ * @return `vec4f`
+ */
+export const texture = /*wgsl*/`
+fn texture(texture:texture_2d<f32>, aSampler:sampler, uv:vec2f, crop:bool) -> vec4f {
+    let flipTexture = vec2(1.,-1.);
+    let flipTextureCoordinates = vec2(-1.,1.);
+    let dims:vec2u = textureDimensions(texture, 0);
+    let dimsF32 = vec2f(dims);
+
+    let minScreenSize = min(params.screen.y, params.screen.x);
+    let imageRatio = dimsF32 / minScreenSize;
+
+    let displaceImagePosition =  vec2(0., 1.);
+
+    let imageUV = uv / imageRatio * flipTexture + displaceImagePosition;
+
+    var rgbaImage = textureSample(texture, aSampler, imageUV);
+
+    // e.g. if uv.x < 0. OR uv.y < 0. || uv.x > imageRatio.x OR uv.y > imageRatio.y
+    if (crop && (any(uv < vec2(0.0)) || any(uv > imageRatio))) {
+        rgbaImage = vec4(0.);
+    }
+
+    return rgbaImage;
+}
+`;
+
+/**
+ * @type {String}
+ * places texture in a position
  * @param {texture_2d<f32>} texture `texture_2d<f32>`
  * @param {sampler} aSampler `sampler`
  * @param {vec2<f32>} position `vec2<f32>`

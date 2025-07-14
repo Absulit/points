@@ -2,6 +2,7 @@ import { texturePosition } from 'points/image';
 
 const frag = /*wgsl*/`
 
+${texture}
 ${texturePosition}
 
 @fragment
@@ -14,9 +15,15 @@ fn main(
     @builtin(position) position: vec4<f32>
 ) -> @location(0) vec4<f32> {
 
+    let scale = 4.;
     let center = vec2f(.5) * ratio;
 
-    let textColors = texturePosition(textImg, imageSampler, center, uvr, true);
+    let dims = vec2f(textureDimensions(textImg, 0));
+    let minScreenSize = min(params.screen.y, params.screen.x);
+    let imageWidth = dims / minScreenSize;
+    let halfImageWidth = imageWidth * .5 * scale;
+
+    let textColors = texture(textImg, imageSampler, (uvr / scale) - (center - halfImageWidth) / scale, true);
 
     return textColors;
 }
