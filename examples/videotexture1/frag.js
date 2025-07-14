@@ -1,10 +1,10 @@
 import { fnusin } from 'points/animation';
-import { textureExternalPosition } from 'points/image';
+import { textureExternal, textureExternalPosition } from 'points/image';
 
 const videotexture1Frag = /*wgsl*/`
 
-${fnusin}
 ${textureExternalPosition}
+${textureExternal}
 
 
 @fragment
@@ -17,10 +17,10 @@ fn main(
         @builtin(position) position: vec4<f32>
     ) -> @location(0) vec4<f32> {
 
-    let startPosition = vec2(0.);
+    // let startPosition = vec2(0.);
+    // let rgbaCT = textureExternalPosition(video, feedbackSampler, startPosition, uvr / params.scale, true);
 
-    let rgbaCT = textureExternalPosition(video, feedbackSampler, startPosition, uvr / params.scale, true);
-    // let rgbaCT = textureSampleBaseClampToEdge(video, feedbackSampler, uv);
+    let rgbaCT = textureExternal(video, feedbackSampler, startPosition, uvr / params.scale, true);
 
     return rgbaCT;
 }

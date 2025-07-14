@@ -76,11 +76,43 @@ fn texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>
     let imageUV = uv / imageRatio * flipTexture + displaceImagePosition;
     var rgbaImage = textureSample(texture, aSampler, imageUV);
 
-    let isBeyondImageRight = uv.x > position.x + imageRatio.x;
-    let isBeyondImageLeft = uv.x < position.x;
-    let isBeyondTop =  uv.y > top.y ;
-    let isBeyondBottom = uv.y < position.y;
-    if(crop && (isBeyondTop || isBeyondBottom || isBeyondImageLeft || isBeyondImageRight)){
+    // e.g. if uv.x < 0. OR uv.y < 0. || uv.x > imageRatio.x OR uv.y > imageRatio.y
+    if (crop && (any(uv < vec2(0.0)) || any(uv > imageRatio))) {
+        rgbaImage = vec4(0.);
+    }
+
+    return rgbaImage;
+}
+`;
+
+/**
+ * @type {String}
+ * places texture_external in a position
+ * @param {texture_external} texture `texture_external`
+ * @param {sampler} aSampler `sampler`
+ * @param {vec2<f32>} position `vec2<f32>`
+ * @param {vec2<f32>} uv `vec2<f32>`
+ * @param {bool} crop `bool`
+ * @return `vec4f
+ */
+export const textureExternal = /*wgsl*/`
+fn textureExternal(texture:texture_external, aSampler:sampler, position:vec2<f32>, uv:vec2<f32>, crop:bool) -> vec4<f32> {
+    let flipTexture = vec2(1.,-1.);
+    let flipTextureCoordinates = vec2(-1.,1.);
+    let dims: vec2<u32> = textureDimensions(texture);
+    let dimsF32 = vec2<f32>(f32(dims.x), f32(dims.y));
+
+    let minScreenSize = params.screen.y;
+    let imageRatio = dimsF32 / minScreenSize;
+
+    let displaceImagePosition = position * flipTextureCoordinates / imageRatio + vec2(0, 1);
+    let top = position + vec2(0, imageRatio.y);
+
+    let imageUV = uv / imageRatio * flipTexture + displaceImagePosition;
+    var rgbaImage = textureSampleBaseClampToEdge(texture, aSampler, imageUV);
+
+    // e.g. if uv.x < 0. OR uv.y < 0. || uv.x > imageRatio.x OR uv.y > imageRatio.y
+    if (crop && (any(uv < vec2(0.0)) || any(uv > imageRatio))) {
         rgbaImage = vec4(0.);
     }
 
@@ -115,7 +147,7 @@ fn textureExternalPosition(texture:texture_external, aSampler:sampler, position:
     let dims: vec2<u32> = textureDimensions(texture);
     let dimsF32 = vec2<f32>(f32(dims.x), f32(dims.y));
 
-    let minScreenSize = min(params.screen.y, params.screen.x);
+    let minScreenSize = params.screen.y;
     let imageRatio = dimsF32 / minScreenSize;
 
     let displaceImagePosition = position * flipTextureCoordinates / imageRatio + vec2(0, 1);
@@ -124,12 +156,9 @@ fn textureExternalPosition(texture:texture_external, aSampler:sampler, position:
     let imageUV = uv / imageRatio * flipTexture + displaceImagePosition;
     var rgbaImage = textureSampleBaseClampToEdge(texture, aSampler, imageUV);
 
-    let isBeyondImageRight = uv.x > position.x + imageRatio.x;
-    let isBeyondImageLeft = uv.x < position.x;
-    let isBeyondTop =  uv.y > top.y ;
-    let isBeyondBottom = uv.y < position.y;
-    if(crop && (isBeyondTop || isBeyondBottom || isBeyondImageLeft || isBeyondImageRight)){
-        rgbaImage = vec4(0);
+    // e.g. if uv.x < 0. OR uv.y < 0. || uv.x > imageRatio.x OR uv.y > imageRatio.y
+    if (crop && (any(uv < vec2(0.0)) || any(uv > imageRatio))) {
+        rgbaImage = vec4(0.);
     }
 
     return rgbaImage;
@@ -183,7 +212,7 @@ fn sprite(texture:texture_2d<f32>, aSampler:sampler, position:vec2f, uv:vec2f, i
     let dimsF32 = vec2<f32>(dims);
     let sizeF32 = vec2<f32>(size);
 
-    let minScreenSize = min(params.screen.y, params.screen.x);
+    let minScreenSize = params.screen.y;
     let imageRatio = dimsF32 / minScreenSize;
 
     let numColumns = (dims.x) / (size.x);

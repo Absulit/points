@@ -1,9 +1,12 @@
 import { texturePosition } from 'points/image';
+import { sdfLine2, sdfSegment } from 'sdf';
 
 const frag = /*wgsl*/`
 
 ${texture}
 ${texturePosition}
+${sdfLine2}
+${sdfSegment}
 
 @fragment
 fn main(
@@ -19,8 +22,7 @@ fn main(
     let center = vec2f(.5) * ratio;
 
     let dims = vec2f(textureDimensions(textImg, 0));
-    let minScreenSize = min(params.screen.y, params.screen.x);
-    let imageWidth = dims / minScreenSize;
+    let imageWidth = dims / params.screen * ratio; // if you are using uvr you have to multiply by ratio
     let halfImageWidth = imageWidth * .5 * scale;
 
     let textColors = texture(textImg, imageSampler, (uvr / scale) - (center - halfImageWidth) / scale, true);
