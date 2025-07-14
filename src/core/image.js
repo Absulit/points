@@ -22,7 +22,7 @@ fn texture(texture:texture_2d<f32>, aSampler:sampler, uv:vec2f, crop:bool) -> ve
     let dims:vec2u = textureDimensions(texture, 0);
     let dimsF32 = vec2f(dims);
 
-    let minScreenSize = min(params.screen.y, params.screen.x);
+    let minScreenSize = params.screen.y;
     let imageRatio = dimsF32 / minScreenSize;
 
     let displaceImagePosition =  vec2(0., 1.);
