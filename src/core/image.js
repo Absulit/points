@@ -67,7 +67,7 @@ fn texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>
     let dims: vec2<u32> = textureDimensions(texture, 0);
     let dimsF32 = vec2<f32>(dims);
 
-    let minScreenSize = min(params.screen.y, params.screen.x);
+    let minScreenSize = params.screen.y;
     let imageRatio = dimsF32 / minScreenSize;
 
     let displaceImagePosition = position * flipTextureCoordinates / imageRatio + vec2(0., 1.);
