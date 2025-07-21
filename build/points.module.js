@@ -950,7 +950,7 @@ class Points {
      * from the outside, and unless changed it remains
      * consistent.
      * @param {string} name name of the Param, you can invoke it later in shaders as `Params.[name]`
-     * @param {Number|Array} value Single number or a list of numbers
+     * @param {Number|Boolean|Array<Number>} value Single number or a list of numbers. Boolean is converted to Number.
      * @param {string} structName type as `f32` or a custom struct. Default `few`
      */
     setUniform(name, value, structName = null) {
@@ -1715,7 +1715,6 @@ class Points {
         this.#internal = value;
     }
     /**
-     * @private
      * @param {ShaderType} shaderType
      * @param {boolean} internal
      * @returns string with bindings
@@ -1977,7 +1976,6 @@ class Points {
         await this.#createPipeline();
     }
     /**
-     * @private
      * @param {Float32Array} vertexArray
      * @returns buffer
      */
@@ -1986,13 +1984,13 @@ class Points {
         this.#buffer = this.#createAndMapBuffer(vertexArray, GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST);
     }
     /**
-     * @private
      * @param {Float32Array} data
      * @param {GPUBufferUsageFlags} usage
      * @param {Boolean} mappedAtCreation
+     * @param {Number} size
      * @returns mapped buffer
      */
-    #createAndMapBuffer(data, usage, mappedAtCreation = true, size) {
+    #createAndMapBuffer(data, usage, mappedAtCreation = true, size = null) {
         const buffer = this.#device.createBuffer({
             mappedAtCreation: mappedAtCreation,
             size: size || data.byteLength,
@@ -2004,7 +2002,6 @@ class Points {
     }
 
     /**
-     * @private
      * It creates with size, no with data, so it's empty
      * @param {Number} size numItems * instanceByteSize ;
      * @param {GPUBufferUsageFlags} usage
@@ -2323,7 +2320,6 @@ class Points {
         });
     }
     /**
-     * @private
      * Creates the entries for the pipeline
      * @returns an array with the entries
      */

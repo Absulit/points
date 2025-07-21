@@ -20,12 +20,12 @@ export class Points {
      * from the outside, and unless changed it remains
      * consistent.
      * @param {string} name name of the Param, you can invoke it later in shaders as `Params.[name]`
-     * @param {Number|Array} value Single number or a list of numbers
+     * @param {Number|Boolean|Array<Number>} value Single number or a list of numbers. Boolean is converted to Number.
      * @param {string} structName type as `f32` or a custom struct. Default `few`
      */
-    setUniform(name: string, value: number | any[], structName?: string): {
+    setUniform(name: string, value: number | boolean | Array<number>, structName?: string): {
         name: string;
-        value: number | any[];
+        value: number | boolean | number[];
         type: string;
         size: any;
         internal: boolean;
