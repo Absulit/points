@@ -207,7 +207,7 @@ export default class Points {
     }
     /**
      * Update a list of uniforms
-     * @param {Array<Object>} array object array of the type: `{name, value}`
+     * @param {Array<Object>} arr object array of the type: `{name, value}`
      */
     updateUniforms(arr) {
         arr.forEach(uniform => {
@@ -292,7 +292,7 @@ export default class Points {
     /**
      * Creates a persistent memory buffer across every frame call that can be updated.
      * @param {string} name Name that the Storage will have in the shader.
-     * @param {array} arrayData array with the data that must match the struct.
+     * @param {Array<Uint8Array>} arrayData array with the data that must match the struct.
      * @param {string} structName Name of the struct already existing on the
      * shader that will be the array<structName> of the Storage.
      * @param {boolean} read if this is going to be used to read data back.

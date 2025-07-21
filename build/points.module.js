@@ -721,7 +721,7 @@ async function loadImage(src) {
 /**
  * Returns UTF-16 array of each char
  * @param {String} s
- * @returns {Array<String>}
+ * @returns {Array<Number>}
  */
 function strToCodes(s) {
     return Array.from(s).map(c => c.charCodeAt(0))
@@ -732,7 +732,7 @@ function strToCodes(s) {
  * @param {Image} atlas Image atlas to parse
  * @param {CanvasRenderingContext2D} ctx Canvas context
  * @param {Number} index index in the atlas, so 0 is the first char
- * @param {Object} size cell dimensions
+ * @param {{x: number, y: number}} size cell dimensions
  * @param {Number} finalIndex final positional index in the canvas
  */
 function sprite(atlas, ctx, index, size, finalIndex) {
@@ -978,7 +978,7 @@ class Points {
     }
     /**
      * Update a list of uniforms
-     * @param {Array<Object>} array object array of the type: `{name, value}`
+     * @param {Array<Object>} arr object array of the type: `{name, value}`
      */
     updateUniforms(arr) {
         arr.forEach(uniform => {
@@ -1063,7 +1063,7 @@ class Points {
     /**
      * Creates a persistent memory buffer across every frame call that can be updated.
      * @param {string} name Name that the Storage will have in the shader.
-     * @param {array} arrayData array with the data that must match the struct.
+     * @param {Array<Uint8Array>} arrayData array with the data that must match the struct.
      * @param {string} structName Name of the struct already existing on the
      * shader that will be the array<structName> of the Storage.
      * @param {boolean} read if this is going to be used to read data back.

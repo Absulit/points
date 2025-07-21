@@ -32,9 +32,9 @@ export class Points {
     };
     /**
      * Update a list of uniforms
-     * @param {Array<Object>} array object array of the type: `{name, value}`
+     * @param {Array<Object>} arr object array of the type: `{name, value}`
      */
-    updateUniforms(arr: any): void;
+    updateUniforms(arr: Array<any>): void;
     /**
      * @deprecated use setStorage()
      */
@@ -67,13 +67,13 @@ export class Points {
     /**
      * Creates a persistent memory buffer across every frame call that can be updated.
      * @param {string} name Name that the Storage will have in the shader.
-     * @param {array} arrayData array with the data that must match the struct.
+     * @param {Array<Uint8Array>} arrayData array with the data that must match the struct.
      * @param {string} structName Name of the struct already existing on the
      * shader that will be the array<structName> of the Storage.
      * @param {boolean} read if this is going to be used to read data back.
      * @param {ShaderType} shaderType this tells to what shader the storage is bound
      */
-    setStorageMap(name: string, arrayData: any[], structName: string, read?: boolean, shaderType?: ShaderType): any;
+    setStorageMap(name: string, arrayData: Array<Uint8Array>, structName: string, read?: boolean, shaderType?: ShaderType): any;
     readStorage(name: any): Promise<Float32Array<any>>;
     /**
      * @deprecated use setLayers

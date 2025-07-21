@@ -10,7 +10,7 @@ export async function loadImage(src) {
 /**
  * Returns UTF-16 array of each char
  * @param {String} s
- * @returns {Array<String>}
+ * @returns {Array<Number>}
  */
 function strToCodes(s) {
     return Array.from(s).map(c => c.charCodeAt(0))
@@ -21,7 +21,7 @@ function strToCodes(s) {
  * @param {Image} atlas Image atlas to parse
  * @param {CanvasRenderingContext2D} ctx Canvas context
  * @param {Number} index index in the atlas, so 0 is the first char
- * @param {Object} size cell dimensions
+ * @param {{x: number, y: number}} size cell dimensions
  * @param {Number} finalIndex final positional index in the canvas
  */
 function sprite(atlas, ctx, index, size, finalIndex) {
