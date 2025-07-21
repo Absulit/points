@@ -7,7 +7,8 @@
         "checkJs": true,
         "outDir": "build",
         "target": "ES2015",
-        "module": "ESNext"
+        "module": "ESNext",
+        "types": ["@webgpu/types"],
     },
     "files": [
         "build/points.module.js"

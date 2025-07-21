@@ -1,3 +1,4 @@
 /out
 /assets_ignore
 img/Thumbs.db
+/node_modules

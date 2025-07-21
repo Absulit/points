@@ -73,7 +73,7 @@ export class Points {
      * @param {boolean} read if this is going to be used to read data back.
      * @param {ShaderType} shaderType this tells to what shader the storage is bound
      */
-    setStorageMap(name: string, arrayData: any[], structName: string, read: boolean, shaderType: ShaderType): any;
+    setStorageMap(name: string, arrayData: any[], structName: string, read?: boolean, shaderType?: ShaderType): any;
     readStorage(name: any): Promise<Float32Array<any>>;
     /**
      * @deprecated use setLayers
@@ -202,9 +202,9 @@ export class Points {
      * @param {Number} volume
      * @param {boolean} loop
      * @param {boolean} autoplay
-     * @returns {Audio}
+     * @returns {HTMLAudioElement}
      */
-    setAudio(name: string, path: string, volume: number, loop: boolean, autoplay: boolean): new (src?: string) => HTMLAudioElement;
+    setAudio(name: string, path: string, volume: number, loop: boolean, autoplay: boolean): HTMLAudioElement;
     setTextureStorage2d(name: any, shaderType: any): {
         name: any;
         shaderType: any;
@@ -240,10 +240,10 @@ export class Points {
     };
     /**
      * Listen for an event dispatched from WGSL code
-     * @param {Number} id Number that represents an event Id
+     * @param {String} name Number that represents an event Id
      * @param {Function} callback function to be called when the event occurs
      */
-    addEventListener(name: any, callback: Function, structSize: any): void;
+    addEventListener(name: string, callback: Function, structSize: any): void;
     /**
      * @private
      * for internal use:
@@ -283,7 +283,7 @@ export class Points {
      * @param {Array<RGBAColor>} colors one color per corner
      * @param {Boolean} useTexture
      */
-    addPoint(coordinate: Coordinate, width: number, height: number, colors: Array<RGBAColor>, useTexture: boolean): void;
+    addPoint(coordinate: Coordinate, width: number, height: number, colors: Array<RGBAColor>, useTexture?: boolean): void;
     get canvas(): any;
     get device(): any;
     get context(): any;

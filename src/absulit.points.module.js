@@ -2,6 +2,7 @@
 import UniformKeys from './UniformKeys.js';
 import VertexBufferInfo from './VertexBufferInfo.js';
 import ShaderType from './ShaderType.js';
+import RenderPass from './RenderPass.js';
 import Coordinate from './coordinate.js';
 import RGBAColor from './color.js';
 import Clock from './clock.js';
@@ -297,7 +298,7 @@ export default class Points {
      * @param {boolean} read if this is going to be used to read data back.
      * @param {ShaderType} shaderType this tells to what shader the storage is bound
      */
-    setStorageMap(name, arrayData, structName, read, shaderType) {
+    setStorageMap(name, arrayData, structName, read = false, shaderType = null) {
         const storageToUpdate = this.#nameExists(this.#storage, name)
         if (storageToUpdate) {
             storageToUpdate.array = arrayData;
@@ -806,7 +807,7 @@ export default class Points {
      * @param {Number} volume
      * @param {boolean} loop
      * @param {boolean} autoplay
-     * @returns {Audio}
+     * @returns {HTMLAudioElement}
      */
     setAudio(name, path, volume, loop, autoplay) {
         const audio = new Audio(path);
@@ -917,7 +918,7 @@ export default class Points {
 
     /**
      * Listen for an event dispatched from WGSL code
-     * @param {Number} id Number that represents an event Id
+     * @param {String} name Number that represents an event Id
      * @param {Function} callback function to be called when the event occurs
      */
     addEventListener(name, callback, structSize) {
@@ -1943,7 +1944,7 @@ export default class Points {
      * @param {Array<RGBAColor>} colors one color per corner
      * @param {Boolean} useTexture
      */
-    addPoint(coordinate, width, height, colors, useTexture) {
+    addPoint(coordinate, width, height, colors, useTexture = false) {
         const { x, y, z } = coordinate;
         const nx = this.#getWGSLCoordinate(x, this.#canvas.width);
         const ny = this.#getWGSLCoordinate(y, this.#canvas.height, true);

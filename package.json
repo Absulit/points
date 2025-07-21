@@ -39,5 +39,8 @@
   "bugs": {
     "url": "https://github.com/Absulit/points/issues"
   },
-  "homepage": "https://github.com/Absulit/points#readme"
+  "homepage": "https://github.com/Absulit/points#readme",
+  "devDependencies": {
+    "@webgpu/types": "^0.1.64"
+  }
 }

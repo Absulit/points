@@ -9,7 +9,7 @@ export async function loadImage(src) {
 
 /**
  * Returns UTF-16 array of each char
- * @param {String} str
+ * @param {String} s
  * @returns {Array<String>}
  */
 function strToCodes(s) {
