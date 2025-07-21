@@ -1,16 +1,788 @@
-'use strict';
-import UniformKeys from './UniformKeys.js';
-import VertexBufferInfo from './VertexBufferInfo.js';
-import ShaderType from './ShaderType.js';
-import Coordinate from './coordinate.js';
-import RGBAColor from './color.js';
-import Clock from './clock.js';
-import defaultStructs from './core/defaultStructs.js';
-import { defaultVertexBody } from './core/defaultFunctions.js';
-import { dataSize, getArrayTypeData, isArray, typeSizes } from './data-size.js';
-import { loadImage, strToImage } from './texture-string.js';
+/* @ts-self-types="./points.module.d.ts" */
+class UniformKeys {
+    static TIME = 'time';
+    static DELTA = 'delta';
+    static EPOCH = 'epoch';
+    static SCREEN = 'screen';
+    static MOUSE = 'mouse';
+    static MOUSE_CLICK = 'mouseClick';
+    static MOUSE_DOWN = 'mouseDown';
+    static MOUSE_WHEEL = 'mouseWheel';
+    static MOUSE_DELTA = 'mouseDelta';
+}
 
-export default class Points {
+class VertexBufferInfo {
+    #vertexSize
+    #vertexOffset;
+    #colorOffset;
+    #uvOffset;
+    #vertexCount;
+    /**
+     * Along with the vertexArray it calculates some info like offsets required for the pipeline.
+     * @param {Float32Array} vertexArray array with vertex, color and uv data
+     * @param {Number} triangleDataLength how many items does a triangle row has in vertexArray
+     * @param {Number} vertexOffset index where the vertex data starts in a row of `triangleDataLength` items
+     * @param {Number} colorOffset index where the color data starts in a row of `triangleDataLength` items
+     * @param {Number} uvOffset index where the uv data starts in a row of `triangleDataLength` items
+     */
+    constructor(vertexArray, triangleDataLength = 10, vertexOffset = 0, colorOffset = 4, uvOffset = 8) {
+        this.#vertexSize = vertexArray.BYTES_PER_ELEMENT * triangleDataLength; // Byte size of ONE triangle data (vertex, color, uv). (one row)
+        this.#vertexOffset = vertexArray.BYTES_PER_ELEMENT * vertexOffset;
+        this.#colorOffset = vertexArray.BYTES_PER_ELEMENT * colorOffset; // Byte offset of triangle vertex color attribute.
+        this.#uvOffset = vertexArray.BYTES_PER_ELEMENT * uvOffset;
+        this.#vertexCount = vertexArray.byteLength / this.#vertexSize;
+    }
+
+    get vertexSize() {
+        return this.#vertexSize;
+    }
+
+    get vertexOffset() {
+        return this.#vertexOffset;
+    }
+
+    get colorOffset() {
+        return this.#colorOffset;
+    }
+
+    get uvOffset() {
+        return this.#uvOffset;
+    }
+
+    get vertexCount() {
+        return this.#vertexCount;
+    }
+}
+
+class ShaderType {
+    static VERTEX = 1;
+    static COMPUTE = 2;
+    static FRAGMENT = 3;
+}
+
+class Coordinate {
+    #x;
+    #y;
+    #z;
+    #value;
+    constructor(x = 0, y = 0, z = 0) {
+        this.#x = x;
+        this.#y = y;
+        this.#z = z;
+        this.#value = [x, y, z];
+    }
+
+    set x(value) {
+        this.#x = value;
+        this.#value[0] = value;
+    }
+
+    set y(value) {
+        this.#y = value;
+        this.#value[1] = value;
+    }
+
+    set z(value) {
+        this.#z = value;
+        this.#value[2] = value;
+    }
+
+    get x() {
+        return this.#x;
+    }
+
+    get y() {
+        return this.#y;
+    }
+
+    get z() {
+        return this.#z;
+    }
+
+    get value() {
+        return this.#value;
+    }
+
+    set(x, y, z) {
+        this.#x = x;
+        this.#y = y;
+        this.#z = z;
+        this.#value[0] = x;
+        this.#value[1] = y;
+        this.#value[2] = z;
+    }
+}
+
+class RGBAColor {
+    #value;
+    constructor(r = 0, g = 0, b = 0, a = 1) {
+        if (r > 1 && g > 1 && b > 1) {
+            r /= 255;
+            g /= 255;
+            b /= 255;
+            if (a > 1) {
+                a /= 255;
+            }
+        }
+        this.#value = [r, g, b, a];
+    }
+
+    set r(value) {
+        this.#value[0] = value;
+    }
+
+    set g(value) {
+        this.#value[1] = value;
+    }
+
+    set b(value) {
+        this.#value[2] = value;
+    }
+
+    set a(value) {
+        this.#value[3] = value;
+    }
+
+    get r() {
+        return this.#value[0];
+    }
+
+    get g() {
+        return this.#value[1];
+    }
+
+    get b() {
+        return this.#value[2];
+    }
+
+    get a() {
+        return this.#value[3];
+    }
+
+    get value() {
+        return this.#value;
+    }
+
+    get brightness() {
+        // #Standard
+        // LuminanceA = (0.2126*R) + (0.7152*G) + (0.0722*B)
+        // #Percieved A
+        // LuminanceB = (0.299*R + 0.587*G + 0.114*B)
+        // #Perceived B, slower to calculate
+        // LuminanceC = sqrt(0.299*(R**2) + 0.587*(G**2) + 0.114*(B**2))
+
+
+        let [r, g, b, a] = this.#value;
+        return (0.2126 * r) + (0.7152 * g) + (0.0722 * b);
+    }
+
+    set brightness(value) {
+        this.#value = [value, value, value, 1];
+    }
+
+    set(r, g, b, a) {
+        this.#value = [r, g, b, a];
+    }
+
+    setColor(color) {
+        this.#value = [color.r, color.g, color.b, color.a];
+    }
+
+    add(color) {
+        let [r, g, b, a] = this.#value;
+        //this.#value = [(r + color.r)/2, (g + color.g)/2, (b + color.b)/2, (a + color.a)/2];
+        //this.#value = [(r*a + color.r*color.a), (g*a + color.g*color.a), (b*a + color.b*color.a), 1];
+        this.#value = [(r + color.r), (g + color.g), (b + color.b), (a + color.a)];
+
+
+    }
+
+    blend(color) {
+        let [r0, g0, b0, a0] = this.#value;
+        let [r1, b1, g1, a1] = color.value;
+
+        let a01 = (1 - a0) * a1 + a0;
+
+        let r01 = ((1 - a0) * a1 * r1 + a0 * r0) / a01;
+
+        let g01 = ((1 - a0) * a1 * g1 + a0 * g0) / a01;
+
+        let b01 = ((1 - a0) * a1 * b1 + a0 * b0) / a01;
+
+        this.#value = [r01, g01, b01, a01];
+    }
+
+
+    additive(color) {
+        // https://gist.github.com/JordanDelcros/518396da1c13f75ee057
+        let base = this.#value;
+        let added = color.value;
+
+        let mix = [];
+        mix[3] = 1 - (1 - added[3]) * (1 - base[3]); // alpha
+        mix[0] = Math.round((added[0] * added[3] / mix[3]) + (base[0] * base[3] * (1 - added[3]) / mix[3])); // red
+        mix[1] = Math.round((added[1] * added[3] / mix[3]) + (base[1] * base[3] * (1 - added[3]) / mix[3])); // green
+        mix[2] = Math.round((added[2] * added[3] / mix[3]) + (base[2] * base[3] * (1 - added[3]) / mix[3])); // blue
+
+        this.#value = mix;
+    }
+
+    equal(color) {
+        return (this.#value[0] == color.r) && (this.#value[1] == color.g) && (this.#value[2] == color.b) && (this.#value[3] == color.a);
+    }
+
+
+    static average(colors) {
+        // https://sighack.com/post/averaging-rgb-colors-the-right-way
+        let r = 0, g = 0, b = 0;
+        for (let index = 0; index < colors.length; index++) {
+            const color = colors[index];
+            //if (!color.isNull()) {
+                r += color.r * color.r;
+                g += color.g * color.g;
+                b += color.b * color.b;
+                //a += color.a * color.a;
+            //}
+        }
+        return new RGBAColor(
+            Math.sqrt(r / colors.length),
+            Math.sqrt(g / colors.length),
+            Math.sqrt(b / colors.length)
+            //Math.sqrt(a),
+        );
+    }
+
+    static difference(c1, c2) {
+        let r = 0;
+        let g = 0;
+        let b = 0;
+        if(c1 && !c1.isNull() && c2 && !c2.isNull()){
+            const { r: r1, g: g1, b: b1 } = c1;
+            const { r: r2, g: g2, b: b2 } = c2;
+            r = r1 - r2;
+            g = g1 - g2;
+            b = b1 - b2;
+        }
+
+        return new RGBAColor(r, g, b);
+    }
+
+    isNull() {
+        const [r, g, b, a] = this.#value;
+        return !(isNaN(r) && isNaN(g) && isNaN(b) && isNaN(a))
+    }
+
+    static colorRGBEuclideanDistance(c1, c2) {
+        return Math.sqrt(Math.pow(c1.r - c2.r, 2) +
+            Math.pow(c1.g - c2.g, 2) +
+            Math.pow(c1.b - c2.b, 2));
+    }
+
+    /**
+     * Checks how close two colors are. Closest is `0`.
+     * @param {RGBAColor} color : Color to check distance;
+     * @returns Number distace up to `1.42` I think...
+     */
+    euclideanDistance(color) {
+        const [r, g, b] = this.#value;
+        return Math.sqrt(Math.pow(r - color.r, 2) +
+            Math.pow(g - color.g, 2) +
+            Math.pow(b - color.b, 2));
+    }
+
+    static getClosestColorInPalette(color, palette) {
+        if(!palette){
+            throw('Palette should be an array of `RGBA`s')
+        }
+        let distance = 100;
+        let selectedColor = null;
+        palette.forEach(paletteColor => {
+            let currentDistance = color.euclideanDistance(paletteColor);
+            if (currentDistance < distance) {
+                selectedColor = paletteColor;
+                distance = currentDistance;
+            }
+        });
+        return selectedColor;
+    }
+}
+
+/**
+ * To manage time and delta time,
+ * based on https://github.com/mrdoob/three.js/blob/master/src/core/Clock.js
+ */
+class Clock {
+    #time = 0;
+    #oldTime = 0;
+    #delta = 0;
+    constructor() {
+
+    }
+
+    /**
+     * Gets the current time, it does not calculate the time, it's calcualted
+     *  when `getDelta()` is called.
+     */
+    get time() {
+        return this.#time;
+    }
+
+    /**
+     * Gets the last delta value, it does not calculate the delta, use `getDelta()`
+     */
+    get delta() {
+        return this.#delta;
+    }
+
+    #now() {
+        return (typeof performance === 'undefined' ? Date : performance).now();
+    }
+
+    /**
+     * Calculate time since last frame
+     * It also calculates `time`
+     */
+    getDelta() {
+        this.#delta = 0;
+        const newTime = this.#now();
+        this.#delta = (newTime - this.#oldTime) / 1000;
+        this.#oldTime = newTime;
+        this.#time += this.#delta;
+        return this.#delta;
+    }
+}
+
+const defaultStructs = /*wgsl*/`
+
+struct Fragment {
+    @builtin(position) position: vec4<f32>,
+    @location(0) color: vec4<f32>,
+    @location(1) uv: vec2<f32>,
+    @location(2) ratio: vec2<f32>,
+    @location(3) uvr: vec2<f32>,
+    @location(4) mouse: vec2<f32>
+}
+
+struct Sound {
+    data: array<f32, 2048>,
+    //play
+    //dataLength
+    //duration
+    //currentPosition
+}
+
+struct Event {
+    updated: u32,
+    data: array<f32>
+}
+`;
+
+/**
+ * @type {string}
+ * Default function for the Vertex shader that takes charge of automating the
+ * creation of a few variables that are commonly used.
+ * @param {vec4f} position
+ * @param {vec4f} color
+ * @param {vec2f} uv
+ * @return {Fragment}
+ */
+const defaultVertexBody = /*wgsl*/`
+fn defaultVertexBody(position: vec4<f32>, color: vec4<f32>, uv: vec2<f32>) -> Fragment {
+    var result: Fragment;
+
+    let ratioX = params.screen.x / params.screen.y;
+    let ratioY = 1. / ratioX / (params.screen.y / params.screen.x);
+    result.ratio = vec2(ratioX, ratioY);
+    result.position = vec4<f32>(position);
+    result.color = vec4<f32>(color);
+    result.uv = uv;
+    result.uvr = vec2(uv.x * result.ratio.x, uv.y);
+    result.mouse = vec2(params.mouse.x / params.screen.x, params.mouse.y / params.screen.y);
+    result.mouse = result.mouse * vec2(1.,-1.) - vec2(0., -1.); // flip and move up
+
+    return result;
+}
+`;
+
+const size_4_align_4 = { size: 4, align: 4 };
+const size_8_align_8 = { size: 8, align: 8 };
+const size_12_align_16 = { size: 12, align: 16 };
+const size_16_align_16 = { size: 16, align: 16 };
+const size_16_align_8 = { size: 16, align: 8 };
+const size_32_align_8 = { size: 32, align: 8 };
+const size_24_align_16 = { size: 24, align: 16 };
+const size_48_align_16 = { size: 48, align: 16 };
+const size_32_align_16 = { size: 32, align: 16 };
+const size_64_align_16 = { size: 64, align: 16 };
+
+const typeSizes = {
+    'bool': size_4_align_4,
+    'f32': size_4_align_4,
+    'i32': size_4_align_4,
+    'u32': size_4_align_4,
+
+    'vec2<bool>': size_8_align_8,
+    'vec2<f32>': size_8_align_8,
+    'vec2<i32>': size_8_align_8,
+    'vec2<u32>': size_8_align_8,
+
+    // 'vec2<bool>': size_8_align_8,
+    'vec2f': size_8_align_8,
+    'vec2i': size_8_align_8,
+    'vec2u': size_8_align_8,
+
+    'vec3<bool>': size_12_align_16,
+    'vec3<f32>': size_12_align_16,
+    'vec3<i32>': size_12_align_16,
+    'vec3<u32>': size_12_align_16,
+
+    // 'vec3<bool>': size_12_align_16,
+    'vec3f': size_12_align_16,
+    'vec3i': size_12_align_16,
+    'vec3u': size_12_align_16,
+
+    'vec4<bool>': size_16_align_16,
+    'vec4<f32>': size_16_align_16,
+    'vec4<i32>': size_16_align_16,
+    'vec4<u32>': size_16_align_16,
+    'mat2x2<f32>': size_16_align_8,
+    'mat2x3<f32>': size_32_align_8,
+    'mat2x4<f32>': size_32_align_8,
+    'mat3x2<f32>': size_24_align_16,
+    'mat3x3<f32>': size_48_align_16,
+    'mat3x4<f32>': size_48_align_16,
+    'mat4x2<f32>': size_32_align_16,
+    'mat4x3<f32>': size_64_align_16,
+    'mat4x4<f32>': size_64_align_16,
+
+    // 'vec4<bool>': size_16_align_16,
+    'vec4f': size_16_align_16,
+    'vec4i': size_16_align_16,
+    'vec4u': size_16_align_16,
+    'mat2x2f': size_16_align_8,
+    'mat2x3f': size_32_align_8,
+    'mat2x4f': size_32_align_8,
+    'mat3x2f': size_24_align_16,
+    'mat3x3f': size_48_align_16,
+    'mat3x4f': size_48_align_16,
+    'mat4x2f': size_32_align_16,
+    'mat4x3f': size_64_align_16,
+    'mat4x4f': size_64_align_16,
+};
+
+
+// ignore comments
+const removeCommentsRE = /^(?:(?!\/\/|\/*.*\/).|\n)+/gim;
+
+// struct name:
+const getStructNameRE = /struct\s+?(\w+)\s*{[^}]+}\n?/g;
+
+// what's inside a struct:
+const insideStructRE = /struct\s+?\w+\s*{([^}]+)}\n?/g;
+
+const arrayTypeAndAmountRE = /\s*<\s*([^,]+)\s*,?\s*(\d+)?\s*>/g;
+
+const arrayIntegrityRE = /\s*(array\s*<\s*\w+\s*(?:,\s*\d+)?\s*>)\s*,?/g;
+
+// you have to separete the result by splitting new lines
+
+function removeComments(value) {
+    const matches = value.matchAll(removeCommentsRE);
+    let result = '';
+    for (const match of matches) {
+        const captured = match[0];
+        result += captured;
+    }
+    return result;
+}
+
+function getInsideStruct(value) {
+    const matches = value.matchAll(insideStructRE);
+    let lines = null;
+    for (const match of matches) {
+        lines = match[1].split('\n');
+        lines = lines.map(element => element.trim())
+            .filter(e => e !== '');
+    }
+    return lines;
+}
+
+function getStructDataByName(value) {
+    const matches = value.matchAll(getStructNameRE);
+    let result = new Map();
+    for (const match of matches) {
+        const captured = match[0];
+        const name = match[1];
+        const lines = getInsideStruct(captured);
+        const types = lines.map(l => {
+            const right = l.split(':')[1];
+            let type = '';
+            if (isArray(right)) {
+                const arrayMatch = right.matchAll(arrayIntegrityRE);
+                type = arrayMatch.next().value[1];
+            } else {
+                type = right.split(',')[0].trim();
+            }
+            return type;
+        });
+
+        const names = lines.map(l => {
+            const left = l.split(':')[0];
+            let name = '';
+            name = left.split(',')[0].trim();
+            return name;
+        });
+
+        result.set(name, {
+            captured,
+            lines,
+            types,
+            unique_types: [...new Set(types)],
+            names,
+        });
+    }
+    return result;
+}
+
+function getArrayTypeAndAmount(value) {
+    const matches = value.matchAll(arrayTypeAndAmountRE);
+    let result = [];
+    for (const match of matches) {
+        const type = match[1];
+        const amount = match[2];
+        result.push({ type, amount: Number(amount) });
+    }
+    return result;
+}
+
+function getPadding(bytes, aligment, nextTypeDataSize) {
+    const nextMultiple = (bytes + aligment - 1) & ~(aligment - 1);
+    const needsPadding = (bytes + nextTypeDataSize) > nextMultiple;
+    let padAmount = 0;
+    if (needsPadding) {
+        padAmount = nextMultiple - bytes;
+    }
+    return padAmount;
+}
+
+/**
+ * Check if string has 'array' in it
+ * @param {String} value
+ * @returns {boolean}
+ */
+function isArray(value) {
+    return value.indexOf('array') != -1;
+}
+
+function getArrayAlign(structName, structData) {
+    const [d] = getArrayTypeAndAmount(structName);
+    const t = typeSizes[d.type] || structData.get(d.type);
+    if (!t) {
+        throw new Error(`${d.type} type has not been declared previously`)
+    }
+
+    // if it's not in typeSizes is a struct,
+    //therefore probably stored in structData
+    return t.align || t.maxAlign;
+}
+
+function getArrayTypeData(currentType, structData) {
+    const [d] = getArrayTypeAndAmount(currentType);
+    if(!d){
+        throw `${currentType} seems to have an error, maybe a wrong amount?`;
+    }
+    if (d.amount == 0) {
+        throw new Error(`${currentType} has an amount of 0`);
+    }
+    // if is an array with no amount then use these default values
+    let currentTypeData = { size: 16, align: 16 };
+    if (!!d.amount) {
+        const t = typeSizes[d.type];
+        if (t) {
+            // if array, the size is equal to the align
+            currentTypeData = { size: t.align * d.amount, align: t.align };
+            // currentTypeData = { size: t.size * d.amount, align: t.align };
+            // currentTypeData = { size: 0, align: 0 };
+        } else {
+            const sd = structData.get(d.type);
+            if (sd) {
+                currentTypeData = { size: sd.bytes * d.amount, align: sd.maxAlign };
+            }
+        }
+    } else {
+        const t = typeSizes[d.type] || structData.get(d.type);
+        currentTypeData = { size: t.size || t.bytes, align: t.maxAlign };
+    }
+    return currentTypeData;
+}
+
+const dataSize = value => {
+    const noCommentsValue = removeComments(value);
+    const structData = getStructDataByName(noCommentsValue);
+
+    for (const [structDatumKey, structDatum] of structData) {
+        // to obtain the higher max alignment, but this can be also calculated
+        // in the next step
+        structDatum.unique_types.forEach(ut => {
+            let maxAlign = structDatum.maxAlign || 0;
+            let align = 0;
+            // if it doesn't exists in typeSizes is an Array or a new Struct
+            if (!typeSizes[ut]) {
+                if (isArray(ut)) {
+                    align = getArrayAlign(ut, structData);
+                } else {
+                    const sd = structData.get(ut);
+                    align = sd.maxAlign;
+                }
+            } else {
+                align = typeSizes[ut].align;
+            }
+            maxAlign = align > maxAlign ? align : maxAlign;
+            structDatum.maxAlign = maxAlign;
+        });
+
+        let byteCounter = 0;
+        structDatum.types.forEach((t, i) => {
+            const name = structDatum.names[i];
+            const currentType = t;
+            const nextType = structDatum.types[i + 1];
+            let currentTypeData = typeSizes[currentType];
+            let nextTypeData = typeSizes[nextType];
+
+            structDatum.paddings = structDatum.paddings || {};
+
+            // if currentTypeData or nextTypeData have no data it means
+            // it's a struct or an array
+            // if it's a struct the data is already saved in structData
+            // because it was calculated previously
+            // assuming the struct was declared previously
+            if (!currentTypeData) {
+                if (currentType) {
+                    if (isArray(currentType)) {
+                        currentTypeData = getArrayTypeData(currentType, structData);
+                    } else {
+                        const sd = structData.get(currentType);
+                        if (sd) {
+                            currentTypeData = { size: sd.bytes, align: sd.maxAlign };
+                        }
+                    }
+                }
+            }
+            // read above
+            if (!nextTypeData) {
+                if (nextType) {
+                    if (isArray(nextType)) {
+                        nextTypeData = getArrayTypeData(nextType, structData);
+                    } else {
+                        const sd = structData.get(nextType);
+                        if (sd) {
+                            nextTypeData = { size: sd.bytes, align: sd.maxAlign };
+                        }
+                    }
+                }
+            }
+
+            if (!!currentTypeData) {
+                byteCounter += currentTypeData.size;
+                if ((currentTypeData.size === structDatum.maxAlign) || !nextType) {
+                    return;
+                }
+            }
+
+            if (!!nextTypeData) {
+                const padAmount = getPadding(byteCounter, structDatum.maxAlign, nextTypeData.size);
+                if (padAmount) {
+                    structDatum.paddings[name] = padAmount / 4;
+                    byteCounter += padAmount;
+                }
+            }
+        });
+
+        const padAmount = getPadding(byteCounter, structDatum.maxAlign, 16);
+        if (padAmount) {
+            structDatum.paddings[''] = padAmount / 4;
+            byteCounter += padAmount;
+        }
+
+        structDatum.bytes = byteCounter;
+    }
+    return structData;
+};
+
+async function loadImage(src) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.src = src;
+        img.onload = () => resolve(img);
+        img.onerror = err => reject(err);
+    });
+}
+
+/**
+ * Returns UTF-16 array of each char
+ * @param {String} str
+ * @returns {Array<String>}
+ */
+function strToCodes(s) {
+    return Array.from(s).map(c => c.charCodeAt(0))
+}
+
+/**
+ *
+ * @param {Image} atlas Image atlas to parse
+ * @param {CanvasRenderingContext2D} ctx Canvas context
+ * @param {Number} index index in the atlas, so 0 is the first char
+ * @param {Object} size cell dimensions
+ * @param {Number} finalIndex final positional index in the canvas
+ */
+function sprite(atlas, ctx, index, size, finalIndex) {
+    const { width } = atlas;
+    const numColumns = width / size.x;
+
+    const x = index % numColumns;
+    const y = Math.floor(index / numColumns);
+
+    ctx.drawImage(
+        atlas,
+        x * size.x,
+        y * size.y,
+        size.x,
+        size.y,
+
+        size.x * finalIndex,
+        0,
+
+        size.x,
+        size.y);
+}
+
+/**
+ * @typedef {number} SignedNumber
+ * A numeric value that may be negative or positive.
+ */
+
+/**
+ * Expects an atlas/spritesheed with chars in UTF-16 order.
+ * This means `A` is expected at index `65`; if not there,
+ * use offset to move backwards (negative) or forward (positive)
+ * @param {String} str String used to extract letters from the image
+ * @param {Image} atlasImg image with the Atlas to extract letters from
+ * @param {{x: number, y: number}} size width and height in pixels of each letter
+ * @param {SignedNumber} offset how many chars is the atlas offset from the UTF-16
+ * @returns {string} Base64 image
+ */
+function strToImage(str, atlasImg, size, offset = 0) {
+    const chars = strToCodes(str);
+    const canvas = document.createElement('canvas');
+    canvas.width = chars.length * size.x;
+    canvas.height = size.y;
+    const ctx = canvas.getContext('2d');
+
+    chars.forEach((c, i) => sprite(atlasImg, ctx, c + offset, size, i));
+    return canvas.toDataURL('image/png');
+}
+
+class Points {
     #canvasId = null;
     #canvas = null;
     #device = null;
@@ -135,7 +907,7 @@ export default class Points {
             if (!texture2d.imageTexture && texture2d.texture) {
                 this.#createTextureBindingToCopy(texture2d);
             }
-        })
+        });
     }
 
     #onMouseMove = e => {
@@ -200,7 +972,7 @@ export default class Points {
             type: structName,
             size: null,
             internal: this.#internal
-        }
+        };
         this.#uniforms.push(uniform);
         return uniform;
     }
@@ -215,7 +987,7 @@ export default class Points {
                 throw '`updateUniform()` can\'t be called without first `addUniform()`.';
             }
             variable.value = uniform.value;
-        })
+        });
     }
     /**
      * @deprecated use setStorage()
@@ -256,7 +1028,7 @@ export default class Points {
             read: read,
             buffer: null,
             internal: this.#internal
-        }
+        };
         this.#storage.push(storage);
         return storage;
     }
@@ -298,7 +1070,7 @@ export default class Points {
      * @param {ShaderType} shaderType this tells to what shader the storage is bound
      */
     setStorageMap(name, arrayData, structName, read, shaderType) {
-        const storageToUpdate = this.#nameExists(this.#storage, name)
+        const storageToUpdate = this.#nameExists(this.#storage, name);
         if (storageToUpdate) {
             storageToUpdate.array = arrayData;
             return storageToUpdate;
@@ -312,7 +1084,7 @@ export default class Points {
             buffer: null,
             read: read,
             internal: this.#internal
-        }
+        };
         this.#storage.push(storage);
         return storage;
     }
@@ -467,7 +1239,7 @@ export default class Points {
             texture: null,
             renderPassIndex: renderPassIndex,
             internal: this.#internal
-        }
+        };
         this.#textures2d.push(texture2d);
         return texture2d;
     }
@@ -517,7 +1289,7 @@ export default class Points {
      */
     async updateTextureImage(name, path, shaderType) {
         if (!this.#nameExists(this.#textures2d, name)) {
-            console.warn('image can not be updated')
+            console.warn('image can not be updated');
             return;
         }
         const response = await fetch(path);
@@ -583,7 +1355,7 @@ export default class Points {
                 bitmap: imageBitmap
             },
             internal: this.#internal
-        }
+        };
         this.#textures2d.push(texture2d);
         return texture2d;
     }
@@ -766,11 +1538,11 @@ export default class Points {
             audio: audio,
             analyser: null,
             data: null
-        }
+        };
         // this.#audio.play();
         // audio
         const audioContext = new AudioContext();
-        let resume = _ => { audioContext.resume() }
+        let resume = _ => { audioContext.resume(); };
         if (audioContext.state === 'suspended') {
             document.body.addEventListener('touchend', resume, false);
             document.body.addEventListener('click', resume, false);
@@ -819,11 +1591,11 @@ export default class Points {
             audio: audio,
             analyser: null,
             data: null
-        }
+        };
         // this.#audio.play();
         // audio
         const audioContext = new AudioContext();
-        let resume = _ => { audioContext.resume() }
+        let resume = _ => { audioContext.resume(); };
         if (audioContext.state === 'suspended') {
             document.body.addEventListener('touchend', resume, false);
             document.body.addEventListener('click', resume, false);
@@ -910,7 +1682,7 @@ export default class Points {
             texture: null,
             size: size,
             internal: this.#internal
-        }
+        };
         this.#bindingTextures.push(bindingTexture);
         return bindingTexture;
     }
@@ -965,7 +1737,7 @@ export default class Points {
             let internalCheck = internal == storageItem.internal;
             if (!storageItem.shaderType && internalCheck || storageItem.shaderType == shaderType && internalCheck) {
                 let T = storageItem.structName;
-                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, read_write> ${storageItem.name}: ${T};\n`
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, read_write> ${storageItem.name}: ${T};\n`;
                 bindingIndex += 1;
             }
         });
@@ -973,7 +1745,7 @@ export default class Points {
             if (!this.#layers.shaderType || this.#layers.shaderType == shaderType) {
                 let totalSize = 0;
                 this.#layers.forEach(layerItem => totalSize += layerItem.size);
-                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, read_write> layers: array<array<vec4<f32>, ${totalSize}>>;\n`
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, read_write> layers: array<array<vec4<f32>, ${totalSize}>>;\n`;
                 bindingIndex += 1;
             }
         }
@@ -1086,8 +1858,7 @@ export default class Points {
     #generateDataSize = () => {
         const allShaders = this.#renderPasses.map(renderPass => {
             const { vertex, compute, fragment } = renderPass.compiledShaders;
-            return vertex + compute + fragment;;
-        }).join('\n');
+            return vertex + compute + fragment;        }).join('\n');
         this.#dataSize = dataSize(allShaders);
         // since uniforms are in a sigle struct
         // this is only required for storage
@@ -1186,7 +1957,7 @@ export default class Points {
      * Adds two triangles called points per number of columns and rows
      */
     async createScreen() {
-        let hasVertexAndFragmentShader = this.#renderPasses.some(renderPass => renderPass.hasVertexAndFragmentShader)
+        let hasVertexAndFragmentShader = this.#renderPasses.some(renderPass => renderPass.hasVertexAndFragmentShader);
         if (hasVertexAndFragmentShader) {
             let colors = [
                 new RGBAColor(1, 0, 0),
@@ -1248,7 +2019,7 @@ export default class Points {
     }
 
     #createParametersUniforms() {
-        const paramsDataSize = this.#dataSize.get('Params')
+        const paramsDataSize = this.#dataSize.get('Params');
         const paddings = paramsDataSize.paddings;
         // we check the paddings list and add 0's to just the ones that need it
         const uniformsClone = JSON.parse(JSON.stringify(this.#uniforms));
@@ -1284,12 +2055,12 @@ export default class Points {
                 let readStorageItem = {
                     name: storageItem.name,
                     size: storageItem.structSize
-                }
+                };
                 if (storageItem.mapped) {
                     readStorageItem = {
                         name: storageItem.name,
                         size: storageItem.array.length,
-                    }
+                    };
                 }
                 this.#readStorage.push(readStorageItem);
                 usage = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC;
@@ -1373,7 +2144,7 @@ export default class Points {
                         { texture: cubeTexture, origin: { x: 0, y: 0, z: i } },
                         [imageBitmap.width, imageBitmap.height, 1]
                     );
-                })
+                });
 
                 texture2dArray.texture = cubeTexture;
             } else {
@@ -1424,13 +2195,13 @@ export default class Points {
                         let bglEntry = {
                             binding: index,
                             visibility: GPUShaderStage.COMPUTE
-                        }
+                        };
                         bglEntry[entry.type.name] = { 'type': entry.type.type };
                         if (entry.type.format) {
-                            bglEntry[entry.type.name].format = entry.type.format
+                            bglEntry[entry.type.name].format = entry.type.format;
                         }
                         if (entry.type.viewDimension) {
-                            bglEntry[entry.type.name].viewDimension = entry.type.viewDimension
+                            bglEntry[entry.type.name].viewDimension = entry.type.viewDimension;
                         }
                         bglEntries.push(bglEntry);
                     });
@@ -1753,10 +2524,10 @@ export default class Points {
                     let bglEntry = {
                         binding: index,
                         visibility: GPUShaderStage.FRAGMENT
-                    }
+                    };
                     bglEntry[entry.type.name] = { 'type': entry.type.type };
                     if (entry.type.viewDimension) {
-                        bglEntry[entry.type.name].viewDimension = entry.type.viewDimension
+                        bglEntry[entry.type.name].viewDimension = entry.type.viewDimension;
                     }
                     // TODO: 1262
                     // if you remove this there's an error that I think is not explained right
@@ -1765,7 +2536,7 @@ export default class Points {
                     // not remove the type and leaving it empty as it seems you have to do here:
                     // https://gpuweb.github.io/gpuweb/#bindgroup-examples
                     if (entry.type.type == 'uniform') {
-                        bglEntry.visibility = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT
+                        bglEntry.visibility = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT;
                     }
                     bglEntries.push(bglEntry);
                 });
@@ -2014,3 +2785,5 @@ export default class Points {
         }
     }
 }
+
+export { Points };

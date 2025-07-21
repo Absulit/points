@@ -1,0 +1,22 @@
+{
+    "$schema": "https://jsr.io/schema/config-file.v1.json",
+    "name": "@absulit/points",
+    "version": "2.0.3",
+    "description": "A Generative Art library made in WebGPU",
+    "license": "MIT",
+    "exports": {
+        ".": "./build/points.min.js",
+        "./dev": "./build/points.module.js",
+        "./prod": "./build/points.min.js"
+    },
+    "publish": {
+        "include": [
+            "./build/",
+            "LICENSE",
+            "README.md",
+            "./src/",
+            "./example/",
+            "./jsr.json"
+        ]
+    }
+}

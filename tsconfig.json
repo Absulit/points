@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "declaration": true,
+        "emitDeclarationOnly": true,
+        "allowJs": true,
+        "checkJs": true,
+        "outDir": "build",
+        "target": "ES2015",
+        "module": "ESNext"
+    },
+    "files": [
+        "build/points.module.js"
+    ]
+}
