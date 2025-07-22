@@ -11,6 +11,21 @@ import { defaultVertexBody } from './core/defaultFunctions.js';
 import { dataSize, getArrayTypeData, isArray, typeSizes } from './data-size.js';
 import { loadImage, strToImage } from './texture-string.js';
 
+/**
+ * @typedef {[number, number, number, number]} vec4f
+ * Four element array
+ */
+
+/**
+ * @typedef {[number, number, number]} vec3f
+ * Three element array
+ */
+
+/**
+ * @typedef {[number, number]} vec2f
+ * Two element array
+ */
+
 export default class Points {
     #canvasId = null;
     #canvas = null;
@@ -292,7 +307,7 @@ export default class Points {
     /**
      * Creates a persistent memory buffer across every frame call that can be updated.
      * @param {string} name Name that the Storage will have in the shader.
-     * @param {Array<Uint8Array>} arrayData array with the data that must match the struct.
+     * @param {Array} arrayData array with the data that must match the struct.
      * @param {string} structName Name of the struct already existing on the
      * shader that will be the array<structName> of the Storage.
      * @param {boolean} read if this is going to be used to read data back.

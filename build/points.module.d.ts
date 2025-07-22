@@ -2,6 +2,30 @@
  * A numeric value that may be negative or positive.
  */
 export type SignedNumber = number;
+/**
+ * Four element array
+ */
+export type vec4f = [number, number, number, number];
+/**
+ * Three element array
+ */
+export type vec3f = [number, number, number];
+/**
+ * Two element array
+ */
+export type vec2f = [number, number];
+/**
+ * @typedef {[number, number, number, number]} vec4f
+ * Four element array
+ */
+/**
+ * @typedef {[number, number, number]} vec3f
+ * Three element array
+ */
+/**
+ * @typedef {[number, number]} vec2f
+ * Two element array
+ */
 export class Points {
     constructor(canvasId: any);
     set fitWindow(value: boolean);
@@ -67,13 +91,13 @@ export class Points {
     /**
      * Creates a persistent memory buffer across every frame call that can be updated.
      * @param {string} name Name that the Storage will have in the shader.
-     * @param {Array<Uint8Array>} arrayData array with the data that must match the struct.
+     * @param {Array} arrayData array with the data that must match the struct.
      * @param {string} structName Name of the struct already existing on the
      * shader that will be the array<structName> of the Storage.
      * @param {boolean} read if this is going to be used to read data back.
      * @param {ShaderType} shaderType this tells to what shader the storage is bound
      */
-    setStorageMap(name: string, arrayData: Array<Uint8Array>, structName: string, read?: boolean, shaderType?: ShaderType): any;
+    setStorageMap(name: string, arrayData: any[], structName: string, read?: boolean, shaderType?: ShaderType): any;
     readStorage(name: any): Promise<Float32Array<any>>;
     /**
      * @deprecated use setLayers

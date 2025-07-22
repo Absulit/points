@@ -729,7 +729,7 @@ function strToCodes(s) {
 
 /**
  *
- * @param {Image} atlas Image atlas to parse
+ * @param {HTMLImageElement} atlas Image atlas to parse
  * @param {CanvasRenderingContext2D} ctx Canvas context
  * @param {Number} index index in the atlas, so 0 is the first char
  * @param {{x: number, y: number}} size cell dimensions
@@ -766,7 +766,7 @@ function sprite(atlas, ctx, index, size, finalIndex) {
  * This means `A` is expected at index `65`; if not there,
  * use offset to move backwards (negative) or forward (positive)
  * @param {String} str String used to extract letters from the image
- * @param {Image} atlasImg image with the Atlas to extract letters from
+ * @param {HTMLImageElement} atlasImg image with the Atlas to extract letters from
  * @param {{x: number, y: number}} size width and height in pixels of each letter
  * @param {SignedNumber} offset how many chars is the atlas offset from the UTF-16
  * @returns {string} Base64 image
@@ -781,6 +781,21 @@ function strToImage(str, atlasImg, size, offset = 0) {
     chars.forEach((c, i) => sprite(atlasImg, ctx, c + offset, size, i));
     return canvas.toDataURL('image/png');
 }
+
+/**
+ * @typedef {[number, number, number, number]} vec4f
+ * Four element array
+ */
+
+/**
+ * @typedef {[number, number, number]} vec3f
+ * Three element array
+ */
+
+/**
+ * @typedef {[number, number]} vec2f
+ * Two element array
+ */
 
 class Points {
     #canvasId = null;
@@ -1063,7 +1078,7 @@ class Points {
     /**
      * Creates a persistent memory buffer across every frame call that can be updated.
      * @param {string} name Name that the Storage will have in the shader.
-     * @param {Array<Uint8Array>} arrayData array with the data that must match the struct.
+     * @param {Array} arrayData array with the data that must match the struct.
      * @param {string} structName Name of the struct already existing on the
      * shader that will be the array<structName> of the Storage.
      * @param {boolean} read if this is going to be used to read data back.
