@@ -797,13 +797,55 @@ function strToImage(str, atlasImg, size, offset = 0) {
  * Two element array
  */
 
+// TODO move classes to imports
+class UniformsArray extends Array {
+    #buffer = null;
+    constructor(...elements) {
+        super(...elements);
+    }
+
+    get buffer() {
+        return this.#buffer;
+    }
+
+    set buffer(v) {
+        this.#buffer = v;
+    }
+}
+class LayersArray extends Array {
+    #buffer = null;
+    #shaderType = null;
+    constructor(...elements) {
+        super(...elements);
+    }
+
+    get buffer() {
+        return this.#buffer;
+    }
+
+    set buffer(v) {
+        this.#buffer = v;
+    }
+
+    get shaderType() {
+        return this.#shaderType;
+    }
+
+    /**
+     * @param {ShaderType} v
+     */
+    set shaderType(v) {
+        this.#shaderType = v;
+    }
+}
+
 class Points {
     #canvasId = null;
     #canvas = null;
     #device = null;
     #context = null;
     #presentationFormat = null;
-    #renderPasses = null
+    #renderPasses = null;
     #postRenderPasses = [];
     #vertexBufferInfo = null;
     #buffer = null;
@@ -815,7 +857,7 @@ class Points {
     #numRows = 1;
     #commandsFinished = [];
     #renderPassDescriptor = null;
-    #uniforms = [];
+    #uniforms = new UniformsArray();
     #storage = [];
     #readStorage = [];
     #samplers = [];
@@ -825,7 +867,7 @@ class Points {
     #texturesExternal = [];
     #texturesStorage2d = [];
     #bindingTextures = [];
-    #layers = [];
+    #layers = new LayersArray();
     #originalCanvasWidth = null;
     #originalCanvasHeigth = null;
     #clock = new Clock();
@@ -1078,7 +1120,7 @@ class Points {
     /**
      * Creates a persistent memory buffer across every frame call that can be updated.
      * @param {string} name Name that the Storage will have in the shader.
-     * @param {Array} arrayData array with the data that must match the struct.
+     * @param {Array<Number>} arrayData array with the data that must match the struct.
      * @param {string} structName Name of the struct already existing on the
      * shader that will be the array<structName> of the Storage.
      * @param {boolean} read if this is going to be used to read data back.
@@ -1116,7 +1158,7 @@ class Points {
         return arrayBufferCopy;
     }
     /**
-     * @deprecated use setLayers
+     * @deprecated use {@link setLayers}
      */
     addLayers(numLayers, shaderType) {
         for (let layerIndex = 0; layerIndex < numLayers; layerIndex++) {
@@ -1390,7 +1432,7 @@ class Points {
      * @param {String} shaderType
      * @returns
      */
-    async setTextureString(name, text, path, size, offset = 0, shaderType = null){
+    async setTextureString(name, text, path, size, offset = 0, shaderType = null) {
         const atlas = await loadImage(path);
         const textImg = strToImage(text, atlas, size, offset);
         return this.setTextureImage(name, textImg, shaderType);
@@ -2565,7 +2607,7 @@ class Points {
         //--------------------------------------------
         this.#delta = this.#clock.getDelta();
         this.#time = this.#clock.time;
-        this.#epoch = new Date() / 1000;
+        this.#epoch = +new Date() / 1000;
         this.setUniform(UniformKeys.TIME, this.#time);
         this.setUniform(UniformKeys.DELTA, this.#delta);
         this.setUniform(UniformKeys.EPOCH, this.#epoch);
