@@ -349,7 +349,7 @@ export default class Points {
     /**
      * Creates a persistent memory buffer across every frame call that can be updated.
      * @param {string} name Name that the Storage will have in the shader.
-     * @param {Array<Number>} arrayData array with the data that must match the struct.
+     * @param {Uint8Array<ArrayBuffer>} arrayData array with the data that must match the struct.
      * @param {string} structName Name of the struct already existing on the
      * shader that will be the array<structName> of the Storage.
      * @param {boolean} read if this is going to be used to read data back.
@@ -981,7 +981,7 @@ export default class Points {
     addEventListener(name, callback, structSize) {
         // TODO: remove structSize
         // this extra 4 is for the boolean flag in the Event struct
-        let data = Array(structSize + 4).fill(0);
+        let data = new Uint8Array(Array(structSize + 4).fill(0));
         this.setStorageMap(name, data, 'Event', true);
         this.#events.set(this.#events_ids,
             {
