@@ -1,2 +1,5 @@
-export { default as RenderPass } from './RenderPass.js';
-export { default as Points } from './absulit.points.module.js';
+import RenderPass from './RenderPass.js';
+import Points from './absulit.points.module.js';
+
+export { RenderPass };
+export default Points; // Only one default allowed

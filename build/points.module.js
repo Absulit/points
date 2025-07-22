@@ -2971,4 +2971,6 @@ class Points {
     }
 }
 
-export { Points, RenderPass };
+// Only one default allowed
+
+export { RenderPass, Points as default };
