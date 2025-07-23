@@ -1,10 +1,10 @@
 /**
- * @type {Screen}
+ * @type {String}
  * Draws an infinite cross.
  * Useful to draw it where the mouse is.
- * @param position
- * @param color
- * @param uv
+ * @param {vec2f} position
+ * @param {vec4f} color
+ * @param {vec2f} uv
  */
 export const showDebugCross = /*wgsl*/`
 fn showDebugCross(position:vec2<f32>, color:vec4<f32>, uv:vec2<f32>) -> vec4<f32>{
@@ -15,10 +15,10 @@ fn showDebugCross(position:vec2<f32>, color:vec4<f32>, uv:vec2<f32>) -> vec4<f32
 `;
 
 /**
- * @type {Screen}
+ * @type {String}
  * Border around the screen
- * @param color
- * @param uv
+ * @param {vec4f} color
+ * @param {vec2f} uv
  */
 export const showDebugFrame = /*wgsl*/`
 fn showDebugFrame(color:vec4<f32>, uv:vec2<f32>) -> vec4<f32> {

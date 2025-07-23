@@ -1,16 +1,16 @@
 /**
- * @type {Screen}
+ * @type {String}
  * Draws an infinite cross.
  * Useful to draw it where the mouse is.
- * @param position
- * @param color
- * @param uv
+ * @param {vec2f} position
+ * @param {vec4f} color
+ * @param {vec2f} uv
  */
-export const showDebugCross: Screen;
+export const showDebugCross: string;
 /**
- * @type {Screen}
+ * @type {String}
  * Border around the screen
- * @param color
+ * @param {vec4f}color
  * @param uv
  */
-export const showDebugFrame: Screen;
+export const showDebugFrame: string;

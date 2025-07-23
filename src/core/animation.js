@@ -4,11 +4,6 @@
  */
 
 /**
- * @typedef {number} f32
- * Float 32
- */
-
-/**
  * @type {String}
  * Animates `sin()` over `params.time` and a provided `speed`.
  * The value is not normalized, so in the range -1..1

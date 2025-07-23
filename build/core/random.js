@@ -1,7 +1,7 @@
 /* @ts-self-types="./../points.module.d.ts" */
 /**
  * @type {String}
- * Single random number. 
+ * Single random number.
  * Use `seed` to change seed.
  * @return `f32`
  */

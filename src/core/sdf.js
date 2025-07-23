@@ -1,5 +1,6 @@
 /**
  * A few signed distance functions
+ * @module
  */
 
 
@@ -8,7 +9,7 @@
  * Function used to create lines. It's a dependency of them.
  * @param {vec2f} p uv
  * @param {vec2f} a point A
- * @param {vec2f>} b point B
+ * @param {vec2f} b point B
  * @return `f32`
  */
 export const sdfSegment = /*wgsl*/`

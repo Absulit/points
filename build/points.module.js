@@ -914,26 +914,6 @@ function strToImage(str, atlasImg, size, offset = 0) {
     return canvas.toDataURL('image/png');
 }
 
-/**
- * @typedef {[number, number, number, number]} vec4f
- * Four element array
- */
-
-/**
- * @typedef {[number, number, number]} vec3f
- * Three element array
- */
-
-/**
- * @typedef {[number, number]} vec2f
- * Two element array
- */
-
-/**
- * @typedef {number} f32
- * Float 32
- */
-
 // TODO move classes to imports
 class UniformsArray extends Array {
     #buffer = null;

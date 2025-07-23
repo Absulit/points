@@ -2,11 +2,6 @@
 // https://github.com/ashima/webgl-noise/blob/master/src/cellular2D.glsl
 
 /**
- * @typedef {[number, number]} vec2f
- * Two element array
- */
-
-/**
  * @type {String}
  * Cellular noise
  * @param {vec2f} P position

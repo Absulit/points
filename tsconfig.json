@@ -9,13 +9,15 @@
         "allowJs": true,
         "checkJs": true,
         "outDir": "build",
+
         "target": "ES2015",
         "module": "ESNext",
         "types": [
-            "@webgpu/types"
-        ],
+            "@webgpu/types",
+        ]
     },
     "files": [
+        "src/types/index.d.ts",
         "build/points.module.js",
         "build/core/animation.js",
         "build/core/audio.js",

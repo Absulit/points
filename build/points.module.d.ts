@@ -2,22 +2,6 @@
  * A numeric value that may be negative or positive.
  */
 export type SignedNumber = number;
-/**
- * Four element array
- */
-export type vec4f = [number, number, number, number];
-/**
- * Three element array
- */
-export type vec3f = [number, number, number];
-/**
- * Two element array
- */
-export type vec2f = [number, number];
-/**
- * Float 32
- */
-export type f32 = number;
 export class RenderPass {
     /**
      * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
