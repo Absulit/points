@@ -929,6 +929,11 @@ function strToImage(str, atlasImg, size, offset = 0) {
  * Two element array
  */
 
+/**
+ * @typedef {number} f32
+ * Float 32
+ */
+
 // TODO move classes to imports
 class UniformsArray extends Array {
     #buffer = null;
@@ -2970,7 +2975,5 @@ class Points {
         }
     }
 }
-
-// Only one default allowed
 
 export { RenderPass, Points as default };

@@ -11,6 +11,26 @@
         "types": ["@webgpu/types"],
     },
     "files": [
-        "build/points.module.js"
+        "build/points.module.js",
+        "build/core/animation.js",
+        "build/core/audio.js",
+        "build/core/cellular2d.js",
+        "build/core/classicnoise2d.js",
+        "build/core/color.js",
+        "build/core/debug.js",
+        "build/core/defaultConstants.js",
+        "build/core/defaultFunctions.js",
+        "build/core/defaultStructs.js",
+        "build/core/defaultVertexStructs.js",
+        "build/core/effects.js",
+        "build/core/image.js",
+        "build/core/math.js",
+        "build/core/noise2d.js",
+        "build/core/random.js",
+        "build/core/sdf.js",
+        "build/core/valuenoise.js",
+        "build/core/voronoi.js",
+
+
     ]
 }

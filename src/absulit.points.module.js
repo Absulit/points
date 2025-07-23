@@ -26,6 +26,11 @@ import { loadImage, strToImage } from './texture-string.js';
  * Two element array
  */
 
+/**
+ * @typedef {number} f32
+ * Float 32
+ */
+
 // TODO move classes to imports
 class UniformsArray extends Array {
     #buffer = null;

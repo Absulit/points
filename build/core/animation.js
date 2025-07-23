@@ -1,3 +1,4 @@
+/* @ts-self-types="./../points.module.d.ts" */
 /**
  * Utilities for animation
  * @module
@@ -14,7 +15,7 @@
  * The value is not normalized, so in the range -1..1
  * @param {f32} speed
  */
-export const fusin = /*wgsl*/`
+const fusin = /*wgsl*/`
 fn fusin(speed: f32) -> f32{
     return sin(params.time * speed);
 }
@@ -26,7 +27,7 @@ fn fusin(speed: f32) -> f32{
  * The value is not normalized, so in the range -1..1
  * @param {f32} speed
  */
-export const fucos = /*wgsl*/`
+const fucos = /*wgsl*/`
 fn fucos(speed: f32) -> f32{
     return cos(params.time * speed);
 }
@@ -38,8 +39,10 @@ fn fucos(speed: f32) -> f32{
  * The value is normalized, so in the range 0..1
  * @param {f32} speed
  */
-export const fnusin = /*wgsl*/`
+const fnusin = /*wgsl*/`
 fn fnusin(speed: f32) -> f32{
     return (sin(params.time * speed) + 1.) * .5;
 }
 `;
+
+export { fnusin, fucos, fusin };

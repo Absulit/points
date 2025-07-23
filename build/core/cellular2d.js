@@ -1,3 +1,4 @@
+/* @ts-self-types="./../points.module.d.ts" */
 // original: Author :  Stefan Gustavson (stefan.gustavson@liu.se)
 // https://github.com/ashima/webgl-noise/blob/master/src/cellular2D.glsl
 
@@ -13,7 +14,7 @@
  * @return `vec2f`
  */
 
-export const cellular = /*wgsl*/`
+const cellular = /*wgsl*/`
 // Modulo 289 without a division (only multiplications)
 fn mod289_v3(x:vec3<f32>) -> vec3<f32> {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
@@ -95,3 +96,5 @@ fn cellular(P:vec2<f32>) -> vec2<f32> {
     return sqrt(d1.xy);
 }
 `;
+
+export { cellular };
