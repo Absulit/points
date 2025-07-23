@@ -1,6 +1,9 @@
 {
     "compilerOptions": {
-        "lib": ["DOM", "ESNext"],
+        "lib": [
+            "DOM",
+            "ESNext"
+        ],
         "declaration": true,
         "emitDeclarationOnly": true,
         "allowJs": true,
@@ -8,7 +11,9 @@
         "outDir": "build",
         "target": "ES2015",
         "module": "ESNext",
-        "types": ["@webgpu/types"],
+        "types": [
+            "@webgpu/types"
+        ],
     },
     "files": [
         "build/points.module.js",
@@ -30,7 +35,5 @@
         "build/core/sdf.js",
         "build/core/valuenoise.js",
         "build/core/voronoi.js",
-
-
     ]
 }
