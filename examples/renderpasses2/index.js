@@ -2,7 +2,7 @@ import vert1 from './renderpass1/vert.js';
 import frag1 from './renderpass1/frag.js';
 
 import RenderPass from 'renderpass';
-import RenderPasses from 'renderpasses';
+import RenderPasses from 'points/renderpasses';
 
 const renderpasses1 = {
     /**

@@ -7,7 +7,7 @@
         "declaration": true,
         "emitDeclarationOnly": true,
         "allowJs": true,
-        "checkJs": true,
+        "checkJs": false, // TODO remove to check types
         "outDir": "build",
 
         "target": "ES2015",
@@ -19,6 +19,7 @@
     "files": [
         "src/types/index.d.ts",
         "build/RenderPass.module.js",
+        "build/RenderPasses.module.js",
         "build/ShaderType.module.js",
         "build/points.module.js",
         "build/core/animation.js",

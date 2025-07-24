@@ -18,6 +18,15 @@ export default [
     plugins: []
   },
   {
+    input: 'src/RenderPasses.js',
+    output: {
+      file: 'build/RenderPasses.module.js',
+      format: 'esm',
+      banner: '/* @ts-self-types="./RenderPasses.module.d.ts" */'
+    },
+    plugins: []
+  },
+  {
     input: 'src/entries.js',
     output: {
       file: 'build/points.module.js',

@@ -7,6 +7,7 @@ npx rollup -c
 swc build/points.module.js --out-file build/points.min.js
 swc build/RenderPass.module.js --out-file build/RenderPass.min.js
 swc build/ShaderType.module.js --out-file build/ShaderType.min.js
+swc build/RenderPasses.module.js --out-file build/RenderPasses.min.js
 
 swc build/core/animation.js --out-file build/core/animation.min.js
 swc build/core/audio.js --out-file build/core/audio.min.js
@@ -18,7 +19,6 @@ swc build/core/math.js --out-file build/core/math.min.js
 swc build/core/noise2d.js --out-file build/core/noise2d.min.js
 swc build/core/classicnoise2d.js --out-file build/core/classicnoise2d.min.js
 swc build/core/random.js --out-file build/core/random.min.js
-swc build/core/RenderPasses.js --out-file build/core/RenderPasses.min.js
 swc build/core/sdf.js --out-file build/core/sdf.min.js
 
 
