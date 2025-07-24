@@ -1,9 +1,9 @@
 import { sdfLine2, sdfSegment } from 'sdf';
 import { fnusin } from 'points/animation';
-import { snoise } from 'noise2d';
+import { snoise } from 'points/noise2d';
 import { PI, E, rotateVector } from 'math';
-import { texturePosition } from 'image';
-import { RGBAFromHSV, layer } from 'color';
+import { texturePosition } from 'points/image';
+import { RGBAFromHSV, layer } from 'points/color';
 import { structs } from '../structs.js';
 const frag = /*wgsl*/`
 

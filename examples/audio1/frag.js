@@ -1,7 +1,7 @@
 import { fnusin } from 'points/animation';
-import { snoise } from 'noise2d';
+import { snoise } from 'points/noise2d';
 import { sdfCircle } from 'sdf';
-import { WHITE, RED, layer } from 'color';
+import { WHITE, RED, layer } from 'points/color';
 import { audioAverage, audioAverageSegments } from 'audio';
 
 const frag = /*wgsl*/`

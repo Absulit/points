@@ -1,6 +1,6 @@
 import { fnusin } from 'points/animation';
-import { brightness } from 'color';
-import { texturePosition } from 'image';
+import { brightness } from 'points/color';
+import { texturePosition } from 'points/image';
 
 const frag = /*wgsl*/`
 

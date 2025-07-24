@@ -1,5 +1,5 @@
 import { sdfCircle } from 'sdf';
-import { WHITE, BLUE, GREEN, RED, YELLOW } from 'color';
+import { WHITE, BLUE, GREEN, RED, YELLOW } from 'points/color';
 import { fnusin } from 'points/animation';
 
 const frag = /*wgsl*/`

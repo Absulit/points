@@ -1,5 +1,5 @@
 import { sdfCircle } from 'sdf';
-import { snoise } from 'noise2d';
+import { snoise } from 'points/noise2d';
 
 const frag = /*wgsl*/`
 

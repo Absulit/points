@@ -1,6 +1,6 @@
 import { fnusin } from 'points/animation';
 import { PI, rotateVector } from 'math';
-import { snoise } from 'noise2d';
+import { snoise } from 'points/noise2d';
 import { sdfCircle } from 'sdf';
 import { structs } from './structs.js';
 

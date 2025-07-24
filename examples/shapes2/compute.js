@@ -1,5 +1,5 @@
 import { fnusin } from 'points/animation';
-import { clearAlpha, soften4, soften8 } from 'effects';
+import { clearAlpha, soften4, soften8 } from 'points/effects';
 import { sdfCircle, sdfLine2, sdfSegment } from 'sdf';
 
 const compute = /*wgsl*/`

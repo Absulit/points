@@ -1,8 +1,8 @@
-import { RED, brightness } from 'color';
+import { RED, brightness } from 'points/color';
 import { showDebugFrame } from 'debug';
 import { sdfCircle, sdfLine, sdfSegment } from 'sdf';
-import { sprite, texturePosition } from 'image';
-import { snoise } from 'noise2d';
+import { sprite, texturePosition } from 'points/image';
+import { snoise } from 'points/noise2d';
 
 const frag = /*wgsl*/`
 

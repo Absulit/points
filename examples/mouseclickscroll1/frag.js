@@ -1,5 +1,5 @@
 import { sdfCircle } from 'sdf';
-import { GREEN, RED } from 'color';
+import { GREEN, RED } from 'points/color';
 
 const frag = /*wgsl*/`
 

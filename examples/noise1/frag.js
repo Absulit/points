@@ -1,5 +1,5 @@
 import { fnusin } from 'points/animation';
-import { snoise } from 'noise2d';
+import { snoise } from 'points/noise2d';
 
 const frag = /*wgsl*/`
 

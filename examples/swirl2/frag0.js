@@ -1,7 +1,7 @@
 import { fnusin } from 'points/animation';
-import { texturePosition } from 'image';
+import { texturePosition } from 'points/image';
 import { PI } from 'math';
-import { snoise } from 'noise2d';
+import { snoise } from 'points/noise2d';
 
 const frag = /*wgsl*/`
 
