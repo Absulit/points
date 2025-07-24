@@ -1,4 +1,3 @@
-/* @ts-self-types="./../points.module.d.ts" */
 // original: Author : Ian McEwan, Ashima Arts.
 // https://github.com/ashima/webgl-noise/blob/master/src/noise2D.glsl
 

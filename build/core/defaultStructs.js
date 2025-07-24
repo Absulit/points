@@ -1,4 +1,3 @@
-/* @ts-self-types="./../points.module.d.ts" */
 const defaultStructs = /*wgsl*/`
 
 struct Fragment {

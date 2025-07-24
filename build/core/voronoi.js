@@ -1,4 +1,3 @@
-/* @ts-self-types="./../points.module.d.ts" */
 import { rand } from './random.js';
 
 // Created by Sebastián Sanabria Díaz absulit.com

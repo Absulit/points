@@ -18,6 +18,8 @@
     },
     "files": [
         "src/types/index.d.ts",
+        "build/RenderPass.module.js",
+        "build/ShaderType.module.js",
         "build/points.module.js",
         "build/core/animation.js",
         "build/core/audio.js",

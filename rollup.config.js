@@ -1,10 +1,31 @@
 export default [
   {
+    input: 'src/RenderPass.js',
+    output: {
+      file: 'build/RenderPass.module.js',
+      format: 'esm',
+      banner: '/* @ts-self-types="./RenderPass.module.d.ts" */'
+    },
+    plugins: []
+  },
+  {
+    input: 'src/ShaderType.js',
+    output: {
+      file: 'build/ShaderType.module.js',
+      format: 'esm',
+      banner: '/* @ts-self-types="./ShaderType.module.d.ts" */'
+    },
+    plugins: []
+  },
+  {
     input: 'src/entries.js',
     output: {
       file: 'build/points.module.js',
       format: 'esm',
-      banner: '/* @ts-self-types="./points.module.d.ts" */'
+      // banner: `
+      //   /* @ts-self-types="./RenderPass.module.d.ts" */
+      //   /* @ts-self-types="./points.module.d.ts" */
+      // `
     },
     plugins: []
   },
@@ -32,7 +53,9 @@ export default [
     output: {
       dir: 'build/core',
       format: 'esm',
-      banner: '/* @ts-self-types="./../points.module.d.ts" */'
+      // banner: '/* @ts-self-types="./../points.module.d.ts" */'
     }
-  }
+  },
 ];
+
+

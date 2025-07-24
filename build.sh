@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-rm -rf ./build/core/
+rm -rf ./build/
 
 npx rollup -c
 

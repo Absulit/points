@@ -1,4 +1,3 @@
-/* @ts-self-types="./../points.module.d.ts" */
 const euclideanDistance = /*wgsl*/`
 fn euclideanDistance(color:vec4<f32>, distanceColor:vec4<f32>) -> f32{
     return sqrt(

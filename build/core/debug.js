@@ -1,4 +1,3 @@
-/* @ts-self-types="./../points.module.d.ts" */
 /**
  * @type {String}
  * Draws an infinite cross.
@@ -18,8 +17,8 @@ fn showDebugCross(position:vec2<f32>, color:vec4<f32>, uv:vec2<f32>) -> vec4<f32
 /**
  * @type {String}
  * Border around the screen
- * @param {vec4f}color
- * @param uv
+ * @param {vec4f} color
+ * @param {vec2f} uv
  */
 const showDebugFrame = /*wgsl*/`
 fn showDebugFrame(color:vec4<f32>, uv:vec2<f32>) -> vec4<f32> {

@@ -1,4 +1,3 @@
-/* @ts-self-types="./../points.module.d.ts" */
 /**
  * A few signed distance functions
  * @module

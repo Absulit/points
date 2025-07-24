@@ -1,4 +1,3 @@
-/* @ts-self-types="./../points.module.d.ts" */
 const audioAverage = /*wgsl*/`
 fn audioAverage(sound:Sound) -> f32 {
     var audioAverage = 0.;

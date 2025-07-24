@@ -54,3 +54,7 @@ type texture_external = any;
  * Texture image
  */
 type texture_2d<f32> = any;
+
+declare class RenderPass {
+    constructor(vertexShader: string, fragmentShader: string, computeShader: string, workgroupCountX: any, workgroupCountY: any, workgroupCountZ: any);
+}

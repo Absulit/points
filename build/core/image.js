@@ -1,4 +1,3 @@
-/* @ts-self-types="./../points.module.d.ts" */
 /**
  * @type {String}
  * places texture in a position

@@ -1,4 +1,3 @@
-/* @ts-self-types="./../points.module.d.ts" */
 import { rand } from './random.js';
 
 const valueNoise = /*wgsl*/`

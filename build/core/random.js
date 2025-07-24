@@ -1,4 +1,3 @@
-/* @ts-self-types="./../points.module.d.ts" */
 /**
  * @type {String}
  * Single random number.
