@@ -1,6 +1,6 @@
 import { fnusin } from 'points/animation';
 import { structs } from './structs.js';
-import { rand } from 'random';
+import { rand } from 'points/random';
 
 const frag = /*wgsl*/`
 

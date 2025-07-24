@@ -1,7 +1,7 @@
 import { fnusin } from 'points/animation';
-import { PI, rotateVector } from 'math';
+import { PI, rotateVector } from 'points/math';
 import { snoise } from 'points/noise2d';
-import { sdfCircle } from 'sdf';
+import { sdfCircle } from 'points/sdf';
 import { texturePosition } from 'points/image';
 
 const frag = /*wgsl*/`

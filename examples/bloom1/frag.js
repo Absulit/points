@@ -1,9 +1,9 @@
 import { snoise } from 'points/noise2d';
 import { texturePosition } from 'points/image';
 import { bloom, brightness } from 'points/color';
-import { sdfCircle, sdfLine, sdfSegment } from 'sdf';
+import { sdfCircle, sdfLine, sdfSegment } from 'points/sdf';
 import { fnusin, fusin } from 'points/animation';
-import { polar, PI } from 'math';
+import { polar, PI } from 'points/math';
 
 const frag = /*wgsl*/`
 

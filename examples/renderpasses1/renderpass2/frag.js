@@ -1,5 +1,5 @@
 import { texturePosition } from 'points/image';
-import { PI, rotateVector } from 'math';
+import { PI, rotateVector } from 'points/math';
 import { blur9 } from 'points/effects';
 
 const frag = /*wgsl*/`

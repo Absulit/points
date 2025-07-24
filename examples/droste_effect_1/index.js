@@ -8,7 +8,6 @@ import frag1 from './renderpass1/frag.js';
 
 import Points from 'points';
 import ShaderType from 'shadertype';
-import RenderPasses from 'renderpasses';
 import RenderPass from 'renderpass';
 
 

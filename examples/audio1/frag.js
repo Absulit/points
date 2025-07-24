@@ -1,6 +1,6 @@
 import { fnusin } from 'points/animation';
 import { snoise } from 'points/noise2d';
-import { sdfCircle } from 'sdf';
+import { sdfCircle } from 'points/sdf';
 import { WHITE, RED, layer } from 'points/color';
 import { audioAverage, audioAverageSegments } from 'audio';
 

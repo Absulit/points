@@ -1,6 +1,6 @@
 import { fnusin } from 'points/animation';
 import { brightness } from 'points/color';
-import { polar } from 'math';
+import { polar } from 'points/math';
 import { snoise } from 'points/noise2d';
 import { texturePosition } from 'points/image';
 

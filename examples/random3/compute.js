@@ -1,6 +1,6 @@
 import { fnusin } from 'points/animation';
 import { RGBAFromHSV } from 'points/color';
-import { rand, random } from 'random';
+import { rand, random } from 'points/random';
 
 const compute = /*wgsl*/`
 

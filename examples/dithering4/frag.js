@@ -1,5 +1,5 @@
 import { snoise } from 'points/noise2d';
-import { PI } from 'math';
+import { PI } from 'points/math';
 import { texturePosition } from 'points/image';
 import { fnusin } from 'points/animation';
 import { brightness } from 'points/color';

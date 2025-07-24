@@ -1,8 +1,8 @@
 import { fnusin } from 'points/animation';
-import { polar, rotateVector } from 'math';
+import { polar, rotateVector } from 'points/math';
 import { snoise } from 'points/noise2d';
-import { PI } from 'math';
-import { rand } from 'random';
+import { PI } from 'points/math';
+import { rand } from 'points/random';
 
 const frag = /*wgsl*/`
 

@@ -1,5 +1,5 @@
 import { showDebugCross, showDebugFrame } from 'debug';
-import { sdfLine, sdfSegment } from 'sdf';
+import { sdfLine, sdfSegment } from 'points/sdf';
 
 const frag = /*wgsl*/`
 

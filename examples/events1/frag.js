@@ -1,4 +1,4 @@
-import { sdfCircle } from 'sdf';
+import { sdfCircle } from 'points/sdf';
 import { WHITE, BLUE, GREEN, RED, YELLOW } from 'points/color';
 import { fnusin } from 'points/animation';
 

@@ -1,8 +1,8 @@
 import { showDebugCross } from 'debug';
 import { GREEN, layer, RED } from 'points/color';
 import { decodeNumberSprite, sprite } from 'points/image';
-import { sdfLine, sdfSegment, sdfSmooth, sdfSquare } from 'sdf';
-import { rotateVector } from 'math';
+import { sdfLine, sdfSegment, sdfSmooth, sdfSquare } from 'points/sdf';
+import { rotateVector } from 'points/math';
 import { fnusin } from 'points/animation';
 
 const frag = /*wgsl*/`
