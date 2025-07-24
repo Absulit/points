@@ -1,4 +1,4 @@
-import { fnusin } from 'animation';
+import { fnusin } from 'points/animation';
 import { snoise } from 'noise2d';
 import { sdfCircle } from 'sdf';
 import { WHITE, RED, layer } from 'color';

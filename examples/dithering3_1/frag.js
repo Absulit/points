@@ -1,6 +1,6 @@
 import { snoise } from 'noise2d';
 import { texturePosition } from 'image';
-import { fnusin } from 'animation';
+import { fnusin } from 'points/animation';
 
 const frag = /*wgsl*/`
 struct Variable{

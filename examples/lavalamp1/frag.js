@@ -1,4 +1,4 @@
-import { fnusin } from 'animation';
+import { fnusin } from 'points/animation';
 import { polar, rotateVector } from 'math';
 import { snoise } from 'noise2d';
 import { PI } from 'math';

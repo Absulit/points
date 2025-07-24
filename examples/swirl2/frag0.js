@@ -1,4 +1,4 @@
-import { fnusin } from 'animation';
+import { fnusin } from 'points/animation';
 import { texturePosition } from 'image';
 import { PI } from 'math';
 import { snoise } from 'noise2d';

@@ -3,7 +3,7 @@ import { GREEN, layer, RED } from 'color';
 import { decodeNumberSprite, sprite } from 'image';
 import { sdfLine, sdfSegment, sdfSmooth, sdfSquare } from 'sdf';
 import { rotateVector } from 'math';
-import { fnusin } from 'animation';
+import { fnusin } from 'points/animation';
 
 const frag = /*wgsl*/`
 

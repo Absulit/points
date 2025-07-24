@@ -1,4 +1,4 @@
-import { fnusin } from 'animation';
+import { fnusin } from 'points/animation';
 import { rotateVector } from 'math';
 import { sdfLine2, sdfCircle, sdfSquare, sdfSegment } from 'sdf';
 

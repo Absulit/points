@@ -1,4 +1,4 @@
-import { fnusin } from 'animation';
+import { fnusin } from 'points/animation';
 import { RGBAFromHSV } from 'color';
 import { rand, random } from 'random';
 

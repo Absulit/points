@@ -1,4 +1,4 @@
-import { fnusin } from 'animation';
+import { fnusin } from 'points/animation';
 import { brightness } from 'color';
 import { polar } from 'math';
 import { snoise } from 'noise2d';

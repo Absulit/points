@@ -1,5 +1,5 @@
 import { sdfLine2, sdfSegment } from 'sdf';
-import { fnusin } from 'animation';
+import { fnusin } from 'points/animation';
 import { snoise } from 'noise2d';
 import { PI, E, rotateVector } from 'math';
 import { texturePosition } from 'image';

@@ -1,4 +1,4 @@
-import { fnusin } from 'animation';
+import { fnusin } from 'points/animation';
 import { sdfCircle } from 'sdf';
 import { WHITE, RED, GREEN, YELLOW, layer } from 'color';
 import { audioAverage, audioAverageSegments } from 'audio';

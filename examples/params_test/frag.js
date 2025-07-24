@@ -1,4 +1,4 @@
-import { fnusin } from 'animation';
+import { fnusin } from 'points/animation';
 import { structs } from './structs.js';
 import { rand } from 'random';
 
