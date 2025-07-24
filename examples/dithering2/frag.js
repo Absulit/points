@@ -2,7 +2,7 @@ import { snoise } from 'points/noise2d';
 import { getClosestColorInPalette, orderedDithering, orderedDithering_threshold_map } from 'points/effects';
 import { texturePosition } from 'points/image';
 import { brightness } from 'points/color';
-import { fnusin, fusin } from 'animation';
+import { fnusin, fusin } from 'points/animation';
 
 const frag = /*wgsl*/`
 

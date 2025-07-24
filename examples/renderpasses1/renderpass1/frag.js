@@ -1,4 +1,4 @@
-import { fusin } from 'animation';
+import { fusin } from 'points/animation';
 import { texturePosition } from 'points/image';
 
 const frag = /*wgsl*/`
