@@ -1,5 +1,5 @@
 import { RED, brightness } from 'points/color';
-import { showDebugFrame } from 'debug';
+import { showDebugFrame } from 'points/debug';
 import { sdfCircle, sdfLine, sdfSegment } from 'points/sdf';
 import { sprite, texturePosition } from 'points/image';
 import { snoise } from 'points/noise2d';

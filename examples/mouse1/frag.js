@@ -1,4 +1,4 @@
-import { showDebugCross, showDebugFrame } from 'debug';
+import { showDebugCross, showDebugFrame } from 'points/debug';
 import { sdfLine, sdfSegment } from 'points/sdf';
 
 const frag = /*wgsl*/`

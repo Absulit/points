@@ -1,4 +1,4 @@
-import { showDebugCross } from 'debug';
+import { showDebugCross } from 'points/debug';
 import { GREEN, layer, RED } from 'points/color';
 import { decodeNumberSprite, sprite } from 'points/image';
 import { sdfLine, sdfSegment, sdfSmooth, sdfSquare } from 'points/sdf';

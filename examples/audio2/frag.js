@@ -1,7 +1,7 @@
 import { fnusin } from 'points/animation';
 import { sdfCircle } from 'points/sdf';
 import { WHITE, RED, GREEN, YELLOW, layer } from 'points/color';
-import { audioAverage, audioAverageSegments } from 'audio';
+import { audioAverage, audioAverageSegments } from 'points/audio';
 import { texturePosition } from 'points/image';
 
 const frag = /*wgsl*/`
