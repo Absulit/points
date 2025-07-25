@@ -1,7 +1,7 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
-import RenderPass from 'renderpass';
+import { RenderPass } from 'points';
 const shapes2 = {
     renderPasses: [
         new RenderPass(vert, frag, compute, 800, 800, 1)

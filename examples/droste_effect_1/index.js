@@ -7,8 +7,8 @@ import compute1 from './renderpass1/compute.js';
 import frag1 from './renderpass1/frag.js';
 
 import Points from 'points';
-import ShaderType from 'shadertype';
-import RenderPass from 'renderpass';
+import { ShaderType } from 'points';
+import { RenderPass } from 'points';
 
 
 /**
