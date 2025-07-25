@@ -3,6 +3,7 @@ import UniformKeys from './UniformKeys.js';
 import VertexBufferInfo from './VertexBufferInfo.js';
 import ShaderType from './ShaderType.js';
 import RenderPass from './RenderPass.js';
+import RenderPasses from './RenderPasses.js';
 import Coordinate from './coordinate.js';
 import RGBAColor from './color.js';
 import Clock from './clock.js';
@@ -2053,3 +2054,6 @@ export default class Points {
         }
     }
 }
+
+
+export { ShaderType, RenderPass, RenderPasses };
