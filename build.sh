@@ -5,9 +5,9 @@ rm -rf ./build/
 npx rollup -c
 
 swc build/points.module.js --out-file build/points.min.js
-swc build/RenderPass.module.js --out-file build/RenderPass.min.js
-swc build/ShaderType.module.js --out-file build/ShaderType.min.js
-swc build/RenderPasses.module.js --out-file build/RenderPasses.min.js
+swc build/RenderPass.js --out-file build/RenderPass.min.js
+swc build/ShaderType.js --out-file build/ShaderType.min.js
+swc build/RenderPasses.js --out-file build/RenderPasses.min.js
 
 swc build/core/animation.js --out-file build/core/animation.min.js
 swc build/core/audio.js --out-file build/core/audio.min.js
@@ -37,5 +37,5 @@ done
 
 npx tsc
 
-# npm publish --dry-run
+npm publish --dry-run
 jsr publish --dry-run --allow-dirty

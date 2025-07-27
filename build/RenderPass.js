@@ -1,4 +1,4 @@
-/* @ts-self-types="./RenderPass.module.d.ts" */
+/* @ts-self-types="./RenderPass.d.ts" */
 class RenderPass {
     #vertexShader;
     #computeShader;

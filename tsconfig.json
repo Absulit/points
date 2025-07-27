@@ -18,9 +18,9 @@
     },
     "files": [
         "src/types/index.d.ts",
-        "build/RenderPass.module.js",
-        "build/RenderPasses.module.js",
-        "build/ShaderType.module.js",
+        "build/RenderPass.js",
+        "build/RenderPasses.js",
+        "build/ShaderType.js",
         "build/points.module.js",
         "build/core/animation.js",
         "build/core/audio.js",

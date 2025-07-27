@@ -2,28 +2,41 @@ export default [
   {
     input: 'src/RenderPass.js',
     output: {
-      file: 'build/RenderPass.module.js',
+      file: 'build/RenderPass.js',
       format: 'esm',
-      banner: '/* @ts-self-types="./RenderPass.module.d.ts" */'
+      banner: '/* @ts-self-types="./RenderPass.d.ts" */'
     },
     plugins: []
   },
   {
     input: 'src/ShaderType.js',
     output: {
-      file: 'build/ShaderType.module.js',
+      file: 'build/ShaderType.js',
       format: 'esm',
-      banner: '/* @ts-self-types="./ShaderType.module.d.ts" */'
+      banner: '/* @ts-self-types="./ShaderType.d.ts" */'
     },
     plugins: []
   },
   {
     input: 'src/RenderPasses.js',
     output: {
-      file: 'build/RenderPasses.module.js',
+      file: 'build/RenderPasses.js',
       format: 'esm',
-      banner: '/* @ts-self-types="./RenderPasses.module.d.ts" */'
+      banner: '/* @ts-self-types="./RenderPasses.d.ts" */'
     },
+    external: [
+      './core/RenderPasses/color/index.js',
+      './core/RenderPasses/grayscale/index.js',
+      './core/RenderPasses/chromaticAberration/index.js',
+      './core/RenderPasses/pixelate/index.js',
+      './core/RenderPasses/lensDistortion/index.js',
+      './core/RenderPasses/filmgrain/index.js',
+      './core/RenderPasses/bloom/index.js',
+      './core/RenderPasses/blur/index.js',
+      './core/RenderPasses/waves/index.js',
+      './absulit.points.module.js',
+      './RenderPass.js',
+    ],
     plugins: []
   },
   {

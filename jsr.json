@@ -50,6 +50,7 @@
             "LICENSE",
             "README.md",
             "./src/",
+            "./img/",
             "./example/",
             "./jsr.json"
         ]

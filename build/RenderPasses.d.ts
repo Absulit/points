@@ -12,66 +12,16 @@ declare class RenderPasses {
     static BLOOM: number;
     static BLUR: number;
     static WAVES: number;
-    static "__#3@#LIST": {
-        1: {
-            vertexShader: string;
-            fragmentShader: string;
-            init: (points: any, params: any) => Promise<void>;
-            update: (points: any) => void;
-        };
-        2: {
-            vertexShader: string;
-            fragmentShader: string;
-            init: (points: any, params: any) => Promise<void>;
-            update: (points: any) => void;
-        };
-        3: {
-            vertexShader: string;
-            fragmentShader: string;
-            init: (points: any, params: any) => Promise<void>;
-            update: (points: any) => void;
-        };
-        4: {
-            vertexShader: string;
-            fragmentShader: string;
-            init: (points: any, params: any) => Promise<void>;
-            update: (points: any) => void;
-        };
-        5: {
-            vertexShader: string;
-            fragmentShader: string;
-            init: (points: any, params: any) => Promise<void>;
-            update: (points: any) => Promise<void>;
-        };
-        6: {
-            vertexShader: string;
-            fragmentShader: string;
-            init: (points: any, params: any) => Promise<void>;
-            update: (points: any) => void;
-        };
-        7: {
-            vertexShader: string;
-            fragmentShader: string;
-            /**
-             *
-             * @param {Points} points
-             * @param {*} params
-             */
-            init: (points: Points, params: any) => Promise<void>;
-            update: (points: any) => void;
-        };
-        8: {
-            vertexShader: string;
-            fragmentShader: string;
-            init: (points: any, params: any) => Promise<void>;
-            update: (points: any) => void;
-        };
-        9: {
-            vertexShader: string;
-            fragmentShader: string;
-            init: (points: any, params: any) => Promise<void>;
-            update: (points: any) => void;
-        };
+    static "__#2@#LIST": {
+        1: any;
+        2: any;
+        3: any;
+        4: any;
+        5: any;
+        6: any;
+        7: any;
+        8: any;
+        9: any;
     };
     /**
      * Add a `RenderPass` from the `RenderPasses` list

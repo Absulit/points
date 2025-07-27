@@ -16,7 +16,8 @@
   "directories": {
     "src": "src",
     "build": "build",
-    "example": "examples"
+    "example": "examples",
+    "img": "img"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
