@@ -1,3 +1,4 @@
+/* @ts-self-types="./color.d.ts" */
 const RED = /*wgsl*/`
 const RED = vec4(1.,0.,0.,1.);
 `;

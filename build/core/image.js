@@ -1,3 +1,4 @@
+/* @ts-self-types="./image.d.ts" */
 /**
  * @type {String}
  * places texture in a position

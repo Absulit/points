@@ -1,3 +1,4 @@
+/* @ts-self-types="./defaultVertexStructs.d.ts" */
 /**
  * non used structs unless required
  */

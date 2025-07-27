@@ -27,6 +27,15 @@ swc build/core/sdf.js --out-file build/core/sdf.min.js
 # this needs to be added for JSR
 echo '/* @ts-self-types="./points.module.d.ts" */' | cat - build/points.min.js > temp && mv temp build/points.min.js
 
+
+list="animation audio color debug effects image math noise2d classicnoise2d random sdf"
+
+for item in $list; do
+    echo '/* @ts-self-types="./'$item'.d.ts" */' | cat - build/core/$item.min.js > temp && mv temp build/core/$item.min.js
+done
+
+
 npx tsc
 
-# jsr publish --dry-run --allow-dirty
+# npm publish --dry-run
+jsr publish --dry-run --allow-dirty

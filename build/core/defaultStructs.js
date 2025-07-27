@@ -1,3 +1,4 @@
+/* @ts-self-types="./defaultStructs.d.ts" */
 const defaultStructs = /*wgsl*/`
 
 struct Fragment {

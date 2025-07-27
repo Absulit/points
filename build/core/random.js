@@ -1,3 +1,4 @@
+/* @ts-self-types="./random.d.ts" */
 /**
  * @type {String}
  * Single random number.

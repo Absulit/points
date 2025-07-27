@@ -1,3 +1,4 @@
+/* @ts-self-types="./animation.d.ts" */
 /**
  * Utilities for animation
  * @module

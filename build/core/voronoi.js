@@ -1,3 +1,4 @@
+/* @ts-self-types="./voronoi.d.ts" */
 import { rand } from './random.js';
 
 // Created by Sebastián Sanabria Díaz absulit.com

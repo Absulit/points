@@ -1,3 +1,4 @@
+/* @ts-self-types="./math.d.ts" */
 /**
  * Math utils
  */

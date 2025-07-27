@@ -1,3 +1,4 @@
+/* @ts-self-types="./points.module.d.ts" */
 class ShaderType {
     static VERTEX = 1;
     static COMPUTE = 2;
@@ -815,6 +816,65 @@ fn main(
     var noise = rand();
     noise = noise * .5 + .5;
     let finalColor = (imageColor + imageColor * noise)  * .5;
+
+    return finalColor;
+}
+`;
+
+const filmgrain = {
+    vertexShader: vert$3,
+    fragmentShader: frag$3,
+    init: async (points, params) => {
+        points._setInternal(true);
+        points.addSampler('renderpass_feedbackSampler', null);
+        points.addTexture2d('renderpass_feedbackTexture', true);
+        points._setInternal(false);
+
+    },
+    update: points => {
+
+    }
+};
+
+const vert$2 = /*wgsl*/`
+
+@vertex
+fn main(
+    @location(0) position: vec4<f32>,
+    @location(1) color: vec4<f32>,
+    @location(2) uv: vec2<f32>,
+    @builtin(vertex_index) vertexIndex: u32
+) -> Fragment {
+
+    return defaultVertexBody(position, color, uv);
+}
+`;
+
+const frag$2 = /*wgsl*/`
+
+${texturePosition}
+${bloom$1}
+${brightness}
+${PI}
+
+@fragment
+fn main(
+    @location(0) color: vec4<f32>,
+    @location(1) uv: vec2<f32>,
+    @location(2) ratio: vec2<f32>,  // relation between params.screen.x and params.screen.y
+    @location(3) uvr: vec2<f32>,    // uv with aspect ratio corrected
+    @location(4) mouse: vec2<f32>,
+    @builtin(position) position: vec4<f32>
+) -> @location(0) vec4<f32> {
+
+    let startPosition = vec2(0.,0.);
+    let rgbaImage = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, startPosition, uvr, false); //* .998046;
+
+    let input = brightness(rgbaImage);
+    let bloomVal = bloom(input, i32(params.bloom_iterations), params.bloom_amount);
+    let rgbaBloom = vec4(bloomVal);
+
+    let finalColor:vec4<f32> = rgbaImage + rgbaBloom;
 
     return finalColor;
 }
@@ -3638,65 +3698,6 @@ class Points {
         }
     }
 }
-
-const filmgrain = {
-    vertexShader: vert$3,
-    fragmentShader: frag$3,
-    init: async (points, params) => {
-        points._setInternal(true);
-        points.addSampler('renderpass_feedbackSampler', null);
-        points.addTexture2d('renderpass_feedbackTexture', true);
-        points._setInternal(false);
-
-    },
-    update: points => {
-
-    }
-};
-
-const vert$2 = /*wgsl*/`
-
-@vertex
-fn main(
-    @location(0) position: vec4<f32>,
-    @location(1) color: vec4<f32>,
-    @location(2) uv: vec2<f32>,
-    @builtin(vertex_index) vertexIndex: u32
-) -> Fragment {
-
-    return defaultVertexBody(position, color, uv);
-}
-`;
-
-const frag$2 = /*wgsl*/`
-
-${texturePosition}
-${bloom$1}
-${brightness}
-${PI}
-
-@fragment
-fn main(
-    @location(0) color: vec4<f32>,
-    @location(1) uv: vec2<f32>,
-    @location(2) ratio: vec2<f32>,  // relation between params.screen.x and params.screen.y
-    @location(3) uvr: vec2<f32>,    // uv with aspect ratio corrected
-    @location(4) mouse: vec2<f32>,
-    @builtin(position) position: vec4<f32>
-) -> @location(0) vec4<f32> {
-
-    let startPosition = vec2(0.,0.);
-    let rgbaImage = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, startPosition, uvr, false); //* .998046;
-
-    let input = brightness(rgbaImage);
-    let bloomVal = bloom(input, i32(params.bloom_iterations), params.bloom_amount);
-    let rgbaBloom = vec4(bloomVal);
-
-    let finalColor:vec4<f32> = rgbaImage + rgbaBloom;
-
-    return finalColor;
-}
-`;
 
 const bloom = {
     vertexShader: vert$2,

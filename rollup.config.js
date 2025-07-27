@@ -31,38 +31,36 @@ export default [
     output: {
       file: 'build/points.module.js',
       format: 'esm',
-      // banner: `
-      //   /* @ts-self-types="./RenderPass.module.d.ts" */
-      //   /* @ts-self-types="./points.module.d.ts" */
-      // `
+      banner: '/* @ts-self-types="./points.module.d.ts" */'
     },
     plugins: []
   },
   {
-    input: [
-      'src/core/animation.js',
-      'src/core/audio.js',
-      'src/core/cellular2d.js',
-      'src/core/classicnoise2d.js',
-      'src/core/color.js',
-      'src/core/debug.js',
-      'src/core/defaultConstants.js',
-      'src/core/defaultFunctions.js',
-      'src/core/defaultStructs.js',
-      'src/core/defaultVertexStructs.js',
-      'src/core/effects.js',
-      'src/core/image.js',
-      'src/core/math.js',
-      'src/core/noise2d.js',
-      'src/core/random.js',
-      'src/core/sdf.js',
-      'src/core/valuenoise.js',
-      'src/core/voronoi.js',
-    ],
+    input: {
+      animation: 'src/core/animation.js',
+      audio: 'src/core/audio.js',
+      cellular2d: 'src/core/cellular2d.js',
+      classicnoise2d: 'src/core/classicnoise2d.js',
+      color: 'src/core/color.js',
+      debug: 'src/core/debug.js',
+      defaultConstants: 'src/core/defaultConstants.js',
+      defaultFunctions: 'src/core/defaultFunctions.js',
+      defaultStructs: 'src/core/defaultStructs.js',
+      defaultVertexStructs: 'src/core/defaultVertexStructs.js',
+      effects: 'src/core/effects.js',
+      image: 'src/core/image.js',
+      math: 'src/core/math.js',
+      noise2d: 'src/core/noise2d.js',
+      random: 'src/core/random.js',
+      sdf: 'src/core/sdf.js',
+      valuenoise: 'src/core/valuenoise.js',
+      voronoi: 'src/core/voronoi.js',
+    },
     output: {
       dir: 'build/core',
       format: 'esm',
-      // banner: '/* @ts-self-types="./../points.module.d.ts" */'
+      entryFileNames: '[name].js',
+      banner: chunk => `/* @ts-self-types="./${chunk.name}.d.ts" */`,
     }
   },
 ];

@@ -1,3 +1,4 @@
+/* @ts-self-types="./debug.d.ts" */
 /**
  * @type {String}
  * Draws an infinite cross.

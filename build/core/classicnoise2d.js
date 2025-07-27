@@ -1,3 +1,4 @@
+/* @ts-self-types="./classicnoise2d.d.ts" */
 // original: Author :  Stefan Gustavson (stefan.gustavson@liu.se)
 // https://github.com/ashima/webgl-noise/blob/master/src/classicnoise2D.glsl
 

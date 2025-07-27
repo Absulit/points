@@ -1,3 +1,4 @@
+/* @ts-self-types="./valuenoise.d.ts" */
 import { rand } from './random.js';
 
 const valueNoise = /*wgsl*/`

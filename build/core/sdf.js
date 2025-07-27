@@ -1,3 +1,4 @@
+/* @ts-self-types="./sdf.d.ts" */
 /**
  * A few signed distance functions
  * @module

@@ -1,3 +1,4 @@
+/* @ts-self-types="./defaultFunctions.d.ts" */
 /**
  * @type {string}
  * Default function for the Vertex shader that takes charge of automating the

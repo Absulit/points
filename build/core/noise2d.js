@@ -1,3 +1,4 @@
+/* @ts-self-types="./noise2d.d.ts" */
 // original: Author : Ian McEwan, Ashima Arts.
 // https://github.com/ashima/webgl-noise/blob/master/src/noise2D.glsl
 
