@@ -1,30 +1,51 @@
 <html>
-    <head>
-        <title></title>
 
-        <link rel="stylesheet" type="text/css" href="style.css">
-    </head>
-    <body>
-        <canvas id="gl-canvas" width="800" height="800">
-            Oops ... your browser doesn't support the HTML5 canvas element
-        </canvas>
+<head>
+    <title></title>
 
-        <script src="../src/vendor/stats.js"></script>
-        <script src="../src/vendor/ccapture/CCapture.all.min.js"></script>
-        <script type="module">
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
 
-            // import the `Points` class
+<body>
+    <canvas id="canvas" width="800" height="800">
+        Oops ... your browser doesn't support the HTML5 canvas element
+    </canvas>
 
-            import Points from '../src/absulit.points.module.js';
-            import RenderPass from '../src/RenderPass.js';
-            import { fnusin } from '../src/core/animation.js';
 
-            // reference the canvas in the constructor
-            const points = new Points('gl-canvas');
+    <script type="importmap">
+            {
+              "imports": {
+                "points": "../build/points.min.js",
 
-            // create your render pass with three shaders as follow
-            const renderPasses = [
-                new RenderPass(/*wgsl*/`
+                "points/animation": "../build/core/animation.min.js",
+                "points/audio": "../build/core/audio.min.js",
+                "points/color": "../build/core/color.min.js",
+                "points/debug": "../build/core/debug.min.js",
+                "points/effects": "../build/core/effects.min.js",
+                "points/image": "../build/core/image.min.js",
+                "points/math": "../build/core/math.min.js",
+                "points/noise2d": "../build/core/noise2d.min.js",
+                "points/classicnoise2d": "../build/core/classicnoise2d.min.js",
+                "points/random": "../build/core/random.min.js",
+                "points/sdf": "../build/core/sdf.min.js"
+              }
+            }
+    </script>
+
+
+    <script type="module">
+
+        // import the `Points` class
+
+        import Points, { RenderPass } from 'points';
+        import { fnusin } from 'points/animation';
+
+        // reference the canvas in the constructor
+        const points = new Points('canvas');
+
+        // create your render pass with three shaders as follow
+        const renderPasses = [
+            new RenderPass(/*wgsl*/`
                 @vertex
                 fn main(
                     @location(0) position: vec4<f32>,
@@ -69,19 +90,20 @@
                     let time = params.time;
                 }
                 `,
-                )
-            ];
+            )
+        ];
 
-            // call the POINTS init method and then the update method
-            await points.init(renderPasses);
-            update();
+        // call the POINTS init method and then the update method
+        await points.init(renderPasses);
+        update();
 
-            // call `points.update()` methods to render a new frame
-            function update() {
-                points.update();
-                requestAnimationFrame(update);
-            }
+        // call `points.update()` methods to render a new frame
+        function update() {
+            points.update();
+            requestAnimationFrame(update);
+        }
 
-        </script>
-    </body>
+    </script>
+</body>
+
 </html>
