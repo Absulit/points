@@ -91,14 +91,35 @@ You can have a Vertex + Fragment shaders without a Compute shader, and also a Co
 
  ` as in examples/basic.html`
 
+```html
+<script type="importmap">
+    {
+        "imports": {
+            "points": "https://cdn.jsdelivr.net/npm/@absulit/points/build/points.min.js",
+
+            "points/animation": "https://cdn.jsdelivr.net/npm/@absulit/points/build/core/animation.min.js"
+            "points/audio": "https://cdn.jsdelivr.net/npm/@absulit/points/build/core/audio.min.js",
+            "points/color": "https://cdn.jsdelivr.net/npm/@absulit/points/build/core/color.min.js",
+            "points/debug": "https://cdn.jsdelivr.net/npm/@absulit/points/build/core/debug.min.js",
+            "points/effects": "https://cdn.jsdelivr.net/npm/@absulit/points/build/core/effects.min.js",
+            "points/image": "https://cdn.jsdelivr.net/npm/@absulit/points/build/core/image.min.js",
+            "points/math": "https://cdn.jsdelivr.net/npm/@absulit/points/build/core/math.min.js",
+            "points/noise2d": "https://cdn.jsdelivr.net/npm/@absulit/points/build/core/noise2d.min.js",
+            "points/classicnoise2d": "https://cdn.jsdelivr.net/npm/@absulit/points/build/core/classicnoise2d.min.js",
+            "points/random": "https://cdn.jsdelivr.net/npm/@absulit/points/build/core/random.min.js",
+            "points/sdf": "https://cdn.jsdelivr.net/npm/@absulit/points/build/core/sdf.min.js"
+        }
+    }
+</script>
+```
+
 ```js
 // import the `Points` class
 
-import Points from '../src/absulit.points.module.js';
-import RenderPass from '../src/RenderPass.js';
+import Points, { RenderPass } from 'points';
 
 // reference the canvas in the constructor
-const points = new Points('gl-canvas');
+const points = new Points('canvas');
 
 // create your render pass with three shaders as follow
 const renderPasses = [
