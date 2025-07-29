@@ -122,8 +122,52 @@ You can have a Vertex + Fragment shaders without a Compute shader, and also a Co
 
 ### npm
 
+1. create index.html and main.js
+
+    add main as module in index.html
+
+```html
+<script type="module" src="main.js"></script>
+```
+
+2. Install points
 ```sh
+npm init
 npm i @absulit/points
+```
+
+3. Install parcel (or any live server that is able to recognize importmaps or path aliases)
+
+```sh
+npm install --save-dev parcel
+```
+
+4. Run live server
+```sh
+npx parcel index.html
+```
+
+5. Add in package.json (so parcel can recognize the paths)
+
+```json
+"alias": {
+  "points": "@absulit/points",
+  "points/animation": "@absulit/points/build/core/animation"
+}
+```
+
+6. Add/Create jsconfig.json (for intellisense)
+
+```json
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "points": ["node_modules/@absulit/points"],
+      "points/animation": ["node_modules/@absulit/points/build/core/animation"]
+    }
+  }
+}
 ```
 
 ### bun
