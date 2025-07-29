@@ -124,13 +124,13 @@ You can have a Vertex + Fragment shaders without a Compute shader, and also a Co
 
 1. create index.html and main.js
 
-    add main as module in index.html
+    Add main as module in `index.html`
 
 ```html
 <script type="module" src="main.js"></script>
 ```
 
-2. Install points
+2. Install `points`
 ```sh
 npm init
 npm i @absulit/points
@@ -147,7 +147,7 @@ npm install --save-dev parcel
 npx parcel index.html
 ```
 
-5. Add in package.json (so parcel can recognize the paths)
+5. Add in `package.json` (so parcel can recognize the paths)
 
 ```json
 "alias": {
@@ -156,7 +156,7 @@ npx parcel index.html
 }
 ```
 
-6. Add/Create jsconfig.json (for intellisense)
+6. Add/Create `jsconfig.json` (for intellisense)
 
 ```json
 {
