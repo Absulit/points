@@ -171,8 +171,25 @@ npx parcel index.html
 ```
 
 ### bun
+1. Install `points`
+
 ```sh
-bunx jsr add @absulit/points
+bun init #select blank
+bun i @absulit/points
+```
+
+2. Run server
+```sh
+bun index.html
+```
+
+3. Add to `tsconfig.json` (for intellisense)
+```json
+"baseUrl": ".",
+"paths": {
+    "points": ["node_modules/@absulit/points"],
+    "points/animation": ["node_modules/@absulit/points/build/core/animation"]
+}
 ```
 
 
