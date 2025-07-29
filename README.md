@@ -87,10 +87,16 @@ To add more shaders you need to add a new RenderPass.
 
 You can have a Vertex + Fragment shaders without a Compute shader, and also a Compute shader without a Vertex + Fragment shaders, so you can have a computational shader, a visual shader, or both.
 
-# Setup
+# Installation
 
- ` as in examples/basic.html`
+### cdn (importmap)
 
+---
+
+> **Note:**  "points" is the required and main library.
+ The others are helper libraries for shaders but not required.
+
+---
 ```html
 <script type="importmap">
     {
@@ -111,7 +117,25 @@ You can have a Vertex + Fragment shaders without a Compute shader, and also a Co
         }
     }
 </script>
+
 ```
+
+### npm
+
+```sh
+npm i @absulit/points
+```
+
+### bun
+```sh
+bunx jsr add @absulit/points
+```
+
+
+
+# Setup
+
+ ` as in examples/basic.html`
 
 ```js
 // import the `Points` class
@@ -159,26 +183,6 @@ You can take a look at `/examples/main.js` and `/examples/index.html`
 <canvas id="canvas" width="800" height="800">
     Oops ... your browser doesn't support the HTML5 canvas element
 </canvas>
-
-<script type="importmap">
-    {
-        "imports": {
-            "points": "https://cdn.jsdelivr.net/npm/@absulit/points/build/points.min.js",
-
-            "points/animation": "https://cdn.jsdelivr.net/npm/@absulit/points/build/core/animation.min.js",
-            "points/audio": "https://cdn.jsdelivr.net/npm/@absulit/points/build/core/audio.min.js",
-            "points/color": "https://cdn.jsdelivr.net/npm/@absulit/points/build/core/color.min.js",
-            "points/debug": "https://cdn.jsdelivr.net/npm/@absulit/points/build/core/debug.min.js",
-            "points/effects": "https://cdn.jsdelivr.net/npm/@absulit/points/build/core/effects.min.js",
-            "points/image": "https://cdn.jsdelivr.net/npm/@absulit/points/build/core/image.min.js",
-            "points/math": "https://cdn.jsdelivr.net/npm/@absulit/points/build/core/math.min.js",
-            "points/noise2d": "https://cdn.jsdelivr.net/npm/@absulit/points/build/core/noise2d.min.js",
-            "points/classicnoise2d": "https://cdn.jsdelivr.net/npm/@absulit/points/build/core/classicnoise2d.min.js",
-            "points/random": "https://cdn.jsdelivr.net/npm/@absulit/points/build/core/random.min.js",
-            "points/sdf": "https://cdn.jsdelivr.net/npm/@absulit/points/build/core/sdf.min.js"
-        }
-    }
-</script>
 ```
 
 ## main.js
