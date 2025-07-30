@@ -177,6 +177,7 @@ npx parcel index.html
 ```
 
 7. `Reload Window` in vscode to reload `jsconfig.json`
+    - Press `Ctrl + Shift + P` > Developer: Reload Window
 
 ### bun
 
