@@ -133,7 +133,11 @@ You can have a Vertex + Fragment shaders without a Compute shader, and also a Co
 2. Install `points`
 ```sh
 npm init
-npm i @absulit/points
+
+# select only one of the following two
+npm i @absulit/points # npm package
+npx jsr add @absulit/points # or jsr package
+
 ```
 
 3. Install parcel (or any live server that is able to recognize importmaps or path aliases)
