@@ -175,7 +175,10 @@ npx parcel index.html
 
 ```sh
 bun init #select blank
-bun i @absulit/points
+
+# select only one of the following two
+bun i @absulit/points # npm package or
+bun x jsr add @absulit/points # jsr package
 ```
 
 2. Run server
@@ -187,12 +190,12 @@ bun index.html
 ```json
 "baseUrl": ".",
 "paths": {
-    "points": ["node_modules/@absulit/points"],
+    "points": ["node_modules/@absulit/points/build/points.min.js"],
     "points/animation": ["node_modules/@absulit/points/build/core/animation"]
 }
 ```
 
-
+4. Restart server
 
 # Setup
 
@@ -211,12 +214,32 @@ const renderPasses = [
     new RenderPass(
         /*wgsl*/ `
             // add @vertex string
+            @vertex
+            fn main(
+                @location(0) position: vec4f,
+                @location(1) color: vec4f,
+                @location(2) uv: vec2f,
+                @builtin(vertex_index) vertexIndex: u32
+            ) -> Fragment {
+                return defaultVertexBody(position, color, uv);
+            }
         `,
         /*wgsl*/`
             // add @fragment string
+            @fragment
+            fn main(
+                @location(0) color: vec4f,
+                @location(1) uv: vec2f,
+                @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
+                @location(3) uvr: vec2f,    // uv with aspect ratio corrected
+                @location(4) mouse: vec2f,
+                @builtin(position) position: vec4f
+            ) -> @location(0) vec4f {
+                return color;
+            }
         `,
         /*wgsl*/`
-            // add @compute string
+            // add @compute string (this can be null)
         `
     )
 ];
