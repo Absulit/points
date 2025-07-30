@@ -1,6 +1,7 @@
 // import the `Points` class
-
 import Points, { RenderPass } from 'points';
+
+// import a function
 import { fnusin } from 'points/animation';
 
 // reference the canvas in the constructor
@@ -20,7 +21,7 @@ const renderPasses = [
             return defaultVertexBody(position, color, uv);
         }`,
         /*wgsl*/`
-        ${fnusin}
+        ${fnusin} // include the function
         @fragment
         fn main(
             @location(0) color:vec4f,

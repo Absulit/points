@@ -1,0 +1,31 @@
+{
+  "name": "npm_demo",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npx parcel index.html"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "parcel": "^2.15.4"
+  },
+  "alias": {
+    "points": "@absulit/points/build/points.min.js",
+    "points/animation": "@absulit/points/build/core/animation",
+    "points/audio": "@absulit/points/build/core/audio.min.js",
+    "points/color": "@absulit/points/build/core/color.min.js",
+    "points/debug": "@absulit/points/build/core/debug.min.js",
+    "points/effects": "@absulit/points/build/core/effects.min.js",
+    "points/image": "@absulit/points/build/core/image.min.js",
+    "points/math": "@absulit/points/build/core/math.min.js",
+    "points/noise2d": "@absulit/points/build/core/noise2d.min.js",
+    "points/classicnoise2d": "@absulit/points/build/core/classicnoise2d.min.js",
+    "points/random": "@absulit/points/build/core/random.min.js",
+    "points/sdf": "@absulit/points/build/core/sdf.min.js"
+  },
+  "dependencies": {
+    "@absulit/points": "^0.1.0-alpha.1"
+  }
+}
