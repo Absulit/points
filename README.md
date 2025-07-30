@@ -122,7 +122,7 @@ You can have a Vertex + Fragment shaders without a Compute shader, and also a Co
 
 ### npm
 
-1. create index.html and main.js
+1. create `index.html` and `main.js`
 
     Add main as module in `index.html`
 
@@ -150,9 +150,11 @@ npx parcel index.html
 5. Add in `package.json` (so parcel can recognize the paths)
 
 ```json
-"alias": {
-  "points": "@absulit/points",
-  "points/animation": "@absulit/points/build/core/animation"
+{
+    "alias": {
+      "points": "@absulit/points",
+      "points/animation": "@absulit/points/build/core/animation"
+    }
 }
 ```
 
@@ -163,15 +165,27 @@ npx parcel index.html
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "points": ["node_modules/@absulit/points"],
-      "points/animation": ["node_modules/@absulit/points/build/core/animation"]
+        "points": ["node_modules/@absulit/points/build/points.min.js"],
+        "points/animation": ["node_modules/@absulit/points/build/core/animation"]
     }
   }
 }
 ```
 
+7. `Reload Window` in vscode to reload `jsconfig.json`
+
 ### bun
-1. Install `points`
+
+1. create `index.html` and `main.js`
+
+    Add main as module in `index.html`
+
+```html
+<script type="module" src="main.js"></script>
+```
+
+
+2. Install `points`
 
 ```sh
 bun init #select blank
@@ -181,21 +195,25 @@ bun i @absulit/points # npm package or
 bun x jsr add @absulit/points # jsr package
 ```
 
-2. Run server
+3. Run server
 ```sh
 bun index.html
 ```
 
-3. Add to `tsconfig.json` (for intellisense)
+4. Add to `tsconfig.json` (for intellisense)
 ```json
-"baseUrl": ".",
-"paths": {
-    "points": ["node_modules/@absulit/points/build/points.min.js"],
-    "points/animation": ["node_modules/@absulit/points/build/core/animation"]
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+        "points": ["node_modules/@absulit/points/build/points.min.js"],
+        "points/animation": ["node_modules/@absulit/points/build/core/animation"]
+    }
+  }
 }
 ```
 
-4. Restart server
+5. Restart server
 
 # Setup
 
