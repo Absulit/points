@@ -89,7 +89,9 @@ You can have a Vertex + Fragment shaders without a Compute shader, and also a Co
 
 # Installation
 
-### cdn (importmap)
+[examples_tutorial](examples_tutorial) has a directory per type of installation:
+
+### cdn (importmap) [code: examples_tutorial/cdn/](examples_tutorial/cdn/)
 
 ---
 
@@ -120,7 +122,13 @@ You can have a Vertex + Fragment shaders without a Compute shader, and also a Co
 
 ```
 
-### npm
+### npm [code: examples_tutorial/npm/](examples_tutorial/npm/)
+
+---
+
+> **Note:** if you copy the example directory you can just run `npm install` and `npm start`
+
+---
 
 1. create `index.html` and `main.js`
 
@@ -179,7 +187,13 @@ npx parcel index.html
 7. `Reload Window` in vscode to reload `jsconfig.json`
     - Press `Ctrl + Shift + P` > Developer: Reload Window
 
-### bun
+### bun [code: examples_tutorial/bun/](examples_tutorial/bun/)
+
+---
+
+> **Note:** if you copy the example directory you can just run `bun install` and `bun start`
+
+---
 
 1. create `index.html` and `main.js`
 
