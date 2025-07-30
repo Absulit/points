@@ -156,7 +156,7 @@ npx parcel index.html
 ```json
 {
     "alias": {
-      "points": "@absulit/points",
+      "points": "@absulit/points/build/points.min.js",
       "points/animation": "@absulit/points/build/core/animation"
     }
 }
