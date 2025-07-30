@@ -4,6 +4,7 @@ import Points, { RenderPass } from 'points';
 // import a function
 import { fnusin } from 'points/animation';
 
+
 // reference the canvas in the constructor
 const points = new Points('canvas');
 
@@ -58,8 +59,10 @@ const renderPasses = [
 ];
 
 // call the POINTS init method and then the update method
-await points.init(renderPasses);
-update();
+(async function init(){
+    await points.init(renderPasses);
+    update();
+})();
 
 // call `points.update()` methods to render a new frame
 function update() {
