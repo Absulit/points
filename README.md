@@ -234,9 +234,10 @@ bun index.html
 
 5. Restart server
 
-# Setup
+# Code Setup
 
- ` as in examples/basic.html`
+[code: examples_tutorial/cdn/main.js](examples_tutorial/cdn/main.js)
+
 
 ```js
 // import the `Points` class
@@ -292,7 +293,7 @@ function update() {
 }
 ```
 
-# Examples
+# Reposiroty Examples
 These are the examples from the live demo page here: https://absulit.github.io/points/examples/. It's recommended to download the repo for this. You can also click the source button (`<>`) in the live examples
 
 Source located at [examples/index.html](examples)
@@ -312,7 +313,7 @@ You can take a look at `/examples/main.js` and `/examples/index.html`
 ```js
 // import the `Points` class
 
-import Points from '../src/absulit.points.module.js';
+import Points from 'points';
 
 // import the base project
 import base from '../examples/base/index.js';
