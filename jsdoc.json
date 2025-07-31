@@ -2,6 +2,7 @@
   "source": {
     "include": [
       "src",
+      "src/core",
       "docs/apidocs.md"
     ],
     "includePattern": ".+\\.js$"
@@ -18,5 +19,8 @@
     "cleandoc": {
       "theme": "dark"
     }
-  }
+  },
+  "theme_opts": {
+  "flatten": true
+}
 }

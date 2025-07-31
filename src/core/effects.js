@@ -1,3 +1,11 @@
+/**
+ * These are wgsl functions, not js functions.
+ * The function is enclosed in a js string constant,
+ * to be appended into the code to reference it in the string shader.
+ * @module points/effects
+ */
+
+
 export const euclideanDistance = /*wgsl*/`
 fn euclideanDistance(color:vec4<f32>, distanceColor:vec4<f32>) -> f32{
     return sqrt(

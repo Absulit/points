@@ -1,4 +1,11 @@
 /**
+ * These are wgsl functions, not js functions.
+ * The function is enclosed in a js string constant,
+ * to be appended into the code to reference it in the string shader.
+ * @module defaultFunctions
+ */
+
+/**
  * @type {string}
  * Default function for the Vertex shader that takes charge of automating the
  * creation of a few variables that are commonly used.
