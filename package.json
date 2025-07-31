@@ -15,6 +15,7 @@
   ],
   "directories": {
     "src": "src",
+    "doc": "docs",
     "build": "build",
     "example": "examples",
     "img": "img"
