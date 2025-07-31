@@ -13,6 +13,7 @@ import RenderPass from './RenderPass.js';
 
 /**
  * List of predefined Render Passes for Post Processing.
+ * @class
  */
 export default class RenderPasses {
     static COLOR = 1;
@@ -42,6 +43,7 @@ export default class RenderPasses {
      * @param {Points} points References a `Points` instance
      * @param {RenderPasses} renderPassId Select a static property from `RenderPasses`
      * @param {Object} params An object with the params needed by the `RenderPass`
+     * @returns {Promise<void>}
      */
     static async add(points, renderPassId, params) {
         if (points.renderPasses?.length) {
@@ -62,7 +64,7 @@ export default class RenderPasses {
      * @param {Number} b blue
      * @param {Number} a alpha
      * @param {Number} blendAmount how much you want to blend it from 0..1
-     * @returns
+     * @returns {Promise<void>}
      */
     static async color(points, r, g, b, a, blendAmount) {
         return await RenderPasses.add(points, RenderPasses.COLOR, { color: [r, g, b, a], blendAmount });
@@ -71,7 +73,7 @@ export default class RenderPasses {
     /**
      * Grayscale postprocessing. Takes the brightness of an image and returns it; that makes the grayscale result.
      * @param {Points} points a `Points` reference
-     * @returns
+     * @returns {Promise<void>}
      */
     static async grayscale(points) {
         return await RenderPasses.add(points, RenderPasses.GRAYSCALE);
@@ -81,7 +83,7 @@ export default class RenderPasses {
      * Chromatic Aberration postprocessing. Color bleeds simulating a lens effect without distortion.
      * @param {Points} points a `Points` reference
      * @param {Number} distance from 0..1 how far the channels are visually apart from each other in the screen, but the value can be greater and negative
-     * @returns
+     * @returns {Promise<void>}
      */
     static async chromaticAberration(points, distance) {
         return await RenderPasses.add(points, RenderPasses.CHROMATIC_ABERRATION, { distance });
@@ -92,7 +94,7 @@ export default class RenderPasses {
      * @param {Points} points a `Points` reference
      * @param {Number} width width of the pixel in pixels
      * @param {Number} height width of the pixel in pixels
-     * @returns
+     * @returns {Promise<void>}
      */
     static async pixelate(points, width, height) {
         return await RenderPasses.add(points, RenderPasses.PIXELATE, { pixelsWidth: width, pixelsHeight: height });
@@ -103,7 +105,7 @@ export default class RenderPasses {
      * @param {Points} points a `Points` reference
      * @param {Number} amount positive or negative value on how distorted the image will be
      * @param {Number} distance of chromatic aberration: from 0..1 how far the channels are visually apart from each other in the screen, but the value can be greater and negative
-     * @returns
+     * @returns {Promise<void>}
      */
     static async lensDistortion(points, amount, distance) {
         return await RenderPasses.add(points, RenderPasses.LENS_DISTORTION, { amount, distance });
@@ -112,7 +114,7 @@ export default class RenderPasses {
     /**
      * Film grain postprocessing. White noise added to the output to simulate film irregularities.
      * @param {Points} points a `Points` reference
-     * @returns
+     * @returns {Promise<void>}
      */
     static async filmgrain(points) {
         return await RenderPasses.add(points, RenderPasses.FILM_GRAIN);
@@ -122,7 +124,7 @@ export default class RenderPasses {
      * Bloom postprocessing. Increases brightness of already bright areas to create a haze effect.
      * @param {Points} points a `Points` reference
      * @param {Number} amount how bright the effect will be
-     * @returns
+     * @returns {Promise<void>}
      */
     static async bloom(points, amount) {
         return await RenderPasses.add(points, RenderPasses.BLOOM, { amount });
@@ -136,7 +138,7 @@ export default class RenderPasses {
      * @param {Number} directionX direction in X
      * @param {Number} directionY directon in Y
      * @param {Number} radians rotation in radians
-     * @returns
+     * @returns {Promise<void>}
      */
     static async blur(points, resolutionX, resolutionY, directionX, directionY, radians) {
         return await RenderPasses.add(points, RenderPasses.BLUR, { resolution: [resolutionX, resolutionY], direction: [directionX, directionY], radians });
@@ -147,7 +149,7 @@ export default class RenderPasses {
      * @param {Points} points a `Points` reference
      * @param {Number} scale how big the wave noise is
      * @param {Number} intensity a soft or hard effect
-     * @returns
+     * @returns {Promise<void>}
      */
     static async waves(points, scale, intensity) {
         return await RenderPasses.add(points, RenderPasses.WAVES, { scale, intensity });

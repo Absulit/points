@@ -40,5 +40,5 @@ npx tsc
 npm publish --dry-run
 jsr publish --dry-run --allow-dirty
 
-npx jsdoc -c jsdoc.json
+jsdoc -c jsdoc.json
 
