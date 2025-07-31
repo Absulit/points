@@ -1,6 +1,6 @@
 'use strict';
 
-export default class RenderPass {
+class RenderPass {
     #vertexShader;
     #computeShader;
     #fragmentShader;
@@ -131,3 +131,5 @@ export default class RenderPass {
         return this.#workgroupCountZ;
     }
 }
+
+export default RenderPass;

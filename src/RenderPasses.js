@@ -15,7 +15,7 @@ import RenderPass from './RenderPass.js';
  * List of predefined Render Passes for Post Processing.
  * @class
  */
-export default class RenderPasses {
+class RenderPasses {
     static COLOR = 1;
     static GRAYSCALE = 2;
     static CHROMATIC_ABERRATION = 3;
@@ -155,3 +155,5 @@ export default class RenderPasses {
         return await RenderPasses.add(points, RenderPasses.WAVES, { scale, intensity });
     }
 }
+
+export default RenderPasses;

@@ -1699,6 +1699,10 @@ class LayersArray extends Array {
     }
 }
 
+/**
+ * Main class Points
+ * @class
+ */
 class Points {
     #canvasId = null;
     #canvas = null;

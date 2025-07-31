@@ -199,6 +199,10 @@ export class ShaderType {
     static COMPUTE: number;
     static FRAGMENT: number;
 }
+/**
+ * Main class Points
+ * @class
+ */
 declare class Points {
     constructor(canvasId: any);
     set fitWindow(value: boolean);

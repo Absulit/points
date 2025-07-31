@@ -11,50 +11,14 @@ import defaultStructs from './core/defaultStructs.js';
 import { defaultVertexBody } from './core/defaultFunctions.js';
 import { dataSize, getArrayTypeData, isArray, typeSizes } from './data-size.js';
 import { loadImage, strToImage } from './texture-string.js';
+import LayersArray from './LayersArray.js';
+import UniformsArray from './UniformsArray.js';
 
-// TODO move classes to imports
-class UniformsArray extends Array {
-    #buffer = null;
-    constructor(...elements) {
-        super(...elements);
-    }
-
-    get buffer() {
-        return this.#buffer;
-    }
-
-    set buffer(v) {
-        this.#buffer = v;
-    }
-}
-class LayersArray extends Array {
-    #buffer = null;
-    #shaderType = null;
-    constructor(...elements) {
-        super(...elements);
-    }
-
-    get buffer() {
-        return this.#buffer;
-    }
-
-    set buffer(v) {
-        this.#buffer = v;
-    }
-
-    get shaderType() {
-        return this.#shaderType;
-    }
-
-    /**
-     * @param {ShaderType} v
-     */
-    set shaderType(v) {
-        this.#shaderType = v;
-    }
-}
-
-export default class Points {
+/**
+ * Main class Points
+ * @class Points
+ */
+class Points {
     #canvasId = null;
     #canvas = null;
     #device = null;
@@ -2056,5 +2020,5 @@ export default class Points {
     }
 }
 
-
+export default Points;
 export { ShaderType, RenderPass, RenderPasses };

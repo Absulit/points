@@ -2,7 +2,8 @@
   "source": {
     "include": [
       "src"
-    ]
+    ],
+    "includePattern": ".+\\.js$"
   },
   "sourceType": "module",
   "opts": {
