@@ -1,6 +1,6 @@
 'use strict';
 
-export default class VertexBufferInfo {
+class VertexBufferInfo {
     #vertexSize
     #vertexOffset;
     #colorOffset;
@@ -42,3 +42,5 @@ export default class VertexBufferInfo {
         return this.#vertexCount;
     }
 }
+
+export default VertexBufferInfo;

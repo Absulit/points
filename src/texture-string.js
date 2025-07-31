@@ -1,3 +1,13 @@
+/**
+ * Utility methods to for the {@link Points#setTextureString | setTextureString()}
+ * @module texture-string
+ */
+
+/**
+ * Method to load image with await
+ * @param {String} src
+ * @returns {Promise<void>}
+ */
 export async function loadImage(src) {
     return new Promise((resolve, reject) => {
         const img = new Image();

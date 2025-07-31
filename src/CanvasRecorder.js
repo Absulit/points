@@ -1,4 +1,4 @@
-export default class CanvasRecorder {
+class CanvasRecorder {
     #canvas = null;
     #options = null;
 
@@ -53,3 +53,6 @@ export default class CanvasRecorder {
         a.click();
     }
 }
+
+export default CanvasRecorder;
+
