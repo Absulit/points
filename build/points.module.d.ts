@@ -194,6 +194,9 @@ export class RenderPasses {
      */
     static waves(points: Points, scale: number, intensity: number): Promise<void>;
 }
+/**
+ * @class ShaderType
+ */
 export class ShaderType {
     static VERTEX: number;
     static COMPUTE: number;
@@ -201,7 +204,7 @@ export class ShaderType {
 }
 /**
  * Main class Points
- * @class
+ * @class Points
  */
 declare class Points {
     constructor(canvasId: any);
@@ -495,6 +498,9 @@ declare class Coordinate {
     set(x: any, y: any, z: any): void;
     #private;
 }
+/**
+ * @class RGBAColor
+ */
 declare class RGBAColor {
     static average(colors: any): RGBAColor;
     static difference(c1: any, c2: any): RGBAColor;

@@ -3,10 +3,16 @@ export const BLUE: "\nconst BLUE = vec4(0.,0.,1.,1.);\n";
 export const CYAN: "\nconst CYAN = vec4(0.,1.,1.,1.);\n";
 export const GREEN: "\nconst GREEN = vec4(0.,1.,0.,1.);\n";
 export const MAGENTA: "\nconst MAGENTA = vec4(1.,0.,1.,1.);\n";
+/**
+ * These are wgsl functions, not js functions.
+ * The function is enclosed in a js string constant,
+ * to be appended into the code to reference it in the string shader.
+ * @module points/color
+ */
 export const RED: "\nconst RED = vec4(1.,0.,0.,1.);\n";
 /**
- * @type {string}
  * Creates a rgba `vec4f` from an hsv color value
+ * @type {string}
  * @param {f32} h hue
  * @param {f32} s saturation
  * @param {f32} v value
@@ -16,38 +22,38 @@ export const RGBAFromHSV: string;
 export const WHITE: "\nconst WHITE = vec4(1.,1.,1.,1.);\n";
 export const YELLOW: "\nconst YELLOW = vec4(1.,1.,0.,1.);\n";
 /**
- * @type {String}
  * Compute the FFT (Fast Fourier Transform)
+ * @type {String}
  * @param {f32} input `f32`
  * @param {i32} iterations `i32` 2, two is good
  * @param {f32} intensity `f32` 0..1 a percentage
  */
 export const bloom: string;
 /**
- * @type {String}
  * Returns the perceived brightness of a color by the eye
  * # Standard
  * LuminanceA = (0.2126*R) + (0.7152*G) + (0.0722*B)
+ * @type {String}
  * @param {vec4f} color
  * @return `f32`
  */
 export const brightness: string;
 /**
- * @type {String}
  * Returns the perceived brightness of a color by the eye
  * # Percieved A
  * LuminanceB = (0.299*R + 0.587*G + 0.114*B)
+ * @type {String}
  * @param {vec4f} color
  * @return `f32`
  */
 export const brightnessB: string;
 /**
- * @type {String}
  * Returns the perceived brightness of a color by the eye
  * # Percieved B
  * slower to calculate
  *
  * LuminanceC = sqrt(0.299*(R**2) + 0.587*(G**2) + 0.114*(B**2))
+ * @type {String}
  * @param {vec4f} color
  * @return `f32`
  */

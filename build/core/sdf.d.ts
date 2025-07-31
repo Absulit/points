@@ -1,6 +1,6 @@
 /**
- * @type {String}
  * Creates a circle
+ * @type {String}
  * @param {vec2f} position center of the circle
  * @param {f32} radius how big the circle is
  * @param {f32} feather how soft the edges are
@@ -9,8 +9,8 @@
  */
 export const sdfCircle: string;
 /**
- * @type {String}
  * Creates a line with a pixel stroke.
+ * @type {String}
  * @param {vec2f} p1 start of the line
  * @param {vec2f} p2 end of the line
  * @param {f32} pixelStroke width in pixels with an 800 base
@@ -19,8 +19,8 @@ export const sdfCircle: string;
  */
 export const sdfLine: string;
 /**
- * @type {String}
  * Better than sdfLine to create lines
+ * @type {String}
  * @param {vec2f} p1 start of the line
  * @param {vec2f} p2 end of the line
  * @param {f32} feather how soft the edges are
@@ -30,12 +30,15 @@ export const sdfLine: string;
 export const sdfLine2: string;
 export const sdfRectangle: "\n\n";
 /**
- * A few signed distance functions
- * @module
+ * A few signed distance functions.
+ * These are wgsl functions, not js functions.
+ * The function is enclosed in a js string constant,
+ * to be appended into the code to reference it in the string shader.
+ * @module points/sdf
  */
 /**
- * @type {String}
  * Function used to create lines. It's a dependency of them.
+ * @type {String}
  * @param {vec2f} p uv
  * @param {vec2f} a point A
  * @param {vec2f} b point B
@@ -43,15 +46,15 @@ export const sdfRectangle: "\n\n";
  */
 export const sdfSegment: string;
 /**
- * @type {String}
  * Special for letters and create an sdf version of a texture
+ * @type {String}
  * @param {vec4f} color final color
  * @return `vec4f`
  */
 export const sdfSmooth: string;
 /**
- * @type {String}
  * Creates a square
+ * @type {String}
  * @param {vec2f} position center of the square
  * @param {f32} radius how big the square is to a corner
  * @param {f32} feather how soft the edges are

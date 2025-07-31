@@ -44,8 +44,8 @@ fn texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>
 `;
 
 /**
- * @type {String}
  * places texture_external in a position
+ * @type {String}
  * @param {texture_external} texture `texture_external`
  * @param {sampler} aSampler `sampler`
  * @param {vec2<f32>} position `vec2<f32>`
@@ -82,8 +82,8 @@ fn textureExternalPosition(texture:texture_external, aSampler:sampler, position:
 `;
 
 /**
- * @type {String}
  * Flips texture in Y. This because it comes flipped, so this corrects it.
+ * @type {String}
  * @param {vec2f} uv uv coordinates
  * @return `vec2f`
  */
@@ -94,8 +94,8 @@ fn flipTextureUV(uv:vec2<f32>) -> vec2<f32>{
 `;
 
 /**
- * @type {String}
  * Sprite or Atlas. Extract a piece of the sprite with an index.
+ * @type {String}
  * @param {texture_2d<f32>} texture texture to sample
  * @param {sampler} aSampler a sampler
  * @param {vec2f} position coordiantes where the image will be printed
@@ -185,8 +185,8 @@ fn decodeNumberSprite(
 `;
 
 /**
- * @type {String}
  * Increase the aparent pixel size of the texture image using `textureSample`
+ * @type {String}
  * @param {texture_2d<f32>} texture `texture_2d<f32>`
  * @param {sampler} textureSampler `sampler`
  * @param {f32} pixelsWidth `f32`
@@ -205,8 +205,8 @@ fn pixelateTexture(texture:texture_2d<f32>, textureSampler:sampler, pixelsWidth:
 `;
 
 /**
- * @type {String}
  * Increase the aparent pixel size of the texture image using `texturePosition`
+ * @type {String}
  * @param {texture_2d<f32>} texture `texture_2d<f32>`
  * @param {sampler} textureSampler `sampler`
  * @param {vec2f} position `vec2f`

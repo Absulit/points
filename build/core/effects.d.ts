@@ -2,11 +2,17 @@ export const blur8: "\nfn blur8(color:vec4<f32>, colorsAround:array<vec4<f32>, 8
 export const blur9: "\n// based on https://github.com/Jam3/glsl-fast-gaussian-blur/blob/master/9.glsl\nfn blur9(image: texture_2d<f32>, imageSampler:sampler, position:vec2<f32>, uv:vec2<f32>, resolution: vec2<f32>, direction: vec2<f32>) -> vec4<f32> {\n    var color = vec4(0.0);\n    let off1 = vec2(1.3846153846) * direction;\n    let off2 = vec2(3.2307692308) * direction;\n    color += texturePosition(image, imageSampler, position, uv, true) * 0.2270270270;\n    color += texturePosition(image, imageSampler, position, uv + (off1 / resolution), true) * 0.3162162162;\n    color += texturePosition(image, imageSampler, position, uv - (off1 / resolution), true) * 0.3162162162;\n    color += texturePosition(image, imageSampler, position, uv + (off2 / resolution), true) * 0.0702702703;\n    color += texturePosition(image, imageSampler, position, uv - (off2 / resolution), true) * 0.0702702703;\n    return color;\n}\n";
 export const clearAlpha: "\n// level 2.\nfn clearAlpha(currentColor:vec4<f32>, level:f32) -> vec4<f32>{\n    var ar = currentColor.a / level;\n    if(ar <= .09){\n        ar = 0.;\n    }\n    return vec4<f32>(currentColor.rgb, ar);\n}\n";
 export const clearMix: "\n//const clearMixlevel = 1.81;//1.01\nfn clearMix(color:vec4<f32>, level:f32) -> vec4<f32> {\n    let rr = color.r / level;\n    let gr = color.g / level;\n    let br = color.b / level;\n    var ar = color.a / level;\n    if(ar <= .09){\n        ar = 0.;\n    }\n    return vec4<f32>(rr, gr, br, ar);\n}\n";
+/**
+ * These are wgsl functions, not js functions.
+ * The function is enclosed in a js string constant,
+ * to be appended into the code to reference it in the string shader.
+ * @module points/effects
+ */
 export const euclideanDistance: "\nfn euclideanDistance(color:vec4<f32>, distanceColor:vec4<f32>) -> f32{\n    return sqrt(\n        pow(color.r - distanceColor.r, 2.) +\n        pow(color.g - distanceColor.g, 2.) +\n        pow(color.b - distanceColor.b, 2.)\n    );\n}\n";
 /**
- * @type {String}
  * From a palette declared in `getClosestColorInPalette_palette`
  * gets the closest color based on `distance`
+ * @type {String}
  * @param {vec4<f32>} color `vec4<f32>` color to replace with
  * @param {u32} numPaletteItems `u32` length of getClosestColorInPalette_palette
  * @param {f32} distance `f32` from 0..1 that indicates how close it should be from the color

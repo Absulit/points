@@ -11,15 +11,15 @@
  */
 export const decodeNumberSprite: string;
 /**
- * @type {String}
  * Flips texture in Y. This because it comes flipped, so this corrects it.
+ * @type {String}
  * @param {vec2f} uv uv coordinates
  * @return `vec2f`
  */
 export const flipTextureUV: string;
 /**
- * @type {String}
  * Increase the aparent pixel size of the texture image using `textureSample`
+ * @type {String}
  * @param {texture_2d<f32>} texture `texture_2d<f32>`
  * @param {sampler} textureSampler `sampler`
  * @param {f32} pixelsWidth `f32`
@@ -28,8 +28,8 @@ export const flipTextureUV: string;
  */
 export const pixelateTexture: string;
 /**
- * @type {String}
  * Increase the aparent pixel size of the texture image using `texturePosition`
+ * @type {String}
  * @param {texture_2d<f32>} texture `texture_2d<f32>`
  * @param {sampler} textureSampler `sampler`
  * @param {vec2f} position `vec2f`
@@ -39,8 +39,8 @@ export const pixelateTexture: string;
  */
 export const pixelateTexturePosition: string;
 /**
- * @type {String}
  * Sprite or Atlas. Extract a piece of the sprite with an index.
+ * @type {String}
  * @param {texture_2d<f32>} texture texture to sample
  * @param {sampler} aSampler a sampler
  * @param {vec2f} position coordiantes where the image will be printed
@@ -51,8 +51,8 @@ export const pixelateTexturePosition: string;
  */
 export const sprite: string;
 /**
- * @type {String}
  * places texture_external in a position
+ * @type {String}
  * @param {texture_external} texture `texture_external`
  * @param {sampler} aSampler `sampler`
  * @param {vec2<f32>} position `vec2<f32>`
@@ -62,8 +62,14 @@ export const sprite: string;
  */
 export const textureExternalPosition: string;
 /**
- * @type {String}
+ * These are wgsl functions, not js functions.
+ * The function is enclosed in a js string constant,
+ * to be appended into the code to reference it in the string shader.
+ * @module points/image
+ */
+/**
  * places texture in a position
+ * @type {String}
  * @param {texture_2d<f32>} texture `texture_2d<f32>`
  * @param {sampler} aSampler `sampler`
  * @param {vec2<f32>} position `vec2<f32>`

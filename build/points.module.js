@@ -1,4 +1,7 @@
 /* @ts-self-types="./points.module.d.ts" */
+/**
+ * @class ShaderType
+ */
 class ShaderType {
     static VERTEX = 1;
     static COMPUTE = 2;
@@ -152,8 +155,15 @@ fn main(
 `;
 
 /**
- * @type {String}
+ * These are wgsl functions, not js functions.
+ * The function is enclosed in a js string constant,
+ * to be appended into the code to reference it in the string shader.
+ * @module points/image
+ */
+
+/**
  * places texture in a position
+ * @type {String}
  * @param {texture_2d<f32>} texture `texture_2d<f32>`
  * @param {sampler} aSampler `sampler`
  * @param {vec2<f32>} position `vec2<f32>`
@@ -190,8 +200,8 @@ fn texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>
 `;
 
 /**
- * @type {String}
  * places texture_external in a position
+ * @type {String}
  * @param {texture_external} texture `texture_external`
  * @param {sampler} aSampler `sampler`
  * @param {vec2<f32>} position `vec2<f32>`
@@ -228,8 +238,8 @@ fn textureExternalPosition(texture:texture_external, aSampler:sampler, position:
 `;
 
 /**
- * @type {String}
  * Increase the aparent pixel size of the texture image using `texturePosition`
+ * @type {String}
  * @param {texture_2d<f32>} texture `texture_2d<f32>`
  * @param {sampler} textureSampler `sampler`
  * @param {vec2f} position `vec2f`
@@ -305,15 +315,20 @@ fn main(
 `;
 
 /**
- * Utilities for animation
- * @module
+ * Utilities for animation.
+ * <br>
+ * <br>
+ * These are wgsl functions, not js functions.
+ * The function is enclosed in a js string constant,
+ * to be appended into the code to reference it in the string shader.
+ * @module points/animation
  */
 
 
 /**
- * @type {String}
  * Animates `sin()` over `params.time` and a provided `speed`.
  * The value is normalized, so in the range 0..1
+ * @type {String}
  * @param {f32} speed
  */
 const fnusin = /*wgsl*/`
@@ -322,13 +337,21 @@ fn fnusin(speed: f32) -> f32{
 }
 `;
 
+/**
+ * These are wgsl functions, not js functions.
+ * The function is enclosed in a js string constant,
+ * to be appended into the code to reference it in the string shader.
+ * @module points/color
+ */
+
+
 const WHITE = /*wgsl*/`
 const WHITE = vec4(1.,1.,1.,1.);
 `;
 
 /**
- * @type {String}
  * Compute the FFT (Fast Fourier Transform)
+ * @type {String}
  * @param {f32} input `f32`
  * @param {i32} iterations `i32` 2, two is good
  * @param {f32} intensity `f32` 0..1 a percentage
@@ -350,10 +373,10 @@ fn bloom(input:f32, iterations:i32, intensity:f32) -> f32 {
 
 
 /**
- * @type {String}
  * Returns the perceived brightness of a color by the eye
  * # Standard
  * LuminanceA = (0.2126*R) + (0.7152*G) + (0.0722*B)
+ * @type {String}
  * @param {vec4f} color
  * @return `f32`
  */
@@ -543,13 +566,18 @@ fn main(
 
 /**
  * Math utils
+ *
+ * These are wgsl functions, not js functions.
+ * The function is enclosed in a js string constant,
+ * to be appended into the code to reference it in the string shader.
+ * @module points/math
  */
 
 const PI = /*wgsl*/`const PI = 3.14159265;`;
 
 /**
- * @type {String}
  * Using polar coordinates, calculates the final point as `vec2<f32>`
+ * @type {String}
  * @param {f32} distance distance from origin
  * @param {f32} radians Angle in radians
  */
@@ -560,8 +588,8 @@ fn polar(distance: f32, radians: f32) -> vec2<f32> {
 `;
 
 /**
- * @type {String}
  * Rotates a vector an amount of radians
+ * @type {String}
  * @param {vec2f} p vector to rotate
  * @param {f32} rads angle in radians
  */
@@ -575,12 +603,19 @@ fn rotateVector(p:vec2<f32>, rads:f32 ) -> vec2<f32> {
 }
 `;
 
-// original: Author : Ian McEwan, Ashima Arts.
-// https://github.com/ashima/webgl-noise/blob/master/src/noise2D.glsl
+/**
+ * original: Author : Ian McEwan, Ashima Arts.
+ * https://github.com/ashima/webgl-noise/blob/master/src/noise2D.glsl
+ *
+ * These are wgsl functions, not js functions.
+ * The function is enclosed in a js string constant,
+ * to be appended into the code to reference it in the string shader.
+ * @module points/noise2d
+ */
 
 /**
- * @type {String}
  * Noise
+ * @type {String}
  * @param {vec2f} v usually the uv
  * @return `f32`
  */
@@ -770,16 +805,17 @@ fn main(
 `;
 
 /**
- * @type {String}
- * Single random number.
- * Use `seed` to change seed.
- * @return `f32`
+ * These are wgsl functions, not js functions.
+ * The function is enclosed in a js string constant,
+ * to be appended into the code to reference it in the string shader.
+ * @module points/random
  */
 
+
 /**
- * @type {String}
  * Random number that returns a `vec2f`.
  * Use `rand_seed:vec2f` to change seed.
+ * @type {String}
  * @return `f32` equivalent to `rand_seed.y` and `rand_seed` is the result.
  */
 const rand = /*wgsl*/`
@@ -880,15 +916,66 @@ fn main(
 }
 `;
 
+/**
+ * Collection of Keys used for the default uniforms
+ * assigned in the {@link Points} class.
+ * This is mainly for internal purposes.
+ * @class UniformKeys
+ */
 class UniformKeys {
+    /**
+     * To set the time in milliseconds
+     * @type {string}
+     * @static
+     */
     static TIME = 'time';
+    /**
+     * To set the time after the last frame
+     * @type {string}
+     * @static
+     */
     static DELTA = 'delta';
+    /**
+     * To set the current date and time in seconds
+     * @type {string}
+     * @static
+     */
     static EPOCH = 'epoch';
+    /**
+     * To set screen dimensions
+     * @type {string}
+     * @static
+     */
     static SCREEN = 'screen';
+    /**
+     * To set mouse coordinates
+     * @type {string}
+     * @static
+     */
     static MOUSE = 'mouse';
+    /**
+     * To set if the mouse has been clicked.
+     * @type {string}
+     * @static
+     */
     static MOUSE_CLICK = 'mouseClick';
+    /**
+     * To set if the mouse is down.
+     * @type {string}
+     * @static
+     */
     static MOUSE_DOWN = 'mouseDown';
+    /**
+     * To set if the wheel is moving.
+     * @type {string}
+     * @static
+     */
     static MOUSE_WHEEL = 'mouseWheel';
+    /**
+     * To set how much the wheel has moved.
+     * @type {string}
+     * @static
+     */
     static MOUSE_DELTA = 'mouseDelta';
 }
 
@@ -988,6 +1075,9 @@ class Coordinate {
     }
 }
 
+/**
+ * @class RGBAColor
+ */
 class RGBAColor {
     #value;
     constructor(r = 0, g = 0, b = 0, a = 1) {
@@ -1185,6 +1275,7 @@ class RGBAColor {
 /**
  * To manage time and delta time,
  * based on https://github.com/mrdoob/three.js/blob/master/src/core/Clock.js
+ * @class Clock
  */
 class Clock {
     #time = 0;
@@ -1253,9 +1344,16 @@ struct Event {
 `;
 
 /**
- * @type {string}
+ * These are wgsl functions, not js functions.
+ * The function is enclosed in a js string constant,
+ * to be appended into the code to reference it in the string shader.
+ * @module defaultFunctions
+ */
+
+/**
  * Default function for the Vertex shader that takes charge of automating the
  * creation of a few variables that are commonly used.
+ * @type {string}
  * @param {vec4f} position
  * @param {vec4f} color
  * @param {vec2f} uv
@@ -1278,6 +1376,12 @@ fn defaultVertexBody(position: vec4<f32>, color: vec4<f32>, uv: vec2<f32>) -> Fr
     return result;
 }
 `;
+
+/**
+ * Utility types and methods to set wgsl types in memory.
+ * This is mainly internal.
+ * @module data-size
+ */
 
 const size_4_align_4 = { size: 4, align: 4 };
 const size_8_align_8 = { size: 8, align: 8 };
@@ -1584,6 +1688,16 @@ const dataSize = value => {
     return structData;
 };
 
+/**
+ * Utility methods to for the {@link Points#setTextureString | setTextureString()}
+ * @module texture-string
+ */
+
+/**
+ * Method to load image with await
+ * @param {String} src
+ * @returns {Promise<void>}
+ */
 async function loadImage(src) {
     return new Promise((resolve, reject) => {
         const img = new Image();
@@ -1657,21 +1771,9 @@ function strToImage(str, atlasImg, size, offset = 0) {
     return canvas.toDataURL('image/png');
 }
 
-// TODO move classes to imports
-class UniformsArray extends Array {
-    #buffer = null;
-    constructor(...elements) {
-        super(...elements);
-    }
-
-    get buffer() {
-        return this.#buffer;
-    }
-
-    set buffer(v) {
-        this.#buffer = v;
-    }
-}
+/**
+ * @class LayersArray
+ */
 class LayersArray extends Array {
     #buffer = null;
     #shaderType = null;
@@ -1700,8 +1802,30 @@ class LayersArray extends Array {
 }
 
 /**
+ * @class UniformsArray
+ */
+class UniformsArray extends Array {
+    #buffer = null;
+    constructor(...elements) {
+        super(...elements);
+    }
+
+    get buffer() {
+        return this.#buffer;
+    }
+
+    /**
+     * set buffer
+     * @param {*} v
+     */
+    set buffer(v) {
+        this.#buffer = v;
+    }
+}
+
+/**
  * Main class Points
- * @class
+ * @class Points
  */
 class Points {
     #canvasId = null;
@@ -3739,6 +3863,16 @@ fn main(
     return defaultVertexBody(position, color, uv);
 }
 `;
+
+/**
+ * These are wgsl functions, not js functions.
+ * The function is enclosed in a js string constant,
+ * to be appended into the code to reference it in the string shader.
+ * @module points/effects
+ */
+
+
+
 
 const blur9 = /*wgsl*/`
 // based on https://github.com/Jam3/glsl-fast-gaussian-blur/blob/master/9.glsl

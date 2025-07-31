@@ -1,8 +1,15 @@
 /* @ts-self-types="./debug.d.ts" */
 /**
- * @type {String}
+ * These are wgsl functions, not js functions.
+ * The function is enclosed in a js string constant,
+ * to be appended into the code to reference it in the string shader.
+ * @module points/debug
+ */
+
+/**
  * Draws an infinite cross.
  * Useful to draw it where the mouse is.
+ * @type {String}
  * @param {vec2f} position
  * @param {vec4f} color
  * @param {vec2f} uv
@@ -16,8 +23,8 @@ fn showDebugCross(position:vec2<f32>, color:vec4<f32>, uv:vec2<f32>) -> vec4<f32
 `;
 
 /**
- * @type {String}
  * Border around the screen
+ * @type {String}
  * @param {vec4f} color
  * @param {vec2f} uv
  */

@@ -6,9 +6,9 @@
  */
 
 /**
- * @type {string}
  * Default function for the Vertex shader that takes charge of automating the
  * creation of a few variables that are commonly used.
+ * @type {string}
  * @param {vec4f} position
  * @param {vec4f} color
  * @param {vec2f} uv

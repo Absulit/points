@@ -1,4 +1,7 @@
 /* @ts-self-types="./ShaderType.d.ts" */
+/**
+ * @class ShaderType
+ */
 class ShaderType {
     static VERTEX = 1;
     static COMPUTE = 2;
