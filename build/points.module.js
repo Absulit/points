@@ -2235,6 +2235,7 @@ class Points {
      * @param {string} name
      * @param {string} path
      * @param {ShaderType} shaderType
+     * @returns {Object}
      */
     async setTextureImage(name, path, shaderType = null) {
         const texture2dToUpdate = this.#nameExists(this.#textures2d, name);
@@ -2290,7 +2291,7 @@ class Points {
      * @param {{x: number, y: number}} size size of a individual character e.g.: `{x:10, y:20}`
      * @param {Number} offset how many characters back or forward it must move to start
      * @param {String} shaderType
-     * @returns
+     * @returns {Object}
      */
     async setTextureString(name, text, path, size, offset = 0, shaderType = null) {
         const atlas = await loadImage(path);
@@ -2583,7 +2584,7 @@ class Points {
      * @param {string} fragmentName name of the variable in the fragment shader
      * @param {Array<number, 2>} size dimensions of the texture, by default screen
      * size
-     * @returns
+     * @returns {Object}
      */
     setBindingTexture(computeName, fragmentName, size) {
         // TODO: validate that names don't exist already
@@ -2634,7 +2635,7 @@ class Points {
     /**
      * @param {ShaderType} shaderType
      * @param {boolean} internal
-     * @returns string with bindings
+     * @returns {String} string with bindings
      */
     #createDynamicGroupBindings(shaderType, internal) {
         // `internal` here is a flag for a custom pass
@@ -2796,7 +2797,7 @@ class Points {
     /**
      * One time function to call to initialize the shaders.
      * @param {Array<RenderPass>} renderPasses Collection of RenderPass, which contain Vertex, Compute and Fragment shaders.
-     * @returns false | undefined
+     * @returns {Boolean} false | undefined
      */
     async init(renderPasses) {
         this.#renderPasses = renderPasses.concat(this.#postRenderPasses);
@@ -2905,7 +2906,7 @@ class Points {
      * @param {GPUBufferUsageFlags} usage
      * @param {Boolean} mappedAtCreation
      * @param {Number} size
-     * @returns mapped buffer
+     * @returns {GPUBuffer} mapped buffer
      */
     #createAndMapBuffer(data, usage, mappedAtCreation = true, size = null) {
         const buffer = this.#device.createBuffer({
@@ -2922,7 +2923,7 @@ class Points {
      * It creates with size, no with data, so it's empty
      * @param {Number} size numItems * instanceByteSize ;
      * @param {GPUBufferUsageFlags} usage
-     * @returns buffer
+     * @returns {GPUBuffer} buffer
      */
     #createBuffer(size, usage) {
         const buffer = this.#device.createBuffer({

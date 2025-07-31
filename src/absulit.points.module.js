@@ -590,6 +590,7 @@ export default class Points {
      * @param {string} name
      * @param {string} path
      * @param {ShaderType} shaderType
+     * @returns {Object}
      */
     async setTextureImage(name, path, shaderType = null) {
         const texture2dToUpdate = this.#nameExists(this.#textures2d, name);
@@ -645,7 +646,7 @@ export default class Points {
      * @param {{x: number, y: number}} size size of a individual character e.g.: `{x:10, y:20}`
      * @param {Number} offset how many characters back or forward it must move to start
      * @param {String} shaderType
-     * @returns
+     * @returns {Object}
      */
     async setTextureString(name, text, path, size, offset = 0, shaderType = null) {
         const atlas = await loadImage(path);
@@ -938,7 +939,7 @@ export default class Points {
      * @param {string} fragmentName name of the variable in the fragment shader
      * @param {Array<number, 2>} size dimensions of the texture, by default screen
      * size
-     * @returns
+     * @returns {Object}
      */
     setBindingTexture(computeName, fragmentName, size) {
         // TODO: validate that names don't exist already
@@ -979,9 +980,9 @@ export default class Points {
         ++this.#events_ids;
     }
     /**
-     * @private
      * for internal use:
      * to flag add* methods and variables as part of the RenderPasses
+     * @private
      */
     _setInternal(value) {
         this.#internal = value;
@@ -989,7 +990,7 @@ export default class Points {
     /**
      * @param {ShaderType} shaderType
      * @param {boolean} internal
-     * @returns string with bindings
+     * @returns {String} string with bindings
      */
     #createDynamicGroupBindings(shaderType, internal) {
         // `internal` here is a flag for a custom pass
@@ -1152,7 +1153,7 @@ export default class Points {
     /**
      * One time function to call to initialize the shaders.
      * @param {Array<RenderPass>} renderPasses Collection of RenderPass, which contain Vertex, Compute and Fragment shaders.
-     * @returns false | undefined
+     * @returns {Boolean} false | undefined
      */
     async init(renderPasses) {
         this.#renderPasses = renderPasses.concat(this.#postRenderPasses);
@@ -1261,7 +1262,7 @@ export default class Points {
      * @param {GPUBufferUsageFlags} usage
      * @param {Boolean} mappedAtCreation
      * @param {Number} size
-     * @returns mapped buffer
+     * @returns {GPUBuffer} mapped buffer
      */
     #createAndMapBuffer(data, usage, mappedAtCreation = true, size = null) {
         const buffer = this.#device.createBuffer({
@@ -1278,7 +1279,7 @@ export default class Points {
      * It creates with size, no with data, so it's empty
      * @param {Number} size numItems * instanceByteSize ;
      * @param {GPUBufferUsageFlags} usage
-     * @returns buffer
+     * @returns {GPUBuffer} buffer
      */
     #createBuffer(size, usage) {
         const buffer = this.#device.createBuffer({

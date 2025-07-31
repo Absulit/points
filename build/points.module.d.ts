@@ -327,8 +327,9 @@ declare class Points {
      * @param {string} name
      * @param {string} path
      * @param {ShaderType} shaderType
+     * @returns {Object}
      */
-    setTextureImage(name: string, path: string, shaderType?: ShaderType): Promise<any>;
+    setTextureImage(name: string, path: string, shaderType?: ShaderType): any;
     /**
      * Loads a text string as a texture.
      * Using an Atlas or a Spritesheet with UTF-16 chars (`path`) it will create a new texture
@@ -342,12 +343,12 @@ declare class Points {
      * @param {{x: number, y: number}} size size of a individual character e.g.: `{x:10, y:20}`
      * @param {Number} offset how many characters back or forward it must move to start
      * @param {String} shaderType
-     * @returns
+     * @returns {Object}
      */
     setTextureString(name: string, text: string, path: string, size: {
         x: number;
         y: number;
-    }, offset?: number, shaderType?: string): Promise<any>;
+    }, offset?: number, shaderType?: string): any;
     /**
      * Load images as texture_2d_array
      * @param {string} name
@@ -418,21 +419,9 @@ declare class Points {
      * @param {string} fragmentName name of the variable in the fragment shader
      * @param {Array<number, 2>} size dimensions of the texture, by default screen
      * size
-     * @returns
+     * @returns {Object}
      */
-    setBindingTexture(computeName: string, fragmentName: string, size: Array<number, 2>): {
-        compute: {
-            name: string;
-            shaderType: number;
-        };
-        fragment: {
-            name: string;
-            shaderType: number;
-        };
-        texture: any;
-        size: number[];
-        internal: boolean;
-    };
+    setBindingTexture(computeName: string, fragmentName: string, size: Array<number, 2>): any;
     /**
      * Listen for an event dispatched from WGSL code
      * @param {String} name Number that represents an event Id
@@ -455,9 +444,9 @@ declare class Points {
     /**
      * One time function to call to initialize the shaders.
      * @param {Array<RenderPass>} renderPasses Collection of RenderPass, which contain Vertex, Compute and Fragment shaders.
-     * @returns false | undefined
+     * @returns {Boolean} false | undefined
      */
-    init(renderPasses: Array<RenderPass>): Promise<boolean>;
+    init(renderPasses: Array<RenderPass>): boolean;
     /**
      * Mainly to be used with RenderPasses.js
      * @param {RenderPass} renderPass
