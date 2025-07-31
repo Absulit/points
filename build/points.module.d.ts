@@ -429,9 +429,9 @@ declare class Points {
      */
     addEventListener(name: string, callback: Function, structSize: any): void;
     /**
-     * @private
      * for internal use:
      * to flag add* methods and variables as part of the RenderPasses
+     * @private
      */
     private _setInternal;
     /**

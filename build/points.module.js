@@ -2625,9 +2625,9 @@ class Points {
         ++this.#events_ids;
     }
     /**
-     * @private
      * for internal use:
      * to flag add* methods and variables as part of the RenderPasses
+     * @private
      */
     _setInternal(value) {
         this.#internal = value;

@@ -1,8 +1,19 @@
 {
   "source": {
-    "include": ["src"]
+    "include": [
+      "src"
+    ]
   },
   "opts": {
+    "template": "node_modules/clean-jsdoc-theme",
     "destination": "./apidocs"
+  },
+  "templates": {
+    "default": {
+      "includeDate": false
+    },
+    "cleandoc": {
+      "theme": "dark"
+    }
   }
 }
