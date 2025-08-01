@@ -152,34 +152,7 @@ class Points {
         this.#mouseX = e.clientX - rect.left;
         this.#mouseY = e.clientY - rect.top;
     }
-    /**
-     * @deprecated use setUniform
-     */
-    addUniform(name, value, structName) {
-        if (structName && isArray(structName)) {
-            throw `${structName} is an array, which is currently not supported for Uniforms.`;
-        }
-        if (this.#nameExists(this.#uniforms, name)) {
-            return;
-        }
-        this.#uniforms.push({
-            name: name,
-            value: value,
-            type: structName,
-            size: null,
-            internal: this.#internal
-        });
-    }
-    /**
-     * @deprecated use setUniform
-     */
-    updateUniform(name, value) {
-        const variable = this.#uniforms.find(v => v.name === name);
-        if (!variable) {
-            throw '`updateUniform()` can\'t be called without first `addUniform()`.';
-        }
-        variable.value = value;
-    }
+
     /**
      * Set a param as uniform to send to all shaders.
      * A Uniform is a value that can only be changed
@@ -225,24 +198,7 @@ class Points {
             variable.value = uniform.value;
         })
     }
-    /**
-     * @deprecated use setStorage()
-     */
-    addStorage(name, structName, read, shaderType, arrayData) {
-        if (this.#nameExists(this.#storage, name)) {
-            return;
-        }
-        this.#storage.push({
-            mapped: !!arrayData,
-            name: name,
-            structName: structName,
-            // structSize: null,
-            shaderType: shaderType,
-            read: read,
-            buffer: null,
-            internal: this.#internal
-        });
-    }
+
     /**
      * Creates a persistent memory buffer across every frame call.
      * @param {string} name Name that the Storage will have in the shader
@@ -268,34 +224,7 @@ class Points {
         this.#storage.push(storage);
         return storage;
     }
-    /**
-     * @deprecated
-     */
-    addStorageMap(name, arrayData, structName, read, shaderType) {
-        if (this.#nameExists(this.#storage, name)) {
-            return;
-        }
-        this.#storage.push({
-            mapped: true,
-            name: name,
-            structName: structName,
-            shaderType: shaderType,
-            array: arrayData,
-            buffer: null,
-            read: read,
-            internal: this.#internal
-        });
-    }
-    /**
-     * @deprecated use setStorageMap
-     */
-    updateStorageMap(name, arrayData) {
-        const variable = this.#storage.find(v => v.name === name);
-        if (!variable) {
-            throw '`updateStorageMap()` can\'t be called without first `addStorageMap()`.';
-        }
-        variable.array = arrayData;
-    }
+
     /**
      * Creates a persistent memory buffer across every frame call that can be updated.
      * @param {string} name Name that the Storage will have in the shader.
@@ -363,35 +292,6 @@ class Points {
     }
 
     /**
-     * @deprecated use setSampler
-     */
-
-    addSampler(name, descriptor, shaderType) {
-        if ('sampler' == name) {
-            throw '`name` can not be sampler since is a WebGPU keyword';
-        }
-        if (this.#nameExists(this.#samplers, name)) {
-            return;
-        }
-        // Create a sampler with linear filtering for smooth interpolation.
-        descriptor = descriptor || {
-            addressModeU: 'clamp-to-edge',
-            addressModeV: 'clamp-to-edge',
-            magFilter: 'linear',
-            minFilter: 'linear',
-            mipmapFilter: 'linear',
-            //maxAnisotropy: 10,
-        };
-        this.#samplers.push({
-            name: name,
-            descriptor: descriptor,
-            shaderType: shaderType,
-            resource: null,
-            internal: this.#internal
-        });
-    }
-
-    /**
      * Creates a `sampler` to be sent to the shaders.
      * @param {string} name Name of the `sampler` to be called in the shaders.
      * @param {GPUSamplerDescriptor} descriptor
@@ -401,8 +301,10 @@ class Points {
         if ('sampler' == name) {
             throw 'setSampler: `name` can not be sampler since is a WebGPU keyword.';
         }
-        if (this.#nameExists(this.#samplers, name)) {
-            throw `setSampler: \`${name}\` already exists.`;
+        const exists = this.#nameExists(this.#samplers, name)
+        if (exists) {
+            console.warn(`setSampler: \`${name}\` already exists.`);
+            return exists;
         }
         // Create a sampler with linear filtering for smooth interpolation.
         descriptor = descriptor || {
@@ -424,33 +326,16 @@ class Points {
         return sampler;
     }
 
-
-    /**
-     * @deprecated use setTexture2d
-     */
-
-    addTexture2d(name, copyCurrentTexture, shaderType, renderPassIndex) {
-        if (this.#nameExists(this.#textures2d, name)) {
-            return;
-        }
-        this.#textures2d.push({
-            name: name,
-            copyCurrentTexture: copyCurrentTexture,
-            shaderType: shaderType,
-            texture: null,
-            renderPassIndex: renderPassIndex,
-            internal: this.#internal
-        });
-    }
-
     /**
      * Create a `texture_2d` in the shaders.
      * @param {string} name Name to call the texture in the shaders.
      * @param {boolean} copyCurrentTexture If you want the fragment output to be copied here.
      */
     setTexture2d(name, copyCurrentTexture, shaderType, renderPassIndex) {
-        if (this.#nameExists(this.#textures2d, name)) {
-            throw `setTexture2d: \`${name}\` already exists.`;
+        const exists = this.#nameExists(this.#textures2d, name);
+        if (exists) {
+            console.warn(`setTexture2d: \`${name}\` already exists.`);
+            return exists;
         }
         const texture2d = {
             name: name,

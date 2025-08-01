@@ -6,10 +6,10 @@ const waves = {
     fragmentShader,
     init: async (points, params) => {
         points._setInternal(true);
-        points.addSampler('renderpass_feedbackSampler', null);
-        points.addTexture2d('renderpass_feedbackTexture', true);
-        points.addUniform('waves_scale', params?.scale || .45);
-        points.addUniform('waves_intensity', params?.intensity || .03);
+        points.setSampler('renderpass_feedbackSampler', null);
+        points.setTexture2d('renderpass_feedbackTexture', true);
+        points.setUniform('waves_scale', params?.scale || .45);
+        points.setUniform('waves_intensity', params?.intensity || .03);
         points._setInternal(false);
     },
     update: points => {

@@ -8,7 +8,7 @@ import filmgrain from './core/RenderPasses/filmgrain/index.js';
 import bloom from './core/RenderPasses/bloom/index.js';
 import blur from './core/RenderPasses/blur/index.js';
 import waves from './core/RenderPasses/waves/index.js';
-import Points from './absulit.points.module.js';
+import Points from './points.js';
 import RenderPass from './RenderPass.js';
 
 /**

@@ -18,8 +18,6 @@ fn main(
     @builtin(position) position: vec4<f32>
 ) -> @location(0) vec4<f32> {
 
-
-
     let feedbackColor = blur9(
         renderpass_feedbackTexture,
         renderpass_feedbackSampler,
