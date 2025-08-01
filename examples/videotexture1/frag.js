@@ -1,5 +1,5 @@
-import { fnusin } from 'animation';
-import { textureExternalPosition } from 'image';
+import { fnusin } from 'points/animation';
+import { textureExternalPosition } from 'points/image';
 
 const videotexture1Frag = /*wgsl*/`
 

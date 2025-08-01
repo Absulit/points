@@ -1,3 +1,14 @@
+/**
+ * Utility methods to for the {@link Points#setTextureString | setTextureString()}
+ * @module texture-string
+ * @ignore
+ */
+
+/**
+ * Method to load image with await
+ * @param {String} src
+ * @returns {Promise<void>}
+ */
 export async function loadImage(src) {
     return new Promise((resolve, reject) => {
         const img = new Image();
@@ -9,8 +20,8 @@ export async function loadImage(src) {
 
 /**
  * Returns UTF-16 array of each char
- * @param {String} str
- * @returns {Array<String>}
+ * @param {String} s
+ * @returns {Array<Number>}
  */
 function strToCodes(s) {
     return Array.from(s).map(c => c.charCodeAt(0))
@@ -18,10 +29,10 @@ function strToCodes(s) {
 
 /**
  *
- * @param {Image} atlas Image atlas to parse
+ * @param {HTMLImageElement} atlas Image atlas to parse
  * @param {CanvasRenderingContext2D} ctx Canvas context
  * @param {Number} index index in the atlas, so 0 is the first char
- * @param {Object} size cell dimensions
+ * @param {{x: number, y: number}} size cell dimensions
  * @param {Number} finalIndex final positional index in the canvas
  */
 function sprite(atlas, ctx, index, size, finalIndex) {
@@ -55,7 +66,7 @@ function sprite(atlas, ctx, index, size, finalIndex) {
  * This means `A` is expected at index `65`; if not there,
  * use offset to move backwards (negative) or forward (positive)
  * @param {String} str String used to extract letters from the image
- * @param {Image} atlasImg image with the Atlas to extract letters from
+ * @param {HTMLImageElement} atlasImg image with the Atlas to extract letters from
  * @param {{x: number, y: number}} size width and height in pixels of each letter
  * @param {SignedNumber} offset how many chars is the atlas offset from the UTF-16
  * @returns {string} Base64 image

@@ -1,10 +1,17 @@
 /**
- * @type {Screen}
+ * These are wgsl functions, not js functions.
+ * The function is enclosed in a js string constant,
+ * to be appended into the code to reference it in the string shader.
+ * @module points/debug
+ */
+
+/**
  * Draws an infinite cross.
  * Useful to draw it where the mouse is.
- * @param position
- * @param color
- * @param uv
+ * @type {String}
+ * @param {vec2f} position
+ * @param {vec4f} color
+ * @param {vec2f} uv
  */
 export const showDebugCross = /*wgsl*/`
 fn showDebugCross(position:vec2<f32>, color:vec4<f32>, uv:vec2<f32>) -> vec4<f32>{
@@ -15,10 +22,10 @@ fn showDebugCross(position:vec2<f32>, color:vec4<f32>, uv:vec2<f32>) -> vec4<f32
 `;
 
 /**
- * @type {Screen}
  * Border around the screen
- * @param color
- * @param uv
+ * @type {String}
+ * @param {vec4f} color
+ * @param {vec2f} uv
  */
 export const showDebugFrame = /*wgsl*/`
 fn showDebugFrame(color:vec4<f32>, uv:vec2<f32>) -> vec4<f32> {

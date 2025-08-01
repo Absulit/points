@@ -1,7 +1,7 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
-import ShaderType from 'shadertype';
+import { ShaderType } from 'points';
 
 const options = {
     scale: 1,

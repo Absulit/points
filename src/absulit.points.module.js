@@ -2,6 +2,8 @@
 import UniformKeys from './UniformKeys.js';
 import VertexBufferInfo from './VertexBufferInfo.js';
 import ShaderType from './ShaderType.js';
+import RenderPass from './RenderPass.js';
+import RenderPasses from './RenderPasses.js';
 import Coordinate from './coordinate.js';
 import RGBAColor from './color.js';
 import Clock from './clock.js';
@@ -9,14 +11,20 @@ import defaultStructs from './core/defaultStructs.js';
 import { defaultVertexBody } from './core/defaultFunctions.js';
 import { dataSize, getArrayTypeData, isArray, typeSizes } from './data-size.js';
 import { loadImage, strToImage } from './texture-string.js';
+import LayersArray from './LayersArray.js';
+import UniformsArray from './UniformsArray.js';
 
-export default class Points {
+/**
+ * Main class Points
+ * @class Points
+ */
+class Points {
     #canvasId = null;
     #canvas = null;
     #device = null;
     #context = null;
     #presentationFormat = null;
-    #renderPasses = null
+    #renderPasses = null;
     #postRenderPasses = [];
     #vertexBufferInfo = null;
     #buffer = null;
@@ -28,7 +36,7 @@ export default class Points {
     #numRows = 1;
     #commandsFinished = [];
     #renderPassDescriptor = null;
-    #uniforms = [];
+    #uniforms = new UniformsArray();
     #storage = [];
     #readStorage = [];
     #samplers = [];
@@ -38,7 +46,7 @@ export default class Points {
     #texturesExternal = [];
     #texturesStorage2d = [];
     #bindingTextures = [];
-    #layers = [];
+    #layers = new LayersArray();
     #originalCanvasWidth = null;
     #originalCanvasHeigth = null;
     #clock = new Clock();
@@ -178,7 +186,7 @@ export default class Points {
      * from the outside, and unless changed it remains
      * consistent.
      * @param {string} name name of the Param, you can invoke it later in shaders as `Params.[name]`
-     * @param {Number|Array} value Single number or a list of numbers
+     * @param {Number|Boolean|Array<Number>} value Single number or a list of numbers. Boolean is converted to Number.
      * @param {string} structName type as `f32` or a custom struct. Default `few`
      */
     setUniform(name, value, structName = null) {
@@ -206,7 +214,7 @@ export default class Points {
     }
     /**
      * Update a list of uniforms
-     * @param {Array<Object>} array object array of the type: `{name, value}`
+     * @param {Array<Object>} arr object array of the type: `{name, value}`
      */
     updateUniforms(arr) {
         arr.forEach(uniform => {
@@ -291,13 +299,13 @@ export default class Points {
     /**
      * Creates a persistent memory buffer across every frame call that can be updated.
      * @param {string} name Name that the Storage will have in the shader.
-     * @param {array} arrayData array with the data that must match the struct.
+     * @param {Uint8Array<ArrayBuffer>} arrayData array with the data that must match the struct.
      * @param {string} structName Name of the struct already existing on the
      * shader that will be the array<structName> of the Storage.
      * @param {boolean} read if this is going to be used to read data back.
      * @param {ShaderType} shaderType this tells to what shader the storage is bound
      */
-    setStorageMap(name, arrayData, structName, read, shaderType) {
+    setStorageMap(name, arrayData, structName, read = false, shaderType = null) {
         const storageToUpdate = this.#nameExists(this.#storage, name)
         if (storageToUpdate) {
             storageToUpdate.array = arrayData;
@@ -328,23 +336,7 @@ export default class Points {
         }
         return arrayBufferCopy;
     }
-    /**
-     * @deprecated use setLayers
-     */
-    addLayers(numLayers, shaderType) {
-        for (let layerIndex = 0; layerIndex < numLayers; layerIndex++) {
-            this.#layers.shaderType = shaderType;
-            this.#layers.push({
-                name: `layer${layerIndex}`,
-                size: this.#canvas.width * this.#canvas.height,
-                structName: 'vec4<f32>',
-                structSize: 16,
-                array: null,
-                buffer: null,
-                internal: this.#internal
-            });
-        }
-    }
+
     /**
      * Layers of data made of `vec4f`
      * @param {Number} numLayers
@@ -491,61 +483,13 @@ export default class Points {
         texture2d_B.texture = cubeTexture;
         this.#texturesToCopy.push({ a, b: texture2d_B.texture });
     }
-    /**
-     * @deprecated use setTextureImage
-     */
-    async addTextureImage(name, path, shaderType) {
-        if (this.#nameExists(this.#textures2d, name)) {
-            return;
-        }
-        const response = await fetch(path);
-        const blob = await response.blob();
-        const imageBitmap = await createImageBitmap(blob);
-        this.#textures2d.push({
-            name: name,
-            copyCurrentTexture: false,
-            shaderType: shaderType,
-            texture: null,
-            imageTexture: {
-                bitmap: imageBitmap
-            },
-            internal: this.#internal
-        });
-    }
-    /**
-     * @deprecated use setTextureImage
-     */
-    async updateTextureImage(name, path, shaderType) {
-        if (!this.#nameExists(this.#textures2d, name)) {
-            console.warn('image can not be updated')
-            return;
-        }
-        const response = await fetch(path);
-        const blob = await response.blob();
-        const imageBitmap = await createImageBitmap(blob);
-        const texture2d = this.#textures2d.filter(obj => obj.name == name)[0];
-        texture2d.imageTexture.bitmap = imageBitmap;
-        const cubeTexture = this.#device.createTexture({
-            size: [imageBitmap.width, imageBitmap.height, 1],
-            format: 'rgba8unorm',
-            usage:
-                GPUTextureUsage.TEXTURE_BINDING |
-                GPUTextureUsage.COPY_SRC |
-                GPUTextureUsage.COPY_DST |
-                GPUTextureUsage.RENDER_ATTACHMENT,
-        });
-        this.#device.queue.copyExternalImageToTexture(
-            { source: imageBitmap },
-            { texture: cubeTexture },
-            [imageBitmap.width, imageBitmap.height]
-        );
-        texture2d.texture = cubeTexture;
-    }
+
     /**
      * Load an image as texture_2d
      * @param {string} name
      * @param {string} path
      * @param {ShaderType} shaderType
+     * @returns {Object}
      */
     async setTextureImage(name, path, shaderType = null) {
         const texture2dToUpdate = this.#nameExists(this.#textures2d, name);
@@ -601,9 +545,9 @@ export default class Points {
      * @param {{x: number, y: number}} size size of a individual character e.g.: `{x:10, y:20}`
      * @param {Number} offset how many characters back or forward it must move to start
      * @param {String} shaderType
-     * @returns
+     * @returns {Object}
      */
-    async setTextureString(name, text, path, size, offset = 0, shaderType = null){
+    async setTextureString(name, text, path, size, offset = 0, shaderType = null) {
         const atlas = await loadImage(path);
         const textImg = strToImage(text, atlas, size, offset);
         return this.setTextureImage(name, textImg, shaderType);
@@ -640,27 +584,6 @@ export default class Points {
             internal: this.#internal,
         });
     }
-    /**
-     * @deprecated use setTextureVideo
-     */
-
-    async addTextureVideo(name, path, shaderType) {
-        if (this.#nameExists(this.#texturesExternal, name)) {
-            return;
-        }
-        const video = document.createElement('video');
-        video.loop = true;
-        video.autoplay = true;
-        video.muted = true;
-        video.src = new URL(path, import.meta.url).toString();
-        await video.play();
-        this.#texturesExternal.push({
-            name: name,
-            shaderType: shaderType,
-            video: video,
-            internal: this.#internal
-        });
-    }
 
     /**
      * Load an video as texture2d
@@ -686,36 +609,6 @@ export default class Points {
         };
         this.#texturesExternal.push(textureExternal);
         return textureExternal;
-    }
-
-    /**
-     * @deprecated use setTextureWebcam
-     */
-    async addTextureWebcam(name, shaderType) {
-        if (this.#nameExists(this.#texturesExternal, name)) {
-            return;
-        }
-        const video = document.createElement('video');
-        //video.loop = true;
-        //video.autoplay = true;
-        video.muted = true;
-        //document.body.appendChild(video);
-        if (navigator.mediaDevices.getUserMedia) {
-            await navigator.mediaDevices.getUserMedia({ video: true })
-                .then(async function (stream) {
-                    video.srcObject = stream;
-                    await video.play();
-                })
-                .catch(function (err) {
-                    console.log(err);
-                });
-        }
-        this.#texturesExternal.push({
-            name: name,
-            shaderType: shaderType,
-            video: video,
-            internal: this.#internal
-        });
     }
 
     /**
@@ -753,60 +646,13 @@ export default class Points {
     }
 
     /**
-     * @deprecated use setAudio
-     */
-    addAudio(name, path, volume, loop, autoplay) {
-        const audio = new Audio(path);
-        audio.volume = volume;
-        audio.autoplay = autoplay;
-        audio.loop = loop;
-        const sound = {
-            name: name,
-            path: path,
-            audio: audio,
-            analyser: null,
-            data: null
-        }
-        // this.#audio.play();
-        // audio
-        const audioContext = new AudioContext();
-        let resume = _ => { audioContext.resume() }
-        if (audioContext.state === 'suspended') {
-            document.body.addEventListener('touchend', resume, false);
-            document.body.addEventListener('click', resume, false);
-        }
-        const source = audioContext.createMediaElementSource(audio);
-        // // audioContext.createMediaStreamSource()
-        const analyser = audioContext.createAnalyser();
-        analyser.fftSize = 2048;
-        source.connect(analyser);
-        analyser.connect(audioContext.destination);
-        const bufferLength = analyser.fftSize;//analyser.frequencyBinCount;
-        // const bufferLength = analyser.frequencyBinCount;
-        const data = new Uint8Array(bufferLength);
-        // analyser.getByteTimeDomainData(data);
-        analyser.getByteFrequencyData(data);
-        // storage that will have the data on WGSL
-        this.setStorageMap(name, data,
-            // `array<f32, ${bufferLength}>`
-            'Sound' // custom struct in defaultStructs.js
-        );
-        // uniform that will have the data length as a quick reference
-        this.setUniform(`${name}Length`, analyser.frequencyBinCount);
-        sound.analyser = analyser;
-        sound.data = data;
-        this.#sounds.push(sound);
-        return audio;
-    }
-
-    /**
      * Assigns an audio FrequencyData to a StorageMap
      * @param {string} name name of the Storage and prefix of the length variable e.g. `[name]Length`.
      * @param {string} path
      * @param {Number} volume
      * @param {boolean} loop
      * @param {boolean} autoplay
-     * @returns {Audio}
+     * @returns {HTMLAudioElement}
      */
     setAudio(name, path, volume, loop, autoplay) {
         const audio = new Audio(path);
@@ -867,24 +713,6 @@ export default class Points {
         this.#texturesStorage2d.push(texturesStorage2d);
         return texturesStorage2d;
     }
-    /**
-     * @deprecated use setBindingTexture
-     */
-    addBindingTexture(computeName, fragmentName, size) {
-        this.#bindingTextures.push({
-            compute: {
-                name: computeName,
-                shaderType: ShaderType.COMPUTE
-            },
-            fragment: {
-                name: fragmentName,
-                shaderType: ShaderType.FRAGMENT
-            },
-            texture: null,
-            size: size,
-            internal: this.#internal
-        });
-    }
 
     /**
      * Sets a texture to the compute and fragment shader, in the compute you can
@@ -894,7 +722,7 @@ export default class Points {
      * @param {string} fragmentName name of the variable in the fragment shader
      * @param {Array<number, 2>} size dimensions of the texture, by default screen
      * size
-     * @returns
+     * @returns {Object}
      */
     setBindingTexture(computeName, fragmentName, size) {
         // TODO: validate that names don't exist already
@@ -917,13 +745,13 @@ export default class Points {
 
     /**
      * Listen for an event dispatched from WGSL code
-     * @param {Number} id Number that represents an event Id
+     * @param {String} name Number that represents an event Id
      * @param {Function} callback function to be called when the event occurs
      */
     addEventListener(name, callback, structSize) {
         // TODO: remove structSize
         // this extra 4 is for the boolean flag in the Event struct
-        let data = Array(structSize + 4).fill(0);
+        let data = new Uint8Array(Array(structSize + 4).fill(0));
         this.setStorageMap(name, data, 'Event', true);
         this.#events.set(this.#events_ids,
             {
@@ -935,18 +763,17 @@ export default class Points {
         ++this.#events_ids;
     }
     /**
-     * @private
      * for internal use:
      * to flag add* methods and variables as part of the RenderPasses
+     * @private
      */
     _setInternal(value) {
         this.#internal = value;
     }
     /**
-     * @private
      * @param {ShaderType} shaderType
      * @param {boolean} internal
-     * @returns string with bindings
+     * @returns {String} string with bindings
      */
     #createDynamicGroupBindings(shaderType, internal) {
         // `internal` here is a flag for a custom pass
@@ -1109,7 +936,7 @@ export default class Points {
     /**
      * One time function to call to initialize the shaders.
      * @param {Array<RenderPass>} renderPasses Collection of RenderPass, which contain Vertex, Compute and Fragment shaders.
-     * @returns false | undefined
+     * @returns {Boolean} false | undefined
      */
     async init(renderPasses) {
         this.#renderPasses = renderPasses.concat(this.#postRenderPasses);
@@ -1206,7 +1033,6 @@ export default class Points {
         await this.#createPipeline();
     }
     /**
-     * @private
      * @param {Float32Array} vertexArray
      * @returns buffer
      */
@@ -1215,13 +1041,13 @@ export default class Points {
         this.#buffer = this.#createAndMapBuffer(vertexArray, GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST);
     }
     /**
-     * @private
      * @param {Float32Array} data
      * @param {GPUBufferUsageFlags} usage
      * @param {Boolean} mappedAtCreation
-     * @returns mapped buffer
+     * @param {Number} size
+     * @returns {GPUBuffer} mapped buffer
      */
-    #createAndMapBuffer(data, usage, mappedAtCreation = true, size) {
+    #createAndMapBuffer(data, usage, mappedAtCreation = true, size = null) {
         const buffer = this.#device.createBuffer({
             mappedAtCreation: mappedAtCreation,
             size: size || data.byteLength,
@@ -1233,11 +1059,10 @@ export default class Points {
     }
 
     /**
-     * @private
      * It creates with size, no with data, so it's empty
      * @param {Number} size numItems * instanceByteSize ;
      * @param {GPUBufferUsageFlags} usage
-     * @returns buffer
+     * @returns {GPUBuffer} buffer
      */
     #createBuffer(size, usage) {
         const buffer = this.#device.createBuffer({
@@ -1552,7 +1377,6 @@ export default class Points {
         });
     }
     /**
-     * @private
      * Creates the entries for the pipeline
      * @returns an array with the entries
      */
@@ -1783,7 +1607,7 @@ export default class Points {
         //--------------------------------------------
         this.#delta = this.#clock.getDelta();
         this.#time = this.#clock.time;
-        this.#epoch = new Date() / 1000;
+        this.#epoch = +new Date() / 1000;
         this.setUniform(UniformKeys.TIME, this.#time);
         this.setUniform(UniformKeys.DELTA, this.#delta);
         this.setUniform(UniformKeys.EPOCH, this.#epoch);
@@ -1947,7 +1771,7 @@ export default class Points {
      * @param {Array<RGBAColor>} colors one color per corner
      * @param {Boolean} useTexture
      */
-    addPoint(coordinate, width, height, colors) {
+    addPoint(coordinate, width, height, colors, useTexture = false) {
         const { x, y, z } = coordinate;
         const nx = this.#getWGSLCoordinate(x, this.#canvas.width);
         const ny = this.#getWGSLCoordinate(y, this.#canvas.height, true);
@@ -2014,3 +1838,6 @@ export default class Points {
         }
     }
 }
+
+export default Points;
+export { ShaderType, RenderPass, RenderPasses };

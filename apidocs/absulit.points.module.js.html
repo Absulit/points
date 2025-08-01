@@ -1,0 +1,1845 @@
+<!DOCTYPE html><html lang="en" style="font-size:16px"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Source: absulit.points.module.js</title><!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]--><script src="scripts/third-party/hljs.js" defer="defer"></script><script src="scripts/third-party/hljs-line-num.js" defer="defer"></script><script src="scripts/third-party/popper.js" defer="defer"></script><script src="scripts/third-party/tippy.js" defer="defer"></script><script src="scripts/third-party/tocbot.min.js"></script><script>var baseURL="/",locationPathname="";baseURL=(locationPathname=document.location.pathname).substr(0,locationPathname.lastIndexOf("/")+1)</script><link rel="stylesheet" href="styles/clean-jsdoc-theme.min.css"><svg aria-hidden="true" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="display:none"><defs><symbol id="copy-icon" viewbox="0 0 488.3 488.3"><g><path d="M314.25,85.4h-227c-21.3,0-38.6,17.3-38.6,38.6v325.7c0,21.3,17.3,38.6,38.6,38.6h227c21.3,0,38.6-17.3,38.6-38.6V124    C352.75,102.7,335.45,85.4,314.25,85.4z M325.75,449.6c0,6.4-5.2,11.6-11.6,11.6h-227c-6.4,0-11.6-5.2-11.6-11.6V124    c0-6.4,5.2-11.6,11.6-11.6h227c6.4,0,11.6,5.2,11.6,11.6V449.6z"/><path d="M401.05,0h-227c-21.3,0-38.6,17.3-38.6,38.6c0,7.5,6,13.5,13.5,13.5s13.5-6,13.5-13.5c0-6.4,5.2-11.6,11.6-11.6h227    c6.4,0,11.6,5.2,11.6,11.6v325.7c0,6.4-5.2,11.6-11.6,11.6c-7.5,0-13.5,6-13.5,13.5s6,13.5,13.5,13.5c21.3,0,38.6-17.3,38.6-38.6    V38.6C439.65,17.3,422.35,0,401.05,0z"/></g></symbol><symbol id="search-icon" viewBox="0 0 512 512"><g><g><path d="M225.474,0C101.151,0,0,101.151,0,225.474c0,124.33,101.151,225.474,225.474,225.474    c124.33,0,225.474-101.144,225.474-225.474C450.948,101.151,349.804,0,225.474,0z M225.474,409.323    c-101.373,0-183.848-82.475-183.848-183.848S124.101,41.626,225.474,41.626s183.848,82.475,183.848,183.848    S326.847,409.323,225.474,409.323z"/></g></g><g><g><path d="M505.902,476.472L386.574,357.144c-8.131-8.131-21.299-8.131-29.43,0c-8.131,8.124-8.131,21.306,0,29.43l119.328,119.328    c4.065,4.065,9.387,6.098,14.715,6.098c5.321,0,10.649-2.033,14.715-6.098C514.033,497.778,514.033,484.596,505.902,476.472z"/></g></g></symbol><symbol id="font-size-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M11.246 15H4.754l-2 5H.6L7 4h2l6.4 16h-2.154l-2-5zm-.8-2L8 6.885 5.554 13h4.892zM21 12.535V12h2v8h-2v-.535a4 4 0 1 1 0-6.93zM19 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></symbol><symbol id="add-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z"/></symbol><symbol id="minus-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M5 11h14v2H5z"/></symbol><symbol id="dark-theme-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M10 7a7 7 0 0 0 12 4.9v.1c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2h.1A6.979 6.979 0 0 0 10 7zm-6 5a8 8 0 0 0 15.062 3.762A9 9 0 0 1 8.238 4.938 7.999 7.999 0 0 0 4 12z"/></symbol><symbol id="light-theme-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12zm0-2a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM11 1h2v3h-2V1zm0 19h2v3h-2v-3zM3.515 4.929l1.414-1.414L7.05 5.636 5.636 7.05 3.515 4.93zM16.95 18.364l1.414-1.414 2.121 2.121-1.414 1.414-2.121-2.121zm2.121-14.85l1.414 1.415-2.121 2.121-1.414-1.414 2.121-2.121zM5.636 16.95l1.414 1.414-2.121 2.121-1.414-1.414 2.121-2.121zM23 11v2h-3v-2h3zM4 11v2H1v-2h3z"/></symbol><symbol id="reset-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M18.537 19.567A9.961 9.961 0 0 1 12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10c0 2.136-.67 4.116-1.81 5.74L17 12h3a8 8 0 1 0-2.46 5.772l.997 1.795z"/></symbol><symbol id="down-icon" viewBox="0 0 16 16"><path fill-rule="evenodd" clip-rule="evenodd" d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z"></path></symbol><symbol id="codepen-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M16.5 13.202L13 15.535v3.596L19.197 15 16.5 13.202zM14.697 12L12 10.202 9.303 12 12 13.798 14.697 12zM20 10.869L18.303 12 20 13.131V10.87zM19.197 9L13 4.869v3.596l3.5 2.333L19.197 9zM7.5 10.798L11 8.465V4.869L4.803 9 7.5 10.798zM4.803 15L11 19.131v-3.596l-3.5-2.333L4.803 15zM4 13.131L5.697 12 4 10.869v2.262zM2 9a1 1 0 0 1 .445-.832l9-6a1 1 0 0 1 1.11 0l9 6A1 1 0 0 1 22 9v6a1 1 0 0 1-.445.832l-9 6a1 1 0 0 1-1.11 0l-9-6A1 1 0 0 1 2 15V9z"/></symbol><symbol id="close-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z"/></symbol><symbol id="menu-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z"/></symbol></defs></svg></head><body data-theme="dark"><div class="sidebar-container"><div class="sidebar" id="sidebar"><div class="sidebar-items-container"><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-modules"><div>Modules</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="module-defaultFunctions.html">defaultFunctions</a></div><div class="sidebar-section-children"><a href="module-points_animation.html">points/animation</a></div><div class="sidebar-section-children"><a href="module-points_audio.html">points/audio</a></div><div class="sidebar-section-children"><a href="module-points_cellular2d.html">points/cellular2d</a></div><div class="sidebar-section-children"><a href="module-points_classicnoise2d.html">points/classicnoise2d</a></div><div class="sidebar-section-children"><a href="module-points_color.html">points/color</a></div><div class="sidebar-section-children"><a href="module-points_debug.html">points/debug</a></div><div class="sidebar-section-children"><a href="module-points_effects.html">points/effects</a></div><div class="sidebar-section-children"><a href="module-points_image.html">points/image</a></div><div class="sidebar-section-children"><a href="module-points_math.html">points/math</a></div><div class="sidebar-section-children"><a href="module-points_noise2d.html">points/noise2d</a></div><div class="sidebar-section-children"><a href="module-points_random.html">points/random</a></div><div class="sidebar-section-children"><a href="module-points_sdf.html">points/sdf</a></div><div class="sidebar-section-children"><a href="module-points_valuenoise.html">points/valuenoise</a></div><div class="sidebar-section-children"><a href="module-points_voronoi.html">points/voronoi</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-classes"><div>Classes</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="CanvasRecorder.html">CanvasRecorder</a></div><div class="sidebar-section-children"><a href="Points.html">Points</a></div><div class="sidebar-section-children"><a href="RenderPass.html">RenderPass</a></div><div class="sidebar-section-children"><a href="RenderPasses.html">RenderPasses</a></div><div class="sidebar-section-children"><a href="ShaderType.html">ShaderType</a></div><div class="sidebar-section-children"><a href="VertexBufferInfo.html">VertexBufferInfo</a></div></div></div></div></div><div class="navbar-container" id="VuAckcnZhf"><nav class="navbar"><div class="navbar-left-items"></div><div class="navbar-right-items"><div class="navbar-right-item"><button class="icon-button search-button" aria-label="open-search"><svg><use xlink:href="#search-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button theme-toggle" aria-label="toggle-theme"><svg><use class="theme-svg-use" xlink:href="#light-theme-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button font-size" aria-label="change-font-size"><svg><use xlink:href="#font-size-icon"></use></svg></button></div></div><nav></nav></nav></div><div class="toc-container"><div class="toc-content"><span class="bold">On this page</span><div id="eed4d2a0bfd64539bb9df78095dec881"></div></div></div><div class="body-wrapper"><div class="main-content"><div class="main-wrapper"><section id="source-page" class="source-page"><header><h1 id="title" class="has-anchor">absulit.points.module.js</h1></header><article><pre class="prettyprint source lang-js"><code>'use strict';
+import UniformKeys from './UniformKeys.js';
+import VertexBufferInfo from './VertexBufferInfo.js';
+import ShaderType from './ShaderType.js';
+import RenderPass from './RenderPass.js';
+import RenderPasses from './RenderPasses.js';
+import Coordinate from './coordinate.js';
+import RGBAColor from './color.js';
+import Clock from './clock.js';
+import defaultStructs from './core/defaultStructs.js';
+import { defaultVertexBody } from './core/defaultFunctions.js';
+import { dataSize, getArrayTypeData, isArray, typeSizes } from './data-size.js';
+import { loadImage, strToImage } from './texture-string.js';
+import LayersArray from './LayersArray.js';
+import UniformsArray from './UniformsArray.js';
+
+/**
+ * Main class Points
+ * @class Points
+ */
+class Points {
+    #canvasId = null;
+    #canvas = null;
+    #device = null;
+    #context = null;
+    #presentationFormat = null;
+    #renderPasses = null;
+    #postRenderPasses = [];
+    #vertexBufferInfo = null;
+    #buffer = null;
+    #internal = false;
+    #presentationSize = null;
+    #depthTexture = null;
+    #vertexArray = [];
+    #numColumns = 1;
+    #numRows = 1;
+    #commandsFinished = [];
+    #renderPassDescriptor = null;
+    #uniforms = new UniformsArray();
+    #storage = [];
+    #readStorage = [];
+    #samplers = [];
+    #textures2d = [];
+    #texturesToCopy = [];
+    #textures2dArray = [];
+    #texturesExternal = [];
+    #texturesStorage2d = [];
+    #bindingTextures = [];
+    #layers = new LayersArray();
+    #originalCanvasWidth = null;
+    #originalCanvasHeigth = null;
+    #clock = new Clock();
+    #time = 0;
+    #delta = 0;
+    #epoch = 0;
+    #mouseX = 0;
+    #mouseY = 0;
+    #mouseDown = false;
+    #mouseClick = false;
+    #mouseWheel = false;
+    #mouseDelta = [0, 0];
+    #fullscreen = false;
+    #fitWindow = false;
+    #lastFitWindow = false;
+    #sounds = []; // audio
+    #events = new Map();
+    #events_ids = 0;
+    #dataSize = null;
+
+    constructor(canvasId) {
+        this.#canvasId = canvasId;
+        this.#canvas = document.getElementById(this.#canvasId);
+        if (this.#canvasId) {
+            this.#canvas.addEventListener('click', e => {
+                this.#mouseClick = true;
+            });
+            this.#canvas.addEventListener('mousemove', this.#onMouseMove, { passive: true });
+            this.#canvas.addEventListener('mousedown', e => {
+                this.#mouseDown = true;
+            });
+            this.#canvas.addEventListener('mouseup', e => {
+                this.#mouseDown = false;
+            });
+            this.#canvas.addEventListener('wheel', e => {
+                this.#mouseWheel = true;
+                this.#mouseDelta = [e.deltaX, e.deltaY];
+            }, { passive: true });
+            this.#originalCanvasWidth = this.#canvas.clientWidth;
+            this.#originalCanvasHeigth = this.#canvas.clientHeight;
+            window.addEventListener('resize', this.#resizeCanvasToFitWindow, false);
+            document.addEventListener("fullscreenchange", e => {
+                this.#fullscreen = !!document.fullscreenElement;
+                if (!this.#fullscreen &amp;&amp; !this.#fitWindow) {
+                    this.#resizeCanvasToDefault();
+                }
+                if (!this.#fullscreen) {
+                    this.fitWindow = this.#lastFitWindow;
+                }
+            });
+        }
+    }
+
+    #resizeCanvasToFitWindow = () => {
+        if (this.#fitWindow) {
+            const { offsetWidth, offsetHeight } = this.#canvas.parentNode;
+            this.#canvas.width = offsetWidth;
+            this.#canvas.height = offsetHeight;
+            this.#setScreenSize();
+        }
+    }
+
+    #resizeCanvasToDefault = () => {
+        this.#canvas.width = this.#originalCanvasWidth;
+        this.#canvas.height = this.#originalCanvasHeigth;
+        this.#setScreenSize();
+    }
+
+    #setScreenSize = () => {
+        this.#presentationSize = [
+            this.#canvas.clientWidth,
+            this.#canvas.clientHeight,
+        ];
+        this.#context.configure({
+            device: this.#device,
+            format: this.#presentationFormat,
+            //size: this.#presentationSize,
+            width: this.#canvas.clientWidth,
+            height: this.#canvas.clientHeight,
+            alphaMode: 'premultiplied',
+            // Specify we want both RENDER_ATTACHMENT and COPY_SRC since we
+            // will copy out of the swapchain texture.
+            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
+        });
+        this.#depthTexture = this.#device.createTexture({
+            size: this.#presentationSize,
+            format: 'depth24plus',
+            usage: GPUTextureUsage.RENDER_ATTACHMENT,
+        });
+        // this is to solve an issue that requires the texture to be resized
+        // if the screen dimensions change, this for a `addTexture2d` with
+        // `copyCurrentTexture` parameter set to `true`.
+        this.#textures2d.forEach(texture2d => {
+            if (!texture2d.imageTexture &amp;&amp; texture2d.texture) {
+                this.#createTextureBindingToCopy(texture2d);
+            }
+        })
+    }
+
+    #onMouseMove = e => {
+        // get position relative to canvas
+        const rect = this.#canvas.getBoundingClientRect();
+        this.#mouseX = e.clientX - rect.left;
+        this.#mouseY = e.clientY - rect.top;
+    }
+    /**
+     * @deprecated use setUniform
+     */
+    addUniform(name, value, structName) {
+        if (structName &amp;&amp; isArray(structName)) {
+            throw `${structName} is an array, which is currently not supported for Uniforms.`;
+        }
+        if (this.#nameExists(this.#uniforms, name)) {
+            return;
+        }
+        this.#uniforms.push({
+            name: name,
+            value: value,
+            type: structName,
+            size: null,
+            internal: this.#internal
+        });
+    }
+    /**
+     * @deprecated use setUniform
+     */
+    updateUniform(name, value) {
+        const variable = this.#uniforms.find(v => v.name === name);
+        if (!variable) {
+            throw '`updateUniform()` can\'t be called without first `addUniform()`.';
+        }
+        variable.value = value;
+    }
+    /**
+     * Set a param as uniform to send to all shaders.
+     * A Uniform is a value that can only be changed
+     * from the outside, and unless changed it remains
+     * consistent.
+     * @param {string} name name of the Param, you can invoke it later in shaders as `Params.[name]`
+     * @param {Number|Boolean|Array&lt;Number>} value Single number or a list of numbers. Boolean is converted to Number.
+     * @param {string} structName type as `f32` or a custom struct. Default `few`
+     */
+    setUniform(name, value, structName = null) {
+        let uniformToUpdate = this.#nameExists(this.#uniforms, name);
+        if (uniformToUpdate &amp;&amp; structName) {
+            //if name exists is an update
+            throw '`setUniform()` can\'t set the structName of an already defined uniform.';
+        }
+        if (uniformToUpdate) {
+            uniformToUpdate.value = value;
+            return;
+        }
+        if (structName &amp;&amp; isArray(structName)) {
+            throw `${structName} is an array, which is currently not supported for Uniforms.`;
+        }
+        const uniform = {
+            name: name,
+            value: value,
+            type: structName,
+            size: null,
+            internal: this.#internal
+        }
+        this.#uniforms.push(uniform);
+        return uniform;
+    }
+    /**
+     * Update a list of uniforms
+     * @param {Array&lt;Object>} arr object array of the type: `{name, value}`
+     */
+    updateUniforms(arr) {
+        arr.forEach(uniform => {
+            const variable = this.#uniforms.find(v => v.name === uniform.name);
+            if (!variable) {
+                throw '`updateUniform()` can\'t be called without first `addUniform()`.';
+            }
+            variable.value = uniform.value;
+        })
+    }
+    /**
+     * @deprecated use setStorage()
+     */
+    addStorage(name, structName, read, shaderType, arrayData) {
+        if (this.#nameExists(this.#storage, name)) {
+            return;
+        }
+        this.#storage.push({
+            mapped: !!arrayData,
+            name: name,
+            structName: structName,
+            // structSize: null,
+            shaderType: shaderType,
+            read: read,
+            buffer: null,
+            internal: this.#internal
+        });
+    }
+    /**
+     * Creates a persistent memory buffer across every frame call.
+     * @param {string} name Name that the Storage will have in the shader
+     * @param {string} structName Name of the struct already existing on the
+     * shader that will be the array&lt;structName> of the Storage
+     * @param {boolean} read if this is going to be used to read data back
+     * @param {ShaderType} shaderType this tells to what shader the storage is bound
+     */
+    setStorage(name, structName, read, shaderType, arrayData) {
+        if (this.#nameExists(this.#storage, name)) {
+            throw `\`setStorage()\` You have already defined \`${name}\``;
+        }
+        const storage = {
+            mapped: !!arrayData,
+            name: name,
+            structName: structName,
+            // structSize: null,
+            shaderType: shaderType,
+            read: read,
+            buffer: null,
+            internal: this.#internal
+        }
+        this.#storage.push(storage);
+        return storage;
+    }
+    /**
+     * @deprecated
+     */
+    addStorageMap(name, arrayData, structName, read, shaderType) {
+        if (this.#nameExists(this.#storage, name)) {
+            return;
+        }
+        this.#storage.push({
+            mapped: true,
+            name: name,
+            structName: structName,
+            shaderType: shaderType,
+            array: arrayData,
+            buffer: null,
+            read: read,
+            internal: this.#internal
+        });
+    }
+    /**
+     * @deprecated use setStorageMap
+     */
+    updateStorageMap(name, arrayData) {
+        const variable = this.#storage.find(v => v.name === name);
+        if (!variable) {
+            throw '`updateStorageMap()` can\'t be called without first `addStorageMap()`.';
+        }
+        variable.array = arrayData;
+    }
+    /**
+     * Creates a persistent memory buffer across every frame call that can be updated.
+     * @param {string} name Name that the Storage will have in the shader.
+     * @param {Uint8Array&lt;ArrayBuffer>} arrayData array with the data that must match the struct.
+     * @param {string} structName Name of the struct already existing on the
+     * shader that will be the array&lt;structName> of the Storage.
+     * @param {boolean} read if this is going to be used to read data back.
+     * @param {ShaderType} shaderType this tells to what shader the storage is bound
+     */
+    setStorageMap(name, arrayData, structName, read = false, shaderType = null) {
+        const storageToUpdate = this.#nameExists(this.#storage, name)
+        if (storageToUpdate) {
+            storageToUpdate.array = arrayData;
+            return storageToUpdate;
+        }
+        const storage = {
+            mapped: true,
+            name: name,
+            structName: structName,
+            shaderType: shaderType,
+            array: arrayData,
+            buffer: null,
+            read: read,
+            internal: this.#internal
+        }
+        this.#storage.push(storage);
+        return storage;
+    }
+    async readStorage(name) {
+        let storageItem = this.#readStorage.find(storageItem => storageItem.name === name);
+        let arrayBuffer = null;
+        let arrayBufferCopy = null;
+        if (storageItem) {
+            await storageItem.buffer.mapAsync(GPUMapMode.READ);
+            arrayBuffer = storageItem.buffer.getMappedRange();
+            arrayBufferCopy = new Float32Array(arrayBuffer.slice(0));
+            storageItem.buffer.unmap();
+        }
+        return arrayBufferCopy;
+    }
+
+    /**
+     * Layers of data made of `vec4f`
+     * @param {Number} numLayers
+     * @param {ShaderType} shaderType
+     */
+    setLayers(numLayers, shaderType) {
+        // TODO: check what data to return
+        for (let layerIndex = 0; layerIndex &lt; numLayers; layerIndex++) {
+            this.#layers.shaderType = shaderType;
+            this.#layers.push({
+                name: `layer${layerIndex}`,
+                size: this.#canvas.width * this.#canvas.height,
+                structName: 'vec4&lt;f32>',
+                structSize: 16,
+                array: null,
+                buffer: null,
+                internal: this.#internal
+            });
+        }
+    }
+
+    #nameExists(arrayOfObjects, name) {
+        return arrayOfObjects.find(obj => obj.name == name);
+    }
+
+    /**
+     * @deprecated use setSampler
+     */
+
+    addSampler(name, descriptor, shaderType) {
+        if ('sampler' == name) {
+            throw '`name` can not be sampler since is a WebGPU keyword';
+        }
+        if (this.#nameExists(this.#samplers, name)) {
+            return;
+        }
+        // Create a sampler with linear filtering for smooth interpolation.
+        descriptor = descriptor || {
+            addressModeU: 'clamp-to-edge',
+            addressModeV: 'clamp-to-edge',
+            magFilter: 'linear',
+            minFilter: 'linear',
+            mipmapFilter: 'linear',
+            //maxAnisotropy: 10,
+        };
+        this.#samplers.push({
+            name: name,
+            descriptor: descriptor,
+            shaderType: shaderType,
+            resource: null,
+            internal: this.#internal
+        });
+    }
+
+    /**
+     * Creates a `sampler` to be sent to the shaders.
+     * @param {string} name Name of the `sampler` to be called in the shaders.
+     * @param {GPUSamplerDescriptor} descriptor
+     */
+
+    setSampler(name, descriptor, shaderType) {
+        if ('sampler' == name) {
+            throw 'setSampler: `name` can not be sampler since is a WebGPU keyword.';
+        }
+        if (this.#nameExists(this.#samplers, name)) {
+            throw `setSampler: \`${name}\` already exists.`;
+        }
+        // Create a sampler with linear filtering for smooth interpolation.
+        descriptor = descriptor || {
+            addressModeU: 'clamp-to-edge',
+            addressModeV: 'clamp-to-edge',
+            magFilter: 'linear',
+            minFilter: 'linear',
+            mipmapFilter: 'linear',
+            //maxAnisotropy: 10,
+        };
+        const sampler = {
+            name: name,
+            descriptor: descriptor,
+            shaderType: shaderType,
+            resource: null,
+            internal: this.#internal
+        };
+        this.#samplers.push(sampler);
+        return sampler;
+    }
+
+
+    /**
+     * @deprecated use setTexture2d
+     */
+
+    addTexture2d(name, copyCurrentTexture, shaderType, renderPassIndex) {
+        if (this.#nameExists(this.#textures2d, name)) {
+            return;
+        }
+        this.#textures2d.push({
+            name: name,
+            copyCurrentTexture: copyCurrentTexture,
+            shaderType: shaderType,
+            texture: null,
+            renderPassIndex: renderPassIndex,
+            internal: this.#internal
+        });
+    }
+
+    /**
+     * Create a `texture_2d` in the shaders.
+     * @param {string} name Name to call the texture in the shaders.
+     * @param {boolean} copyCurrentTexture If you want the fragment output to be copied here.
+     */
+    setTexture2d(name, copyCurrentTexture, shaderType, renderPassIndex) {
+        if (this.#nameExists(this.#textures2d, name)) {
+            throw `setTexture2d: \`${name}\` already exists.`;
+        }
+        const texture2d = {
+            name: name,
+            copyCurrentTexture: copyCurrentTexture,
+            shaderType: shaderType,
+            texture: null,
+            renderPassIndex: renderPassIndex,
+            internal: this.#internal
+        }
+        this.#textures2d.push(texture2d);
+        return texture2d;
+    }
+
+
+    copyTexture(nameTextureA, nameTextureB) {
+        const texture2d_A = this.#nameExists(this.#textures2d, nameTextureA);
+        const texture2d_B = this.#nameExists(this.#textures2d, nameTextureB);
+        if (!(texture2d_A &amp;&amp; texture2d_B)) {
+            console.error('One of the textures does not exist.');
+        }
+        const a = texture2d_A.texture;
+        const cubeTexture = this.#device.createTexture({
+            size: [a.width, a.height, 1],
+            format: 'rgba8unorm',
+            usage:
+                GPUTextureUsage.TEXTURE_BINDING |
+                GPUTextureUsage.COPY_DST |
+                GPUTextureUsage.RENDER_ATTACHMENT,
+        });
+        texture2d_B.texture = cubeTexture;
+        this.#texturesToCopy.push({ a, b: texture2d_B.texture });
+    }
+
+    /**
+     * Load an image as texture_2d
+     * @param {string} name
+     * @param {string} path
+     * @param {ShaderType} shaderType
+     * @returns {Object}
+     */
+    async setTextureImage(name, path, shaderType = null) {
+        const texture2dToUpdate = this.#nameExists(this.#textures2d, name);
+        const response = await fetch(path);
+        const blob = await response.blob();
+        const imageBitmap = await createImageBitmap(blob);
+        if (texture2dToUpdate) {
+            if (shaderType) {
+                throw '`setTextureImage()` the param `shaderType` should not be updated after its creation.';
+            }
+            texture2dToUpdate.imageTexture.bitmap = imageBitmap;
+            const cubeTexture = this.#device.createTexture({
+                size: [imageBitmap.width, imageBitmap.height, 1],
+                format: 'rgba8unorm',
+                usage:
+                    GPUTextureUsage.TEXTURE_BINDING |
+                    GPUTextureUsage.COPY_SRC |
+                    GPUTextureUsage.COPY_DST |
+                    GPUTextureUsage.RENDER_ATTACHMENT,
+            });
+            this.#device.queue.copyExternalImageToTexture(
+                { source: imageBitmap },
+                { texture: cubeTexture },
+                [imageBitmap.width, imageBitmap.height]
+            );
+            texture2dToUpdate.texture = cubeTexture;
+            return texture2dToUpdate;
+        }
+        const texture2d = {
+            name: name,
+            copyCurrentTexture: false,
+            shaderType: shaderType,
+            texture: null,
+            imageTexture: {
+                bitmap: imageBitmap
+            },
+            internal: this.#internal
+        }
+        this.#textures2d.push(texture2d);
+        return texture2d;
+    }
+
+    /**
+     * Loads a text string as a texture.
+     * Using an Atlas or a Spritesheet with UTF-16 chars (`path`) it will create a new texture
+     * that contains only the `text` characters.
+     * Characters in the atlas `path` must be in order of the UTF-16 chars.
+     * It can have missing characters at the end or at the start, so the `offset` is added to take account for those chars.
+     * For example, `A` is 65, but if one character is removed before the letter `A`, then offset is -1
+     * @param {String} name id of the wgsl variable in the shader
+     * @param {String} text text you want to load as texture
+     * @param {String} path atlas to grab characters from
+     * @param {{x: number, y: number}} size size of a individual character e.g.: `{x:10, y:20}`
+     * @param {Number} offset how many characters back or forward it must move to start
+     * @param {String} shaderType
+     * @returns {Object}
+     */
+    async setTextureString(name, text, path, size, offset = 0, shaderType = null) {
+        const atlas = await loadImage(path);
+        const textImg = strToImage(text, atlas, size, offset);
+        return this.setTextureImage(name, textImg, shaderType);
+    }
+
+    /**
+     * Load images as texture_2d_array
+     * @param {string} name
+     * @param {Array} paths
+     * @param {ShaderType} shaderType
+     */
+    // TODO: verify if this can be updated after creation
+    // TODO: return texture2dArray object
+    async setTextureImageArray(name, paths, shaderType) {
+        if (this.#nameExists(this.#textures2dArray, name)) {
+            // TODO: throw exception here
+            return;
+        }
+        const imageBitmaps = [];
+        for await (const path of paths) {
+            console.log(path);
+            const response = await fetch(path);
+            const blob = await response.blob();
+            imageBitmaps.push(await createImageBitmap(blob));
+        }
+        this.#textures2dArray.push({
+            name: name,
+            copyCurrentTexture: false,
+            shaderType: shaderType,
+            texture: null,
+            imageTextures: {
+                bitmaps: imageBitmaps
+            },
+            internal: this.#internal,
+        });
+    }
+
+    /**
+     * Load an video as texture2d
+     * @param {string} name
+     * @param {string} path
+     * @param {ShaderType} shaderType
+     */
+    async setTextureVideo(name, path, shaderType) {
+        if (this.#nameExists(this.#texturesExternal, name)) {
+            throw `setTextureVideo: ${name} already exists.`;
+        }
+        const video = document.createElement('video');
+        video.loop = true;
+        video.autoplay = true;
+        video.muted = true;
+        video.src = new URL(path, import.meta.url).toString();
+        await video.play();
+        const textureExternal = {
+            name: name,
+            shaderType: shaderType,
+            video: video,
+            internal: this.#internal
+        };
+        this.#texturesExternal.push(textureExternal);
+        return textureExternal;
+    }
+
+    /**
+     * Load webcam as texture2d
+     * @param {string} name
+     * @param {ShaderType} shaderType
+     */
+    async setTextureWebcam(name, shaderType) {
+        if (this.#nameExists(this.#texturesExternal, name)) {
+            throw `setTextureWebcam: ${name} already exists.`;
+        }
+        const video = document.createElement('video');
+        //video.loop = true;
+        //video.autoplay = true;
+        video.muted = true;
+        //document.body.appendChild(video);
+        if (navigator.mediaDevices.getUserMedia) {
+            await navigator.mediaDevices.getUserMedia({ video: true })
+                .then(async function (stream) {
+                    video.srcObject = stream;
+                    await video.play();
+                })
+                .catch(function (err) {
+                    console.log(err);
+                });
+        }
+        const textureExternal = {
+            name: name,
+            shaderType: shaderType,
+            video: video,
+            internal: this.#internal
+        };
+        this.#texturesExternal.push(textureExternal);
+        return textureExternal;
+    }
+
+    /**
+     * Assigns an audio FrequencyData to a StorageMap
+     * @param {string} name name of the Storage and prefix of the length variable e.g. `[name]Length`.
+     * @param {string} path
+     * @param {Number} volume
+     * @param {boolean} loop
+     * @param {boolean} autoplay
+     * @returns {HTMLAudioElement}
+     */
+    setAudio(name, path, volume, loop, autoplay) {
+        const audio = new Audio(path);
+        audio.volume = volume;
+        audio.autoplay = autoplay;
+        audio.loop = loop;
+        const sound = {
+            name: name,
+            path: path,
+            audio: audio,
+            analyser: null,
+            data: null
+        }
+        // this.#audio.play();
+        // audio
+        const audioContext = new AudioContext();
+        let resume = _ => { audioContext.resume() }
+        if (audioContext.state === 'suspended') {
+            document.body.addEventListener('touchend', resume, false);
+            document.body.addEventListener('click', resume, false);
+        }
+        const source = audioContext.createMediaElementSource(audio);
+        // // audioContext.createMediaStreamSource()
+        const analyser = audioContext.createAnalyser();
+        analyser.fftSize = 2048;
+        source.connect(analyser);
+        analyser.connect(audioContext.destination);
+        const bufferLength = analyser.fftSize;//analyser.frequencyBinCount;
+        // const bufferLength = analyser.frequencyBinCount;
+        const data = new Uint8Array(bufferLength);
+        // analyser.getByteTimeDomainData(data);
+        analyser.getByteFrequencyData(data);
+        // storage that will have the data on WGSL
+        this.setStorageMap(name, data,
+            // `array&lt;f32, ${bufferLength}>`
+            'Sound' // custom struct in defaultStructs.js
+        );
+        // uniform that will have the data length as a quick reference
+        this.setUniform(`${name}Length`, analyser.frequencyBinCount);
+        sound.analyser = analyser;
+        sound.data = data;
+        this.#sounds.push(sound);
+        return audio;
+    }
+
+
+    // TODO: verify this method
+    setTextureStorage2d(name, shaderType) {
+        if (this.#nameExists(this.#texturesStorage2d, name)) {
+            throw `setTextureStorage2d: ${name} already exists.`
+        }
+        const texturesStorage2d = {
+            name: name,
+            shaderType: shaderType,
+            texture: null,
+            internal: this.#internal
+        };
+        this.#texturesStorage2d.push(texturesStorage2d);
+        return texturesStorage2d;
+    }
+
+    /**
+     * Sets a texture to the compute and fragment shader, in the compute you can
+     * write to the texture, and in the fragment you can read the texture, so is
+     * a one way communication method.
+     * @param {string} computeName name of the variable in the compute shader
+     * @param {string} fragmentName name of the variable in the fragment shader
+     * @param {Array&lt;number, 2>} size dimensions of the texture, by default screen
+     * size
+     * @returns {Object}
+     */
+    setBindingTexture(computeName, fragmentName, size) {
+        // TODO: validate that names don't exist already
+        const bindingTexture = {
+            compute: {
+                name: computeName,
+                shaderType: ShaderType.COMPUTE
+            },
+            fragment: {
+                name: fragmentName,
+                shaderType: ShaderType.FRAGMENT
+            },
+            texture: null,
+            size: size,
+            internal: this.#internal
+        }
+        this.#bindingTextures.push(bindingTexture);
+        return bindingTexture;
+    }
+
+    /**
+     * Listen for an event dispatched from WGSL code
+     * @param {String} name Number that represents an event Id
+     * @param {Function} callback function to be called when the event occurs
+     */
+    addEventListener(name, callback, structSize) {
+        // TODO: remove structSize
+        // this extra 4 is for the boolean flag in the Event struct
+        let data = new Uint8Array(Array(structSize + 4).fill(0));
+        this.setStorageMap(name, data, 'Event', true);
+        this.#events.set(this.#events_ids,
+            {
+                id: this.#events_ids,
+                name: name,
+                callback: callback,
+            }
+        );
+        ++this.#events_ids;
+    }
+    /**
+     * for internal use:
+     * to flag add* methods and variables as part of the RenderPasses
+     * @private
+     */
+    _setInternal(value) {
+        this.#internal = value;
+    }
+    /**
+     * @param {ShaderType} shaderType
+     * @param {boolean} internal
+     * @returns {String} string with bindings
+     */
+    #createDynamicGroupBindings(shaderType, internal) {
+        // `internal` here is a flag for a custom pass
+        internal = internal || false;
+        if (!shaderType) {
+            throw '`ShaderType` is required';
+        }
+        const groupId = 0;
+        let dynamicGroupBindings = '';
+        let bindingIndex = 0;
+        if (this.#uniforms.length) {
+            dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var &lt;uniform> params: Params;\n`;
+            bindingIndex += 1;
+        }
+        this.#storage.forEach(storageItem => {
+            let internalCheck = internal == storageItem.internal;
+            if (!storageItem.shaderType &amp;&amp; internalCheck || storageItem.shaderType == shaderType &amp;&amp; internalCheck) {
+                let T = storageItem.structName;
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var &lt;storage, read_write> ${storageItem.name}: ${T};\n`
+                bindingIndex += 1;
+            }
+        });
+        if (this.#layers.length) {
+            if (!this.#layers.shaderType || this.#layers.shaderType == shaderType) {
+                let totalSize = 0;
+                this.#layers.forEach(layerItem => totalSize += layerItem.size);
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var &lt;storage, read_write> layers: array&lt;array&lt;vec4&lt;f32>, ${totalSize}>>;\n`
+                bindingIndex += 1;
+            }
+        }
+        this.#samplers.forEach((sampler, index) => {
+            let internalCheck = internal == sampler.internal;
+            if (!sampler.shaderType &amp;&amp; internalCheck || sampler.shaderType == shaderType &amp;&amp; internalCheck) {
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${sampler.name}: sampler;\n`;
+                bindingIndex += 1;
+            }
+        });
+        this.#texturesStorage2d.forEach((texture, index) => {
+            let internalCheck = internal &amp;&amp; texture.internal;
+            if (!texture.shaderType &amp;&amp; internalCheck || texture.shaderType == shaderType &amp;&amp; internalCheck) {
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_storage_2d&lt;rgba8unorm, write>;\n`;
+                bindingIndex += 1;
+            }
+        });
+        this.#textures2d.forEach((texture, index) => {
+            let internalCheck = internal == texture.internal;
+            if (!texture.shaderType &amp;&amp; internalCheck || texture.shaderType == shaderType &amp;&amp; internalCheck) {
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d&lt;f32>;\n`;
+                bindingIndex += 1;
+            }
+        });
+        this.#textures2dArray.forEach((texture, index) => {
+            let internalCheck = internal == texture.internal;
+            if (!texture.shaderType &amp;&amp; internalCheck || texture.shaderType == shaderType &amp;&amp; internalCheck) {
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d_array&lt;f32>;\n`;
+                bindingIndex += 1;
+            }
+        });
+        this.#texturesExternal.forEach(externalTexture => {
+            let internalCheck = internal == externalTexture.internal;
+            if (!externalTexture.shaderType &amp;&amp; internalCheck || externalTexture.shaderType == shaderType &amp;&amp; internalCheck) {
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${externalTexture.name}: texture_external;\n`;
+                bindingIndex += 1;
+            }
+        });
+        this.#bindingTextures.forEach(bindingTexture => {
+            let internalCheck = internal == bindingTexture.internal;
+            if (bindingTexture.compute.shaderType == shaderType &amp;&amp; internalCheck) {
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.compute.name}: texture_storage_2d&lt;rgba8unorm, write>;\n`;
+                bindingIndex += 1;
+            }
+            if (bindingTexture.fragment.shaderType == shaderType &amp;&amp; internalCheck) {
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.fragment.name}: texture_2d&lt;f32>;\n`;
+                bindingIndex += 1;
+            }
+        });
+        return dynamicGroupBindings;
+    }
+    /**
+     * Establishes the density of the base mesh, by default 1x1, meaning two triangles.
+     * The final number of triangles is `numColumns` * `numRows` * `2` ( 2 being the triangles )
+     * @param {Number} numColumns quads horizontally
+     * @param {Number} numRows quads vertically
+     */
+    setMeshDensity(numColumns, numRows) {
+        if (numColumns == 0 || numRows == 0) {
+            throw 'Parameters should be greater than 0';
+        }
+        this.#numColumns = numColumns;
+        this.#numRows = numRows;
+    }
+
+    #compileRenderPass = (renderPass, index) => {
+        let vertexShader = renderPass.vertexShader;
+        let computeShader = renderPass.computeShader;
+        let fragmentShader = renderPass.fragmentShader;
+        let colorsVertWGSL = vertexShader;
+        let colorsComputeWGSL = computeShader;
+        let colorsFragWGSL = fragmentShader;
+        let dynamicGroupBindingsVertex = '';
+        let dynamicGroupBindingsCompute = '';
+        let dynamicGroupBindingsFragment = '';
+        let dynamicStructParams = '';
+        this.#uniforms.forEach(u => {
+            u.type = u.type || 'f32';
+            dynamicStructParams += /*wgsl*/`${u.name}:${u.type}, \n\t`;
+        });
+        if (this.#uniforms.length) {
+            dynamicStructParams = /*wgsl*/`struct Params {\n\t${dynamicStructParams}\n}\n`;
+        }
+        renderPass.hasVertexShader &amp;&amp; (dynamicGroupBindingsVertex += dynamicStructParams);
+        renderPass.hasComputeShader &amp;&amp; (dynamicGroupBindingsCompute += dynamicStructParams);
+        renderPass.hasFragmentShader &amp;&amp; (dynamicGroupBindingsFragment += dynamicStructParams);
+        renderPass.hasVertexShader &amp;&amp; (dynamicGroupBindingsVertex += this.#createDynamicGroupBindings(ShaderType.VERTEX, renderPass.internal));
+        renderPass.hasComputeShader &amp;&amp; (dynamicGroupBindingsCompute += this.#createDynamicGroupBindings(ShaderType.COMPUTE, renderPass.internal));
+        dynamicGroupBindingsFragment += this.#createDynamicGroupBindings(ShaderType.FRAGMENT, renderPass.internal);
+        renderPass.hasVertexShader &amp;&amp; (colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + defaultVertexBody + colorsVertWGSL);
+        renderPass.hasComputeShader &amp;&amp; (colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + colorsComputeWGSL);
+        renderPass.hasFragmentShader &amp;&amp; (colorsFragWGSL = dynamicGroupBindingsFragment + defaultStructs + colorsFragWGSL);
+        console.groupCollapsed(`Render Pass ${index}`);
+        console.groupCollapsed('VERTEX');
+        console.log(colorsVertWGSL);
+        console.groupEnd();
+        if (renderPass.hasComputeShader) {
+            console.groupCollapsed('COMPUTE');
+            console.log(colorsComputeWGSL);
+            console.groupEnd();
+        }
+        console.groupCollapsed('FRAGMENT');
+        console.log(colorsFragWGSL);
+        console.groupEnd();
+        console.groupEnd();
+        renderPass.hasVertexShader &amp;&amp; (renderPass.compiledShaders.vertex = colorsVertWGSL);
+        renderPass.hasComputeShader &amp;&amp; (renderPass.compiledShaders.compute = colorsComputeWGSL);
+        renderPass.hasFragmentShader &amp;&amp; (renderPass.compiledShaders.fragment = colorsFragWGSL);
+    }
+    #generateDataSize = () => {
+        const allShaders = this.#renderPasses.map(renderPass => {
+            const { vertex, compute, fragment } = renderPass.compiledShaders;
+            return vertex + compute + fragment;;
+        }).join('\n');
+        this.#dataSize = dataSize(allShaders);
+        // since uniforms are in a sigle struct
+        // this is only required for storage
+        this.#storage.forEach(s => {
+            if (!s.mapped) {
+                if (isArray(s.structName)) {
+                    const typeData = getArrayTypeData(s.structName, this.#dataSize);
+                    s.structSize = typeData.size;
+                } else {
+                    const d = this.#dataSize.get(s.structName) || typeSizes[s.structName];
+                    if (!d) {
+                        throw `${s.structName} has not been defined.`
+                    }
+                    s.structSize = d.bytes || d.size;
+                }
+            }
+        });
+    }
+    /**
+     * One time function to call to initialize the shaders.
+     * @param {Array&lt;RenderPass>} renderPasses Collection of RenderPass, which contain Vertex, Compute and Fragment shaders.
+     * @returns {Boolean} false | undefined
+     */
+    async init(renderPasses) {
+        this.#renderPasses = renderPasses.concat(this.#postRenderPasses);
+        // initializing internal uniforms
+        this.setUniform(UniformKeys.TIME, this.#time);
+        this.setUniform(UniformKeys.DELTA, this.#delta);
+        this.setUniform(UniformKeys.EPOCH, this.#epoch);
+        this.setUniform(UniformKeys.SCREEN, [0, 0], 'vec2f');
+        this.setUniform(UniformKeys.MOUSE, [0, 0], 'vec2f');
+        this.setUniform(UniformKeys.MOUSE_CLICK, this.#mouseClick);
+        this.setUniform(UniformKeys.MOUSE_DOWN, this.#mouseDown);
+        this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
+        this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta, 'vec2f');
+        let hasComputeShaders = this.#renderPasses.some(renderPass => renderPass.hasComputeShader);
+        if (!hasComputeShaders &amp;&amp; this.#bindingTextures.length) {
+            throw ' `addBindingTexture` requires at least one Compute Shader in a `RenderPass`'
+        }
+        this.#renderPasses.forEach(this.#compileRenderPass);
+        this.#generateDataSize();
+        //
+        let adapter = null;
+        try {
+            adapter = await navigator.gpu.requestAdapter();
+        } catch (err) {
+            console.log(err);
+        }
+        if (!adapter) { return false; }
+        this.#device = await adapter.requestDevice();
+        this.#device.lost.then(info => {
+            console.log(info);
+        });
+        if (this.#canvas !== null) this.#context = this.#canvas.getContext('webgpu');
+        this.#presentationFormat = navigator.gpu.getPreferredCanvasFormat();
+        if (this.#canvasId) {
+            if (this.#fitWindow) {
+                this.#resizeCanvasToFitWindow();
+            } else {
+                this.#resizeCanvasToDefault();
+            }
+        }
+        this.#renderPassDescriptor = {
+            colorAttachments: [
+                {
+                    //view: textureView,
+                    clearValue: { r: 0.0, g: 0.0, b: 0.0, a: 1.0 },
+                    loadOp: 'clear',
+                    storeOp: 'store',
+                }
+            ],
+            depthStencilAttachment: {
+                //view: this.#depthTexture.createView(),
+                depthClearValue: 1.0,
+                depthLoadOp: 'clear',
+                depthStoreOp: 'store'
+            }
+        };
+        await this.createScreen();
+        return true;
+    }
+
+    /**
+     * Mainly to be used with RenderPasses.js
+     * @param {RenderPass} renderPass
+     */
+    addRenderPass(renderPass) {
+        this.#postRenderPasses.push(renderPass);
+    }
+
+    get renderPasses() {
+        return this.#renderPasses;
+    }
+
+    /**
+     * Adds two triangles called points per number of columns and rows
+     */
+    async createScreen() {
+        let hasVertexAndFragmentShader = this.#renderPasses.some(renderPass => renderPass.hasVertexAndFragmentShader)
+        if (hasVertexAndFragmentShader) {
+            let colors = [
+                new RGBAColor(1, 0, 0),
+                new RGBAColor(0, 1, 0),
+                new RGBAColor(0, 0, 1),
+                new RGBAColor(1, 1, 0),
+            ];
+            for (let xIndex = 0; xIndex &lt; this.#numRows; xIndex++) {
+                for (let yIndex = 0; yIndex &lt; this.#numColumns; yIndex++) {
+                    const coordinate = new Coordinate(xIndex * this.#canvas.clientWidth / this.#numColumns, yIndex * this.#canvas.clientHeight / this.#numRows, .3);
+                    this.addPoint(coordinate, this.#canvas.clientWidth / this.#numColumns, this.#canvas.clientHeight / this.#numRows, colors);
+                }
+            }
+            this.#createVertexBuffer(new Float32Array(this.#vertexArray));
+        }
+        this.#createComputeBuffers();
+        await this.#createPipeline();
+    }
+    /**
+     * @param {Float32Array} vertexArray
+     * @returns buffer
+     */
+    #createVertexBuffer(vertexArray) {
+        this.#vertexBufferInfo = new VertexBufferInfo(vertexArray);
+        this.#buffer = this.#createAndMapBuffer(vertexArray, GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST);
+    }
+    /**
+     * @param {Float32Array} data
+     * @param {GPUBufferUsageFlags} usage
+     * @param {Boolean} mappedAtCreation
+     * @param {Number} size
+     * @returns {GPUBuffer} mapped buffer
+     */
+    #createAndMapBuffer(data, usage, mappedAtCreation = true, size = null) {
+        const buffer = this.#device.createBuffer({
+            mappedAtCreation: mappedAtCreation,
+            size: size || data.byteLength,
+            usage: usage,
+        });
+        new Float32Array(buffer.getMappedRange()).set(data);
+        buffer.unmap();
+        return buffer;
+    }
+
+    /**
+     * It creates with size, no with data, so it's empty
+     * @param {Number} size numItems * instanceByteSize ;
+     * @param {GPUBufferUsageFlags} usage
+     * @returns {GPUBuffer} buffer
+     */
+    #createBuffer(size, usage) {
+        const buffer = this.#device.createBuffer({
+            size: size,
+            usage: usage,
+        });
+        return buffer
+    }
+
+    #createParametersUniforms() {
+        const paramsDataSize = this.#dataSize.get('Params')
+        const paddings = paramsDataSize.paddings;
+        // we check the paddings list and add 0's to just the ones that need it
+        const uniformsClone = JSON.parse(JSON.stringify(this.#uniforms));
+        let arrayValues = uniformsClone.map(v => {
+            const padding = paddings[v.name];
+            if (padding) {
+                if (v.value.constructor !== Array) {
+                    v.value = [v.value];
+                }
+                for (let i = 0; i &lt; padding; i++) {
+                    v.value.push(0);
+                }
+            }
+            return v.value;
+        }).flat(1);
+        const finalPadding = paddings[''];
+        if (finalPadding) {
+            for (let i = 0; i &lt; finalPadding; i++) {
+                arrayValues.push(0);
+            }
+        }
+        const values = new Float32Array(arrayValues);
+        this.#uniforms.buffer = this.#createAndMapBuffer(values, GPUBufferUsage.UNIFORM, true, paramsDataSize.bytes);
+    }
+
+    #createComputeBuffers() {
+        //--------------------------------------------
+        this.#createParametersUniforms();
+        //--------------------------------------------
+        this.#storage.forEach(storageItem => {
+            let usage = GPUBufferUsage.STORAGE;
+            if (storageItem.read) {
+                let readStorageItem = {
+                    name: storageItem.name,
+                    size: storageItem.structSize
+                }
+                if (storageItem.mapped) {
+                    readStorageItem = {
+                        name: storageItem.name,
+                        size: storageItem.array.length,
+                    }
+                }
+                this.#readStorage.push(readStorageItem);
+                usage = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC;
+            }
+            storageItem.usage = usage;
+            if (storageItem.mapped) {
+                const values = new Float32Array(storageItem.array);
+                storageItem.buffer = this.#createAndMapBuffer(values, usage);
+            } else {
+                storageItem.buffer = this.#createBuffer(storageItem.structSize, usage);
+            }
+        });
+        //--------------------------------------------
+        this.#readStorage.forEach(readStorageItem => {
+            readStorageItem.buffer = this.#device.createBuffer({
+                size: readStorageItem.size,
+                usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
+            });
+        });
+        //--------------------------------------------
+        if (this.#layers.length) {
+            //let layerValues = [];
+            let layersSize = 0;
+            this.#layers.forEach(layerItem => {
+                layersSize += layerItem.size * layerItem.structSize;
+            });
+            this.#layers.buffer = this.#createBuffer(layersSize, GPUBufferUsage.STORAGE);
+        }
+        //--------------------------------------------
+        this.#samplers.forEach(sampler => sampler.resource = this.#device.createSampler(sampler.descriptor));
+        //--------------------------------------------
+        this.#texturesStorage2d.forEach(textureStorage2d => {
+            textureStorage2d.texture = this.#device.createTexture({
+                size: this.#presentationSize,
+                format: 'rgba8unorm',
+                usage: GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
+            });
+        });
+        //--------------------------------------------
+        this.#textures2d.forEach(texture2d => {
+            if (texture2d.imageTexture) {
+                let cubeTexture;
+                const imageBitmap = texture2d.imageTexture.bitmap;
+                cubeTexture = this.#device.createTexture({
+                    label: texture2d.name,
+                    size: [imageBitmap.width, imageBitmap.height, 1],
+                    format: 'rgba8unorm',
+                    usage:
+                        GPUTextureUsage.TEXTURE_BINDING |
+                        GPUTextureUsage.COPY_SRC |
+                        GPUTextureUsage.COPY_DST |
+                        GPUTextureUsage.RENDER_ATTACHMENT,
+                });
+                this.#device.queue.copyExternalImageToTexture(
+                    { source: imageBitmap },
+                    { texture: cubeTexture },
+                    [imageBitmap.width, imageBitmap.height]
+                );
+                texture2d.texture = cubeTexture;
+                // } else if (texture2d.copyCurrentTexture) {
+            } else {
+                this.#createTextureBindingToCopy(texture2d);
+            }
+        });
+        //--------------------------------------------
+        this.#textures2dArray.forEach(texture2dArray => {
+            if (texture2dArray.imageTextures) {
+                let cubeTexture;
+                const imageBitmaps = texture2dArray.imageTextures.bitmaps;
+                cubeTexture = this.#device.createTexture({
+                    size: [imageBitmaps[0].width, imageBitmaps[0].height, imageBitmaps.length],
+                    format: 'rgba8unorm',
+                    usage:
+                        GPUTextureUsage.TEXTURE_BINDING |
+                        GPUTextureUsage.COPY_DST |
+                        GPUTextureUsage.RENDER_ATTACHMENT,
+                });
+                imageBitmaps.forEach((imageBitmap, i) => {
+                    this.#device.queue.copyExternalImageToTexture(
+                        { source: imageBitmap },
+                        { texture: cubeTexture, origin: { x: 0, y: 0, z: i } },
+                        [imageBitmap.width, imageBitmap.height, 1]
+                    );
+                })
+
+                texture2dArray.texture = cubeTexture;
+            } else {
+                this.#createTextureBindingToCopy(texture2dArray);
+            }
+        });
+        //--------------------------------------------
+        this.#texturesExternal.forEach(externalTexture => {
+            externalTexture.texture = this.#device.importExternalTexture({
+                source: externalTexture.video
+            });
+        });
+        //--------------------------------------------
+        this.#bindingTextures.forEach(bindingTexture => {
+            bindingTexture.texture = this.#device.createTexture({
+                size: bindingTexture.size || this.#presentationSize,
+                format: 'rgba8unorm',
+                usage: GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
+            });
+        });
+    }
+
+    #createTextureBindingToCopy(texture2d) {
+        texture2d.texture = this.#device.createTexture({
+            label: texture2d.name,
+            size: this.#presentationSize,
+            format: this.#presentationFormat, // if 'depth24plus' throws error
+            usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
+        });
+    }
+
+    #createTextureToSize(texture2d, width, height) {
+        texture2d.texture = this.#device.createTexture({
+            label: texture2d.name,
+            size: [width, height],
+            format: this.#presentationFormat, // if 'depth24plus' throws error
+            usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
+        });
+    }
+
+    #createComputeBindGroup() {
+        this.#renderPasses.forEach((renderPass, index) => {
+            if (renderPass.hasComputeShader) {
+                const entries = this.#createEntries(ShaderType.COMPUTE);
+                if (entries.length) {
+                    let bglEntries = [];
+                    entries.forEach((entry, index) => {
+                        let bglEntry = {
+                            binding: index,
+                            visibility: GPUShaderStage.COMPUTE
+                        }
+                        bglEntry[entry.type.name] = { 'type': entry.type.type };
+                        if (entry.type.format) {
+                            bglEntry[entry.type.name].format = entry.type.format
+                        }
+                        if (entry.type.viewDimension) {
+                            bglEntry[entry.type.name].viewDimension = entry.type.viewDimension
+                        }
+                        bglEntries.push(bglEntry);
+                    });
+                    renderPass.bindGroupLayout = this.#device.createBindGroupLayout({ entries: bglEntries });
+                    /**
+                     * @type {GPUBindGroup}
+                     */
+                    renderPass.computeBindGroup = this.#device.createBindGroup({
+                        label: `_createComputeBindGroup 0 - ${index}`,
+                        layout: renderPass.bindGroupLayout,
+                        entries: entries
+                    });
+                }
+            }
+        });
+    }
+
+    async #createPipeline() {
+        this.#createComputeBindGroup();
+        this.#renderPasses.forEach((renderPass, index) => {
+            if (renderPass.hasComputeShader) {
+                renderPass.computePipeline = this.#device.createComputePipeline({
+                    layout: this.#device.createPipelineLayout({
+                        bindGroupLayouts: [renderPass.bindGroupLayout]
+                    }),
+                    label: `_createPipeline() - ${index}`,
+                    compute: {
+                        module: this.#device.createShaderModule({
+                            code: renderPass.compiledShaders.compute
+                        }),
+                        entryPoint: "main"
+                    }
+                });
+            }
+        });
+
+        //--------------------------------------
+
+        this.#createParams();
+        //this.createVertexBuffer(new Float32Array(this.#vertexArray));
+        // enum GPUPrimitiveTopology {
+        //     'point-list',
+        //     'line-list',
+        //     'line-strip',
+        //     'triangle-list',
+        //     'triangle-strip',
+        // };
+        this.#renderPasses.forEach(renderPass => {
+            if (renderPass.hasVertexAndFragmentShader) {
+                renderPass.renderPipeline = this.#device.createRenderPipeline({
+                    // layout: 'auto',
+                    layout: this.#device.createPipelineLayout({
+                        bindGroupLayouts: [renderPass.bindGroupLayout]
+                    }),
+                    //primitive: { topology: 'triangle-strip' },
+                    primitive: { topology: 'triangle-list' },
+                    depthStencil: {
+                        depthWriteEnabled: true,
+                        depthCompare: 'less',
+                        format: 'depth24plus',
+                    },
+                    vertex: {
+                        module: this.#device.createShaderModule({
+                            code: renderPass.compiledShaders.vertex,
+                        }),
+                        entryPoint: 'main', // shader function name
+                        buffers: [
+                            {
+                                arrayStride: this.#vertexBufferInfo.vertexSize,
+                                attributes: [
+                                    {
+                                        // position
+                                        shaderLocation: 0,
+                                        offset: this.#vertexBufferInfo.vertexOffset,
+                                        format: 'float32x4',
+                                    },
+                                    {
+                                        // colors
+                                        shaderLocation: 1,
+                                        offset: this.#vertexBufferInfo.colorOffset,
+                                        format: 'float32x4',
+                                    },
+                                    {
+                                        // uv
+                                        shaderLocation: 2,
+                                        offset: this.#vertexBufferInfo.uvOffset,
+                                        format: 'float32x2',
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                    fragment: {
+                        module: this.#device.createShaderModule({
+                            code: renderPass.compiledShaders.fragment,
+                        }),
+                        entryPoint: 'main', // shader function name
+                        targets: [
+                            {
+                                format: this.#presentationFormat,
+                                blend: {
+                                    alpha: {
+                                        srcFactor: 'src-alpha',
+                                        dstFactor: 'one-minus-src-alpha',
+                                        operation: 'add'
+                                    },
+                                    color: {
+                                        srcFactor: 'src-alpha',
+                                        dstFactor: 'one-minus-src-alpha',
+                                        operation: 'add'
+                                    },
+                                },
+                                writeMask: GPUColorWrite.ALL,
+                            },
+                        ],
+                    },
+                });
+            }
+        });
+    }
+    /**
+     * Creates the entries for the pipeline
+     * @returns an array with the entries
+     */
+    #createEntries(shaderType, internal) {
+        internal = internal || false;
+        let entries = [];
+        let bindingIndex = 0;
+        if (this.#uniforms.length) {
+            entries.push(
+                {
+                    binding: bindingIndex++,
+                    resource: {
+                        label: 'uniform',
+                        buffer: this.#uniforms.buffer
+                    },
+                    type: {
+                        name: 'buffer',
+                        type: 'uniform'
+                    }
+                }
+            );
+        }
+        if (this.#storage.length) {
+            this.#storage.forEach(storageItem => {
+                let internalCheck = internal == storageItem.internal;
+                if (!storageItem.shaderType &amp;&amp; internalCheck || storageItem.shaderType == shaderType &amp;&amp; internalCheck) {
+                    entries.push(
+                        {
+                            binding: bindingIndex++,
+                            resource: {
+                                label: 'storage',
+                                buffer: storageItem.buffer
+                            },
+                            type: {
+                                name: 'buffer',
+                                type: 'storage'
+                            }
+                        }
+                    );
+                }
+            });
+        }
+        if (this.#layers.length) {
+            if (!this.#layers.shaderType || this.#layers.shaderType == shaderType) {
+                entries.push(
+                    {
+                        binding: bindingIndex++,
+                        resource: {
+                            label: 'layer',
+                            buffer: this.#layers.buffer
+                        },
+                        type: {
+                            name: 'buffer',
+                            type: 'storage'
+                        }
+                    }
+                );
+            }
+        }
+        if (this.#samplers.length) {
+            this.#samplers.forEach((sampler, index) => {
+                let internalCheck = internal == sampler.internal;
+                if (!sampler.shaderType &amp;&amp; internalCheck || sampler.shaderType == shaderType &amp;&amp; internalCheck) {
+                    entries.push(
+                        {
+                            binding: bindingIndex++,
+                            resource: sampler.resource,
+                            type: {
+                                name: 'sampler',
+                                type: 'filtering'
+                            }
+                        }
+                    );
+                }
+            });
+        }
+        if (this.#texturesStorage2d.length) {
+            this.#texturesStorage2d.forEach((textureStorage2d, index) => {
+                let internalCheck = internal == textureStorage2d.internal;
+                if (!textureStorage2d.shaderType &amp;&amp; internalCheck || textureStorage2d.shaderType == shaderType &amp;&amp; internalCheck) {
+                    entries.push(
+                        {
+                            label: 'texture storage 2d',
+                            binding: bindingIndex++,
+                            resource: textureStorage2d.texture.createView(),
+                            type: {
+                                name: 'storageTexture',
+                                type: 'write-only'
+                            }
+                        }
+                    );
+                }
+            });
+        }
+        if (this.#textures2d.length) {
+            this.#textures2d.forEach((texture2d, index) => {
+                let internalCheck = internal == texture2d.internal;
+                if (!texture2d.shaderType &amp;&amp; internalCheck || texture2d.shaderType == shaderType &amp;&amp; internalCheck) {
+                    entries.push(
+                        {
+                            label: 'texture 2d',
+                            binding: bindingIndex++,
+                            resource: texture2d.texture.createView(),
+                            type: {
+                                name: 'texture',
+                                type: 'float'
+                            }
+                        }
+                    );
+                }
+            });
+        }
+        if (this.#textures2dArray.length) {
+            this.#textures2dArray.forEach((texture2dArray, index) => {
+                let internalCheck = internal == texture2dArray.internal;
+                if (!texture2dArray.shaderType &amp;&amp; internalCheck || texture2dArray.shaderType == shaderType &amp;&amp; internalCheck) {
+                    entries.push(
+                        {
+                            label: 'texture 2d array',
+                            binding: bindingIndex++,
+                            resource: texture2dArray.texture.createView({
+                                dimension: '2d-array',
+                                baseArrayLayer: 0,
+                                arrayLayerCount: texture2dArray.imageTextures.bitmaps.length
+                            }),
+                            type: {
+                                name: 'texture',
+                                type: 'float',
+                                viewDimension: '2d-array'
+                            }
+                        }
+                    );
+                }
+            });
+        }
+        if (this.#texturesExternal.length) {
+            this.#texturesExternal.forEach(externalTexture => {
+                let internalCheck = internal == externalTexture.internal;
+                if (!externalTexture.shaderType &amp;&amp; internalCheck || externalTexture.shaderType == shaderType &amp;&amp; internalCheck) {
+                    entries.push(
+                        {
+                            label: 'external texture',
+                            binding: bindingIndex++,
+                            resource: externalTexture.texture,
+                            type: {
+                                name: 'externalTexture',
+                                // type: 'write-only'
+                            }
+                        }
+                    );
+                }
+            });
+        }
+        if (this.#bindingTextures.length) {
+            this.#bindingTextures.forEach(bindingTexture => {
+                let internalCheck = internal == bindingTexture.internal;
+                if (bindingTexture.compute.shaderType == shaderType &amp;&amp; internalCheck) {
+                    entries.push(
+                        {
+                            label: 'binding texture',
+                            binding: bindingIndex++,
+                            resource: bindingTexture.texture.createView(),
+                            type: {
+                                name: 'storageTexture',
+                                type: 'write-only',
+                                format: 'rgba8unorm'
+                            }
+                        }
+                    );
+                }
+            });
+            this.#bindingTextures.forEach(bindingTexture => {
+                let internalCheck = internal == bindingTexture.internal;
+                if (bindingTexture.fragment.shaderType == shaderType &amp;&amp; internalCheck) {
+                    entries.push(
+                        {
+                            label: 'binding texture 2',
+                            binding: bindingIndex++,
+                            resource: bindingTexture.texture.createView(),
+                            type: {
+                                name: 'texture',
+                                type: 'float'
+                            }
+                        }
+                    );
+                }
+            });
+        }
+        return entries;
+    }
+
+    #createParams() {
+        this.#renderPasses.forEach(renderPass => {
+            const entries = this.#createEntries(ShaderType.FRAGMENT, renderPass.internal);
+            if (entries.length) {
+                let bglEntries = [];
+                entries.forEach((entry, index) => {
+                    let bglEntry = {
+                        binding: index,
+                        visibility: GPUShaderStage.FRAGMENT
+                    }
+                    bglEntry[entry.type.name] = { 'type': entry.type.type };
+                    if (entry.type.viewDimension) {
+                        bglEntry[entry.type.name].viewDimension = entry.type.viewDimension
+                    }
+                    // TODO: 1262
+                    // if you remove this there's an error that I think is not explained right
+                    // it talks about a storage in index 1 but it was actually the 0
+                    // and so is to this uniform you have to change the visibility
+                    // not remove the type and leaving it empty as it seems you have to do here:
+                    // https://gpuweb.github.io/gpuweb/#bindgroup-examples
+                    if (entry.type.type == 'uniform') {
+                        bglEntry.visibility = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT
+                    }
+                    bglEntries.push(bglEntry);
+                });
+                renderPass.bindGroupLayout = this.#device.createBindGroupLayout({ entries: bglEntries });
+                renderPass.uniformBindGroup = this.#device.createBindGroup({
+                    label: '_createParams() 0',
+                    layout: renderPass.bindGroupLayout,
+                    entries: entries
+                });
+            }
+        });
+    }
+    async update() {
+        if (!this.#canvas || !this.#device) return;
+        //--------------------------------------------
+        this.#delta = this.#clock.getDelta();
+        this.#time = this.#clock.time;
+        this.#epoch = +new Date() / 1000;
+        this.setUniform(UniformKeys.TIME, this.#time);
+        this.setUniform(UniformKeys.DELTA, this.#delta);
+        this.setUniform(UniformKeys.EPOCH, this.#epoch);
+        this.setUniform(UniformKeys.SCREEN, [this.#canvas.width, this.#canvas.height]);
+        this.setUniform(UniformKeys.MOUSE, [this.#mouseX, this.#mouseY]);
+        this.setUniform(UniformKeys.MOUSE_CLICK, this.#mouseClick);
+        this.setUniform(UniformKeys.MOUSE_DOWN, this.#mouseDown);
+        this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
+        this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta);
+        //--------------------------------------------
+        this.#createParametersUniforms();
+        // TODO: create method for this
+        this.#storage.forEach(storageItem => {
+            if (storageItem.mapped) {
+                const values = new Float32Array(storageItem.array);
+                storageItem.buffer = this.#createAndMapBuffer(values, storageItem.usage);
+            }
+        });
+        // AUDIO
+        // this.#analyser.getByteTimeDomainData(this.#dataArray);
+        this.#sounds.forEach(sound => {
+            sound.analyser?.getByteFrequencyData(sound.data);
+        });
+        // END AUDIO
+        this.#texturesExternal.forEach(externalTexture => {
+            externalTexture.texture = this.#device.importExternalTexture({
+                source: externalTexture.video
+            });
+            if ('requestVideoFrameCallback' in externalTexture.video) {
+                externalTexture.video.requestVideoFrameCallback(() => { });
+            }
+        });
+
+        this.#createComputeBindGroup();
+
+        let commandEncoder = this.#device.createCommandEncoder();
+
+        this.#renderPasses.forEach(renderPass => {
+            if (renderPass.hasComputeShader) {
+                const passEncoder = commandEncoder.beginComputePass();
+                passEncoder.setPipeline(renderPass.computePipeline);
+                if (this.#uniforms.length) {
+                    passEncoder.setBindGroup(0, renderPass.computeBindGroup);
+                }
+                passEncoder.dispatchWorkgroups(
+                    renderPass.workgroupCountX,
+                    renderPass.workgroupCountY,
+                    renderPass.workgroupCountZ
+                );
+                passEncoder.end();
+            }
+        });
+
+        // ---------------------
+
+        this.#renderPassDescriptor.colorAttachments[0].view = this.#context.getCurrentTexture().createView();
+        this.#renderPassDescriptor.depthStencilAttachment.view = this.#depthTexture.createView();
+
+        const swapChainTexture = this.#context.getCurrentTexture();
+
+        //commandEncoder = this.#device.createCommandEncoder();
+        this.#renderPasses.forEach((renderPass, renderPassIndex) => {
+            if (renderPass.hasVertexAndFragmentShader) {
+                const passEncoder = commandEncoder.beginRenderPass(this.#renderPassDescriptor);
+                passEncoder.setPipeline(renderPass.renderPipeline);
+                this.#createParams();
+                if (this.#uniforms.length) {
+                    passEncoder.setBindGroup(0, renderPass.uniformBindGroup);
+                }
+                passEncoder.setVertexBuffer(0, this.#buffer);
+                /**
+                 * vertexCount: number The number of vertices to draw
+                 * instanceCount?: number | undefined The number of instances to draw
+                 * firstVertex?: number | undefined Offset into the vertex buffers, in vertices, to begin drawing from
+                 * firstInstance?: number | undefined First instance to draw
+                 */
+                //passEncoder.draw(3, 1, 0, 0);
+                passEncoder.draw(this.#vertexBufferInfo.vertexCount);
+                passEncoder.end();
+                // Copy the rendering results from the swapchain into |texture2d.texture|.
+                this.#textures2d.forEach(texture2d => {
+                    if (texture2d.renderPassIndex == renderPassIndex || texture2d.renderPassIndex == null) {
+                        if (texture2d.copyCurrentTexture) {
+                            commandEncoder.copyTextureToTexture(
+                                {
+                                    texture: swapChainTexture,
+                                },
+                                {
+                                    texture: texture2d.texture,
+                                },
+                                this.#presentationSize
+                            );
+                        }
+                    }
+                });
+                this.#texturesToCopy.forEach(texturePair => {
+                    // console.log(texturePair.a);
+                    // this.#createTextureToSize(texturePair.b, texturePair.a.width, texturePair.a.height);
+                    commandEncoder.copyTextureToTexture(
+                        {
+                            texture: texturePair.a,
+                        },
+                        {
+                            texture: texturePair.b,
+                        },
+                        [texturePair.a.width, texturePair.a.height]
+                    );
+                });
+                this.#texturesToCopy = [];
+            }
+        });
+
+
+
+        if (this.#readStorage.length) {
+            this.#readStorage.forEach(readStorageItem => {
+                let storageItem = this.#storage.find(storageItem => storageItem.name === readStorageItem.name);
+                commandEncoder.copyBufferToBuffer(
+                    storageItem.buffer /* source buffer */,
+                    0 /* source offset */,
+                    readStorageItem.buffer /* destination buffer */,
+                    0 /* destination offset */,
+                    readStorageItem.buffer.size /* size */
+                );
+            });
+        }
+        // ---------------------
+        this.#commandsFinished.push(commandEncoder.finish());
+        this.#device.queue.submit(this.#commandsFinished);
+        this.#commandsFinished = [];
+        //
+        //this.#vertexArray = [];
+        // reset mouse values because it doesn't happen by itself
+        this.#mouseClick = false;
+        this.#mouseWheel = false;
+        this.#mouseDelta = [0, 0];
+        await this.read();
+    }
+    async read() {
+        for (const [key, event] of this.#events) {
+            let eventRead = await this.readStorage(event.name);
+            if (eventRead) {
+                let id = eventRead[0];
+                if (id != 0) {
+                    event.callback &amp;&amp; event.callback(eventRead.slice(1, -1));
+                }
+            }
+        }
+    }
+
+    #getWGSLCoordinate(value, side, invert = false) {
+        const direction = invert ? -1 : 1;
+        const p = value / side;
+        return (p * 2 - 1) * direction;
+    };
+    /**
+     * Adds two triangles as a quad called Point
+     * @param {Coordinate} coordinate `x` from 0 to canvas.width, `y` from 0 to canvas.height, `z` it goes from 0.0 to 1.0 and forward
+     * @param {Number} width point width
+     * @param {Number} height point height
+     * @param {Array&lt;RGBAColor>} colors one color per corner
+     * @param {Boolean} useTexture
+     */
+    addPoint(coordinate, width, height, colors, useTexture = false) {
+        const { x, y, z } = coordinate;
+        const nx = this.#getWGSLCoordinate(x, this.#canvas.width);
+        const ny = this.#getWGSLCoordinate(y, this.#canvas.height, true);
+        const nz = z;
+        const nw = this.#getWGSLCoordinate(x + width, this.#canvas.width);
+        const nh = this.#getWGSLCoordinate(y + height, this.#canvas.height);
+        const { r: r0, g: g0, b: b0, a: a0 } = colors[0];
+        const { r: r1, g: g1, b: b1, a: a1 } = colors[1];
+        const { r: r2, g: g2, b: b2, a: a2 } = colors[2];
+        const { r: r3, g: g3, b: b3, a: a3 } = colors[3];
+        this.#vertexArray.push(
+            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * .5, (+ny + 1) * .5,// 0 top left
+            +nw, +ny, nz, 1, r1, g1, b1, a1, (+nw + 1) * .5, (+ny + 1) * .5,// 1 top right
+            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * .5, (-nh + 1) * .5,// 2 bottom right
+            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * .5, (+ny + 1) * .5,// 3 top left
+            +nx, -nh, nz, 1, r2, g2, b2, a2, (+nx + 1) * .5, (-nh + 1) * .5,// 4 bottom left
+            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * .5, (-nh + 1) * .5,// 5 bottom right
+        );
+    }
+    get canvas() {
+        return this.#canvas;
+    }
+    get device() {
+        return this.#device;
+    }
+    get context() {
+        return this.#context;
+    }
+    get presentationFormat() {
+        return this.#presentationFormat;
+    }
+    get buffer() {
+        return this.#buffer;
+    }
+    get fullscreen() {
+        return this.#fullscreen;
+    }
+    set fullscreen(value) {
+        if (value) {
+            this.#lastFitWindow = this.#fitWindow;
+            this.fitWindow = value;
+            this.#canvas.requestFullscreen().catch(err => {
+                throw `Error attempting to enable fullscreen mode: ${err.message} (${err.name})`;
+            });
+            this.#fullscreen = true;
+        } else {
+            document.exitFullscreen();
+            this.#fullscreen = false;
+            this.#resizeCanvasToDefault();
+        }
+    }
+    get fitWindow() {
+        return this.#fitWindow;
+    }
+    set fitWindow(value) {
+        if (!this.#context) {
+            throw 'fitWindow must be assigned after Points.init() call or you don\'t have a Canvas assigned in the constructor';
+        }
+        this.#fitWindow = value;
+        if (this.#fitWindow) {
+            this.#resizeCanvasToFitWindow();
+        } else {
+            this.#resizeCanvasToDefault();
+        }
+    }
+}
+
+export default Points;
+export { ShaderType, RenderPass, RenderPasses };</code></pre></article></section></div></div></div><div class="search-container" id="PkfLWpAbet" style="display:none"><div class="wrapper" id="iCxFxjkHbP"><button class="icon-button search-close-button" id="VjLlGakifb" aria-label="close search"><svg><use xlink:href="#close-icon"></use></svg></button><div class="search-box-c"><svg><use xlink:href="#search-icon"></use></svg> <input type="text" id="vpcKVYIppa" class="search-input" placeholder="Search..." autofocus></div><div class="search-result-c" id="fWwVHRuDuN"><span class="search-result-c-text">Type anything to view search result</span></div></div></div><div class="mobile-menu-icon-container"><button class="icon-button" id="mobile-menu" data-isopen="false" aria-label="menu"><svg><use xlink:href="#menu-icon"></use></svg></button></div><div id="mobile-sidebar" class="mobile-sidebar-container"><div class="mobile-sidebar-wrapper"><div class="mobile-nav-links"></div><div class="mobile-sidebar-items-c"><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-modules"><div>Modules</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="module-defaultFunctions.html">defaultFunctions</a></div><div class="sidebar-section-children"><a href="module-points_animation.html">points/animation</a></div><div class="sidebar-section-children"><a href="module-points_audio.html">points/audio</a></div><div class="sidebar-section-children"><a href="module-points_cellular2d.html">points/cellular2d</a></div><div class="sidebar-section-children"><a href="module-points_classicnoise2d.html">points/classicnoise2d</a></div><div class="sidebar-section-children"><a href="module-points_color.html">points/color</a></div><div class="sidebar-section-children"><a href="module-points_debug.html">points/debug</a></div><div class="sidebar-section-children"><a href="module-points_effects.html">points/effects</a></div><div class="sidebar-section-children"><a href="module-points_image.html">points/image</a></div><div class="sidebar-section-children"><a href="module-points_math.html">points/math</a></div><div class="sidebar-section-children"><a href="module-points_noise2d.html">points/noise2d</a></div><div class="sidebar-section-children"><a href="module-points_random.html">points/random</a></div><div class="sidebar-section-children"><a href="module-points_sdf.html">points/sdf</a></div><div class="sidebar-section-children"><a href="module-points_valuenoise.html">points/valuenoise</a></div><div class="sidebar-section-children"><a href="module-points_voronoi.html">points/voronoi</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-classes"><div>Classes</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="CanvasRecorder.html">CanvasRecorder</a></div><div class="sidebar-section-children"><a href="Points.html">Points</a></div><div class="sidebar-section-children"><a href="RenderPass.html">RenderPass</a></div><div class="sidebar-section-children"><a href="RenderPasses.html">RenderPasses</a></div><div class="sidebar-section-children"><a href="ShaderType.html">ShaderType</a></div><div class="sidebar-section-children"><a href="VertexBufferInfo.html">VertexBufferInfo</a></div></div></div><div class="mobile-navbar-actions"><div class="navbar-right-item"><button class="icon-button search-button" aria-label="open-search"><svg><use xlink:href="#search-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button theme-toggle" aria-label="toggle-theme"><svg><use class="theme-svg-use" xlink:href="#light-theme-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button font-size" aria-label="change-font-size"><svg><use xlink:href="#font-size-icon"></use></svg></button></div></div></div></div><script type="text/javascript" src="scripts/core.min.js"></script><script src="scripts/search.min.js" defer="defer"></script><script src="scripts/third-party/fuse.js" defer="defer"></script><script type="text/javascript">var tocbotInstance=tocbot.init({tocSelector:"#eed4d2a0bfd64539bb9df78095dec881",contentSelector:".main-content",headingSelector:"h1, h2, h3",hasInnerContainers:!0,scrollContainer:".main-content",headingsOffset:130,onClick:bringLinkToView})</script></body></html>

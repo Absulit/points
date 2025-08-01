@@ -1,7 +1,6 @@
 import vert from './vert.js';
 import frag from './frag.js';
 import Points from 'points';
-import RenderPasses from 'renderpasses';
 
 let audio = null;
 

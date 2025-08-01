@@ -1,5 +1,5 @@
 
-import { clearMix } from 'effects';
+import { clearMix } from 'points/effects';
 const compute = /*wgsl*/`
 
 ${clearMix}

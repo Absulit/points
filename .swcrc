@@ -1,0 +1,14 @@
+{
+  "jsc": {
+    "target": "esnext",
+    "parser": {
+      "syntax": "ecmascript",
+      "jsx": false
+    }
+  },
+  "module": {
+    "type": "es6"
+  },
+  "minify": true,
+  "sourceMaps": false
+}

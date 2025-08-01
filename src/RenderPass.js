@@ -1,6 +1,14 @@
 'use strict';
+/**
+ * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
+ * This is useful for PostProcessing.
+ * @example
+ *
+ * // vert, frag and compute are strings
+ * new RenderPass(vert, frag, compute, 800, 800);
+ */
 
-export default class RenderPass {
+class RenderPass {
     #vertexShader;
     #computeShader;
     #fragmentShader;
@@ -131,3 +139,5 @@ export default class RenderPass {
         return this.#workgroupCountZ;
     }
 }
+
+export default RenderPass;

@@ -1,8 +1,8 @@
-import { snoise } from 'noise2d';
-import { PI } from 'math';
-import { texturePosition } from 'image';
-import { fnusin } from 'animation';
-import { brightness } from 'color';
+import { snoise } from 'points/noise2d';
+import { PI } from 'points/math';
+import { texturePosition } from 'points/image';
+import { fnusin } from 'points/animation';
+import { brightness } from 'points/color';
 
 const frag = /*wgsl*/`
 

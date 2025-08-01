@@ -1,6 +1,6 @@
-import { fnusin } from 'animation';
-import { clearAlpha, soften4, soften8 } from 'effects';
-import { sdfCircle, sdfLine2, sdfSegment } from 'sdf';
+import { fnusin } from 'points/animation';
+import { clearAlpha, soften4, soften8 } from 'points/effects';
+import { sdfCircle, sdfLine2, sdfSegment } from 'points/sdf';
 
 const compute = /*wgsl*/`
 

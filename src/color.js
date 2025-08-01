@@ -1,3 +1,7 @@
+/**
+ * @class RGBAColor
+ * @ignore
+ */
 class RGBAColor {
     #value;
     constructor(r = 0, g = 0, b = 0, a = 1) {

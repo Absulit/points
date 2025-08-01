@@ -1,8 +1,10 @@
 /**
  * To manage time and delta time,
  * based on https://github.com/mrdoob/three.js/blob/master/src/core/Clock.js
+ * @class Clock
+ * @ignore
  */
-export default class Clock {
+class Clock {
     #time = 0;
     #oldTime = 0;
     #delta = 0;
@@ -42,3 +44,5 @@ export default class Clock {
         return this.#delta;
     }
 }
+
+export default Clock;

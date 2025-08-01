@@ -6,9 +6,9 @@ const bloom = {
     vertexShader,
     fragmentShader,
     /**
-     * 
-     * @param {Points} points 
-     * @param {*} params 
+     *
+     * @param {Points} points
+     * @param {*} params
      */
     init: async (points, params) => {
         points._setInternal(true);

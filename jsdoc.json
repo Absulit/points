@@ -1,0 +1,26 @@
+{
+  "source": {
+    "include": [
+      "src",
+      "src/core",
+      "docs/apidocs.md"
+    ],
+    "includePattern": ".+\\.js$"
+  },
+  "sourceType": "module",
+  "opts": {
+    "template": "node_modules/clean-jsdoc-theme",
+    "destination": "./apidocs"
+  },
+  "templates": {
+    "default": {
+      "includeDate": false
+    },
+    "cleandoc": {
+      "theme": "dark"
+    }
+  },
+  "theme_opts": {
+    "flatten": true
+  }
+}

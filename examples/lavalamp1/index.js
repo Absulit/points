@@ -1,6 +1,6 @@
 import Points from 'points';
-import RenderPass from 'renderpass';
-import ShaderType from 'shadertype';
+import { RenderPass } from 'points';
+import { ShaderType } from 'points';
 
 import vert1 from './vert.js';
 import frag1 from './frag.js';
