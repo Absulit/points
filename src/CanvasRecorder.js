@@ -1,3 +1,10 @@
+/**
+ * @class CanvasRecorder
+ *
+ * @example
+ * const recorder = new CanvasRecorder(canvas);
+ */
+
 class CanvasRecorder {
     #canvas = null;
     #options = null;
