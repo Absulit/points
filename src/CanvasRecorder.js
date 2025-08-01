@@ -16,6 +16,9 @@ class CanvasRecorder {
         };
     }
 
+    /**
+     * Starts the video recording.
+     */
     start() {
         const videoStream = this.#canvas.captureStream(60);
         let chunks = [];
@@ -30,10 +33,17 @@ class CanvasRecorder {
         };
         this.mediaRecorder.start();
     }
+
+    /**
+     * Stops the video recording and downloads the video.
+     */
     stop() {
         this.mediaRecorder.stop();
     }
 
+    /**
+     * Retrieves the current frame as a PNG and downloads the image.
+     */
     getPNG() {
         this.#canvas.toBlob(
             blob => {

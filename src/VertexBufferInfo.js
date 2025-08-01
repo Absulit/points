@@ -1,11 +1,8 @@
-'use strict';
-
 /**
  * Along with the vertexArray it calculates some info like offsets required for the pipeline.
  * @class VertexBufferInfo
  * @ignore
  */
-
 class VertexBufferInfo {
     #vertexSize
     #vertexOffset;
