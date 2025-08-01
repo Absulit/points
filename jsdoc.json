@@ -21,6 +21,6 @@
     }
   },
   "theme_opts": {
-  "flatten": true
-}
+    "flatten": true
+  }
 }
