@@ -4,6 +4,7 @@
  * assigned in the {@link Points} class.
  * This is mainly for internal purposes.
  * @class UniformKeys
+ * @ignore
  */
 class UniformKeys {
     /**

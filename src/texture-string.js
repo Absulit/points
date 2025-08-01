@@ -1,6 +1,7 @@
 /**
  * Utility methods to for the {@link Points#setTextureString | setTextureString()}
  * @module texture-string
+ * @ignore
  */
 
 /**

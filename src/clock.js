@@ -2,6 +2,7 @@
  * To manage time and delta time,
  * based on https://github.com/mrdoob/three.js/blob/master/src/core/Clock.js
  * @class Clock
+ * @ignore
  */
 class Clock {
     #time = 0;

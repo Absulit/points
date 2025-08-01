@@ -1,5 +1,6 @@
 /**
  * @class RGBAColor
+ * @ignore
  */
 class RGBAColor {
     #value;

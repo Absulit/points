@@ -1,5 +1,6 @@
 /**
  * @class LayersArray
+ * @ignore
  */
 class LayersArray extends Array {
     #buffer = null;

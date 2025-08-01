@@ -1,5 +1,6 @@
 /**
  * @class UniformsArray
+ * @ignore
  */
 class UniformsArray extends Array {
     #buffer = null;
