@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 
+clear
+
 rm -rf ./build/
 
 npx rollup -c
 
-swc build/points.module.js --out-file build/points.min.js
+swc build/points.js --out-file build/points.min.js
 swc build/RenderPass.js --out-file build/RenderPass.min.js
 swc build/ShaderType.js --out-file build/ShaderType.min.js
 swc build/RenderPasses.js --out-file build/RenderPasses.min.js
@@ -25,7 +27,7 @@ swc build/core/sdf.js --out-file build/core/sdf.min.js
 
 
 # this needs to be added for JSR
-echo '/* @ts-self-types="./points.module.d.ts" */' | cat - build/points.min.js > temp && mv temp build/points.min.js
+echo '/* @ts-self-types="./points.d.ts" */' | cat - build/points.min.js > temp && mv temp build/points.min.js
 
 
 list="animation audio color debug effects image math noise2d classicnoise2d random sdf"
@@ -40,5 +42,7 @@ npx tsc
 npm publish --dry-run
 jsr publish --dry-run --allow-dirty
 
+rm -rf ./apidocs/
+mkdir apidocs
 jsdoc -c jsdoc.json
 

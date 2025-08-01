@@ -1,6 +1,5 @@
 import vertexShader from './vert.js';
 import fragmentShader from './frag.js';
-import Points from '../../../points.js';
 
 const bloom = {
     vertexShader,

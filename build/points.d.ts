@@ -60,7 +60,7 @@ export class RenderPasses {
     static BLOOM: number;
     static BLUR: number;
     static WAVES: number;
-    static "__#11@#LIST": {
+    static "__#4@#LIST": {
         1: {
             vertexShader: string;
             fragmentShader: string;
@@ -219,14 +219,6 @@ declare class Points {
     set fitWindow(value: boolean);
     get fitWindow(): boolean;
     /**
-     * @deprecated use setUniform
-     */
-    addUniform(name: any, value: any, structName: any): void;
-    /**
-     * @deprecated use setUniform
-     */
-    updateUniform(name: any, value: any): void;
-    /**
      * Set a param as uniform to send to all shaders.
      * A Uniform is a value that can only be changed
      * from the outside, and unless changed it remains
@@ -248,10 +240,6 @@ declare class Points {
      */
     updateUniforms(arr: Array<any>): void;
     /**
-     * @deprecated use setStorage()
-     */
-    addStorage(name: any, structName: any, read: any, shaderType: any, arrayData: any): void;
-    /**
      * Creates a persistent memory buffer across every frame call.
      * @param {string} name Name that the Storage will have in the shader
      * @param {string} structName Name of the struct already existing on the
@@ -268,14 +256,6 @@ declare class Points {
         buffer: any;
         internal: boolean;
     };
-    /**
-     * @deprecated
-     */
-    addStorageMap(name: any, arrayData: any, structName: any, read: any, shaderType: any): void;
-    /**
-     * @deprecated use setStorageMap
-     */
-    updateStorageMap(name: any, arrayData: any): void;
     /**
      * Creates a persistent memory buffer across every frame call that can be updated.
      * @param {string} name Name that the Storage will have in the shader.
@@ -294,38 +274,17 @@ declare class Points {
      */
     setLayers(numLayers: number, shaderType: ShaderType): void;
     /**
-     * @deprecated use setSampler
-     */
-    addSampler(name: any, descriptor: any, shaderType: any): void;
-    /**
      * Creates a `sampler` to be sent to the shaders.
      * @param {string} name Name of the `sampler` to be called in the shaders.
      * @param {GPUSamplerDescriptor} descriptor
      */
-    setSampler(name: string, descriptor: GPUSamplerDescriptor, shaderType: any): {
-        name: string;
-        descriptor: GPUSamplerDescriptor;
-        shaderType: any;
-        resource: any;
-        internal: boolean;
-    };
-    /**
-     * @deprecated use setTexture2d
-     */
-    addTexture2d(name: any, copyCurrentTexture: any, shaderType: any, renderPassIndex: any): void;
+    setSampler(name: string, descriptor: GPUSamplerDescriptor, shaderType: any): any;
     /**
      * Create a `texture_2d` in the shaders.
      * @param {string} name Name to call the texture in the shaders.
      * @param {boolean} copyCurrentTexture If you want the fragment output to be copied here.
      */
-    setTexture2d(name: string, copyCurrentTexture: boolean, shaderType: any, renderPassIndex: any): {
-        name: string;
-        copyCurrentTexture: boolean;
-        shaderType: any;
-        texture: any;
-        renderPassIndex: any;
-        internal: boolean;
-    };
+    setTexture2d(name: string, copyCurrentTexture: boolean, shaderType: any, renderPassIndex: any): any;
     copyTexture(nameTextureA: any, nameTextureB: any): void;
     /**
      * Load an image as texture_2d
