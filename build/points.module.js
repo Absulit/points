@@ -8,6 +8,15 @@ class ShaderType {
     static FRAGMENT = 3;
 }
 
+/**
+ * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
+ * This is useful for PostProcessing.
+ * @example
+ *
+ * // vert, frag and compute are strings
+ * new RenderPass(vert, frag, compute, 800, 800);
+ */
+
 class RenderPass {
     #vertexShader;
     #computeShader;
@@ -921,6 +930,7 @@ fn main(
  * assigned in the {@link Points} class.
  * This is mainly for internal purposes.
  * @class UniformKeys
+ * @ignore
  */
 class UniformKeys {
     /**
@@ -979,6 +989,11 @@ class UniformKeys {
     static MOUSE_DELTA = 'mouseDelta';
 }
 
+/**
+ * Along with the vertexArray it calculates some info like offsets required for the pipeline.
+ * @class VertexBufferInfo
+ * @ignore
+ */
 class VertexBufferInfo {
     #vertexSize
     #vertexOffset;
@@ -1077,6 +1092,7 @@ class Coordinate {
 
 /**
  * @class RGBAColor
+ * @ignore
  */
 class RGBAColor {
     #value;
@@ -1276,6 +1292,7 @@ class RGBAColor {
  * To manage time and delta time,
  * based on https://github.com/mrdoob/three.js/blob/master/src/core/Clock.js
  * @class Clock
+ * @ignore
  */
 class Clock {
     #time = 0;
@@ -1344,6 +1361,11 @@ struct Event {
 `;
 
 /**
+ * The defaultVertexBody is used as a drop-in replacement of the vertex shader content.
+ * <br>
+ * This is not required, but useful if you plan to use the default parameters of the library.
+ * <br>
+ * <br>
  * These are wgsl functions, not js functions.
  * The function is enclosed in a js string constant,
  * to be appended into the code to reference it in the string shader.
@@ -1381,6 +1403,7 @@ fn defaultVertexBody(position: vec4<f32>, color: vec4<f32>, uv: vec2<f32>) -> Fr
  * Utility types and methods to set wgsl types in memory.
  * This is mainly internal.
  * @module data-size
+ * @ignore
  */
 
 const size_4_align_4 = { size: 4, align: 4 };
@@ -1691,6 +1714,7 @@ const dataSize = value => {
 /**
  * Utility methods to for the {@link Points#setTextureString | setTextureString()}
  * @module texture-string
+ * @ignore
  */
 
 /**
@@ -1773,6 +1797,7 @@ function strToImage(str, atlasImg, size, offset = 0) {
 
 /**
  * @class LayersArray
+ * @ignore
  */
 class LayersArray extends Array {
     #buffer = null;
@@ -1803,6 +1828,7 @@ class LayersArray extends Array {
 
 /**
  * @class UniformsArray
+ * @ignore
  */
 class UniformsArray extends Array {
     #buffer = null;
@@ -2145,23 +2171,7 @@ class Points {
         }
         return arrayBufferCopy;
     }
-    /**
-     * @deprecated use {@link setLayers}
-     */
-    addLayers(numLayers, shaderType) {
-        for (let layerIndex = 0; layerIndex < numLayers; layerIndex++) {
-            this.#layers.shaderType = shaderType;
-            this.#layers.push({
-                name: `layer${layerIndex}`,
-                size: this.#canvas.width * this.#canvas.height,
-                structName: 'vec4<f32>',
-                structSize: 16,
-                array: null,
-                buffer: null,
-                internal: this.#internal
-            });
-        }
-    }
+
     /**
      * Layers of data made of `vec4f`
      * @param {Number} numLayers
@@ -2308,56 +2318,7 @@ class Points {
         texture2d_B.texture = cubeTexture;
         this.#texturesToCopy.push({ a, b: texture2d_B.texture });
     }
-    /**
-     * @deprecated use setTextureImage
-     */
-    async addTextureImage(name, path, shaderType) {
-        if (this.#nameExists(this.#textures2d, name)) {
-            return;
-        }
-        const response = await fetch(path);
-        const blob = await response.blob();
-        const imageBitmap = await createImageBitmap(blob);
-        this.#textures2d.push({
-            name: name,
-            copyCurrentTexture: false,
-            shaderType: shaderType,
-            texture: null,
-            imageTexture: {
-                bitmap: imageBitmap
-            },
-            internal: this.#internal
-        });
-    }
-    /**
-     * @deprecated use setTextureImage
-     */
-    async updateTextureImage(name, path, shaderType) {
-        if (!this.#nameExists(this.#textures2d, name)) {
-            console.warn('image can not be updated');
-            return;
-        }
-        const response = await fetch(path);
-        const blob = await response.blob();
-        const imageBitmap = await createImageBitmap(blob);
-        const texture2d = this.#textures2d.filter(obj => obj.name == name)[0];
-        texture2d.imageTexture.bitmap = imageBitmap;
-        const cubeTexture = this.#device.createTexture({
-            size: [imageBitmap.width, imageBitmap.height, 1],
-            format: 'rgba8unorm',
-            usage:
-                GPUTextureUsage.TEXTURE_BINDING |
-                GPUTextureUsage.COPY_SRC |
-                GPUTextureUsage.COPY_DST |
-                GPUTextureUsage.RENDER_ATTACHMENT,
-        });
-        this.#device.queue.copyExternalImageToTexture(
-            { source: imageBitmap },
-            { texture: cubeTexture },
-            [imageBitmap.width, imageBitmap.height]
-        );
-        texture2d.texture = cubeTexture;
-    }
+
     /**
      * Load an image as texture_2d
      * @param {string} name
@@ -2458,27 +2419,6 @@ class Points {
             internal: this.#internal,
         });
     }
-    /**
-     * @deprecated use setTextureVideo
-     */
-
-    async addTextureVideo(name, path, shaderType) {
-        if (this.#nameExists(this.#texturesExternal, name)) {
-            return;
-        }
-        const video = document.createElement('video');
-        video.loop = true;
-        video.autoplay = true;
-        video.muted = true;
-        video.src = new URL(path, import.meta.url).toString();
-        await video.play();
-        this.#texturesExternal.push({
-            name: name,
-            shaderType: shaderType,
-            video: video,
-            internal: this.#internal
-        });
-    }
 
     /**
      * Load an video as texture2d
@@ -2504,36 +2444,6 @@ class Points {
         };
         this.#texturesExternal.push(textureExternal);
         return textureExternal;
-    }
-
-    /**
-     * @deprecated use setTextureWebcam
-     */
-    async addTextureWebcam(name, shaderType) {
-        if (this.#nameExists(this.#texturesExternal, name)) {
-            return;
-        }
-        const video = document.createElement('video');
-        //video.loop = true;
-        //video.autoplay = true;
-        video.muted = true;
-        //document.body.appendChild(video);
-        if (navigator.mediaDevices.getUserMedia) {
-            await navigator.mediaDevices.getUserMedia({ video: true })
-                .then(async function (stream) {
-                    video.srcObject = stream;
-                    await video.play();
-                })
-                .catch(function (err) {
-                    console.log(err);
-                });
-        }
-        this.#texturesExternal.push({
-            name: name,
-            shaderType: shaderType,
-            video: video,
-            internal: this.#internal
-        });
     }
 
     /**
@@ -2568,53 +2478,6 @@ class Points {
         };
         this.#texturesExternal.push(textureExternal);
         return textureExternal;
-    }
-
-    /**
-     * @deprecated use setAudio
-     */
-    addAudio(name, path, volume, loop, autoplay) {
-        const audio = new Audio(path);
-        audio.volume = volume;
-        audio.autoplay = autoplay;
-        audio.loop = loop;
-        const sound = {
-            name: name,
-            path: path,
-            audio: audio,
-            analyser: null,
-            data: null
-        };
-        // this.#audio.play();
-        // audio
-        const audioContext = new AudioContext();
-        let resume = _ => { audioContext.resume(); };
-        if (audioContext.state === 'suspended') {
-            document.body.addEventListener('touchend', resume, false);
-            document.body.addEventListener('click', resume, false);
-        }
-        const source = audioContext.createMediaElementSource(audio);
-        // // audioContext.createMediaStreamSource()
-        const analyser = audioContext.createAnalyser();
-        analyser.fftSize = 2048;
-        source.connect(analyser);
-        analyser.connect(audioContext.destination);
-        const bufferLength = analyser.fftSize;//analyser.frequencyBinCount;
-        // const bufferLength = analyser.frequencyBinCount;
-        const data = new Uint8Array(bufferLength);
-        // analyser.getByteTimeDomainData(data);
-        analyser.getByteFrequencyData(data);
-        // storage that will have the data on WGSL
-        this.setStorageMap(name, data,
-            // `array<f32, ${bufferLength}>`
-            'Sound' // custom struct in defaultStructs.js
-        );
-        // uniform that will have the data length as a quick reference
-        this.setUniform(`${name}Length`, analyser.frequencyBinCount);
-        sound.analyser = analyser;
-        sound.data = data;
-        this.#sounds.push(sound);
-        return audio;
     }
 
     /**
@@ -2684,24 +2547,6 @@ class Points {
         };
         this.#texturesStorage2d.push(texturesStorage2d);
         return texturesStorage2d;
-    }
-    /**
-     * @deprecated use setBindingTexture
-     */
-    addBindingTexture(computeName, fragmentName, size) {
-        this.#bindingTextures.push({
-            compute: {
-                name: computeName,
-                shaderType: ShaderType.COMPUTE
-            },
-            fragment: {
-                name: fragmentName,
-                shaderType: ShaderType.FRAGMENT
-            },
-            texture: null,
-            size: size,
-            internal: this.#internal
-        });
     }
 
     /**

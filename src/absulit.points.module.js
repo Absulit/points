@@ -336,23 +336,7 @@ class Points {
         }
         return arrayBufferCopy;
     }
-    /**
-     * @deprecated use {@link setLayers}
-     */
-    addLayers(numLayers, shaderType) {
-        for (let layerIndex = 0; layerIndex < numLayers; layerIndex++) {
-            this.#layers.shaderType = shaderType;
-            this.#layers.push({
-                name: `layer${layerIndex}`,
-                size: this.#canvas.width * this.#canvas.height,
-                structName: 'vec4<f32>',
-                structSize: 16,
-                array: null,
-                buffer: null,
-                internal: this.#internal
-            });
-        }
-    }
+
     /**
      * Layers of data made of `vec4f`
      * @param {Number} numLayers
@@ -499,56 +483,7 @@ class Points {
         texture2d_B.texture = cubeTexture;
         this.#texturesToCopy.push({ a, b: texture2d_B.texture });
     }
-    /**
-     * @deprecated use setTextureImage
-     */
-    async addTextureImage(name, path, shaderType) {
-        if (this.#nameExists(this.#textures2d, name)) {
-            return;
-        }
-        const response = await fetch(path);
-        const blob = await response.blob();
-        const imageBitmap = await createImageBitmap(blob);
-        this.#textures2d.push({
-            name: name,
-            copyCurrentTexture: false,
-            shaderType: shaderType,
-            texture: null,
-            imageTexture: {
-                bitmap: imageBitmap
-            },
-            internal: this.#internal
-        });
-    }
-    /**
-     * @deprecated use setTextureImage
-     */
-    async updateTextureImage(name, path, shaderType) {
-        if (!this.#nameExists(this.#textures2d, name)) {
-            console.warn('image can not be updated')
-            return;
-        }
-        const response = await fetch(path);
-        const blob = await response.blob();
-        const imageBitmap = await createImageBitmap(blob);
-        const texture2d = this.#textures2d.filter(obj => obj.name == name)[0];
-        texture2d.imageTexture.bitmap = imageBitmap;
-        const cubeTexture = this.#device.createTexture({
-            size: [imageBitmap.width, imageBitmap.height, 1],
-            format: 'rgba8unorm',
-            usage:
-                GPUTextureUsage.TEXTURE_BINDING |
-                GPUTextureUsage.COPY_SRC |
-                GPUTextureUsage.COPY_DST |
-                GPUTextureUsage.RENDER_ATTACHMENT,
-        });
-        this.#device.queue.copyExternalImageToTexture(
-            { source: imageBitmap },
-            { texture: cubeTexture },
-            [imageBitmap.width, imageBitmap.height]
-        );
-        texture2d.texture = cubeTexture;
-    }
+
     /**
      * Load an image as texture_2d
      * @param {string} name
@@ -649,27 +584,6 @@ class Points {
             internal: this.#internal,
         });
     }
-    /**
-     * @deprecated use setTextureVideo
-     */
-
-    async addTextureVideo(name, path, shaderType) {
-        if (this.#nameExists(this.#texturesExternal, name)) {
-            return;
-        }
-        const video = document.createElement('video');
-        video.loop = true;
-        video.autoplay = true;
-        video.muted = true;
-        video.src = new URL(path, import.meta.url).toString();
-        await video.play();
-        this.#texturesExternal.push({
-            name: name,
-            shaderType: shaderType,
-            video: video,
-            internal: this.#internal
-        });
-    }
 
     /**
      * Load an video as texture2d
@@ -695,36 +609,6 @@ class Points {
         };
         this.#texturesExternal.push(textureExternal);
         return textureExternal;
-    }
-
-    /**
-     * @deprecated use setTextureWebcam
-     */
-    async addTextureWebcam(name, shaderType) {
-        if (this.#nameExists(this.#texturesExternal, name)) {
-            return;
-        }
-        const video = document.createElement('video');
-        //video.loop = true;
-        //video.autoplay = true;
-        video.muted = true;
-        //document.body.appendChild(video);
-        if (navigator.mediaDevices.getUserMedia) {
-            await navigator.mediaDevices.getUserMedia({ video: true })
-                .then(async function (stream) {
-                    video.srcObject = stream;
-                    await video.play();
-                })
-                .catch(function (err) {
-                    console.log(err);
-                });
-        }
-        this.#texturesExternal.push({
-            name: name,
-            shaderType: shaderType,
-            video: video,
-            internal: this.#internal
-        });
     }
 
     /**
@@ -759,53 +643,6 @@ class Points {
         };
         this.#texturesExternal.push(textureExternal);
         return textureExternal;
-    }
-
-    /**
-     * @deprecated use setAudio
-     */
-    addAudio(name, path, volume, loop, autoplay) {
-        const audio = new Audio(path);
-        audio.volume = volume;
-        audio.autoplay = autoplay;
-        audio.loop = loop;
-        const sound = {
-            name: name,
-            path: path,
-            audio: audio,
-            analyser: null,
-            data: null
-        }
-        // this.#audio.play();
-        // audio
-        const audioContext = new AudioContext();
-        let resume = _ => { audioContext.resume() }
-        if (audioContext.state === 'suspended') {
-            document.body.addEventListener('touchend', resume, false);
-            document.body.addEventListener('click', resume, false);
-        }
-        const source = audioContext.createMediaElementSource(audio);
-        // // audioContext.createMediaStreamSource()
-        const analyser = audioContext.createAnalyser();
-        analyser.fftSize = 2048;
-        source.connect(analyser);
-        analyser.connect(audioContext.destination);
-        const bufferLength = analyser.fftSize;//analyser.frequencyBinCount;
-        // const bufferLength = analyser.frequencyBinCount;
-        const data = new Uint8Array(bufferLength);
-        // analyser.getByteTimeDomainData(data);
-        analyser.getByteFrequencyData(data);
-        // storage that will have the data on WGSL
-        this.setStorageMap(name, data,
-            // `array<f32, ${bufferLength}>`
-            'Sound' // custom struct in defaultStructs.js
-        );
-        // uniform that will have the data length as a quick reference
-        this.setUniform(`${name}Length`, analyser.frequencyBinCount);
-        sound.analyser = analyser;
-        sound.data = data;
-        this.#sounds.push(sound);
-        return audio;
     }
 
     /**
@@ -875,24 +712,6 @@ class Points {
         };
         this.#texturesStorage2d.push(texturesStorage2d);
         return texturesStorage2d;
-    }
-    /**
-     * @deprecated use setBindingTexture
-     */
-    addBindingTexture(computeName, fragmentName, size) {
-        this.#bindingTextures.push({
-            compute: {
-                name: computeName,
-                shaderType: ShaderType.COMPUTE
-            },
-            fragment: {
-                name: fragmentName,
-                shaderType: ShaderType.FRAGMENT
-            },
-            texture: null,
-            size: size,
-            internal: this.#internal
-        });
     }
 
     /**

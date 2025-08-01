@@ -1,4 +1,13 @@
 /* @ts-self-types="./RenderPass.d.ts" */
+/**
+ * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
+ * This is useful for PostProcessing.
+ * @example
+ *
+ * // vert, frag and compute are strings
+ * new RenderPass(vert, frag, compute, 800, 800);
+ */
+
 class RenderPass {
     #vertexShader;
     #computeShader;

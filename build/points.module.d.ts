@@ -2,6 +2,14 @@
  * A numeric value that may be negative or positive.
  */
 export type SignedNumber = number;
+/**
+ * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
+ * This is useful for PostProcessing.
+ * @example
+ *
+ * // vert, frag and compute are strings
+ * new RenderPass(vert, frag, compute, 800, 800);
+ */
 export class RenderPass {
     /**
      * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
@@ -280,10 +288,6 @@ declare class Points {
     setStorageMap(name: string, arrayData: Uint8Array<ArrayBuffer>, structName: string, read?: boolean, shaderType?: ShaderType): any;
     readStorage(name: any): Promise<Float32Array<any>>;
     /**
-     * @deprecated use {@link setLayers}
-     */
-    addLayers(numLayers: any, shaderType: any): void;
-    /**
      * Layers of data made of `vec4f`
      * @param {Number} numLayers
      * @param {ShaderType} shaderType
@@ -324,14 +328,6 @@ declare class Points {
     };
     copyTexture(nameTextureA: any, nameTextureB: any): void;
     /**
-     * @deprecated use setTextureImage
-     */
-    addTextureImage(name: any, path: any, shaderType: any): Promise<void>;
-    /**
-     * @deprecated use setTextureImage
-     */
-    updateTextureImage(name: any, path: any, shaderType: any): Promise<void>;
-    /**
      * Load an image as texture_2d
      * @param {string} name
      * @param {string} path
@@ -366,10 +362,6 @@ declare class Points {
      */
     setTextureImageArray(name: string, paths: any[], shaderType: ShaderType): Promise<void>;
     /**
-     * @deprecated use setTextureVideo
-     */
-    addTextureVideo(name: any, path: any, shaderType: any): Promise<void>;
-    /**
      * Load an video as texture2d
      * @param {string} name
      * @param {string} path
@@ -382,10 +374,6 @@ declare class Points {
         internal: boolean;
     }>;
     /**
-     * @deprecated use setTextureWebcam
-     */
-    addTextureWebcam(name: any, shaderType: any): Promise<void>;
-    /**
      * Load webcam as texture2d
      * @param {string} name
      * @param {ShaderType} shaderType
@@ -396,10 +384,6 @@ declare class Points {
         video: HTMLVideoElement;
         internal: boolean;
     }>;
-    /**
-     * @deprecated use setAudio
-     */
-    addAudio(name: any, path: any, volume: any, loop: any, autoplay: any): HTMLAudioElement;
     /**
      * Assigns an audio FrequencyData to a StorageMap
      * @param {string} name name of the Storage and prefix of the length variable e.g. `[name]Length`.
@@ -416,10 +400,6 @@ declare class Points {
         texture: any;
         internal: boolean;
     };
-    /**
-     * @deprecated use setBindingTexture
-     */
-    addBindingTexture(computeName: any, fragmentName: any, size: any): void;
     /**
      * Sets a texture to the compute and fragment shader, in the compute you can
      * write to the texture, and in the fragment you can read the texture, so is
@@ -500,6 +480,7 @@ declare class Coordinate {
 }
 /**
  * @class RGBAColor
+ * @ignore
  */
 declare class RGBAColor {
     static average(colors: any): RGBAColor;

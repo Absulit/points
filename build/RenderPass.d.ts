@@ -1,4 +1,12 @@
 export { RenderPass as default };
+/**
+ * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
+ * This is useful for PostProcessing.
+ * @example
+ *
+ * // vert, frag and compute are strings
+ * new RenderPass(vert, frag, compute, 800, 800);
+ */
 declare class RenderPass {
     /**
      * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
