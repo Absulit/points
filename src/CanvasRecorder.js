@@ -1,6 +1,4 @@
 /**
- * @class CanvasRecorder
- *
  * @example
  * const recorder = new CanvasRecorder(canvas);
  */
