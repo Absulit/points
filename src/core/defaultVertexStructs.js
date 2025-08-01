@@ -1,5 +1,15 @@
 /**
  * non used structs unless required
+ * <br>
+ * <br>
+ * These are wgsl functions, not js functions.
+ * The function is enclosed in a js string constant,
+ * to be appended into the code to reference it in the string shader.
+ * @module defaultVertexStructs
+ */
+
+/**
+ * Unused structs for the future.
  */
 const defaultVertexStructs = /*wgsl*/`
 

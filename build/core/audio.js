@@ -1,4 +1,14 @@
 /* @ts-self-types="./audio.d.ts" */
+/**
+ * Utilities for audio work.
+ * <br>
+ * <br>
+ * These are wgsl functions, not js functions.
+ * The function is enclosed in a js string constant,
+ * to be appended into the code to reference it in the string shader.
+ * @module points/audio
+ */
+
 const audioAverage = /*wgsl*/`
 fn audioAverage(sound:Sound) -> f32 {
     var audioAverage = 0.;
