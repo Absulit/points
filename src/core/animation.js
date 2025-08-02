@@ -13,6 +13,8 @@
  * The value is not normalized, so in the range -1..1
  * @type {String}
  * @param {f32} speed
+ * @example
+ * let va;ue = fusin(2.);
  */
 export const fusin = /*wgsl*/`
 fn fusin(speed: f32) -> f32{
