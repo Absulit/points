@@ -1,6 +1,6 @@
 /**
  * Along with the vertexArray it calculates some info like offsets required for the pipeline.
- * @class VertexBufferInfo
+ * Internal use.
  * @ignore
  */
 class VertexBufferInfo {
