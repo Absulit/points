@@ -17,6 +17,23 @@ import UniformsArray from './UniformsArray.js';
 /**
  * Main class Points
  * @class Points
+ * @example
+ * import Points from 'points';
+ * const points = new Points('canvas');
+ *
+ * let renderPasses = [
+ *     new RenderPass(vert1, frag1, compute1),
+ *     new RenderPass(vert2, frag2, compute2)
+ * ];
+ *
+ * await points.init(renderPasses);
+ * update();
+ *
+ * function update() {
+ *     points.update();
+ *     requestAnimationFrame(update);
+ * }
+ *
  */
 class Points {
     #canvasId = null;
