@@ -39,7 +39,7 @@ export const TAU = /*wgsl*/`const TAU = PI * 2;`;
  *
  * @example
  * // js
- * import { PHI  } from 'points/math';
+ * import { PHI } from 'points/math';
  *
  * // wgsl string
  * ${PHI }
