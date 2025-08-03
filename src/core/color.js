@@ -11,6 +11,14 @@
 /**
  * RED color;
  * @type {vec4f}
+ *
+ * @example
+ * // js
+ * import { RED } from 'points/color';
+ *
+ * // wgsl string
+ * ${RED}
+ * let value = RED * vec4f(.5);
  */
 export const RED = /*wgsl*/`
 const RED = vec4(1.,0.,0.,1.);
@@ -19,6 +27,14 @@ const RED = vec4(1.,0.,0.,1.);
 /**
  * GREEN color;
  * @type {vec4f}
+ *
+ * @example
+ * // js
+ * import { GREEN } from 'points/color';
+ *
+ * // wgsl string
+ * ${GREEN}
+ * let value = GREEN * vec4f(.5);
  */
 export const GREEN = /*wgsl*/`
 const GREEN = vec4(0.,1.,0.,1.);
@@ -27,6 +43,14 @@ const GREEN = vec4(0.,1.,0.,1.);
 /**
  * BLUE color;
  * @type {vec4f}
+ *
+ * @example
+ * // js
+ * import { BLUE } from 'points/color';
+ *
+ * // wgsl string
+ * ${BLUE}
+ * let value = BLUE * vec4f(.5);
  */
 export const BLUE = /*wgsl*/`
 const BLUE = vec4(0.,0.,1.,1.);
@@ -35,6 +59,14 @@ const BLUE = vec4(0.,0.,1.,1.);
 /**
  * YELLOW color;
  * @type {vec4f}
+ *
+ * @example
+ * // js
+ * import { YELLOW } from 'points/color';
+ *
+ * // wgsl string
+ * ${YELLOW}
+ * let value = YELLOW * vec4f(.5);
  */
 export const YELLOW = /*wgsl*/`
 const YELLOW = vec4(1.,1.,0.,1.);
@@ -43,6 +75,14 @@ const YELLOW = vec4(1.,1.,0.,1.);
 /**
  * CYAN color;
  * @type {vec4f}
+ *
+ * @example
+ * // js
+ * import { CYAN } from 'points/color';
+ *
+ * // wgsl string
+ * ${CYAN}
+ * let value = CYAN * vec4f(.5);
  */
 export const CYAN = /*wgsl*/`
 const CYAN = vec4(0.,1.,1.,1.);
@@ -51,6 +91,14 @@ const CYAN = vec4(0.,1.,1.,1.);
 /**
  * MAGENTA color;
  * @type {vec4f}
+ *
+ * @example
+ * // js
+ * import { MAGENTA } from 'points/color';
+ *
+ * // wgsl string
+ * ${MAGENTA}
+ * let value = MAGENTA * vec4f(.5);
  */
 export const MAGENTA = /*wgsl*/`
 const MAGENTA = vec4(1.,0.,1.,1.);
@@ -59,6 +107,14 @@ const MAGENTA = vec4(1.,0.,1.,1.);
 /**
  * WHITE color;
  * @type {vec4f}
+ *
+ * @example
+ * // js
+ * import { WHITE } from 'points/color';
+ *
+ * // wgsl string
+ * ${WHITE}
+ * let value = WHITE * vec4f(.5);
  */
 export const WHITE = /*wgsl*/`
 const WHITE = vec4(1.,1.,1.,1.);
@@ -67,6 +123,15 @@ const WHITE = vec4(1.,1.,1.,1.);
 /**
  * BLACK color;
  * @type {vec4f}
+ *
+ * @example
+ * // js
+ * import { BLACK } from 'points/color';
+ *
+ * // wgsl string
+ * ${BLACK}
+ * let value = BLACK * vec4f(.5);
+ *
  */
 export const BLACK = /*wgsl*/`
 const BLACK = vec4(0.,0.,0.,1.);
@@ -84,7 +149,7 @@ const BLACK = vec4(0.,0.,0.,1.);
  *
  * // wgsl string
  * ${layer}
- * let value = layer(rgba1, rgba2);
+ * let value = RED * vec4f(.5);
  */
 export const layer = /*wgsl*/`
 // https://stackoverflow.com/a/24501192/507186
