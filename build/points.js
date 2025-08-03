@@ -1,6 +1,19 @@
 /* @ts-self-types="./points.d.ts" */
 /**
+ * In different calls to the main {@link Points} class, it is used to
+ * tell the library in what stage of the shaders the data to be sent.
  * @class ShaderType
+ *
+ * @example
+ * // Send storage data to the Fragment Shaders only
+ * points.setStorage('variables', 'Variables', false, ShaderType.FRAGMENT);
+ * points.setStorage('objects', `array<Object, ${numObjects}>`, false, ShaderType.FRAGMENT);
+ *
+ * @example
+ * // Send storage data to the Compute Shaders only
+ * points.setStorage('variables', 'Variable', false, ShaderType.COMPUTE);
+ *
+ *
  */
 class ShaderType {
     static VERTEX = 1;
@@ -345,6 +358,8 @@ fn main(
  * The value is normalized, so in the range 0..1
  * @type {String}
  * @param {f32} speed
+ * @example
+ * let value = fnusin(2.);
  */
 const fnusin = /*wgsl*/`
 fn fnusin(speed: f32) -> f32{
@@ -1312,7 +1327,7 @@ class UniformKeys {
 
 /**
  * Along with the vertexArray it calculates some info like offsets required for the pipeline.
- * @class VertexBufferInfo
+ * Internal use.
  * @ignore
  */
 class VertexBufferInfo {
@@ -1656,6 +1671,16 @@ class Clock {
     }
 }
 
+/**
+ * Fragment, Sound, and Event structs.
+ * <br>
+ * <br>
+ * Fragment used in Vertex Shaders.<br>
+ * Sound used along with {@link Points#setAudio}<br>
+ * Event used along with {@link Points#addEventListener}<br>
+ * @module defaultStructs
+ */
+
 const defaultStructs = /*wgsl*/`
 
 struct Fragment {
@@ -1690,7 +1715,14 @@ struct Event {
  * These are wgsl functions, not js functions.
  * The function is enclosed in a js string constant,
  * to be appended into the code to reference it in the string shader.
+ *
+ * Use the base example as reference: examples/base/vert.js
+
  * @module defaultFunctions
+ *
+ * @example
+ * // Inside the main vertex function add this
+ *  return defaultVertexBody(position, color, uv);
  */
 
 /**
@@ -2189,6 +2221,8 @@ class UniformsArray extends Array {
  *     points.update();
  *     requestAnimationFrame(update);
  * }
+ *
+ * @category Main
  *
  */
 class Points {
@@ -2704,13 +2738,21 @@ class Points {
     }
 
     /**
-     * Assigns an audio FrequencyData to a StorageMap
+     * Assigns an audio FrequencyData to a StorageMap.<br>
+     * Calling setAudio creates a Storage with `name` in the wgsl shaders.<br>
+     * From this storage you can read the audio data sent to the shader as numeric values.<br>
      * @param {string} name name of the Storage and prefix of the length variable e.g. `[name]Length`.
      * @param {string} path
      * @param {Number} volume
      * @param {boolean} loop
      * @param {boolean} autoplay
      * @returns {HTMLAudioElement}
+     * @example
+     * // js
+     * const audio = points.setAudio('audio', 'audiofile.ogg', volume, loop, autoplay);
+     *
+     * // wgsl
+     * let audioX = audio.data[ u32(uvr.x * params.audioLength)] / 256;
      */
     setAudio(name, path, volume, loop, autoplay) {
         const audio = new Audio(path);

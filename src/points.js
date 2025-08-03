@@ -34,6 +34,8 @@ import UniformsArray from './UniformsArray.js';
  *     requestAnimationFrame(update);
  * }
  *
+ * @category Main
+ *
  */
 class Points {
     #canvasId = null;

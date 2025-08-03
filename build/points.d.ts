@@ -209,7 +209,20 @@ export class RenderPasses {
     static waves(points: Points, scale: number, intensity: number): Promise<void>;
 }
 /**
+ * In different calls to the main {@link Points} class, it is used to
+ * tell the library in what stage of the shaders the data to be sent.
  * @class ShaderType
+ *
+ * @example
+ * // Send storage data to the Fragment Shaders only
+ * points.setStorage('variables', 'Variables', false, ShaderType.FRAGMENT);
+ * points.setStorage('objects', `array<Object, ${numObjects}>`, false, ShaderType.FRAGMENT);
+ *
+ * @example
+ * // Send storage data to the Compute Shaders only
+ * points.setStorage('variables', 'Variable', false, ShaderType.COMPUTE);
+ *
+ *
  */
 export class ShaderType {
     static VERTEX: number;
@@ -235,6 +248,8 @@ export class ShaderType {
  *     points.update();
  *     requestAnimationFrame(update);
  * }
+ *
+ * @category Main
  *
  */
 declare class Points {
@@ -367,13 +382,21 @@ declare class Points {
         internal: boolean;
     }>;
     /**
-     * Assigns an audio FrequencyData to a StorageMap
+     * Assigns an audio FrequencyData to a StorageMap.<br>
+     * Calling setAudio creates a Storage with `name` in the wgsl shaders.<br>
+     * From this storage you can read the audio data sent to the shader as numeric values.<br>
      * @param {string} name name of the Storage and prefix of the length variable e.g. `[name]Length`.
      * @param {string} path
      * @param {Number} volume
      * @param {boolean} loop
      * @param {boolean} autoplay
      * @returns {HTMLAudioElement}
+     * @example
+     * // js
+     * const audio = points.setAudio('audio', 'audiofile.ogg', volume, loop, autoplay);
+     *
+     * // wgsl
+     * let audioX = audio.data[ u32(uvr.x * params.audioLength)] / 256;
      */
     setAudio(name: string, path: string, volume: number, loop: boolean, autoplay: boolean): HTMLAudioElement;
     setTextureStorage2d(name: any, shaderType: any): {

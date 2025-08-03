@@ -1,4 +1,14 @@
 /* @ts-self-types="./defaultStructs.d.ts" */
+/**
+ * Fragment, Sound, and Event structs.
+ * <br>
+ * <br>
+ * Fragment used in Vertex Shaders.<br>
+ * Sound used along with {@link Points#setAudio}<br>
+ * Event used along with {@link Points#addEventListener}<br>
+ * @module defaultStructs
+ */
+
 const defaultStructs = /*wgsl*/`
 
 struct Fragment {
