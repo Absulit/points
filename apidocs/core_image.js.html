@@ -8,14 +8,24 @@
  */
 
 /**
- * places texture in a position
+ * Places texture in a position. The texture being an image loaded from the JS side.
  * @type {String}
  * @param {texture_2d&lt;f32>} texture `texture_2d&lt;f32>`
  * @param {sampler} aSampler `sampler`
  * @param {vec2&lt;f32>} position `vec2&lt;f32>`
  * @param {vec2&lt;f32>} uv `vec2&lt;f32>`
  * @param {bool} crop `bool`
- * @return `vec4f`
+ * @returns {vec4f}
+ *
+ * @example
+ * // js
+ * import { texturePosition } from 'points/image';
+ *
+ * await points.setTextureImage('image', 'myimage.jpg');
+ *
+ * // wgsl string
+ * ${texturePosition}
+ * let value = texturePosition(image, imageSampler, vec2f(), uvr, true);
  */
 export const texturePosition = /*wgsl*/`
 fn texturePosition(texture:texture_2d&lt;f32>, aSampler:sampler, position:vec2&lt;f32>, uv:vec2&lt;f32>, crop:bool) -> vec4&lt;f32> {
@@ -46,14 +56,24 @@ fn texturePosition(texture:texture_2d&lt;f32>, aSampler:sampler, position:vec2&l
 `;
 
 /**
- * places texture_external in a position
+ * Places texture_external in a position. Texture external being in this case
+ * a video loaded as texture in the JS side.
  * @type {String}
  * @param {texture_external} texture `texture_external`
  * @param {sampler} aSampler `sampler`
  * @param {vec2&lt;f32>} position `vec2&lt;f32>`
  * @param {vec2&lt;f32>} uv `vec2&lt;f32>`
  * @param {bool} crop `bool`
- * @return `vec4f
+ * @returns {vec4f}
+ *
+ * @example
+ * // js
+ * import { textureExternalPosition } from 'points/image';
+ * await points.setTextureVideo('video', 'myvideo.mp4');
+ *
+ * // wgsl string
+ * ${textureExternalPosition}
+ * let value = textureExternalPosition(video, imageSampler, vec2f(), uvr, true);
  */
 export const textureExternalPosition = /*wgsl*/`
 fn textureExternalPosition(texture:texture_external, aSampler:sampler, position:vec2&lt;f32>, uv:vec2&lt;f32>, crop:bool) -> vec4&lt;f32> {
@@ -87,7 +107,15 @@ fn textureExternalPosition(texture:texture_external, aSampler:sampler, position:
  * Flips texture in Y. This because it comes flipped, so this corrects it.
  * @type {String}
  * @param {vec2f} uv uv coordinates
- * @return `vec2f`
+ * @returns {vec2f}
+ *
+ * @example
+ * // js
+ * import { flipTextureUV } from 'points/image';
+ *
+ * // wgsl string
+ * ${flipTextureUV}
+ * let value = flipTextureUV(uvr);
  */
 export const flipTextureUV = /*wgsl*/`
 fn flipTextureUV(uv:vec2&lt;f32>) -> vec2&lt;f32>{
@@ -104,7 +132,15 @@ fn flipTextureUV(uv:vec2&lt;f32>) -> vec2&lt;f32>{
  * @param {vec2f} uv uv coordinates
  * @param {vec2f} index position in the atlas: e.g. `0` is the first
  * @param {vec2f} size dimensions of the cell: e.g. `32x32px`
- * @return `vecff`
+ * @return {vec4f}
+ *
+ * @example
+ * // js
+ * import { sprite } from 'points/image';
+ *
+ * // wgsl string
+ * ${sprite}
+ * let value = sprite(texture, imageSampler, vec2f(), uvr, 0, vec2(8u,22u) );
  */
 export const sprite = /*wgsl*/`
 fn sprite(texture:texture_2d&lt;f32>, aSampler:sampler, position:vec2f, uv:vec2f, index:u32, size:vec2&lt;u32>) -> vec4f {
