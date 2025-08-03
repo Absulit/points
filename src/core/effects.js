@@ -354,8 +354,8 @@ fn blur9(image: texture_2d<f32>, imageSampler:sampler, position:vec2<f32>, uv:ve
 /**
  * WIP
  */
-export const blur8 = /*wgsl*/`
-fn blur8(color:vec4<f32>, colorsAround:array<vec4<f32>, 8>, amount:f32) -> {
+// export const blur8 = /*wgsl*/`
+// fn blur8(color:vec4<f32>, colorsAround:array<vec4<f32>, 8>, amount:f32) -> {
 
-}
-`;
+// }
+// `;
