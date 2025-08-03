@@ -10,16 +10,40 @@
 /**
  * PI is the ratio of a circle's circumference to its diameter.
  * [PI](https://en.wikipedia.org/wiki/Pi)
+ *
+ * @example
+ * // js
+ * import { PI } from 'points/math';
+ *
+ * // wgsl string
+ * ${PI}
+ * let value = PI * 3;
  */
 export const PI = /*wgsl*/`const PI = 3.14159265;`;
 /**
  * TAU  is the ratio of a circle's circumference to its radius.
  * [TAU](https://en.wikipedia.org/wiki/Tau_(mathematics))
+ *
+ * @example
+ * // js
+ * import { TAU } from 'points/math';
+ *
+ * // wgsl string
+ * ${TAU}
+ * let value = TAU / 3.5;
  */
 export const TAU = /*wgsl*/`const TAU = PI * 2;`;
 /**
  * PHI is the Golden Ratio
  * [PHI](https://en.wikipedia.org/wiki/Golden_ratio)
+ *
+ * @example
+ * // js
+ * import { PHI  } from 'points/math';
+ *
+ * // wgsl string
+ * ${PHI }
+ * let value = PHI + 3;
  */
 export const PHI = /*wgsl*/`const PHI = 1.61803398;`;
 /**
@@ -27,6 +51,14 @@ export const PHI = /*wgsl*/`const PHI = 1.61803398;`;
  * that is the base of the natural logarithm and exponential function.
  * It is sometimes called Euler's number, after the Swiss mathematician Leonhard Euler.
  * [E](https://en.wikipedia.org/wiki/E_(mathematical_constant))
+ *
+ * @example
+ * // js
+ * import { E } from 'points/math';
+ *
+ * // wgsl string
+ * ${E}
+ * let value = E - 1.3;
  */
 export const E = /*wgsl*/`const E = 2.71828182;`;
 
