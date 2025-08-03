@@ -6,13 +6,13 @@ const color = {
     fragmentShader,
     init: async (points, params) => {
         points._setInternal(true);
-        points.addSampler('renderpass_feedbackSampler', null);
-        points.addTexture2d('renderpass_feedbackTexture', true);
-        points.addUniform('color_blendAmount', params?.blendAmount || .5);
-        points.addUniform('color_r', params?.color[0] || 1);
-        points.addUniform('color_g', params?.color[1] || 1);
-        points.addUniform('color_b', params?.color[2] || 0);
-        points.addUniform('color_a', params?.color[3] || 1);
+        points.setSampler('renderpass_feedbackSampler', null);
+        points.setTexture2d('renderpass_feedbackTexture', true);
+        points.setUniform('color_blendAmount', params?.blendAmount || .5);
+        points.setUniform('color_r', params?.color[0] || 1);
+        points.setUniform('color_g', params?.color[1] || 1);
+        points.setUniform('color_b', params?.color[2] || 0);
+        points.setUniform('color_a', params?.color[3] || 1);
         points._setInternal(false);
     },
     update: points => {

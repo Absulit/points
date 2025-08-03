@@ -9,6 +9,12 @@
  * @module points/audio
  */
 
+
+/**
+ * Average of all the value in sound.data (Sound struct in {@link module:defaultStructs})
+ * @param {Sound} sound
+ * @returns {f32} average result
+ */
 const audioAverage = /*wgsl*/`
 fn audioAverage(sound:Sound) -> f32 {
     var audioAverage = 0.;
@@ -20,6 +26,9 @@ fn audioAverage(sound:Sound) -> f32 {
 }
 `;
 
+/**
+ *
+ */
 const audioAverageSegments = /*wgsl*/`
 fn audioAverageSegments(segmentNum:i32) -> f32{
     // arrayLength(&array)

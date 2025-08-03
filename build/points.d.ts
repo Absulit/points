@@ -3,12 +3,18 @@
  */
 export type SignedNumber = number;
 /**
- * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
- * This is useful for PostProcessing.
- * @example
+ * A RenderPass is a way to have a block of shaders to pass to your application pipeline and
+ * these render passes will be executed in the order you pass them in the {@link Points#init} method.
  *
- * // vert, frag and compute are strings
- * new RenderPass(vert, frag, compute, 800, 800);
+ * @example
+ * // vert, frag and compute are strings with the wgsl shaders.
+ * let renderPasses = [
+ *     new RenderPass(vert1, frag1, compute1),
+ *     new RenderPass(vert2, frag2, compute2)
+ * ];
+
+ * // we pass the array of renderPasses
+ * await points.init(renderPasses);
  */
 export class RenderPass {
     /**
@@ -60,7 +66,7 @@ export class RenderPasses {
     static BLOOM: number;
     static BLUR: number;
     static WAVES: number;
-    static "__#11@#LIST": {
+    static "__#4@#LIST": {
         1: {
             vertexShader: string;
             fragmentShader: string;
@@ -203,7 +209,20 @@ export class RenderPasses {
     static waves(points: Points, scale: number, intensity: number): Promise<void>;
 }
 /**
+ * In different calls to the main {@link Points} class, it is used to
+ * tell the library in what stage of the shaders the data to be sent.
  * @class ShaderType
+ *
+ * @example
+ * // Send storage data to the Fragment Shaders only
+ * points.setStorage('variables', 'Variables', false, ShaderType.FRAGMENT);
+ * points.setStorage('objects', `array<Object, ${numObjects}>`, false, ShaderType.FRAGMENT);
+ *
+ * @example
+ * // Send storage data to the Compute Shaders only
+ * points.setStorage('variables', 'Variable', false, ShaderType.COMPUTE);
+ *
+ *
  */
 export class ShaderType {
     static VERTEX: number;
@@ -213,19 +232,30 @@ export class ShaderType {
 /**
  * Main class Points
  * @class Points
+ * @example
+ * import Points from 'points';
+ * const points = new Points('canvas');
+ *
+ * let renderPasses = [
+ *     new RenderPass(vert1, frag1, compute1),
+ *     new RenderPass(vert2, frag2, compute2)
+ * ];
+ *
+ * await points.init(renderPasses);
+ * update();
+ *
+ * function update() {
+ *     points.update();
+ *     requestAnimationFrame(update);
+ * }
+ *
+ * @category Main
+ *
  */
 declare class Points {
     constructor(canvasId: any);
     set fitWindow(value: boolean);
     get fitWindow(): boolean;
-    /**
-     * @deprecated use setUniform
-     */
-    addUniform(name: any, value: any, structName: any): void;
-    /**
-     * @deprecated use setUniform
-     */
-    updateUniform(name: any, value: any): void;
     /**
      * Set a param as uniform to send to all shaders.
      * A Uniform is a value that can only be changed
@@ -248,10 +278,6 @@ declare class Points {
      */
     updateUniforms(arr: Array<any>): void;
     /**
-     * @deprecated use setStorage()
-     */
-    addStorage(name: any, structName: any, read: any, shaderType: any, arrayData: any): void;
-    /**
      * Creates a persistent memory buffer across every frame call.
      * @param {string} name Name that the Storage will have in the shader
      * @param {string} structName Name of the struct already existing on the
@@ -268,14 +294,6 @@ declare class Points {
         buffer: any;
         internal: boolean;
     };
-    /**
-     * @deprecated
-     */
-    addStorageMap(name: any, arrayData: any, structName: any, read: any, shaderType: any): void;
-    /**
-     * @deprecated use setStorageMap
-     */
-    updateStorageMap(name: any, arrayData: any): void;
     /**
      * Creates a persistent memory buffer across every frame call that can be updated.
      * @param {string} name Name that the Storage will have in the shader.
@@ -294,38 +312,17 @@ declare class Points {
      */
     setLayers(numLayers: number, shaderType: ShaderType): void;
     /**
-     * @deprecated use setSampler
-     */
-    addSampler(name: any, descriptor: any, shaderType: any): void;
-    /**
      * Creates a `sampler` to be sent to the shaders.
      * @param {string} name Name of the `sampler` to be called in the shaders.
      * @param {GPUSamplerDescriptor} descriptor
      */
-    setSampler(name: string, descriptor: GPUSamplerDescriptor, shaderType: any): {
-        name: string;
-        descriptor: GPUSamplerDescriptor;
-        shaderType: any;
-        resource: any;
-        internal: boolean;
-    };
-    /**
-     * @deprecated use setTexture2d
-     */
-    addTexture2d(name: any, copyCurrentTexture: any, shaderType: any, renderPassIndex: any): void;
+    setSampler(name: string, descriptor: GPUSamplerDescriptor, shaderType: any): any;
     /**
      * Create a `texture_2d` in the shaders.
      * @param {string} name Name to call the texture in the shaders.
      * @param {boolean} copyCurrentTexture If you want the fragment output to be copied here.
      */
-    setTexture2d(name: string, copyCurrentTexture: boolean, shaderType: any, renderPassIndex: any): {
-        name: string;
-        copyCurrentTexture: boolean;
-        shaderType: any;
-        texture: any;
-        renderPassIndex: any;
-        internal: boolean;
-    };
+    setTexture2d(name: string, copyCurrentTexture: boolean, shaderType: any, renderPassIndex: any): any;
     copyTexture(nameTextureA: any, nameTextureB: any): void;
     /**
      * Load an image as texture_2d
@@ -385,13 +382,21 @@ declare class Points {
         internal: boolean;
     }>;
     /**
-     * Assigns an audio FrequencyData to a StorageMap
+     * Assigns an audio FrequencyData to a StorageMap.<br>
+     * Calling setAudio creates a Storage with `name` in the wgsl shaders.<br>
+     * From this storage you can read the audio data sent to the shader as numeric values.<br>
      * @param {string} name name of the Storage and prefix of the length variable e.g. `[name]Length`.
      * @param {string} path
      * @param {Number} volume
      * @param {boolean} loop
      * @param {boolean} autoplay
      * @returns {HTMLAudioElement}
+     * @example
+     * // js
+     * const audio = points.setAudio('audio', 'audiofile.ogg', volume, loop, autoplay);
+     *
+     * // wgsl
+     * let audioX = audio.data[ u32(uvr.x * params.audioLength)] / 256;
      */
     setAudio(name: string, path: string, volume: number, loop: boolean, autoplay: boolean): HTMLAudioElement;
     setTextureStorage2d(name: any, shaderType: any): {

@@ -34,7 +34,7 @@ export default [
       './core/RenderPasses/bloom/index.js',
       './core/RenderPasses/blur/index.js',
       './core/RenderPasses/waves/index.js',
-      './absulit.points.module.js',
+      './points.js',
       './RenderPass.js',
     ],
     plugins: []
@@ -42,9 +42,9 @@ export default [
   {
     input: 'src/entries.js',
     output: {
-      file: 'build/points.module.js',
+      file: 'build/points.js',
       format: 'esm',
-      banner: '/* @ts-self-types="./points.module.d.ts" */'
+      banner: '/* @ts-self-types="./points.d.ts" */'
     },
     plugins: []
   },

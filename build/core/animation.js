@@ -14,6 +14,8 @@
  * The value is not normalized, so in the range -1..1
  * @type {String}
  * @param {f32} speed
+ * @example
+ * let value = fusin(2.);
  */
 const fusin = /*wgsl*/`
 fn fusin(speed: f32) -> f32{
@@ -26,6 +28,8 @@ fn fusin(speed: f32) -> f32{
  * The value is not normalized, so in the range -1..1
  * @type {String}
  * @param {f32} speed
+ * @example
+ * let value = fucos(2.);
  */
 const fucos = /*wgsl*/`
 fn fucos(speed: f32) -> f32{
@@ -38,6 +42,8 @@ fn fucos(speed: f32) -> f32{
  * The value is normalized, so in the range 0..1
  * @type {String}
  * @param {f32} speed
+ * @example
+ * let value = fnusin(2.);
  */
 const fnusin = /*wgsl*/`
 fn fnusin(speed: f32) -> f32{

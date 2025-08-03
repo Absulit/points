@@ -3,6 +3,8 @@
  * The value is normalized, so in the range 0..1
  * @type {String}
  * @param {f32} speed
+ * @example
+ * let value = fnusin(2.);
  */
 export const fnusin: string;
 /**
@@ -10,6 +12,8 @@ export const fnusin: string;
  * The value is not normalized, so in the range -1..1
  * @type {String}
  * @param {f32} speed
+ * @example
+ * let value = fucos(2.);
  */
 export const fucos: string;
 /**
@@ -26,5 +30,7 @@ export const fucos: string;
  * The value is not normalized, so in the range -1..1
  * @type {String}
  * @param {f32} speed
+ * @example
+ * let value = fusin(2.);
  */
 export const fusin: string;

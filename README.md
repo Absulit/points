@@ -293,7 +293,7 @@ function update() {
 }
 ```
 
-# Reposiroty Examples
+# Repository Examples
 These are the examples from the live demo page here: https://absulit.github.io/points/examples/. It's recommended to download the repo for this. You can also click the source button (`<>`) in the live examples
 
 Source located at [examples/index.html](examples)

@@ -21,7 +21,7 @@
         "build/RenderPass.js",
         "build/RenderPasses.js",
         "build/ShaderType.js",
-        "build/points.module.js",
+        "build/points.js",
         "build/core/animation.js",
         "build/core/audio.js",
         "build/core/cellular2d.js",

@@ -31,7 +31,7 @@
         "./prod/random": "./build/core/random.min.js",
         "./prod/sdf": "./build/core/sdf.min.js",
 
-        "./dev": "./build/points.module.js",
+        "./dev": "./build/points.js",
         "./dev/animation": "./build/core/animation.js",
         "./dev/audio": "./build/core/audio.js",
         "./dev/color": "./build/core/color.js",

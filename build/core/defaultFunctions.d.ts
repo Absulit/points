@@ -7,7 +7,14 @@
  * These are wgsl functions, not js functions.
  * The function is enclosed in a js string constant,
  * to be appended into the code to reference it in the string shader.
+ *
+ * Use the base example as reference: examples/base/vert.js
+
  * @module defaultFunctions
+ *
+ * @example
+ * // Inside the main vertex function add this
+ *  return defaultVertexBody(position, color, uv);
  */
 /**
  * Default function for the Vertex shader that takes charge of automating the

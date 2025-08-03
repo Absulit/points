@@ -6,10 +6,10 @@ const pixelate = {
     fragmentShader,
     init: async (points, params) => {
         points._setInternal(true);
-        points.addSampler('renderpass_feedbackSampler', null);
-        points.addTexture2d('renderpass_feedbackTexture', true);
-        points.addUniform('pixelate_pixelsWidth', params.pixelsWidth);
-        points.addUniform('pixelate_pixelsHeight', params.pixelsHeight);
+        points.setSampler('renderpass_feedbackSampler', null);
+        points.setTexture2d('renderpass_feedbackTexture', true);
+        points.setUniform('pixelate_pixelsWidth', params.pixelsWidth);
+        points.setUniform('pixelate_pixelsHeight', params.pixelsHeight);
         points._setInternal(false);
     },
     update: points => {
