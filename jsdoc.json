@@ -7,20 +7,19 @@
     ],
     "includePattern": ".+\\.js$"
   },
+  "plugins": [
+    "plugins/markdown"
+  ],
   "sourceType": "module",
   "opts": {
     "template": "node_modules/clean-jsdoc-theme",
-    "destination": "./apidocs"
-  },
-  "templates": {
-    "default": {
-      "includeDate": false
-    },
-    "cleandoc": {
-      "theme": "dark"
+    "destination": "./apidocs",
+    "theme_opts": {
+      "default_theme": "dark"
     }
   },
-  "theme_opts": {
-    "flatten": true
+  "markdown": {
+    "hardwrap": false,
+    "idInHeadings": true
   }
 }
