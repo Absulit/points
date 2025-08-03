@@ -6,6 +6,22 @@
  * @module points/effects
  */
 
+/**
+ * Calculates the [Euclidean Distance](https://en.wikipedia.org/wiki/Euclidean_distance)
+ * between colors.
+ * @type {String}
+ * @param {vec4f} color
+ * @param {vec4f} distanceColor
+ * @returns {f32}
+ *
+ * @example
+ * // js
+ * import { euclideanDistance } from 'points/effects';
+ *
+ * // wgsl string
+ * ${euclideanDistance}
+ * let currentDistance = euclideanDistance(color, paletteColor);
+ */
 const euclideanDistance = /*wgsl*/`
 fn euclideanDistance(color:vec4<f32>, distanceColor:vec4<f32>) -> f32{
     return sqrt(
@@ -17,13 +33,30 @@ fn euclideanDistance(color:vec4<f32>, distanceColor:vec4<f32>) -> f32{
 `;
 
 /**
- * From a palette declared in `getClosestColorInPalette_palette`
- * gets the closest color based on `distance`
+ * This assumes you have declared a palette in a variable or constant called
+ * `getClosestColorInPalette_palette`
+ * <br>
+ * Gets the closest color based on the `distance` parameter.
  * @type {String}
- * @param {vec4<f32>} color `vec4<f32>` color to replace with
+ * @param {vec4f} color `vec4<f32>` color to replace with
  * @param {u32} numPaletteItems `u32` length of getClosestColorInPalette_palette
  * @param {f32} distance `f32` from 0..1 that indicates how close it should be from the color
- * @returns `vec4<f32>`
+ * @returns {vec4f}
+ *
+ * @example
+ * // js
+ * import { getClosestColorInPalette } from 'points/effects';
+ *
+ * // wgsl string
+ * ${getClosestColorInPalette}
+ *
+ * const numPaletteItems = 2;
+ * const getClosestColorInPalette_palette = array<vec4f, numPaletteItems>(
+ *  vec4(255./255., 69./255., 0., 1.),
+ *  vec4(255./255., 168./255., 0, 1.),
+ * );
+ *
+ * let value = getClosestColorInPalette(rgba, numPaletteItems, distance);
  */
 const getClosestColorInPalette = /*wgsl*/`
 ${euclideanDistance}
@@ -53,6 +86,10 @@ fn getClosestColorInPalette(color:vec4<f32>, numPaletteItems:u32, distance:f32) 
 }
 `;
 
+/**
+ * To be used with `orderedDithering`.<br>
+ * You can use this or create yours.
+ */
 const orderedDithering_threshold_map = /*wgsl*/`
 const orderedDithering_threshold_map = array<f32,16>(
     1, 9, 3, 11,
@@ -62,6 +99,28 @@ const orderedDithering_threshold_map = array<f32,16>(
 );
 `;
 
+/**
+ * Applies [Ordered Dithering](https://en.wikipedia.org/wiki/Ordered_dithering) to a color.
+ * Best with the colors of an image texture.
+ * <br>
+ * This requires `orderedDithering_threshold_map` to be imported or
+ * create your own version of it.
+ * @param {vec4f} color
+ * @param {f32} depth
+ * @param {vec2f} dims dimensions
+ * @param {vec2f} uv
+ * @returns {vec4f}
+ *
+ * @example
+ * // js
+ * import { orderedDithering, orderedDithering_threshold_map } from 'points/effects';
+ *
+ * // wgsl string
+ * ${orderedDithering}
+ * ${orderedDithering_threshold_map}
+ * let color = texturePosition(image, imageSampler, vec2(0.), uvr, false);
+ * let value = orderedDithering(color, depth, dims, uvr);
+ */
 const orderedDithering = /*wgsl*/`
 fn orderedDithering(color:vec4<f32>, depth:f32, dims:vec2<u32>, uv:vec2<f32>) -> vec4<f32> {
     // const orderedDithering_threshold_map = array<f32,16>(
@@ -88,7 +147,19 @@ fn orderedDithering(color:vec4<f32>, depth:f32, dims:vec2<u32>, uv:vec2<f32>) ->
     return ditheredImage;
 }
 `;
-
+/**
+ * Takes a color and reduces its values by a `level`
+ * @param {vec4f} color
+ * @param {f32} level
+ *
+ * @example
+ * // js
+ * import { clearMix } from 'points/effects';
+ *
+ * // wgsl string
+ * ${clearMix}
+ * let value = clearMix(color, 1.01);
+ */
 const clearMix = /*wgsl*/`
 //const clearMixlevel = 1.81;//1.01
 fn clearMix(color:vec4<f32>, level:f32) -> vec4<f32> {
@@ -103,6 +174,19 @@ fn clearMix(color:vec4<f32>, level:f32) -> vec4<f32> {
 }
 `;
 
+/**
+ * Takes a color and reduces its value but applied to the alpha channel.
+ * @param {vec4f} currentColor
+ * @param {f32} level
+ *
+ * @example
+ * // js
+ * import { clearAlpha } from 'points/effects';
+ *
+ * // wgsl string
+ * ${clearAlpha}
+ * let value = clearAlpha(color, 1.01);
+ */
 const clearAlpha = /*wgsl*/`
 // level 2.
 fn clearAlpha(currentColor:vec4<f32>, level:f32) -> vec4<f32>{
@@ -114,7 +198,20 @@ fn clearAlpha(currentColor:vec4<f32>, level:f32) -> vec4<f32>{
 }
 `;
 
-
+/**
+ * From a given texture and its position, get the 9 color values around.
+ * @param {texture_2d} texture
+ * @param {vec2i} position
+ * @param {i32} distance
+ *
+ * @example
+ * // js
+ * import { getColorsAroundTexture } from 'points/effects';
+ *
+ * // wgsl string
+ * ${getColorsAroundTexture}
+ * let value = getColorsAroundTexture(texture, position, distance);
+ */
 const getColorsAroundTexture = /*wgsl*/`
 fn getColorsAroundTexture(texture:texture_2d<f32>, position: vec2<i32>, distance: i32) -> array<  vec4<f32>, 8  > {
     return array< vec4<f32>,8 >(
@@ -130,6 +227,20 @@ fn getColorsAroundTexture(texture:texture_2d<f32>, position: vec2<i32>, distance
 }
 `;
 
+/**
+ * From a given texture and its position, get top, botto, left and right color values
+ * @param {texture_2d} texture
+ * @param {vec2i} position
+ * @param {i32} distance
+ *
+ * @example
+ * // js
+ * import { getColorsAround4Texture } from 'points/effects';
+ *
+ * // wgsl string
+ * ${getColorsAround4Texture}
+ * let value = getColorsAround4Texture(texture, position, distance);
+ */
 const getColorsAround4Texture = /*wgsl*/`
 fn getColorsAround4Texture(texture:texture_2d<f32>, position: vec2<i32>, distance: i32) -> array<  vec4<f32>, 4  > {
     return array< vec4<f32>, 4 >(
@@ -152,6 +263,20 @@ fn getColorsAround4Texture(texture:texture_2d<f32>, position: vec2<i32>, distanc
 // }
 // `;
 
+/**
+ * Softens a color based on list of colors around it or any list of 4 colors.
+ * @param {vec4f} color
+ * @param {Array<vec4f, 4>} colorsAround
+ * @param {f32} colorPower intensity
+ *
+ * @example
+ * // js
+ * import { soften4 } from 'points/effects';
+ *
+ * // wgsl string
+ * ${soften4}
+ * let value = soften4(color, colorsAround,  colorPower);
+ */
 const soften4 = /*wgsl*/`
 fn soften4(color:vec4<f32>, colorsAround:array<vec4<f32>, 4>, colorPower:f32) -> vec4<f32> {
     var newColor:vec4<f32> = color;
@@ -164,6 +289,21 @@ fn soften4(color:vec4<f32>, colorsAround:array<vec4<f32>, 4>, colorPower:f32) ->
 }
 `;
 
+/**
+ * Softens a color based on list of colors around it or any list of 8 colors.
+ *
+ * @param {vec4f} color
+ * @param {Array<vec4f, 8>} colorsAround
+ * @param {f32} colorPower intensity
+ *
+ * @example
+ * // js
+ * import { soften8 } from 'points/effects';
+ *
+ * // wgsl string
+ * ${soften8}
+ * let value = soften8(color, colorsA);
+ */
 const soften8 = /*wgsl*/`
 fn soften8(color:vec4<f32>, colorsAround:array<vec4<f32>, 8>, colorPower:f32) -> vec4<f32> {
     var newColor:vec4<f32> = color;
@@ -184,10 +324,27 @@ fn soften8(color:vec4<f32>, colorsAround:array<vec4<f32>, 8>, colorPower:f32) ->
 }
 `;
 
-
-
+/**
+ * Applies a blur to an image
+ * <br>
+ * based on https://github.com/Jam3/glsl-fast-gaussian-blur/blob/master/9.glsl
+ *
+ * @param {texture_2d} image
+ * @param {sampler} imageSampler
+ * @param {vec2f} position
+ * @param {vec2f} uv
+ * @param {vec2f} resolution
+ * @param {vec2f} direction
+ *
+ * @example
+ * // js
+ * import { blur9 } from 'points/effects';
+ *
+ * // wgsl string
+ * ${blur9}
+ * let value = blur9(image, imageSampler, position, uv, resolution, direction);
+ */
 const blur9 = /*wgsl*/`
-// based on https://github.com/Jam3/glsl-fast-gaussian-blur/blob/master/9.glsl
 fn blur9(image: texture_2d<f32>, imageSampler:sampler, position:vec2<f32>, uv:vec2<f32>, resolution: vec2<f32>, direction: vec2<f32>) -> vec4<f32> {
     var color = vec4(0.0);
     let off1 = vec2(1.3846153846) * direction;
@@ -201,11 +358,13 @@ fn blur9(image: texture_2d<f32>, imageSampler:sampler, position:vec2<f32>, uv:ve
 }
 `;
 
+/**
+ * WIP
+ */
+// export const blur8 = /*wgsl*/`
+// fn blur8(color:vec4<f32>, colorsAround:array<vec4<f32>, 8>, amount:f32) -> {
 
-const blur8 = /*wgsl*/`
-fn blur8(color:vec4<f32>, colorsAround:array<vec4<f32>, 8>, amount:f32) -> {
+// }
+// `;
 
-}
-`;
-
-export { blur8, blur9, clearAlpha, clearMix, euclideanDistance, getClosestColorInPalette, getColorsAround4Texture, getColorsAroundTexture, orderedDithering, orderedDithering_threshold_map, soften4, soften8 };
+export { blur9, clearAlpha, clearMix, euclideanDistance, getClosestColorInPalette, getColorsAround4Texture, getColorsAroundTexture, orderedDithering, orderedDithering_threshold_map, soften4, soften8 };

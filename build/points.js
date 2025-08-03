@@ -352,10 +352,6 @@ fn main(
  * The function is enclosed in a js string constant,
  * to be appended into the code to reference it in the string shader.
  * @module points/animation
- * @example
- * ```js
- * const a = 1;
- * ```
  */
 
 
@@ -379,6 +375,9 @@ fn fnusin(speed: f32) -> f32{
 `;
 
 /**
+ * A few color constants and wgsl methods to work with colors.
+ * <br>
+ * <br>
  * These are wgsl functions, not js functions.
  * The function is enclosed in a js string constant,
  * to be appended into the code to reference it in the string shader.
@@ -386,6 +385,18 @@ fn fnusin(speed: f32) -> f32{
  */
 
 
+/**
+ * WHITE color;
+ * @type {vec4f}
+ *
+ * @example
+ * // js
+ * import { WHITE } from 'points/color';
+ *
+ * // wgsl string
+ * ${WHITE}
+ * let value = WHITE * vec4f(.5);
+ */
 const WHITE = /*wgsl*/`
 const WHITE = vec4(1.,1.,1.,1.);
 `;
@@ -396,6 +407,15 @@ const WHITE = vec4(1.,1.,1.,1.);
  * @param {f32} input `f32`
  * @param {i32} iterations `i32` 2, two is good
  * @param {f32} intensity `f32` 0..1 a percentage
+ * @returns {f32}
+ *
+ * @example
+ * // js
+ * import { bloom } from 'points/color';
+ *
+ * // wgsl string
+ * ${bloom}
+ * let value = bloom(input, iterations, intensity);
  */
 const bloom$1 = /*wgsl*/`
 fn bloom(input:f32, iterations:i32, intensity:f32) -> f32 {
@@ -414,20 +434,27 @@ fn bloom(input:f32, iterations:i32, intensity:f32) -> f32 {
 
 
 /**
- * Returns the perceived brightness of a color by the eye
- * # Standard
- * LuminanceA = (0.2126*R) + (0.7152*G) + (0.0722*B)
+ * Returns the perceived brightness of a color by the eye.<br>
+ * // Standard<br>
+ * `LuminanceA = (0.2126*R) + (0.7152*G) + (0.0722*B)`
  * @type {String}
  * @param {vec4f} color
- * @return `f32`
+ * @returns {f32}
+ * @example
+ * // js
+ * import { brightness } from 'points/color';
+ *
+ * // wgsl string
+ * ${brightness}
+ * let value = brightness(rgba);
  */
 const brightness = /*wgsl*/`
 fn brightness(color:vec4<f32>) -> f32 {
-    // #Standard
+    // // Standard
     // LuminanceA = (0.2126*R) + (0.7152*G) + (0.0722*B)
-    // #Percieved A
+    // // Percieved A
     // LuminanceB = (0.299*R + 0.587*G + 0.114*B)
-    // #Perceived B, slower to calculate
+    // // Perceived B, slower to calculate
     // LuminanceC = sqrt(0.299*(R**2) + 0.587*(G**2) + 0.114*(B**2))
     return (0.2126 * color.r) + (0.7152 * color.g) + (0.0722 * color.b);
 }
@@ -1001,10 +1028,27 @@ fn main(
  */
 
 
-
-
+/**
+ * Applies a blur to an image
+ * <br>
+ * based on https://github.com/Jam3/glsl-fast-gaussian-blur/blob/master/9.glsl
+ *
+ * @param {texture_2d} image
+ * @param {sampler} imageSampler
+ * @param {vec2f} position
+ * @param {vec2f} uv
+ * @param {vec2f} resolution
+ * @param {vec2f} direction
+ *
+ * @example
+ * // js
+ * import { blur9 } from 'points/effects';
+ *
+ * // wgsl string
+ * ${blur9}
+ * let value = blur9(image, imageSampler, position, uv, resolution, direction);
+ */
 const blur9 = /*wgsl*/`
-// based on https://github.com/Jam3/glsl-fast-gaussian-blur/blob/master/9.glsl
 fn blur9(image: texture_2d<f32>, imageSampler:sampler, position:vec2<f32>, uv:vec2<f32>, resolution: vec2<f32>, direction: vec2<f32>) -> vec4<f32> {
     var color = vec4(0.0);
     let off1 = vec2(1.3846153846) * direction;
@@ -1017,6 +1061,15 @@ fn blur9(image: texture_2d<f32>, imageSampler:sampler, position:vec2<f32>, uv:ve
     return color;
 }
 `;
+
+/**
+ * WIP
+ */
+// export const blur8 = /*wgsl*/`
+// fn blur8(color:vec4<f32>, colorsAround:array<vec4<f32>, 8>, amount:f32) -> {
+
+// }
+// `;
 
 const frag$1 = /*wgsl*/`
 

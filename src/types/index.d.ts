@@ -25,6 +25,10 @@ type vec2u = [number, number];
 /**
  * Two element array
  */
+type vec2i = [number, number];
+/**
+ * Two element array
+ */
 type vec2<f32> = [number, number];
 /**
  * Float 32

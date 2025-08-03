@@ -36,10 +36,6 @@ export const fucos: string;
  * The function is enclosed in a js string constant,
  * to be appended into the code to reference it in the string shader.
  * @module points/animation
- * @example
- * ```js
- * const a = 1;
- * ```
  */
 /**
  * Animates `sin()` over `params.time` and a provided `speed`.

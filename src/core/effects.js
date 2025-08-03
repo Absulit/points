@@ -198,15 +198,18 @@ fn clearAlpha(currentColor:vec4<f32>, level:f32) -> vec4<f32>{
 `;
 
 /**
- *
+ * From a given texture and its position, get the 9 color values around.
+ * @param {texture_2d} texture
+ * @param {vec2i} position
+ * @param {i32} distance
  *
  * @example
  * // js
- * import { orderedDithering } from 'points/effects';
+ * import { getColorsAroundTexture } from 'points/effects';
  *
  * // wgsl string
- * ${orderedDithering}
- * let value = orderedDithering(color, uvr);
+ * ${getColorsAroundTexture}
+ * let value = getColorsAroundTexture(texture, position, distance);
  */
 export const getColorsAroundTexture = /*wgsl*/`
 fn getColorsAroundTexture(texture:texture_2d<f32>, position: vec2<i32>, distance: i32) -> array<  vec4<f32>, 8  > {
@@ -224,15 +227,18 @@ fn getColorsAroundTexture(texture:texture_2d<f32>, position: vec2<i32>, distance
 `;
 
 /**
- *
+ * From a given texture and its position, get top, botto, left and right color values
+ * @param {texture_2d} texture
+ * @param {vec2i} position
+ * @param {i32} distance
  *
  * @example
  * // js
- * import { orderedDithering } from 'points/effects';
+ * import { getColorsAround4Texture } from 'points/effects';
  *
  * // wgsl string
- * ${orderedDithering}
- * let value = orderedDithering(color, uvr);
+ * ${getColorsAround4Texture}
+ * let value = getColorsAround4Texture(texture, position, distance);
  */
 export const getColorsAround4Texture = /*wgsl*/`
 fn getColorsAround4Texture(texture:texture_2d<f32>, position: vec2<i32>, distance: i32) -> array<  vec4<f32>, 4  > {
@@ -264,11 +270,11 @@ fn getColorsAround4Texture(texture:texture_2d<f32>, position: vec2<i32>, distanc
  *
  * @example
  * // js
- * import { orderedDithering } from 'points/effects';
+ * import { soften4 } from 'points/effects';
  *
  * // wgsl string
- * ${orderedDithering}
- * let value = orderedDithering(color, uvr);
+ * ${soften4}
+ * let value = soften4(color, colorsAround,  colorPower);
  */
 export const soften4 = /*wgsl*/`
 fn soften4(color:vec4<f32>, colorsAround:array<vec4<f32>, 4>, colorPower:f32) -> vec4<f32> {

@@ -14,6 +14,14 @@
  * Average of all the value in sound.data (Sound struct in {@link module:defaultStructs})
  * @param {Sound} sound
  * @returns {f32} average result
+ * @example
+ * // js
+ * import { audioAverage } from 'points/audio';
+ * points.setAudio('audio', 'myaudio.ogg', volume, loop, autoplay);
+ *
+ * // wgsl string
+ * ${audioAverage}
+ * let value = audioAverage(audio); // audio is the audio Storage name set in Points#setAudio
  */
 const audioAverage = /*wgsl*/`
 fn audioAverage(sound:Sound) -> f32 {
@@ -27,7 +35,9 @@ fn audioAverage(sound:Sound) -> f32 {
 `;
 
 /**
- *
+ * WIP
+ * @param {i32} segmentNum
+ * @returns {f32}
  */
 const audioAverageSegments = /*wgsl*/`
 fn audioAverageSegments(segmentNum:i32) -> f32{

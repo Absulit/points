@@ -9,10 +9,19 @@
 
 /**
  * Calculates the [Euclidean Distance](https://en.wikipedia.org/wiki/Euclidean_distance)
+ * between colors.
  * @type {String}
  * @param {vec4f} color
  * @param {vec4f} distanceColor
  * @returns {f32}
+ *
+ * @example
+ * // js
+ * import { euclideanDistance } from 'points/effects';
+ *
+ * // wgsl string
+ * ${euclideanDistance}
+ * let currentDistance = euclideanDistance(color, paletteColor);
  */
 export const euclideanDistance = /*wgsl*/`
 fn euclideanDistance(color:vec4&lt;f32>, distanceColor:vec4&lt;f32>) -> f32{
@@ -37,7 +46,7 @@ fn euclideanDistance(color:vec4&lt;f32>, distanceColor:vec4&lt;f32>) -> f32{
  *
  * @example
  * // js
- * import { getClosestColorInPalette } from 'points/debug';
+ * import { getClosestColorInPalette } from 'points/effects';
  *
  * // wgsl string
  * ${getClosestColorInPalette}
@@ -191,15 +200,18 @@ fn clearAlpha(currentColor:vec4&lt;f32>, level:f32) -> vec4&lt;f32>{
 `;
 
 /**
- *
+ * From a given texture and its position, get the 9 color values around.
+ * @param {texture_2d} texture
+ * @param {vec2i} position
+ * @param {i32} distance
  *
  * @example
  * // js
- * import { orderedDithering } from 'points/effects';
+ * import { getColorsAroundTexture } from 'points/effects';
  *
  * // wgsl string
- * ${orderedDithering}
- * let value = orderedDithering(color, uvr);
+ * ${getColorsAroundTexture}
+ * let value = getColorsAroundTexture(texture, position, distance);
  */
 export const getColorsAroundTexture = /*wgsl*/`
 fn getColorsAroundTexture(texture:texture_2d&lt;f32>, position: vec2&lt;i32>, distance: i32) -> array&lt;  vec4&lt;f32>, 8  > {
@@ -217,15 +229,18 @@ fn getColorsAroundTexture(texture:texture_2d&lt;f32>, position: vec2&lt;i32>, di
 `;
 
 /**
- *
+ * From a given texture and its position, get top, botto, left and right color values
+ * @param {texture_2d} texture
+ * @param {vec2i} position
+ * @param {i32} distance
  *
  * @example
  * // js
- * import { orderedDithering } from 'points/effects';
+ * import { getColorsAround4Texture } from 'points/effects';
  *
  * // wgsl string
- * ${orderedDithering}
- * let value = orderedDithering(color, uvr);
+ * ${getColorsAround4Texture}
+ * let value = getColorsAround4Texture(texture, position, distance);
  */
 export const getColorsAround4Texture = /*wgsl*/`
 fn getColorsAround4Texture(texture:texture_2d&lt;f32>, position: vec2&lt;i32>, distance: i32) -> array&lt;  vec4&lt;f32>, 4  > {
@@ -257,11 +272,11 @@ fn getColorsAround4Texture(texture:texture_2d&lt;f32>, position: vec2&lt;i32>, d
  *
  * @example
  * // js
- * import { orderedDithering } from 'points/effects';
+ * import { soften4 } from 'points/effects';
  *
  * // wgsl string
- * ${orderedDithering}
- * let value = orderedDithering(color, uvr);
+ * ${soften4}
+ * let value = soften4(color, colorsAround,  colorPower);
  */
 export const soften4 = /*wgsl*/`
 fn soften4(color:vec4&lt;f32>, colorsAround:array&lt;vec4&lt;f32>, 4>, colorPower:f32) -> vec4&lt;f32> {
@@ -347,9 +362,9 @@ fn blur9(image: texture_2d&lt;f32>, imageSampler:sampler, position:vec2&lt;f32>,
 /**
  * WIP
  */
-export const blur8 = /*wgsl*/`
-fn blur8(color:vec4&lt;f32>, colorsAround:array&lt;vec4&lt;f32>, 8>, amount:f32) -> {
+// export const blur8 = /*wgsl*/`
+// fn blur8(color:vec4&lt;f32>, colorsAround:array&lt;vec4&lt;f32>, 8>, amount:f32) -> {
 
-}
-`;
+// }
+// `;
 </code></pre></article></section></div></div></div><div class="search-container" id="PkfLWpAbet" style="display:none"><div class="wrapper" id="iCxFxjkHbP"><button class="icon-button search-close-button" id="VjLlGakifb" aria-label="close search"><svg><use xlink:href="#close-icon"></use></svg></button><div class="search-box-c"><svg><use xlink:href="#search-icon"></use></svg> <input type="text" id="vpcKVYIppa" class="search-input" placeholder="Search..." autofocus></div><div class="search-result-c" id="fWwVHRuDuN"><span class="search-result-c-text">Type anything to view search result</span></div></div></div><div class="mobile-menu-icon-container"><button class="icon-button" id="mobile-menu" data-isopen="false" aria-label="menu"><svg><use xlink:href="#menu-icon"></use></svg></button></div><div id="mobile-sidebar" class="mobile-sidebar-container"><div class="mobile-sidebar-wrapper"><div class="mobile-nav-links"></div><div class="mobile-sidebar-items-c"><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-modules"><div>Modules</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="module-defaultFunctions.html">defaultFunctions</a></div><div class="sidebar-section-children"><a href="module-defaultStructs.html">defaultStructs</a></div><div class="sidebar-section-children"><a href="module-points_animation.html">points/animation</a></div><div class="sidebar-section-children"><a href="module-points_audio.html">points/audio</a></div><div class="sidebar-section-children"><a href="module-points_cellular2d.html">points/cellular2d</a></div><div class="sidebar-section-children"><a href="module-points_classicnoise2d.html">points/classicnoise2d</a></div><div class="sidebar-section-children"><a href="module-points_color.html">points/color</a></div><div class="sidebar-section-children"><a href="module-points_debug.html">points/debug</a></div><div class="sidebar-section-children"><a href="module-points_effects.html">points/effects</a></div><div class="sidebar-section-children"><a href="module-points_image.html">points/image</a></div><div class="sidebar-section-children"><a href="module-points_math.html">points/math</a></div><div class="sidebar-section-children"><a href="module-points_noise2d.html">points/noise2d</a></div><div class="sidebar-section-children"><a href="module-points_random.html">points/random</a></div><div class="sidebar-section-children"><a href="module-points_sdf.html">points/sdf</a></div><div class="sidebar-section-children"><a href="module-points_valuenoise.html">points/valuenoise</a></div><div class="sidebar-section-children"><a href="module-points_voronoi.html">points/voronoi</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-classes"><div>Classes</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="CanvasRecorder.html">CanvasRecorder</a></div><div class="sidebar-section-children"><a href="Points.html">Points</a></div><div class="sidebar-section-children"><a href="RenderPass.html">RenderPass</a></div><div class="sidebar-section-children"><a href="RenderPasses.html">RenderPasses</a></div><div class="sidebar-section-children"><a href="ShaderType.html">ShaderType</a></div></div></div><div class="mobile-navbar-actions"><div class="navbar-right-item"><button class="icon-button search-button" aria-label="open-search"><svg><use xlink:href="#search-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button theme-toggle" aria-label="toggle-theme"><svg><use class="theme-svg-use" xlink:href="#light-theme-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button font-size" aria-label="change-font-size"><svg><use xlink:href="#font-size-icon"></use></svg></button></div></div></div></div><script type="text/javascript" src="scripts/core.min.js"></script><script src="scripts/search.min.js" defer="defer"></script><script src="scripts/third-party/fuse.js" defer="defer"></script><script type="text/javascript">var tocbotInstance=tocbot.init({tocSelector:"#eed4d2a0bfd64539bb9df78095dec881",contentSelector:".main-content",headingSelector:"h1, h2, h3",hasInnerContainers:!0,scrollContainer:".main-content",headingsOffset:130,onClick:bringLinkToView})</script></body></html>
