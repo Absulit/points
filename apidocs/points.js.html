@@ -813,6 +813,17 @@ class Points {
      * The final number of triangles is `numColumns` * `numRows` * `2` ( 2 being the triangles )
      * @param {Number} numColumns quads horizontally
      * @param {Number} numRows quads vertically
+     *
+     * @example
+     * // js
+     * points.setMeshDensity(20,20);
+     *
+     * // wgsl string
+     * //// vertex shader
+     * var modifiedPosition = position;
+     * modifiedPosition.w = modifiedPosition.w + sin(f32(vertexIndex) * (params.time) * .01) * .1;
+     *
+     * return defaultVertexBody(modifiedPosition, color, uv);
      */
     setMeshDensity(numColumns, numRows) {
         if (numColumns == 0 || numRows == 0) {
