@@ -15,6 +15,14 @@
  * @param {vec2f} a point A
  * @param {vec2f} b point B
  * @return {f32}
+ *
+ * @example
+ * // js
+ * import { sdfSegment } from 'points/sdf';
+ *
+ * // wgsl string
+ * ${sdfSegment}
+ * let value = sdfSegment(uv, point1, point2);
  */
 export const sdfSegment = /*wgsl*/`
 fn sdfSegment(p:vec2f, a:vec2f, b:vec2f) -> f32{
@@ -33,6 +41,14 @@ fn sdfSegment(p:vec2f, a:vec2f, b:vec2f) -> f32{
  * @param {f32} pixelStroke width in pixels with an 800 base
  * @param {vec2f} uv uv coordinates
  * @return {f32}
+ *
+ * @example
+ * // js
+ * import { sdfLine } from 'points/sdf';
+ *
+ * // wgsl string
+ * ${sdfLine}
+ * let value = sdfLine(p1, p2, pixeStroke, uvr);
  */
 export const sdfLine = /*wgsl*/`
 fn sdfLine(p1:vec2f, p2:vec2f, pixelStroke:f32, uv:vec2f)->f32{
@@ -53,6 +69,14 @@ fn sdfLine(p1:vec2f, p2:vec2f, pixelStroke:f32, uv:vec2f)->f32{
  * @param {f32} feather how soft the edges are
  * @param {vec2f} uv uv coordinates
  * @return {f32}
+ *
+ * @example
+ * // js
+ * import { sdfCircle } from 'points/sdf';
+ *
+ * // wgsl string
+ * ${sdfCircle}
+ * let value = sdfCircle(position, radius, feather, uvr);
  */
 export const sdfCircle = /*wgsl*/`
 fn sdfCircle(position:vec2f, radius: f32, feather: f32, uv:vec2f) -> f32 {
@@ -71,6 +95,14 @@ fn sdfCircle(position:vec2f, radius: f32, feather: f32, uv:vec2f) -> f32 {
  * @param {f32} rotationRads rotates the whole square
  * @param {vec2f} uv uv coordinates
  * @return {f32}
+ *
+ * @example
+ * // js
+ * import { sdfSquare } from 'points/sdf';
+ *
+ * // wgsl string
+ * ${sdfSquare}
+ * let value = sdfSquare(position, radius, feather, rotation, uvr);
  */
 export const sdfSquare = /*wgsl*/`
 fn sdfSquare(position:vec2f, radius:f32, feather:f32, rotationRads: f32, uv:vec2f) -> f32 {
@@ -99,6 +131,14 @@ fn sdfSquare(position:vec2f, radius:f32, feather:f32, rotationRads: f32, uv:vec2
  * @param {f32} feather how soft the edges are
  * @param {vec2f} uv uv coordinates
  * @return {f32}
+ *
+ * @example
+ * // js
+ * import { sdfLine2 } from 'points/sdf';
+ *
+ * // wgsl string
+ * ${sdfLine2}
+ * let value = sdfLine2(p1, p2, feather, uvr);
  */
 export const sdfLine2 = /*wgsl*/`
 fn sdfLine2(p1:vec2f, p2:vec2f, feather:f32, uv:vec2f)->f32{
@@ -113,6 +153,14 @@ fn sdfLine2(p1:vec2f, p2:vec2f, feather:f32, uv:vec2f)->f32{
  * @type {String}
  * @param {vec4f} color final color
  * @return {vec4f}
+ *
+ * @example
+ * // js
+ * import { sdfSmooth } from 'points/sdf';
+ *
+ * // wgsl string
+ * ${sdfSmooth}
+ * let value = sdfSmooth();
  */
 export const sdfSmooth = /*wgsl*/`
 fn sdfSmooth(color:vec4<f32>) -> vec4<f32> {
