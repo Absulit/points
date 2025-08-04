@@ -1,5 +1,5 @@
 /**
- *
+ * Various random functions.
  *
  * These are wgsl functions, not js functions.
  * The function is enclosed in a js string constant,
