@@ -327,7 +327,7 @@ class Points {
     /**
      * Creates a `sampler` to be sent to the shaders. Internally it will be a {@link GPUSampler}
      * @param {string} name Name of the `sampler` to be called in the shaders.
-     * @param {GPUSamplerDescriptor} descriptor
+     * @param {GPUSamplerDescriptor} descriptor `Object` with properties that affect the image. See example below.
      * @returns {Object}
      *
      * @example
