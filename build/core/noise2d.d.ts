@@ -8,9 +8,17 @@
  * @module points/noise2d
  */
 /**
- * Noise
+ * Sinplex Noise function
  * @type {String}
  * @param {vec2f} v usually the uv
- * @return `f32`
+ * @returns {f32}
+ *
+ * @example
+ * // js
+ * import { snoise } from 'points/noise2d';
+ *
+ * // wgsl string
+ * ${snoise}
+ * let value = snoise(uv);
  */
 export const snoise: string;

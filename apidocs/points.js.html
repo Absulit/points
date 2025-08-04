@@ -175,7 +175,7 @@ class Points {
     }
 
     /**
-     * Set a `param` (predefined struct already in all shader)
+     * Sets a `param` (predefined struct already in all shader)
      * as uniform to send to all shaders.
      * A Uniform is a value that can only be changed
      * from the outside (js side, not the wgsl side),
@@ -218,14 +218,14 @@ class Points {
         return uniform;
     }
     /**
-     * Update a list of uniforms
+     * Updates a list of uniforms
      * @param {Array&lt;Object>} arr object array of the type: `{name, value}`
      */
     updateUniforms(arr) {
         arr.forEach(uniform => {
             const variable = this.#uniforms.find(v => v.name === uniform.name);
             if (!variable) {
-                throw '`updateUniform()` can\'t be called without first `addUniform()`.';
+                throw '`updateUniform()` can\'t be called without first `setUniform()`.';
             }
             variable.value = uniform.value;
         })
@@ -826,7 +826,7 @@ class Points {
     }
 
     /**
-     * Listen for an event dispatched from WGSL code
+     * Listens for an event dispatched from WGSL code
      * @param {String} name Number that represents an event Id
      * @param {Function} callback function to be called when the event occurs
      * @param {Number} structSize size of the data to be returned
@@ -865,6 +865,7 @@ class Points {
      * for internal use:
      * to flag add* methods and variables as part of the RenderPasses
      * @private
+     * @ignore
      */
     _setInternal(value) {
         this.#internal = value;
@@ -1044,7 +1045,7 @@ class Points {
         });
     }
     /**
-     * One time function to call to initialize the shaders.
+     * One time function call to initialize the shaders.
      * @param {Array&lt;RenderPass>} renderPasses Collection of {@link RenderPass}, which contain Vertex, Compute and Fragment shaders.
      * @returns {Boolean} false | undefined
      *
