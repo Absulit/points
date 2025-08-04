@@ -288,12 +288,24 @@ class Points {
     }
 
     /**
-     * Layers of data made of `vec4f`
+     * Layers of data made of `vec4f`.
+     * This creates a storage array named `layers` of the size
+     * of the screen in pixels;
      * @param {Number} numLayers
      * @param {ShaderType} shaderType
+     *
+     * @example
+     * // js
+     * points.setLayers(2);
+     *
+     * // wgsl string
+     * var point = textureLoad(image, vec2&lt;i32>(ix,iy), 0);
+     * layers[0][pointIndex] = point;
+     * layers[1][pointIndex] = point;
      */
     setLayers(numLayers, shaderType) {
         // TODO: check what data to return
+        // TODO: improve jsdoc because the array definition is confusing
         for (let layerIndex = 0; layerIndex &lt; numLayers; layerIndex++) {
             this.#layers.shaderType = shaderType;
             this.#layers.push({
