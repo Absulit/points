@@ -659,6 +659,15 @@ class Points {
      * Listen for an event dispatched from WGSL code
      * @param {String} name Number that represents an event Id
      * @param {Function} callback function to be called when the event occurs
+     * @param {Number} structSize size of the data to be returned
+     *
+     * @example
+     * // js
+     * points.addEventListener('click_event', data => {
+     *     audio.play();
+     * }, 4);
+     *
+     * // wgsl string
      */
     addEventListener(name, callback, structSize) {
         // TODO: remove structSize
