@@ -156,7 +156,7 @@ class Points {
             usage: GPUTextureUsage.RENDER_ATTACHMENT,
         });
         // this is to solve an issue that requires the texture to be resized
-        // if the screen dimensions change, this for a `addTexture2d` with
+        // if the screen dimensions change, this for a `setTexture2d` with
         // `copyCurrentTexture` parameter set to `true`.
         this.#textures2d.forEach(texture2d => {
             if (!texture2d.imageTexture && texture2d.texture) {
@@ -430,9 +430,27 @@ class Points {
     }
 
     /**
-     * Create a `texture_2d` in the shaders.
+     * Creates a `texture_2d` in the shaders.<br>
+     * Used to write data and then print to screen.<br>
+     * It can also be used for write the current render pass (what you see on the screen)
+     * to this texture, to be used in the next cycle of this render pass; meaning
+     * you effectively have the previous frame data before printing the next one.
+     *
      * @param {string} name Name to call the texture in the shaders.
      * @param {boolean} copyCurrentTexture If you want the fragment output to be copied here.
+     * @returns {Object}
+     *
+     * @example
+     * // js
+     * points.setTexture2d('feedbackTexture', true);
+     *
+     * // wgsl string
+     * var rgba = textureSampleLevel(
+     *     feedbackTexture, feedbackSampler,
+     *     vec2<f32>(f32(GlobalId.x), f32(GlobalId.y)),
+     *     0.0
+     * );
+     *
      */
     setTexture2d(name, copyCurrentTexture, shaderType, renderPassIndex) {
         const exists = this.#nameExists(this.#textures2d, name);
