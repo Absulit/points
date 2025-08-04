@@ -49,7 +49,7 @@ fn random() -> f32 {
  * @example
  * // js
  * import { rand } from 'points/random';
- * rand_seed.x = .01835255; // .
+ * rand_seed.x = .01835255;
  *
  * // wgsl string
  * ${rand}
@@ -69,6 +69,15 @@ fn rand() -> f32 {
  * Random number from `vec2f` param
  * @type {String}
  * @param {vec2f} co `vec2f` vector
+ * @returns {f32}
+ *
+ * @example
+ * // js
+ * import { rand2 } from 'points/random';
+ *
+ * // wgsl string
+ * ${rand2}
+ * let value = rand2(uvr);
  */
 export const rand2 = /*wgsl*/`
 fn rand2(co: vec2<f32>) -> f32 {
