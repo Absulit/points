@@ -219,12 +219,31 @@ class Points {
     }
 
     /**
-     * Creates a persistent memory buffer across every frame call.
+     * Creates a persistent memory buffer across every frame call. See [GPUBuffer](https://www.w3.org/TR/webgpu/#gpubuffer)
+     * <br>
+     * Meaning it can be updated in the shaders across the execution of every frame.
+     * <br>
+     * It can have almost any type, like `f32` or `vec2f` or even array<f32>.
      * @param {string} name Name that the Storage will have in the shader
      * @param {string} structName Name of the struct already existing on the
-     * shader that will be the array<structName> of the Storage
+     * shader. This will be the type of the Storage.
      * @param {boolean} read if this is going to be used to read data back
      * @param {ShaderType} shaderType this tells to what shader the storage is bound
+     * @returns {Object}
+     *
+     * @example
+     * // js
+     * points.setStorage('result', 'f32');
+     *
+     * // wgsl string
+     * result[index]  = 128.;
+     *
+     * @example
+     * // js
+     * points.setStorage('colors', 'array<vec3f, 6>');
+     *
+     * // wgsl string
+     * colors[index] = vec3f(248, 208, 146) / 255;
      */
     setStorage(name, structName, read, shaderType, arrayData) {
         if (this.#nameExists(this.#storage, name)) {
