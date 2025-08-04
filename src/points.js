@@ -628,14 +628,26 @@ class Points {
     }
 
     /**
-     * Sets a texture to the compute and fragment shader, in the compute you can
-     * write to the texture, and in the fragment you can read the texture, so is
-     * a one way communication method.
+     * Special texture where data can be written to it in the Compute Shader and
+     * Is a one way communication method.
+     * Ideal to store data to it in the Compute Shader and later visualize it in
+     * the Fragment Shader.
      * @param {string} computeName name of the variable in the compute shader
      * @param {string} fragmentName name of the variable in the fragment shader
      * @param {Array<number, 2>} size dimensions of the texture, by default screen
      * size
      * @returns {Object}
+     *
+     * @example
+     *
+     * // js
+     * points.setBindingTexture('outputTex', 'computeTexture');
+     *
+     * // wgsl string
+     * //// compute
+     * textureStore(outputTex, GlobalId.xy, rgba);
+     * //// fragment
+     * let value = texturePosition(computeTexture, imageSampler, position, uv, false);
      */
     setBindingTexture(computeName, fragmentName, size) {
         // TODO: validate that names don't exist already
