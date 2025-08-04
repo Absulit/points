@@ -325,9 +325,26 @@ class Points {
     }
 
     /**
-     * Creates a `sampler` to be sent to the shaders.
+     * Creates a `sampler` to be sent to the shaders. Internally it will be a {@link GPUSampler}
      * @param {string} name Name of the `sampler` to be called in the shaders.
      * @param {GPUSamplerDescriptor} descriptor
+     * @returns {Object}
+     *
+     * @example
+     * // js
+     * const descriptor = {
+     *  addressModeU: 'repeat',
+     *  addressModeV: 'repeat',
+     *  magFilter: 'nearest',
+     *  minFilter: 'nearest',
+     *  mipmapFilter: 'nearest',
+     *  //maxAnisotropy: 10,
+     * }
+     *
+     * points.setSampler('imageSampler', descriptor);
+     *
+     * // wgsl string
+     * let value = texturePosition(image, imageSampler, position, uvr, true);
      */
 
     setSampler(name, descriptor, shaderType) {
