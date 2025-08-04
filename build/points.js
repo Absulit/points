@@ -83,6 +83,10 @@ class RenderPass {
         this.#workgroupCountZ = workgroupCountZ || 1;
     }
 
+    /**
+     * To use with {link RenderPasses} so it's internal
+     * @ignore
+     */
     get internal() {
         return this.#internal;
     }
@@ -91,14 +95,23 @@ class RenderPass {
         this.#internal = value;
     }
 
+    /**
+     * get the vertex shader content
+     */
     get vertexShader() {
         return this.#vertexShader;
     }
 
+    /**
+     * get the compute shader content
+     */
     get computeShader() {
         return this.#computeShader;
     }
 
+    /**
+     * get the fragment shader content
+     */
     get fragmentShader() {
         return this.#fragmentShader;
     }
@@ -1313,7 +1326,7 @@ class RenderPasses {
     };
 
     /**
-     * Add a `RenderPass` from the `RenderPasses` list
+     * Adds a `RenderPass` from the `RenderPasses` list
      * @param {Points} points References a `Points` instance
      * @param {RenderPasses} renderPassId Select a static property from `RenderPasses`
      * @param {Object} params An object with the params needed by the `RenderPass`

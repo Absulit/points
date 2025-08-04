@@ -53,7 +53,7 @@ declare class RenderPasses {
         9: any;
     };
     /**
-     * Add a `RenderPass` from the `RenderPasses` list
+     * Adds a `RenderPass` from the `RenderPasses` list
      * @param {Points} points References a `Points` instance
      * @param {RenderPasses} renderPassId Select a static property from `RenderPasses`
      * @param {Object} params An object with the params needed by the `RenderPass`

@@ -26,9 +26,22 @@ export class RenderPass {
      */
     constructor(vertexShader: string, fragmentShader: string, computeShader: string, workgroupCountX: any, workgroupCountY: any, workgroupCountZ: any);
     set internal(value: boolean);
+    /**
+     * To use with {link RenderPasses} so it's internal
+     * @ignore
+     */
     get internal(): boolean;
+    /**
+     * get the vertex shader content
+     */
     get vertexShader(): string;
+    /**
+     * get the compute shader content
+     */
     get computeShader(): string;
+    /**
+     * get the fragment shader content
+     */
     get fragmentShader(): string;
     set computePipeline(value: any);
     get computePipeline(): any;
@@ -156,7 +169,7 @@ export class RenderPasses {
         };
     };
     /**
-     * Add a `RenderPass` from the `RenderPasses` list
+     * Adds a `RenderPass` from the `RenderPasses` list
      * @param {Points} points References a `Points` instance
      * @param {RenderPasses} renderPassId Select a static property from `RenderPasses`
      * @param {Object} params An object with the params needed by the `RenderPass`

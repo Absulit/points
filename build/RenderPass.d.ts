@@ -23,9 +23,22 @@ declare class RenderPass {
      */
     constructor(vertexShader: string, fragmentShader: string, computeShader: string, workgroupCountX: any, workgroupCountY: any, workgroupCountZ: any);
     set internal(value: boolean);
+    /**
+     * To use with {link RenderPasses} so it's internal
+     * @ignore
+     */
     get internal(): boolean;
+    /**
+     * get the vertex shader content
+     */
     get vertexShader(): string;
+    /**
+     * get the compute shader content
+     */
     get computeShader(): string;
+    /**
+     * get the fragment shader content
+     */
     get fragmentShader(): string;
     set computePipeline(value: any);
     get computePipeline(): any;
