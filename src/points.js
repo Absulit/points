@@ -615,10 +615,19 @@ class Points {
     }
 
     /**
-     * Load an video as texture2d
+     * Load an video as `texture_external`and then
+     * it will be available to read data from in the shaders.
+     * Supports web formats like mp4 and webm.
      * @param {string} name
      * @param {string} path
      * @param {ShaderType} shaderType
+     *
+     * @example
+     * // js
+     * await points.setTextureVideo('video', './../myvideo.mp4');
+     *
+     * // wgsl string
+     * let rgba = textureExternalPosition(video, imageSampler, position, uvr, true);
      */
     async setTextureVideo(name, path, shaderType) {
         if (this.#nameExists(this.#texturesExternal, name)) {
