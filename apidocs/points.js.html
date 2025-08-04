@@ -617,12 +617,13 @@ class Points {
     }
 
     /**
-     * Load an video as `texture_external`and then
+     * Loads a video as `texture_external`and then
      * it will be available to read data from in the shaders.
      * Supports web formats like mp4 and webm.
      * @param {string} name
      * @param {string} path
      * @param {ShaderType} shaderType
+     * @returns {Object}
      *
      * @example
      * // js
@@ -652,9 +653,18 @@ class Points {
     }
 
     /**
-     * Load webcam as texture2d
-     * @param {string} name
+     * Loads webcam as `texture_external`and then
+     * it will be available to read data from in the shaders.
+     * @param {String} name
      * @param {ShaderType} shaderType
+     * @returns {Object}
+     *
+     * @example
+     * // js
+     * await points.setTextureWebcam('video');
+     *
+     * // wgsl string
+     * et rgba = textureExternalPosition(video, imageSampler, position, uvr, true);
      */
     async setTextureWebcam(name, shaderType) {
         if (this.#nameExists(this.#texturesExternal, name)) {
