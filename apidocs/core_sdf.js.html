@@ -162,7 +162,7 @@ fn sdfLine2(p1:vec2f, p2:vec2f, feather:f32, uv:vec2f)->f32{
  *
  * // wgsl string
  * ${sdfSmooth}
- * let value = sdfSmooth();
+ * let value = sdfSmooth(rgba);
  */
 export const sdfSmooth = /*wgsl*/`
 fn sdfSmooth(color:vec4&lt;f32>) -> vec4&lt;f32> {
