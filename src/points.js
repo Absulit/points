@@ -436,7 +436,7 @@ class Points {
      * to this texture, to be used in the next cycle of this render pass; meaning
      * you effectively have the previous frame data before printing the next one.
      *
-     * @param {string} name Name to call the texture in the shaders.
+     * @param {String} name Name to call the texture in the shaders.
      * @param {boolean} copyCurrentTexture If you want the fragment output to be copied here.
      * @returns {Object}
      *
@@ -491,11 +491,20 @@ class Points {
     }
 
     /**
-     * Load an image as texture_2d
-     * @param {string} name
-     * @param {string} path
-     * @param {ShaderType} shaderType
+     * Loads an image as `texture_2d` and then it will be available to read
+     * data from in the shaders.<br>
+     * Supports web formats like JPG, PNG.
+     * @param {string} name identifier it will have in the shaders
+     * @param {string} path image address in a web server
+     * @param {ShaderType} shaderType in what shader type it will exist only
      * @returns {Object}
+     *
+     * @example
+     * // js
+     * await points.setTextureImage('image', './../myimage.jpg');
+     *
+     * // wgsl string
+     * let rgba = texturePosition(image, imageSampler, position, uvr, true);
      */
     async setTextureImage(name, path, shaderType = null) {
         const texture2dToUpdate = this.#nameExists(this.#textures2d, name);
