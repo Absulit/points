@@ -553,6 +553,7 @@ class Points {
      * Assigns an audio FrequencyData to a StorageMap.<br>
      * Calling setAudio creates a Storage with `name` in the wgsl shaders.<br>
      * From this storage you can read the audio data sent to the shader as numeric values.<br>
+     * Values in `audio.data` are composed of integers on a scale from 0..255
      * @param {string} name name of the Storage and prefix of the length variable e.g. `[name]Length`.
      * @param {string} path
      * @param {Number} volume
@@ -864,8 +865,11 @@ class Points {
     }
     /**
      * One time function to call to initialize the shaders.
-     * @param {Array<RenderPass>} renderPasses Collection of RenderPass, which contain Vertex, Compute and Fragment shaders.
+     * @param {Array<RenderPass>} renderPasses Collection of {@link RenderPass}, which contain Vertex, Compute and Fragment shaders.
      * @returns {Boolean} false | undefined
+     *
+     * @example
+     * await points.init(renderPasses)
      */
     async init(renderPasses) {
         this.#renderPasses = renderPasses.concat(this.#postRenderPasses);
@@ -927,8 +931,10 @@ class Points {
     }
 
     /**
-     * Mainly to be used with RenderPasses.js
+     * Mainly to be used with {@link RenderPasses}<br>
+     * Injects a render pass after all the render passes added by the user.
      * @param {RenderPass} renderPass
+     * @ignore
      */
     addRenderPass(renderPass) {
         this.#postRenderPasses.push(renderPass);
@@ -940,6 +946,7 @@ class Points {
 
     /**
      * Adds two triangles called points per number of columns and rows
+     * @ignore
      */
     async createScreen() {
         let hasVertexAndFragmentShader = this.#renderPasses.some(renderPass => renderPass.hasVertexAndFragmentShader)
@@ -1693,12 +1700,15 @@ class Points {
         return (p * 2 - 1) * direction;
     };
     /**
+     * - **currently for internal use**<br>
+     * - **might be private in the future**<br>
      * Adds two triangles as a quad called Point
      * @param {Coordinate} coordinate `x` from 0 to canvas.width, `y` from 0 to canvas.height, `z` it goes from 0.0 to 1.0 and forward
      * @param {Number} width point width
      * @param {Number} height point height
      * @param {Array<RGBAColor>} colors one color per corner
      * @param {Boolean} useTexture
+     * @ignore
      */
     addPoint(coordinate, width, height, colors, useTexture = false) {
         const { x, y, z } = coordinate;

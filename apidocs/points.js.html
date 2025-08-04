@@ -665,12 +665,14 @@ class Points {
      *
      * @example
      * // js
+     * // the event name will be reflected as a variable name in the shader
      * points.addEventListener('click_event', data => {
      *     // response action in JS
      * }, 4);
      *
      * // wgsl string
      *  if(params.mouseClick == 1.){
+     *      // Same name of the Event
      *      // we fire the event with a 1
      *      // it will be set to 0 in the next frame
      *      click_event.updated = 1;
@@ -864,8 +866,11 @@ class Points {
     }
     /**
      * One time function to call to initialize the shaders.
-     * @param {Array&lt;RenderPass>} renderPasses Collection of RenderPass, which contain Vertex, Compute and Fragment shaders.
+     * @param {Array&lt;RenderPass>} renderPasses Collection of {@link RenderPass}, which contain Vertex, Compute and Fragment shaders.
      * @returns {Boolean} false | undefined
+     *
+     * @example
+     * await points.init(renderPasses)
      */
     async init(renderPasses) {
         this.#renderPasses = renderPasses.concat(this.#postRenderPasses);
@@ -927,8 +932,10 @@ class Points {
     }
 
     /**
-     * Mainly to be used with RenderPasses.js
+     * Mainly to be used with {@link RenderPasses}&lt;br>
+     * Injects a render pass after all the render passes added by the user.
      * @param {RenderPass} renderPass
+     * @ignore
      */
     addRenderPass(renderPass) {
         this.#postRenderPasses.push(renderPass);
@@ -940,6 +947,7 @@ class Points {
 
     /**
      * Adds two triangles called points per number of columns and rows
+     * @ignore
      */
     async createScreen() {
         let hasVertexAndFragmentShader = this.#renderPasses.some(renderPass => renderPass.hasVertexAndFragmentShader)
@@ -1693,12 +1701,15 @@ class Points {
         return (p * 2 - 1) * direction;
     };
     /**
+     * - **currently for internal use**&lt;br>
+     * - **might be private in the future**&lt;br>
      * Adds two triangles as a quad called Point
      * @param {Coordinate} coordinate `x` from 0 to canvas.width, `y` from 0 to canvas.height, `z` it goes from 0.0 to 1.0 and forward
      * @param {Number} width point width
      * @param {Number} height point height
      * @param {Array&lt;RGBAColor>} colors one color per corner
      * @param {Boolean} useTexture
+     * @ignore
      */
     addPoint(coordinate, width, height, colors, useTexture = false) {
         const { x, y, z } = coordinate;
