@@ -556,7 +556,7 @@ class Points {
      * For example, `A` is 65, but if one character is removed before the letter `A`, then offset is `-1`
      * @param {String} name id of the wgsl variable in the shader
      * @param {String} text text you want to load as texture
-     * @param {String} path atlas to grab characters from
+     * @param {String} path atlas to grab characters from, image address in a web server
      * @param {{x: number, y: number}} size size of a individual character e.g.: `{x:10, y:20}`
      * @param {Number} offset how many characters back or forward it must move to start
      * @param {String} shaderType
@@ -584,8 +584,8 @@ class Points {
 
     /**
      * Load images as texture_2d_array
-     * @param {string} name
-     * @param {Array} paths
+     * @param {string} name id of the wgsl variable in the shader
+     * @param {Array} paths image addresses in a web server
      * @param {ShaderType} shaderType
      */
     // TODO: verify if this can be updated after creation
@@ -618,8 +618,8 @@ class Points {
      * Loads a video as `texture_external`and then
      * it will be available to read data from in the shaders.
      * Supports web formats like mp4 and webm.
-     * @param {string} name
-     * @param {string} path
+     * @param {string} name id of the wgsl variable in the shader
+     * @param {string} path video address in a web server
      * @param {ShaderType} shaderType
      * @returns {Object}
      *
@@ -653,7 +653,7 @@ class Points {
     /**
      * Loads webcam as `texture_external`and then
      * it will be available to read data from in the shaders.
-     * @param {String} name
+     * @param {String} name id of the wgsl variable in the shader
      * @param {ShaderType} shaderType
      * @returns {Object}
      *
@@ -699,7 +699,7 @@ class Points {
      * From this storage you can read the audio data sent to the shader as numeric values.<br>
      * Values in `audio.data` are composed of integers on a scale from 0..255
      * @param {string} name name of the Storage and prefix of the length variable e.g. `[name]Length`.
-     * @param {string} path
+     * @param {string} path audio file address in a web server
      * @param {Number} volume
      * @param {boolean} loop
      * @param {boolean} autoplay
