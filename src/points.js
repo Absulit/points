@@ -173,7 +173,7 @@ class Points {
     }
 
     /**
-     * Set a `param` (predefined struct already in all shader)
+     * Sets a `param` (predefined struct already in all shader)
      * as uniform to send to all shaders.
      * A Uniform is a value that can only be changed
      * from the outside (js side, not the wgsl side),
@@ -223,7 +223,7 @@ class Points {
         arr.forEach(uniform => {
             const variable = this.#uniforms.find(v => v.name === uniform.name);
             if (!variable) {
-                throw '`updateUniform()` can\'t be called without first `addUniform()`.';
+                throw '`updateUniform()` can\'t be called without first `setUniform()`.';
             }
             variable.value = uniform.value;
         })
