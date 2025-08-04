@@ -216,7 +216,7 @@ class Points {
         return uniform;
     }
     /**
-     * Update a list of uniforms
+     * Updates a list of uniforms
      * @param {Array<Object>} arr object array of the type: `{name, value}`
      */
     updateUniforms(arr) {
@@ -824,7 +824,7 @@ class Points {
     }
 
     /**
-     * Listen for an event dispatched from WGSL code
+     * Listens for an event dispatched from WGSL code
      * @param {String} name Number that represents an event Id
      * @param {Function} callback function to be called when the event occurs
      * @param {Number} structSize size of the data to be returned
@@ -863,6 +863,7 @@ class Points {
      * for internal use:
      * to flag add* methods and variables as part of the RenderPasses
      * @private
+     * @ignore
      */
     _setInternal(value) {
         this.#internal = value;
@@ -1042,7 +1043,7 @@ class Points {
         });
     }
     /**
-     * One time function to call to initialize the shaders.
+     * One time function call to initialize the shaders.
      * @param {Array<RenderPass>} renderPasses Collection of {@link RenderPass}, which contain Vertex, Compute and Fragment shaders.
      * @returns {Boolean} false | undefined
      *
