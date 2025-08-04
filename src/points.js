@@ -265,12 +265,48 @@ class Points {
 
     /**
      * Creates a persistent memory buffer across every frame call that can be updated.
+     * See [GPUBuffer](https://www.w3.org/TR/webgpu/#gpubuffer)
+     * <br>
+     * Meaning it can be updated in the shaders across the execution of every frame.
+     * <br>
+     * It can have almost any type, like `f32` or `vec2f` or even array<f32>.
+     * <br>
+     * The difference with {@link Points#setStorage|setStorage} is that this can be initialized
+     * with data.
      * @param {string} name Name that the Storage will have in the shader.
      * @param {Uint8Array<ArrayBuffer>} arrayData array with the data that must match the struct.
      * @param {string} structName Name of the struct already existing on the
-     * shader that will be the array<structName> of the Storage.
+     * shader. This will be the type of the Storage.
      * @param {boolean} read if this is going to be used to read data back.
      * @param {ShaderType} shaderType this tells to what shader the storage is bound
+     *
+     * @example
+     * // js examples/data1
+     * const firstMatrix = [
+     *     2, 4 , // 2 rows 4 columns
+     *     1, 2, 3, 4,
+     *     5, 6, 7, 8
+     * ];
+     * const secondMatrix = [
+     *     4, 2, // 4 rows 2 columns
+     *     1, 2,
+     *     3, 4,
+     *     5, 6,
+     *     7, 8
+     * ];
+     *
+     * // Matrix should exist as a struct in the wgsl shader
+     * points.setStorageMap('firstMatrix', firstMatrix, 'Matrix');
+     * points.setStorageMap('secondMatrix', secondMatrix, 'Matrix');
+     * points.setStorage('resultMatrix', 'Matrix', true); // this reads data back
+     *
+     * // wgsl string
+     * struct Matrix {
+     *     size : vec2<f32>,
+     *     numbers: array<f32>,
+     * }
+     *
+     * resultMatrix.size = vec2(firstMatrix.size.x, secondMatrix.size.y);
      */
     setStorageMap(name, arrayData, structName, read = false, shaderType = null) {
         const storageToUpdate = this.#nameExists(this.#storage, name)
