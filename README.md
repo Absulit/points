@@ -87,6 +87,10 @@ To add more shaders you need to add a new RenderPass.
 
 You can have a Vertex + Fragment shaders without a Compute shader, and also a Compute shader without a Vertex + Fragment shaders, so you can have a computational shader, a visual shader, or both.
 
+# API
+Description of modules and functions here
+[https://absulit.github.io/points/apidocs/](https://absulit.github.io/points/apidocs/index.html)
+
 # Installation
 
 [examples_tutorial](examples_tutorial) has a directory per type of installation:
@@ -1076,6 +1080,12 @@ RenderPasses.waves(points, .05, .03);
 The render pass takes the output from your already defined shaders as a Texture and then applies a process to create an effect. It takes a few assumptions to work interchangeably between them or in a layered way, this by using the same name for the output texture and input texture.
 
 Also because JavaScript wraps and hides all of this process, I think it's better for you in the long run to just study and extract the postprocessing render pass and include it in your own render passes. Currently adding all 9 render passes seems to have no effect in the framerate, but this could be different in a larger project, so customizing your render passes is better.
+
+# Collaborators
+
+[@juulio](https://github.com/juulio)
+- Documentation testing
+- Verifying installation is understandable
 
 # Legacy folder (original project)
 

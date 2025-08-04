@@ -1,6 +1,8 @@
 /**
  * Utilities for animation.
  * <br>
+ * Functions that use sine and `params.time` to increase and decrease a value over time.
+ * <br>
  * <br>
  * These are wgsl functions, not js functions.
  * The function is enclosed in a js string constant,
@@ -14,6 +16,11 @@
  * @type {String}
  * @param {f32} speed
  * @example
+ * // js
+ * import { fusin } from 'points/animation';
+ *
+ * // wgsl string
+ * ${fusin}
  * let value = fusin(2.);
  */
 export const fusin = /*wgsl*/`
@@ -28,6 +35,11 @@ fn fusin(speed: f32) -> f32{
  * @type {String}
  * @param {f32} speed
  * @example
+ * // js
+ * import { fucos } from 'points/animation';
+ *
+ * // wgsl string
+ * ${fucos}
  * let value = fucos(2.);
  */
 export const fucos = /*wgsl*/`
@@ -42,6 +54,11 @@ fn fucos(speed: f32) -> f32{
  * @type {String}
  * @param {f32} speed
  * @example
+ * // js
+ * import { fnusin } from 'points/animation';
+ *
+ * // wgsl string
+ * ${fnusin}
  * let value = fnusin(2.);
  */
 export const fnusin = /*wgsl*/`

@@ -1,5 +1,8 @@
 export { defaultStructs as default };
 /**
+ * The defaultStructs are structs already incorporated onto the shaders you create,
+ * so you can call them without import.
+ * <br>
  * Fragment, Sound, and Event structs.
  * <br>
  * <br>

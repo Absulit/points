@@ -1,7 +1,7 @@
 /**
- * original: Author :  Stefan Gustavson (stefan.gustavson@liu.se)
- * https://github.com/ashima/webgl-noise/blob/master/src/classicnoise2D.glsl
- *
+ * original: Author :  Stefan Gustavson (stefan.gustavson@liu.se)<br>
+ * https://github.com/ashima/webgl-noise/blob/master/src/classicnoise2D.glsl<br>
+ *<br>
  * These are wgsl functions, not js functions.
  * The function is enclosed in a js string constant,
  * to be appended into the code to reference it in the string shader.
@@ -31,6 +31,14 @@ fn fade(t:vec2<f32>) -> vec2<f32> {
  * @type {String}
  * @param {vec2f} P point
  * @return `f32`
+ *
+ * @example
+ * // js
+ * import { cnoise } from 'points/classicnoise2d';
+ *
+ * // wgsl string
+ * ${cnoise}
+ * let value = cnoise(uvr);
  */
 export const cnoise = /*wgsl*/`
 ${auxiliars}
@@ -80,6 +88,14 @@ fn cnoise(P:vec2<f32>) ->f32 {
  * @param {vec2f} P point
  * @param {vec2f} rep point
  * @return `f32`
+ *
+ * @example
+ * // js
+ * import { pnoise } from 'points/classicnoise2d';
+ *
+ * // wgsl string
+ * ${pnoise}
+ * let value = pnoise(uvr);
  */
 export const pnoise = /*wgsl*/`
 ${auxiliars}
