@@ -550,12 +550,12 @@ class Points {
     }
 
     /**
-     * Loads a text string as a texture.
+     * Loads a text string as a texture.&lt;br>
      * Using an Atlas or a Spritesheet with UTF-16 chars (`path`) it will create a new texture
-     * that contains only the `text` characters.
-     * Characters in the atlas `path` must be in order of the UTF-16 chars.
-     * It can have missing characters at the end or at the start, so the `offset` is added to take account for those chars.
-     * For example, `A` is 65, but if one character is removed before the letter `A`, then offset is -1
+     * that contains only the `text` characters.&lt;br>
+     * Characters in the atlas `path` must be in order of the UTF-16 chars.&lt;br>
+     * It can have missing characters at the end or at the start, so the `offset` is added to take account for those chars.&lt;br>
+     * For example, `A` is 65, but if one character is removed before the letter `A`, then offset is `-1`
      * @param {String} name id of the wgsl variable in the shader
      * @param {String} text text you want to load as texture
      * @param {String} path atlas to grab characters from
@@ -563,6 +563,19 @@ class Points {
      * @param {Number} offset how many characters back or forward it must move to start
      * @param {String} shaderType
      * @returns {Object}
+     *
+     * @example
+     * // js
+     * await points.setTextureString(
+     *     'textImg',
+     *     'Custom Text',
+     *     './../img/inconsolata_regular_8x22.png',
+     *     size,
+     *     -32
+     * );
+     *
+     * // wgsl string
+     * let textColors = texturePosition(textImg, imageSampler, position, uvr, true);
      */
     async setTextureString(name, text, path, size, offset = 0, shaderType = null) {
         const atlas = await loadImage(path);
