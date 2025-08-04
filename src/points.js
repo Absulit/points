@@ -173,13 +173,24 @@ class Points {
     }
 
     /**
-     * Set a param as uniform to send to all shaders.
+     * Set a `param` (predefined struct already in all shader)
+     * as uniform to send to all shaders.
      * A Uniform is a value that can only be changed
-     * from the outside, and unless changed it remains
-     * consistent.
+     * from the outside (js side, not the wgsl side),
+     * and unless changed it remains consistent.
      * @param {string} name name of the Param, you can invoke it later in shaders as `Params.[name]`
      * @param {Number|Boolean|Array<Number>} value Single number or a list of numbers. Boolean is converted to Number.
-     * @param {string} structName type as `f32` or a custom struct. Default `few`
+     * @param {string} structName type as `f32` or a custom struct. Default `f32`.
+     * @return {Object}
+     *
+     * @example
+     * // js
+     *  points.setUniform('color0', options.color0, 'vec3f');
+     *  points.setUniform('color1', options.color1, 'vec3f');
+     *  points.setUniform('scale', options.scale, 'f32');
+     *
+     * // wgsl string
+     * let finalColor:vec4f = mix(color0, color1, params.scale);
      */
     setUniform(name, value, structName = null) {
         let uniformToUpdate = this.#nameExists(this.#uniforms, name);
