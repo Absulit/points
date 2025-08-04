@@ -666,10 +666,16 @@ class Points {
      * @example
      * // js
      * points.addEventListener('click_event', data => {
-     *     audio.play();
+     *     // response action in JS
      * }, 4);
      *
      * // wgsl string
+     *  if(params.mouseClick == 1.){
+     *      // we fire the event with a 1
+     *      // it will be set to 0 in the next frame
+     *      click_event.updated = 1;
+     *  }
+     *
      */
     addEventListener(name, callback, structSize) {
         // TODO: remove structSize
