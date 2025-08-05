@@ -8,7 +8,7 @@ Looking for an explanation on how to use POINTS? follow this link:
 
 ## Main classes:<br>
 ```js
-import Points {RenderPass, RenderPasses} from 'points'
+import Points { RenderPass, RenderPasses } from 'points';
 ```
 {@link Points}<br>
 {@link RenderPass}<br>
@@ -18,7 +18,7 @@ import Points {RenderPass, RenderPasses} from 'points'
 ## Submodules with helper wgsl functions:
 
 ```js
-import { fnusin } from 'points/animation'
+import { fnusin } from 'points/animation';
 ```
 
 {@link module:points/animation|points/animation}<br>
