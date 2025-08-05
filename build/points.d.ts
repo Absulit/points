@@ -304,8 +304,19 @@ export class ShaderType {
  */
 declare class Points {
     constructor(canvasId: any);
-    set fitWindow(value: boolean);
-    get fitWindow(): boolean;
+    /**
+     * If the canvas has a fixed size e.g. `800x800`, `fitWindow` will fill
+     * the available window space.
+     * @type {Boolean}
+     * @throws {String} {@link Points#init} has not been called
+     *
+     * @example
+     *  if (await points.init(renderPasses)) {
+     *      points.fitWindow = isFitWindowData.isFitWindow;
+     *      update();
+     *  }
+     */
+    set fitWindow(value: any);
     /**
      * Sets a `param` (predefined struct already in all shader)
      * as uniform to send to all shaders.
@@ -676,12 +687,27 @@ declare class Points {
      * @ignore
      */
     addRenderPass(renderPass: RenderPass): void;
+    /**
+     * Get the active list of {@link RenderPass}
+     */
     get renderPasses(): any;
     /**
      * Adds two triangles called points per number of columns and rows
      * @ignore
      */
     createScreen(): Promise<void>;
+    /**
+     * Method executed on each {@link https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame | requestAnimationFrame}.
+     * Here's where all the calls to update data will be executed.
+     * @example
+     * await points.init(renderPasses);
+     * update();
+     *
+     * function update() {
+     *     points.update();
+     *     requestAnimationFrame(update);
+     * }
+     */
     update(): Promise<void>;
     read(): Promise<void>;
     /**
@@ -696,11 +722,22 @@ declare class Points {
      * @ignore
      */
     addPoint(coordinate: Coordinate, width: number, height: number, colors: Array<RGBAColor>, useTexture?: boolean): void;
-    get canvas(): any;
+    /**
+     * Reference to the canvas assigned in the constructor
+     * @type {HTMLCanvasElement}
+     */
+    get canvas(): HTMLCanvasElement;
     get device(): any;
     get context(): any;
     get presentationFormat(): any;
     get buffer(): any;
+    /**
+     * Triggers the app to run in full screen mode
+     * @type {Boolean}
+     *
+     * @example
+     * points.fullscreen = true
+     */
     set fullscreen(value: boolean);
     get fullscreen(): boolean;
     #private;
