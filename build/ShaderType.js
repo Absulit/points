@@ -16,8 +16,17 @@
  *
  */
 class ShaderType {
+    /**
+     * Vertex Shader
+     */
     static VERTEX = 1;
+    /**
+     * Compute Shader
+     */
     static COMPUTE = 2;
+    /**
+     * Fragment Shader
+     */
     static FRAGMENT = 3;
 }
 

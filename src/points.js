@@ -217,7 +217,7 @@ class Points {
     }
     /**
      * Updates a list of uniforms
-     * @param {Array<Object>} arr object array of the type: `{name, value}`
+     * @param {Array<{name:String, value:Number}>} arr object array of the type: `{name, value}`
      */
     updateUniforms(arr) {
         arr.forEach(uniform => {

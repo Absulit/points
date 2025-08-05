@@ -266,8 +266,17 @@ export class RenderPasses {
  *
  */
 export class ShaderType {
+    /**
+     * Vertex Shader
+     */
     static VERTEX: number;
+    /**
+     * Compute Shader
+     */
     static COMPUTE: number;
+    /**
+     * Fragment Shader
+     */
     static FRAGMENT: number;
 }
 /**
@@ -320,9 +329,12 @@ declare class Points {
     setUniform(name: string, value: number | boolean | Array<number>, structName?: string): any;
     /**
      * Updates a list of uniforms
-     * @param {Array<Object>} arr object array of the type: `{name, value}`
+     * @param {Array<{name:String, value:Number}>} arr object array of the type: `{name, value}`
      */
-    updateUniforms(arr: Array<any>): void;
+    updateUniforms(arr: Array<{
+        name: string;
+        value: number;
+    }>): void;
     /**
      * Creates a persistent memory buffer across every frame call. See [GPUBuffer](https://www.w3.org/TR/webgpu/#gpubuffer)
      * <br>

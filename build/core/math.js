@@ -10,7 +10,8 @@
 
 /**
  * PI is the ratio of a circle's circumference to its diameter.
- * [PI](https://en.wikipedia.org/wiki/Pi)
+ *
+ * @see https://en.wikipedia.org/wiki/Pi
  *
  * @example
  * // js
@@ -23,7 +24,8 @@
 const PI = /*wgsl*/`const PI = 3.14159265;`;
 /**
  * TAU  is the ratio of a circle's circumference to its radius.
- * [TAU](https://en.wikipedia.org/wiki/Tau_(mathematics))
+ *
+ * @see https://en.wikipedia.org/wiki/Tau_(mathematics)
  *
  * @example
  * // js
@@ -36,7 +38,8 @@ const PI = /*wgsl*/`const PI = 3.14159265;`;
 const TAU = /*wgsl*/`const TAU = PI * 2;`;
 /**
  * PHI is the Golden Ratio
- * [PHI](https://en.wikipedia.org/wiki/Golden_ratio)
+ *
+ * @see https://en.wikipedia.org/wiki/Golden_ratio
  *
  * @example
  * // js
@@ -51,7 +54,8 @@ const PHI = /*wgsl*/`const PHI = 1.61803398;`;
  * E is a mathematical constant approximately equal to 2.71828
  * that is the base of the natural logarithm and exponential function.
  * It is sometimes called Euler's number, after the Swiss mathematician Leonhard Euler.
- * [E](https://en.wikipedia.org/wiki/E_(mathematical_constant))
+ *
+ * @see https://en.wikipedia.org/wiki/E_(mathematical_constant)
  *
  * @example
  * // js

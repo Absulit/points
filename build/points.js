@@ -16,8 +16,17 @@
  *
  */
 class ShaderType {
+    /**
+     * Vertex Shader
+     */
     static VERTEX = 1;
+    /**
+     * Compute Shader
+     */
     static COMPUTE = 2;
+    /**
+     * Fragment Shader
+     */
     static FRAGMENT = 3;
 }
 
@@ -686,7 +695,8 @@ fn main(
 
 /**
  * PI is the ratio of a circle's circumference to its diameter.
- * [PI](https://en.wikipedia.org/wiki/Pi)
+ *
+ * @see https://en.wikipedia.org/wiki/Pi
  *
  * @example
  * // js
@@ -2594,7 +2604,7 @@ class Points {
     }
     /**
      * Updates a list of uniforms
-     * @param {Array<Object>} arr object array of the type: `{name, value}`
+     * @param {Array<{name:String, value:Number}>} arr object array of the type: `{name, value}`
      */
     updateUniforms(arr) {
         arr.forEach(uniform => {

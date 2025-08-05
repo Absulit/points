@@ -16,7 +16,16 @@ export { ShaderType as default };
  *
  */
 declare class ShaderType {
+    /**
+     * Vertex Shader
+     */
     static VERTEX: number;
+    /**
+     * Compute Shader
+     */
     static COMPUTE: number;
+    /**
+     * Fragment Shader
+     */
     static FRAGMENT: number;
 }

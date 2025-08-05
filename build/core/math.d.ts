@@ -2,7 +2,8 @@
  * E is a mathematical constant approximately equal to 2.71828
  * that is the base of the natural logarithm and exponential function.
  * It is sometimes called Euler's number, after the Swiss mathematician Leonhard Euler.
- * [E](https://en.wikipedia.org/wiki/E_(mathematical_constant))
+ *
+ * @see https://en.wikipedia.org/wiki/E_(mathematical_constant)
  *
  * @example
  * // js
@@ -15,7 +16,8 @@
 export const E: "const E = 2.71828182;";
 /**
  * PHI is the Golden Ratio
- * [PHI](https://en.wikipedia.org/wiki/Golden_ratio)
+ *
+ * @see https://en.wikipedia.org/wiki/Golden_ratio
  *
  * @example
  * // js
@@ -36,7 +38,8 @@ export const PHI: "const PHI = 1.61803398;";
  */
 /**
  * PI is the ratio of a circle's circumference to its diameter.
- * [PI](https://en.wikipedia.org/wiki/Pi)
+ *
+ * @see https://en.wikipedia.org/wiki/Pi
  *
  * @example
  * // js
@@ -49,7 +52,8 @@ export const PHI: "const PHI = 1.61803398;";
 export const PI: "const PI = 3.14159265;";
 /**
  * TAU  is the ratio of a circle's circumference to its radius.
- * [TAU](https://en.wikipedia.org/wiki/Tau_(mathematics))
+ *
+ * @see https://en.wikipedia.org/wiki/Tau_(mathematics)
  *
  * @example
  * // js
