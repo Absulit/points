@@ -44,6 +44,6 @@
   "homepage": "https://github.com/Absulit/points#readme",
   "devDependencies": {
     "@webgpu/types": "^0.1.64",
-    "clean-jsdoc-theme": "^4.3.0"
+    "docolatte": "^4.5.1"
   }
 }
