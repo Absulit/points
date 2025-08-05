@@ -1,4 +1,4 @@
-import { brightness } from 'color';
+import { brightness } from 'points/color';
 
 const compute = /*wgsl*/`
 

@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+        "points": ["node_modules/@absulit/points/build/points"],
+        "points/animation": ["node_modules/@absulit/points/build/core/animation"],
+        "points/audio": ["node_modules/@absulit/points/build/core/audio"],
+        "points/color": ["node_modules/@absulit/points/build/core/color"],
+        "points/debug": ["node_modules/@absulit/points/build/core/debug"],
+        "points/effects": ["node_modules/@absulit/points/build/core/effects"],
+        "points/image": ["node_modules/@absulit/points/build/core/image"],
+        "points/math": ["node_modules/@absulit/points/build/core/math"],
+        "points/noise2d": ["node_modules/@absulit/points/build/core/noise2d"],
+        "points/classicnoise2d": ["node_modules/@absulit/points/build/core/classicnoise2d"],
+        "points/random": ["node_modules/@absulit/points/build/core/random"],
+        "points/sdf": ["node_modules/@absulit/points/build/core/sdf"]
+    }
+  }
+}

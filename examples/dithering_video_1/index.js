@@ -1,8 +1,8 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
-import RenderPass from 'renderpass';
-import ShaderType from 'shadertype';
+import { RenderPass } from 'points';
+import { ShaderType } from 'points';
 import Points from 'points';
 
 const options = {

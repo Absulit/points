@@ -1,4 +1,9 @@
-export default class CanvasRecorder {
+/**
+ * @example
+ * const recorder = new CanvasRecorder(canvas);
+ */
+
+class CanvasRecorder {
     #canvas = null;
     #options = null;
 
@@ -16,6 +21,9 @@ export default class CanvasRecorder {
         };
     }
 
+    /**
+     * Starts the video recording.
+     */
     start() {
         const videoStream = this.#canvas.captureStream(60);
         let chunks = [];
@@ -30,10 +38,17 @@ export default class CanvasRecorder {
         };
         this.mediaRecorder.start();
     }
+
+    /**
+     * Stops the video recording and downloads the video.
+     */
     stop() {
         this.mediaRecorder.stop();
     }
 
+    /**
+     * Retrieves the current frame as a PNG and downloads the image.
+     */
     getPNG() {
         this.#canvas.toBlob(
             blob => {
@@ -53,3 +68,6 @@ export default class CanvasRecorder {
         a.click();
     }
 }
+
+export default CanvasRecorder;
+

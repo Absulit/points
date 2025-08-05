@@ -1,6 +1,9 @@
-'use strict';
-
-export default class VertexBufferInfo {
+/**
+ * Along with the vertexArray it calculates some info like offsets required for the pipeline.
+ * Internal use.
+ * @ignore
+ */
+class VertexBufferInfo {
     #vertexSize
     #vertexOffset;
     #colorOffset;
@@ -42,3 +45,5 @@ export default class VertexBufferInfo {
         return this.#vertexCount;
     }
 }
+
+export default VertexBufferInfo;

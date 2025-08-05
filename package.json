@@ -1,0 +1,49 @@
+{
+  "name": "@absulit/points",
+  "version": "0.1.0-alpha.1",
+  "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
+  "description": "A Generative Art library made in WebGPU",
+  "main": "build/points.min.js",
+  "files": [
+    "build/",
+    "src/",
+    "LICENSE",
+    "README.md"
+  ],
+  "directories": {
+    "src": "src",
+    "doc": "docs",
+    "build": "build",
+    "example": "examples",
+    "img": "img"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Absulit/points.git"
+  },
+  "keywords": [
+    "javascript",
+    "webgpu",
+    "creative-coding",
+    "shaders",
+    "generative-art",
+    "genart",
+    "wgsl"
+  ],
+  "author": "absulit",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Absulit/points/issues"
+  },
+  "homepage": "https://github.com/Absulit/points#readme",
+  "devDependencies": {
+    "@webgpu/types": "^0.1.64",
+    "clean-jsdoc-theme": "^4.3.0"
+  }
+}

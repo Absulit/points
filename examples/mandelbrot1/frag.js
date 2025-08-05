@@ -1,4 +1,4 @@
-import { fnusin, fucos, fusin } from 'animation';
+import { fnusin, fucos, fusin } from 'points/animation';
 const frag = /*wgsl*/`
 
 ${fnusin}

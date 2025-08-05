@@ -1,5 +1,5 @@
 import Points from 'points';
-import RenderPass from 'renderpass';
+import { RenderPass } from 'points';
 
 import {
     vec3,

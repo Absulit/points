@@ -1,7 +1,7 @@
 import vert from './vert.js';
 import frag0 from './frag.js';
 import Points from 'points';
-import RenderPass from 'renderpass';
+import { RenderPass } from 'points';
 
 const options = {
     rotation: -.866,

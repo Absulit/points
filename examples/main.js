@@ -1,10 +1,10 @@
 'use strict';
 import * as dat from 'datgui';
-import Points from 'points';
-import RenderPass from 'renderpass';
+import Points, { RenderPass } from 'points';
 import { shaderProjects } from './index_files/shader_projects.js';
 import { isMobile } from './utils.js';
 import CanvasRecorder from './../src/CanvasRecorder.js';
+
 
 const canvas = document.getElementById('canvas');
 const gui = new dat.GUI({ name: 'Points GUI' });

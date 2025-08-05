@@ -1,0 +1,44 @@
+{
+    "compilerOptions": {
+        "lib": [
+            "DOM",
+            "ESNext"
+        ],
+        "declaration": true,
+        "emitDeclarationOnly": true,
+        "allowJs": true,
+        "checkJs": false, // TODO true to check types
+        "outDir": "build",
+
+        "target": "ES2015",
+        "module": "ESNext",
+        "types": [
+            "@webgpu/types",
+        ]
+    },
+    "files": [
+        "src/types/index.d.ts",
+        "build/RenderPass.js",
+        "build/RenderPasses.js",
+        "build/ShaderType.js",
+        "build/points.js",
+        "build/core/animation.js",
+        "build/core/audio.js",
+        "build/core/cellular2d.js",
+        "build/core/classicnoise2d.js",
+        "build/core/color.js",
+        "build/core/debug.js",
+        "build/core/defaultConstants.js",
+        "build/core/defaultFunctions.js",
+        "build/core/defaultStructs.js",
+        "build/core/defaultVertexStructs.js",
+        "build/core/effects.js",
+        "build/core/image.js",
+        "build/core/math.js",
+        "build/core/noise2d.js",
+        "build/core/random.js",
+        "build/core/sdf.js",
+        "build/core/valuenoise.js",
+        "build/core/voronoi.js",
+    ]
+}

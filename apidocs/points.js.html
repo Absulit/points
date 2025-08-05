@@ -1,21 +1,51 @@
-'use strict';
+<!DOCTYPE html><html lang="en" style="font-size:16px"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Source: points.js</title><!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]--><script src="scripts/third-party/hljs.js" defer="defer"></script><script src="scripts/third-party/hljs-line-num.js" defer="defer"></script><script src="scripts/third-party/popper.js" defer="defer"></script><script src="scripts/third-party/tippy.js" defer="defer"></script><script src="scripts/third-party/tocbot.min.js"></script><script>var baseURL="/",locationPathname="";baseURL=(locationPathname=document.location.pathname).substr(0,locationPathname.lastIndexOf("/")+1)</script><link rel="stylesheet" href="styles/clean-jsdoc-theme.min.css"><svg aria-hidden="true" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="display:none"><defs><symbol id="copy-icon" viewbox="0 0 488.3 488.3"><g><path d="M314.25,85.4h-227c-21.3,0-38.6,17.3-38.6,38.6v325.7c0,21.3,17.3,38.6,38.6,38.6h227c21.3,0,38.6-17.3,38.6-38.6V124    C352.75,102.7,335.45,85.4,314.25,85.4z M325.75,449.6c0,6.4-5.2,11.6-11.6,11.6h-227c-6.4,0-11.6-5.2-11.6-11.6V124    c0-6.4,5.2-11.6,11.6-11.6h227c6.4,0,11.6,5.2,11.6,11.6V449.6z"/><path d="M401.05,0h-227c-21.3,0-38.6,17.3-38.6,38.6c0,7.5,6,13.5,13.5,13.5s13.5-6,13.5-13.5c0-6.4,5.2-11.6,11.6-11.6h227    c6.4,0,11.6,5.2,11.6,11.6v325.7c0,6.4-5.2,11.6-11.6,11.6c-7.5,0-13.5,6-13.5,13.5s6,13.5,13.5,13.5c21.3,0,38.6-17.3,38.6-38.6    V38.6C439.65,17.3,422.35,0,401.05,0z"/></g></symbol><symbol id="search-icon" viewBox="0 0 512 512"><g><g><path d="M225.474,0C101.151,0,0,101.151,0,225.474c0,124.33,101.151,225.474,225.474,225.474    c124.33,0,225.474-101.144,225.474-225.474C450.948,101.151,349.804,0,225.474,0z M225.474,409.323    c-101.373,0-183.848-82.475-183.848-183.848S124.101,41.626,225.474,41.626s183.848,82.475,183.848,183.848    S326.847,409.323,225.474,409.323z"/></g></g><g><g><path d="M505.902,476.472L386.574,357.144c-8.131-8.131-21.299-8.131-29.43,0c-8.131,8.124-8.131,21.306,0,29.43l119.328,119.328    c4.065,4.065,9.387,6.098,14.715,6.098c5.321,0,10.649-2.033,14.715-6.098C514.033,497.778,514.033,484.596,505.902,476.472z"/></g></g></symbol><symbol id="font-size-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M11.246 15H4.754l-2 5H.6L7 4h2l6.4 16h-2.154l-2-5zm-.8-2L8 6.885 5.554 13h4.892zM21 12.535V12h2v8h-2v-.535a4 4 0 1 1 0-6.93zM19 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></symbol><symbol id="add-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z"/></symbol><symbol id="minus-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M5 11h14v2H5z"/></symbol><symbol id="dark-theme-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M10 7a7 7 0 0 0 12 4.9v.1c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2h.1A6.979 6.979 0 0 0 10 7zm-6 5a8 8 0 0 0 15.062 3.762A9 9 0 0 1 8.238 4.938 7.999 7.999 0 0 0 4 12z"/></symbol><symbol id="light-theme-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12zm0-2a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM11 1h2v3h-2V1zm0 19h2v3h-2v-3zM3.515 4.929l1.414-1.414L7.05 5.636 5.636 7.05 3.515 4.93zM16.95 18.364l1.414-1.414 2.121 2.121-1.414 1.414-2.121-2.121zm2.121-14.85l1.414 1.415-2.121 2.121-1.414-1.414 2.121-2.121zM5.636 16.95l1.414 1.414-2.121 2.121-1.414-1.414 2.121-2.121zM23 11v2h-3v-2h3zM4 11v2H1v-2h3z"/></symbol><symbol id="reset-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M18.537 19.567A9.961 9.961 0 0 1 12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10c0 2.136-.67 4.116-1.81 5.74L17 12h3a8 8 0 1 0-2.46 5.772l.997 1.795z"/></symbol><symbol id="down-icon" viewBox="0 0 16 16"><path fill-rule="evenodd" clip-rule="evenodd" d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z"></path></symbol><symbol id="codepen-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M16.5 13.202L13 15.535v3.596L19.197 15 16.5 13.202zM14.697 12L12 10.202 9.303 12 12 13.798 14.697 12zM20 10.869L18.303 12 20 13.131V10.87zM19.197 9L13 4.869v3.596l3.5 2.333L19.197 9zM7.5 10.798L11 8.465V4.869L4.803 9 7.5 10.798zM4.803 15L11 19.131v-3.596l-3.5-2.333L4.803 15zM4 13.131L5.697 12 4 10.869v2.262zM2 9a1 1 0 0 1 .445-.832l9-6a1 1 0 0 1 1.11 0l9 6A1 1 0 0 1 22 9v6a1 1 0 0 1-.445.832l-9 6a1 1 0 0 1-1.11 0l-9-6A1 1 0 0 1 2 15V9z"/></symbol><symbol id="close-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z"/></symbol><symbol id="menu-icon" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z"/></symbol></defs></svg></head><body data-theme="dark"><div class="sidebar-container"><div class="sidebar" id="sidebar"><div class="sidebar-items-container"><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-modules"><div>Modules</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="module-defaultFunctions.html">defaultFunctions</a></div><div class="sidebar-section-children"><a href="module-defaultStructs.html">defaultStructs</a></div><div class="sidebar-section-children"><a href="module-points_animation.html">points/animation</a></div><div class="sidebar-section-children"><a href="module-points_audio.html">points/audio</a></div><div class="sidebar-section-children"><a href="module-points_cellular2d.html">points/cellular2d</a></div><div class="sidebar-section-children"><a href="module-points_classicnoise2d.html">points/classicnoise2d</a></div><div class="sidebar-section-children"><a href="module-points_color.html">points/color</a></div><div class="sidebar-section-children"><a href="module-points_debug.html">points/debug</a></div><div class="sidebar-section-children"><a href="module-points_effects.html">points/effects</a></div><div class="sidebar-section-children"><a href="module-points_image.html">points/image</a></div><div class="sidebar-section-children"><a href="module-points_math.html">points/math</a></div><div class="sidebar-section-children"><a href="module-points_noise2d.html">points/noise2d</a></div><div class="sidebar-section-children"><a href="module-points_random.html">points/random</a></div><div class="sidebar-section-children"><a href="module-points_sdf.html">points/sdf</a></div><div class="sidebar-section-children"><a href="module-points_valuenoise.html">points/valuenoise</a></div><div class="sidebar-section-children"><a href="module-points_voronoi.html">points/voronoi</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-classes"><div>Classes</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="CanvasRecorder.html">CanvasRecorder</a></div><div class="sidebar-section-children"><a href="Points.html">Points</a></div><div class="sidebar-section-children"><a href="RenderPass.html">RenderPass</a></div><div class="sidebar-section-children"><a href="RenderPasses.html">RenderPasses</a></div><div class="sidebar-section-children"><a href="ShaderType.html">ShaderType</a></div></div></div></div></div><div class="navbar-container" id="VuAckcnZhf"><nav class="navbar"><div class="navbar-left-items"></div><div class="navbar-right-items"><div class="navbar-right-item"><button class="icon-button search-button" aria-label="open-search"><svg><use xlink:href="#search-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button theme-toggle" aria-label="toggle-theme"><svg><use class="theme-svg-use" xlink:href="#light-theme-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button font-size" aria-label="change-font-size"><svg><use xlink:href="#font-size-icon"></use></svg></button></div></div><nav></nav></nav></div><div class="toc-container"><div class="toc-content"><span class="bold">On this page</span><div id="eed4d2a0bfd64539bb9df78095dec881"></div></div></div><div class="body-wrapper"><div class="main-content"><div class="main-wrapper"><section id="source-page" class="source-page"><header><h1 id="title" class="has-anchor">points.js</h1></header><article><pre class="prettyprint source lang-js"><code>'use strict';
 import UniformKeys from './UniformKeys.js';
 import VertexBufferInfo from './VertexBufferInfo.js';
 import ShaderType from './ShaderType.js';
+import RenderPass from './RenderPass.js';
+import RenderPasses from './RenderPasses.js';
 import Coordinate from './coordinate.js';
 import RGBAColor from './color.js';
 import Clock from './clock.js';
 import defaultStructs from './core/defaultStructs.js';
 import { defaultVertexBody } from './core/defaultFunctions.js';
 import { dataSize, getArrayTypeData, isArray, typeSizes } from './data-size.js';
+import { loadImage, strToImage } from './texture-string.js';
+import LayersArray from './LayersArray.js';
+import UniformsArray from './UniformsArray.js';
 
-export default class Points {
+/**
+ * Main class Points
+ * @class Points
+ * @example
+ * import Points from 'points';
+ * const points = new Points('canvas');
+ *
+ * let renderPasses = [
+ *     new RenderPass(vert1, frag1, compute1),
+ *     new RenderPass(vert2, frag2, compute2)
+ * ];
+ *
+ * await points.init(renderPasses);
+ * update();
+ *
+ * function update() {
+ *     points.update();
+ *     requestAnimationFrame(update);
+ * }
+ *
+ * @category Main
+ *
+ */
+class Points {
     #canvasId = null;
     #canvas = null;
     #device = null;
     #context = null;
     #presentationFormat = null;
-    #renderPasses = null
+    #renderPasses = null;
     #postRenderPasses = [];
     #vertexBufferInfo = null;
     #buffer = null;
@@ -27,7 +57,7 @@ export default class Points {
     #numRows = 1;
     #commandsFinished = [];
     #renderPassDescriptor = null;
-    #uniforms = [];
+    #uniforms = new UniformsArray();
     #storage = [];
     #readStorage = [];
     #samplers = [];
@@ -37,7 +67,7 @@ export default class Points {
     #texturesExternal = [];
     #texturesStorage2d = [];
     #bindingTextures = [];
-    #layers = [];
+    #layers = new LayersArray();
     #originalCanvasWidth = null;
     #originalCanvasHeigth = null;
     #clock = new Clock();
@@ -81,7 +111,7 @@ export default class Points {
             window.addEventListener('resize', this.#resizeCanvasToFitWindow, false);
             document.addEventListener("fullscreenchange", e => {
                 this.#fullscreen = !!document.fullscreenElement;
-                if (!this.#fullscreen && !this.#fitWindow) {
+                if (!this.#fullscreen &amp;&amp; !this.#fitWindow) {
                     this.#resizeCanvasToDefault();
                 }
                 if (!this.#fullscreen) {
@@ -128,10 +158,10 @@ export default class Points {
             usage: GPUTextureUsage.RENDER_ATTACHMENT,
         });
         // this is to solve an issue that requires the texture to be resized
-        // if the screen dimensions change, this for a `addTexture2d` with
+        // if the screen dimensions change, this for a `setTexture2d` with
         // `copyCurrentTexture` parameter set to `true`.
         this.#textures2d.forEach(texture2d => {
-            if (!texture2d.imageTexture && texture2d.texture) {
+            if (!texture2d.imageTexture &amp;&amp; texture2d.texture) {
                 this.#createTextureBindingToCopy(texture2d);
             }
         })
@@ -143,46 +173,30 @@ export default class Points {
         this.#mouseX = e.clientX - rect.left;
         this.#mouseY = e.clientY - rect.top;
     }
+
     /**
-     * @deprecated use setUniform
-     */
-    addUniform(name, value, structName) {
-        if (structName && isArray(structName)) {
-            throw `${structName} is an array, which is currently not supported for Uniforms.`;
-        }
-        if (this.#nameExists(this.#uniforms, name)) {
-            return;
-        }
-        this.#uniforms.push({
-            name: name,
-            value: value,
-            type: structName,
-            size: null,
-            internal: this.#internal
-        });
-    }
-    /**
-     * @deprecated use setUniform
-     */
-    updateUniform(name, value) {
-        const variable = this.#uniforms.find(v => v.name === name);
-        if (!variable) {
-            throw '`updateUniform()` can\'t be called without first `addUniform()`.';
-        }
-        variable.value = value;
-    }
-    /**
-     * Set a param as uniform to send to all shaders.
+     * Sets a `param` (predefined struct already in all shader)
+     * as uniform to send to all shaders.
      * A Uniform is a value that can only be changed
-     * from the outside, and unless changed it remains
-     * consistent.
+     * from the outside (js side, not the wgsl side),
+     * and unless changed it remains consistent.
      * @param {string} name name of the Param, you can invoke it later in shaders as `Params.[name]`
-     * @param {Number|Array} value Single number or a list of numbers
-     * @param {string} structName type as `f32` or a custom struct. Default `few`
+     * @param {Number|Boolean|Array&lt;Number>} value Single number or a list of numbers. Boolean is converted to Number.
+     * @param {string} structName type as `f32` or a custom struct. Default `f32`.
+     * @return {Object}
+     *
+     * @example
+     * // js
+     *  points.setUniform('color0', options.color0, 'vec3f');
+     *  points.setUniform('color1', options.color1, 'vec3f');
+     *  points.setUniform('scale', options.scale, 'f32');
+     *
+     * // wgsl string
+     * let finalColor:vec4f = mix(color0, color1, params.scale);
      */
     setUniform(name, value, structName = null) {
         let uniformToUpdate = this.#nameExists(this.#uniforms, name);
-        if (uniformToUpdate && structName) {
+        if (uniformToUpdate &amp;&amp; structName) {
             //if name exists is an update
             throw '`setUniform()` can\'t set the structName of an already defined uniform.';
         }
@@ -190,7 +204,7 @@ export default class Points {
             uniformToUpdate.value = value;
             return;
         }
-        if (structName && isArray(structName)) {
+        if (structName &amp;&amp; isArray(structName)) {
             throw `${structName} is an array, which is currently not supported for Uniforms.`;
         }
         const uniform = {
@@ -204,43 +218,45 @@ export default class Points {
         return uniform;
     }
     /**
-     * Update a list of uniforms
-     * @param {Array<Object>} array object array of the type: `{name, value}`
+     * Updates a list of uniforms
+     * @param {Array&lt;{name:String, value:Number}>} arr object array of the type: `{name, value}`
      */
     updateUniforms(arr) {
         arr.forEach(uniform => {
             const variable = this.#uniforms.find(v => v.name === uniform.name);
             if (!variable) {
-                throw '`updateUniform()` can\'t be called without first `addUniform()`.';
+                throw '`updateUniform()` can\'t be called without first `setUniform()`.';
             }
             variable.value = uniform.value;
         })
     }
+
     /**
-     * @deprecated use setStorage()
-     */
-    addStorage(name, structName, read, shaderType, arrayData) {
-        if (this.#nameExists(this.#storage, name)) {
-            return;
-        }
-        this.#storage.push({
-            mapped: !!arrayData,
-            name: name,
-            structName: structName,
-            // structSize: null,
-            shaderType: shaderType,
-            read: read,
-            buffer: null,
-            internal: this.#internal
-        });
-    }
-    /**
-     * Creates a persistent memory buffer across every frame call.
+     * Creates a persistent memory buffer across every frame call. See [GPUBuffer](https://www.w3.org/TR/webgpu/#gpubuffer)
+     * &lt;br>
+     * Meaning it can be updated in the shaders across the execution of every frame.
+     * &lt;br>
+     * It can have almost any type, like `f32` or `vec2f` or even array&lt;f32>.
      * @param {string} name Name that the Storage will have in the shader
      * @param {string} structName Name of the struct already existing on the
-     * shader that will be the array<structName> of the Storage
+     * shader. This will be the type of the Storage.
      * @param {boolean} read if this is going to be used to read data back
      * @param {ShaderType} shaderType this tells to what shader the storage is bound
+     * @returns {Object}
+     *
+     * @example
+     * // js
+     * points.setStorage('result', 'f32');
+     *
+     * // wgsl string
+     * result[index]  = 128.;
+     *
+     * @example
+     * // js
+     * points.setStorage('colors', 'array&lt;vec3f, 6>');
+     *
+     * // wgsl string
+     * colors[index] = vec3f(248, 208, 146) / 255;
      */
     setStorage(name, structName, read, shaderType, arrayData) {
         if (this.#nameExists(this.#storage, name)) {
@@ -259,44 +275,53 @@ export default class Points {
         this.#storage.push(storage);
         return storage;
     }
-    /**
-     * @deprecated
-     */
-    addStorageMap(name, arrayData, structName, read, shaderType) {
-        if (this.#nameExists(this.#storage, name)) {
-            return;
-        }
-        this.#storage.push({
-            mapped: true,
-            name: name,
-            structName: structName,
-            shaderType: shaderType,
-            array: arrayData,
-            buffer: null,
-            read: read,
-            internal: this.#internal
-        });
-    }
-    /**
-     * @deprecated use setStorageMap
-     */
-    updateStorageMap(name, arrayData) {
-        const variable = this.#storage.find(v => v.name === name);
-        if (!variable) {
-            throw '`updateStorageMap()` can\'t be called without first `addStorageMap()`.';
-        }
-        variable.array = arrayData;
-    }
+
     /**
      * Creates a persistent memory buffer across every frame call that can be updated.
+     * See [GPUBuffer](https://www.w3.org/TR/webgpu/#gpubuffer)
+     * &lt;br>
+     * Meaning it can be updated in the shaders across the execution of every frame.
+     * &lt;br>
+     * It can have almost any type, like `f32` or `vec2f` or even array&lt;f32>.
+     * &lt;br>
+     * The difference with {@link Points#setStorage|setStorage} is that this can be initialized
+     * with data.
      * @param {string} name Name that the Storage will have in the shader.
-     * @param {array} arrayData array with the data that must match the struct.
+     * @param {Uint8Array&lt;ArrayBuffer>} arrayData array with the data that must match the struct.
      * @param {string} structName Name of the struct already existing on the
-     * shader that will be the array<structName> of the Storage.
+     * shader. This will be the type of the Storage.
      * @param {boolean} read if this is going to be used to read data back.
      * @param {ShaderType} shaderType this tells to what shader the storage is bound
+     *
+     * @example
+     * // js examples/data1
+     * const firstMatrix = [
+     *     2, 4 , // 2 rows 4 columns
+     *     1, 2, 3, 4,
+     *     5, 6, 7, 8
+     * ];
+     * const secondMatrix = [
+     *     4, 2, // 4 rows 2 columns
+     *     1, 2,
+     *     3, 4,
+     *     5, 6,
+     *     7, 8
+     * ];
+     *
+     * // Matrix should exist as a struct in the wgsl shader
+     * points.setStorageMap('firstMatrix', firstMatrix, 'Matrix');
+     * points.setStorageMap('secondMatrix', secondMatrix, 'Matrix');
+     * points.setStorage('resultMatrix', 'Matrix', true); // this reads data back
+     *
+     * // wgsl string
+     * struct Matrix {
+     *     size : vec2&lt;f32>,
+     *     numbers: array&lt;f32>,
+     * }
+     *
+     * resultMatrix.size = vec2(firstMatrix.size.x, secondMatrix.size.y);
      */
-    setStorageMap(name, arrayData, structName, read, shaderType) {
+    setStorageMap(name, arrayData, structName, read = false, shaderType = null) {
         const storageToUpdate = this.#nameExists(this.#storage, name)
         if (storageToUpdate) {
             storageToUpdate.array = arrayData;
@@ -327,36 +352,32 @@ export default class Points {
         }
         return arrayBufferCopy;
     }
+
     /**
-     * @deprecated use setLayers
-     */
-    addLayers(numLayers, shaderType) {
-        for (let layerIndex = 0; layerIndex < numLayers; layerIndex++) {
-            this.#layers.shaderType = shaderType;
-            this.#layers.push({
-                name: `layer${layerIndex}`,
-                size: this.#canvas.width * this.#canvas.height,
-                structName: 'vec4<f32>',
-                structSize: 16,
-                array: null,
-                buffer: null,
-                internal: this.#internal
-            });
-        }
-    }
-    /**
-     * Layers of data made of `vec4f`
+     * Layers of data made of `vec4f`.
+     * This creates a storage array named `layers` of the size
+     * of the screen in pixels;
      * @param {Number} numLayers
      * @param {ShaderType} shaderType
+     *
+     * @example
+     * // js
+     * points.setLayers(2);
+     *
+     * // wgsl string
+     * var point = textureLoad(image, vec2&lt;i32>(ix,iy), 0);
+     * layers[0][pointIndex] = point;
+     * layers[1][pointIndex] = point;
      */
     setLayers(numLayers, shaderType) {
         // TODO: check what data to return
-        for (let layerIndex = 0; layerIndex < numLayers; layerIndex++) {
+        // TODO: improve jsdoc because the array definition is confusing
+        for (let layerIndex = 0; layerIndex &lt; numLayers; layerIndex++) {
             this.#layers.shaderType = shaderType;
             this.#layers.push({
                 name: `layer${layerIndex}`,
                 size: this.#canvas.width * this.#canvas.height,
-                structName: 'vec4<f32>',
+                structName: 'vec4&lt;f32>',
                 structSize: 16,
                 array: null,
                 buffer: null,
@@ -370,46 +391,36 @@ export default class Points {
     }
 
     /**
-     * @deprecated use setSampler
-     */
-
-    addSampler(name, descriptor, shaderType) {
-        if ('sampler' == name) {
-            throw '`name` can not be sampler since is a WebGPU keyword';
-        }
-        if (this.#nameExists(this.#samplers, name)) {
-            return;
-        }
-        // Create a sampler with linear filtering for smooth interpolation.
-        descriptor = descriptor || {
-            addressModeU: 'clamp-to-edge',
-            addressModeV: 'clamp-to-edge',
-            magFilter: 'linear',
-            minFilter: 'linear',
-            mipmapFilter: 'linear',
-            //maxAnisotropy: 10,
-        };
-        this.#samplers.push({
-            name: name,
-            descriptor: descriptor,
-            shaderType: shaderType,
-            resource: null,
-            internal: this.#internal
-        });
-    }
-
-    /**
-     * Creates a `sampler` to be sent to the shaders.
+     * Creates a `sampler` to be sent to the shaders. Internally it will be a {@link GPUSampler}
      * @param {string} name Name of the `sampler` to be called in the shaders.
-     * @param {GPUSamplerDescriptor} descriptor
+     * @param {GPUSamplerDescriptor} descriptor `Object` with properties that affect the image. See example below.
+     * @returns {Object}
+     *
+     * @example
+     * // js
+     * const descriptor = {
+     *  addressModeU: 'repeat',
+     *  addressModeV: 'repeat',
+     *  magFilter: 'nearest',
+     *  minFilter: 'nearest',
+     *  mipmapFilter: 'nearest',
+     *  //maxAnisotropy: 10,
+     * }
+     *
+     * points.setSampler('imageSampler', descriptor);
+     *
+     * // wgsl string
+     * let value = texturePosition(image, imageSampler, position, uvr, true);
      */
 
     setSampler(name, descriptor, shaderType) {
         if ('sampler' == name) {
             throw 'setSampler: `name` can not be sampler since is a WebGPU keyword.';
         }
-        if (this.#nameExists(this.#samplers, name)) {
-            throw `setSampler: \`${name}\` already exists.`;
+        const exists = this.#nameExists(this.#samplers, name)
+        if (exists) {
+            console.warn(`setSampler: \`${name}\` already exists.`);
+            return exists;
         }
         // Create a sampler with linear filtering for smooth interpolation.
         descriptor = descriptor || {
@@ -431,33 +442,34 @@ export default class Points {
         return sampler;
     }
 
-
     /**
-     * @deprecated use setTexture2d
-     */
-
-    addTexture2d(name, copyCurrentTexture, shaderType, renderPassIndex) {
-        if (this.#nameExists(this.#textures2d, name)) {
-            return;
-        }
-        this.#textures2d.push({
-            name: name,
-            copyCurrentTexture: copyCurrentTexture,
-            shaderType: shaderType,
-            texture: null,
-            renderPassIndex: renderPassIndex,
-            internal: this.#internal
-        });
-    }
-
-    /**
-     * Create a `texture_2d` in the shaders.
-     * @param {string} name Name to call the texture in the shaders.
+     * Creates a `texture_2d` in the shaders.&lt;br>
+     * Used to write data and then print to screen.&lt;br>
+     * It can also be used for write the current render pass (what you see on the screen)
+     * to this texture, to be used in the next cycle of this render pass; meaning
+     * you effectively have the previous frame data before printing the next one.
+     *
+     * @param {String} name Name to call the texture in the shaders.
      * @param {boolean} copyCurrentTexture If you want the fragment output to be copied here.
+     * @returns {Object}
+     *
+     * @example
+     * // js
+     * points.setTexture2d('feedbackTexture', true);
+     *
+     * // wgsl string
+     * var rgba = textureSampleLevel(
+     *     feedbackTexture, feedbackSampler,
+     *     vec2&lt;f32>(f32(GlobalId.x), f32(GlobalId.y)),
+     *     0.0
+     * );
+     *
      */
     setTexture2d(name, copyCurrentTexture, shaderType, renderPassIndex) {
-        if (this.#nameExists(this.#textures2d, name)) {
-            throw `setTexture2d: \`${name}\` already exists.`;
+        const exists = this.#nameExists(this.#textures2d, name);
+        if (exists) {
+            console.warn(`setTexture2d: \`${name}\` already exists.`);
+            return exists;
         }
         const texture2d = {
             name: name,
@@ -475,7 +487,7 @@ export default class Points {
     copyTexture(nameTextureA, nameTextureB) {
         const texture2d_A = this.#nameExists(this.#textures2d, nameTextureA);
         const texture2d_B = this.#nameExists(this.#textures2d, nameTextureB);
-        if (!(texture2d_A && texture2d_B)) {
+        if (!(texture2d_A &amp;&amp; texture2d_B)) {
             console.error('One of the textures does not exist.');
         }
         const a = texture2d_A.texture;
@@ -490,61 +502,22 @@ export default class Points {
         texture2d_B.texture = cubeTexture;
         this.#texturesToCopy.push({ a, b: texture2d_B.texture });
     }
+
     /**
-     * @deprecated use setTextureImage
-     */
-    async addTextureImage(name, path, shaderType) {
-        if (this.#nameExists(this.#textures2d, name)) {
-            return;
-        }
-        const response = await fetch(path);
-        const blob = await response.blob();
-        const imageBitmap = await createImageBitmap(blob);
-        this.#textures2d.push({
-            name: name,
-            copyCurrentTexture: false,
-            shaderType: shaderType,
-            texture: null,
-            imageTexture: {
-                bitmap: imageBitmap
-            },
-            internal: this.#internal
-        });
-    }
-    /**
-     * @deprecated uset setTextureImage
-     */
-    async updateTextureImage(name, path, shaderType) {
-        if (!this.#nameExists(this.#textures2d, name)) {
-            console.warn('image can not be updated')
-            return;
-        }
-        const response = await fetch(path);
-        const blob = await response.blob();
-        const imageBitmap = await createImageBitmap(blob);
-        const texture2d = this.#textures2d.filter(obj => obj.name == name)[0];
-        texture2d.imageTexture.bitmap = imageBitmap;
-        const cubeTexture = this.#device.createTexture({
-            size: [imageBitmap.width, imageBitmap.height, 1],
-            format: 'rgba8unorm',
-            usage:
-                GPUTextureUsage.TEXTURE_BINDING |
-                GPUTextureUsage.COPY_SRC |
-                GPUTextureUsage.COPY_DST |
-                GPUTextureUsage.RENDER_ATTACHMENT,
-        });
-        this.#device.queue.copyExternalImageToTexture(
-            { source: imageBitmap },
-            { texture: cubeTexture },
-            [imageBitmap.width, imageBitmap.height]
-        );
-        texture2d.texture = cubeTexture;
-    }
-    /**
-     * Load an image as texture_2d
-     * @param {string} name
-     * @param {string} path
-     * @param {ShaderType} shaderType
+     * Loads an image as `texture_2d` and then it will be available to read
+     * data from in the shaders.&lt;br>
+     * Supports web formats like JPG, PNG.
+     * @param {string} name identifier it will have in the shaders
+     * @param {string} path image address in a web server
+     * @param {ShaderType} shaderType in what shader type it will exist only
+     * @returns {Object}
+     *
+     * @example
+     * // js
+     * await points.setTextureImage('image', './../myimage.jpg');
+     *
+     * // wgsl string
+     * let rgba = texturePosition(image, imageSampler, position, uvr, true);
      */
     async setTextureImage(name, path, shaderType = null) {
         const texture2dToUpdate = this.#nameExists(this.#textures2d, name);
@@ -586,10 +559,46 @@ export default class Points {
         this.#textures2d.push(texture2d);
         return texture2d;
     }
+
+    /**
+     * Loads a text string as a texture.&lt;br>
+     * Using an Atlas or a Spritesheet with UTF-16 chars (`path`) it will create a new texture
+     * that contains only the `text` characters.&lt;br>
+     * Characters in the atlas `path` must be in order of the UTF-16 chars.&lt;br>
+     * It can have missing characters at the end or at the start, so the `offset` is added to take account for those chars.&lt;br>
+     * For example, `A` is 65, but if one character is removed before the letter `A`, then offset is `-1`
+     * @param {String} name id of the wgsl variable in the shader
+     * @param {String} text text you want to load as texture
+     * @param {String} path atlas to grab characters from, image address in a web server
+     * @param {{x: number, y: number}} size size of a individual character e.g.: `{x:10, y:20}`
+     * @param {Number} offset how many characters back or forward it must move to start
+     * @param {String} shaderType
+     * @returns {Object}
+     *
+     * @example
+     * // js
+     * await points.setTextureString(
+     *     'textImg',
+     *     'Custom Text',
+     *     './../img/inconsolata_regular_8x22.png',
+     *     size,
+     *     -32
+     * );
+     *
+     * // wgsl string
+     * let textColors = texturePosition(textImg, imageSampler, position, uvr, true);
+     *
+     */
+    async setTextureString(name, text, path, size, offset = 0, shaderType = null) {
+        const atlas = await loadImage(path);
+        const textImg = strToImage(text, atlas, size, offset);
+        return this.setTextureImage(name, textImg, shaderType);
+    }
+
     /**
      * Load images as texture_2d_array
-     * @param {string} name
-     * @param {Array} paths
+     * @param {string} name id of the wgsl variable in the shader
+     * @param {Array} paths image addresses in a web server
      * @param {ShaderType} shaderType
      */
     // TODO: verify if this can be updated after creation
@@ -617,33 +626,22 @@ export default class Points {
             internal: this.#internal,
         });
     }
-    /**
-     * @deprecated use setTextureVideo
-     */
-
-    async addTextureVideo(name, path, shaderType) {
-        if (this.#nameExists(this.#texturesExternal, name)) {
-            return;
-        }
-        const video = document.createElement('video');
-        video.loop = true;
-        video.autoplay = true;
-        video.muted = true;
-        video.src = new URL(path, import.meta.url).toString();
-        await video.play();
-        this.#texturesExternal.push({
-            name: name,
-            shaderType: shaderType,
-            video: video,
-            internal: this.#internal
-        });
-    }
 
     /**
-     * Load an video as texture2d
-     * @param {string} name
-     * @param {string} path
+     * Loads a video as `texture_external`and then
+     * it will be available to read data from in the shaders.
+     * Supports web formats like mp4 and webm.
+     * @param {string} name id of the wgsl variable in the shader
+     * @param {string} path video address in a web server
      * @param {ShaderType} shaderType
+     * @returns {Object}
+     *
+     * @example
+     * // js
+     * await points.setTextureVideo('video', './../myvideo.mp4');
+     *
+     * // wgsl string
+     * let rgba = textureExternalPosition(video, imageSampler, position, uvr, true);
      */
     async setTextureVideo(name, path, shaderType) {
         if (this.#nameExists(this.#texturesExternal, name)) {
@@ -666,39 +664,18 @@ export default class Points {
     }
 
     /**
-     * @deprecated use setTextureWebcam
-     */
-    async addTextureWebcam(name, shaderType) {
-        if (this.#nameExists(this.#texturesExternal, name)) {
-            return;
-        }
-        const video = document.createElement('video');
-        //video.loop = true;
-        //video.autoplay = true;
-        video.muted = true;
-        //document.body.appendChild(video);
-        if (navigator.mediaDevices.getUserMedia) {
-            await navigator.mediaDevices.getUserMedia({ video: true })
-                .then(async function (stream) {
-                    video.srcObject = stream;
-                    await video.play();
-                })
-                .catch(function (err) {
-                    console.log(err);
-                });
-        }
-        this.#texturesExternal.push({
-            name: name,
-            shaderType: shaderType,
-            video: video,
-            internal: this.#internal
-        });
-    }
-
-    /**
-     * Load webcam as texture2d
-     * @param {string} name
+     * Loads webcam as `texture_external`and then
+     * it will be available to read data from in the shaders.
+     * @param {String} name id of the wgsl variable in the shader
      * @param {ShaderType} shaderType
+     * @returns {Object}
+     *
+     * @example
+     * // js
+     * await points.setTextureWebcam('video');
+     *
+     * // wgsl string
+     * et rgba = textureExternalPosition(video, imageSampler, position, uvr, true);
      */
     async setTextureWebcam(name, shaderType) {
         if (this.#nameExists(this.#texturesExternal, name)) {
@@ -730,60 +707,22 @@ export default class Points {
     }
 
     /**
-     * @deprecated use setAudio
-     */
-    addAudio(name, path, volume, loop, autoplay) {
-        const audio = new Audio(path);
-        audio.volume = volume;
-        audio.autoplay = autoplay;
-        audio.loop = loop;
-        const sound = {
-            name: name,
-            path: path,
-            audio: audio,
-            analyser: null,
-            data: null
-        }
-        // this.#audio.play();
-        // audio
-        const audioContext = new AudioContext();
-        let resume = _ => { audioContext.resume() }
-        if (audioContext.state === 'suspended') {
-            document.body.addEventListener('touchend', resume, false);
-            document.body.addEventListener('click', resume, false);
-        }
-        const source = audioContext.createMediaElementSource(audio);
-        // // audioContext.createMediaStreamSource()
-        const analyser = audioContext.createAnalyser();
-        analyser.fftSize = 2048;
-        source.connect(analyser);
-        analyser.connect(audioContext.destination);
-        const bufferLength = analyser.fftSize;//analyser.frequencyBinCount;
-        // const bufferLength = analyser.frequencyBinCount;
-        const data = new Uint8Array(bufferLength);
-        // analyser.getByteTimeDomainData(data);
-        analyser.getByteFrequencyData(data);
-        // storage that will have the data on WGSL
-        this.setStorageMap(name, data,
-            // `array<f32, ${bufferLength}>`
-            'Sound' // custom struct in defaultStructs.js
-        );
-        // uniform that will have the data length as a quick reference
-        this.setUniform(`${name}Length`, analyser.frequencyBinCount);
-        sound.analyser = analyser;
-        sound.data = data;
-        this.#sounds.push(sound);
-        return audio;
-    }
-
-    /**
-     * Assigns an audio FrequencyData to a StorageMap
+     * Assigns an audio FrequencyData to a StorageMap.&lt;br>
+     * Calling setAudio creates a Storage with `name` in the wgsl shaders.&lt;br>
+     * From this storage you can read the audio data sent to the shader as numeric values.&lt;br>
+     * Values in `audio.data` are composed of integers on a scale from 0..255
      * @param {string} name name of the Storage and prefix of the length variable e.g. `[name]Length`.
-     * @param {string} path
+     * @param {string} path audio file address in a web server
      * @param {Number} volume
      * @param {boolean} loop
      * @param {boolean} autoplay
-     * @returns {Audio}
+     * @returns {HTMLAudioElement}
+     * @example
+     * // js
+     * const audio = points.setAudio('audio', 'audiofile.ogg', volume, loop, autoplay);
+     *
+     * // wgsl
+     * let audioX = audio.data[ u32(uvr.x * params.audioLength)] / 256;
      */
     setAudio(name, path, volume, loop, autoplay) {
         const audio = new Audio(path);
@@ -818,7 +757,7 @@ export default class Points {
         analyser.getByteFrequencyData(data);
         // storage that will have the data on WGSL
         this.setStorageMap(name, data,
-            // `array<f32, ${bufferLength}>`
+            // `array&lt;f32, ${bufferLength}>`
             'Sound' // custom struct in defaultStructs.js
         );
         // uniform that will have the data length as a quick reference
@@ -844,34 +783,28 @@ export default class Points {
         this.#texturesStorage2d.push(texturesStorage2d);
         return texturesStorage2d;
     }
-    /**
-     * @deprecated use setBindingTexture
-     */
-    addBindingTexture(computeName, fragmentName, size) {
-        this.#bindingTextures.push({
-            compute: {
-                name: computeName,
-                shaderType: ShaderType.COMPUTE
-            },
-            fragment: {
-                name: fragmentName,
-                shaderType: ShaderType.FRAGMENT
-            },
-            texture: null,
-            size: size,
-            internal: this.#internal
-        });
-    }
 
     /**
-     * Sets a texture to the compute and fragment shader, in the compute you can
-     * write to the texture, and in the fragment you can read the texture, so is
-     * a one way communication method.
+     * Special texture where data can be written to it in the Compute Shader and
+     * Is a one way communication method.
+     * Ideal to store data to it in the Compute Shader and later visualize it in
+     * the Fragment Shader.
      * @param {string} computeName name of the variable in the compute shader
      * @param {string} fragmentName name of the variable in the fragment shader
-     * @param {Array<number, 2>} size dimensions of the texture, by default screen
+     * @param {Array&lt;number, 2>} size dimensions of the texture, by default screen
      * size
-     * @returns
+     * @returns {Object}
+     *
+     * @example
+     *
+     * // js
+     * points.setBindingTexture('outputTex', 'computeTexture');
+     *
+     * // wgsl string
+     * //// compute
+     * textureStore(outputTex, GlobalId.xy, rgba);
+     * //// fragment
+     * let value = texturePosition(computeTexture, imageSampler, position, uv, false);
      */
     setBindingTexture(computeName, fragmentName, size) {
         // TODO: validate that names don't exist already
@@ -893,14 +826,31 @@ export default class Points {
     }
 
     /**
-     * Listen for an event dispatched from WGSL code
-     * @param {Number} id Number that represents an event Id
+     * Listens for an event dispatched from WGSL code
+     * @param {String} name Number that represents an event Id
      * @param {Function} callback function to be called when the event occurs
+     * @param {Number} structSize size of the data to be returned
+     *
+     * @example
+     * // js
+     * // the event name will be reflected as a variable name in the shader
+     * points.addEventListener('click_event', data => {
+     *     // response action in JS
+     * }, 4);
+     *
+     * // wgsl string
+     *  if(params.mouseClick == 1.){
+     *      // Same name of the Event
+     *      // we fire the event with a 1
+     *      // it will be set to 0 in the next frame
+     *      click_event.updated = 1;
+     *  }
+     *
      */
     addEventListener(name, callback, structSize) {
         // TODO: remove structSize
         // this extra 4 is for the boolean flag in the Event struct
-        let data = Array(structSize + 4).fill(0);
+        let data = new Uint8Array(Array(structSize + 4).fill(0));
         this.setStorageMap(name, data, 'Event', true);
         this.#events.set(this.#events_ids,
             {
@@ -912,18 +862,18 @@ export default class Points {
         ++this.#events_ids;
     }
     /**
-     * @private
      * for internal use:
      * to flag add* methods and variables as part of the RenderPasses
+     * @private
+     * @ignore
      */
     _setInternal(value) {
         this.#internal = value;
     }
     /**
-     * @private
      * @param {ShaderType} shaderType
      * @param {boolean} internal
-     * @returns string with bindings
+     * @returns {String} string with bindings
      */
     #createDynamicGroupBindings(shaderType, internal) {
         // `internal` here is a flag for a custom pass
@@ -935,14 +885,14 @@ export default class Points {
         let dynamicGroupBindings = '';
         let bindingIndex = 0;
         if (this.#uniforms.length) {
-            dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <uniform> params: Params;\n`;
+            dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var &lt;uniform> params: Params;\n`;
             bindingIndex += 1;
         }
         this.#storage.forEach(storageItem => {
             let internalCheck = internal == storageItem.internal;
-            if (!storageItem.shaderType && internalCheck || storageItem.shaderType == shaderType && internalCheck) {
+            if (!storageItem.shaderType &amp;&amp; internalCheck || storageItem.shaderType == shaderType &amp;&amp; internalCheck) {
                 let T = storageItem.structName;
-                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, read_write> ${storageItem.name}: ${T};\n`
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var &lt;storage, read_write> ${storageItem.name}: ${T};\n`
                 bindingIndex += 1;
             }
         });
@@ -950,53 +900,53 @@ export default class Points {
             if (!this.#layers.shaderType || this.#layers.shaderType == shaderType) {
                 let totalSize = 0;
                 this.#layers.forEach(layerItem => totalSize += layerItem.size);
-                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, read_write> layers: array<array<vec4<f32>, ${totalSize}>>;\n`
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var &lt;storage, read_write> layers: array&lt;array&lt;vec4&lt;f32>, ${totalSize}>>;\n`
                 bindingIndex += 1;
             }
         }
         this.#samplers.forEach((sampler, index) => {
             let internalCheck = internal == sampler.internal;
-            if (!sampler.shaderType && internalCheck || sampler.shaderType == shaderType && internalCheck) {
+            if (!sampler.shaderType &amp;&amp; internalCheck || sampler.shaderType == shaderType &amp;&amp; internalCheck) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${sampler.name}: sampler;\n`;
                 bindingIndex += 1;
             }
         });
         this.#texturesStorage2d.forEach((texture, index) => {
-            let internalCheck = internal && texture.internal;
-            if (!texture.shaderType && internalCheck || texture.shaderType == shaderType && internalCheck) {
-                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_storage_2d<rgba8unorm, write>;\n`;
+            let internalCheck = internal &amp;&amp; texture.internal;
+            if (!texture.shaderType &amp;&amp; internalCheck || texture.shaderType == shaderType &amp;&amp; internalCheck) {
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_storage_2d&lt;rgba8unorm, write>;\n`;
                 bindingIndex += 1;
             }
         });
         this.#textures2d.forEach((texture, index) => {
             let internalCheck = internal == texture.internal;
-            if (!texture.shaderType && internalCheck || texture.shaderType == shaderType && internalCheck) {
-                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d<f32>;\n`;
+            if (!texture.shaderType &amp;&amp; internalCheck || texture.shaderType == shaderType &amp;&amp; internalCheck) {
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d&lt;f32>;\n`;
                 bindingIndex += 1;
             }
         });
         this.#textures2dArray.forEach((texture, index) => {
             let internalCheck = internal == texture.internal;
-            if (!texture.shaderType && internalCheck || texture.shaderType == shaderType && internalCheck) {
-                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d_array<f32>;\n`;
+            if (!texture.shaderType &amp;&amp; internalCheck || texture.shaderType == shaderType &amp;&amp; internalCheck) {
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d_array&lt;f32>;\n`;
                 bindingIndex += 1;
             }
         });
         this.#texturesExternal.forEach(externalTexture => {
             let internalCheck = internal == externalTexture.internal;
-            if (!externalTexture.shaderType && internalCheck || externalTexture.shaderType == shaderType && internalCheck) {
+            if (!externalTexture.shaderType &amp;&amp; internalCheck || externalTexture.shaderType == shaderType &amp;&amp; internalCheck) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${externalTexture.name}: texture_external;\n`;
                 bindingIndex += 1;
             }
         });
         this.#bindingTextures.forEach(bindingTexture => {
             let internalCheck = internal == bindingTexture.internal;
-            if (bindingTexture.compute.shaderType == shaderType && internalCheck) {
-                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.compute.name}: texture_storage_2d<rgba8unorm, write>;\n`;
+            if (bindingTexture.compute.shaderType == shaderType &amp;&amp; internalCheck) {
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.compute.name}: texture_storage_2d&lt;rgba8unorm, write>;\n`;
                 bindingIndex += 1;
             }
-            if (bindingTexture.fragment.shaderType == shaderType && internalCheck) {
-                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.fragment.name}: texture_2d<f32>;\n`;
+            if (bindingTexture.fragment.shaderType == shaderType &amp;&amp; internalCheck) {
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.fragment.name}: texture_2d&lt;f32>;\n`;
                 bindingIndex += 1;
             }
         });
@@ -1007,6 +957,17 @@ export default class Points {
      * The final number of triangles is `numColumns` * `numRows` * `2` ( 2 being the triangles )
      * @param {Number} numColumns quads horizontally
      * @param {Number} numRows quads vertically
+     *
+     * @example
+     * // js
+     * points.setMeshDensity(20,20);
+     *
+     * // wgsl string
+     * //// vertex shader
+     * var modifiedPosition = position;
+     * modifiedPosition.w = modifiedPosition.w + sin(f32(vertexIndex) * (params.time) * .01) * .1;
+     *
+     * return defaultVertexBody(modifiedPosition, color, uv);
      */
     setMeshDensity(numColumns, numRows) {
         if (numColumns == 0 || numRows == 0) {
@@ -1034,15 +995,15 @@ export default class Points {
         if (this.#uniforms.length) {
             dynamicStructParams = /*wgsl*/`struct Params {\n\t${dynamicStructParams}\n}\n`;
         }
-        renderPass.hasVertexShader && (dynamicGroupBindingsVertex += dynamicStructParams);
-        renderPass.hasComputeShader && (dynamicGroupBindingsCompute += dynamicStructParams);
-        renderPass.hasFragmentShader && (dynamicGroupBindingsFragment += dynamicStructParams);
-        renderPass.hasVertexShader && (dynamicGroupBindingsVertex += this.#createDynamicGroupBindings(ShaderType.VERTEX, renderPass.internal));
-        renderPass.hasComputeShader && (dynamicGroupBindingsCompute += this.#createDynamicGroupBindings(ShaderType.COMPUTE, renderPass.internal));
+        renderPass.hasVertexShader &amp;&amp; (dynamicGroupBindingsVertex += dynamicStructParams);
+        renderPass.hasComputeShader &amp;&amp; (dynamicGroupBindingsCompute += dynamicStructParams);
+        renderPass.hasFragmentShader &amp;&amp; (dynamicGroupBindingsFragment += dynamicStructParams);
+        renderPass.hasVertexShader &amp;&amp; (dynamicGroupBindingsVertex += this.#createDynamicGroupBindings(ShaderType.VERTEX, renderPass.internal));
+        renderPass.hasComputeShader &amp;&amp; (dynamicGroupBindingsCompute += this.#createDynamicGroupBindings(ShaderType.COMPUTE, renderPass.internal));
         dynamicGroupBindingsFragment += this.#createDynamicGroupBindings(ShaderType.FRAGMENT, renderPass.internal);
-        renderPass.hasVertexShader && (colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + defaultVertexBody + colorsVertWGSL);
-        renderPass.hasComputeShader && (colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + colorsComputeWGSL);
-        renderPass.hasFragmentShader && (colorsFragWGSL = dynamicGroupBindingsFragment + defaultStructs + colorsFragWGSL);
+        renderPass.hasVertexShader &amp;&amp; (colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + defaultVertexBody + colorsVertWGSL);
+        renderPass.hasComputeShader &amp;&amp; (colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + colorsComputeWGSL);
+        renderPass.hasFragmentShader &amp;&amp; (colorsFragWGSL = dynamicGroupBindingsFragment + defaultStructs + colorsFragWGSL);
         console.groupCollapsed(`Render Pass ${index}`);
         console.groupCollapsed('VERTEX');
         console.log(colorsVertWGSL);
@@ -1056,9 +1017,9 @@ export default class Points {
         console.log(colorsFragWGSL);
         console.groupEnd();
         console.groupEnd();
-        renderPass.hasVertexShader && (renderPass.compiledShaders.vertex = colorsVertWGSL);
-        renderPass.hasComputeShader && (renderPass.compiledShaders.compute = colorsComputeWGSL);
-        renderPass.hasFragmentShader && (renderPass.compiledShaders.fragment = colorsFragWGSL);
+        renderPass.hasVertexShader &amp;&amp; (renderPass.compiledShaders.vertex = colorsVertWGSL);
+        renderPass.hasComputeShader &amp;&amp; (renderPass.compiledShaders.compute = colorsComputeWGSL);
+        renderPass.hasFragmentShader &amp;&amp; (renderPass.compiledShaders.fragment = colorsFragWGSL);
     }
     #generateDataSize = () => {
         const allShaders = this.#renderPasses.map(renderPass => {
@@ -1084,9 +1045,12 @@ export default class Points {
         });
     }
     /**
-     * One time function to call to initialize the shaders.
-     * @param {Array<RenderPass>} renderPasses Collection of RenderPass, which contain Vertex, Compute and Fragment shaders.
-     * @returns false | undefined
+     * One time function call to initialize the shaders.
+     * @param {Array&lt;RenderPass>} renderPasses Collection of {@link RenderPass}, which contain Vertex, Compute and Fragment shaders.
+     * @returns {Boolean} false | undefined
+     *
+     * @example
+     * await points.init(renderPasses)
      */
     async init(renderPasses) {
         this.#renderPasses = renderPasses.concat(this.#postRenderPasses);
@@ -1101,7 +1065,7 @@ export default class Points {
         this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
         this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta, 'vec2f');
         let hasComputeShaders = this.#renderPasses.some(renderPass => renderPass.hasComputeShader);
-        if (!hasComputeShaders && this.#bindingTextures.length) {
+        if (!hasComputeShaders &amp;&amp; this.#bindingTextures.length) {
             throw ' `addBindingTexture` requires at least one Compute Shader in a `RenderPass`'
         }
         this.#renderPasses.forEach(this.#compileRenderPass);
@@ -1148,8 +1112,10 @@ export default class Points {
     }
 
     /**
-     * Mainly to be used with RenderPasses.js
+     * Mainly to be used with {@link RenderPasses}&lt;br>
+     * Injects a render pass after all the render passes added by the user.
      * @param {RenderPass} renderPass
+     * @ignore
      */
     addRenderPass(renderPass) {
         this.#postRenderPasses.push(renderPass);
@@ -1161,6 +1127,7 @@ export default class Points {
 
     /**
      * Adds two triangles called points per number of columns and rows
+     * @ignore
      */
     async createScreen() {
         let hasVertexAndFragmentShader = this.#renderPasses.some(renderPass => renderPass.hasVertexAndFragmentShader)
@@ -1171,8 +1138,8 @@ export default class Points {
                 new RGBAColor(0, 0, 1),
                 new RGBAColor(1, 1, 0),
             ];
-            for (let xIndex = 0; xIndex < this.#numRows; xIndex++) {
-                for (let yIndex = 0; yIndex < this.#numColumns; yIndex++) {
+            for (let xIndex = 0; xIndex &lt; this.#numRows; xIndex++) {
+                for (let yIndex = 0; yIndex &lt; this.#numColumns; yIndex++) {
                     const coordinate = new Coordinate(xIndex * this.#canvas.clientWidth / this.#numColumns, yIndex * this.#canvas.clientHeight / this.#numRows, .3);
                     this.addPoint(coordinate, this.#canvas.clientWidth / this.#numColumns, this.#canvas.clientHeight / this.#numRows, colors);
                 }
@@ -1183,7 +1150,6 @@ export default class Points {
         await this.#createPipeline();
     }
     /**
-     * @private
      * @param {Float32Array} vertexArray
      * @returns buffer
      */
@@ -1192,13 +1158,13 @@ export default class Points {
         this.#buffer = this.#createAndMapBuffer(vertexArray, GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST);
     }
     /**
-     * @private
      * @param {Float32Array} data
      * @param {GPUBufferUsageFlags} usage
      * @param {Boolean} mappedAtCreation
-     * @returns mapped buffer
+     * @param {Number} size
+     * @returns {GPUBuffer} mapped buffer
      */
-    #createAndMapBuffer(data, usage, mappedAtCreation = true, size) {
+    #createAndMapBuffer(data, usage, mappedAtCreation = true, size = null) {
         const buffer = this.#device.createBuffer({
             mappedAtCreation: mappedAtCreation,
             size: size || data.byteLength,
@@ -1210,11 +1176,10 @@ export default class Points {
     }
 
     /**
-     * @private
      * It creates with size, no with data, so it's empty
      * @param {Number} size numItems * instanceByteSize ;
      * @param {GPUBufferUsageFlags} usage
-     * @returns buffer
+     * @returns {GPUBuffer} buffer
      */
     #createBuffer(size, usage) {
         const buffer = this.#device.createBuffer({
@@ -1235,7 +1200,7 @@ export default class Points {
                 if (v.value.constructor !== Array) {
                     v.value = [v.value];
                 }
-                for (let i = 0; i < padding; i++) {
+                for (let i = 0; i &lt; padding; i++) {
                     v.value.push(0);
                 }
             }
@@ -1243,7 +1208,7 @@ export default class Points {
         }).flat(1);
         const finalPadding = paddings[''];
         if (finalPadding) {
-            for (let i = 0; i < finalPadding; i++) {
+            for (let i = 0; i &lt; finalPadding; i++) {
                 arrayValues.push(0);
             }
         }
@@ -1529,7 +1494,6 @@ export default class Points {
         });
     }
     /**
-     * @private
      * Creates the entries for the pipeline
      * @returns an array with the entries
      */
@@ -1555,7 +1519,7 @@ export default class Points {
         if (this.#storage.length) {
             this.#storage.forEach(storageItem => {
                 let internalCheck = internal == storageItem.internal;
-                if (!storageItem.shaderType && internalCheck || storageItem.shaderType == shaderType && internalCheck) {
+                if (!storageItem.shaderType &amp;&amp; internalCheck || storageItem.shaderType == shaderType &amp;&amp; internalCheck) {
                     entries.push(
                         {
                             binding: bindingIndex++,
@@ -1592,7 +1556,7 @@ export default class Points {
         if (this.#samplers.length) {
             this.#samplers.forEach((sampler, index) => {
                 let internalCheck = internal == sampler.internal;
-                if (!sampler.shaderType && internalCheck || sampler.shaderType == shaderType && internalCheck) {
+                if (!sampler.shaderType &amp;&amp; internalCheck || sampler.shaderType == shaderType &amp;&amp; internalCheck) {
                     entries.push(
                         {
                             binding: bindingIndex++,
@@ -1609,7 +1573,7 @@ export default class Points {
         if (this.#texturesStorage2d.length) {
             this.#texturesStorage2d.forEach((textureStorage2d, index) => {
                 let internalCheck = internal == textureStorage2d.internal;
-                if (!textureStorage2d.shaderType && internalCheck || textureStorage2d.shaderType == shaderType && internalCheck) {
+                if (!textureStorage2d.shaderType &amp;&amp; internalCheck || textureStorage2d.shaderType == shaderType &amp;&amp; internalCheck) {
                     entries.push(
                         {
                             label: 'texture storage 2d',
@@ -1627,7 +1591,7 @@ export default class Points {
         if (this.#textures2d.length) {
             this.#textures2d.forEach((texture2d, index) => {
                 let internalCheck = internal == texture2d.internal;
-                if (!texture2d.shaderType && internalCheck || texture2d.shaderType == shaderType && internalCheck) {
+                if (!texture2d.shaderType &amp;&amp; internalCheck || texture2d.shaderType == shaderType &amp;&amp; internalCheck) {
                     entries.push(
                         {
                             label: 'texture 2d',
@@ -1645,7 +1609,7 @@ export default class Points {
         if (this.#textures2dArray.length) {
             this.#textures2dArray.forEach((texture2dArray, index) => {
                 let internalCheck = internal == texture2dArray.internal;
-                if (!texture2dArray.shaderType && internalCheck || texture2dArray.shaderType == shaderType && internalCheck) {
+                if (!texture2dArray.shaderType &amp;&amp; internalCheck || texture2dArray.shaderType == shaderType &amp;&amp; internalCheck) {
                     entries.push(
                         {
                             label: 'texture 2d array',
@@ -1668,7 +1632,7 @@ export default class Points {
         if (this.#texturesExternal.length) {
             this.#texturesExternal.forEach(externalTexture => {
                 let internalCheck = internal == externalTexture.internal;
-                if (!externalTexture.shaderType && internalCheck || externalTexture.shaderType == shaderType && internalCheck) {
+                if (!externalTexture.shaderType &amp;&amp; internalCheck || externalTexture.shaderType == shaderType &amp;&amp; internalCheck) {
                     entries.push(
                         {
                             label: 'external texture',
@@ -1686,7 +1650,7 @@ export default class Points {
         if (this.#bindingTextures.length) {
             this.#bindingTextures.forEach(bindingTexture => {
                 let internalCheck = internal == bindingTexture.internal;
-                if (bindingTexture.compute.shaderType == shaderType && internalCheck) {
+                if (bindingTexture.compute.shaderType == shaderType &amp;&amp; internalCheck) {
                     entries.push(
                         {
                             label: 'binding texture',
@@ -1703,7 +1667,7 @@ export default class Points {
             });
             this.#bindingTextures.forEach(bindingTexture => {
                 let internalCheck = internal == bindingTexture.internal;
-                if (bindingTexture.fragment.shaderType == shaderType && internalCheck) {
+                if (bindingTexture.fragment.shaderType == shaderType &amp;&amp; internalCheck) {
                     entries.push(
                         {
                             label: 'binding texture 2',
@@ -1760,7 +1724,7 @@ export default class Points {
         //--------------------------------------------
         this.#delta = this.#clock.getDelta();
         this.#time = this.#clock.time;
-        this.#epoch = new Date() / 1000;
+        this.#epoch = +new Date() / 1000;
         this.setUniform(UniformKeys.TIME, this.#time);
         this.setUniform(UniformKeys.DELTA, this.#delta);
         this.setUniform(UniformKeys.EPOCH, this.#epoch);
@@ -1905,7 +1869,7 @@ export default class Points {
             if (eventRead) {
                 let id = eventRead[0];
                 if (id != 0) {
-                    event.callback && event.callback(eventRead.slice(1, -1));
+                    event.callback &amp;&amp; event.callback(eventRead.slice(1, -1));
                 }
             }
         }
@@ -1917,14 +1881,17 @@ export default class Points {
         return (p * 2 - 1) * direction;
     };
     /**
+     * - **currently for internal use**&lt;br>
+     * - **might be private in the future**&lt;br>
      * Adds two triangles as a quad called Point
      * @param {Coordinate} coordinate `x` from 0 to canvas.width, `y` from 0 to canvas.height, `z` it goes from 0.0 to 1.0 and forward
      * @param {Number} width point width
      * @param {Number} height point height
-     * @param {Array<RGBAColor>} colors one color per corner
+     * @param {Array&lt;RGBAColor>} colors one color per corner
      * @param {Boolean} useTexture
+     * @ignore
      */
-    addPoint(coordinate, width, height, colors) {
+    addPoint(coordinate, width, height, colors, useTexture = false) {
         const { x, y, z } = coordinate;
         const nx = this.#getWGSLCoordinate(x, this.#canvas.width);
         const ny = this.#getWGSLCoordinate(y, this.#canvas.height, true);
@@ -1991,3 +1958,6 @@ export default class Points {
         }
     }
 }
+
+export default Points;
+export { ShaderType, RenderPass, RenderPasses };</code></pre></article></section></div></div></div><div class="search-container" id="PkfLWpAbet" style="display:none"><div class="wrapper" id="iCxFxjkHbP"><button class="icon-button search-close-button" id="VjLlGakifb" aria-label="close search"><svg><use xlink:href="#close-icon"></use></svg></button><div class="search-box-c"><svg><use xlink:href="#search-icon"></use></svg> <input type="text" id="vpcKVYIppa" class="search-input" placeholder="Search..." autofocus></div><div class="search-result-c" id="fWwVHRuDuN"><span class="search-result-c-text">Type anything to view search result</span></div></div></div><div class="mobile-menu-icon-container"><button class="icon-button" id="mobile-menu" data-isopen="false" aria-label="menu"><svg><use xlink:href="#menu-icon"></use></svg></button></div><div id="mobile-sidebar" class="mobile-sidebar-container"><div class="mobile-sidebar-wrapper"><div class="mobile-nav-links"></div><div class="mobile-sidebar-items-c"><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-modules"><div>Modules</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="module-defaultFunctions.html">defaultFunctions</a></div><div class="sidebar-section-children"><a href="module-defaultStructs.html">defaultStructs</a></div><div class="sidebar-section-children"><a href="module-points_animation.html">points/animation</a></div><div class="sidebar-section-children"><a href="module-points_audio.html">points/audio</a></div><div class="sidebar-section-children"><a href="module-points_cellular2d.html">points/cellular2d</a></div><div class="sidebar-section-children"><a href="module-points_classicnoise2d.html">points/classicnoise2d</a></div><div class="sidebar-section-children"><a href="module-points_color.html">points/color</a></div><div class="sidebar-section-children"><a href="module-points_debug.html">points/debug</a></div><div class="sidebar-section-children"><a href="module-points_effects.html">points/effects</a></div><div class="sidebar-section-children"><a href="module-points_image.html">points/image</a></div><div class="sidebar-section-children"><a href="module-points_math.html">points/math</a></div><div class="sidebar-section-children"><a href="module-points_noise2d.html">points/noise2d</a></div><div class="sidebar-section-children"><a href="module-points_random.html">points/random</a></div><div class="sidebar-section-children"><a href="module-points_sdf.html">points/sdf</a></div><div class="sidebar-section-children"><a href="module-points_valuenoise.html">points/valuenoise</a></div><div class="sidebar-section-children"><a href="module-points_voronoi.html">points/voronoi</a></div></div><div class="sidebar-section-title with-arrow" data-isopen="false" id="sidebar-classes"><div>Classes</div><svg><use xlink:href="#down-icon"></use></svg></div><div class="sidebar-section-children-container"><div class="sidebar-section-children"><a href="CanvasRecorder.html">CanvasRecorder</a></div><div class="sidebar-section-children"><a href="Points.html">Points</a></div><div class="sidebar-section-children"><a href="RenderPass.html">RenderPass</a></div><div class="sidebar-section-children"><a href="RenderPasses.html">RenderPasses</a></div><div class="sidebar-section-children"><a href="ShaderType.html">ShaderType</a></div></div></div><div class="mobile-navbar-actions"><div class="navbar-right-item"><button class="icon-button search-button" aria-label="open-search"><svg><use xlink:href="#search-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button theme-toggle" aria-label="toggle-theme"><svg><use class="theme-svg-use" xlink:href="#light-theme-icon"></use></svg></button></div><div class="navbar-right-item"><button class="icon-button font-size" aria-label="change-font-size"><svg><use xlink:href="#font-size-icon"></use></svg></button></div></div></div></div><script type="text/javascript" src="scripts/core.min.js"></script><script src="scripts/search.min.js" defer="defer"></script><script src="scripts/third-party/fuse.js" defer="defer"></script><script type="text/javascript">var tocbotInstance=tocbot.init({tocSelector:"#eed4d2a0bfd64539bb9df78095dec881",contentSelector:".main-content",headingSelector:"h1, h2, h3",hasInnerContainers:!0,scrollContainer:".main-content",headingsOffset:130,onClick:bringLinkToView})</script></body></html>

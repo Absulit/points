@@ -1,0 +1,25 @@
+{
+  "source": {
+    "include": [
+      "src",
+      "src/core",
+      "docs/apidocs.md"
+    ],
+    "includePattern": ".+\\.js$"
+  },
+  "plugins": [
+    "plugins/markdown"
+  ],
+  "sourceType": "module",
+  "opts": {
+    "template": "node_modules/clean-jsdoc-theme",
+    "destination": "./apidocs",
+    "theme_opts": {
+      "default_theme": "dark"
+    }
+  },
+  "markdown": {
+    "hardwrap": false,
+    "idInHeadings": true
+  }
+}

@@ -1,7 +1,7 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
-import RenderPass from 'renderpass';
+import { RenderPass } from 'points';
 import Points from 'points';
 const circleblur = {
     renderPasses: [

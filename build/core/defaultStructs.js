@@ -1,0 +1,40 @@
+/* @ts-self-types="./defaultStructs.d.ts" */
+/**
+ * The defaultStructs are structs already incorporated onto the shaders you create,
+ * so you can call them without import.
+ * <br>
+ * Fragment, Sound, and Event structs.
+ * <br>
+ * <br>
+ * Fragment used in Vertex Shaders.<br>
+ * Sound used along with {@link Points#setAudio}<br>
+ * Event used along with {@link Points#addEventListener}<br>
+ * @module defaultStructs
+ */
+
+const defaultStructs = /*wgsl*/`
+
+struct Fragment {
+    @builtin(position) position: vec4<f32>,
+    @location(0) color: vec4<f32>,
+    @location(1) uv: vec2<f32>,
+    @location(2) ratio: vec2<f32>,
+    @location(3) uvr: vec2<f32>,
+    @location(4) mouse: vec2<f32>
+}
+
+struct Sound {
+    data: array<f32, 2048>,
+    //play
+    //dataLength
+    //duration
+    //currentPosition
+}
+
+struct Event {
+    updated: u32,
+    data: array<f32>
+}
+`;
+
+export { defaultStructs as default };

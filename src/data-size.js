@@ -1,3 +1,9 @@
+/**
+ * Utility types and methods to set wgsl types in memory.
+ * This is mainly internal.
+ * @module data-size
+ * @ignore
+ */
 
 const size_4_align_4 = { size: 4, align: 4 };
 const size_8_align_8 = { size: 8, align: 8 };

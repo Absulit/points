@@ -3,7 +3,7 @@
     "target": "ES6",
     "baseUrl": "./",
     "paths": {
-      "points": ["./src/absulit.points.module.js"],
+      "points": ["./src/points.js"],
 
       "datasize": ["./src/data-size.js"],
       "renderpass": ["./src/RenderPass.js"],

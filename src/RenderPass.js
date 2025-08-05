@@ -1,6 +1,20 @@
 'use strict';
+/**
+ * A RenderPass is a way to have a block of shaders to pass to your application pipeline and
+ * these render passes will be executed in the order you pass them in the {@link Points#init} method.
+ *
+ * @example
+ * // vert, frag and compute are strings with the wgsl shaders.
+ * let renderPasses = [
+ *     new RenderPass(vert1, frag1, compute1),
+ *     new RenderPass(vert2, frag2, compute2)
+ * ];
 
-export default class RenderPass {
+ * // we pass the array of renderPasses
+ * await points.init(renderPasses);
+ */
+
+class RenderPass {
     #vertexShader;
     #computeShader;
     #fragmentShader;
@@ -47,6 +61,10 @@ export default class RenderPass {
         this.#workgroupCountZ = workgroupCountZ || 1;
     }
 
+    /**
+     * To use with {link RenderPasses} so it's internal
+     * @ignore
+     */
     get internal() {
         return this.#internal;
     }
@@ -55,14 +73,23 @@ export default class RenderPass {
         this.#internal = value;
     }
 
+    /**
+     * get the vertex shader content
+     */
     get vertexShader() {
         return this.#vertexShader;
     }
 
+    /**
+     * get the compute shader content
+     */
     get computeShader() {
         return this.#computeShader;
     }
 
+    /**
+     * get the fragment shader content
+     */
     get fragmentShader() {
         return this.#fragmentShader;
     }
@@ -131,3 +158,5 @@ export default class RenderPass {
         return this.#workgroupCountZ;
     }
 }
+
+export default RenderPass;
