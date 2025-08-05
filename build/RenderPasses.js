@@ -13,6 +13,34 @@ import RenderPass from './RenderPass.js';
 /**
  * List of predefined Render Passes for Post Processing.
  * @class
+ *
+ * @example
+ * import Points from 'points';
+ * const points = new Points('canvas');
+ *
+ * let renderPasses = [
+ *     new RenderPass(vert1, frag1, compute1),
+ *     new RenderPass(vert2, frag2, compute2)
+ * ];
+ *
+ * RenderPasses.grayscale(points);
+ * RenderPasses.chromaticAberration(points, .02);
+ * RenderPasses.color(points, .5, 1, 0, 1, .5);
+ * RenderPasses.pixelate(points, 10, 10);
+ * RenderPasses.lensDistortion(points, .4, .01);
+ * RenderPasses.filmgrain(points);
+ * RenderPasses.bloom(points, .5);
+ * RenderPasses.blur(points, 100, 100, .4, 0, 0.0);
+ * RenderPasses.waves(points, .05, .03);
+ *
+ * await points.init(renderPasses);
+ *
+ * update();
+ *
+ * function update() {
+ *     points.update();
+ *     requestAnimationFrame(update);
+ * }
  */
 class RenderPasses {
     static COLOR = 1;
@@ -38,7 +66,7 @@ class RenderPasses {
     };
 
     /**
-     * Add a `RenderPass` from the `RenderPasses` list
+     * Adds a `RenderPass` from the `RenderPasses` list
      * @param {Points} points References a `Points` instance
      * @param {RenderPasses} renderPassId Select a static property from `RenderPasses`
      * @param {Object} params An object with the params needed by the `RenderPass`

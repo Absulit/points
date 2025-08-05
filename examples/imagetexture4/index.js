@@ -10,9 +10,9 @@ const imagetexture4 = {
     frag,
     init: async (points, folder) => {
         /**
-         * @type {GPUObjectDescriptorBase}
+         * @type {GPUSamplerDescriptor}
          */
-        let descriptor = {
+        const descriptor = {
             addressModeU: 'clamp-to-edge',
             addressModeV: 'clamp-to-edge',
             magFilter: 'nearest',

@@ -5,7 +5,15 @@
  * @param {f32} radius how big the circle is
  * @param {f32} feather how soft the edges are
  * @param {vec2f} uv uv coordinates
- * @return `f32`
+ * @return {f32}
+ *
+ * @example
+ * // js
+ * import { sdfCircle } from 'points/sdf';
+ *
+ * // wgsl string
+ * ${sdfCircle}
+ * let value = sdfCircle(position, radius, feather, uvr);
  */
 export const sdfCircle: string;
 /**
@@ -15,7 +23,15 @@ export const sdfCircle: string;
  * @param {vec2f} p2 end of the line
  * @param {f32} pixelStroke width in pixels with an 800 base
  * @param {vec2f} uv uv coordinates
- * @return `f32`
+ * @return {f32}
+ *
+ * @example
+ * // js
+ * import { sdfLine } from 'points/sdf';
+ *
+ * // wgsl string
+ * ${sdfLine}
+ * let value = sdfLine(p1, p2, pixeStroke, uvr);
  */
 export const sdfLine: string;
 /**
@@ -25,12 +41,21 @@ export const sdfLine: string;
  * @param {vec2f} p2 end of the line
  * @param {f32} feather how soft the edges are
  * @param {vec2f} uv uv coordinates
- * @return `f32`
+ * @return {f32}
+ *
+ * @example
+ * // js
+ * import { sdfLine2 } from 'points/sdf';
+ *
+ * // wgsl string
+ * ${sdfLine2}
+ * let value = sdfLine2(p1, p2, feather, uvr);
  */
 export const sdfLine2: string;
-export const sdfRectangle: "\n\n";
 /**
  * A few signed distance functions.
+ * <br>
+ * <br>
  * These are wgsl functions, not js functions.
  * The function is enclosed in a js string constant,
  * to be appended into the code to reference it in the string shader.
@@ -42,14 +67,30 @@ export const sdfRectangle: "\n\n";
  * @param {vec2f} p uv
  * @param {vec2f} a point A
  * @param {vec2f} b point B
- * @return `f32`
+ * @return {f32}
+ *
+ * @example
+ * // js
+ * import { sdfSegment } from 'points/sdf';
+ *
+ * // wgsl string
+ * ${sdfSegment}
+ * let value = sdfSegment(uv, point1, point2);
  */
 export const sdfSegment: string;
 /**
  * Special for letters and create an sdf version of a texture
  * @type {String}
  * @param {vec4f} color final color
- * @return `vec4f`
+ * @return {vec4f}
+ *
+ * @example
+ * // js
+ * import { sdfSmooth } from 'points/sdf';
+ *
+ * // wgsl string
+ * ${sdfSmooth}
+ * let value = sdfSmooth(rgba);
  */
 export const sdfSmooth: string;
 /**
@@ -60,6 +101,14 @@ export const sdfSmooth: string;
  * @param {f32} feather how soft the edges are
  * @param {f32} rotationRads rotates the whole square
  * @param {vec2f} uv uv coordinates
- * @return `f32`
+ * @return {f32}
+ *
+ * @example
+ * // js
+ * import { sdfSquare } from 'points/sdf';
+ *
+ * // wgsl string
+ * ${sdfSquare}
+ * let value = sdfSquare(position, radius, feather, rotation, uvr);
  */
 export const sdfSquare: string;
