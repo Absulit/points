@@ -3,16 +3,23 @@
 `POINTS` is a library that uses WebGPU and allows you to create shaders without worrying too much about the setup.
 
 Looking for an explanation on how to use POINTS? follow this link:
-[README](../README.md)
+[README](https://github.com/Absulit/points)
 
 
 ## Main classes:<br>
+```js
+import Points {RenderPass, RenderPasses} from 'points'
+```
 {@link Points}<br>
 {@link RenderPass}<br>
-<br>
 {@link RenderPasses}
 
+
 ## Submodules with helper wgsl functions:
+
+```js
+import { fnusin } from 'points/animation'
+```
 
 {@link module:points/animation|points/animation}<br>
 {@link module:points/audio|points/audio}<br>

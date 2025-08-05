@@ -3450,7 +3450,7 @@ class Points {
         this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta, 'vec2f');
         let hasComputeShaders = this.#renderPasses.some(renderPass => renderPass.hasComputeShader);
         if (!hasComputeShaders && this.#bindingTextures.length) {
-            throw ' `addBindingTexture` requires at least one Compute Shader in a `RenderPass`'
+            throw ' `setBindingTexture` requires at least one Compute Shader in a `RenderPass`'
         }
         this.#renderPasses.forEach(this.#compileRenderPass);
         this.#generateDataSize();
@@ -3505,6 +3505,9 @@ class Points {
         this.#postRenderPasses.push(renderPass);
     }
 
+    /**
+     * Get the active list of {@link RenderPass}
+     */
     get renderPasses() {
         return this.#renderPasses;
     }
@@ -4103,6 +4106,19 @@ class Points {
             }
         });
     }
+
+    /**
+     * Method executed on each {@link https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame | requestAnimationFrame}.
+     * Here's where all the calls to update data will be executed.
+     * @example
+     * await points.init(renderPasses);
+     * update();
+     *
+     * function update() {
+     *     points.update();
+     *     requestAnimationFrame(update);
+     * }
+     */
     async update() {
         if (!this.#canvas || !this.#device) return;
         //--------------------------------------------
@@ -4221,8 +4237,6 @@ class Points {
             }
         });
 
-
-
         if (this.#readStorage.length) {
             this.#readStorage.forEach(readStorageItem => {
                 let storageItem = this.#storage.find(storageItem => storageItem.name === readStorageItem.name);
@@ -4295,6 +4309,10 @@ class Points {
             +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * .5, (-nh + 1) * .5,// 5 bottom right
         );
     }
+    /**
+     * Reference to the canvas assigned in the constructor
+     * @type {HTMLCanvasElement}
+     */
     get canvas() {
         return this.#canvas;
     }
@@ -4313,6 +4331,14 @@ class Points {
     get fullscreen() {
         return this.#fullscreen;
     }
+
+    /**
+     * Triggers the app to run in full screen mode
+     * @type {Boolean}
+     *
+     * @example
+     * points.fullscreen = true
+     */
     set fullscreen(value) {
         if (value) {
             this.#lastFitWindow = this.#fitWindow;
@@ -4327,9 +4353,19 @@ class Points {
             this.#resizeCanvasToDefault();
         }
     }
-    get fitWindow() {
-        return this.#fitWindow;
-    }
+
+    /**
+     * If the canvas has a fixed size e.g. `800x800`, `fitWindow` will fill
+     * the available window space.
+     * @type {Boolean}
+     * @throws {String} {@link Points#init} has not been called
+     *
+     * @example
+     *  if (await points.init(renderPasses)) {
+     *      points.fitWindow = isFitWindowData.isFitWindow;
+     *      update();
+     *  }
+     */
     set fitWindow(value) {
         if (!this.#context) {
             throw 'fitWindow must be assigned after Points.init() call or you don\'t have a Canvas assigned in the constructor';
