@@ -150,7 +150,13 @@ const BLACK = vec4(0.,0.,0.,1.);
  *
  * // wgsl string
  * ${layer}
- * let value = RED * vec4f(.5);
+ *
+ * let rgbaImage1 = texturePosition(image1, imageSampler, position, uvr, true);
+ * let rgbaImage2 = texturePosition(image2, imageSampler, position, uvr, true);
+ * let rgbaImage3 = texturePosition(image3, imageSampler, position, uvr, true);
+ *
+ * var finalColor:vec4f = layer(rgbaImage2, rgbaImage3);
+ * finalColor = layer(rgbaImage1, finalColor);
  */
 const layer = /*wgsl*/`
 // https://stackoverflow.com/a/24501192/507186
@@ -173,7 +179,7 @@ fn layer(back:vec4<f32>, front: vec4<f32>) -> vec4<f32> {
  *
  * // wgsl string
  * ${RGBAFromHSV}
- * let value = layer(h,s,v,n);
+ * let value = RGBAFromHSV(h,s,v,n);
  */
 const RGBAFromHSV = /*wgsl*/`
 fn hsvAux(h:f32, s:f32, v:f32, n:f32) -> f32 {
