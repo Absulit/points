@@ -35,6 +35,7 @@ import UniformsArray from './UniformsArray.js';
  * }
  *
  * @category Main
+ * @module points
  *
  */
 class Points {
