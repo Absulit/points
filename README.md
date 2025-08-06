@@ -157,8 +157,18 @@ npx jsr add @absulit/points # or jsr package
 ```json
 {
     "alias": {
-      "points": "@absulit/points/build/points.min.js",
-      "points/animation": "@absulit/points/build/core/animation"
+        "points": "@absulit/points/build/points.min.js",
+        "points/animation": "@absulit/points/build/core/animation",
+        "points/audio": "@absulit/points/build/core/audio.min.js",
+        "points/color": "@absulit/points/build/core/color.min.js",
+        "points/debug": "@absulit/points/build/core/debug.min.js",
+        "points/effects": "@absulit/points/build/core/effects.min.js",
+        "points/image": "@absulit/points/build/core/image.min.js",
+        "points/math": "@absulit/points/build/core/math.min.js",
+        "points/noise2d": "@absulit/points/build/core/noise2d.min.js",
+        "points/classicnoise2d": "@absulit/points/build/core/classicnoise2d.min.js",
+        "points/random": "@absulit/points/build/core/random.min.js",
+        "points/sdf": "@absulit/points/build/core/sdf.min.js"
     }
 }
 ```
@@ -170,8 +180,18 @@ npx jsr add @absulit/points # or jsr package
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-        "points": ["node_modules/@absulit/points/build/points.min.js"],
-        "points/animation": ["node_modules/@absulit/points/build/core/animation"]
+        "points": ["node_modules/@absulit/points/build/points"],
+        "points/animation": ["node_modules/@absulit/points/build/core/animation"],
+        "points/audio": ["node_modules/@absulit/points/build/core/audio"],
+        "points/color": ["node_modules/@absulit/points/build/core/color"],
+        "points/debug": ["node_modules/@absulit/points/build/core/debug"],
+        "points/effects": ["node_modules/@absulit/points/build/core/effects"],
+        "points/image": ["node_modules/@absulit/points/build/core/image"],
+        "points/math": ["node_modules/@absulit/points/build/core/math"],
+        "points/noise2d": ["node_modules/@absulit/points/build/core/noise2d"],
+        "points/classicnoise2d": ["node_modules/@absulit/points/build/core/classicnoise2d"],
+        "points/random": ["node_modules/@absulit/points/build/core/random"],
+        "points/sdf": ["node_modules/@absulit/points/build/core/sdf"]
     }
   }
 }
