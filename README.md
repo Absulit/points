@@ -158,7 +158,7 @@ npx jsr add @absulit/points # or jsr package
 {
     "alias": {
         "points": "@absulit/points/build/points.min.js",
-        "points/animation": "@absulit/points/build/core/animation",
+        "points/animation": "@absulit/points/build/core/animation.min.js",
         "points/audio": "@absulit/points/build/core/audio.min.js",
         "points/color": "@absulit/points/build/core/color.min.js",
         "points/debug": "@absulit/points/build/core/debug.min.js",
@@ -180,7 +180,7 @@ npx jsr add @absulit/points # or jsr package
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-        "points": ["node_modules/@absulit/points/build/points"],
+        "points": ["node_modules/@absulit/points/build/points.js"],
         "points/animation": ["node_modules/@absulit/points/build/core/animation"],
         "points/audio": ["node_modules/@absulit/points/build/core/audio"],
         "points/color": ["node_modules/@absulit/points/build/core/color"],
