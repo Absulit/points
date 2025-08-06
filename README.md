@@ -246,12 +246,9 @@ bun i @absulit/points # npm package or
 bun x jsr add @absulit/points # jsr package
 ```
 
-3. Run server
-```sh
-bun index.html
-```
 
-4. Add to `tsconfig.json` (for intellisense)
+
+3. Add to `tsconfig.json` (for intellisense)
 ```json
 {
   "compilerOptions": {
@@ -264,7 +261,10 @@ bun index.html
 }
 ```
 
-5. Restart server
+4. Run server
+```sh
+bun index.html
+```
 
 # Code Setup
 
