@@ -173,7 +173,7 @@ class Points {
     }
 
     /**
-     * Sets a `param` (predefined struct already in all shader)
+     * Sets a `param` (predefined struct already in all shaders)
      * as uniform to send to all shaders.
      * A Uniform is a value that can only be changed
      * from the outside (js side, not the wgsl side),
@@ -190,12 +190,14 @@ class Points {
      *  points.setUniform('scale', options.scale, 'f32');
      *
      * // wgsl string
+     * let color0 = vec4(params.color0/255, 1.);
+     * let color1 = vec4(params.color1/255, 1.);
      * let finalColor:vec4f = mix(color0, color1, params.scale);
      */
     setUniform(name, value, structName = null) {
         let uniformToUpdate = this.#nameExists(this.#uniforms, name);
         if (uniformToUpdate && structName) {
-            //if name exists is an update
+            // if name exists is an update
             throw '`setUniform()` can\'t set the structName of an already defined uniform.';
         }
         if (uniformToUpdate) {
