@@ -191,6 +191,12 @@ npm install --save-dev parcel
 npx parcel index.html
 ```
 
+---
+
+> **Note:** if an error shows up after running `parcel`, delete this line ` "main": "main.js",` from package.json
+
+---
+
 
 
 ### bun [code: examples_tutorial/bun/](examples_tutorial/bun/)
