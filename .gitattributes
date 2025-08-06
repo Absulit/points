@@ -1,0 +1,10 @@
+# .gitattributes
+
+# Ignore entire folder
+apidocs/* linguist-documentation
+
+# Ignore vendor libraries
+src/vendor/* linguist-vendored
+
+# Ignore generated files
+# *.min.js linguist-generated
