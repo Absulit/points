@@ -100,7 +100,7 @@ export const RED: vec4f;
  *
  * // wgsl string
  * ${RGBAFromHSV}
- * let value = layer(h,s,v,n);
+ * let value = RGBAFromHSV(h,s,v,n);
  */
 export const RGBAFromHSV: string;
 /**
@@ -209,6 +209,12 @@ export const brightnessC: string;
  *
  * // wgsl string
  * ${layer}
- * let value = RED * vec4f(.5);
+ *
+ * let rgbaImage1 = texturePosition(image1, imageSampler, position, uvr, true);
+ * let rgbaImage2 = texturePosition(image2, imageSampler, position, uvr, true);
+ * let rgbaImage3 = texturePosition(image3, imageSampler, position, uvr, true);
+ *
+ * var finalColor:vec4f = layer(rgbaImage2, rgbaImage3);
+ * finalColor = layer(rgbaImage1, finalColor);
  */
 export const layer: "\n// https://stackoverflow.com/a/24501192/507186\nfn layer(back:vec4<f32>, front: vec4<f32>) -> vec4<f32> {\n    return front * front.a + back * (1. - front.a);\n}\n";
