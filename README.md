@@ -152,18 +152,7 @@ npx jsr add @absulit/points # or jsr package
 
 ```
 
-3. Install parcel (or any live server that is able to recognize importmaps or path aliases)
-
-```sh
-npm install --save-dev parcel
-```
-
-4. Run live server
-```sh
-npx parcel index.html
-```
-
-5. Add in `package.json` (so parcel can recognize the paths)
+3. Add in `package.json` (so parcel can recognize the paths)
 
 ```json
 {
@@ -174,7 +163,7 @@ npx parcel index.html
 }
 ```
 
-6. Add/Create `jsconfig.json` (for intellisense)
+4. Add/Create `jsconfig.json` (for intellisense)
 
 ```json
 {
@@ -188,8 +177,21 @@ npx parcel index.html
 }
 ```
 
-7. `Reload Window` in vscode to reload `jsconfig.json`
+5. `Reload Window` in vscode to reload `jsconfig.json`
     - Press `Ctrl + Shift + P` > Developer: Reload Window
+
+6. Install parcel (or any live server that is able to recognize importmaps or path aliases)
+
+```sh
+npm install --save-dev parcel
+```
+
+7. Run live server
+```sh
+npx parcel index.html
+```
+
+
 
 ### bun [code: examples_tutorial/bun/](examples_tutorial/bun/)
 
