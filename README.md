@@ -254,8 +254,18 @@ bun x jsr add @absulit/points # jsr package
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-        "points": ["node_modules/@absulit/points/build/points.min.js"],
-        "points/animation": ["node_modules/@absulit/points/build/core/animation"]
+        "points": ["node_modules/@absulit/points/build/points.js"],
+        "points/animation": ["node_modules/@absulit/points/build/core/animation"],
+        "points/audio": ["node_modules/@absulit/points/build/core/audio"],
+        "points/color": ["node_modules/@absulit/points/build/core/color"],
+        "points/debug": ["node_modules/@absulit/points/build/core/debug"],
+        "points/effects": ["node_modules/@absulit/points/build/core/effects"],
+        "points/image": ["node_modules/@absulit/points/build/core/image"],
+        "points/math": ["node_modules/@absulit/points/build/core/math"],
+        "points/noise2d": ["node_modules/@absulit/points/build/core/noise2d"],
+        "points/classicnoise2d": ["node_modules/@absulit/points/build/core/classicnoise2d"],
+        "points/random": ["node_modules/@absulit/points/build/core/random"],
+        "points/sdf": ["node_modules/@absulit/points/build/core/sdf"]
     }
   }
 }
@@ -268,10 +278,13 @@ bun index.html
 
 # Code Setup
 
+Steps after installing. Here you will actually create the application and add the vertex, fragment and compute shaders.
+
 [code: examples_tutorial/cdn/main.js](examples_tutorial/cdn/main.js)
 
 
 ```js
+// this is your main.js file
 // import the `Points` class
 
 import Points, { RenderPass } from 'points';
