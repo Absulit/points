@@ -6,7 +6,7 @@
  */
 
 /**
- * Places texture. The texture being an image loaded from the JS side.
+ * Places a texture. The texture being an image loaded from the JS side.
  * @type {String}
  * places texture
  * @param {texture_2d<f32>} texture `texture_2d<f32>`
