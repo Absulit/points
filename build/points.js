@@ -213,8 +213,9 @@ fn main(
  * @module points/image
  */
 
+
 /**
- * Places texture in a position. The texture being an image loaded from the JS side.
+ * Places texture in a position
  * @type {String}
  * @param {texture_2d<f32>} texture `texture_2d<f32>`
  * @param {sampler} aSampler `sampler`
@@ -240,7 +241,7 @@ fn texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>
     let dims: vec2<u32> = textureDimensions(texture, 0);
     let dimsF32 = vec2<f32>(dims);
 
-    let minScreenSize = min(params.screen.y, params.screen.x);
+    let minScreenSize = params.screen.y;
     let imageRatio = dimsF32 / minScreenSize;
 
     let displaceImagePosition = position * flipTextureCoordinates / imageRatio + vec2(0., 1.);
@@ -249,11 +250,8 @@ fn texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>
     let imageUV = uv / imageRatio * flipTexture + displaceImagePosition;
     var rgbaImage = textureSample(texture, aSampler, imageUV);
 
-    let isBeyondImageRight = uv.x > position.x + imageRatio.x;
-    let isBeyondImageLeft = uv.x < position.x;
-    let isBeyondTop =  uv.y > top.y ;
-    let isBeyondBottom = uv.y < position.y;
-    if(crop && (isBeyondTop || isBeyondBottom || isBeyondImageLeft || isBeyondImageRight)){
+    // e.g. if uv.x < 0. OR uv.y < 0. || uv.x > imageRatio.x OR uv.y > imageRatio.y
+    if (crop && (any(uv < vec2(0.0)) || any(uv > imageRatio))) {
         rgbaImage = vec4(0.);
     }
 
@@ -288,7 +286,7 @@ fn textureExternalPosition(texture:texture_external, aSampler:sampler, position:
     let dims: vec2<u32> = textureDimensions(texture);
     let dimsF32 = vec2<f32>(f32(dims.x), f32(dims.y));
 
-    let minScreenSize = min(params.screen.y, params.screen.x);
+    let minScreenSize = params.screen.y;
     let imageRatio = dimsF32 / minScreenSize;
 
     let displaceImagePosition = position * flipTextureCoordinates / imageRatio + vec2(0, 1);
@@ -297,12 +295,9 @@ fn textureExternalPosition(texture:texture_external, aSampler:sampler, position:
     let imageUV = uv / imageRatio * flipTexture + displaceImagePosition;
     var rgbaImage = textureSampleBaseClampToEdge(texture, aSampler, imageUV);
 
-    let isBeyondImageRight = uv.x > position.x + imageRatio.x;
-    let isBeyondImageLeft = uv.x < position.x;
-    let isBeyondTop =  uv.y > top.y ;
-    let isBeyondBottom = uv.y < position.y;
-    if(crop && (isBeyondTop || isBeyondBottom || isBeyondImageLeft || isBeyondImageRight)){
-        rgbaImage = vec4(0);
+    // e.g. if uv.x < 0. OR uv.y < 0. || uv.x > imageRatio.x OR uv.y > imageRatio.y
+    if (crop && (any(uv < vec2(0.0)) || any(uv > imageRatio))) {
+        rgbaImage = vec4(0.);
     }
 
     return rgbaImage;
