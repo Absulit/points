@@ -30,7 +30,7 @@ fn mod289_v3(x:vec3<f32>) -> vec3<f32> {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
-fn mod289(x: vec2<f32>) -> vec2<f32> {
+fn mod289(x: vec2f) -> vec2f {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
@@ -50,9 +50,9 @@ const K = 0.142857142857; // 1/7
 const Ko = 0.428571428571; // 3/7
 const jitter = 1.0; // Less gives more regular pattern
 
-fn cellular(P:vec2<f32>) -> vec2<f32> {
-    let Pi:vec2<f32> = mod289(floor(P));
-    let Pf:vec2<f32> = fract(P);
+fn cellular(P:vec2f) -> vec2f {
+    let Pi:vec2f = mod289(floor(P));
+    let Pf:vec2f = fract(P);
     let oi:vec3<f32> = vec3(-1.0, 0.0, 1.0);
     let of_:vec3<f32> = vec3(-0.5, 0.5, 1.5);
     let px:vec3<f32> = permute(Pi.x + oi);

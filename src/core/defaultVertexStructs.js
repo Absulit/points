@@ -31,7 +31,7 @@ struct Position{
 struct Vertex {
     position: Position,
     color: Color,
-    uv: vec2<f32>,
+    uv: vec2f,
 }
 
 struct Point {

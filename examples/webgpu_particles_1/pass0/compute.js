@@ -4,7 +4,7 @@ const compute = /*wgsl*/`
 
 ${structs}
 
-var<private> rand_seed : vec2<f32>;
+var<private> rand_seed : vec2f;
 
 fn init_rand(invocation_id : u32, seed : vec4<f32>) {
   rand_seed = seed.xz;
@@ -13,8 +13,8 @@ fn init_rand(invocation_id : u32, seed : vec4<f32>) {
 }
 
 fn rand() -> f32 {
-  rand_seed.x = fract(cos(dot(rand_seed, vec2<f32>(23.14077926, 232.61690225))) * 136.8168);
-  rand_seed.y = fract(cos(dot(rand_seed, vec2<f32>(54.47856553, 345.84153136))) * 534.7645);
+  rand_seed.x = fract(cos(dot(rand_seed, vec2f(23.14077926, 232.61690225))) * 136.8168);
+  rand_seed.y = fract(cos(dot(rand_seed, vec2f(54.47856553, 345.84153136))) * 534.7645);
   return rand_seed.y;
 }
 
@@ -61,8 +61,8 @@ fn main(
         coord.x = coord.x + select(0, 1, any(mask.yw)); // x  y
         coord.y = coord.y + select(0, 1, any(mask.zw)); // z  w
       }
-      let uv = vec2<f32>(coord) / vec2<f32>(textureDimensions(texture));
-      particle.position = vec3<f32>((uv - 0.5) * 3.0 * vec2<f32>(1.0, -1.0), 0.0);
+      let uv = vec2f(coord) / vec2f(textureDimensions(texture));
+      particle.position = vec3<f32>((uv - 0.5) * 3.0 * vec2f(1.0, -1.0), 0.0);
       particle.color = textureLoad(texture, coord, 0);
       particle.velocity.x = (rand() - 0.5) * 0.1;
       particle.velocity.y = (rand() - 0.5) * 0.1;

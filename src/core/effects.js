@@ -121,7 +121,7 @@ const orderedDithering_threshold_map = array<f32,16>(
  * let value = orderedDithering(color, depth, dims, uvr);
  */
 export const orderedDithering = /*wgsl*/`
-fn orderedDithering(color:vec4<f32>, depth:f32, dims:vec2<u32>, uv:vec2<f32>) -> vec4<f32> {
+fn orderedDithering(color:vec4<f32>, depth:f32, dims:vec2<u32>, uv:vec2f) -> vec4<f32> {
     // const orderedDithering_threshold_map = array<f32,16>(
     //     1, 9, 3, 11,
     //     13, 5, 15, 7,
@@ -344,7 +344,7 @@ fn soften8(color:vec4<f32>, colorsAround:array<vec4<f32>, 8>, colorPower:f32) ->
  * let value = blur9(image, imageSampler, position, uv, resolution, direction);
  */
 export const blur9 = /*wgsl*/`
-fn blur9(image: texture_2d<f32>, imageSampler:sampler, position:vec2<f32>, uv:vec2<f32>, resolution: vec2<f32>, direction: vec2<f32>) -> vec4<f32> {
+fn blur9(image: texture_2d<f32>, imageSampler:sampler, position:vec2f, uv:vec2f, resolution: vec2f, direction: vec2f) -> vec4<f32> {
     var color = vec4(0.0);
     let off1 = vec2(1.3846153846) * direction;
     let off2 = vec2(3.2307692308) * direction;

@@ -21,7 +21,7 @@ fn taylorInvSqrt(r:vec4<f32>) -> vec4<f32> {
   return 1.79284291400159 - 0.85373472095314 * r;
 }
 
-fn fade(t:vec2<f32>) -> vec2<f32> {
+fn fade(t:vec2f) -> vec2f {
   return t*t*t*(t*(t*6.0-15.0)+10.0);
 }
 `;
@@ -44,7 +44,7 @@ export const cnoise = /*wgsl*/`
 ${auxiliars}
 
 // Classic Perlin noise
-fn cnoise(P:vec2<f32>) ->f32 {
+fn cnoise(P:vec2f) ->f32 {
     var Pi = floor(P.xyxy) + vec4(0.0, 0.0, 1.0, 1.0);
     let Pf = fract(P.xyxy) - vec4(0.0, 0.0, 1.0, 1.0);
     Pi = mod289(Pi); // To avoid truncation effects in permutation
@@ -101,7 +101,7 @@ export const pnoise = /*wgsl*/`
 ${auxiliars}
 
 // Classic Perlin noise, periodic variant
-fn pnoise(P:vec2<f32>, rep:vec2<f32>) -> f32 {
+fn pnoise(P:vec2f, rep:vec2f) -> f32 {
     var Pi = floor(P.xyxy) + vec4(0.0, 0.0, 1.0, 1.0);
     let Pf = fract(P.xyxy) - vec4(0.0, 0.0, 1.0, 1.0);
     Pi = Pi % rep.xyxy; // To create noise with explicit period

@@ -81,8 +81,8 @@ export const E = /*wgsl*/`const E = 2.71828182;`;
  * let value = polar(distance, radians);
  */
 export const polar = /*wgsl*/`
-fn polar(distance: f32, radians: f32) -> vec2<f32> {
-    return vec2<f32>(distance * cos(radians), distance * sin(radians));
+fn polar(distance: f32, radians: f32) -> vec2f {
+    return vec2f(distance * cos(radians), distance * sin(radians));
 }
 `;
 
@@ -101,7 +101,7 @@ fn polar(distance: f32, radians: f32) -> vec2<f32> {
  * let value = rotateVector(position, radians);
  */
 export const rotateVector = /*wgsl*/`
-fn rotateVector(p:vec2<f32>, rads:f32 ) -> vec2<f32> {
+fn rotateVector(p:vec2f, rads:f32 ) -> vec2f {
     let s = sin(rads);
     let c = cos(rads);
     let xnew = p.x * c - p.y * s;

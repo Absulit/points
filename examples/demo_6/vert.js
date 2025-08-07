@@ -5,14 +5,14 @@ const vert = /*wgsl*/`
 struct CustomFragment {
     @builtin(position) position: vec4<f32>,
     @location(0) color: vec4<f32>,
-    @location(1) uv: vec2<f32>
+    @location(1) uv: vec2f
 }
 
 @vertex
 fn main(
     @location(0) position: vec4<f32>,
     @location(1) color: vec4<f32>,
-    @location(2) uv: vec2<f32>,
+    @location(2) uv: vec2f,
     @builtin(vertex_index) vertexIndex: u32) -> CustomFragment {
 
     var result: CustomFragment;

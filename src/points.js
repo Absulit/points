@@ -316,7 +316,7 @@ class Points {
      *
      * // wgsl string
      * struct Matrix {
-     *     size : vec2<f32>,
+     *     size : vec2f,
      *     numbers: array<f32>,
      * }
      *
@@ -461,7 +461,7 @@ class Points {
      * // wgsl string
      * var rgba = textureSampleLevel(
      *     feedbackTexture, feedbackSampler,
-     *     vec2<f32>(f32(GlobalId.x), f32(GlobalId.y)),
+     *     vec2f(f32(GlobalId.x), f32(GlobalId.y)),
      *     0.0
      * );
      *

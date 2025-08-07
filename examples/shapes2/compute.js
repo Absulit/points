@@ -104,7 +104,7 @@ fn main(
     }
     (*rgbaP) = rgba;
 
-    let sdf = sdfCircle(vec2<f32>(1.,1.) * fnusin(1), .01, .2, uv);
+    let sdf = sdfCircle(vec2f(1.,1.) * fnusin(1), .01, .2, uv);
     (*rgbaP) += sdf;
 
 

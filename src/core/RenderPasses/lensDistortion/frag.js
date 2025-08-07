@@ -16,7 +16,7 @@ ${PI}
 ${WHITE}
 ${polar}
 
-fn angle(p1:vec2<f32>, p2:vec2<f32>) -> f32 {
+fn angle(p1:vec2f, p2:vec2f) -> f32 {
     let d = p1 - p2;
     return abs(atan2(d.y, d.x)) / PI;
 }
@@ -24,10 +24,10 @@ fn angle(p1:vec2<f32>, p2:vec2<f32>) -> f32 {
 @fragment
 fn main(
     @location(0) color: vec4<f32>,
-    @location(1) uv: vec2<f32>,
-    @location(2) ratio: vec2<f32>,  // relation between params.screen.x and params.screen.y
-    @location(3) uvr: vec2<f32>,    // uv with aspect ratio corrected
-    @location(4) mouse: vec2<f32>,
+    @location(1) uv: vec2f,
+    @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
+    @location(3) uvr: vec2f,    // uv with aspect ratio corrected
+    @location(4) mouse: vec2f,
     @builtin(position) position: vec4<f32>
 ) -> @location(0) vec4<f32> {
 
