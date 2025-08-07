@@ -15,7 +15,7 @@ import LayersArray from './LayersArray.js';
 import UniformsArray from './UniformsArray.js';
 
 /**
- * Main class Points
+ * Main class Points, this is the entry point of an application with this library.
  * @class Points
  * @example
  * import Points from 'points';

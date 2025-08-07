@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Points</title>
+    <title>Class: RenderPass | Points</title>
     <meta name="description" content="A Generative Art library made in WebGPU"><meta name="keywords" content="javascript, webgl, crative-coding, shaders, generative-art, webgpu, genart, wgsl">
     <link rel="icon" title="dummy" href="data:image/x-icon;base64,AA">
     <script src="scripts/docolatte.min.js"></script>
@@ -22,7 +22,7 @@
         </div>
         <div class="topbar">
             <h1 class="page-title">
-                <a href="#">Home</a>
+                <a href="#">Class: RenderPass</a>
             </h1>
             <a class="light-switch" title="Switch light/dark mode" href="#"><i class="label auto">
 <svg  class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -38,57 +38,285 @@
 
 
 
+
+<article class="doc">
+    <header>
+        
+            <h2 class="name"><span class="attribs"><span class="attributes"></span></span>
+                <span class="ancestors"><a href="module-points.html">points</a>.</span>RenderPass<span class="signature">(vertexShader, fragmentShader, computeShader)</span><span class="type-signature"></span></h2>
+            
+                <div class="class-description"><p>A RenderPass is a way to have a block of shaders to pass to your application pipeline and
+these render passes will be executed in the order you pass them in the Points#init method.</p></div>
+            
+        
+    </header>
+
+    <div class="container-overview">
+    
+        
+
+    
+    <h2>Constructor</h2>
+    
+
+    
+    <h4 class="name" id="RenderPass"><span class="attributes"></span>new RenderPass<span class="signature">(vertexShader, fragmentShader, computeShader)</span><span class="type-signature"></span></h4>
+    
+
     
 
 
-    <article class="package">
-        <h3 class="head">
-            <span class="package-name"></span>
-            <span class="package-version"></span>
-        </h3>
-    </article>
+
+<div class="description">
+    <p>A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
+This is useful for PostProcessing.</p>
+</div>
 
 
 
 
 
 
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<div class="table-wrap">
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>vertexShader</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"><p>WGSL Vertex Shader in a String.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>fragmentShader</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"><p>WGSL Fragment Shader in a String.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>computeShader</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"><p>WGSL Compute Shader in a String.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+</div>
+
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="RenderPass.js.html">RenderPass.js</a>, <a href="RenderPass.js.html#line19">line 19</a>
+</dd>
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+
+    <pre class="prettyprint lang-js"><code>import Points, { RenderPass } from 'points';// vert, frag and compute are strings with the wgsl shaders.let renderPasses = [    new RenderPass(vert1, frag1, compute1),    new RenderPass(vert2, frag2, compute2)];// we pass the array of renderPassesawait points.init(renderPasses);</code></pre>
 
 
 
 
     
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="computeShader"><span class="attributes"></span>computeShader<span class="type-signature"></span></h4>
 
 
 
 
-    <article class="readme">
-        <h1 id="points-api-docs">POINTS API docs</h1>
-<p><code>POINTS</code> is a library that uses WebGPU and allows you to create shaders without worrying too much about the setup.</p>
-<p>Looking for an explanation on how to use POINTS? follow this link:
-<a href="https://github.com/Absulit/points">README</a></p>
-<h2 id="main-classes%3A">Main classes:<br></h2>
-<pre class="prettyprint source lang-js"><code>import Points { RenderPass, RenderPasses } from 'points';
-</code></pre>
-<p>Points<br>
-RenderPass<br>
-RenderPasses</p>
-<h2 id="submodules-with-helper-wgsl-functions%3A">Submodules with helper wgsl functions:</h2>
-<pre class="prettyprint source lang-js"><code>import { fnusin } from 'points/animation';
-</code></pre>
-<p><a href="module-points_animation.html">points/animation</a><br>
-<a href="module-points_audio.html">points/audio</a><br>
-<a href="module-points_color.html">points/color</a><br>
-<a href="module-points_debug.html">points/debug</a><br>
-<a href="module-points_effects.html">points/effects</a><br>
-<a href="module-points_image.html">points/image</a><br>
-<a href="module-points_math.html">points/math</a><br>
-<a href="module-points_noise2d.html">points/noise2d</a><br>
-<a href="module-points_classicnoise2d.html">points/classicnoise2d</a><br>
-<a href="module-points_random.html">points/random</a><br>
-<a href="module-points_sdf.html">points/sdf</a><br></p>
-    </article>
+<div class="description">
+    <p>get the compute shader content</p>
+</div>
 
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="RenderPass.js.html">RenderPass.js</a>, <a href="RenderPass.js.html#line88">line 88</a>
+</dd>
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="fragmentShader"><span class="attributes"></span>fragmentShader<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    <p>get the fragment shader content</p>
+</div>
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="RenderPass.js.html">RenderPass.js</a>, <a href="RenderPass.js.html#line95">line 95</a>
+</dd>
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="vertexShader"><span class="attributes"></span>vertexShader<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    <p>get the vertex shader content</p>
+</div>
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="RenderPass.js.html">RenderPass.js</a>, <a href="RenderPass.js.html#line81">line 81</a>
+</dd>
+</dl>
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+
+    
+</article>
 
 
 
@@ -109,7 +337,7 @@ RenderPasses</p>
                     Documentation generated by <a rel="external" href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a><wbr>
                     using <a rel="external" href="https://github.com/amekusa/docolatte">Docolatte</a> theme
                     
-                    <wbr>on <time datetime="2025-08-06T21:11:54.836Z">Wed, 06 Aug 2025 21:11:54 GMT</time>
+                    <wbr>on <time datetime="2025-08-06T21:11:54.851Z">Wed, 06 Aug 2025 21:11:54 GMT</time>
                     
                 </p>
                 

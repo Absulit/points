@@ -15,7 +15,7 @@ import RenderPass from './RenderPass.js';
  * @class
  *
  * @example
- * import Points from 'points';
+ * import Points, { RenderPass, RenderPasses } from 'points';
  * const points = new Points('canvas');
  *
  * let renderPasses = [

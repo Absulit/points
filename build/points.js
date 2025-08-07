@@ -13,7 +13,7 @@
  * // Send storage data to the Compute Shaders only
  * points.setStorage('variables', 'Variable', false, ShaderType.COMPUTE);
  *
- *
+ * @memberof module:points
  */
 class ShaderType {
     /**
@@ -35,6 +35,7 @@ class ShaderType {
  * these render passes will be executed in the order you pass them in the {@link Points#init} method.
  *
  * @example
+ * import Points, { RenderPass } from 'points';
  * // vert, frag and compute are strings with the wgsl shaders.
  * let renderPasses = [
  *     new RenderPass(vert1, frag1, compute1),
@@ -43,6 +44,7 @@ class ShaderType {
 
  * // we pass the array of renderPasses
  * await points.init(renderPasses);
+ * @memberof module:points
  */
 
 class RenderPass {
@@ -1285,7 +1287,7 @@ const waves = {
  * @class
  *
  * @example
- * import Points from 'points';
+ * import Points, { RenderPass, RenderPasses } from 'points';
  * const points = new Points('canvas');
  *
  * let renderPasses = [
@@ -1311,6 +1313,7 @@ const waves = {
  *     points.update();
  *     requestAnimationFrame(update);
  * }
+ * @memberof module:points
  */
 class RenderPasses {
     static COLOR = 1;
@@ -2402,7 +2405,7 @@ class UniformsArray extends Array {
 }
 
 /**
- * Main class Points
+ * Main class Points, this is the entry point of an application with this library.
  * @class Points
  * @example
  * import Points from 'points';
@@ -2422,6 +2425,7 @@ class UniformsArray extends Array {
  * }
  *
  * @category Main
+ * @module points
  *
  */
 class Points {
