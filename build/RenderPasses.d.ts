@@ -4,7 +4,7 @@ export { RenderPasses as default };
  * @class
  *
  * @example
- * import Points from 'points';
+ * import Points, { RenderPass, RenderPasses } from 'points';
  * const points = new Points('canvas');
  *
  * let renderPasses = [
@@ -30,6 +30,7 @@ export { RenderPasses as default };
  *     points.update();
  *     requestAnimationFrame(update);
  * }
+ * @memberof module:points
  */
 declare class RenderPasses {
     static COLOR: number;
