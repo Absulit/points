@@ -5,6 +5,9 @@
 Looking for an explanation on how to use POINTS? follow this link:
 [README](https://github.com/Absulit/points)
 
+## Examples
+[Documentation Live demos](https://absulit.github.io/points/examples/)<br>
+[Gravity Pull: Audio Visualizer](https://absulit.github.io/Gravity-Pull/)
 
 ## Main classes:<br>
 ```js
@@ -13,7 +16,6 @@ import Points { RenderPass, RenderPasses } from 'points';
 {@link Points}<br>
 {@link RenderPass}<br>
 {@link RenderPasses}
-
 
 ## Submodules with helper wgsl functions:
 

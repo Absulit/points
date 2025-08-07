@@ -8,7 +8,6 @@
 /**
  * Places a texture. The texture being an image loaded from the JS side.
  * @type {String}
- * places texture
  * @param {texture_2d<f32>} texture `texture_2d<f32>`
  * @param {sampler} aSampler `sampler`
  * @param {vec2<f32>} uv `vec2<f32>`
@@ -52,15 +51,14 @@ fn texture(texture:texture_2d<f32>, aSampler:sampler, uv:vec2f, crop:bool) -> ve
 `;
 
 /**
+ * Places texture in a position
  * @type {String}
- * places texture in a position
  * @param {texture_2d<f32>} texture `texture_2d<f32>`
  * @param {sampler} aSampler `sampler`
  * @param {vec2<f32>} position `vec2<f32>`
  * @param {vec2<f32>} uv `vec2<f32>`
  * @param {bool} crop `bool`
  * @returns {vec4f}
- * @deprecated
  *
  * @example
  * // js
@@ -98,8 +96,8 @@ fn texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>
 `;
 
 /**
- * @type {String}
  * places texture_external in a position
+ * @type {String}
  * @param {texture_external} texture `texture_external`
  * @param {sampler} aSampler `sampler`
  * @param {vec2<f32>} uv `vec2<f32>`
