@@ -102,13 +102,21 @@ fn texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>
  * places texture_external in a position
  * @param {texture_external} texture `texture_external`
  * @param {sampler} aSampler `sampler`
- * @param {vec2<f32>} position `vec2<f32>`
  * @param {vec2<f32>} uv `vec2<f32>`
  * @param {bool} crop `bool`
- * @return `vec4f
+ * @returns {vec4f}
+ *
+ * @example
+ * // js
+ * import { textureExternal } from 'points/image';
+ * await points.setTextureVideo('video', 'myvideo.mp4');
+ *
+ * // wgsl string
+ * ${textureExternal}
+ * let value = textureExternal(video, imageSampler, uvr, true);
  */
 export const textureExternal = /*wgsl*/`
-fn textureExternal(texture:texture_external, aSampler:sampler, position:vec2<f32>, uv:vec2<f32>, crop:bool) -> vec4<f32> {
+fn textureExternal(texture:texture_external, aSampler:sampler, uv:vec2f, crop:bool) -> vec4f {
     let flipTexture = vec2(1.,-1.);
     let flipTextureCoordinates = vec2(-1.,1.);
     let dims: vec2<u32> = textureDimensions(texture);
@@ -117,8 +125,7 @@ fn textureExternal(texture:texture_external, aSampler:sampler, position:vec2<f32
     let minScreenSize = params.screen.y;
     let imageRatio = dimsF32 / minScreenSize;
 
-    let displaceImagePosition = position * flipTextureCoordinates / imageRatio + vec2(0, 1);
-    let top = position + vec2(0, imageRatio.y);
+    let displaceImagePosition = vec2(0., 1.);
 
     let imageUV = uv / imageRatio * flipTexture + displaceImagePosition;
     var rgbaImage = textureSampleBaseClampToEdge(texture, aSampler, imageUV);
