@@ -13,7 +13,7 @@ export { ShaderType as default };
  * // Send storage data to the Compute Shaders only
  * points.setStorage('variables', 'Variable', false, ShaderType.COMPUTE);
  *
- *
+ * @memberof module:points
  */
 declare class ShaderType {
     /**

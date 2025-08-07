@@ -4,6 +4,7 @@
  * these render passes will be executed in the order you pass them in the {@link Points#init} method.
  *
  * @example
+ * import Points, { RenderPass } from 'points';
  * // vert, frag and compute are strings with the wgsl shaders.
  * let renderPasses = [
  *     new RenderPass(vert1, frag1, compute1),
@@ -12,6 +13,7 @@
 
  * // we pass the array of renderPasses
  * await points.init(renderPasses);
+ * @memberof module:points
  */
 
 class RenderPass {

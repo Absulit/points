@@ -15,7 +15,7 @@ import RenderPass from './RenderPass.js';
  * @class
  *
  * @example
- * import Points from 'points';
+ * import Points, { RenderPass, RenderPasses } from 'points';
  * const points = new Points('canvas');
  *
  * let renderPasses = [
@@ -41,6 +41,7 @@ import RenderPass from './RenderPass.js';
  *     points.update();
  *     requestAnimationFrame(update);
  * }
+ * @memberof module:points
  */
 class RenderPasses {
     static COLOR = 1;

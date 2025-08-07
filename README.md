@@ -152,44 +152,72 @@ npx jsr add @absulit/points # or jsr package
 
 ```
 
-3. Install parcel (or any live server that is able to recognize importmaps or path aliases)
-
-```sh
-npm install --save-dev parcel
-```
-
-4. Run live server
-```sh
-npx parcel index.html
-```
-
-5. Add in `package.json` (so parcel can recognize the paths)
+3. Add in `package.json` (so parcel can recognize the paths)
 
 ```json
 {
     "alias": {
-      "points": "@absulit/points/build/points.min.js",
-      "points/animation": "@absulit/points/build/core/animation"
+        "points": "@absulit/points/build/points.min.js",
+        "points/animation": "@absulit/points/build/core/animation.min.js",
+        "points/audio": "@absulit/points/build/core/audio.min.js",
+        "points/color": "@absulit/points/build/core/color.min.js",
+        "points/debug": "@absulit/points/build/core/debug.min.js",
+        "points/effects": "@absulit/points/build/core/effects.min.js",
+        "points/image": "@absulit/points/build/core/image.min.js",
+        "points/math": "@absulit/points/build/core/math.min.js",
+        "points/noise2d": "@absulit/points/build/core/noise2d.min.js",
+        "points/classicnoise2d": "@absulit/points/build/core/classicnoise2d.min.js",
+        "points/random": "@absulit/points/build/core/random.min.js",
+        "points/sdf": "@absulit/points/build/core/sdf.min.js"
     }
 }
 ```
 
-6. Add/Create `jsconfig.json` (for intellisense)
+4. Add/Create `jsconfig.json` (for intellisense)
 
 ```json
 {
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-        "points": ["node_modules/@absulit/points/build/points.min.js"],
-        "points/animation": ["node_modules/@absulit/points/build/core/animation"]
+        "points": ["node_modules/@absulit/points/build/points.js"],
+        "points/animation": ["node_modules/@absulit/points/build/core/animation"],
+        "points/audio": ["node_modules/@absulit/points/build/core/audio"],
+        "points/color": ["node_modules/@absulit/points/build/core/color"],
+        "points/debug": ["node_modules/@absulit/points/build/core/debug"],
+        "points/effects": ["node_modules/@absulit/points/build/core/effects"],
+        "points/image": ["node_modules/@absulit/points/build/core/image"],
+        "points/math": ["node_modules/@absulit/points/build/core/math"],
+        "points/noise2d": ["node_modules/@absulit/points/build/core/noise2d"],
+        "points/classicnoise2d": ["node_modules/@absulit/points/build/core/classicnoise2d"],
+        "points/random": ["node_modules/@absulit/points/build/core/random"],
+        "points/sdf": ["node_modules/@absulit/points/build/core/sdf"]
     }
   }
 }
 ```
 
-7. `Reload Window` in vscode to reload `jsconfig.json`
+5. `Reload Window` in vscode to reload `jsconfig.json`
     - Press `Ctrl + Shift + P` > Developer: Reload Window
+
+6. Install parcel (or any live server that is able to recognize importmaps or path aliases)
+
+```sh
+npm install --save-dev parcel
+```
+
+7. Run live server
+```sh
+npx parcel index.html
+```
+
+---
+
+> **Note:** if an error shows up after running `parcel`, delete this line ` "main": "main.js",` from package.json
+
+---
+
+
 
 ### bun [code: examples_tutorial/bun/](examples_tutorial/bun/)
 
@@ -218,32 +246,45 @@ bun i @absulit/points # npm package or
 bun x jsr add @absulit/points # jsr package
 ```
 
-3. Run server
-```sh
-bun index.html
-```
 
-4. Add to `tsconfig.json` (for intellisense)
+
+3. Add to `tsconfig.json` (for intellisense)
 ```json
 {
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-        "points": ["node_modules/@absulit/points/build/points.min.js"],
-        "points/animation": ["node_modules/@absulit/points/build/core/animation"]
+        "points": ["node_modules/@absulit/points/build/points.js"],
+        "points/animation": ["node_modules/@absulit/points/build/core/animation"],
+        "points/audio": ["node_modules/@absulit/points/build/core/audio"],
+        "points/color": ["node_modules/@absulit/points/build/core/color"],
+        "points/debug": ["node_modules/@absulit/points/build/core/debug"],
+        "points/effects": ["node_modules/@absulit/points/build/core/effects"],
+        "points/image": ["node_modules/@absulit/points/build/core/image"],
+        "points/math": ["node_modules/@absulit/points/build/core/math"],
+        "points/noise2d": ["node_modules/@absulit/points/build/core/noise2d"],
+        "points/classicnoise2d": ["node_modules/@absulit/points/build/core/classicnoise2d"],
+        "points/random": ["node_modules/@absulit/points/build/core/random"],
+        "points/sdf": ["node_modules/@absulit/points/build/core/sdf"]
     }
   }
 }
 ```
 
-5. Restart server
+4. Run server
+```sh
+bun index.html
+```
 
 # Code Setup
+
+Steps after installing. Here you will actually create the application and add the vertex, fragment and compute shaders.
 
 [code: examples_tutorial/cdn/main.js](examples_tutorial/cdn/main.js)
 
 
 ```js
+// this is your main.js file
 // import the `Points` class
 
 import Points, { RenderPass } from 'points';
