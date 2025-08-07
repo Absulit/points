@@ -1,28 +1,22 @@
-import { fnusin } from 'points/animation';
-import { textureExternalPosition } from 'points/image';
+import { textureExternal } from 'points/image';
 
 const videotexture1Frag = /*wgsl*/`
 
-${fnusin}
-${textureExternalPosition}
-
+${textureExternal}
 
 @fragment
 fn main(
-        @location(0) color: vec4<f32>,
-        @location(1) uv: vec2<f32>,
-        @location(2) ratio: vec2<f32>,
-        @location(3) uvr: vec2<f32>,
-        @location(4) mouse: vec2<f32>,
-        @builtin(position) position: vec4<f32>
-    ) -> @location(0) vec4<f32> {
+        @location(0) color: vec4f,
+        @location(1) uv: vec2f,
+        @location(2) ratio: vec2f,
+        @location(3) uvr: vec2f,
+        @location(4) mouse: vec2f,
+        @builtin(position) position: vec4f
+    ) -> @location(0) vec4f {
 
-    let startPosition = vec2(0.);
+    let rgba = textureExternal(video, feedbackSampler, uvr / params.scale, true);
 
-    let rgbaCT = textureExternalPosition(video, feedbackSampler, startPosition, uvr / params.scale, true);
-    // let rgbaCT = textureSampleBaseClampToEdge(video, feedbackSampler, uv);
-
-    return rgbaCT;
+    return rgba;
 }
 `;
 

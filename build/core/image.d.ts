@@ -96,6 +96,52 @@ export const pixelateTexturePosition: string;
  */
 export const sprite: string;
 /**
+ * These are wgsl functions, not js functions.
+ * The function is enclosed in a js string constant,
+ * to be appended into the code to reference it in the string shader.
+ * @module points/image
+ */
+/**
+ * Places a texture. The texture being an image loaded from the JS side.
+ * @type {String}
+ * @param {texture_2d<f32>} texture `texture_2d<f32>`
+ * @param {sampler} aSampler `sampler`
+ * @param {vec2<f32>} uv `vec2<f32>`
+ * @param {bool} crop `bool`
+ * @returns {vec4f}
+ *
+ * @example
+ *
+ * // js
+ * import { texture } from 'points/image';
+ *
+ * await points.setTextureImage('image', 'myimage.jpg');
+ *
+ * // wgsl string
+ * ${texture}
+ * let value = texture(image, imageSampler, uvr, true);
+ */
+export const texture: string;
+/**
+ * places texture_external in a position
+ * @type {String}
+ * @param {texture_external} texture `texture_external`
+ * @param {sampler} aSampler `sampler`
+ * @param {vec2<f32>} uv `vec2<f32>`
+ * @param {bool} crop `bool`
+ * @returns {vec4f}
+ *
+ * @example
+ * // js
+ * import { textureExternal } from 'points/image';
+ * await points.setTextureVideo('video', 'myvideo.mp4');
+ *
+ * // wgsl string
+ * ${textureExternal}
+ * let value = textureExternal(video, imageSampler, uvr, true);
+ */
+export const textureExternal: string;
+/**
  * Places texture_external in a position. Texture external being in this case
  * a video loaded as texture in the JS side.
  * @type {String}
@@ -117,13 +163,7 @@ export const sprite: string;
  */
 export const textureExternalPosition: string;
 /**
- * These are wgsl functions, not js functions.
- * The function is enclosed in a js string constant,
- * to be appended into the code to reference it in the string shader.
- * @module points/image
- */
-/**
- * Places texture in a position. The texture being an image loaded from the JS side.
+ * Places texture in a position
  * @type {String}
  * @param {texture_2d<f32>} texture `texture_2d<f32>`
  * @param {sampler} aSampler `sampler`
