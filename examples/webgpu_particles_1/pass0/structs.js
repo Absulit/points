@@ -2,12 +2,12 @@ export const structs = /*wgsl*/`
 
 struct RenderParams {
     modelViewProjectionMatrix : mat4x4<f32>,
-    right : vec3<f32>,
-    up : vec3<f32>
+    right : vec3f,
+    up : vec3f
 }
 
 struct VertexInput {
-    @location(0) position : vec3<f32>,
+    @location(0) position : vec3f,
     @location(1) color : vec4<f32>,
     @location(2) quad_pos : vec2f, // -1..+1
 }
@@ -24,10 +24,10 @@ struct SimulationParams {
   }
 
 struct Particle {
-    position : vec3<f32>,
+    position : vec3f,
     lifetime : f32,
     color    : vec4<f32>,
-    velocity : vec3<f32>,
+    velocity : vec3f,
 }
 
 struct Particles {

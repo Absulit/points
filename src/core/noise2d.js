@@ -25,7 +25,7 @@
 
 export const snoise = /*wgsl*/`
 
-fn mod289_v3(x: vec3<f32>) -> vec3<f32> {
+fn mod289_v3(x: vec3f) -> vec3f {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
@@ -33,7 +33,7 @@ fn mod289_v2(x: vec2f) -> vec2f {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
-fn permute(x: vec3<f32>) -> vec3<f32> {
+fn permute(x: vec3f) -> vec3f {
     return mod289_v3(((x*34.0)+10.0)*x);
 }
 

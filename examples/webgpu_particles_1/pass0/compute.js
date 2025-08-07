@@ -62,7 +62,7 @@ fn main(
         coord.y = coord.y + select(0, 1, any(mask.zw)); // z  w
       }
       let uv = vec2f(coord) / vec2f(textureDimensions(texture));
-      particle.position = vec3<f32>((uv - 0.5) * 3.0 * vec2f(1.0, -1.0), 0.0);
+      particle.position = vec3f((uv - 0.5) * 3.0 * vec2f(1.0, -1.0), 0.0);
       particle.color = textureLoad(texture, coord, 0);
       particle.velocity.x = (rand() - 0.5) * 0.1;
       particle.velocity.y = (rand() - 0.5) * 0.1;

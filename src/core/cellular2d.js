@@ -26,7 +26,7 @@
 
 export const cellular = /*wgsl*/`
 // Modulo 289 without a division (only multiplications)
-fn mod289_v3(x:vec3<f32>) -> vec3<f32> {
+fn mod289_v3(x:vec3f) -> vec3f {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
@@ -35,12 +35,12 @@ fn mod289(x: vec2f) -> vec2f {
 }
 
 // Modulo 7 without a division
-fn mod7(x:vec3<f32>) -> vec3<f32> {
+fn mod7(x:vec3f) -> vec3f {
     return x - floor(x * (1.0 / 7.0)) * 7.0;
 }
 
 // Permutation polynomial: (34x^2 + 6x) mod 289
-fn permute(x: vec3<f32>) -> vec3<f32> {
+fn permute(x: vec3f) -> vec3f {
     return mod289_v3((34.0 * x + 10.0) * x);
 }
 
@@ -53,15 +53,15 @@ const jitter = 1.0; // Less gives more regular pattern
 fn cellular(P:vec2f) -> vec2f {
     let Pi:vec2f = mod289(floor(P));
     let Pf:vec2f = fract(P);
-    let oi:vec3<f32> = vec3(-1.0, 0.0, 1.0);
-    let of_:vec3<f32> = vec3(-0.5, 0.5, 1.5);
-    let px:vec3<f32> = permute(Pi.x + oi);
-    var p:vec3<f32> = permute(px.x + Pi.y + oi); // p11, p12, p13
-    var ox:vec3<f32> = fract(p*K) - Ko;
-    var oy:vec3<f32> = mod7(floor(p*K))*K - Ko;
-    var dx:vec3<f32> = Pf.x + 0.5 + jitter*ox;
-    var dy:vec3<f32> = Pf.y - of_ + jitter*oy;
-    var d1:vec3<f32> = dx * dx + dy * dy; // d11, d12 and d13, squared
+    let oi:vec3f = vec3(-1.0, 0.0, 1.0);
+    let of_:vec3f = vec3(-0.5, 0.5, 1.5);
+    let px:vec3f = permute(Pi.x + oi);
+    var p:vec3f = permute(px.x + Pi.y + oi); // p11, p12, p13
+    var ox:vec3f = fract(p*K) - Ko;
+    var oy:vec3f = mod7(floor(p*K))*K - Ko;
+    var dx:vec3f = Pf.x + 0.5 + jitter*ox;
+    var dy:vec3f = Pf.y - of_ + jitter*oy;
+    var d1:vec3f = dx * dx + dy * dy; // d11, d12 and d13, squared
     p = permute(px.y + Pi.y + oi); // p21, p22, p23
     ox = fract(p*K) - Ko;
     oy = mod7(floor(p*K))*K - Ko;
