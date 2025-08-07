@@ -71,7 +71,7 @@ fn texture(texture:texture_2d<f32>, aSampler:sampler, uv:vec2f, crop:bool) -> ve
  * let value = texturePosition(image, imageSampler, vec2f(), uvr, true);
  */
 export const texturePosition = /*wgsl*/`
-fn texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2f, uv:vec2f, crop:bool) -> vec4<f32> {
+fn texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2f, uv:vec2f, crop:bool) -> vec4f {
     let flipTexture = vec2(1.,-1.);
     let flipTextureCoordinates = vec2(-1.,1.);
     let dims: vec2<u32> = textureDimensions(texture, 0);
@@ -158,7 +158,7 @@ fn textureExternal(texture:texture_external, aSampler:sampler, uv:vec2f, crop:bo
  * let value = textureExternalPosition(video, imageSampler, vec2f(), uvr, true);
  */
 export const textureExternalPosition = /*wgsl*/`
-fn textureExternalPosition(texture:texture_external, aSampler:sampler, position:vec2f, uv:vec2f, crop:bool) -> vec4<f32> {
+fn textureExternalPosition(texture:texture_external, aSampler:sampler, position:vec2f, uv:vec2f, crop:bool) -> vec4f {
     let flipTexture = vec2(1.,-1.);
     let flipTextureCoordinates = vec2(-1.,1.);
     let dims: vec2<u32> = textureDimensions(texture);
@@ -291,7 +291,7 @@ fn decodeNumberSprite(
     uv:vec2f,
     ratio:vec2f,
     size:vec2<u32>
-) -> vec4<f32> {
+) -> vec4f {
 
     let sizeF32 = vec2(f32(size.x),f32(size.y));
     let cellRatio = vec2(sizeF32.x/params.screen.x,sizeF32.y/params.screen.y)*ratio;
@@ -330,7 +330,7 @@ fn decodeNumberSprite(
  * let value = pixelateTexture(image, imageSampler, 10,10, uvr);
  */
 export const pixelateTexture = /*wgsl*/`
-fn pixelateTexture(texture:texture_2d<f32>, textureSampler:sampler, pixelsWidth:f32, pixelsHeight:f32, uv:vec2f) -> vec4<f32> {
+fn pixelateTexture(texture:texture_2d<f32>, textureSampler:sampler, pixelsWidth:f32, pixelsHeight:f32, uv:vec2f) -> vec4f {
     let dx = pixelsWidth * (1. / params.screen.x);
     let dy = pixelsHeight * (1. / params.screen.y);
 
@@ -361,13 +361,13 @@ fn pixelateTexture(texture:texture_2d<f32>, textureSampler:sampler, pixelsWidth:
  * let value = pixelateTexturePosition(image, imageSampler, vec2f(), 10,10, uvr);
  */
 export const pixelateTexturePosition = /*wgsl*/`
-fn pixelateTexturePosition(texture:texture_2d<f32>, textureSampler:sampler, position:vec2f, pixelsWidth:f32, pixelsHeight:f32, uv:vec2f) -> vec4<f32> {
+fn pixelateTexturePosition(texture:texture_2d<f32>, textureSampler:sampler, position:vec2f, pixelsWidth:f32, pixelsHeight:f32, uv:vec2f) -> vec4f {
     let dx = pixelsWidth * (1. / params.screen.x);
     let dy = pixelsHeight * (1. / params.screen.y);
 
     let coord = vec2(dx*floor( uv.x / dx), dy * floor( uv.y / dy));
 
-    //texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2f, uv:vec2f, crop:bool) -> vec4<f32> {
+    //texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2f, uv:vec2f, crop:bool) -> vec4f {
     return texturePosition(texture, textureSampler, position, coord, true);
 }
 `;

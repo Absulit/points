@@ -26,7 +26,7 @@
  * let value = showDebugCross(position, color, uvr);
  */
 export const showDebugCross = /*wgsl*/`
-fn showDebugCross(position:vec2f, color:vec4<f32>, uv:vec2f) -> vec4<f32>{
+fn showDebugCross(position:vec2f, color:vec4f, uv:vec2f) -> vec4f{
     let horizontal = sdfLine(vec2(0, position.y), vec2(10, position.y), 1., uv) * color;
     let vertical = sdfLine(vec2(position.x, 0), vec2(position.x, 10), 1., uv) * color;
     return vertical + horizontal;
@@ -48,7 +48,7 @@ fn showDebugCross(position:vec2f, color:vec4<f32>, uv:vec2f) -> vec4<f32>{
  * let value = showDebugFrame(color, uvr);
  */
 export const showDebugFrame = /*wgsl*/`
-fn showDebugFrame(color:vec4<f32>, uv:vec2f) -> vec4<f32> {
+fn showDebugFrame(color:vec4f, uv:vec2f) -> vec4f {
     let ratioX = params.screen.x / params.screen.y;
     let ratioY = 1. / ratioX / (params.screen.y / params.screen.x);
     let ratio = vec2(ratioX, ratioY);

@@ -378,7 +378,7 @@ class Points {
             this.#layers.push({
                 name: `layer${layerIndex}`,
                 size: this.#canvas.width * this.#canvas.height,
-                structName: 'vec4<f32>',
+                structName: 'vec4f',
                 structSize: 16,
                 array: null,
                 buffer: null,
@@ -901,7 +901,7 @@ class Points {
             if (!this.#layers.shaderType || this.#layers.shaderType == shaderType) {
                 let totalSize = 0;
                 this.#layers.forEach(layerItem => totalSize += layerItem.size);
-                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, read_write> layers: array<array<vec4<f32>, ${totalSize}>>;\n`
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, read_write> layers: array<array<vec4f, ${totalSize}>>;\n`
                 bindingIndex += 1;
             }
         }

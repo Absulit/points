@@ -22,13 +22,13 @@ ${GREEN}
 
 @fragment
 fn main(
-        @location(0) color: vec4<f32>,
+        @location(0) color: vec4f,
         @location(1) uv: vec2f,
         @location(2) ratio: vec2f,
         @location(3) uvr: vec2f,
         @location(4) mouse: vec2f,
-        @builtin(position) position: vec4<f32>
-    ) -> @location(0) vec4<f32> {
+        @builtin(position) position: vec4f
+    ) -> @location(0) vec4f {
 
     let scaleDigits = .25;
     let startPosition = vec2(.5, .5) * ratio * scaleDigits;
@@ -53,7 +53,7 @@ fn main(
     let debugPosition = mouse * ratio;
     let debugBottom = showDebugCross(debugPosition, RED, uvr);
 
-    var finalColor:vec4<f32> = layer(layer(digits, digits2), debugBottom);
+    var finalColor:vec4f = layer(layer(digits, digits2), debugBottom);
 
     finalColor = sdfSmooth(finalColor);
     // -----------------------------------------------

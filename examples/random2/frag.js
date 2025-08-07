@@ -9,13 +9,13 @@ ${texturePosition}
 
 @fragment
 fn main(
-        @location(0) color: vec4<f32>,
+        @location(0) color: vec4f,
         @location(1) uv: vec2f,
         @location(2) ratio: vec2f,
         @location(3) uvr: vec2f,
         @location(4) mouse: vec2f,
-        @builtin(position) position: vec4<f32>
-    ) -> @location(0) vec4<f32> {
+        @builtin(position) position: vec4f
+    ) -> @location(0) vec4f {
 
     let startPosition = vec2(0.,0.);
     // let texColor = texturePosition(feedbackTexture, feedbackSampler, startPosition, uvr, false);
@@ -28,7 +28,7 @@ fn main(
         c = 0.;
     }
 
-    let finalColor:vec4<f32> = vec4(c) + texColorCompute;
+    let finalColor:vec4f = vec4(c) + texColorCompute;
 
     return finalColor;
 }

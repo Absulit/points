@@ -14,20 +14,20 @@ ${sdfLine2}
 
 @fragment
 fn main(
-        @location(0) color: vec4<f32>,
+        @location(0) color: vec4f,
         @location(1) uv: vec2f,
         @location(2) ratio: vec2f,
         @location(3) uvr: vec2f,
         @location(4) mouse: vec2f,
-        @builtin(position) position: vec4<f32>
-    ) -> @location(0) vec4<f32> {
+        @builtin(position) position: vec4f
+    ) -> @location(0) vec4f {
 
     let point = points[0];
 
     var orangeBall = sdfCircle(vec2(.4, .5), .1, 0., uvr) * vec4(1,.5,0,1);
     var redBall = sdfCircle(vec2(.6, .5), .1, .1, uvr) * vec4(1,0,0,1);
 
-    var finalColor:vec4<f32> = mix(orangeBall, redBall, uvr.x);
+    var finalColor:vec4f = mix(orangeBall, redBall, uvr.x);
 
     //finalColor += sdfSquare(uvr, vec2(.9, .5  ),  10);
     //finalColor += sdfLine(vec2(.5,.5), vec2(.6,.6), .001, uvr );

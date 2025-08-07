@@ -23,13 +23,13 @@ const CHROMATICDISPLACEMENT = 0.003695;
 
 @fragment
 fn main(
-    @location(0) color: vec4<f32>,
+    @location(0) color: vec4f,
     @location(1) uv: vec2f,
     @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
     @location(3) uvr: vec2f,    // uv with aspect ratio corrected
     @location(4) mouse: vec2f,
-    @builtin(position) position: vec4<f32>
-) -> @location(0) vec4<f32> {
+    @builtin(position) position: vec4f
+) -> @location(0) vec4f {
 
     let n1 = snoise(uvr * 100. * 0.0016 /*params.sliderA*/ + params.time * .1);
 
@@ -67,7 +67,7 @@ fn main(
     let circleColorR = sdfCircle(circlePosition, .4 * b, 0.1, subuv + cdv);
     let circleColorB = sdfCircle(circlePosition, .4 * b, 0.1, subuv - cdv);
 
-    let finalColor:vec4<f32> = vec4(circleColorR, circleColor, circleColorB, 1);
+    let finalColor:vec4f = vec4(circleColorR, circleColor, circleColorB, 1);
     return finalColor + showDebugFrame(RED, uvr);
 }
 `;

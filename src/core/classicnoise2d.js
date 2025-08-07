@@ -9,15 +9,15 @@
  */
 
 const auxiliars = /*wgsl*/`
-fn mod289(x:vec4<f32>) -> vec4<f32> {
+fn mod289(x:vec4f) -> vec4f {
   return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
-fn permute(x:vec4<f32>) -> vec4<f32> {
+fn permute(x:vec4f) -> vec4f {
   return mod289(((x*34.0)+10.0)*x);
 }
 
-fn taylorInvSqrt(r:vec4<f32>) -> vec4<f32> {
+fn taylorInvSqrt(r:vec4f) -> vec4f {
   return 1.79284291400159 - 0.85373472095314 * r;
 }
 

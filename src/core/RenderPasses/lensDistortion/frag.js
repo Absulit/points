@@ -23,13 +23,13 @@ fn angle(p1:vec2f, p2:vec2f) -> f32 {
 
 @fragment
 fn main(
-    @location(0) color: vec4<f32>,
+    @location(0) color: vec4f,
     @location(1) uv: vec2f,
     @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
     @location(3) uvr: vec2f,    // uv with aspect ratio corrected
     @location(4) mouse: vec2f,
-    @builtin(position) position: vec4<f32>
-) -> @location(0) vec4<f32> {
+    @builtin(position) position: vec4f
+) -> @location(0) vec4f {
 
     let imagePosition = vec2(0.0,0.0) * ratio;
     let center = vec2(.5,.5) * ratio;
@@ -76,7 +76,7 @@ fn main(
     let imageColorG = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * ratio, nuv, true).g;
     let imageColorB = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * ratio, nuv - cdv * params.lensDistortion_amount , true).b;
 
-    let chromaticAberration:vec4<f32> = vec4(imageColorR, imageColorG, imageColorB, 1);
+    let chromaticAberration:vec4f = vec4(imageColorR, imageColorG, imageColorB, 1);
     // -- Chromatic Aberration
 
 

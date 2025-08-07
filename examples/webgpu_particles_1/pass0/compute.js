@@ -6,7 +6,7 @@ ${structs}
 
 var<private> rand_seed : vec2f;
 
-fn init_rand(invocation_id : u32, seed : vec4<f32>) {
+fn init_rand(invocation_id : u32, seed : vec4f) {
   rand_seed = seed.xz;
   rand_seed = fract(rand_seed * cos(35.456+f32(invocation_id) * seed.yw));
   rand_seed = fract(rand_seed * cos(41.235+f32(invocation_id) * seed.xw));
@@ -55,8 +55,8 @@ fn main(
         //  |   TOP-LEFT   |  TOP-RIGHT   | BOTTOM-LEFT  | BOTTOM_RIGHT |
         //
         let probabilites = textureLoad(texture, coord, level);
-        let value = vec4<f32>(rand());
-        let mask = (value >= vec4<f32>(0.0, probabilites.xyz)) & (value < probabilites);
+        let value = vec4f(rand());
+        let mask = (value >= vec4f(0.0, probabilites.xyz)) & (value < probabilites);
         coord = coord * 2;
         coord.x = coord.x + select(0, 1, any(mask.yw)); // x  y
         coord.y = coord.y + select(0, 1, any(mask.zw)); // z  w

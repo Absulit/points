@@ -22,7 +22,7 @@
  * let currentDistance = euclideanDistance(color, paletteColor);
  */
 export const euclideanDistance = /*wgsl*/`
-fn euclideanDistance(color:vec4<f32>, distanceColor:vec4<f32>) -> f32{
+fn euclideanDistance(color:vec4f, distanceColor:vec4f) -> f32{
     return sqrt(
         pow(color.r - distanceColor.r, 2.) +
         pow(color.g - distanceColor.g, 2.) +
@@ -37,7 +37,7 @@ fn euclideanDistance(color:vec4<f32>, distanceColor:vec4<f32>) -> f32{
  * <br>
  * Gets the closest color based on the `distance` parameter.
  * @type {String}
- * @param {vec4f} color `vec4<f32>` color to replace with
+ * @param {vec4f} color `vec4f` color to replace with
  * @param {u32} numPaletteItems `u32` length of getClosestColorInPalette_palette
  * @param {f32} distance `f32` from 0..1 that indicates how close it should be from the color
  * @returns {vec4f}
@@ -60,9 +60,9 @@ fn euclideanDistance(color:vec4<f32>, distanceColor:vec4<f32>) -> f32{
 export const getClosestColorInPalette = /*wgsl*/`
 ${euclideanDistance}
 
-fn getClosestColorInPalette(color:vec4<f32>, numPaletteItems:u32, distance:f32) -> vec4<f32> {
+fn getClosestColorInPalette(color:vec4f, numPaletteItems:u32, distance:f32) -> vec4f {
     // numPaletteItems = 5
-    // getClosestColorInPalette_palette = array< vec4<f32>, 5 /* numPaletteItems */>(
+    // getClosestColorInPalette_palette = array< vec4f, 5 /* numPaletteItems */>(
     //     vec4(0),
     //     vec4(0,1,0,1),
     //     vec4(1,0,0,1),
@@ -121,7 +121,7 @@ const orderedDithering_threshold_map = array<f32,16>(
  * let value = orderedDithering(color, depth, dims, uvr);
  */
 export const orderedDithering = /*wgsl*/`
-fn orderedDithering(color:vec4<f32>, depth:f32, dims:vec2<u32>, uv:vec2f) -> vec4<f32> {
+fn orderedDithering(color:vec4f, depth:f32, dims:vec2<u32>, uv:vec2f) -> vec4f {
     // const orderedDithering_threshold_map = array<f32,16>(
     //     1, 9, 3, 11,
     //     13, 5, 15, 7,
@@ -161,7 +161,7 @@ fn orderedDithering(color:vec4<f32>, depth:f32, dims:vec2<u32>, uv:vec2f) -> vec
  */
 export const clearMix = /*wgsl*/`
 //const clearMixlevel = 1.81;//1.01
-fn clearMix(color:vec4<f32>, level:f32) -> vec4<f32> {
+fn clearMix(color:vec4f, level:f32) -> vec4f {
     let rr = color.r / level;
     let gr = color.g / level;
     let br = color.b / level;
@@ -169,7 +169,7 @@ fn clearMix(color:vec4<f32>, level:f32) -> vec4<f32> {
     if(ar <= .09){
         ar = 0.;
     }
-    return vec4<f32>(rr, gr, br, ar);
+    return vec4f(rr, gr, br, ar);
 }
 `;
 
@@ -188,12 +188,12 @@ fn clearMix(color:vec4<f32>, level:f32) -> vec4<f32> {
  */
 export const clearAlpha = /*wgsl*/`
 // level 2.
-fn clearAlpha(currentColor:vec4<f32>, level:f32) -> vec4<f32>{
+fn clearAlpha(currentColor:vec4f, level:f32) -> vec4f{
     var ar = currentColor.a / level;
     if(ar <= .09){
         ar = 0.;
     }
-    return vec4<f32>(currentColor.rgb, ar);
+    return vec4f(currentColor.rgb, ar);
 }
 `;
 
@@ -212,8 +212,8 @@ fn clearAlpha(currentColor:vec4<f32>, level:f32) -> vec4<f32>{
  * let value = getColorsAroundTexture(texture, position, distance);
  */
 export const getColorsAroundTexture = /*wgsl*/`
-fn getColorsAroundTexture(texture:texture_2d<f32>, position: vec2<i32>, distance: i32) -> array<  vec4<f32>, 8  > {
-    return array< vec4<f32>,8 >(
+fn getColorsAroundTexture(texture:texture_2d<f32>, position: vec2<i32>, distance: i32) -> array<  vec4f, 8  > {
+    return array< vec4f,8 >(
         textureLoad(texture, vec2<i32>( position.x-distance, position.y-distance  ),  0).rgba,
         textureLoad(texture, vec2<i32>( position.x, position.y-distance  ),  0).rgba,
         textureLoad(texture, vec2<i32>( position.x+distance, position.y-distance  ),  0).rgba,
@@ -241,8 +241,8 @@ fn getColorsAroundTexture(texture:texture_2d<f32>, position: vec2<i32>, distance
  * let value = getColorsAround4Texture(texture, position, distance);
  */
 export const getColorsAround4Texture = /*wgsl*/`
-fn getColorsAround4Texture(texture:texture_2d<f32>, position: vec2<i32>, distance: i32) -> array<  vec4<f32>, 4  > {
-    return array< vec4<f32>, 4 >(
+fn getColorsAround4Texture(texture:texture_2d<f32>, position: vec2<i32>, distance: i32) -> array<  vec4f, 4  > {
+    return array< vec4f, 4 >(
         //textureLoad(texture, vec2<i32>( position.x-distance, position.y-distance  ),  0).rgba,
         textureLoad(texture, vec2<i32>( position.x, position.y-distance  ),  0).rgba,
         //textureLoad(texture, vec2<i32>( position.x+distance, position.y-distance  ),  0).rgba,
@@ -257,7 +257,7 @@ fn getColorsAround4Texture(texture:texture_2d<f32>, position: vec2<i32>, distanc
 
 // export const getColorsAroundBuffer = /*wgsl*/`
 
-// fn getColorsAroundBuffer(bufferPointer: ptr<function, array<vec4<f32>> >, position: vec2<i32>, distance: i32) -> array<  vec4<f32>, 8  >{
+// fn getColorsAroundBuffer(bufferPointer: ptr<function, array<vec4f> >, position: vec2<i32>, distance: i32) -> array<  vec4f, 8  >{
 
 // }
 // `;
@@ -277,8 +277,8 @@ fn getColorsAround4Texture(texture:texture_2d<f32>, position: vec2<i32>, distanc
  * let value = soften4(color, colorsAround,  colorPower);
  */
 export const soften4 = /*wgsl*/`
-fn soften4(color:vec4<f32>, colorsAround:array<vec4<f32>, 4>, colorPower:f32) -> vec4<f32> {
-    var newColor:vec4<f32> = color;
+fn soften4(color:vec4f, colorsAround:array<vec4f, 4>, colorPower:f32) -> vec4f {
+    var newColor:vec4f = color;
     for (var indexColors = 0u; indexColors < 4u; indexColors++) {
         var colorAround = colorsAround[indexColors];
         colorAround = (color + colorAround * colorPower) / (colorPower + 1.);
@@ -304,8 +304,8 @@ fn soften4(color:vec4<f32>, colorsAround:array<vec4<f32>, 4>, colorPower:f32) ->
  * let value = soften8(color, colorsA);
  */
 export const soften8 = /*wgsl*/`
-fn soften8(color:vec4<f32>, colorsAround:array<vec4<f32>, 8>, colorPower:f32) -> vec4<f32> {
-    var newColor:vec4<f32> = color;
+fn soften8(color:vec4f, colorsAround:array<vec4f, 8>, colorPower:f32) -> vec4f {
+    var newColor:vec4f = color;
     for (var indexColors = 0u; indexColors < 8u; indexColors++) {
         var colorAround = colorsAround[indexColors];
         // colorAround.r = (color.r + colorAround.r * colorPower) / (colorPower + 1.);
@@ -344,7 +344,7 @@ fn soften8(color:vec4<f32>, colorsAround:array<vec4<f32>, 8>, colorPower:f32) ->
  * let value = blur9(image, imageSampler, position, uv, resolution, direction);
  */
 export const blur9 = /*wgsl*/`
-fn blur9(image: texture_2d<f32>, imageSampler:sampler, position:vec2f, uv:vec2f, resolution: vec2f, direction: vec2f) -> vec4<f32> {
+fn blur9(image: texture_2d<f32>, imageSampler:sampler, position:vec2f, uv:vec2f, resolution: vec2f, direction: vec2f) -> vec4f {
     var color = vec4(0.0);
     let off1 = vec2(1.3846153846) * direction;
     let off2 = vec2(3.2307692308) * direction;
@@ -361,7 +361,7 @@ fn blur9(image: texture_2d<f32>, imageSampler:sampler, position:vec2f, uv:vec2f,
  * WIP
  */
 // export const blur8 = /*wgsl*/`
-// fn blur8(color:vec4<f32>, colorsAround:array<vec4<f32>, 8>, amount:f32) -> {
+// fn blur8(color:vec4f, colorsAround:array<vec4f, 8>, amount:f32) -> {
 
 // }
 // `;
