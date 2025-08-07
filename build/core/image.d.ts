@@ -42,7 +42,7 @@ export const flipTextureUV: string;
  * @param {sampler} textureSampler `sampler`
  * @param {f32} pixelsWidth `f32`
  * @param {f32} pixelsHeight `f32`
- * @param {vec2f} uv `vec2<f32>`
+ * @param {vec2f} uv `vec2f`
  * @returns {vec4f}
  *
  * @example
@@ -63,7 +63,7 @@ export const pixelateTexture: string;
  * @param {vec2f} position `vec2f`
  * @param {f32} pixelsWidth `f32`
  * @param {f32} pixelsHeight `f32`
- * @param {vec2<f32>} uv `vec2<f32>`
+ * @param {vec2f} uv `vec2f`
  * @returns {vec4f}
  *
  * @example
@@ -106,7 +106,7 @@ export const sprite: string;
  * @type {String}
  * @param {texture_2d<f32>} texture `texture_2d<f32>`
  * @param {sampler} aSampler `sampler`
- * @param {vec2<f32>} uv `vec2<f32>`
+ * @param {vec2f} uv `vec2f`
  * @param {bool} crop `bool`
  * @returns {vec4f}
  *
@@ -127,7 +127,7 @@ export const texture: string;
  * @type {String}
  * @param {texture_external} texture `texture_external`
  * @param {sampler} aSampler `sampler`
- * @param {vec2<f32>} uv `vec2<f32>`
+ * @param {vec2f} uv `vec2f`
  * @param {bool} crop `bool`
  * @returns {vec4f}
  *
@@ -147,8 +147,8 @@ export const textureExternal: string;
  * @type {String}
  * @param {texture_external} texture `texture_external`
  * @param {sampler} aSampler `sampler`
- * @param {vec2<f32>} position `vec2<f32>`
- * @param {vec2<f32>} uv `vec2<f32>`
+ * @param {vec2f} position `vec2f`
+ * @param {vec2f} uv `vec2f`
  * @param {bool} crop `bool`
  * @returns {vec4f}
  *
@@ -167,8 +167,8 @@ export const textureExternalPosition: string;
  * @type {String}
  * @param {texture_2d<f32>} texture `texture_2d<f32>`
  * @param {sampler} aSampler `sampler`
- * @param {vec2<f32>} position `vec2<f32>`
- * @param {vec2<f32>} uv `vec2<f32>`
+ * @param {vec2f} position `vec2f`
+ * @param {vec2f} uv `vec2f`
  * @param {bool} crop `bool`
  * @returns {vec4f}
  *
