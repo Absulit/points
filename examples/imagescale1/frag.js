@@ -1,4 +1,4 @@
-import { texturePosition } from 'points/image';
+import { texturePosition, texture } from 'points/image';
 import { layer } from 'points/color';
 
 const frag = /*wgsl*/`

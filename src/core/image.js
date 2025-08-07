@@ -13,7 +13,18 @@
  * @param {sampler} aSampler `sampler`
  * @param {vec2<f32>} uv `vec2<f32>`
  * @param {bool} crop `bool`
- * @return `vec4f`
+ * @returns {vec4f}
+ *
+ * @example
+ *
+ * // js
+ * import { texture } from 'points/image';
+ *
+ * await points.setTextureImage('image', 'myimage.jpg');
+ *
+ * // wgsl string
+ * ${texture}
+ * let value = texture(image, imageSampler, uvr, true);
  */
 export const texture = /*wgsl*/`
 fn texture(texture:texture_2d<f32>, aSampler:sampler, uv:vec2f, crop:bool) -> vec4f {
@@ -49,6 +60,7 @@ fn texture(texture:texture_2d<f32>, aSampler:sampler, uv:vec2f, crop:bool) -> ve
  * @param {vec2<f32>} uv `vec2<f32>`
  * @param {bool} crop `bool`
  * @returns {vec4f}
+ * @deprecated
  *
  * @example
  * // js
