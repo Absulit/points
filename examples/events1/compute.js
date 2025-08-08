@@ -3,7 +3,7 @@ const compute = /*wgsl*/`
 struct Variable{
     init: f32,
     circleRadius:f32,
-    circlePosition:vec2<f32>
+    circlePosition:vec2f
 }
 
 @compute @workgroup_size(8,8,1)

@@ -10,13 +10,13 @@ ${texturePosition}
 
 @fragment
 fn main(
-        @location(0) color: vec4<f32>,
-        @location(1) uv: vec2<f32>,
-        @location(2) ratio: vec2<f32>,
-        @location(3) uvr: vec2<f32>,
-        @location(4) mouse: vec2<f32>,
-        @builtin(position) position: vec4<f32>
-    ) -> @location(0) vec4<f32> {
+        @location(0) color: vec4f,
+        @location(1) uv: vec2f,
+        @location(2) ratio: vec2f,
+        @location(3) uvr: vec2f,
+        @location(4) mouse: vec2f,
+        @builtin(position) position: vec4f
+    ) -> @location(0) vec4f {
 
     let lines = sin( uv.x*(uv.x + 3. * fnusin(1.))  ) ;
     let startPosition = vec2(0.);
@@ -24,7 +24,7 @@ fn main(
 
     let b = brightness(rgbaImage);
 
-    let finalColor:vec4<f32> = vec4(b);
+    let finalColor:vec4f = vec4(b);
 
 
     return finalColor;

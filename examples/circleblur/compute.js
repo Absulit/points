@@ -31,10 +31,10 @@ fn main(
 
     var rgba = textureSampleLevel(
         feedbackTexture,feedbackSampler,
-        vec2<f32>(f32(GlobalId.x), f32(GlobalId.y)),
+        vec2f(f32(GlobalId.x), f32(GlobalId.y)),
         0.0
     );
-    rgba = clearMix(rgba, 1.01) + vec4<f32>(1.,0.,0., .5);
+    rgba = clearMix(rgba, 1.01) + vec4f(1.,0.,0., .5);
     textureStore(outputTex, GlobalId.xy, rgba);
 }
 `;

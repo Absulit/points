@@ -14,13 +14,13 @@ ${texturePosition}
 
 @fragment
 fn main(
-        @location(0) color: vec4<f32>,
-        @location(1) uv: vec2<f32>,
-        @location(2) ratio: vec2<f32>,
-        @location(3) uvr: vec2<f32>,
-        @location(4) mouse: vec2<f32>,
-        @builtin(position) position: vec4<f32>
-    ) -> @location(0) vec4<f32> {
+        @location(0) color: vec4f,
+        @location(1) uv: vec2f,
+        @location(2) ratio: vec2f,
+        @location(3) uvr: vec2f,
+        @location(4) mouse: vec2f,
+        @builtin(position) position: vec4f
+    ) -> @location(0) vec4f {
 
     let startPosition = vec2(0.);
     let texColor = texturePosition(feedbackTexture, feedbackSampler, startPosition, uvr, false);
@@ -40,7 +40,7 @@ fn main(
     let decayB =  texColor.b * .9 * texColor3.b;
     let decayA =  texColor.a * .9;
 
-    var finalColor:vec4<f32> = vec4(uv.x * c, uv.y * c, c, 1);
+    var finalColor:vec4f = vec4(uv.x * c, uv.y * c, c, 1);
     finalColor += vec4(decayR, decayG, decayB, 1);
     finalColor += texColorCompute;
 

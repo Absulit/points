@@ -25,19 +25,19 @@
 
 export const snoise = /*wgsl*/`
 
-fn mod289_v3(x: vec3<f32>) -> vec3<f32> {
+fn mod289_v3(x: vec3f) -> vec3f {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
-fn mod289_v2(x: vec2<f32>) -> vec2<f32> {
+fn mod289_v2(x: vec2f) -> vec2f {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
-fn permute(x: vec3<f32>) -> vec3<f32> {
+fn permute(x: vec3f) -> vec3f {
     return mod289_v3(((x*34.0)+10.0)*x);
 }
 
-fn snoise(v:vec2<f32>) -> f32 {
+fn snoise(v:vec2f) -> f32 {
     let C = vec4(0.211324865405187,  // (3.0-sqrt(3.0))/6.0
                         0.366025403784439,  // 0.5*(sqrt(3.0)-1.0)
                        -0.577350269189626,  // -1.0 + 2.0 * C.x

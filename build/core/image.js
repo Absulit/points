@@ -11,7 +11,7 @@
  * @type {String}
  * @param {texture_2d<f32>} texture `texture_2d<f32>`
  * @param {sampler} aSampler `sampler`
- * @param {vec2<f32>} uv `vec2<f32>`
+ * @param {vec2f} uv `vec2f`
  * @param {bool} crop `bool`
  * @returns {vec4f}
  *
@@ -56,8 +56,8 @@ fn texture(texture:texture_2d<f32>, aSampler:sampler, uv:vec2f, crop:bool) -> ve
  * @type {String}
  * @param {texture_2d<f32>} texture `texture_2d<f32>`
  * @param {sampler} aSampler `sampler`
- * @param {vec2<f32>} position `vec2<f32>`
- * @param {vec2<f32>} uv `vec2<f32>`
+ * @param {vec2f} position `vec2f`
+ * @param {vec2f} uv `vec2f`
  * @param {bool} crop `bool`
  * @returns {vec4f}
  *
@@ -72,11 +72,11 @@ fn texture(texture:texture_2d<f32>, aSampler:sampler, uv:vec2f, crop:bool) -> ve
  * let value = texturePosition(image, imageSampler, vec2f(), uvr, true);
  */
 const texturePosition = /*wgsl*/`
-fn texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>, uv:vec2<f32>, crop:bool) -> vec4<f32> {
+fn texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2f, uv:vec2f, crop:bool) -> vec4f {
     let flipTexture = vec2(1.,-1.);
     let flipTextureCoordinates = vec2(-1.,1.);
     let dims: vec2<u32> = textureDimensions(texture, 0);
-    let dimsF32 = vec2<f32>(dims);
+    let dimsF32 = vec2f(dims);
 
     let minScreenSize = params.screen.y;
     let imageRatio = dimsF32 / minScreenSize;
@@ -101,7 +101,7 @@ fn texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>
  * @type {String}
  * @param {texture_external} texture `texture_external`
  * @param {sampler} aSampler `sampler`
- * @param {vec2<f32>} uv `vec2<f32>`
+ * @param {vec2f} uv `vec2f`
  * @param {bool} crop `bool`
  * @returns {vec4f}
  *
@@ -119,7 +119,7 @@ fn textureExternal(texture:texture_external, aSampler:sampler, uv:vec2f, crop:bo
     let flipTexture = vec2(1.,-1.);
     let flipTextureCoordinates = vec2(-1.,1.);
     let dims: vec2<u32> = textureDimensions(texture);
-    let dimsF32 = vec2<f32>(f32(dims.x), f32(dims.y));
+    let dimsF32 = vec2f(f32(dims.x), f32(dims.y));
 
     let minScreenSize = params.screen.y;
     let imageRatio = dimsF32 / minScreenSize;
@@ -144,8 +144,8 @@ fn textureExternal(texture:texture_external, aSampler:sampler, uv:vec2f, crop:bo
  * @type {String}
  * @param {texture_external} texture `texture_external`
  * @param {sampler} aSampler `sampler`
- * @param {vec2<f32>} position `vec2<f32>`
- * @param {vec2<f32>} uv `vec2<f32>`
+ * @param {vec2f} position `vec2f`
+ * @param {vec2f} uv `vec2f`
  * @param {bool} crop `bool`
  * @returns {vec4f}
  *
@@ -159,11 +159,11 @@ fn textureExternal(texture:texture_external, aSampler:sampler, uv:vec2f, crop:bo
  * let value = textureExternalPosition(video, imageSampler, vec2f(), uvr, true);
  */
 const textureExternalPosition = /*wgsl*/`
-fn textureExternalPosition(texture:texture_external, aSampler:sampler, position:vec2<f32>, uv:vec2<f32>, crop:bool) -> vec4<f32> {
+fn textureExternalPosition(texture:texture_external, aSampler:sampler, position:vec2f, uv:vec2f, crop:bool) -> vec4f {
     let flipTexture = vec2(1.,-1.);
     let flipTextureCoordinates = vec2(-1.,1.);
     let dims: vec2<u32> = textureDimensions(texture);
-    let dimsF32 = vec2<f32>(f32(dims.x), f32(dims.y));
+    let dimsF32 = vec2f(f32(dims.x), f32(dims.y));
 
     let minScreenSize = params.screen.y;
     let imageRatio = dimsF32 / minScreenSize;
@@ -198,7 +198,7 @@ fn textureExternalPosition(texture:texture_external, aSampler:sampler, position:
  * let value = flipTextureUV(uvr);
  */
 const flipTextureUV = /*wgsl*/`
-fn flipTextureUV(uv:vec2<f32>) -> vec2<f32>{
+fn flipTextureUV(uv:vec2f) -> vec2f{
     return uv * vec2(1,-1) + vec2(0,1);
 }
 `;
@@ -227,8 +227,8 @@ fn sprite(texture:texture_2d<f32>, aSampler:sampler, position:vec2f, uv:vec2f, i
     let flipTexture = vec2(1.,-1.);
     let flipTextureCoordinates = vec2(-1.,1.);
     let dims:vec2<u32> = textureDimensions(texture, 0);
-    let dimsF32 = vec2<f32>(dims);
-    let sizeF32 = vec2<f32>(size);
+    let dimsF32 = vec2f(dims);
+    let sizeF32 = vec2f(size);
 
     let minScreenSize = params.screen.y;
     let imageRatio = dimsF32 / minScreenSize;
@@ -288,11 +288,11 @@ fn decodeNumberSprite(
     index0Char:u32,
     image:texture_2d<f32>,
     imageSampler:sampler,
-    position:vec2<f32>,
-    uv:vec2<f32>,
-    ratio:vec2<f32>,
+    position:vec2f,
+    uv:vec2f,
+    ratio:vec2f,
     size:vec2<u32>
-) -> vec4<f32> {
+) -> vec4f {
 
     let sizeF32 = vec2(f32(size.x),f32(size.y));
     let cellRatio = vec2(sizeF32.x/params.screen.x,sizeF32.y/params.screen.y)*ratio;
@@ -319,7 +319,7 @@ fn decodeNumberSprite(
  * @param {sampler} textureSampler `sampler`
  * @param {f32} pixelsWidth `f32`
  * @param {f32} pixelsHeight `f32`
- * @param {vec2f} uv `vec2<f32>`
+ * @param {vec2f} uv `vec2f`
  * @returns {vec4f}
  *
  * @example
@@ -331,7 +331,7 @@ fn decodeNumberSprite(
  * let value = pixelateTexture(image, imageSampler, 10,10, uvr);
  */
 const pixelateTexture = /*wgsl*/`
-fn pixelateTexture(texture:texture_2d<f32>, textureSampler:sampler, pixelsWidth:f32, pixelsHeight:f32, uv:vec2<f32>) -> vec4<f32> {
+fn pixelateTexture(texture:texture_2d<f32>, textureSampler:sampler, pixelsWidth:f32, pixelsHeight:f32, uv:vec2f) -> vec4f {
     let dx = pixelsWidth * (1. / params.screen.x);
     let dy = pixelsHeight * (1. / params.screen.y);
 
@@ -350,7 +350,7 @@ fn pixelateTexture(texture:texture_2d<f32>, textureSampler:sampler, pixelsWidth:
  * @param {vec2f} position `vec2f`
  * @param {f32} pixelsWidth `f32`
  * @param {f32} pixelsHeight `f32`
- * @param {vec2<f32>} uv `vec2<f32>`
+ * @param {vec2f} uv `vec2f`
  * @returns {vec4f}
  *
  * @example
@@ -362,13 +362,13 @@ fn pixelateTexture(texture:texture_2d<f32>, textureSampler:sampler, pixelsWidth:
  * let value = pixelateTexturePosition(image, imageSampler, vec2f(), 10,10, uvr);
  */
 const pixelateTexturePosition = /*wgsl*/`
-fn pixelateTexturePosition(texture:texture_2d<f32>, textureSampler:sampler, position:vec2<f32>, pixelsWidth:f32, pixelsHeight:f32, uv:vec2<f32>) -> vec4<f32> {
+fn pixelateTexturePosition(texture:texture_2d<f32>, textureSampler:sampler, position:vec2f, pixelsWidth:f32, pixelsHeight:f32, uv:vec2f) -> vec4f {
     let dx = pixelsWidth * (1. / params.screen.x);
     let dy = pixelsHeight * (1. / params.screen.y);
 
     let coord = vec2(dx*floor( uv.x / dx), dy * floor( uv.y / dy));
 
-    //texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>, uv:vec2<f32>, crop:bool) -> vec4<f32> {
+    //texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2f, uv:vec2f, crop:bool) -> vec4f {
     return texturePosition(texture, textureSampler, position, coord, true);
 }
 `;

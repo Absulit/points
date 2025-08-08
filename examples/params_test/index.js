@@ -22,8 +22,8 @@ const base = {
       sliderA:f32,
       sliderB:f32,
       sliderC:f32,
-      right:vec3<f32>,
-      up:vec3<f32>,
+      right:vec3f,
+      up:vec3f,
       modelViewProjectionMatrix:mat4x4<f32>,
       time:f32,
       epoch:f32,
@@ -61,7 +61,7 @@ const base = {
 
     points.setStorageMap('values', [1.0, 99.0], 'array<f32, 2>');
 
-    // points.setUniform('test4', [1, 0, 0, 1], 'array< vec4<f32>, 1 >');
+    // points.setUniform('test4', [1, 0, 0, 1], 'array< vec4f, 1 >');
     // TODO: throw error if using array in uniform?
     // points.setUniform('test5', [1,1,1,1], 'array<f32,4>');
 
