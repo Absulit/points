@@ -13,21 +13,21 @@ ${sdfCircle}
 ${fnusin}
 
 // struct Colors{
-//     // items: array< vec4<f32>, 800*800 >
-//     items: array< vec4<f32>, 640000 >
+//     // items: array< vec4f, 800*800 >
+//     items: array< vec4f, 640000 >
 // }
 
 fn getPointsIndex(position:vec2<u32>) -> u32{
     return position.y + (position.x * u32(params.screen.x));
 }
 
-fn getColorAt(position:vec2<u32>) -> vec4<f32> {
+fn getColorAt(position:vec2<u32>) -> vec4f {
     let index:u32 = getPointsIndex(position);
     return points[index];
 }
 
-fn getColorsAroundLayer(position: vec2<u32>, distance: u32) -> array<  vec4<f32>, 8  > {
-    return array< vec4<f32>,8 >(
+fn getColorsAroundLayer(position: vec2<u32>, distance: u32) -> array<  vec4f, 8  > {
+    return array< vec4f,8 >(
         getColorAt( vec2<u32>( position.x-distance, position.y-distance  ) ).rgba,
         getColorAt( vec2<u32>( position.x, position.y-distance  ) ).rgba,
         getColorAt( vec2<u32>( position.x+distance, position.y-distance  ) ).rgba,
@@ -39,8 +39,8 @@ fn getColorsAroundLayer(position: vec2<u32>, distance: u32) -> array<  vec4<f32>
     );
 }
 
-fn getColorsAround4Layer(position: vec2<u32>, distance: u32) -> array<  vec4<f32>, 4 > {
-    return array< vec4<f32>, 4 >(
+fn getColorsAround4Layer(position: vec2<u32>, distance: u32) -> array<  vec4f, 4 > {
+    return array< vec4f, 4 >(
         //getColorAt( vec2<u32>( position.x-distance, position.y-distance  ) ).rgba,
         getColorAt( vec2<u32>( position.x, position.y-distance  ) ).rgba,
         //getColorAt( vec2<u32>( position.x+distance, position.y-distance  ) ).rgba,
@@ -80,7 +80,7 @@ fn main(
 
 
     var rgba = vec4(0.);
-    var colorsAround = array<  vec4<f32>, 4  >();
+    var colorsAround = array<  vec4f, 4  >();
 
     let nx = f32(GlobalId.x) / numColumns;
     let ny = f32(GlobalId.y) / numRows;
@@ -104,7 +104,7 @@ fn main(
     }
     (*rgbaP) = rgba;
 
-    let sdf = sdfCircle(vec2<f32>(1.,1.) * fnusin(1), .01, .2, uv);
+    let sdf = sdfCircle(vec2f(1.,1.) * fnusin(1), .01, .2, uv);
     (*rgbaP) += sdf;
 
 

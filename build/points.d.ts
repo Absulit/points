@@ -283,6 +283,9 @@ export class ShaderType {
     static FRAGMENT: number;
 }
 /**
+ * @module points
+ */
+/**
  * Main class Points, this is the entry point of an application with this library.
  * @class Points
  * @example
@@ -302,9 +305,7 @@ export class ShaderType {
  *     requestAnimationFrame(update);
  * }
  *
- * @category Main
- * @module points
- *
+ * @memberof module:points
  */
 declare class Points {
     constructor(canvasId: any);
@@ -419,7 +420,7 @@ declare class Points {
      *
      * // wgsl string
      * struct Matrix {
-     *     size : vec2<f32>,
+     *     size : vec2f,
      *     numbers: array<f32>,
      * }
      *
@@ -485,7 +486,7 @@ declare class Points {
      * // wgsl string
      * var rgba = textureSampleLevel(
      *     feedbackTexture, feedbackSampler,
-     *     vec2<f32>(f32(GlobalId.x), f32(GlobalId.y)),
+     *     vec2f(f32(GlobalId.x), f32(GlobalId.y)),
      *     0.0
      * );
      *

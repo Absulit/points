@@ -67,8 +67,8 @@ const base = {
 
 
 
-        points.setUniform('right', right, 'vec3<f32>');
-        points.setUniform('up', up, 'vec3<f32>');
+        points.setUniform('right', right, 'vec3f');
+        points.setUniform('up', up, 'vec3f');
         points.setUniform('modelViewProjectionMatrix', modelViewProjectionMatrix, 'mat4x4<f32>');
 
         points.setUniform('deltaTime', 0);

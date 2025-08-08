@@ -4,7 +4,7 @@
 const compute = /*wgsl*/`
 
 struct Matrix {
-    size : vec2<f32>,
+    size : vec2f,
     numbers: array<f32>,
 }
 

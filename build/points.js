@@ -196,9 +196,9 @@ const vert$8 = /*wgsl*/`
 
 @vertex
 fn main(
-    @location(0) position: vec4<f32>,
-    @location(1) color: vec4<f32>,
-    @location(2) uv: vec2<f32>,
+    @location(0) position: vec4f,
+    @location(1) color: vec4f,
+    @location(2) uv: vec2f,
     @builtin(vertex_index) vertexIndex: u32
 ) -> Fragment {
 
@@ -213,13 +213,14 @@ fn main(
  * @module points/image
  */
 
+
 /**
- * Places texture in a position. The texture being an image loaded from the JS side.
+ * Places texture in a position
  * @type {String}
  * @param {texture_2d<f32>} texture `texture_2d<f32>`
  * @param {sampler} aSampler `sampler`
- * @param {vec2<f32>} position `vec2<f32>`
- * @param {vec2<f32>} uv `vec2<f32>`
+ * @param {vec2f} position `vec2f`
+ * @param {vec2f} uv `vec2f`
  * @param {bool} crop `bool`
  * @returns {vec4f}
  *
@@ -234,13 +235,13 @@ fn main(
  * let value = texturePosition(image, imageSampler, vec2f(), uvr, true);
  */
 const texturePosition = /*wgsl*/`
-fn texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>, uv:vec2<f32>, crop:bool) -> vec4<f32> {
+fn texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2f, uv:vec2f, crop:bool) -> vec4f {
     let flipTexture = vec2(1.,-1.);
     let flipTextureCoordinates = vec2(-1.,1.);
     let dims: vec2<u32> = textureDimensions(texture, 0);
-    let dimsF32 = vec2<f32>(dims);
+    let dimsF32 = vec2f(dims);
 
-    let minScreenSize = min(params.screen.y, params.screen.x);
+    let minScreenSize = params.screen.y;
     let imageRatio = dimsF32 / minScreenSize;
 
     let displaceImagePosition = position * flipTextureCoordinates / imageRatio + vec2(0., 1.);
@@ -249,11 +250,8 @@ fn texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>
     let imageUV = uv / imageRatio * flipTexture + displaceImagePosition;
     var rgbaImage = textureSample(texture, aSampler, imageUV);
 
-    let isBeyondImageRight = uv.x > position.x + imageRatio.x;
-    let isBeyondImageLeft = uv.x < position.x;
-    let isBeyondTop =  uv.y > top.y ;
-    let isBeyondBottom = uv.y < position.y;
-    if(crop && (isBeyondTop || isBeyondBottom || isBeyondImageLeft || isBeyondImageRight)){
+    // e.g. if uv.x < 0. OR uv.y < 0. || uv.x > imageRatio.x OR uv.y > imageRatio.y
+    if (crop && (any(uv < vec2(0.0)) || any(uv > imageRatio))) {
         rgbaImage = vec4(0.);
     }
 
@@ -267,8 +265,8 @@ fn texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>
  * @type {String}
  * @param {texture_external} texture `texture_external`
  * @param {sampler} aSampler `sampler`
- * @param {vec2<f32>} position `vec2<f32>`
- * @param {vec2<f32>} uv `vec2<f32>`
+ * @param {vec2f} position `vec2f`
+ * @param {vec2f} uv `vec2f`
  * @param {bool} crop `bool`
  * @returns {vec4f}
  *
@@ -282,13 +280,13 @@ fn texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>
  * let value = textureExternalPosition(video, imageSampler, vec2f(), uvr, true);
  */
 const textureExternalPosition = /*wgsl*/`
-fn textureExternalPosition(texture:texture_external, aSampler:sampler, position:vec2<f32>, uv:vec2<f32>, crop:bool) -> vec4<f32> {
+fn textureExternalPosition(texture:texture_external, aSampler:sampler, position:vec2f, uv:vec2f, crop:bool) -> vec4f {
     let flipTexture = vec2(1.,-1.);
     let flipTextureCoordinates = vec2(-1.,1.);
     let dims: vec2<u32> = textureDimensions(texture);
-    let dimsF32 = vec2<f32>(f32(dims.x), f32(dims.y));
+    let dimsF32 = vec2f(f32(dims.x), f32(dims.y));
 
-    let minScreenSize = min(params.screen.y, params.screen.x);
+    let minScreenSize = params.screen.y;
     let imageRatio = dimsF32 / minScreenSize;
 
     let displaceImagePosition = position * flipTextureCoordinates / imageRatio + vec2(0, 1);
@@ -297,12 +295,9 @@ fn textureExternalPosition(texture:texture_external, aSampler:sampler, position:
     let imageUV = uv / imageRatio * flipTexture + displaceImagePosition;
     var rgbaImage = textureSampleBaseClampToEdge(texture, aSampler, imageUV);
 
-    let isBeyondImageRight = uv.x > position.x + imageRatio.x;
-    let isBeyondImageLeft = uv.x < position.x;
-    let isBeyondTop =  uv.y > top.y ;
-    let isBeyondBottom = uv.y < position.y;
-    if(crop && (isBeyondTop || isBeyondBottom || isBeyondImageLeft || isBeyondImageRight)){
-        rgbaImage = vec4(0);
+    // e.g. if uv.x < 0. OR uv.y < 0. || uv.x > imageRatio.x OR uv.y > imageRatio.y
+    if (crop && (any(uv < vec2(0.0)) || any(uv > imageRatio))) {
+        rgbaImage = vec4(0.);
     }
 
     return rgbaImage;
@@ -318,7 +313,7 @@ fn textureExternalPosition(texture:texture_external, aSampler:sampler, position:
  * @param {vec2f} position `vec2f`
  * @param {f32} pixelsWidth `f32`
  * @param {f32} pixelsHeight `f32`
- * @param {vec2<f32>} uv `vec2<f32>`
+ * @param {vec2f} uv `vec2f`
  * @returns {vec4f}
  *
  * @example
@@ -330,13 +325,13 @@ fn textureExternalPosition(texture:texture_external, aSampler:sampler, position:
  * let value = pixelateTexturePosition(image, imageSampler, vec2f(), 10,10, uvr);
  */
 const pixelateTexturePosition = /*wgsl*/`
-fn pixelateTexturePosition(texture:texture_2d<f32>, textureSampler:sampler, position:vec2<f32>, pixelsWidth:f32, pixelsHeight:f32, uv:vec2<f32>) -> vec4<f32> {
+fn pixelateTexturePosition(texture:texture_2d<f32>, textureSampler:sampler, position:vec2f, pixelsWidth:f32, pixelsHeight:f32, uv:vec2f) -> vec4f {
     let dx = pixelsWidth * (1. / params.screen.x);
     let dy = pixelsHeight * (1. / params.screen.y);
 
     let coord = vec2(dx*floor( uv.x / dx), dy * floor( uv.y / dy));
 
-    //texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2<f32>, uv:vec2<f32>, crop:bool) -> vec4<f32> {
+    //texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2f, uv:vec2f, crop:bool) -> vec4f {
     return texturePosition(texture, textureSampler, position, coord, true);
 }
 `;
@@ -347,17 +342,17 @@ ${texturePosition}
 
 @fragment
 fn main(
-    @location(0) color: vec4<f32>,
-    @location(1) uv: vec2<f32>,
-    @location(2) ratio: vec2<f32>,  // relation between params.screen.x and params.screen.y
-    @location(3) uvr: vec2<f32>,    // uv with aspect ratio corrected
-    @location(4) mouse: vec2<f32>,
-    @builtin(position) position: vec4<f32>
-) -> @location(0) vec4<f32> {
+    @location(0) color: vec4f,
+    @location(1) uv: vec2f,
+    @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
+    @location(3) uvr: vec2f,    // uv with aspect ratio corrected
+    @location(4) mouse: vec2f,
+    @builtin(position) position: vec4f
+) -> @location(0) vec4f {
 
     let imageColor = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0., 0), uvr, true);
     let colorParam = vec4(params.color_r, params.color_g, params.color_b, params.color_a);
-    let finalColor:vec4<f32> = (imageColor + colorParam) * params.color_blendAmount;
+    let finalColor:vec4f = (imageColor + colorParam) * params.color_blendAmount;
 
     return finalColor;
 }
@@ -386,9 +381,9 @@ const vert$7 = /*wgsl*/`
 
 @vertex
 fn main(
-    @location(0) position: vec4<f32>,
-    @location(1) color: vec4<f32>,
-    @location(2) uv: vec2<f32>,
+    @location(0) position: vec4f,
+    @location(1) color: vec4f,
+    @location(2) uv: vec2f,
     @builtin(vertex_index) vertexIndex: u32
 ) -> Fragment {
 
@@ -503,7 +498,7 @@ fn bloom(input:f32, iterations:i32, intensity:f32) -> f32 {
  * let value = brightness(rgba);
  */
 const brightness = /*wgsl*/`
-fn brightness(color:vec4<f32>) -> f32 {
+fn brightness(color:vec4f) -> f32 {
     // // Standard
     // LuminanceA = (0.2126*R) + (0.7152*G) + (0.0722*B)
     // // Percieved A
@@ -523,16 +518,16 @@ ${WHITE}
 
 @fragment
 fn main(
-    @location(0) color: vec4<f32>,
-    @location(1) uv: vec2<f32>,
-    @location(2) ratio: vec2<f32>,  // relation between params.screen.x and params.screen.y
-    @location(3) uvr: vec2<f32>,    // uv with aspect ratio corrected
-    @location(4) mouse: vec2<f32>,
-    @builtin(position) position: vec4<f32>
-) -> @location(0) vec4<f32> {
+    @location(0) color: vec4f,
+    @location(1) uv: vec2f,
+    @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
+    @location(3) uvr: vec2f,    // uv with aspect ratio corrected
+    @location(4) mouse: vec2f,
+    @builtin(position) position: vec4f
+) -> @location(0) vec4f {
 
     let imageColor = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0., 0), uvr, true);
-    let finalColor:vec4<f32> = brightness(imageColor) * WHITE;
+    let finalColor:vec4f = brightness(imageColor) * WHITE;
 
     return finalColor;
 }
@@ -556,9 +551,9 @@ const vert$6 = /*wgsl*/`
 
 @vertex
 fn main(
-    @location(0) position: vec4<f32>,
-    @location(1) color: vec4<f32>,
-    @location(2) uv: vec2<f32>,
+    @location(0) position: vec4f,
+    @location(1) color: vec4f,
+    @location(2) uv: vec2f,
     @builtin(vertex_index) vertexIndex: u32
 ) -> Fragment {
 
@@ -572,13 +567,13 @@ ${texturePosition}
 
 @fragment
 fn main(
-    @location(0) color: vec4<f32>,
-    @location(1) uv: vec2<f32>,
-    @location(2) ratio: vec2<f32>,  // relation between params.screen.x and params.screen.y
-    @location(3) uvr: vec2<f32>,    // uv with aspect ratio corrected
-    @location(4) mouse: vec2<f32>,
-    @builtin(position) position: vec4<f32>
-) -> @location(0) vec4<f32> {
+    @location(0) color: vec4f,
+    @location(1) uv: vec2f,
+    @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
+    @location(3) uvr: vec2f,    // uv with aspect ratio corrected
+    @location(4) mouse: vec2f,
+    @builtin(position) position: vec4f
+) -> @location(0) vec4f {
 
     let imageColor = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0., 0), uvr, true);
 
@@ -590,7 +585,7 @@ fn main(
     let imageColorG = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * ratio, uvr, true).g;
     let imageColorB = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * ratio, uvr - cdv * d, true).b;
 
-    let finalColor:vec4<f32> = vec4(imageColorR, imageColorG, imageColorB, 1);
+    let finalColor:vec4f = vec4(imageColorR, imageColorG, imageColorB, 1);
 
     return finalColor;
 }
@@ -615,9 +610,9 @@ const vert$5 = /*wgsl*/`
 
 @vertex
 fn main(
-    @location(0) position: vec4<f32>,
-    @location(1) color: vec4<f32>,
-    @location(2) uv: vec2<f32>,
+    @location(0) position: vec4f,
+    @location(1) color: vec4f,
+    @location(2) uv: vec2f,
     @builtin(vertex_index) vertexIndex: u32
 ) -> Fragment {
 
@@ -632,13 +627,13 @@ ${pixelateTexturePosition}
 
 @fragment
 fn main(
-    @location(0) color: vec4<f32>,
-    @location(1) uv: vec2<f32>,
-    @location(2) ratio: vec2<f32>,  // relation between params.screen.x and params.screen.y
-    @location(3) uvr: vec2<f32>,    // uv with aspect ratio corrected
-    @location(4) mouse: vec2<f32>,
-    @builtin(position) position: vec4<f32>
-) -> @location(0) vec4<f32> {
+    @location(0) color: vec4f,
+    @location(1) uv: vec2f,
+    @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
+    @location(3) uvr: vec2f,    // uv with aspect ratio corrected
+    @location(4) mouse: vec2f,
+    @builtin(position) position: vec4f
+) -> @location(0) vec4f {
 
 
     let pixelatedColor = pixelateTexturePosition(
@@ -650,7 +645,7 @@ fn main(
         uvr
     );
 
-    let finalColor:vec4<f32> = pixelatedColor;
+    let finalColor:vec4f = pixelatedColor;
 
     return finalColor;
 }
@@ -676,9 +671,9 @@ const vert$4 = /*wgsl*/`
 
 @vertex
 fn main(
-    @location(0) position: vec4<f32>,
-    @location(1) color: vec4<f32>,
-    @location(2) uv: vec2<f32>,
+    @location(0) position: vec4f,
+    @location(1) color: vec4f,
+    @location(2) uv: vec2f,
     @builtin(vertex_index) vertexIndex: u32
 ) -> Fragment {
 
@@ -725,8 +720,8 @@ const PI = /*wgsl*/`const PI = 3.14159265;`;
  * let value = polar(distance, radians);
  */
 const polar = /*wgsl*/`
-fn polar(distance: f32, radians: f32) -> vec2<f32> {
-    return vec2<f32>(distance * cos(radians), distance * sin(radians));
+fn polar(distance: f32, radians: f32) -> vec2f {
+    return vec2f(distance * cos(radians), distance * sin(radians));
 }
 `;
 
@@ -745,7 +740,7 @@ fn polar(distance: f32, radians: f32) -> vec2<f32> {
  * let value = rotateVector(position, radians);
  */
 const rotateVector = /*wgsl*/`
-fn rotateVector(p:vec2<f32>, rads:f32 ) -> vec2<f32> {
+fn rotateVector(p:vec2f, rads:f32 ) -> vec2f {
     let s = sin(rads);
     let c = cos(rads);
     let xnew = p.x * c - p.y * s;
@@ -781,19 +776,19 @@ fn rotateVector(p:vec2<f32>, rads:f32 ) -> vec2<f32> {
 
 const snoise = /*wgsl*/`
 
-fn mod289_v3(x: vec3<f32>) -> vec3<f32> {
+fn mod289_v3(x: vec3f) -> vec3f {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
-fn mod289_v2(x: vec2<f32>) -> vec2<f32> {
+fn mod289_v2(x: vec2f) -> vec2f {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
-fn permute(x: vec3<f32>) -> vec3<f32> {
+fn permute(x: vec3f) -> vec3f {
     return mod289_v3(((x*34.0)+10.0)*x);
 }
 
-fn snoise(v:vec2<f32>) -> f32 {
+fn snoise(v:vec2f) -> f32 {
     let C = vec4(0.211324865405187,  // (3.0-sqrt(3.0))/6.0
                         0.366025403784439,  // 0.5*(sqrt(3.0)-1.0)
                        -0.577350269189626,  // -1.0 + 2.0 * C.x
@@ -858,20 +853,20 @@ ${PI}
 ${WHITE}
 ${polar}
 
-fn angle(p1:vec2<f32>, p2:vec2<f32>) -> f32 {
+fn angle(p1:vec2f, p2:vec2f) -> f32 {
     let d = p1 - p2;
     return abs(atan2(d.y, d.x)) / PI;
 }
 
 @fragment
 fn main(
-    @location(0) color: vec4<f32>,
-    @location(1) uv: vec2<f32>,
-    @location(2) ratio: vec2<f32>,  // relation between params.screen.x and params.screen.y
-    @location(3) uvr: vec2<f32>,    // uv with aspect ratio corrected
-    @location(4) mouse: vec2<f32>,
-    @builtin(position) position: vec4<f32>
-) -> @location(0) vec4<f32> {
+    @location(0) color: vec4f,
+    @location(1) uv: vec2f,
+    @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
+    @location(3) uvr: vec2f,    // uv with aspect ratio corrected
+    @location(4) mouse: vec2f,
+    @builtin(position) position: vec4f
+) -> @location(0) vec4f {
 
     let imagePosition = vec2(0.0,0.0) * ratio;
     let center = vec2(.5,.5) * ratio;
@@ -918,7 +913,7 @@ fn main(
     let imageColorG = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * ratio, nuv, true).g;
     let imageColorB = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * ratio, nuv - cdv * params.lensDistortion_amount , true).b;
 
-    let chromaticAberration:vec4<f32> = vec4(imageColorR, imageColorG, imageColorB, 1);
+    let chromaticAberration:vec4f = vec4(imageColorR, imageColorG, imageColorB, 1);
     // -- Chromatic Aberration
 
 
@@ -953,9 +948,9 @@ const vert$3 = /*wgsl*/`
 
 @vertex
 fn main(
-    @location(0) position: vec4<f32>,
-    @location(1) color: vec4<f32>,
-    @location(2) uv: vec2<f32>,
+    @location(0) position: vec4f,
+    @location(1) color: vec4f,
+    @location(2) uv: vec2f,
     @builtin(vertex_index) vertexIndex: u32
 ) -> Fragment {
 
@@ -989,11 +984,11 @@ fn main(
  * let value = rand();
  */
 const rand = /*wgsl*/`
-var<private> rand_seed : vec2<f32>;
+var<private> rand_seed : vec2f;
 
 fn rand() -> f32 {
-    rand_seed.x = fract(cos(dot(rand_seed, vec2<f32>(23.14077926, 232.61690225))) * 136.8168);
-    rand_seed.y = fract(cos(dot(rand_seed, vec2<f32>(54.47856553, 345.84153136))) * 534.7645);
+    rand_seed.x = fract(cos(dot(rand_seed, vec2f(23.14077926, 232.61690225))) * 136.8168);
+    rand_seed.y = fract(cos(dot(rand_seed, vec2f(54.47856553, 345.84153136))) * 534.7645);
     return rand_seed.y;
 }
 `;
@@ -1006,13 +1001,13 @@ ${snoise}
 
 @fragment
 fn main(
-    @location(0) color: vec4<f32>,
-    @location(1) uv: vec2<f32>,
-    @location(2) ratio: vec2<f32>,  // relation between params.screen.x and params.screen.y
-    @location(3) uvr: vec2<f32>,    // uv with aspect ratio corrected
-    @location(4) mouse: vec2<f32>,
-    @builtin(position) position: vec4<f32>
-) -> @location(0) vec4<f32> {
+    @location(0) color: vec4f,
+    @location(1) uv: vec2f,
+    @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
+    @location(3) uvr: vec2f,    // uv with aspect ratio corrected
+    @location(4) mouse: vec2f,
+    @builtin(position) position: vec4f
+) -> @location(0) vec4f {
 
 
     let imageColor = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0., 0), uvr, true);
@@ -1046,9 +1041,9 @@ const vert$2 = /*wgsl*/`
 
 @vertex
 fn main(
-    @location(0) position: vec4<f32>,
-    @location(1) color: vec4<f32>,
-    @location(2) uv: vec2<f32>,
+    @location(0) position: vec4f,
+    @location(1) color: vec4f,
+    @location(2) uv: vec2f,
     @builtin(vertex_index) vertexIndex: u32
 ) -> Fragment {
 
@@ -1065,13 +1060,13 @@ ${PI}
 
 @fragment
 fn main(
-    @location(0) color: vec4<f32>,
-    @location(1) uv: vec2<f32>,
-    @location(2) ratio: vec2<f32>,  // relation between params.screen.x and params.screen.y
-    @location(3) uvr: vec2<f32>,    // uv with aspect ratio corrected
-    @location(4) mouse: vec2<f32>,
-    @builtin(position) position: vec4<f32>
-) -> @location(0) vec4<f32> {
+    @location(0) color: vec4f,
+    @location(1) uv: vec2f,
+    @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
+    @location(3) uvr: vec2f,    // uv with aspect ratio corrected
+    @location(4) mouse: vec2f,
+    @builtin(position) position: vec4f
+) -> @location(0) vec4f {
 
     let startPosition = vec2(0.,0.);
     let rgbaImage = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, startPosition, uvr, false); //* .998046;
@@ -1080,7 +1075,7 @@ fn main(
     let bloomVal = bloom(input, i32(params.bloom_iterations), params.bloom_amount);
     let rgbaBloom = vec4(bloomVal);
 
-    let finalColor:vec4<f32> = rgbaImage + rgbaBloom;
+    let finalColor:vec4f = rgbaImage + rgbaBloom;
 
     return finalColor;
 }
@@ -1112,9 +1107,9 @@ const vert$1 = /*wgsl*/`
 
 @vertex
 fn main(
-    @location(0) position: vec4<f32>,
-    @location(1) color: vec4<f32>,
-    @location(2) uv: vec2<f32>,
+    @location(0) position: vec4f,
+    @location(1) color: vec4f,
+    @location(2) uv: vec2f,
     @builtin(vertex_index) vertexIndex: u32
 ) -> Fragment {
 
@@ -1151,7 +1146,7 @@ fn main(
  * let value = blur9(image, imageSampler, position, uv, resolution, direction);
  */
 const blur9 = /*wgsl*/`
-fn blur9(image: texture_2d<f32>, imageSampler:sampler, position:vec2<f32>, uv:vec2<f32>, resolution: vec2<f32>, direction: vec2<f32>) -> vec4<f32> {
+fn blur9(image: texture_2d<f32>, imageSampler:sampler, position:vec2f, uv:vec2f, resolution: vec2f, direction: vec2f) -> vec4f {
     var color = vec4(0.0);
     let off1 = vec2(1.3846153846) * direction;
     let off2 = vec2(3.2307692308) * direction;
@@ -1168,7 +1163,7 @@ fn blur9(image: texture_2d<f32>, imageSampler:sampler, position:vec2<f32>, uv:ve
  * WIP
  */
 // export const blur8 = /*wgsl*/`
-// fn blur8(color:vec4<f32>, colorsAround:array<vec4<f32>, 8>, amount:f32) -> {
+// fn blur8(color:vec4f, colorsAround:array<vec4f, 8>, amount:f32) -> {
 
 // }
 // `;
@@ -1182,13 +1177,13 @@ ${blur9}
 
 @fragment
 fn main(
-    @location(0) color: vec4<f32>,
-    @location(1) uv: vec2<f32>,
-    @location(2) ratio: vec2<f32>,  // relation between params.screen.x and params.screen.y
-    @location(3) uvr: vec2<f32>,    // uv with aspect ratio corrected
-    @location(4) mouse: vec2<f32>,
-    @builtin(position) position: vec4<f32>
-) -> @location(0) vec4<f32> {
+    @location(0) color: vec4f,
+    @location(1) uv: vec2f,
+    @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
+    @location(3) uvr: vec2f,    // uv with aspect ratio corrected
+    @location(4) mouse: vec2f,
+    @builtin(position) position: vec4f
+) -> @location(0) vec4f {
 
     let feedbackColor = blur9(
         renderpass_feedbackTexture,
@@ -1228,9 +1223,9 @@ const vert = /*wgsl*/`
 
 @vertex
 fn main(
-    @location(0) position: vec4<f32>,
-    @location(1) color: vec4<f32>,
-    @location(2) uv: vec2<f32>,
+    @location(0) position: vec4f,
+    @location(1) color: vec4f,
+    @location(2) uv: vec2f,
     @builtin(vertex_index) vertexIndex: u32
 ) -> Fragment {
 
@@ -1245,13 +1240,13 @@ ${snoise}
 
 @fragment
 fn main(
-    @location(0) color: vec4<f32>,
-    @location(1) uv: vec2<f32>,
-    @location(2) ratio: vec2<f32>,  // relation between params.screen.x and params.screen.y
-    @location(3) uvr: vec2<f32>,    // uv with aspect ratio corrected
-    @location(4) mouse: vec2<f32>,
-    @builtin(position) position: vec4<f32>
-) -> @location(0) vec4<f32> {
+    @location(0) color: vec4f,
+    @location(1) uv: vec2f,
+    @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
+    @location(3) uvr: vec2f,    // uv with aspect ratio corrected
+    @location(4) mouse: vec2f,
+    @builtin(position) position: vec4f
+) -> @location(0) vec4f {
 
     let scale = params.waves_scale;
     let intensity = params.waves_intensity;
@@ -1260,7 +1255,7 @@ fn main(
     let n = n1 + n2;
 
     let imageColor = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0., 0), uvr + n2, true);
-    let finalColor:vec4<f32> = imageColor;
+    let finalColor:vec4f = imageColor;
 
     return finalColor;
 }
@@ -1882,12 +1877,12 @@ class Clock {
 const defaultStructs = /*wgsl*/`
 
 struct Fragment {
-    @builtin(position) position: vec4<f32>,
-    @location(0) color: vec4<f32>,
-    @location(1) uv: vec2<f32>,
-    @location(2) ratio: vec2<f32>,
-    @location(3) uvr: vec2<f32>,
-    @location(4) mouse: vec2<f32>
+    @builtin(position) position: vec4f,
+    @location(0) color: vec4f,
+    @location(1) uv: vec2f,
+    @location(2) ratio: vec2f,
+    @location(3) uvr: vec2f,
+    @location(4) mouse: vec2f
 }
 
 struct Sound {
@@ -1937,14 +1932,14 @@ struct Event {
  * @return {Fragment}
  */
 const defaultVertexBody = /*wgsl*/`
-fn defaultVertexBody(position: vec4<f32>, color: vec4<f32>, uv: vec2<f32>) -> Fragment {
+fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f) -> Fragment {
     var result: Fragment;
 
     let ratioX = params.screen.x / params.screen.y;
     let ratioY = 1. / ratioX / (params.screen.y / params.screen.x);
     result.ratio = vec2(ratioX, ratioY);
-    result.position = vec4<f32>(position);
-    result.color = vec4<f32>(color);
+    result.position = vec4f(position);
+    result.color = vec4f(color);
     result.uv = uv;
     result.uvr = vec2(uv.x * result.ratio.x, uv.y);
     result.mouse = vec2(params.mouse.x / params.screen.x, params.mouse.y / params.screen.y);
@@ -2405,6 +2400,10 @@ class UniformsArray extends Array {
 }
 
 /**
+ * @module points
+ */
+
+/**
  * Main class Points, this is the entry point of an application with this library.
  * @class Points
  * @example
@@ -2424,9 +2423,7 @@ class UniformsArray extends Array {
  *     requestAnimationFrame(update);
  * }
  *
- * @category Main
- * @module points
- *
+ * @memberof module:points
  */
 class Points {
     #canvasId = null;
@@ -2706,7 +2703,7 @@ class Points {
      *
      * // wgsl string
      * struct Matrix {
-     *     size : vec2<f32>,
+     *     size : vec2f,
      *     numbers: array<f32>,
      * }
      *
@@ -2768,7 +2765,7 @@ class Points {
             this.#layers.push({
                 name: `layer${layerIndex}`,
                 size: this.#canvas.width * this.#canvas.height,
-                structName: 'vec4<f32>',
+                structName: 'vec4f',
                 structSize: 16,
                 array: null,
                 buffer: null,
@@ -2851,7 +2848,7 @@ class Points {
      * // wgsl string
      * var rgba = textureSampleLevel(
      *     feedbackTexture, feedbackSampler,
-     *     vec2<f32>(f32(GlobalId.x), f32(GlobalId.y)),
+     *     vec2f(f32(GlobalId.x), f32(GlobalId.y)),
      *     0.0
      * );
      *
@@ -3291,7 +3288,7 @@ class Points {
             if (!this.#layers.shaderType || this.#layers.shaderType == shaderType) {
                 let totalSize = 0;
                 this.#layers.forEach(layerItem => totalSize += layerItem.size);
-                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, read_write> layers: array<array<vec4<f32>, ${totalSize}>>;\n`;
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, read_write> layers: array<array<vec4f, ${totalSize}>>;\n`;
                 bindingIndex += 1;
             }
         }

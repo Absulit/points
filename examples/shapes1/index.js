@@ -16,7 +16,7 @@ const shapes1 = {
     init: async (points, folder) => {
         const numPoints = 128;
         points.setUniform('numPoints', numPoints);
-        points.setStorage('points', `array<vec2<f32>, ${numPoints}>`);
+        points.setStorage('points', `array<vec2f, ${numPoints}>`);
 
         points.setUniform('squareSize', options.squareSize, 'f32');
         points.setUniform('squareFeather', options.squareFeather, 'f32');

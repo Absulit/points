@@ -15,7 +15,7 @@ fn main(
     let pointIndex = i32(GlobalId.y + (GlobalId.x * dims.x));
     let c = rands[pointIndex];
 
-    textureStore(outputTex, GlobalId.xy, vec4<f32>(c));
+    textureStore(outputTex, GlobalId.xy, vec4f(c));
     storageBarrier();
 }
 `;

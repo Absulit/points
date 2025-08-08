@@ -159,7 +159,7 @@ const BLACK = vec4(0.,0.,0.,1.);
  */
 export const layer = /*wgsl*/`
 // https://stackoverflow.com/a/24501192/507186
-fn layer(back:vec4<f32>, front: vec4<f32>) -> vec4<f32> {
+fn layer(back:vec4f, front: vec4f) -> vec4f {
     return front * front.a + back * (1. - front.a);
 }
 `;
@@ -186,8 +186,8 @@ fn hsvAux(h:f32, s:f32, v:f32, n:f32) -> f32 {
     return v - v * s * max(min(min(k, 4. - k), 1.), 0.);
 };
 
-fn RGBAFromHSV(h:f32, s:f32, v:f32) ->  vec4<f32>{
-    return vec4<f32>(hsvAux(h, s, v, 5.), hsvAux(h, s, v, 3.), hsvAux(h, s, v, 1.), 1.);
+fn RGBAFromHSV(h:f32, s:f32, v:f32) ->  vec4f{
+    return vec4f(hsvAux(h, s, v, 5.), hsvAux(h, s, v, 3.), hsvAux(h, s, v, 1.), 1.);
 }
 `;
 
@@ -239,7 +239,7 @@ fn bloom(input:f32, iterations:i32, intensity:f32) -> f32 {
  * let value = brightness(rgba);
  */
 export const brightness = /*wgsl*/`
-fn brightness(color:vec4<f32>) -> f32 {
+fn brightness(color:vec4f) -> f32 {
     // // Standard
     // LuminanceA = (0.2126*R) + (0.7152*G) + (0.0722*B)
     // // Percieved A
@@ -267,7 +267,7 @@ fn brightness(color:vec4<f32>) -> f32 {
  * let value = brightnessB(rgba);
  */
 export const brightnessB = /*wgsl*/`
-fn brightnessB(color:vec4<f32>) -> f32 {
+fn brightnessB(color:vec4f) -> f32 {
     return (0.299 * color.r) + (0.587 * color.g) + (0.114 * color.b);
 }
 `;
@@ -290,7 +290,7 @@ fn brightnessB(color:vec4<f32>) -> f32 {
  * let value = brightnessC(rgba);
  */
 export const brightnessC = /*wgsl*/`
-fn brightnessC(color:vec4<f32>) -> f32 {
+fn brightnessC(color:vec4f) -> f32 {
     return (0.2126 * pow(color.r, 2.)) + (0.7152 * pow(color.g, 2.)) + (0.0722 * pow(color.b, 2.));
 }
 `;

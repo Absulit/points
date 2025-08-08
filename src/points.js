@@ -1,4 +1,6 @@
-'use strict';
+/**
+ * @module points
+ */
 import UniformKeys from './UniformKeys.js';
 import VertexBufferInfo from './VertexBufferInfo.js';
 import ShaderType from './ShaderType.js';
@@ -34,9 +36,7 @@ import UniformsArray from './UniformsArray.js';
  *     requestAnimationFrame(update);
  * }
  *
- * @category Main
- * @module points
- *
+ * @memberof module:points
  */
 class Points {
     #canvasId = null;
@@ -316,7 +316,7 @@ class Points {
      *
      * // wgsl string
      * struct Matrix {
-     *     size : vec2<f32>,
+     *     size : vec2f,
      *     numbers: array<f32>,
      * }
      *
@@ -378,7 +378,7 @@ class Points {
             this.#layers.push({
                 name: `layer${layerIndex}`,
                 size: this.#canvas.width * this.#canvas.height,
-                structName: 'vec4<f32>',
+                structName: 'vec4f',
                 structSize: 16,
                 array: null,
                 buffer: null,
@@ -461,7 +461,7 @@ class Points {
      * // wgsl string
      * var rgba = textureSampleLevel(
      *     feedbackTexture, feedbackSampler,
-     *     vec2<f32>(f32(GlobalId.x), f32(GlobalId.y)),
+     *     vec2f(f32(GlobalId.x), f32(GlobalId.y)),
      *     0.0
      * );
      *
@@ -901,7 +901,7 @@ class Points {
             if (!this.#layers.shaderType || this.#layers.shaderType == shaderType) {
                 let totalSize = 0;
                 this.#layers.forEach(layerItem => totalSize += layerItem.size);
-                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, read_write> layers: array<array<vec4<f32>, ${totalSize}>>;\n`
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, read_write> layers: array<array<vec4f, ${totalSize}>>;\n`
                 bindingIndex += 1;
             }
         }

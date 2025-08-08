@@ -17,7 +17,7 @@ ${texturePosition}
 ${orderedDithering_threshold_map}
 
 const numPaletteItems = 21;
-const getClosestColorInPalette_palette = array< vec4<f32>, numPaletteItems>(
+const getClosestColorInPalette_palette = array< vec4f, numPaletteItems>(
     vec4(255./255., 69./255., 0., 1.),
     vec4(255./255., 168./255., 0, 1.),
     vec4(255./255., 214./255., 53./255., 1.),
@@ -44,13 +44,13 @@ const getClosestColorInPalette_palette = array< vec4<f32>, numPaletteItems>(
 
 @fragment
 fn main(
-        @location(0) color: vec4<f32>,
-        @location(1) uv: vec2<f32>,
-        @location(2) ratio: vec2<f32>,
-        @location(3) uvr: vec2<f32>,
-        @location(4) mouse: vec2<f32>,
-        @builtin(position) position: vec4<f32>
-    ) -> @location(0) vec4<f32> {
+        @location(0) color: vec4f,
+        @location(1) uv: vec2f,
+        @location(2) ratio: vec2f,
+        @location(3) uvr: vec2f,
+        @location(4) mouse: vec2f,
+        @builtin(position) position: vec4f
+    ) -> @location(0) vec4f {
 
     let n1 = snoise(uv * 2 + 2 * fnusin(1/3));
 

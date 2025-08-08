@@ -8,7 +8,7 @@ const layers1 = {
     init: async points => {
         const numPoints = 800*800;
         points.setUniform('numPoints', numPoints);
-        // points.setStorage('points', numPoints, `array<vec4<f32>, ${numPoints}>`, 4);
+        // points.setStorage('points', numPoints, `array<vec4f, ${numPoints}>`, 4);
         points.setLayers(2);
     },
     update: points => {
