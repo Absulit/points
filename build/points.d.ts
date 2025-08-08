@@ -283,6 +283,9 @@ export class ShaderType {
     static FRAGMENT: number;
 }
 /**
+ * @module points
+ */
+/**
  * Main class Points, this is the entry point of an application with this library.
  * @class Points
  * @example
@@ -302,9 +305,7 @@ export class ShaderType {
  *     requestAnimationFrame(update);
  * }
  *
- * @category Main
- * @module points
- *
+ * @memberof module:points
  */
 declare class Points {
     constructor(canvasId: any);

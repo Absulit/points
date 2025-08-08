@@ -2400,6 +2400,10 @@ class UniformsArray extends Array {
 }
 
 /**
+ * @module points
+ */
+
+/**
  * Main class Points, this is the entry point of an application with this library.
  * @class Points
  * @example
@@ -2419,9 +2423,7 @@ class UniformsArray extends Array {
  *     requestAnimationFrame(update);
  * }
  *
- * @category Main
- * @module points
- *
+ * @memberof module:points
  */
 class Points {
     #canvasId = null;

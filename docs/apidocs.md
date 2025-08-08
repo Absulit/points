@@ -13,9 +13,10 @@ Looking for an explanation on how to use POINTS? follow this link:
 ```js
 import Points { RenderPass, RenderPasses } from 'points';
 ```
-{@link Points}<br>
-{@link RenderPass}<br>
-{@link RenderPasses}
+
+{@link module:points.Points|Points}<br>
+{@link module:points.RenderPass|RenderPass}<br>
+{@link module:points.RenderPasses|RenderPasses}<br>
 
 ## Submodules with helper wgsl functions:
 
@@ -34,4 +35,3 @@ import { fnusin } from 'points/animation';
 {@link module:points/classicnoise2d|points/classicnoise2d}<br>
 {@link module:points/random|points/random}<br>
 {@link module:points/sdf|points/sdf}<br>
-

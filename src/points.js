@@ -1,4 +1,6 @@
-'use strict';
+/**
+ * @module points
+ */
 import UniformKeys from './UniformKeys.js';
 import VertexBufferInfo from './VertexBufferInfo.js';
 import ShaderType from './ShaderType.js';
@@ -34,9 +36,7 @@ import UniformsArray from './UniformsArray.js';
  *     requestAnimationFrame(update);
  * }
  *
- * @category Main
- * @module points
- *
+ * @memberof module:points
  */
 class Points {
     #canvasId = null;
