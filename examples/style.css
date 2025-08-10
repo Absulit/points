@@ -133,7 +133,7 @@ li.menu-main a {
     font-weight: 600;
 }
 
-h2 {
+summary, h2 {
     color               : #00ffc6;
     font-size           : large;
     font-weight         : 600;
