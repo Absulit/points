@@ -138,6 +138,7 @@ summary, h2 {
     font-size           : large;
     font-weight         : 600;
     padding-inline-start: 18px;
+    cursor: pointer;
 }
 
 #nowebgpu {
