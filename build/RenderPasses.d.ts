@@ -42,7 +42,7 @@ declare class RenderPasses {
     static BLOOM: number;
     static BLUR: number;
     static WAVES: number;
-    static "__#2@#LIST": {
+    static #LIST: {
         1: any;
         2: any;
         3: any;

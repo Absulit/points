@@ -110,7 +110,7 @@ export class RenderPasses {
     static BLOOM: number;
     static BLUR: number;
     static WAVES: number;
-    static "__#4@#LIST": {
+    static #LIST: {
         1: {
             vertexShader: string;
             fragmentShader: string;
