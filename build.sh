@@ -6,22 +6,22 @@ rm -rf ./build/
 
 npx rollup -c
 
-swc build/points.js --out-file build/points.min.js
-swc build/RenderPass.js --out-file build/RenderPass.min.js
-swc build/ShaderType.js --out-file build/ShaderType.min.js
-swc build/RenderPasses.js --out-file build/RenderPasses.min.js
+./node_modules/.bin/swc build/points.js --out-file build/points.min.js
+./node_modules/.bin/swc build/RenderPass.js --out-file build/RenderPass.min.js
+./node_modules/.bin/swc build/ShaderType.js --out-file build/ShaderType.min.js
+./node_modules/.bin/swc build/RenderPasses.js --out-file build/RenderPasses.min.js
 
-swc build/core/animation.js --out-file build/core/animation.min.js
-swc build/core/audio.js --out-file build/core/audio.min.js
-swc build/core/color.js --out-file build/core/color.min.js
-swc build/core/debug.js --out-file build/core/debug.min.js
-swc build/core/effects.js --out-file build/core/effects.min.js
-swc build/core/image.js --out-file build/core/image.min.js
-swc build/core/math.js --out-file build/core/math.min.js
-swc build/core/noise2d.js --out-file build/core/noise2d.min.js
-swc build/core/classicnoise2d.js --out-file build/core/classicnoise2d.min.js
-swc build/core/random.js --out-file build/core/random.min.js
-swc build/core/sdf.js --out-file build/core/sdf.min.js
+./node_modules/.bin/swc build/core/animation.js --out-file build/core/animation.min.js
+./node_modules/.bin/swc build/core/audio.js --out-file build/core/audio.min.js
+./node_modules/.bin/swc build/core/color.js --out-file build/core/color.min.js
+./node_modules/.bin/swc build/core/debug.js --out-file build/core/debug.min.js
+./node_modules/.bin/swc build/core/effects.js --out-file build/core/effects.min.js
+./node_modules/.bin/swc build/core/image.js --out-file build/core/image.min.js
+./node_modules/.bin/swc build/core/math.js --out-file build/core/math.min.js
+./node_modules/.bin/swc build/core/noise2d.js --out-file build/core/noise2d.min.js
+./node_modules/.bin/swc build/core/classicnoise2d.js --out-file build/core/classicnoise2d.min.js
+./node_modules/.bin/swc build/core/random.js --out-file build/core/random.min.js
+./node_modules/.bin/swc build/core/sdf.js --out-file build/core/sdf.min.js
 
 
 
@@ -40,9 +40,9 @@ done
 npx tsc
 
 npm publish --dry-run
-jsr publish --dry-run --allow-dirty
+npx jsr publish --dry-run --allow-dirty
 
 rm -rf ./apidocs/
 mkdir apidocs
-jsdoc -c jsdoc.json
+npx jsdoc -c jsdoc.json
 
