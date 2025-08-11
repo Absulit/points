@@ -80,7 +80,7 @@ const shaderNames = {};
 const nav = document.getElementById('nav');
 
 const menuSectionNames = ['showcase', 'reference', 'animation', 'audio', 'color', 'debug', 'effects', 'image', 'math',
-    'noise2d', 'classicnoise2d', 'random', 'renderpasses', 'sdf'];
+    'noise2d', 'classicnoise2d', 'random', 'renderpasses', 'sdf', 'compute', 'raymarching'];
 
 const menuSections = [];
 
