@@ -191,4 +191,5 @@ div.dg.ac {
 .scrollable {
   overflow-y: scroll;
   padding: 0 0 70px 0;
+  scrollbar-width: thin;
 }
