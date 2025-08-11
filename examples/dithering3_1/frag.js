@@ -1,9 +1,7 @@
 import { texture } from 'points/image';
-import { fnusin } from 'points/animation';
 
 const frag = /*wgsl*/`
 
-${fnusin}
 ${texture}
 
 @fragment
