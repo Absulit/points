@@ -1,12 +1,11 @@
 import { RED, brightness } from 'points/color';
 import { showDebugFrame } from 'points/debug';
 import { sdfCircle, sdfLine, sdfSegment } from 'points/sdf';
-import { sprite, texturePosition } from 'points/image';
+import { sprite } from 'points/image';
 import { snoise } from 'points/noise2d';
 
 const frag = /*wgsl*/`
 
-${texturePosition}
 ${sdfSegment}
 ${sdfLine}
 ${sdfCircle}
@@ -51,12 +50,12 @@ fn main(
     let charAIndex = 33u; // A
 
     let chars = array<u32, NUMCHARS>(15,14,8,13,19,18);
-    // let fontColor = texturePosition(font, imageSampler, fontPosition, uvr, false);
+
     var stringColor = vec4(0.);
     for (var index = 0; index < NUMCHARS; index++) {
         let charIndex = chars[index];
-        let charPosition = charSizeF32 * vec2(f32(index), 0);
-        let space = .001 * vec2(f32(index), 0);
+        let charPosition = charSizeF32 * vec2(f32(index), 0) * ratio;
+        let space = 0.;
         stringColor += sprite(font, imageSampler, space + fontPosition + charPosition, pixeleduv / 20, charAIndex + charIndex, charSize);
     }
     let b = brightness(stringColor);

@@ -73,7 +73,7 @@ fn main(
     point = layers[layerIndex][pointIndex];
     let positionU = GlobalId.xy;
     textureStore(outputTex, positionU, point);
-    storageBarrier();
+    // storageBarrier();
     // workgroupBarrier();
 }
 `;

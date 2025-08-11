@@ -1,22 +1,17 @@
 import { sdfLine2, sdfSegment } from 'points/sdf';
 import { fnusin } from 'points/animation';
-import { snoise } from 'points/noise2d';
-import { PI, E, rotateVector } from 'points/math';
+import { PI } from 'points/math';
 import { texturePosition } from 'points/image';
-import { RGBAFromHSV, layer } from 'points/color';
+import { RGBAFromHSV } from 'points/color';
 import { structs } from '../structs.js';
 const frag = /*wgsl*/`
 
 ${structs}
 ${fnusin}
-${snoise}
 ${sdfSegment}
 ${sdfLine2}
 ${PI}
-${E}
 ${texturePosition}
-${rotateVector}
-${layer}
 ${RGBAFromHSV}
 
 const RADIAN = 0.0174533;

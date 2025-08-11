@@ -1,4 +1,3 @@
-import { cnoise } from '../../classicnoise2d.js';
 import { texturePosition } from '../../image.js';
 import { snoise } from '../../noise2d.js';
 const frag = /*wgsl*/`
