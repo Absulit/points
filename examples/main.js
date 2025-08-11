@@ -85,6 +85,18 @@ const ul = nav.children[0];
 const showcaseUl = nav.querySelector('.showcase');
 const referenceUl = nav.querySelector('.reference');
 
+const menuSectionNames = ['showcase', 'reference', 'animation', 'audio', 'color', 'debug', 'effects', 'image', 'math',
+    'noise2d', 'classicnoise2d', 'random', 'renderpasses', 'sdf'];
+
+const menuSections = [];
+
+menuSectionNames.forEach(name => {
+    menuSections.push({
+        name,
+        el: nav.querySelector(`.${name}`)
+    })
+})
+
 let lastSelected = null;
 const onClickNavItem = e => {
     if (isM) {
@@ -116,12 +128,12 @@ shaderProjects
         }
         shaderNames[item.name] = index;
 
-        if (item.tax.indexOf('showcase') !== -1) {
-            showcaseUl.appendChild(createListItem(item, index));
-        }
-        if (item.tax.indexOf('reference') !== -1) {
-            referenceUl.appendChild(createListItem(item, index));
-        }
+        menuSections.forEach(section => {
+            const {name, el} = section;
+            if (item.tax.indexOf(name) !== -1) {
+                el.appendChild(createListItem(item, index));
+            }
+        })
     });
 
 let selectedShader = { index: Number(localStorage.getItem('selected-shader')) || 0 }
