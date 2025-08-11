@@ -1,15 +1,10 @@
-import { snoise } from 'points/noise2d';
-import { texturePosition } from 'points/image';
+import { texture } from 'points/image';
 import { fnusin } from 'points/animation';
 
 const frag = /*wgsl*/`
-struct Variable{
-    init: i32
-}
 
 ${fnusin}
-${snoise}
-${texturePosition}
+${texture}
 
 @fragment
 fn main(
@@ -21,9 +16,7 @@ fn main(
         @builtin(position) position: vec4f
     ) -> @location(0) vec4f {
 
-    //let imageUV = (uv / f + vec2(0, .549 ) ) * vec2(1,-1 * dimsRatio) * ratio.y / params.sliderA;
-    //var point = textureSample(computeTexture, imageSampler, imageUV); //* .998046;
-    var point = texturePosition(computeTexture, imageSampler, vec2(0.), uv / params.scale, true); //* .998046;
+    var point = texture(computeTexture, imageSampler, uv / params.scale, true); //* .998046;
 
     return point;
 }
