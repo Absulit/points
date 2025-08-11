@@ -15,10 +15,7 @@ const navLeft = document.getElementsByClassName('nav column left')[0];
 if (isM) {
     const menuBtn = document.getElementById('menu_btn')
     menuBtn.classList.toggle('hide');
-    menuBtn.addEventListener('click', e => {
-        navLeft.classList.toggle('hide');
-    });
-    navLeft.classList.toggle('scrollable');
+    menuBtn.addEventListener('click', e => navLeft.classList.toggle('hide'));
     gui.close();
     infoEl.classList.toggle('mobile');
 
@@ -81,9 +78,6 @@ gui.add(isFitWindowData, 'isFitWindow').name('Fit Window').listen().onChange(val
 
 const shaderNames = {};
 const nav = document.getElementById('nav');
-const ul = nav.children[0];
-const showcaseUl = nav.querySelector('.showcase');
-const referenceUl = nav.querySelector('.reference');
 
 const menuSectionNames = ['showcase', 'reference', 'animation', 'audio', 'color', 'debug', 'effects', 'image', 'math',
     'noise2d', 'classicnoise2d', 'random', 'renderpasses', 'sdf'];

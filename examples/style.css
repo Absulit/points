@@ -143,6 +143,8 @@ h2 {
   list-style: none;
 }
 
+summary { position: sticky; top: 0; }
+
 summary::before {
   content: "+";
   position: absolute;
@@ -187,6 +189,6 @@ div.dg.ac {
 }
 
 .scrollable {
-  overflow: scroll;
+  overflow-y: scroll;
   padding: 0 0 70px 0;
 }
