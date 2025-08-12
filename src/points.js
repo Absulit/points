@@ -1764,7 +1764,7 @@ class Points {
                 source: externalTexture.video
             });
             if ('requestVideoFrameCallback' in externalTexture.video) {
-                externalTexture.video.requestVideoFrameCallback(() => { });
+                externalTexture.video.requestVideoFrameCallback(_ => { });
             }
         });
 
