@@ -1791,11 +1791,9 @@ class Points {
         });
 
         // ---------------------
-
-        this.#renderPassDescriptor.colorAttachments[0].view = this.#context.getCurrentTexture().createView();
-        this.#renderPassDescriptor.depthStencilAttachment.view = this.#depthTexture.createView();
-
         const swapChainTexture = this.#context.getCurrentTexture();
+        this.#renderPassDescriptor.colorAttachments[0].view = swapChainTexture.createView();
+        this.#renderPassDescriptor.depthStencilAttachment.view = this.#depthTexture.createView();
 
         //commandEncoder = this.#device.createCommandEncoder();
         this.#renderPasses.forEach((renderPass, renderPassIndex) => {
