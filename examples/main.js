@@ -15,10 +15,7 @@ const navLeft = document.getElementsByClassName('nav column left')[0];
 if (isM) {
     const menuBtn = document.getElementById('menu_btn')
     menuBtn.classList.toggle('hide');
-    menuBtn.addEventListener('click', e => {
-        navLeft.classList.toggle('hide');
-    });
-    navLeft.classList.toggle('scrollable');
+    menuBtn.addEventListener('click', e => navLeft.classList.toggle('hide'));
     gui.close();
     infoEl.classList.toggle('mobile');
 
@@ -81,9 +78,18 @@ gui.add(isFitWindowData, 'isFitWindow').name('Fit Window').listen().onChange(val
 
 const shaderNames = {};
 const nav = document.getElementById('nav');
-const ul = nav.children[0];
-const showcaseUl = nav.querySelector('.showcase');
-const referenceUl = nav.querySelector('.reference');
+
+const menuSectionNames = ['showcase', 'reference', 'animation', 'audio', 'color', 'debug', 'effects', 'image', 'math',
+    'noise2d', 'classicnoise2d', 'random', 'renderpasses', 'sdf', 'compute', 'raymarching'];
+
+const menuSections = [];
+
+menuSectionNames.forEach(name => {
+    menuSections.push({
+        name,
+        el: nav.querySelector(`.${name}`)
+    })
+})
 
 let lastSelected = null;
 const onClickNavItem = e => {
@@ -116,12 +122,12 @@ shaderProjects
         }
         shaderNames[item.name] = index;
 
-        if (item.tax.indexOf('showcase') !== -1) {
-            showcaseUl.appendChild(createListItem(item, index));
-        }
-        if (item.tax.indexOf('reference') !== -1) {
-            referenceUl.appendChild(createListItem(item, index));
-        }
+        menuSections.forEach(section => {
+            const {name, el} = section;
+            if (item.tax.indexOf(name) !== -1) {
+                el.appendChild(createListItem(item, index));
+            }
+        })
     });
 
 let selectedShader = { index: Number(localStorage.getItem('selected-shader')) || 0 }

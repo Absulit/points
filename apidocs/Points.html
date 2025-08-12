@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en" data-color-scheme="auto">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Source: core/defaultFunctions.js | Points</title>
+    <title>Class: Points | Points</title>
     <meta name="description" content="A Generative Art library made in WebGPU"><meta name="keywords" content="javascript, webgl, crative-coding, shaders, generative-art, webgpu, genart, wgsl">
     <link rel="icon" title="dummy" href="data:image/x-icon;base64,AA">
     <script src="scripts/docolatte.min.js"></script>
@@ -23,7 +22,7 @@
         </div>
         <div class="topbar">
             <h1 class="page-title">
-                <a href="#">Source: core/defaultFunctions.js</a>
+                <a href="#">Class: Points</a>
             </h1>
             <a class="light-switch" title="Switch light/dark mode" href="#"><i class="label auto">
 <svg  class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -39,58 +38,3199 @@
 
 
 
+
+<article class="doc">
+    <header>
+        
+            <h2 class="name"><span class="attribs"><span class="attributes"></span></span>Points<span class="signature">()</span><span class="type-signature"></span></h2>
+            
+                <div class="class-description"><p>Main class Points, this is the entry point of an application with this library.</p></div>
+            
+        
+    </header>
+
+    <div class="container-overview">
     
-<article class="src">
-    <pre class="prettyprint source linenums lang-js"><span class="_char">_</span><code>/**
- * The defaultFunctions are functions already incorporated onto the shaders you create,
- * so you can call them without import.
- * &lt;br>
- * &lt;br>
- * These are wgsl functions, not js functions.
- * The function is enclosed in a js string constant,
- * to be appended into the code to reference it in the string shader.
- *
- * Use the base example as reference: examples/base/vert.js
- * @module defaultFunctions
- */
+        
 
-/**
- * The defaultVertexBody is used as a drop-in replacement of the vertex shader content.
- * &lt;br>
- * This is not required, but useful if you plan to use the default parameters of the library.
- * &lt;br>
- * All the examples in the examples directory use this function in their vert.js file.
- * &lt;br>
- * &lt;br>
- * Default function for the Vertex shader that takes charge of automating the
- * creation of a few variables that are commonly used.
- * @example
- * // Inside the main vertex function add this
- * return defaultVertexBody(position, color, uv);
- * @type {string}
- * @param {vec4f} position
- * @param {vec4f} color
- * @param {vec2f} uv
- * @return {Fragment}
- */
-export const defaultVertexBody = /*wgsl*/`
-fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f) -> Fragment {
-    var result: Fragment;
+    
+    <h2>Constructor</h2>
+    
 
-    let ratioX = params.screen.x / params.screen.y;
-    let ratioY = 1. / ratioX / (params.screen.y / params.screen.x);
-    result.ratio = vec2(ratioX, ratioY);
-    result.position = vec4f(position);
-    result.color = vec4f(color);
-    result.uv = uv;
-    result.uvr = vec2(uv.x * result.ratio.x, uv.y);
-    result.mouse = vec2(params.mouse.x / params.screen.x, params.mouse.y / params.screen.y);
-    result.mouse = result.mouse * vec2(1.,-1.) - vec2(0., -1.); // flip and move up
+    
+    <h4 class="name" id="Points"><span class="attributes"></span>new Points<span class="signature">()</span><span class="type-signature"></span></h4>
+    
 
-    return result;
-}
-`;
-</code></pre>
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="points.js.html">points.js</a>, <a href="points.js.html#line36">line 36</a>
+</dd>
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+
+    <pre class="prettyprint lang-js"><code>import Points from 'points';const points = new Points('canvas');let renderPasses = [    new RenderPass(vert1, frag1, compute1),    new RenderPass(vert2, frag2, compute2)];await points.init(renderPasses);update();function update() {    points.update();    requestAnimationFrame(update);}</code></pre>
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="canvas"><span class="attributes"></span>canvas<span class="type-signature"> <span class="type">HTMLCanvasElement</span></span></h4>
+
+
+
+
+<div class="description">
+    <p>Reference to the canvas assigned in the constructor</p>
+</div>
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="points.js.html">points.js</a>, <a href="points.js.html#line1928">line 1928</a>
+</dd>
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="fitWindow"><span class="attributes"></span>fitWindow<span class="type-signature"> <span class="type">Boolean</span></span></h4>
+
+
+
+
+<div class="description">
+    <p>If the canvas has a fixed size e.g. <code>800x800</code>, <code>fitWindow</code> will fill
+the available window space.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="points.js.html">points.js</a>, <a href="points.js.html#line1981">line 1981</a>
+</dd>
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+
+    <pre class="prettyprint lang-js"><code>if (await points.init(renderPasses)) {     points.fitWindow = isFitWindowData.isFitWindow;     update(); }</code></pre>
+
+
+
+
+        
+            
+<h4 class="name" id="fullscreen"><span class="attributes"></span>fullscreen<span class="type-signature"> <span class="type">Boolean</span></span></h4>
+
+
+
+
+<div class="description">
+    <p>Triggers the app to run in full screen mode</p>
+</div>
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="points.js.html">points.js</a>, <a href="points.js.html#line1954">line 1954</a>
+</dd>
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+
+    <pre class="prettyprint lang-js"><code>points.fullscreen = true</code></pre>
+
+
+
+
+        
+            
+<h4 class="name" id="renderPasses"><span class="attributes"></span>renderPasses<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    <p>Get the active list of <a href="RenderPass.html">RenderPass</a></p>
+</div>
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="points.js.html">points.js</a>, <a href="points.js.html#line1123">line 1123</a>
+</dd>
+</dl>
+
+
+
+
+
+
+        
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="addEventListener"><span class="attributes"></span>addEventListener<span class="signature">(name, callback, structSize)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Listens for an event dispatched from WGSL code</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<div class="table-wrap">
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>name</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"><p>Number that represents an event Id</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>callback</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"><p>function to be called when the event occurs</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>structSize</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"><p>size of the data to be returned</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+</div>
+
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="points.js.html">points.js</a>, <a href="points.js.html#line846">line 846</a>
+</dd>
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+
+    <pre class="prettyprint lang-js has-caption"><code>// the event name will be reflected as a variable name in the shaderpoints.addEventListener('click_event', data => {    // response action in JS}, 4);// wgsl string if(params.mouseClick == 1.){     // Same name of the Event     // we fire the event with a 1     // it will be set to 0 in the next frame     click_event.updated = 1; }</code><div class="code-caption hljs">js</div></pre>
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="init"><span class="attributes"><span class="attribute">async</span></span>init<span class="signature">(renderPasses)</span><span class="type-signature"> &rarr; <span class="type">Boolean</span></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>One time function call to initialize the shaders.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<div class="table-wrap">
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>renderPasses</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="RenderPass.html">RenderPass</a>[]</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"><p>Collection of <a href="RenderPass.html">RenderPass</a>, which contain Vertex, Compute and Fragment shaders.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+</div>
+
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="points.js.html">points.js</a>, <a href="points.js.html#line1051">line 1051</a>
+</dd>
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+<div class="param-desc">
+    <p>false | undefined</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type:
+    </dt>
+    <dd class="type">
+        
+<span class="param-type">Boolean</span>
+
+    </dd>
+</dl>
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+
+    <pre class="prettyprint lang-js"><code>await points.init(renderPasses)</code></pre>
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="setAudio"><span class="attributes"></span>setAudio<span class="signature">(name, path, volume, loop, autoplay)</span><span class="type-signature"> &rarr; <span class="type">HTMLAudioElement</span></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Assigns an audio FrequencyData to a StorageMap.<br>
+Calling setAudio creates a Storage with <code>name</code> in the wgsl shaders.<br>
+From this storage you can read the audio data sent to the shader as numeric values.<br>
+Values in <code>audio.data</code> are composed of integers on a scale from 0..255</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<div class="table-wrap">
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>name</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"><p>name of the Storage and prefix of the length variable e.g. <code>[name]Length</code>.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>path</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"><p>audio file address in a web server</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>volume</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>loop</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>autoplay</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+</div>
+
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="points.js.html">points.js</a>, <a href="points.js.html#line723">line 723</a>
+</dd>
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+
+
+<dl>
+    <dt>
+        Type:
+    </dt>
+    <dd class="type">
+        
+<span class="param-type">HTMLAudioElement</span>
+
+    </dd>
+</dl>
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+
+    <pre class="prettyprint lang-js has-caption"><code>const audio = points.setAudio('audio', 'audiofile.ogg', volume, loop, autoplay);// wgsllet audioX = audio.data[ u32(uvr.x * params.audioLength)] / 256;</code><div class="code-caption hljs">js</div></pre>
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="setBindingTexture"><span class="attributes"></span>setBindingTexture<span class="signature">(computeName, fragmentName, size)</span><span class="type-signature"> &rarr; <span class="type">Object</span></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Special texture where data can be written to it in the Compute Shader and
+Is a one way communication method.
+Ideal to store data to it in the Compute Shader and later visualize it in
+the Fragment Shader.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<div class="table-wrap">
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>computeName</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"><p>name of the variable in the compute shader</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>fragmentName</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"><p>name of the variable in the fragment shader</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>size</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number, 2[]</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"><p>dimensions of the texture, by default screen
+size</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+</div>
+
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="points.js.html">points.js</a>, <a href="points.js.html#line805">line 805</a>
+</dd>
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+
+
+<dl>
+    <dt>
+        Type:
+    </dt>
+    <dd class="type">
+        
+<span class="param-type">Object</span>
+
+    </dd>
+</dl>
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+
+    <pre class="prettyprint lang-js has-caption"><code>points.setBindingTexture('outputTex', 'computeTexture');// wgsl string//// computetextureStore(outputTex, GlobalId.xy, rgba);//// fragmentlet value = texturePosition(computeTexture, imageSampler, position, uv, false);</code><div class="code-caption hljs">js</div></pre>
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="setLayers"><span class="attributes"></span>setLayers<span class="signature">(numLayers, shaderType)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Layers of data made of <code>vec4f</code>.
+This creates a storage array named <code>layers</code> of the size
+of the screen in pixels;</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<div class="table-wrap">
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>numLayers</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>shaderType</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="ShaderType.html">ShaderType</a></span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+</div>
+
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="points.js.html">points.js</a>, <a href="points.js.html#line368">line 368</a>
+</dd>
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+
+    <pre class="prettyprint lang-js has-caption"><code>points.setLayers(2);// wgsl stringvar point = textureLoad(image, vec2&lt;i32>(ix,iy), 0);layers[0][pointIndex] = point;layers[1][pointIndex] = point;</code><div class="code-caption hljs">js</div></pre>
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="setMeshDensity"><span class="attributes"></span>setMeshDensity<span class="signature">(numColumns, numRows)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Establishes the density of the base mesh, by default 1x1, meaning two triangles.
+The final number of triangles is <code>numColumns</code> * <code>numRows</code> * <code>2</code> ( 2 being the triangles )</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<div class="table-wrap">
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>numColumns</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"><p>quads horizontally</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>numRows</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"><p>quads vertically</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+</div>
+
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="points.js.html">points.js</a>, <a href="points.js.html#line968">line 968</a>
+</dd>
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+
+    <pre class="prettyprint lang-js has-caption"><code>points.setMeshDensity(20,20);// wgsl string//// vertex shadervar modifiedPosition = position;modifiedPosition.w = modifiedPosition.w + sin(f32(vertexIndex) * (params.time) * .01) * .1;return defaultVertexBody(modifiedPosition, color, uv);</code><div class="code-caption hljs">js</div></pre>
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="setSampler"><span class="attributes"></span>setSampler<span class="signature">(name, descriptor)</span><span class="type-signature"> &rarr; <span class="type">Object</span></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Creates a <code>sampler</code> to be sent to the shaders. Internally it will be a GPUSampler</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<div class="table-wrap">
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>name</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"><p>Name of the <code>sampler</code> to be called in the shaders.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>descriptor</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">GPUSamplerDescriptor</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"><p><code>Object</code> with properties that affect the image. See example below.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+</div>
+
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="points.js.html">points.js</a>, <a href="points.js.html#line412">line 412</a>
+</dd>
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+
+
+<dl>
+    <dt>
+        Type:
+    </dt>
+    <dd class="type">
+        
+<span class="param-type">Object</span>
+
+    </dd>
+</dl>
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+
+    <pre class="prettyprint lang-js has-caption"><code>const descriptor = { addressModeU: 'repeat', addressModeV: 'repeat', magFilter: 'nearest', minFilter: 'nearest', mipmapFilter: 'nearest', //maxAnisotropy: 10,}points.setSampler('imageSampler', descriptor);// wgsl stringlet value = texturePosition(image, imageSampler, position, uvr, true);</code><div class="code-caption hljs">js</div></pre>
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="setStorage"><span class="attributes"></span>setStorage<span class="signature">(name, structName, read, shaderType)</span><span class="type-signature"> &rarr; <span class="type">Object</span></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Creates a persistent memory buffer across every frame call. See <a href="https://www.w3.org/TR/webgpu/#gpubuffer">GPUBuffer</a>
+<br>
+Meaning it can be updated in the shaders across the execution of every frame.
+<br>
+It can have almost any type, like <code>f32</code> or <code>vec2f</code> or even array<f32>.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<div class="table-wrap">
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>name</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"><p>Name that the Storage will have in the shader</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>structName</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"><p>Name of the struct already existing on the
+shader. This will be the type of the Storage.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>read</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"><p>if this is going to be used to read data back</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>shaderType</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="ShaderType.html">ShaderType</a></span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"><p>this tells to what shader the storage is bound</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+</div>
+
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="points.js.html">points.js</a>, <a href="points.js.html#line257">line 257</a>
+</dd>
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+
+
+<dl>
+    <dt>
+        Type:
+    </dt>
+    <dd class="type">
+        
+<span class="param-type">Object</span>
+
+    </dd>
+</dl>
+
+
+
+
+
+
+
+    <h5>Examples</h5>
+    
+
+    <pre class="prettyprint lang-js has-caption"><code>points.setStorage('result', 'f32');// wgsl stringresult[index]  = 128.;</code><div class="code-caption hljs">js</div></pre>
+
+    <pre class="prettyprint lang-js has-caption"><code>points.setStorage('colors', 'array&lt;vec3f, 6>');// wgsl stringcolors[index] = vec3f(248, 208, 146) / 255;</code><div class="code-caption hljs">js</div></pre>
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="setStorageMap"><span class="attributes"></span>setStorageMap<span class="signature">(name, arrayData, structName, read, shaderType)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Creates a persistent memory buffer across every frame call that can be updated.
+See <a href="https://www.w3.org/TR/webgpu/#gpubuffer">GPUBuffer</a>
+<br>
+Meaning it can be updated in the shaders across the execution of every frame.
+<br>
+It can have almost any type, like <code>f32</code> or <code>vec2f</code> or even array<f32>.
+<br>
+The difference with <a href="Points.html#setStorage">setStorage</a> is that this can be initialized
+with data.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<div class="table-wrap">
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>name</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>Name that the Storage will have in the shader.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>arrayData</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Uint8Array.&lt;ArrayBuffer></span>
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>array with the data that must match the struct.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>structName</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>Name of the struct already existing on the
+shader. This will be the type of the Storage.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>read</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code>false</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>if this is going to be used to read data back.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>shaderType</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="ShaderType.html">ShaderType</a></span>
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code>null</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>this tells to what shader the storage is bound</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+</div>
+
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="points.js.html">points.js</a>, <a href="points.js.html#line320">line 320</a>
+</dd>
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+
+    <pre class="prettyprint lang-js has-caption"><code>const firstMatrix = [    2, 4 , // 2 rows 4 columns    1, 2, 3, 4,    5, 6, 7, 8];const secondMatrix = [    4, 2, // 4 rows 2 columns    1, 2,    3, 4,    5, 6,    7, 8];// Matrix should exist as a struct in the wgsl shaderpoints.setStorageMap('firstMatrix', firstMatrix, 'Matrix');points.setStorageMap('secondMatrix', secondMatrix, 'Matrix');points.setStorage('resultMatrix', 'Matrix', true); // this reads data back// wgsl stringstruct Matrix {    size : vec2f,    numbers: array&lt;f32>,}resultMatrix.size = vec2(firstMatrix.size.x, secondMatrix.size.y);</code><div class="code-caption hljs">js examples/data1</div></pre>
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="setTexture2d"><span class="attributes"></span>setTexture2d<span class="signature">(name, copyCurrentTexture)</span><span class="type-signature"> &rarr; <span class="type">Object</span></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Creates a <code>texture_2d</code> in the shaders.<br>
+Used to write data and then print to screen.<br>
+It can also be used for write the current render pass (what you see on the screen)
+to this texture, to be used in the next cycle of this render pass; meaning
+you effectively have the previous frame data before printing the next one.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<div class="table-wrap">
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>name</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"><p>Name to call the texture in the shaders.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>copyCurrentTexture</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"><p>If you want the fragment output to be copied here.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+</div>
+
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="points.js.html">points.js</a>, <a href="points.js.html#line464">line 464</a>
+</dd>
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+
+
+<dl>
+    <dt>
+        Type:
+    </dt>
+    <dd class="type">
+        
+<span class="param-type">Object</span>
+
+    </dd>
+</dl>
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+
+    <pre class="prettyprint lang-js has-caption"><code>points.setTexture2d('feedbackTexture', true);// wgsl stringvar rgba = textureSampleLevel(    feedbackTexture, feedbackSampler,    vec2f(f32(GlobalId.x), f32(GlobalId.y)),    0.0);</code><div class="code-caption hljs">js</div></pre>
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="setTextureImage"><span class="attributes"><span class="attribute">async</span></span>setTextureImage<span class="signature">(name, path, shaderType)</span><span class="type-signature"> &rarr; <span class="type">Object</span></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Loads an image as <code>texture_2d</code> and then it will be available to read
+data from in the shaders.<br>
+Supports web formats like JPG, PNG.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<div class="table-wrap">
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>name</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>identifier it will have in the shaders</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>path</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>image address in a web server</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>shaderType</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="ShaderType.html">ShaderType</a></span>
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code>null</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>in what shader type it will exist only</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+</div>
+
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="points.js.html">points.js</a>, <a href="points.js.html#line518">line 518</a>
+</dd>
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+
+
+<dl>
+    <dt>
+        Type:
+    </dt>
+    <dd class="type">
+        
+<span class="param-type">Object</span>
+
+    </dd>
+</dl>
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+
+    <pre class="prettyprint lang-js has-caption"><code>await points.setTextureImage('image', './../myimage.jpg');// wgsl stringlet rgba = texturePosition(image, imageSampler, position, uvr, true);</code><div class="code-caption hljs">js</div></pre>
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="setTextureImageArray"><span class="attributes"><span class="attribute">async</span></span>setTextureImageArray<span class="signature">(name, paths, shaderType)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Load images as texture_2d_array</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<div class="table-wrap">
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>name</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"><p>id of the wgsl variable in the shader</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>paths</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"><p>image addresses in a web server</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>shaderType</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="ShaderType.html">ShaderType</a></span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+</div>
+
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="points.js.html">points.js</a>, <a href="points.js.html#line602">line 602</a>
+</dd>
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="setTextureString"><span class="attributes"><span class="attribute">async</span></span>setTextureString<span class="signature">(name, text, path, size, offset, shaderType)</span><span class="type-signature"> &rarr; <span class="type">Object</span></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Loads a text string as a texture.<br>
+Using an Atlas or a Spritesheet with UTF-16 chars (<code>path</code>) it will create a new texture
+that contains only the <code>text</code> characters.<br>
+Characters in the atlas <code>path</code> must be in order of the UTF-16 chars.<br>
+It can have missing characters at the end or at the start, so the <code>offset</code> is added to take account for those chars.<br>
+For example, <code>A</code> is 65, but if one character is removed before the letter <code>A</code>, then offset is <code>-1</code></p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<div class="table-wrap">
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>name</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>id of the wgsl variable in the shader</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>text</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>text you want to load as texture</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>path</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>atlas to grab characters from, image address in a web server</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>size</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>size of a individual character e.g.: <code>{x:10, y:20}</code></p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>offset</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code>0</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>how many characters back or forward it must move to start</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>shaderType</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code>null</code>
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+</div>
+
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="points.js.html">points.js</a>, <a href="points.js.html#line588">line 588</a>
+</dd>
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+
+
+<dl>
+    <dt>
+        Type:
+    </dt>
+    <dd class="type">
+        
+<span class="param-type">Object</span>
+
+    </dd>
+</dl>
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+
+    <pre class="prettyprint lang-js has-caption"><code>await points.setTextureString(    'textImg',    'Custom Text',    './../img/inconsolata_regular_8x22.png',    size,    -32);// wgsl stringlet textColors = texturePosition(textImg, imageSampler, position, uvr, true);</code><div class="code-caption hljs">js</div></pre>
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="setTextureVideo"><span class="attributes"><span class="attribute">async</span></span>setTextureVideo<span class="signature">(name, path, shaderType)</span><span class="type-signature"> &rarr; <span class="type">Object</span></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Loads a video as <code>texture_external</code>and then
+it will be available to read data from in the shaders.
+Supports web formats like mp4 and webm.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<div class="table-wrap">
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>name</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"><p>id of the wgsl variable in the shader</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>path</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"><p>video address in a web server</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>shaderType</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="ShaderType.html">ShaderType</a></span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+</div>
+
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="points.js.html">points.js</a>, <a href="points.js.html#line642">line 642</a>
+</dd>
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+
+
+<dl>
+    <dt>
+        Type:
+    </dt>
+    <dd class="type">
+        
+<span class="param-type">Object</span>
+
+    </dd>
+</dl>
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+
+    <pre class="prettyprint lang-js has-caption"><code>await points.setTextureVideo('video', './../myvideo.mp4');// wgsl stringlet rgba = textureExternalPosition(video, imageSampler, position, uvr, true);</code><div class="code-caption hljs">js</div></pre>
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="setTextureWebcam"><span class="attributes"><span class="attribute">async</span></span>setTextureWebcam<span class="signature">(name, shaderType)</span><span class="type-signature"> &rarr; <span class="type">Object</span></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Loads webcam as <code>texture_external</code>and then
+it will be available to read data from in the shaders.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<div class="table-wrap">
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>name</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"><p>id of the wgsl variable in the shader</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>shaderType</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="ShaderType.html">ShaderType</a></span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+</div>
+
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="points.js.html">points.js</a>, <a href="points.js.html#line676">line 676</a>
+</dd>
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+
+
+<dl>
+    <dt>
+        Type:
+    </dt>
+    <dd class="type">
+        
+<span class="param-type">Object</span>
+
+    </dd>
+</dl>
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+
+    <pre class="prettyprint lang-js has-caption"><code>await points.setTextureWebcam('video');// wgsl stringet rgba = textureExternalPosition(video, imageSampler, position, uvr, true);</code><div class="code-caption hljs">js</div></pre>
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="setUniform"><span class="attributes"></span>setUniform<span class="signature">(name, value, structName)</span><span class="type-signature"> &rarr; <span class="type">Object</span></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Sets a <code>param</code> (predefined struct already in all shaders)
+as uniform to send to all shaders.
+A Uniform is a value that can only be changed
+from the outside (js side, not the wgsl side),
+and unless changed it remains consistent.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<div class="table-wrap">
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>name</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>name of the Param, you can invoke it later in shaders as <code>Params.[name]</code></p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>value</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<ul><li><span class="param-type">Number</span></li><li><span class="param-type">Boolean</span></li><li><span class="param-type">Number[]</span></li></ul>
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>Single number or a list of numbers. Boolean is converted to Number.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>structName</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code>null</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>type as <code>f32</code> or a custom struct. Default <code>f32</code>.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+</div>
+
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="points.js.html">points.js</a>, <a href="points.js.html#line193">line 193</a>
+</dd>
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+
+
+<dl>
+    <dt>
+        Type:
+    </dt>
+    <dd class="type">
+        
+<span class="param-type">Object</span>
+
+    </dd>
+</dl>
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+
+    <pre class="prettyprint lang-js has-caption"><code> points.setUniform('color0', options.color0, 'vec3f'); points.setUniform('color1', options.color1, 'vec3f'); points.setUniform('scale', options.scale, 'f32');// wgsl stringlet color0 = vec4(params.color0/255, 1.);let color1 = vec4(params.color1/255, 1.);let finalColor:vec4f = mix(color0, color1, params.scale);</code><div class="code-caption hljs">js</div></pre>
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="update"><span class="attributes"><span class="attribute">async</span></span>update<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Method executed on each <a href="https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame">requestAnimationFrame</a>.
+Here's where all the calls to update data will be executed.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="points.js.html">points.js</a>, <a href="points.js.html#line1734">line 1734</a>
+</dd>
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+
+    <pre class="prettyprint lang-js"><code>await points.init(renderPasses);update();function update() {    points.update();    requestAnimationFrame(update);}</code></pre>
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="updateUniforms"><span class="attributes"></span>updateUniforms<span class="signature">(arr)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Updates a list of uniforms</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<div class="table-wrap">
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>arr</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">{name:String, value:Number}[]</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"><p>object array of the type: <code>{name, value}</code></p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+</div>
+
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="points.js.html">points.js</a>, <a href="points.js.html#line220">line 220</a>
+</dd>
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+
+    
+
+    
 </article>
 
 
@@ -112,7 +3252,7 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f) -> Fragment {
                     Documentation generated by <a rel="external" href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a><wbr>
                     using <a rel="external" href="https://github.com/amekusa/docolatte">Docolatte</a> theme
                     
-                    <wbr>on <time datetime="2025-08-12T01:01:29.319Z">Tue, 12 Aug 2025 01:01:29 GMT</time>
+                    <wbr>on <time datetime="2025-08-12T01:01:29.381Z">Tue, 12 Aug 2025 01:01:29 GMT</time>
                     
                 </p>
                 

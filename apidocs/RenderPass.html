@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en" data-color-scheme="auto">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Source: core/defaultFunctions.js | Points</title>
+    <title>Class: RenderPass | Points</title>
     <meta name="description" content="A Generative Art library made in WebGPU"><meta name="keywords" content="javascript, webgl, crative-coding, shaders, generative-art, webgpu, genart, wgsl">
     <link rel="icon" title="dummy" href="data:image/x-icon;base64,AA">
     <script src="scripts/docolatte.min.js"></script>
@@ -23,7 +22,7 @@
         </div>
         <div class="topbar">
             <h1 class="page-title">
-                <a href="#">Source: core/defaultFunctions.js</a>
+                <a href="#">Class: RenderPass</a>
             </h1>
             <a class="light-switch" title="Switch light/dark mode" href="#"><i class="label auto">
 <svg  class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -39,58 +38,283 @@
 
 
 
+
+<article class="doc">
+    <header>
+        
+            <h2 class="name"><span class="attribs"><span class="attributes"></span></span>RenderPass<span class="signature">(vertexShader, fragmentShader, computeShader)</span><span class="type-signature"></span></h2>
+            
+                <div class="class-description"><p>A RenderPass is a way to have a block of shaders to pass to your application pipeline and
+these render passes will be executed in the order you pass them in the <a href="Points.html#init">Points#init</a> method.</p></div>
+            
+        
+    </header>
+
+    <div class="container-overview">
     
-<article class="src">
-    <pre class="prettyprint source linenums lang-js"><span class="_char">_</span><code>/**
- * The defaultFunctions are functions already incorporated onto the shaders you create,
- * so you can call them without import.
- * &lt;br>
- * &lt;br>
- * These are wgsl functions, not js functions.
- * The function is enclosed in a js string constant,
- * to be appended into the code to reference it in the string shader.
- *
- * Use the base example as reference: examples/base/vert.js
- * @module defaultFunctions
- */
+        
 
-/**
- * The defaultVertexBody is used as a drop-in replacement of the vertex shader content.
- * &lt;br>
- * This is not required, but useful if you plan to use the default parameters of the library.
- * &lt;br>
- * All the examples in the examples directory use this function in their vert.js file.
- * &lt;br>
- * &lt;br>
- * Default function for the Vertex shader that takes charge of automating the
- * creation of a few variables that are commonly used.
- * @example
- * // Inside the main vertex function add this
- * return defaultVertexBody(position, color, uv);
- * @type {string}
- * @param {vec4f} position
- * @param {vec4f} color
- * @param {vec2f} uv
- * @return {Fragment}
- */
-export const defaultVertexBody = /*wgsl*/`
-fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f) -> Fragment {
-    var result: Fragment;
+    
+    <h2>Constructor</h2>
+    
 
-    let ratioX = params.screen.x / params.screen.y;
-    let ratioY = 1. / ratioX / (params.screen.y / params.screen.x);
-    result.ratio = vec2(ratioX, ratioY);
-    result.position = vec4f(position);
-    result.color = vec4f(color);
-    result.uv = uv;
-    result.uvr = vec2(uv.x * result.ratio.x, uv.y);
-    result.mouse = vec2(params.mouse.x / params.screen.x, params.mouse.y / params.screen.y);
-    result.mouse = result.mouse * vec2(1.,-1.) - vec2(0., -1.); // flip and move up
+    
+    <h4 class="name" id="RenderPass"><span class="attributes"></span>new RenderPass<span class="signature">(vertexShader, fragmentShader, computeShader)</span><span class="type-signature"></span></h4>
+    
 
-    return result;
-}
-`;
-</code></pre>
+    
+
+
+
+<div class="description">
+    <p>A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
+This is useful for PostProcessing.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<div class="table-wrap">
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>vertexShader</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"><p>WGSL Vertex Shader in a String.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>fragmentShader</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"><p>WGSL Fragment Shader in a String.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>computeShader</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"><p>WGSL Compute Shader in a String.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+</div>
+
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="RenderPass.js.html">RenderPass.js</a>, <a href="RenderPass.js.html#line18">line 18</a>
+</dd>
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+
+    <pre class="prettyprint lang-js"><code>import Points, { RenderPass } from 'points';// vert, frag and compute are strings with the wgsl shaders.let renderPasses = [    new RenderPass(vert1, frag1, compute1),    new RenderPass(vert2, frag2, compute2)];// we pass the array of renderPassesawait points.init(renderPasses);</code></pre>
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="computeShader"><span class="attributes"></span>computeShader<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    <p>get the compute shader content</p>
+</div>
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="RenderPass.js.html">RenderPass.js</a>, <a href="RenderPass.js.html#line87">line 87</a>
+</dd>
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="fragmentShader"><span class="attributes"></span>fragmentShader<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    <p>get the fragment shader content</p>
+</div>
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="RenderPass.js.html">RenderPass.js</a>, <a href="RenderPass.js.html#line94">line 94</a>
+</dd>
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="vertexShader"><span class="attributes"></span>vertexShader<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    <p>get the vertex shader content</p>
+</div>
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="RenderPass.js.html">RenderPass.js</a>, <a href="RenderPass.js.html#line80">line 80</a>
+</dd>
+</dl>
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+
+    
 </article>
 
 
@@ -112,7 +336,7 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f) -> Fragment {
                     Documentation generated by <a rel="external" href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a><wbr>
                     using <a rel="external" href="https://github.com/amekusa/docolatte">Docolatte</a> theme
                     
-                    <wbr>on <time datetime="2025-08-12T01:01:29.319Z">Tue, 12 Aug 2025 01:01:29 GMT</time>
+                    <wbr>on <time datetime="2025-08-12T01:01:29.393Z">Tue, 12 Aug 2025 01:01:29 GMT</time>
                     
                 </p>
                 

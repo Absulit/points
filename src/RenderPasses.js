@@ -41,7 +41,6 @@ import RenderPass from './RenderPass.js';
  *     points.update();
  *     requestAnimationFrame(update);
  * }
- * @memberof module:points
  */
 class RenderPasses {
     static COLOR = 1;

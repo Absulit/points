@@ -1,10 +1,7 @@
-import { fnusin, fucos, fusin } from 'points/animation';
+import { fusin } from 'points/animation';
 const frag = /*wgsl*/`
 
-${fnusin}
 ${fusin}
-${fucos}
-
 
 const NUMITERATIONS = 40;
 

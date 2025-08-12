@@ -1,8 +1,6 @@
-import { fnusin } from 'points/animation';
 import { structs } from '../structs.js';
 const frag = /*wgsl*/`
 
-${fnusin}
 ${structs}
 
 fn opSmoothSubtraction(d1: f32, d2: f32, k: f32) -> f32{

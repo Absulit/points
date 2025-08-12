@@ -110,7 +110,7 @@ fn main(
             (*pointPR) = bottomPoint;
 
             point = layers[layerIndex][pointIndex];
-            let positionU = vec2<u32>(ux,uy);
+            let positionU = vec2u(ux,uy);
             textureStore(outputTex, positionU, point);
             storageBarrier();
         }

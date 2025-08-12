@@ -13,7 +13,6 @@
  * // Send storage data to the Compute Shaders only
  * points.setStorage('variables', 'Variable', false, ShaderType.COMPUTE);
  *
- * @memberof module:points
  */
 class ShaderType {
     /**
@@ -44,7 +43,6 @@ class ShaderType {
 
  * // we pass the array of renderPasses
  * await points.init(renderPasses);
- * @memberof module:points
  */
 
 class RenderPass {
@@ -1308,7 +1306,6 @@ const waves = {
  *     points.update();
  *     requestAnimationFrame(update);
  * }
- * @memberof module:points
  */
 class RenderPasses {
     static COLOR = 1;
@@ -2400,12 +2397,7 @@ class UniformsArray extends Array {
 }
 
 /**
- * @module points
- */
-
-/**
  * Main class Points, this is the entry point of an application with this library.
- * @class Points
  * @example
  * import Points from 'points';
  * const points = new Points('canvas');
@@ -2423,7 +2415,6 @@ class UniformsArray extends Array {
  *     requestAnimationFrame(update);
  * }
  *
- * @memberof module:points
  */
 class Points {
     #canvasId = null;
