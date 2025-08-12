@@ -1188,6 +1188,14 @@ class Points {
         return buffer
     }
 
+    #writeBuffer(buffer, values) {
+        this.#device.queue.writeBuffer(
+            buffer,
+            0,
+            new Float32Array(values)
+        );
+    }
+
     #createParametersUniforms() {
         const paramsDataSize = this.#dataSize.get('Params')
         const paddings = paramsDataSize.paddings;
@@ -1212,7 +1220,34 @@ class Points {
             }
         }
         const values = new Float32Array(arrayValues);
-        this.#uniforms.buffer = this.#createAndMapBuffer(values, GPUBufferUsage.UNIFORM, true, paramsDataSize.bytes);
+        this.#uniforms.buffer = this.#createAndMapBuffer(values, GPUBufferUsage.UNIFORM+GPUBufferUsage.COPY_DST, true, paramsDataSize.bytes);
+    }
+
+    #writeParametersUniforms() {
+        const paramsDataSize = this.#dataSize.get('Params')
+        const paddings = paramsDataSize.paddings;
+        // we check the paddings list and add 0's to just the ones that need it
+        const uniformsClone = structuredClone(this.#uniforms);
+        let arrayValues = uniformsClone.map(v => {
+            const padding = paddings[v.name];
+            if (padding) {
+                if (v.value.constructor !== Array) {
+                    v.value = [v.value];
+                }
+                for (let i = 0; i < padding; i++) {
+                    v.value.push(0);
+                }
+            }
+            return v.value;
+        }).flat(1);
+        const finalPadding = paddings[''];
+        if (finalPadding) {
+            for (let i = 0; i < finalPadding; i++) {
+                arrayValues.push(0);
+            }
+        }
+        const values = new Float32Array(arrayValues);
+        this.#writeBuffer(this.#uniforms.buffer, values);
     }
 
     #createComputeBuffers() {
@@ -1747,7 +1782,8 @@ class Points {
         this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
         this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta);
         //--------------------------------------------
-        this.#createParametersUniforms();
+        // this.#createParametersUniforms();
+        this.#writeParametersUniforms();
         // TODO: create method for this
         this.#storage.forEach(storageItem => {
             if (storageItem.mapped) {
