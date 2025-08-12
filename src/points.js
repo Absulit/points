@@ -1192,7 +1192,7 @@ class Points {
         const paramsDataSize = this.#dataSize.get('Params')
         const paddings = paramsDataSize.paddings;
         // we check the paddings list and add 0's to just the ones that need it
-        const uniformsClone = JSON.parse(JSON.stringify(this.#uniforms));
+        const uniformsClone = structuredClone(this.#uniforms);
         let arrayValues = uniformsClone.map(v => {
             const padding = paddings[v.name];
             if (padding) {
