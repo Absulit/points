@@ -30,7 +30,6 @@ export { RenderPasses as default };
  *     points.update();
  *     requestAnimationFrame(update);
  * }
- * @memberof module:points
  */
 declare class RenderPasses {
     static COLOR: number;

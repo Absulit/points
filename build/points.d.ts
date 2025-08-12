@@ -16,7 +16,6 @@ export type SignedNumber = number;
 
  * // we pass the array of renderPasses
  * await points.init(renderPasses);
- * @memberof module:points
  */
 export class RenderPass {
     /**
@@ -98,7 +97,6 @@ export class RenderPass {
  *     points.update();
  *     requestAnimationFrame(update);
  * }
- * @memberof module:points
  */
 export class RenderPasses {
     static COLOR: number;
@@ -266,7 +264,6 @@ export class RenderPasses {
  * // Send storage data to the Compute Shaders only
  * points.setStorage('variables', 'Variable', false, ShaderType.COMPUTE);
  *
- * @memberof module:points
  */
 export class ShaderType {
     /**
@@ -283,11 +280,7 @@ export class ShaderType {
     static FRAGMENT: number;
 }
 /**
- * @module points
- */
-/**
  * Main class Points, this is the entry point of an application with this library.
- * @class Points
  * @example
  * import Points from 'points';
  * const points = new Points('canvas');
@@ -305,7 +298,6 @@ export class ShaderType {
  *     requestAnimationFrame(update);
  * }
  *
- * @memberof module:points
  */
 declare class Points {
     constructor(canvasId: any);

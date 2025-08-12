@@ -13,7 +13,6 @@
 
  * // we pass the array of renderPasses
  * await points.init(renderPasses);
- * @memberof module:points
  */
 
 class RenderPass {

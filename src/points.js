@@ -1,6 +1,3 @@
-/**
- * @module points
- */
 import UniformKeys from './UniformKeys.js';
 import VertexBufferInfo from './VertexBufferInfo.js';
 import ShaderType from './ShaderType.js';
@@ -18,7 +15,6 @@ import UniformsArray from './UniformsArray.js';
 
 /**
  * Main class Points, this is the entry point of an application with this library.
- * @class Points
  * @example
  * import Points from 'points';
  * const points = new Points('canvas');
@@ -36,7 +32,6 @@ import UniformsArray from './UniformsArray.js';
  *     requestAnimationFrame(update);
  * }
  *
- * @memberof module:points
  */
 class Points {
     #canvasId = null;

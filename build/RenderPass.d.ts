@@ -13,7 +13,6 @@ export { RenderPass as default };
 
  * // we pass the array of renderPasses
  * await points.init(renderPasses);
- * @memberof module:points
  */
 declare class RenderPass {
     /**
