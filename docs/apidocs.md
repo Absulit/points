@@ -11,12 +11,13 @@ Looking for an explanation on how to use POINTS? follow this link:
 
 ## Main classes:<br>
 ```js
-import Points { RenderPass, RenderPasses } from 'points';
+import Points { RenderPass, RenderPasses, ShaderType } from 'points';
 ```
 
-{@link module:points.Points|Points}<br>
-{@link module:points.RenderPass|RenderPass}<br>
-{@link module:points.RenderPasses|RenderPasses}<br>
+{@link Points|Points}<br>
+{@link RenderPass|RenderPass}<br>
+{@link RenderPasses|RenderPasses}<br>
+{@link ShaderType|ShaderType}<br>
 
 ## Submodules with helper wgsl functions:
 
