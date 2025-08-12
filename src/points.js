@@ -1103,7 +1103,7 @@ class Points {
                 depthStoreOp: 'store'
             }
         };
-        await this.createScreen();
+        this.createScreen();
         return true;
     }
 
@@ -1128,7 +1128,7 @@ class Points {
      * Adds two triangles called points per number of columns and rows
      * @ignore
      */
-    async createScreen() {
+    createScreen() {
         let hasVertexAndFragmentShader = this.#renderPasses.some(renderPass => renderPass.hasVertexAndFragmentShader)
         if (hasVertexAndFragmentShader) {
             let colors = [
@@ -1146,7 +1146,7 @@ class Points {
             this.#createVertexBuffer(new Float32Array(this.#vertexArray));
         }
         this.#createComputeBuffers();
-        await this.#createPipeline();
+        this.#createPipeline();
     }
     /**
      * @param {Float32Array} vertexArray
@@ -1389,7 +1389,7 @@ class Points {
         });
     }
 
-    async #createPipeline() {
+    #createPipeline() {
         this.#createComputeBindGroup();
         this.#renderPasses.forEach((renderPass, index) => {
             if (renderPass.hasComputeShader) {
