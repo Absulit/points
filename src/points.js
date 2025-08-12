@@ -1757,9 +1757,7 @@ class Points {
         });
         // AUDIO
         // this.#analyser.getByteTimeDomainData(this.#dataArray);
-        this.#sounds.forEach(sound => {
-            sound.analyser?.getByteFrequencyData(sound.data);
-        });
+        this.#sounds.forEach(sound => sound.analyser?.getByteFrequencyData(sound.data));
         // END AUDIO
         this.#texturesExternal.forEach(externalTexture => {
             externalTexture.texture = this.#device.importExternalTexture({
@@ -1772,7 +1770,7 @@ class Points {
 
         this.#createComputeBindGroup();
 
-        let commandEncoder = this.#device.createCommandEncoder();
+        const commandEncoder = this.#device.createCommandEncoder();
 
         this.#renderPasses.forEach(renderPass => {
             if (renderPass.hasComputeShader) {
