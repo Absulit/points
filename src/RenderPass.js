@@ -24,6 +24,7 @@ class RenderPass {
     #renderPipeline = null;
     #computeBindGroup = null;
     #uniformBindGroup = null;
+    #bindGroupLayout = null;
     #internal = false;
     #hasComputeShader;
     #hasVertexShader;
@@ -60,6 +61,7 @@ class RenderPass {
         this.#workgroupCountX = workgroupCountX || 8;
         this.#workgroupCountY = workgroupCountY || 8;
         this.#workgroupCountZ = workgroupCountZ || 1;
+        Object.seal(this);
     }
 
     /**
@@ -125,6 +127,14 @@ class RenderPass {
 
     get uniformBindGroup() {
         return this.#uniformBindGroup;
+    }
+
+    set bindGroupLayout(value) {
+        this.#bindGroupLayout = value;
+    }
+
+    get bindGroupLayout() {
+        return this.#bindGroupLayout;
     }
 
     get compiledShaders() {
