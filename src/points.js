@@ -1196,7 +1196,7 @@ class Points {
         );
     }
 
-    #createParametersUniforms() {
+    #createUniformValues() {
         const paramsDataSize = this.#dataSize.get('Params')
         const paddings = paramsDataSize.paddings;
         // we check the paddings list and add 0's to just the ones that need it
@@ -1219,34 +1219,16 @@ class Points {
                 arrayValues.push(0);
             }
         }
-        const values = new Float32Array(arrayValues);
-        this.#uniforms.buffer = this.#createAndMapBuffer(values, GPUBufferUsage.UNIFORM+GPUBufferUsage.COPY_DST, true, paramsDataSize.bytes);
+        return { values: new Float32Array(arrayValues), paramsDataSize };
+    }
+
+    #createParametersUniforms() {
+        const { values, paramsDataSize } = this.#createUniformValues();
+        this.#uniforms.buffer = this.#createAndMapBuffer(values, GPUBufferUsage.UNIFORM + GPUBufferUsage.COPY_DST, true, paramsDataSize.bytes);
     }
 
     #writeParametersUniforms() {
-        const paramsDataSize = this.#dataSize.get('Params')
-        const paddings = paramsDataSize.paddings;
-        // we check the paddings list and add 0's to just the ones that need it
-        const uniformsClone = structuredClone(this.#uniforms);
-        let arrayValues = uniformsClone.map(v => {
-            const padding = paddings[v.name];
-            if (padding) {
-                if (v.value.constructor !== Array) {
-                    v.value = [v.value];
-                }
-                for (let i = 0; i < padding; i++) {
-                    v.value.push(0);
-                }
-            }
-            return v.value;
-        }).flat(1);
-        const finalPadding = paddings[''];
-        if (finalPadding) {
-            for (let i = 0; i < finalPadding; i++) {
-                arrayValues.push(0);
-            }
-        }
-        const values = new Float32Array(arrayValues);
+        const { values } = this.#createUniformValues();
         this.#writeBuffer(this.#uniforms.buffer, values);
     }
 
