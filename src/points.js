@@ -192,7 +192,7 @@ class Points {
      * let finalColor:vec4f = mix(color0, color1, params.scale);
      */
     setUniform(name, value, structName = null) {
-        let uniformToUpdate = this.#nameExists(this.#uniforms, name);
+        const uniformToUpdate = this.#nameExists(this.#uniforms, name);
         if (uniformToUpdate && structName) {
             // if name exists is an update
             throw '`setUniform()` can\'t set the structName of an already defined uniform.';
@@ -736,7 +736,7 @@ class Points {
         // this.#audio.play();
         // audio
         const audioContext = new AudioContext();
-        let resume = _ => { audioContext.resume() }
+        const resume = _ => { audioContext.resume() }
         if (audioContext.state === 'suspended') {
             document.body.addEventListener('touchend', resume, false);
             document.body.addEventListener('click', resume, false);
@@ -847,7 +847,7 @@ class Points {
     addEventListener(name, callback, structSize) {
         // TODO: remove structSize
         // this extra 4 is for the boolean flag in the Event struct
-        let data = new Uint8Array(Array(structSize + 4).fill(0));
+        const data = new Uint8Array(Array(structSize + 4).fill(0));
         this.setStorageMap(name, data, 'Event', true);
         this.#events.set(this.#events_ids,
             {
@@ -886,9 +886,9 @@ class Points {
             bindingIndex += 1;
         }
         this.#storage.forEach(storageItem => {
-            let internalCheck = internal == storageItem.internal;
+            const internalCheck = internal == storageItem.internal;
             if (!storageItem.shaderType && internalCheck || storageItem.shaderType == shaderType && internalCheck) {
-                let T = storageItem.structName;
+                const T = storageItem.structName;
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, read_write> ${storageItem.name}: ${T};\n`
                 bindingIndex += 1;
             }
@@ -902,21 +902,21 @@ class Points {
             }
         }
         this.#samplers.forEach((sampler, index) => {
-            let internalCheck = internal == sampler.internal;
+            const internalCheck = internal == sampler.internal;
             if (!sampler.shaderType && internalCheck || sampler.shaderType == shaderType && internalCheck) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${sampler.name}: sampler;\n`;
                 bindingIndex += 1;
             }
         });
         this.#texturesStorage2d.forEach((texture, index) => {
-            let internalCheck = internal && texture.internal;
+            const internalCheck = internal && texture.internal;
             if (!texture.shaderType && internalCheck || texture.shaderType == shaderType && internalCheck) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_storage_2d<rgba8unorm, write>;\n`;
                 bindingIndex += 1;
             }
         });
         this.#textures2d.forEach((texture, index) => {
-            let internalCheck = internal == texture.internal;
+            const internalCheck = internal == texture.internal;
             if (!texture.shaderType && internalCheck || texture.shaderType == shaderType && internalCheck) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d<f32>;\n`;
                 bindingIndex += 1;
@@ -930,14 +930,14 @@ class Points {
             }
         });
         this.#texturesExternal.forEach(externalTexture => {
-            let internalCheck = internal == externalTexture.internal;
+            const internalCheck = internal == externalTexture.internal;
             if (!externalTexture.shaderType && internalCheck || externalTexture.shaderType == shaderType && internalCheck) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${externalTexture.name}: texture_external;\n`;
                 bindingIndex += 1;
             }
         });
         this.#bindingTextures.forEach(bindingTexture => {
-            let internalCheck = internal == bindingTexture.internal;
+            const internalCheck = internal == bindingTexture.internal;
             if (bindingTexture.compute.shaderType == shaderType && internalCheck) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.compute.name}: texture_storage_2d<rgba8unorm, write>;\n`;
                 bindingIndex += 1;
