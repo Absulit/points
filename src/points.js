@@ -1255,7 +1255,7 @@ class Points {
         this.#createParametersUniforms();
         //--------------------------------------------
         this.#storage.forEach(storageItem => {
-            let usage = GPUBufferUsage.STORAGE;
+            let usage = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST;
             if (storageItem.read) {
                 let readStorageItem = {
                     name: storageItem.name,
@@ -1268,7 +1268,7 @@ class Points {
                     }
                 }
                 this.#readStorage.push(readStorageItem);
-                usage = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC;
+                usage = usage | GPUBufferUsage.COPY_SRC;
             }
             storageItem.usage = usage;
             if (storageItem.mapped) {
@@ -1788,7 +1788,7 @@ class Points {
         this.#storage.forEach(storageItem => {
             if (storageItem.mapped) {
                 const values = new Float32Array(storageItem.array);
-                storageItem.buffer = this.#createAndMapBuffer(values, storageItem.usage);
+                this.#writeBuffer(storageItem.buffer, values);
             }
         });
         // AUDIO
