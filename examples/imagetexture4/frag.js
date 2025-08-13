@@ -1,13 +1,8 @@
-import { snoise } from 'points/noise2d';
-import { texturePosition } from 'points/image';
+import { texture } from 'points/image';
 
 const frag = /*wgsl*/`
 
-${snoise}
-${texturePosition}
-
-
-const N = 2.;
+${texture}
 
 @fragment
 fn main(
@@ -19,8 +14,7 @@ fn main(
         @builtin(position) position: vec4f
     ) -> @location(0) vec4f {
 
-    let startPosition = vec2(.0);
-    let rgbaImage = texturePosition(image, imageSampler, startPosition, uvr * params.scale, false); //* .998046;
+    let rgbaImage = texture(image, imageSampler, uvr * params.scale, false);
     let finalColor:vec4f = rgbaImage;
 
     return finalColor;

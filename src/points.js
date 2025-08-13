@@ -923,7 +923,7 @@ class Points {
             }
         });
         this.#textures2dArray.forEach((texture, index) => {
-            let internalCheck = internal == texture.internal;
+            const internalCheck = internal == texture.internal;
             if (!texture.shaderType && internalCheck || texture.shaderType == shaderType && internalCheck) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d_array<f32>;\n`;
                 bindingIndex += 1;
@@ -1176,7 +1176,7 @@ class Points {
     }
 
     /**
-     * It creates with size, no with data, so it's empty
+     * It creates with size, not with data, so it's empty
      * @param {Number} size numItems * instanceByteSize ;
      * @param {GPUBufferUsageFlags} usage
      * @returns {GPUBuffer} buffer
@@ -1785,7 +1785,6 @@ class Points {
         this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
         this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta);
         //--------------------------------------------
-        // this.#createParametersUniforms();
         this.#writeParametersUniforms();
         this.#writeStorages();
         // AUDIO
