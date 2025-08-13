@@ -1,3 +1,4 @@
+'strict mode'
 import UniformKeys from './UniformKeys.js';
 import VertexBufferInfo from './VertexBufferInfo.js';
 import ShaderType from './ShaderType.js';
@@ -1188,6 +1189,11 @@ class Points {
         return buffer
     }
 
+    /**
+     * To update a buffer instead of recreating it
+     * @param {GPUBuffer} buffer
+     * @param {Float32Array} values
+     */
     #writeBuffer(buffer, values) {
         this.#device.queue.writeBuffer(
             buffer,
@@ -1227,9 +1233,24 @@ class Points {
         this.#uniforms.buffer = this.#createAndMapBuffer(values, GPUBufferUsage.UNIFORM + GPUBufferUsage.COPY_DST, true, paramsDataSize.bytes);
     }
 
+    /**
+     * Updates all uniforms (for the update function)
+     */
     #writeParametersUniforms() {
         const { values } = this.#createUniformValues();
         this.#writeBuffer(this.#uniforms.buffer, values);
+    }
+
+    /**
+     * Updates all the storages (for the update function)
+     */
+    #writeStorages(){
+        this.#storage.forEach(storageItem => {
+            if (storageItem.mapped) {
+                const values = new Float32Array(storageItem.array);
+                this.#writeBuffer(storageItem.buffer, values);
+            }
+        });
     }
 
     #createComputeBuffers() {
@@ -1377,9 +1398,9 @@ class Points {
             if (renderPass.hasComputeShader) {
                 const entries = this.#createEntries(ShaderType.COMPUTE);
                 if (entries.length) {
-                    let bglEntries = [];
+                    const bglEntries = [];
                     entries.forEach((entry, index) => {
-                        let bglEntry = {
+                        const bglEntry = {
                             binding: index,
                             visibility: GPUShaderStage.COMPUTE
                         }
@@ -1682,7 +1703,7 @@ class Points {
                 }
             });
             this.#bindingTextures.forEach(bindingTexture => {
-                let internalCheck = internal == bindingTexture.internal;
+                const internalCheck = internal == bindingTexture.internal;
                 if (bindingTexture.fragment.shaderType == shaderType && internalCheck) {
                     entries.push(
                         {
@@ -1766,13 +1787,7 @@ class Points {
         //--------------------------------------------
         // this.#createParametersUniforms();
         this.#writeParametersUniforms();
-        // TODO: create method for this
-        this.#storage.forEach(storageItem => {
-            if (storageItem.mapped) {
-                const values = new Float32Array(storageItem.array);
-                this.#writeBuffer(storageItem.buffer, values);
-            }
-        });
+        this.#writeStorages();
         // AUDIO
         // this.#analyser.getByteTimeDomainData(this.#dataArray);
         this.#sounds.forEach(sound => sound.analyser?.getByteFrequencyData(sound.data));
