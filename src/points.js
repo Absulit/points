@@ -1759,6 +1759,30 @@ class Points {
     }
 
     /**
+     * This is a slimmed down version of {@link #createParams}.
+     * We don't create the bindingGroupLayout since it already exists.
+     * We do update the entries. We have to update them because of
+     * changing textures like videos.
+     * TODO: this can be optimized even further by setting a flag to
+     * NOT CALL the createBindGroup if the texture (video/other)
+     * is not being updated at all. I have to make the createBindGroup call
+     * only if the texture is
+     */
+    #passParams() {
+        this.#renderPasses.forEach(renderPass => {
+            const entries = this.#createEntries(ShaderType.FRAGMENT, renderPass.internal);
+            if (entries.length) {
+                renderPass.entries = entries;
+                renderPass.uniformBindGroup = this.#device.createBindGroup({
+                    label: '_passParams() 0',
+                    layout: renderPass.bindGroupLayout,
+                    entries: renderPass.entries
+                });
+            }
+        });
+    }
+
+    /**
      * Method executed on each {@link https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame | requestAnimationFrame}.
      * Here's where all the calls to update data will be executed.
      * @example
@@ -1826,6 +1850,7 @@ class Points {
         this.#renderPassDescriptor.colorAttachments[0].view = swapChainTexture.createView();
         this.#renderPassDescriptor.depthStencilAttachment.view = this.#depthTexture.createView();
 
+        // this.#createParams();
         this.#passParams();
         this.#renderPasses.forEach((renderPass, renderPassIndex) => {
             if (renderPass.hasVertexAndFragmentShader) {
