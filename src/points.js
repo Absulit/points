@@ -1793,18 +1793,16 @@ class Points {
      * is not being updated at all. I have to make the createBindGroup call
      * only if the texture is updated.
      */
-    #passParams() {
-        this.#renderPasses.forEach(renderPass => {
-            const entries = this.#createEntries(ShaderType.FRAGMENT, renderPass.internal);
-            if (entries.length) {
-                renderPass.entries = entries;
-                renderPass.uniformBindGroup = this.#device.createBindGroup({
-                    label: '_passParams() 0',
-                    layout: renderPass.bindGroupLayout,
-                    entries: renderPass.entries
-                });
-            }
-        });
+    #passParams(renderPass) {
+        const entries = this.#createEntries(ShaderType.FRAGMENT, renderPass.internal);
+        if (entries.length) {
+            renderPass.entries = entries;
+            renderPass.uniformBindGroup = this.#device.createBindGroup({
+                label: '_passParams() 0',
+                layout: renderPass.bindGroupLayout,
+                entries: renderPass.entries
+            });
+        }
     }
 
     /**
@@ -1876,9 +1874,9 @@ class Points {
         this.#renderPassDescriptor.colorAttachments[0].view = swapChainTexture.createView();
         this.#renderPassDescriptor.depthStencilAttachment.view = this.#depthTexture.createView();
 
-        this.#passParams();
         this.#renderPasses.forEach((renderPass, renderPassIndex) => {
             if (renderPass.hasVertexAndFragmentShader) {
+                this.#passParams(renderPass);
                 const passEncoder = commandEncoder.beginRenderPass(this.#renderPassDescriptor);
                 passEncoder.setPipeline(renderPass.renderPipeline);
 
