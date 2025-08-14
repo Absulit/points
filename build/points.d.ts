@@ -52,6 +52,12 @@ export class RenderPass {
     get computeBindGroup(): any;
     set uniformBindGroup(value: any);
     get uniformBindGroup(): any;
+    set bindGroupLayout(value: any);
+    get bindGroupLayout(): any;
+    set bindGroupLayoutCompute(value: any);
+    get bindGroupLayoutCompute(): any;
+    set entries(value: any);
+    get entries(): any;
     get compiledShaders(): {
         vertex: string;
         compute: string;
@@ -694,7 +700,7 @@ declare class Points {
      * Adds two triangles called points per number of columns and rows
      * @ignore
      */
-    createScreen(): Promise<void>;
+    createScreen(): void;
     /**
      * Method executed on each {@link https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame | requestAnimationFrame}.
      * Here's where all the calls to update data will be executed.

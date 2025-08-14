@@ -1,15 +1,12 @@
 // https://www.geeks3d.com/20140213/glsl-shader-library-fish-eye-and-dome-and-barrel-distortion-post-processing-filters/
 
-import { fnusin } from '../../animation.js';
-import { textureExternalPosition, texturePosition } from '../../image.js';
+import { texture } from '../../image.js';
 import { rotateVector, polar, PI } from '../../math.js';
 import { WHITE } from '../../color.js';
 import { snoise } from '../../noise2d.js';
 const frag = /*wgsl*/`
 
-${fnusin}
-${texturePosition}
-${textureExternalPosition}
+${texture}
 ${rotateVector}
 ${snoise}
 ${PI}
@@ -72,16 +69,12 @@ fn main(
     // --------- chromatic displacement vector
     let cdv = vec2(params.lensDistortion_distance, 0.);
     // let dis = distance(vec2(.5,.5), uvr);
-    let imageColorR = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * ratio, nuv + cdv * params.lensDistortion_amount , true).r;
-    let imageColorG = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * ratio, nuv, true).g;
-    let imageColorB = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * ratio, nuv - cdv * params.lensDistortion_amount , true).b;
+    let imageColorR = texture(renderpass_feedbackTexture, renderpass_feedbackSampler, nuv + cdv * params.lensDistortion_amount , true).r;
+    let imageColorG = texture(renderpass_feedbackTexture, renderpass_feedbackSampler, nuv, true).g;
+    let imageColorB = texture(renderpass_feedbackTexture, renderpass_feedbackSampler, nuv - cdv * params.lensDistortion_amount , true).b;
 
     let chromaticAberration:vec4f = vec4(imageColorR, imageColorG, imageColorB, 1);
     // -- Chromatic Aberration
-
-
-
-
 
 
     let finalColor = chromaticAberration;

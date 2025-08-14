@@ -49,6 +49,12 @@ declare class RenderPass {
     get computeBindGroup(): any;
     set uniformBindGroup(value: any);
     get uniformBindGroup(): any;
+    set bindGroupLayout(value: any);
+    get bindGroupLayout(): any;
+    set bindGroupLayoutCompute(value: any);
+    get bindGroupLayoutCompute(): any;
+    set entries(value: any);
+    get entries(): any;
     get compiledShaders(): {
         vertex: string;
         compute: string;
