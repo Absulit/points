@@ -30,10 +30,7 @@ fn main(
     let texColorCompute = texturePosition(computeTexture, feedbackSampler, startPosition, uv, false);
 
     let d = distance(uvr, vec2(.5 + .1 * fusin(2.), .5  + .1 * fusin(4.123)) * ratio);
-    var c = 1.;
-    if(d > .1){
-        c = 0.;
-    }
+    let c = step(d, .1); // if(d > .1){c = 0.;}
 
     let decayR =  texColor.r * .9 * texColor2.r;
     let decayG =  texColor.g * .9;
