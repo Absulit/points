@@ -1826,7 +1826,7 @@ class Points {
         this.#renderPassDescriptor.colorAttachments[0].view = swapChainTexture.createView();
         this.#renderPassDescriptor.depthStencilAttachment.view = this.#depthTexture.createView();
 
-        this.#createParams();
+        this.#passParams();
         this.#renderPasses.forEach((renderPass, renderPassIndex) => {
             if (renderPass.hasVertexAndFragmentShader) {
                 const passEncoder = commandEncoder.beginRenderPass(this.#renderPassDescriptor);
