@@ -54,6 +54,9 @@ class RenderPass {
     #renderPipeline = null;
     #computeBindGroup = null;
     #uniformBindGroup = null;
+    #bindGroupLayout = null;
+    #bindGroupLayoutCompute = null;
+    #entries = null;
     #internal = false;
     #hasComputeShader;
     #hasVertexShader;
@@ -90,6 +93,7 @@ class RenderPass {
         this.#workgroupCountX = workgroupCountX || 8;
         this.#workgroupCountY = workgroupCountY || 8;
         this.#workgroupCountZ = workgroupCountZ || 1;
+        Object.seal(this);
     }
 
     /**
@@ -157,6 +161,29 @@ class RenderPass {
         return this.#uniformBindGroup;
     }
 
+    set bindGroupLayout(value) {
+        this.#bindGroupLayout = value;
+    }
+
+    get bindGroupLayout() {
+        return this.#bindGroupLayout;
+    }
+    set bindGroupLayoutCompute(value) {
+        this.#bindGroupLayoutCompute = value;
+    }
+
+    get bindGroupLayoutCompute() {
+        return this.#bindGroupLayoutCompute;
+    }
+
+    set entries(value) {
+        this.#entries = value;
+    }
+
+    get entries() {
+        return this.#entries;
+    }
+
     get compiledShaders() {
         return this.#compiledShaders;
     }
@@ -211,6 +238,50 @@ fn main(
  * @module points/image
  */
 
+/**
+ * Places a texture. The texture being an image loaded from the JS side.
+ * @type {String}
+ * @param {texture_2d<f32>} texture `texture_2d<f32>`
+ * @param {sampler} aSampler `sampler`
+ * @param {vec2f} uv `vec2f`
+ * @param {bool} crop `bool`
+ * @returns {vec4f}
+ *
+ * @example
+ *
+ * // js
+ * import { texture } from 'points/image';
+ *
+ * await points.setTextureImage('image', 'myimage.jpg');
+ *
+ * // wgsl string
+ * ${texture}
+ * let value = texture(image, imageSampler, uvr, true);
+ */
+const texture = /*wgsl*/`
+fn texture(texture:texture_2d<f32>, aSampler:sampler, uv:vec2f, crop:bool) -> vec4f {
+    let flipTexture = vec2(1.,-1.);
+    let flipTextureCoordinates = vec2(-1.,1.);
+    let dims:vec2u = textureDimensions(texture, 0);
+    let dimsF32 = vec2f(dims);
+
+    let minScreenSize = params.screen.y;
+    let imageRatio = dimsF32 / minScreenSize;
+
+    let displaceImagePosition =  vec2(0., 1.);
+
+    let imageUV = uv / imageRatio * flipTexture + displaceImagePosition;
+
+    var rgbaImage = textureSample(texture, aSampler, imageUV);
+
+    // e.g. if uv.x < 0. OR uv.y < 0. || uv.x > imageRatio.x OR uv.y > imageRatio.y
+    if (crop && (any(uv < vec2(0.0)) || any(uv > imageRatio))) {
+        rgbaImage = vec4(0.);
+    }
+
+    return rgbaImage;
+}
+`;
 
 /**
  * Places texture in a position
@@ -247,51 +318,6 @@ fn texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2f, uv
 
     let imageUV = uv / imageRatio * flipTexture + displaceImagePosition;
     var rgbaImage = textureSample(texture, aSampler, imageUV);
-
-    // e.g. if uv.x < 0. OR uv.y < 0. || uv.x > imageRatio.x OR uv.y > imageRatio.y
-    if (crop && (any(uv < vec2(0.0)) || any(uv > imageRatio))) {
-        rgbaImage = vec4(0.);
-    }
-
-    return rgbaImage;
-}
-`;
-
-/**
- * Places texture_external in a position. Texture external being in this case
- * a video loaded as texture in the JS side.
- * @type {String}
- * @param {texture_external} texture `texture_external`
- * @param {sampler} aSampler `sampler`
- * @param {vec2f} position `vec2f`
- * @param {vec2f} uv `vec2f`
- * @param {bool} crop `bool`
- * @returns {vec4f}
- *
- * @example
- * // js
- * import { textureExternalPosition } from 'points/image';
- * await points.setTextureVideo('video', 'myvideo.mp4');
- *
- * // wgsl string
- * ${textureExternalPosition}
- * let value = textureExternalPosition(video, imageSampler, vec2f(), uvr, true);
- */
-const textureExternalPosition = /*wgsl*/`
-fn textureExternalPosition(texture:texture_external, aSampler:sampler, position:vec2f, uv:vec2f, crop:bool) -> vec4f {
-    let flipTexture = vec2(1.,-1.);
-    let flipTextureCoordinates = vec2(-1.,1.);
-    let dims: vec2<u32> = textureDimensions(texture);
-    let dimsF32 = vec2f(f32(dims.x), f32(dims.y));
-
-    let minScreenSize = params.screen.y;
-    let imageRatio = dimsF32 / minScreenSize;
-
-    let displaceImagePosition = position * flipTextureCoordinates / imageRatio + vec2(0, 1);
-    let top = position + vec2(0, imageRatio.y);
-
-    let imageUV = uv / imageRatio * flipTexture + displaceImagePosition;
-    var rgbaImage = textureSampleBaseClampToEdge(texture, aSampler, imageUV);
 
     // e.g. if uv.x < 0. OR uv.y < 0. || uv.x > imageRatio.x OR uv.y > imageRatio.y
     if (crop && (any(uv < vec2(0.0)) || any(uv > imageRatio))) {
@@ -842,9 +868,7 @@ fn snoise(v:vec2f) -> f32 {
 
 const frag$4 = /*wgsl*/`
 
-${fnusin}
-${texturePosition}
-${textureExternalPosition}
+${texture}
 ${rotateVector}
 ${snoise}
 ${PI}
@@ -907,16 +931,12 @@ fn main(
     // --------- chromatic displacement vector
     let cdv = vec2(params.lensDistortion_distance, 0.);
     // let dis = distance(vec2(.5,.5), uvr);
-    let imageColorR = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * ratio, nuv + cdv * params.lensDistortion_amount , true).r;
-    let imageColorG = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * ratio, nuv, true).g;
-    let imageColorB = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * ratio, nuv - cdv * params.lensDistortion_amount , true).b;
+    let imageColorR = texture(renderpass_feedbackTexture, renderpass_feedbackSampler, nuv + cdv * params.lensDistortion_amount , true).r;
+    let imageColorG = texture(renderpass_feedbackTexture, renderpass_feedbackSampler, nuv, true).g;
+    let imageColorB = texture(renderpass_feedbackTexture, renderpass_feedbackSampler, nuv - cdv * params.lensDistortion_amount , true).b;
 
     let chromaticAberration:vec4f = vec4(imageColorR, imageColorG, imageColorB, 1);
     // -- Chromatic Aberration
-
-
-
-
 
 
     let finalColor = chromaticAberration;
@@ -2574,7 +2594,7 @@ class Points {
      * let finalColor:vec4f = mix(color0, color1, params.scale);
      */
     setUniform(name, value, structName = null) {
-        let uniformToUpdate = this.#nameExists(this.#uniforms, name);
+        const uniformToUpdate = this.#nameExists(this.#uniforms, name);
         if (uniformToUpdate && structName) {
             // if name exists is an update
             throw '`setUniform()` can\'t set the structName of an already defined uniform.';
@@ -2989,7 +3009,6 @@ class Points {
         }
         const imageBitmaps = [];
         for await (const path of paths) {
-            console.log(path);
             const response = await fetch(path);
             const blob = await response.blob();
             imageBitmaps.push(await createImageBitmap(blob));
@@ -3118,7 +3137,7 @@ class Points {
         // this.#audio.play();
         // audio
         const audioContext = new AudioContext();
-        let resume = _ => { audioContext.resume(); };
+        const resume = _ => { audioContext.resume(); };
         if (audioContext.state === 'suspended') {
             document.body.addEventListener('touchend', resume, false);
             document.body.addEventListener('click', resume, false);
@@ -3229,7 +3248,7 @@ class Points {
     addEventListener(name, callback, structSize) {
         // TODO: remove structSize
         // this extra 4 is for the boolean flag in the Event struct
-        let data = new Uint8Array(Array(structSize + 4).fill(0));
+        const data = new Uint8Array(Array(structSize + 4).fill(0));
         this.setStorageMap(name, data, 'Event', true);
         this.#events.set(this.#events_ids,
             {
@@ -3268,9 +3287,9 @@ class Points {
             bindingIndex += 1;
         }
         this.#storage.forEach(storageItem => {
-            let internalCheck = internal == storageItem.internal;
+            const internalCheck = internal == storageItem.internal;
             if (!storageItem.shaderType && internalCheck || storageItem.shaderType == shaderType && internalCheck) {
-                let T = storageItem.structName;
+                const T = storageItem.structName;
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, read_write> ${storageItem.name}: ${T};\n`;
                 bindingIndex += 1;
             }
@@ -3284,42 +3303,42 @@ class Points {
             }
         }
         this.#samplers.forEach((sampler, index) => {
-            let internalCheck = internal == sampler.internal;
+            const internalCheck = internal == sampler.internal;
             if (!sampler.shaderType && internalCheck || sampler.shaderType == shaderType && internalCheck) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${sampler.name}: sampler;\n`;
                 bindingIndex += 1;
             }
         });
         this.#texturesStorage2d.forEach((texture, index) => {
-            let internalCheck = internal && texture.internal;
+            const internalCheck = internal && texture.internal;
             if (!texture.shaderType && internalCheck || texture.shaderType == shaderType && internalCheck) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_storage_2d<rgba8unorm, write>;\n`;
                 bindingIndex += 1;
             }
         });
         this.#textures2d.forEach((texture, index) => {
-            let internalCheck = internal == texture.internal;
+            const internalCheck = internal == texture.internal;
             if (!texture.shaderType && internalCheck || texture.shaderType == shaderType && internalCheck) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d<f32>;\n`;
                 bindingIndex += 1;
             }
         });
         this.#textures2dArray.forEach((texture, index) => {
-            let internalCheck = internal == texture.internal;
+            const internalCheck = internal == texture.internal;
             if (!texture.shaderType && internalCheck || texture.shaderType == shaderType && internalCheck) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d_array<f32>;\n`;
                 bindingIndex += 1;
             }
         });
         this.#texturesExternal.forEach(externalTexture => {
-            let internalCheck = internal == externalTexture.internal;
+            const internalCheck = internal == externalTexture.internal;
             if (!externalTexture.shaderType && internalCheck || externalTexture.shaderType == shaderType && internalCheck) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${externalTexture.name}: texture_external;\n`;
                 bindingIndex += 1;
             }
         });
         this.#bindingTextures.forEach(bindingTexture => {
-            let internalCheck = internal == bindingTexture.internal;
+            const internalCheck = internal == bindingTexture.internal;
             if (bindingTexture.compute.shaderType == shaderType && internalCheck) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.compute.name}: texture_storage_2d<rgba8unorm, write>;\n`;
                 bindingIndex += 1;
@@ -3485,7 +3504,7 @@ class Points {
                 depthStoreOp: 'store'
             }
         };
-        await this.createScreen();
+        this.createScreen();
         return true;
     }
 
@@ -3510,7 +3529,7 @@ class Points {
      * Adds two triangles called points per number of columns and rows
      * @ignore
      */
-    async createScreen() {
+    createScreen() {
         let hasVertexAndFragmentShader = this.#renderPasses.some(renderPass => renderPass.hasVertexAndFragmentShader);
         if (hasVertexAndFragmentShader) {
             let colors = [
@@ -3528,7 +3547,7 @@ class Points {
             this.#createVertexBuffer(new Float32Array(this.#vertexArray));
         }
         this.#createComputeBuffers();
-        await this.#createPipeline();
+        this.#createPipeline();
     }
     /**
      * @param {Float32Array} vertexArray
@@ -3557,7 +3576,7 @@ class Points {
     }
 
     /**
-     * It creates with size, no with data, so it's empty
+     * It creates with size, not with data, so it's empty
      * @param {Number} size numItems * instanceByteSize ;
      * @param {GPUBufferUsageFlags} usage
      * @returns {GPUBuffer} buffer
@@ -3570,11 +3589,24 @@ class Points {
         return buffer
     }
 
-    #createParametersUniforms() {
+    /**
+     * To update a buffer instead of recreating it
+     * @param {GPUBuffer} buffer
+     * @param {Float32Array} values
+     */
+    #writeBuffer(buffer, values) {
+        this.#device.queue.writeBuffer(
+            buffer,
+            0,
+            new Float32Array(values)
+        );
+    }
+
+    #createUniformValues() {
         const paramsDataSize = this.#dataSize.get('Params');
         const paddings = paramsDataSize.paddings;
         // we check the paddings list and add 0's to just the ones that need it
-        const uniformsClone = JSON.parse(JSON.stringify(this.#uniforms));
+        const uniformsClone = structuredClone(this.#uniforms);
         let arrayValues = uniformsClone.map(v => {
             const padding = paddings[v.name];
             if (padding) {
@@ -3593,8 +3625,32 @@ class Points {
                 arrayValues.push(0);
             }
         }
-        const values = new Float32Array(arrayValues);
-        this.#uniforms.buffer = this.#createAndMapBuffer(values, GPUBufferUsage.UNIFORM, true, paramsDataSize.bytes);
+        return { values: new Float32Array(arrayValues), paramsDataSize };
+    }
+
+    #createParametersUniforms() {
+        const { values, paramsDataSize } = this.#createUniformValues();
+        this.#uniforms.buffer = this.#createAndMapBuffer(values, GPUBufferUsage.UNIFORM + GPUBufferUsage.COPY_DST, true, paramsDataSize.bytes);
+    }
+
+    /**
+     * Updates all uniforms (for the update function)
+     */
+    #writeParametersUniforms() {
+        const { values } = this.#createUniformValues();
+        this.#writeBuffer(this.#uniforms.buffer, values);
+    }
+
+    /**
+     * Updates all the storages (for the update function)
+     */
+    #writeStorages() {
+        this.#storage.forEach(storageItem => {
+            if (storageItem.mapped) {
+                const values = new Float32Array(storageItem.array);
+                this.#writeBuffer(storageItem.buffer, values);
+            }
+        });
     }
 
     #createComputeBuffers() {
@@ -3602,7 +3658,7 @@ class Points {
         this.#createParametersUniforms();
         //--------------------------------------------
         this.#storage.forEach(storageItem => {
-            let usage = GPUBufferUsage.STORAGE;
+            let usage = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST;
             if (storageItem.read) {
                 let readStorageItem = {
                     name: storageItem.name,
@@ -3615,7 +3671,7 @@ class Points {
                     };
                 }
                 this.#readStorage.push(readStorageItem);
-                usage = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC;
+                usage = usage | GPUBufferUsage.COPY_SRC;
             }
             storageItem.usage = usage;
             if (storageItem.mapped) {
@@ -3742,9 +3798,9 @@ class Points {
             if (renderPass.hasComputeShader) {
                 const entries = this.#createEntries(ShaderType.COMPUTE);
                 if (entries.length) {
-                    let bglEntries = [];
+                    const bglEntries = [];
                     entries.forEach((entry, index) => {
-                        let bglEntry = {
+                        const bglEntry = {
                             binding: index,
                             visibility: GPUShaderStage.COMPUTE
                         };
@@ -3757,13 +3813,13 @@ class Points {
                         }
                         bglEntries.push(bglEntry);
                     });
-                    renderPass.bindGroupLayout = this.#device.createBindGroupLayout({ entries: bglEntries });
+                    renderPass.bindGroupLayoutCompute = this.#device.createBindGroupLayout({ entries: bglEntries });
                     /**
                      * @type {GPUBindGroup}
                      */
                     renderPass.computeBindGroup = this.#device.createBindGroup({
                         label: `_createComputeBindGroup 0 - ${index}`,
-                        layout: renderPass.bindGroupLayout,
+                        layout: renderPass.bindGroupLayoutCompute,
                         entries: entries
                     });
                 }
@@ -3771,13 +3827,38 @@ class Points {
         });
     }
 
-    async #createPipeline() {
+    /**
+     * This is a slimmed down version of {@link #createComputeBindGroup}.
+     * We don't create the bindingGroupLayout since it already exists.
+     * We do update the entries. We have to update them because of
+     * changing textures like videos.
+     * TODO: this can be optimized even further by setting a flag to
+     * NOT CALL the createBindGroup if the texture (video/other)
+     * is not being updated at all. I have to make the createBindGroup call
+     * only if the texture is updated.
+     */
+    #passComputeBindingGroup(renderPass){
+        const entries = this.#createEntries(ShaderType.COMPUTE);
+        if (entries.length) {
+            renderPass.entries = entries;
+            /**
+             * @type {GPUBindGroup}
+             */
+            renderPass.computeBindGroup = this.#device.createBindGroup({
+                label: `_passComputeBindingGroup 0`,
+                layout: renderPass.bindGroupLayoutCompute,
+                entries: renderPass.entries
+            });
+        }
+    }
+
+    #createPipeline() {
         this.#createComputeBindGroup();
         this.#renderPasses.forEach((renderPass, index) => {
             if (renderPass.hasComputeShader) {
                 renderPass.computePipeline = this.#device.createComputePipeline({
                     layout: this.#device.createPipelineLayout({
-                        bindGroupLayouts: [renderPass.bindGroupLayout]
+                        bindGroupLayouts: [renderPass.bindGroupLayoutCompute]
                     }),
                     label: `_createPipeline() - ${index}`,
                     compute: {
@@ -4047,7 +4128,7 @@ class Points {
                 }
             });
             this.#bindingTextures.forEach(bindingTexture => {
-                let internalCheck = internal == bindingTexture.internal;
+                const internalCheck = internal == bindingTexture.internal;
                 if (bindingTexture.fragment.shaderType == shaderType && internalCheck) {
                     entries.push(
                         {
@@ -4091,14 +4172,37 @@ class Points {
                     }
                     bglEntries.push(bglEntry);
                 });
+                renderPass.entries = entries;
                 renderPass.bindGroupLayout = this.#device.createBindGroupLayout({ entries: bglEntries });
                 renderPass.uniformBindGroup = this.#device.createBindGroup({
                     label: '_createParams() 0',
                     layout: renderPass.bindGroupLayout,
-                    entries: entries
+                    entries: renderPass.entries
                 });
             }
         });
+    }
+
+    /**
+     * This is a slimmed down version of {@link #createParams}.
+     * We don't create the bindingGroupLayout since it already exists.
+     * We do update the entries. We have to update them because of
+     * changing textures like videos.
+     * TODO: this can be optimized even further by setting a flag to
+     * NOT CALL the createBindGroup if the texture (video/other)
+     * is not being updated at all. I have to make the createBindGroup call
+     * only if the texture is updated.
+     */
+    #passParams(renderPass) {
+        const entries = this.#createEntries(ShaderType.FRAGMENT, renderPass.internal);
+        if (entries.length) {
+            renderPass.entries = entries;
+            renderPass.uniformBindGroup = this.#device.createBindGroup({
+                label: '_passParams() 0',
+                layout: renderPass.bindGroupLayout,
+                entries: renderPass.entries
+            });
+        }
     }
 
     /**
@@ -4129,62 +4233,34 @@ class Points {
         this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
         this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta);
         //--------------------------------------------
-        this.#createParametersUniforms();
-        // TODO: create method for this
-        this.#storage.forEach(storageItem => {
-            if (storageItem.mapped) {
-                const values = new Float32Array(storageItem.array);
-                storageItem.buffer = this.#createAndMapBuffer(values, storageItem.usage);
-            }
-        });
+        this.#writeParametersUniforms();
+        this.#writeStorages();
         // AUDIO
         // this.#analyser.getByteTimeDomainData(this.#dataArray);
-        this.#sounds.forEach(sound => {
-            sound.analyser?.getByteFrequencyData(sound.data);
-        });
+        this.#sounds.forEach(sound => sound.analyser?.getByteFrequencyData(sound.data));
         // END AUDIO
         this.#texturesExternal.forEach(externalTexture => {
             externalTexture.texture = this.#device.importExternalTexture({
                 source: externalTexture.video
             });
             if ('requestVideoFrameCallback' in externalTexture.video) {
-                externalTexture.video.requestVideoFrameCallback(() => { });
+                externalTexture.video.requestVideoFrameCallback(_ => { });
             }
         });
 
-        this.#createComputeBindGroup();
-
-        let commandEncoder = this.#device.createCommandEncoder();
-
-        this.#renderPasses.forEach(renderPass => {
-            if (renderPass.hasComputeShader) {
-                const passEncoder = commandEncoder.beginComputePass();
-                passEncoder.setPipeline(renderPass.computePipeline);
-                if (this.#uniforms.length) {
-                    passEncoder.setBindGroup(0, renderPass.computeBindGroup);
-                }
-                passEncoder.dispatchWorkgroups(
-                    renderPass.workgroupCountX,
-                    renderPass.workgroupCountY,
-                    renderPass.workgroupCountZ
-                );
-                passEncoder.end();
-            }
-        });
+        const commandEncoder = this.#device.createCommandEncoder();
 
         // ---------------------
-
-        this.#renderPassDescriptor.colorAttachments[0].view = this.#context.getCurrentTexture().createView();
+        const swapChainTexture = this.#context.getCurrentTexture();
+        this.#renderPassDescriptor.colorAttachments[0].view = swapChainTexture.createView();
         this.#renderPassDescriptor.depthStencilAttachment.view = this.#depthTexture.createView();
 
-        const swapChainTexture = this.#context.getCurrentTexture();
-
-        //commandEncoder = this.#device.createCommandEncoder();
         this.#renderPasses.forEach((renderPass, renderPassIndex) => {
             if (renderPass.hasVertexAndFragmentShader) {
+                this.#passParams(renderPass);
                 const passEncoder = commandEncoder.beginRenderPass(this.#renderPassDescriptor);
                 passEncoder.setPipeline(renderPass.renderPipeline);
-                this.#createParams();
+
                 if (this.#uniforms.length) {
                     passEncoder.setBindGroup(0, renderPass.uniformBindGroup);
                 }
@@ -4200,7 +4276,7 @@ class Points {
                 passEncoder.end();
                 // Copy the rendering results from the swapchain into |texture2d.texture|.
                 this.#textures2d.forEach(texture2d => {
-                    if (texture2d.renderPassIndex == renderPassIndex || texture2d.renderPassIndex == null) {
+                    if (texture2d.renderPassIndex === renderPassIndex || !texture2d.renderPassIndex) {
                         if (texture2d.copyCurrentTexture) {
                             commandEncoder.copyTextureToTexture(
                                 {
@@ -4215,7 +4291,6 @@ class Points {
                     }
                 });
                 this.#texturesToCopy.forEach(texturePair => {
-                    // console.log(texturePair.a);
                     // this.#createTextureToSize(texturePair.b, texturePair.a.width, texturePair.a.height);
                     commandEncoder.copyTextureToTexture(
                         {
@@ -4228,6 +4303,21 @@ class Points {
                     );
                 });
                 this.#texturesToCopy = [];
+            }
+            if (renderPass.hasComputeShader) {
+                this.#passComputeBindingGroup(renderPass);
+
+                const passEncoder = commandEncoder.beginComputePass();
+                passEncoder.setPipeline(renderPass.computePipeline);
+                if (this.#uniforms.length) {
+                    passEncoder.setBindGroup(0, renderPass.computeBindGroup);
+                }
+                passEncoder.dispatchWorkgroups(
+                    renderPass.workgroupCountX,
+                    renderPass.workgroupCountY,
+                    renderPass.workgroupCountZ
+                );
+                passEncoder.end();
             }
         });
 
