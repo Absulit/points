@@ -1437,23 +1437,19 @@ class Points {
      * is not being updated at all. I have to make the createBindGroup call
      * only if the texture is updated.
      */
-    #passComputeBindingGroup(){
-        this.#renderPasses.forEach((renderPass, index) => {
-            if (renderPass.hasComputeShader) {
-                const entries = this.#createEntries(ShaderType.COMPUTE);
-                if (entries.length) {
-                    renderPass.entries = entries;
-                    /**
-                     * @type {GPUBindGroup}
-                     */
-                    renderPass.computeBindGroup = this.#device.createBindGroup({
-                        label: `_passComputeBindingGroup 0 - ${index}`,
-                        layout: renderPass.bindGroupLayoutCompute,
-                        entries: renderPass.entries
-                    });
-                }
-            }
-        });
+    #passComputeBindingGroup(renderPass){
+        const entries = this.#createEntries(ShaderType.COMPUTE);
+        if (entries.length) {
+            renderPass.entries = entries;
+            /**
+             * @type {GPUBindGroup}
+             */
+            renderPass.computeBindGroup = this.#device.createBindGroup({
+                label: `_passComputeBindingGroup 0`,
+                layout: renderPass.bindGroupLayoutCompute,
+                entries: renderPass.entries
+            });
+        }
     }
 
     #createPipeline() {
@@ -1854,12 +1850,13 @@ class Points {
             }
         });
 
-        this.#passComputeBindingGroup();
-
         const commandEncoder = this.#device.createCommandEncoder();
 
         this.#renderPasses.forEach(renderPass => {
             if (renderPass.hasComputeShader) {
+
+                this.#passComputeBindingGroup(renderPass);
+
                 const passEncoder = commandEncoder.beginComputePass();
                 passEncoder.setPipeline(renderPass.computePipeline);
                 if (this.#uniforms.length) {
