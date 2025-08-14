@@ -25,6 +25,8 @@ class RenderPass {
     #computeBindGroup = null;
     #uniformBindGroup = null;
     #bindGroupLayout = null;
+    #bindGroupLayoutCompute = null;
+    #entries = null;
     #internal = false;
     #hasComputeShader;
     #hasVertexShader;
@@ -135,6 +137,21 @@ class RenderPass {
 
     get bindGroupLayout() {
         return this.#bindGroupLayout;
+    }
+    set bindGroupLayoutCompute(value) {
+        this.#bindGroupLayoutCompute = value;
+    }
+
+    get bindGroupLayoutCompute() {
+        return this.#bindGroupLayoutCompute;
+    }
+
+    set entries(value) {
+        this.#entries = value;
+    }
+
+    get entries() {
+        return this.#entries;
     }
 
     get compiledShaders() {

@@ -1244,7 +1244,7 @@ class Points {
     /**
      * Updates all the storages (for the update function)
      */
-    #writeStorages(){
+    #writeStorages() {
         this.#storage.forEach(storageItem => {
             if (storageItem.mapped) {
                 const values = new Float32Array(storageItem.array);
@@ -1413,13 +1413,13 @@ class Points {
                         }
                         bglEntries.push(bglEntry);
                     });
-                    renderPass.bindGroupLayout = this.#device.createBindGroupLayout({ entries: bglEntries });
+                    renderPass.bindGroupLayoutCompute = this.#device.createBindGroupLayout({ entries: bglEntries });
                     /**
                      * @type {GPUBindGroup}
                      */
                     renderPass.computeBindGroup = this.#device.createBindGroup({
                         label: `_createComputeBindGroup 0 - ${index}`,
-                        layout: renderPass.bindGroupLayout,
+                        layout: renderPass.bindGroupLayoutCompute,
                         entries: entries
                     });
                 }
@@ -1433,7 +1433,7 @@ class Points {
             if (renderPass.hasComputeShader) {
                 renderPass.computePipeline = this.#device.createComputePipeline({
                     layout: this.#device.createPipelineLayout({
-                        bindGroupLayouts: [renderPass.bindGroupLayout]
+                        bindGroupLayouts: [renderPass.bindGroupLayoutCompute]
                     }),
                     label: `_createPipeline() - ${index}`,
                     compute: {
@@ -1747,11 +1747,12 @@ class Points {
                     }
                     bglEntries.push(bglEntry);
                 });
+                renderPass.entries = entries;
                 renderPass.bindGroupLayout = this.#device.createBindGroupLayout({ entries: bglEntries });
                 renderPass.uniformBindGroup = this.#device.createBindGroup({
                     label: '_createParams() 0',
                     layout: renderPass.bindGroupLayout,
-                    entries: entries
+                    entries: renderPass.entries
                 });
             }
         });
@@ -1825,12 +1826,12 @@ class Points {
         this.#renderPassDescriptor.colorAttachments[0].view = swapChainTexture.createView();
         this.#renderPassDescriptor.depthStencilAttachment.view = this.#depthTexture.createView();
 
-        //commandEncoder = this.#device.createCommandEncoder();
+        this.#createParams();
         this.#renderPasses.forEach((renderPass, renderPassIndex) => {
             if (renderPass.hasVertexAndFragmentShader) {
                 const passEncoder = commandEncoder.beginRenderPass(this.#renderPassDescriptor);
                 passEncoder.setPipeline(renderPass.renderPipeline);
-                this.#createParams();
+
                 if (this.#uniforms.length) {
                     passEncoder.setBindGroup(0, renderPass.uniformBindGroup);
                 }
