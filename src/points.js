@@ -1850,25 +1850,6 @@ class Points {
 
         const commandEncoder = this.#device.createCommandEncoder();
 
-        this.#renderPasses.forEach(renderPass => {
-            if (renderPass.hasComputeShader) {
-
-                this.#passComputeBindingGroup(renderPass);
-
-                const passEncoder = commandEncoder.beginComputePass();
-                passEncoder.setPipeline(renderPass.computePipeline);
-                if (this.#uniforms.length) {
-                    passEncoder.setBindGroup(0, renderPass.computeBindGroup);
-                }
-                passEncoder.dispatchWorkgroups(
-                    renderPass.workgroupCountX,
-                    renderPass.workgroupCountY,
-                    renderPass.workgroupCountZ
-                );
-                passEncoder.end();
-            }
-        });
-
         // ---------------------
         const swapChainTexture = this.#context.getCurrentTexture();
         this.#renderPassDescriptor.colorAttachments[0].view = swapChainTexture.createView();
@@ -1895,7 +1876,7 @@ class Points {
                 passEncoder.end();
                 // Copy the rendering results from the swapchain into |texture2d.texture|.
                 this.#textures2d.forEach(texture2d => {
-                    if (texture2d.renderPassIndex == renderPassIndex || texture2d.renderPassIndex == null) {
+                    if (texture2d.renderPassIndex === renderPassIndex || !texture2d.renderPassIndex) {
                         if (texture2d.copyCurrentTexture) {
                             commandEncoder.copyTextureToTexture(
                                 {
@@ -1910,7 +1891,6 @@ class Points {
                     }
                 });
                 this.#texturesToCopy.forEach(texturePair => {
-                    // console.log(texturePair.a);
                     // this.#createTextureToSize(texturePair.b, texturePair.a.width, texturePair.a.height);
                     commandEncoder.copyTextureToTexture(
                         {
@@ -1923,6 +1903,22 @@ class Points {
                     );
                 });
                 this.#texturesToCopy = [];
+            }
+            if (renderPass.hasComputeShader) {
+
+                this.#passComputeBindingGroup(renderPass);
+
+                const passEncoder = commandEncoder.beginComputePass();
+                passEncoder.setPipeline(renderPass.computePipeline);
+                if (this.#uniforms.length) {
+                    passEncoder.setBindGroup(0, renderPass.computeBindGroup);
+                }
+                passEncoder.dispatchWorkgroups(
+                    renderPass.workgroupCountX,
+                    renderPass.workgroupCountY,
+                    renderPass.workgroupCountZ
+                );
+                passEncoder.end();
             }
         });
 
