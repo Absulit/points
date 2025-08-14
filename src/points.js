@@ -1427,6 +1427,35 @@ class Points {
         });
     }
 
+    /**
+     * This is a slimmed down version of {@link #createComputeBindGroup}.
+     * We don't create the bindingGroupLayout since it already exists.
+     * We do update the entries. We have to update them because of
+     * changing textures like videos.
+     * TODO: this can be optimized even further by setting a flag to
+     * NOT CALL the createBindGroup if the texture (video/other)
+     * is not being updated at all. I have to make the createBindGroup call
+     * only if the texture is updated.
+     */
+    #passComputeBindingGroup(){
+        this.#renderPasses.forEach((renderPass, index) => {
+            if (renderPass.hasComputeShader) {
+                const entries = this.#createEntries(ShaderType.COMPUTE);
+                if (entries.length) {
+                    renderPass.entries = entries;
+                    /**
+                     * @type {GPUBindGroup}
+                     */
+                    renderPass.computeBindGroup = this.#device.createBindGroup({
+                        label: `_passComputeBindingGroup 0 - ${index}`,
+                        layout: renderPass.bindGroupLayoutCompute,
+                        entries: renderPass.entries
+                    });
+                }
+            }
+        });
+    }
+
     #createPipeline() {
         this.#createComputeBindGroup();
         this.#renderPasses.forEach((renderPass, index) => {
@@ -1766,7 +1795,7 @@ class Points {
      * TODO: this can be optimized even further by setting a flag to
      * NOT CALL the createBindGroup if the texture (video/other)
      * is not being updated at all. I have to make the createBindGroup call
-     * only if the texture is
+     * only if the texture is updated.
      */
     #passParams() {
         this.#renderPasses.forEach(renderPass => {
@@ -1825,7 +1854,7 @@ class Points {
             }
         });
 
-        this.#createComputeBindGroup();
+        this.#passComputeBindingGroup();
 
         const commandEncoder = this.#device.createCommandEncoder();
 
@@ -1850,7 +1879,6 @@ class Points {
         this.#renderPassDescriptor.colorAttachments[0].view = swapChainTexture.createView();
         this.#renderPassDescriptor.depthStencilAttachment.view = this.#depthTexture.createView();
 
-        // this.#createParams();
         this.#passParams();
         this.#renderPasses.forEach((renderPass, renderPassIndex) => {
             if (renderPass.hasVertexAndFragmentShader) {
