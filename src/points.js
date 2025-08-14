@@ -607,7 +607,6 @@ class Points {
         }
         const imageBitmaps = [];
         for await (const path of paths) {
-            console.log(path);
             const response = await fetch(path);
             const blob = await response.blob();
             imageBitmaps.push(await createImageBitmap(blob));
@@ -1905,7 +1904,6 @@ class Points {
                 this.#texturesToCopy = [];
             }
             if (renderPass.hasComputeShader) {
-
                 this.#passComputeBindingGroup(renderPass);
 
                 const passEncoder = commandEncoder.beginComputePass();
