@@ -1,10 +1,8 @@
-import { fusin } from 'points/animation';
-import { texturePosition } from 'points/image';
+import { texture } from 'points/image';
 
 const frag = /*wgsl*/`
 
-${texturePosition}
-${fusin}
+${texture}
 
 @fragment
 fn main(
@@ -16,11 +14,7 @@ fn main(
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
 
-    let imageColor = texturePosition(image, imageSampler, vec2(0.,0), uvr, true);
-
-    let finalColor = imageColor;
-
-    return finalColor;
+    return texture(image, imageSampler, uvr, true);
 }
 `;
 
