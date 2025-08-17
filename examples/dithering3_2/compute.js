@@ -51,11 +51,6 @@ fn main(
     layers[layerIndex][pointIndexC] = rightPoint;
 
 
-    let pointIndexR = i32((GlobalId.y+distance) + (GlobalId.x * dims.x));
-    var bottomPoint = layers[layerIndex][pointIndexR];
-    bottomPoint = vec4(brightness(bottomPoint) + (.5 * quant_error * params.quantError * 2));
-
-    layers[layerIndex][pointIndexR] = bottomPoint;
 
     point = layers[layerIndex][pointIndex];
     textureStore(outputTex, GlobalId.xy, point);
