@@ -1436,7 +1436,7 @@ class Points {
      * is not being updated at all. I have to make the createBindGroup call
      * only if the texture is updated.
      */
-    #passComputeBindingGroup(renderPass){
+    #passComputeBindingGroup(renderPass) {
         const entries = this.#createEntries(ShaderType.COMPUTE);
         if (entries.length) {
             renderPass.entries = entries;
@@ -1920,18 +1920,16 @@ class Points {
             }
         });
 
-        if (this.#readStorage.length) {
-            this.#readStorage.forEach(readStorageItem => {
-                let storageItem = this.#storage.find(storageItem => storageItem.name === readStorageItem.name);
-                commandEncoder.copyBufferToBuffer(
-                    storageItem.buffer /* source buffer */,
-                    0 /* source offset */,
-                    readStorageItem.buffer /* destination buffer */,
-                    0 /* destination offset */,
-                    readStorageItem.buffer.size /* size */
-                );
-            });
-        }
+        this.#readStorage.forEach(readStorageItem => {
+            let storageItem = this.#storage.find(storageItem => storageItem.name === readStorageItem.name);
+            commandEncoder.copyBufferToBuffer(
+                storageItem.buffer /* source buffer */,
+                0 /* source offset */,
+                readStorageItem.buffer /* destination buffer */,
+                0 /* destination offset */,
+                readStorageItem.buffer.size /* size */
+            );
+        });
         // ---------------------
         this.#commandsFinished.push(commandEncoder.finish());
         this.#device.queue.submit(this.#commandsFinished);
