@@ -44,7 +44,7 @@ fn main(
     layers[layerIndex][pointIndex] = point;
 
 
-    let pointIndexC = i32(GlobalId.x + ((GlobalId.y+distance) * dims.y));
+    let pointIndexC = i32(GlobalId.x + (GlobalId.y+distance) * dims.y);
     var rightPoint = layers[layerIndex][pointIndexC];
     rightPoint = vec4(brightness(rightPoint) + (.5 * quant_error * params.quantError * 2));
 
