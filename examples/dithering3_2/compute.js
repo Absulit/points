@@ -8,6 +8,8 @@ struct Variable{
 
 ${brightness}
 
+const distance = 1;
+
 const workgroupSize = 1;
 
 @compute @workgroup_size(workgroupSize,workgroupSize,1)
@@ -25,11 +27,7 @@ fn main(
 
     var point = textureLoad(image, GlobalId.yx, 0); // image
     // var point = textureLoad(image, GlobalId.yx); // video
-    layers[0][pointIndex] = point;
-    layers[1][pointIndex] = point;
-
-    // variables.init = 1;
-
+    layers[layerIndex][pointIndex] = point;
 
     //--------------------------------------------------
 
@@ -40,33 +38,27 @@ fn main(
     let newBrightness = step(.5, b); // if(b > .5){newBrightness = 1.;}
 
     let quant_error = b - newBrightness;
-    let distance = 1;
-    let distanceU = u32(distance);
-    let distanceF = f32(distance);
+
     point = vec4(newBrightness);
 
-    let pointP = &layers[layerIndex][pointIndex];
-    (*pointP) = point;
+    layers[layerIndex][pointIndex] = point;
 
 
-    let pointIndexC = i32(GlobalId.x + ((GlobalId.y+distanceU) * dims.y));
+    let pointIndexC = i32(GlobalId.x + ((GlobalId.y+distance) * dims.y));
     var rightPoint = layers[layerIndex][pointIndexC];
     rightPoint = vec4(brightness(rightPoint) + (.5 * quant_error * params.quantError));
 
-    let pointPC = &layers[layerIndex][pointIndexC];
-    (*pointPC) = rightPoint;
+    layers[layerIndex][pointIndexC] = rightPoint;
 
 
-    let pointIndexR = i32((GlobalId.y+distanceU) + (GlobalId.x * dims.x));
+    let pointIndexR = i32((GlobalId.y+distance) + (GlobalId.x * dims.x));
     var bottomPoint = layers[layerIndex][pointIndexR];
     bottomPoint = vec4(brightness(bottomPoint) + (.5 * quant_error));
 
-    let pointPR = &layers[layerIndex][pointIndexR];
-    (*pointPR) = bottomPoint;
+    layers[layerIndex][pointIndexR] = bottomPoint;
 
     point = layers[layerIndex][pointIndex];
-    let positionU = GlobalId.xy;
-    textureStore(outputTex, positionU, point);
+    textureStore(outputTex, GlobalId.xy, point);
     storageBarrier();
     // workgroupBarrier();
 }
