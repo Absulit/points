@@ -1,7 +1,7 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
-import { ShaderType } from 'points';
+import { ShaderType, RenderPass } from 'points';
 
 const options = {
     scale: 1,
@@ -9,9 +9,9 @@ const options = {
 
 
 const dithering3 = {
-    vert,
-    compute,
-    frag,
+    renderPasses: [
+        new RenderPass(vert, frag, compute, 8, 8, 1),
+    ],
     init: async (points, folder) => {
         let descriptor = {
             addressModeU: 'repeat',
