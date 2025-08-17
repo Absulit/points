@@ -46,14 +46,14 @@ fn main(
 
     let pointIndexC = i32(GlobalId.x + ((GlobalId.y+distance) * dims.y));
     var rightPoint = layers[layerIndex][pointIndexC];
-    rightPoint = vec4(brightness(rightPoint) + (.5 * quant_error * params.quantError));
+    rightPoint = vec4(brightness(rightPoint) + (.5 * quant_error * params.quantError * 2));
 
     layers[layerIndex][pointIndexC] = rightPoint;
 
 
     let pointIndexR = i32((GlobalId.y+distance) + (GlobalId.x * dims.x));
     var bottomPoint = layers[layerIndex][pointIndexR];
-    bottomPoint = vec4(brightness(bottomPoint) + (.5 * quant_error));
+    bottomPoint = vec4(brightness(bottomPoint) + (.5 * quant_error * params.quantError * 2));
 
     layers[layerIndex][pointIndexR] = bottomPoint;
 
