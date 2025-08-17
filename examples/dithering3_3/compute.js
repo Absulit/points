@@ -21,15 +21,9 @@ fn main(
 ) {
     //--------------------------------------------------
     let dims = textureDimensions(image);
-
-    var layerIndex = 0;
     var point = textureLoad(image, GlobalId.xy, 0); // image
-    // var point = textureLoad(image, GlobalId.yx); // video
-
-    // textureStore(outputTex, GlobalId.xy, point);
-
+    // var point = textureLoad(image, GlobalId.xy); // video
     //--------------------------------------------------
-
 
     let b = brightness(point);
     let newBrightness = step(.5, b); // if(b > .5){newBrightness = 1.;}
@@ -40,19 +34,10 @@ fn main(
 
 
     let rightPosition = GlobalId.xy + vec2(distance, 0);
-    var rightPoint = textureLoad(image, rightPosition, 0);
-    let right_new_brightness = newB(rightPoint);
-    // rightPoint = vec4(brightness(rightPoint) + (.5 * quant_error * params.quantError));
-    rightPoint = vec4(right_new_brightness + (.5 * quant_error * params.quantError));
+    var rightPoint = textureLoad(image, rightPosition, 0); // image
+    // var rightPoint = textureLoad(image, rightPosition); // video
+    rightPoint = vec4(brightness(rightPoint) + (.5 * quant_error * params.quantError));
     textureStore(outputTex, rightPosition, rightPoint);
-
-
-    let bottomPosition = GlobalId.xy + vec2(0, distance);
-    var bottomPoint = textureLoad(image, bottomPosition, 0);
-    let bottom_new_brightness = newB(bottomPoint);
-    // bottomPoint = vec4(brightness(bottomPoint) + (.5 * quant_error * params.quantError));
-    bottomPoint = vec4(bottom_new_brightness + (.5 * quant_error * params.quantError));
-    textureStore(outputTex, bottomPosition, bottomPoint);
 
     // storageBarrier();
     // workgroupBarrier();

@@ -24,6 +24,7 @@ const dithering3 = {
         // await points.setTextureWebcam('image');
         // await points.setTextureImage('image', './../img/angel_600x600.jpg');
         // await points.setTextureImage('image', './../img/gratia_800x800.jpg');
+        // await points.setTextureVideo('image', './../img/6982698-hd_1440_1080_25fps_800x800.mp4');
         await points.setTextureImage('image', './../img/absulit_800x800.jpg');
         points.setBindingTexture('outputTex', 'computeTexture');
         // points.setLayers(2);

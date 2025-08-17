@@ -9,6 +9,7 @@ struct Variable{
 ${brightness}
 
 const distance = 1;
+const layerIndex = 0;
 
 const workgroupSize = 1;
 
@@ -21,7 +22,7 @@ fn main(
     //--------------------------------------------------
     let dims = textureDimensions(image);
 
-    var layerIndex = 0;
+
 
     var pointIndex = i32(GlobalId.y + (GlobalId.x * dims.x));
 
