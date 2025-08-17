@@ -47,12 +47,12 @@ fn main(
     textureStore(outputTex, rightPosition, rightPoint);
 
 
-    // let bottomPosition = GlobalId.xy + vec2(0, distance);
-    // var bottomPoint = textureLoad(image, bottomPosition, 0);
-    // let bottom_new_brightness = newB(bottomPoint);
-    // // bottomPoint = vec4(brightness(bottomPoint) + (.5 * quant_error * params.quantError));
-    // bottomPoint = vec4(bottom_new_brightness + (.5 * quant_error * params.quantError));
-    // textureStore(outputTex, bottomPosition, bottomPoint);
+    let bottomPosition = GlobalId.xy + vec2(0, distance);
+    var bottomPoint = textureLoad(image, bottomPosition, 0);
+    let bottom_new_brightness = newB(bottomPoint);
+    // bottomPoint = vec4(brightness(bottomPoint) + (.5 * quant_error * params.quantError));
+    bottomPoint = vec4(bottom_new_brightness + (.5 * quant_error * params.quantError));
+    textureStore(outputTex, bottomPosition, bottomPoint);
 
     // storageBarrier();
     // workgroupBarrier();
