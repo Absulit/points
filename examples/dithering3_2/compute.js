@@ -20,30 +20,24 @@ fn main(
     let dims = textureDimensions(image);
 
     var layerIndex = 0;
-    if(variables.init == 0){
 
-        let pointIndex = i32(GlobalId.y + (GlobalId.x * dims.x));
+    var pointIndex = i32(GlobalId.y + (GlobalId.x * dims.x));
 
-        var point = textureLoad(image, GlobalId.yx, 0); // image
-        // var point = textureLoad(image, GlobalId.yx); // video
-        layers[0][pointIndex] = point;
-        layers[1][pointIndex] = point;
+    var point = textureLoad(image, GlobalId.yx, 0); // image
+    // var point = textureLoad(image, GlobalId.yx); // video
+    layers[0][pointIndex] = point;
+    layers[1][pointIndex] = point;
 
-        // variables.init = 1;
-    }else{
-        layerIndex = 1;
-    }
+    // variables.init = 1;
+
 
     //--------------------------------------------------
 
-    let pointIndex = i32(GlobalId.x + (GlobalId.y * dims.y));
+    pointIndex = i32(GlobalId.x + (GlobalId.y * dims.y));
 
-    var point = layers[layerIndex][pointIndex];
+    point = layers[layerIndex][pointIndex];
     let b = brightness(point);
-    var newBrightness = 0.;
-    if(b > .5){
-        newBrightness = 1.;
-    }
+    let newBrightness = step(.5, b); // if(b > .5){newBrightness = 1.;}
 
     let quant_error = b - newBrightness;
     let distance = 1;
