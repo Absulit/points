@@ -8,6 +8,11 @@ struct Variable{
 
 ${brightness}
 
+fn newB(point:vec4f) -> f32 {
+    let b = brightness(point);
+    return step(.5, b); // if(b > .5){newBrightness = 1.;}
+}
+
 const workgroupSize = 1;
 
 @compute @workgroup_size(workgroupSize,workgroupSize,1)
@@ -20,43 +25,40 @@ fn main(
     let dims = textureDimensions(image);
 
     var layerIndex = 0;
-    var pointIndex = i32(GlobalId.y + (GlobalId.x * dims.x));
     var point = textureLoad(image, GlobalId.xy, 0); // image
     // var point = textureLoad(image, GlobalId.yx); // video
-    // layers[layerIndex][pointIndex] = point;
 
-    textureStore(outputTex, GlobalId.xy, point);
+    // textureStore(outputTex, GlobalId.xy, point);
 
     //--------------------------------------------------
 
-    // pointIndex = i32(GlobalId.x + (GlobalId.y * dims.y));
 
-    point = textureLoad(image, GlobalId.xy, 0);
     let b = brightness(point);
     let newBrightness = step(.5, b); // if(b > .5){newBrightness = 1.;}
 
     let quant_error = b - newBrightness;
     let distance = 1;
     let distanceU = u32(distance);
-    let distanceF = f32(distance);
     point = vec4(newBrightness);
-
     textureStore(outputTex, GlobalId.xy, point);
 
 
-    var rightPoint = textureLoad(image, vec2(GlobalId.x, GlobalId.y + distanceU), 0);
-    rightPoint = vec4(brightness(rightPoint) + (.5 * quant_error * params.quantError));
+    let rightPosition = GlobalId.xy + vec2(distanceU, 0);
+    var rightPoint = textureLoad(image, rightPosition, 0);
+    let right_new_brightness = newB(rightPoint);
+    // rightPoint = vec4(brightness(rightPoint) + (.5 * quant_error * params.quantError));
+    rightPoint = vec4(right_new_brightness + (.5 * quant_error * params.quantError));
+    textureStore(outputTex, rightPosition, rightPoint);
 
-    textureStore(outputTex, vec2(GlobalId.x + distanceU, GlobalId.y), rightPoint);
 
-
-    var bottomPoint = textureLoad(image, vec2(GlobalId.x, GlobalId.y+distanceU ), 0);
+    let bottomPosition = GlobalId.xy + vec2(0, distanceU);
+    var bottomPoint = textureLoad(image, bottomPosition, 0);
+    let bottom_new_brightness = newB(bottomPoint);
     bottomPoint = vec4(brightness(bottomPoint) + (.5 * quant_error));
+    bottomPoint = vec4(bottom_new_brightness + (.5 * quant_error));
+    textureStore(outputTex, bottomPosition, bottomPoint);
 
-    textureStore(outputTex, vec2(GlobalId.x, GlobalId.y+distanceU ), bottomPoint);
-
-    textureStore(outputTex, GlobalId.xy, point);
-    storageBarrier();
+    // storageBarrier();
     // workgroupBarrier();
 }
 `;
