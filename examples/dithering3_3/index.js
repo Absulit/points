@@ -27,7 +27,7 @@ const dithering3 = {
         await points.setTextureImage('image', './../img/absulit_800x800.jpg');
         points.setBindingTexture('outputTex', 'computeTexture');
         // points.setLayers(2);
-        points.setStorage('variables', 'Variable', false, ShaderType.COMPUTE);
+        // points.setStorage('variables', 'Variable', false, ShaderType.COMPUTE);
 
         points.setUniform('scale', options.scale);
         points.setUniform('quantError', options.quantError);

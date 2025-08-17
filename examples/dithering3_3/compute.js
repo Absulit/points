@@ -2,10 +2,6 @@ import { brightness } from 'points/color';
 
 const compute = /*wgsl*/`
 
-struct Variable{
-    init: i32
-}
-
 ${brightness}
 
 const distance = 1;
