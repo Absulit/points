@@ -805,16 +805,18 @@ class Points {
      * //// fragment
      * let value = texturePosition(computeTexture, imageSampler, position, uv, false);
      */
-    setBindingTexture(computeName, fragmentName, size) {
+    setBindingTexture(computeName, fragmentName, writeIndex, readIndex, size) {
         // TODO: validate that names don't exist already
         const bindingTexture = {
             compute: {
                 name: computeName,
-                shaderType: ShaderType.COMPUTE
+                shaderType: ShaderType.COMPUTE,
+                renderPassIndex: writeIndex
             },
             fragment: {
                 name: fragmentName,
-                shaderType: ShaderType.FRAGMENT
+                shaderType: ShaderType.FRAGMENT,
+                renderPassIndex: readIndex
             },
             texture: null,
             size: size,
