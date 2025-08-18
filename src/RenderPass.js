@@ -16,6 +16,7 @@
  */
 
 class RenderPass {
+    #index = null;
     #vertexShader;
     #computeShader;
     #fragmentShader;
@@ -64,6 +65,14 @@ class RenderPass {
         this.#workgroupCountY = workgroupCountY || 8;
         this.#workgroupCountZ = workgroupCountZ || 1;
         Object.seal(this);
+    }
+
+    get index() {
+        return this.#index;
+    }
+
+    set index(value) {
+        this.#index = value;
     }
 
     /**
