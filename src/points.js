@@ -785,11 +785,14 @@ class Points {
 
     /**
      * Special texture where data can be written to it in the Compute Shader and
+     * read from in the Fragment Shader.
      * Is a one way communication method.
      * Ideal to store data to it in the Compute Shader and later visualize it in
      * the Fragment Shader.
      * @param {string} computeName name of the variable in the compute shader
      * @param {string} fragmentName name of the variable in the fragment shader
+     * @param {number} writeIndex RenderPass allowed to write into `outputTex`
+     * @param {number} readIndex RenderPass allowed to read from `computeTexture`
      * @param {Array<number, 2>} size dimensions of the texture, by default screen
      * size
      * @returns {Object}
