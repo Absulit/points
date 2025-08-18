@@ -1855,7 +1855,7 @@ class Points {
         this.#renderPassDescriptor.colorAttachments[0].view = swapChainTexture.createView();
         this.#renderPassDescriptor.depthStencilAttachment.view = this.#depthTexture.createView();
 
-        this.#renderPasses.forEach((renderPass, renderPassIndex) => {
+        this.#renderPasses.forEach(renderPass => {
             if (renderPass.hasVertexAndFragmentShader) {
                 this.#passParams(renderPass);
                 const passEncoder = commandEncoder.beginRenderPass(this.#renderPassDescriptor);
@@ -1876,7 +1876,7 @@ class Points {
                 passEncoder.end();
                 // Copy the rendering results from the swapchain into |texture2d.texture|.
                 this.#textures2d.forEach(texture2d => {
-                    if (texture2d.renderPassIndex === renderPassIndex || !texture2d.renderPassIndex) {
+                    if (texture2d.renderPassIndex === renderPass.index || !texture2d.renderPassIndex) {
                         if (texture2d.copyCurrentTexture) {
                             commandEncoder.copyTextureToTexture(
                                 {
