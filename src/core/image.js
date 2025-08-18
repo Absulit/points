@@ -87,7 +87,7 @@ fn texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2f, uv
     var rgbaImage = textureSample(texture, aSampler, imageUV);
 
     // e.g. if uv.x < 0. OR uv.y < 0. || uv.x > imageRatio.x OR uv.y > imageRatio.y
-    if (crop && (any(uv < vec2(0.0)) || any(uv > imageRatio))) {
+    if (crop && (any(uv < position) || any(uv > position + imageRatio))) {
         rgbaImage = vec4(0.);
     }
 
