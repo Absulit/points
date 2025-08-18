@@ -3,7 +3,7 @@ import { layer, RED, WHITE } from 'points/color';
 import { TAU, PI, rotateVector, polar } from 'points/math';
 import { snoise } from 'points/noise2d';
 import { sdfLine, sdfSegment, sdfSmooth } from 'points/sdf';
-import { decodeNumberSprite, sprite, textureExternalPosition, texturePosition } from 'points/image';
+import { decodeNumberSprite, sprite, textureExternal, texture } from 'points/image';
 const frag = /*wgsl*/`
 
 ${sdfSegment}
@@ -15,8 +15,8 @@ ${polar}
 ${snoise}
 ${layer}
 ${RED}
-${texturePosition}
-${textureExternalPosition}
+${texture}
+${textureExternal}
 ${sprite}
 ${decodeNumberSprite}
 ${WHITE}
@@ -37,19 +37,18 @@ fn main(
     let scale = .2 * ratio;
     // let scale = params.sliderC;
 
-    let feedbackTextureColor = texturePosition(feedbackTexture, imageSampler, vec2(0.) * ratio, uvr, true);
+    let feedbackTextureColor = texture(feedbackTexture, imageSampler, uvr, true);
 
 
-    // let imageColor = texturePosition(image, imageSampler, vec2(0,0), uvr / scale, true);
-    let imageColor = textureExternalPosition(image, imageSampler, vec2(0,0), uvr / scale, true);
-    let feedbackTextureColor1 = texturePosition(feedbackTexture1, imageSampler, vec2(1,0), uvr / scale, true);
-    let feedbackTextureColor2 = texturePosition(feedbackTexture2, imageSampler, vec2(2,0), uvr / scale, true);
-    let feedbackTextureColor3 = texturePosition(feedbackTexture3, imageSampler, vec2(3,0), uvr / scale, true);
-    let feedbackTextureColor4 = texturePosition(feedbackTexture4, imageSampler, vec2(4,0), uvr / scale, true);
+    // let imageColor = texture(image, imageSampler, vec2(0,0), uvr / scale, true);
+    let imageColor = textureExternal(image, imageSampler, uvr / scale, true);
+    let feedbackTextureColor1 = texture(feedbackTexture1, imageSampler, (uvr / scale) - vec2(1,0), true);
+    let feedbackTextureColor2 = texture(feedbackTexture2, imageSampler, (uvr / scale) - vec2(2,0), true);
+    let feedbackTextureColor3 = texture(feedbackTexture3, imageSampler, (uvr / scale) - vec2(3,0), true);
+    let feedbackTextureColor4 = texture(feedbackTexture4, imageSampler, (uvr / scale) - vec2(4,0), true);
 
 
     let images = layer(layer(layer(layer(layer(feedbackTextureColor, imageColor), feedbackTextureColor1), feedbackTextureColor2), feedbackTextureColor3), feedbackTextureColor4);
-    // let images = feedbackTextureColor1;
 
 
     let scaleDigits = .25;
