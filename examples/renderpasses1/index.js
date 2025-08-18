@@ -24,7 +24,7 @@ const renderpasses1 = {
         // await points.setTextureImage('image', './../img/old_king_600x600.jpg');
         await points.setTextureImage('image', './../img/absulit_800x800.jpg');
         points.setSampler('feedbackSampler', null);
-        points.setTexture2d('feedbackTexture', true);
+        points.setTexture2d('feedbackTexture', true, 0);
 
         points.setUniform('rotation', options.rotation, 'f32');
         folder.add(options, 'rotation', 0, 1, .0001).name('Rotation');

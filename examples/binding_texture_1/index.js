@@ -1,8 +1,10 @@
 import vert from './vert.js';
-import compute from './compute.js';
-import frag from './frag.js';
-import compute2 from './compute2.js';
-import frag2 from './frag2.js';
+
+import compute from './pass0/compute.js';
+import frag from './pass0/frag.js';
+
+import compute2 from './pass1/compute.js';
+import frag2 from './pass1/frag.js';
 import Points, { RenderPass } from 'points';
 
 const options = {
@@ -18,7 +20,7 @@ const options = {
 const base = {
 
     renderPasses: [
-        new RenderPass(vert, frag, compute),
+        new RenderPass(vert, frag, compute, 800,800,1),
         new RenderPass(vert, frag2, compute2),
     ],
     /**
@@ -26,7 +28,9 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
-
+        points.setSampler('imageSampler', null);
+        points.setBindingTexture('writeTexture', 'readTexture');
+        points.setTexture2d('renderLayer0', true, 0);
     },
     update: points => {
 
