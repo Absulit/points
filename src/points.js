@@ -812,22 +812,23 @@ class Points {
         if ((Number.isInteger(writeIndex) && !Number.isInteger(readIndex)) || (!Number.isInteger(writeIndex) && Number.isInteger(readIndex))) {
             throw 'The parameters writeIndex and readIndex must both be declared.';
         }
-        const renderPassIndex = Number.isInteger(writeIndex) && Number.isInteger(readIndex);
+        const usesRenderPass = Number.isInteger(writeIndex) && Number.isInteger(readIndex);
         // TODO: validate that names don't exist already
         const bindingTexture = {
             compute: {
                 name: computeName,
-                shaderType: renderPassIndex ? null : ShaderType.COMPUTE,
+                shaderType: ShaderType.COMPUTE,
                 renderPassIndex: writeIndex
             },
             fragment: {
                 name: fragmentName,
-                shaderType: renderPassIndex ? null : ShaderType.FRAGMENT,
+                shaderType: ShaderType.FRAGMENT,
                 renderPassIndex: readIndex
             },
             texture: null,
             size: size,
-            internal: this.#internal
+            internal: this.#internal,
+            usesRenderPass
         }
         this.#bindingTextures.push(bindingTexture);
         return bindingTexture;
