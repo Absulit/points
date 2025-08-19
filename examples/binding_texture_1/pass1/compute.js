@@ -7,6 +7,7 @@ fn main(
     @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
 ) {
 
+    let bColor = textureLoad(b, GlobalId.xy, 0);
 }
 `;
 
