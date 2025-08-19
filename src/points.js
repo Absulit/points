@@ -950,7 +950,20 @@ class Points {
         });
         // TODO: internalcheck can be a filter
         this.#bindingTextures.forEach(bindingTexture => {
-            const internalCheck = internal == bindingTexture.internal;
+            const { usesRenderPass, internal: i } = bindingTexture;
+            const internalCheck = internal == i;
+            if (usesRenderPass) {
+                if (renderPassIndex === bindingTexture.compute.renderPassIndex) {
+                    dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.compute.name}: texture_storage_2d<rgba8unorm, write>;\n`;
+                    bindingIndex += 1;
+                }
+                if (renderPassIndex === bindingTexture.fragment.renderPassIndex) {
+                    dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.fragment.name}: texture_2d<f32>;\n`;
+                    bindingIndex += 1;
+                }
+
+                return;
+            }
             if (bindingTexture.compute.shaderType == shaderType && internalCheck) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.compute.name}: texture_storage_2d<rgba8unorm, write>;\n`;
                 bindingIndex += 1;
