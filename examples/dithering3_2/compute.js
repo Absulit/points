@@ -28,13 +28,13 @@ fn main(
 
     var point = textureLoad(image, GlobalId.yx, 0); // image
     // var point = textureLoad(image, GlobalId.yx); // video
-    layers[layerIndex][pointIndex] = point;
+    points[pointIndex] = point;
 
     //--------------------------------------------------
 
     pointIndex = i32(GlobalId.x + (GlobalId.y * dims.y));
 
-    point = layers[layerIndex][pointIndex];
+    point = points[pointIndex];
     let b = brightness(point);
     let newBrightness = step(.5, b); // if(b > .5){newBrightness = 1.;}
 
@@ -42,18 +42,18 @@ fn main(
 
     point = vec4(newBrightness);
 
-    layers[layerIndex][pointIndex] = point;
+    points[pointIndex] = point;
 
 
     let pointIndexC = i32(GlobalId.x + (GlobalId.y+distance) * dims.y);
-    var rightPoint = layers[layerIndex][pointIndexC];
+    var rightPoint = points[pointIndexC];
     rightPoint = vec4(brightness(rightPoint) + (.5 * quant_error * params.quantError * 2));
 
-    layers[layerIndex][pointIndexC] = rightPoint;
+    points[pointIndexC] = rightPoint;
 
 
 
-    point = layers[layerIndex][pointIndex];
+    point = points[pointIndex];
     textureStore(outputTex, GlobalId.xy, point);
     storageBarrier();
     // workgroupBarrier();
