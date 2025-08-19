@@ -18,7 +18,8 @@ fn main(
 ) -> @location(0) vec4f {
 
     let renderLayer0Color = texture(renderLayer0, imageSampler, uvr, true);
-    let finalColor = renderLayer0Color;
+    let bColor = texture(b, imageSampler, uvr, true);
+    let finalColor = renderLayer0Color + bColor * .1;
 
     return finalColor;
 }
