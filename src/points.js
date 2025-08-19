@@ -809,19 +809,20 @@ class Points {
      * let value = texturePosition(computeTexture, imageSampler, position, uv, false);
      */
     setBindingTexture(computeName, fragmentName, writeIndex, readIndex, size) {
-        if( (Number.isInteger(writeIndex) &&  !Number.isInteger(readIndex)) ||  (!Number.isInteger(writeIndex) &&  Number.isInteger(readIndex)) ){
+        if ((Number.isInteger(writeIndex) && !Number.isInteger(readIndex)) || (!Number.isInteger(writeIndex) && Number.isInteger(readIndex))) {
             throw 'The parameters writeIndex and readIndex must both be declared.';
         }
+        const renderPassIndex = Number.isInteger(writeIndex) && Number.isInteger(readIndex);
         // TODO: validate that names don't exist already
         const bindingTexture = {
             compute: {
                 name: computeName,
-                shaderType: ShaderType.COMPUTE,
+                shaderType: renderPassIndex ? null : ShaderType.COMPUTE,
                 renderPassIndex: writeIndex
             },
             fragment: {
                 name: fragmentName,
-                shaderType: ShaderType.FRAGMENT,
+                shaderType: renderPassIndex ? null : ShaderType.FRAGMENT,
                 renderPassIndex: readIndex
             },
             texture: null,
