@@ -31,6 +31,8 @@ const base = {
         points.setSampler('imageSampler', null);
         points.setBindingTexture('writeTexture', 'readTexture');
         points.setTexture2d('renderLayer0', true, 0);
+
+        points.setBindingTexture('a', 'b', 0, 1);
     },
     update: points => {
 

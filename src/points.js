@@ -809,6 +809,9 @@ class Points {
      * let value = texturePosition(computeTexture, imageSampler, position, uv, false);
      */
     setBindingTexture(computeName, fragmentName, writeIndex, readIndex, size) {
+        if( (Number.isInteger(writeIndex) &&  !Number.isInteger(readIndex)) ||  (!Number.isInteger(writeIndex) &&  Number.isInteger(readIndex)) ){
+            throw 'The parameters writeIndex and readIndex must both be declared.';
+        }
         // TODO: validate that names don't exist already
         const bindingTexture = {
             compute: {
