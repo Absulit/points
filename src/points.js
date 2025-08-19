@@ -816,12 +816,12 @@ class Points {
         const usesRenderPass = Number.isInteger(writeIndex) && Number.isInteger(readIndex);
         // TODO: validate that names don't exist already
         const bindingTexture = {
-            compute: {
+            write: {
                 name: writeName,
                 shaderType: ShaderType.COMPUTE,
                 renderPassIndex: writeIndex
             },
-            fragment: {
+            read: {
                 name: readName,
                 shaderType: ShaderType.FRAGMENT,
                 renderPassIndex: readIndex
@@ -954,23 +954,23 @@ class Points {
             const { usesRenderPass, internal: i } = bindingTexture;
             const internalCheck = internal == i;
             if (usesRenderPass) {
-                if (renderPassIndex === bindingTexture.compute.renderPassIndex && internalCheck) {
-                    dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.compute.name}: texture_storage_2d<rgba8unorm, write>;\n`;
+                if (renderPassIndex === bindingTexture.write.renderPassIndex && internalCheck) {
+                    dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.write.name}: texture_storage_2d<rgba8unorm, write>;\n`;
                     bindingIndex += 1;
                 }
-                if (renderPassIndex === bindingTexture.fragment.renderPassIndex && internalCheck) {
-                    dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.fragment.name}: texture_2d<f32>;\n`;
+                if (renderPassIndex === bindingTexture.read.renderPassIndex && internalCheck) {
+                    dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.read.name}: texture_2d<f32>;\n`;
                     bindingIndex += 1;
                 }
 
                 return;
             }
-            if (bindingTexture.compute.shaderType === shaderType && internalCheck) {
-                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.compute.name}: texture_storage_2d<rgba8unorm, write>;\n`;
+            if (bindingTexture.write.shaderType === shaderType && internalCheck) {
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.write.name}: texture_storage_2d<rgba8unorm, write>;\n`;
                 bindingIndex += 1;
             }
-            if (bindingTexture.fragment.shaderType === shaderType && internalCheck) {
-                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.fragment.name}: texture_2d<f32>;\n`;
+            if (bindingTexture.read.shaderType === shaderType && internalCheck) {
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.read.name}: texture_2d<f32>;\n`;
                 bindingIndex += 1;
             }
         });
@@ -1745,10 +1745,10 @@ class Points {
             const { usesRenderPass, internal: i } = bindingTexture;
             const internalCheck = internal == i;
             if (usesRenderPass) {
-                if (bindingTexture.fragment.renderPassIndex === renderPassIndex && internalCheck) {
+                if (bindingTexture.read.renderPassIndex === renderPassIndex && internalCheck) {
                     entries.push(
                         {
-                            label: `binding texture 2: name: ${bindingTexture.fragment.name}`,
+                            label: `binding texture 2: name: ${bindingTexture.read.name}`,
                             binding: bindingIndex++,
                             resource: bindingTexture.texture.createView(),
                             type: {
@@ -1758,10 +1758,10 @@ class Points {
                         }
                     );
                 }
-                if (bindingTexture.compute.renderPassIndex === renderPassIndex && internalCheck) {
+                if (bindingTexture.write.renderPassIndex === renderPassIndex && internalCheck) {
                     entries.push(
                         {
-                            label: `binding texture: name: ${bindingTexture.compute.name}`,
+                            label: `binding texture: name: ${bindingTexture.write.name}`,
                             binding: bindingIndex++,
                             resource: bindingTexture.texture.createView(),
                             type: {
@@ -1775,10 +1775,10 @@ class Points {
                 return;
             }
 
-            if (bindingTexture.fragment.shaderType == shaderType && internalCheck) {
+            if (bindingTexture.read.shaderType == shaderType && internalCheck) {
                 entries.push(
                     {
-                        label: `binding texture 2: name: ${bindingTexture.fragment.name}`,
+                        label: `binding texture 2: name: ${bindingTexture.read.name}`,
                         binding: bindingIndex++,
                         resource: bindingTexture.texture.createView(),
                         type: {
@@ -1789,10 +1789,10 @@ class Points {
                 );
             }
 
-            if (bindingTexture.compute.shaderType == shaderType && internalCheck) {
+            if (bindingTexture.write.shaderType == shaderType && internalCheck) {
                 entries.push(
                     {
-                        label: `binding texture: name: ${bindingTexture.compute.name}`,
+                        label: `binding texture: name: ${bindingTexture.write.name}`,
                         binding: bindingIndex++,
                         resource: bindingTexture.texture.createView(),
                         type: {
