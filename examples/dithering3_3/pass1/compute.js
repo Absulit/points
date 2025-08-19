@@ -17,10 +17,8 @@ fn main(
     // var point = textureLoad(image, GlobalId.xy); // video
     //--------------------------------------------------
 
-    let b = brightness(point);
-    let newBrightness = step(.5, b); // if(b > .5){newBrightness = 1.;}
 
-    let quant_error = b - newBrightness;
+    let quant_error = textureLoad(quantErrorRead, GlobalId.xy, 0);;
 
     let rightPosition = GlobalId.xy + vec2(distance, 0);
     var rightPoint = textureLoad(computeTexture, rightPosition, 0); // image

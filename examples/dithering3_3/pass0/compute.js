@@ -30,6 +30,7 @@ fn main(
 
     let quant_error = b - newBrightness;
     point = vec4(newBrightness);
+    textureStore(quantErrorWrite, GlobalId.xy, vec4f(quant_error));
     textureStore(outputTex, GlobalId.xy, point);
 
 

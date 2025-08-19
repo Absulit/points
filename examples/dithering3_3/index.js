@@ -34,6 +34,7 @@ const dithering3 = {
         // await points.setTextureVideo('image', './../img/6982698-hd_1440_1080_25fps_800x800.mp4');
         await points.setTextureImage('image', './../img/absulit_800x800.jpg');
         points.setBindingTexture('outputTex', 'computeTexture', 0,1);
+        points.setBindingTexture('quantErrorWrite', 'quantErrorRead', 0,1);
         points.setBindingTexture('outputTex2', 'computeTexture2');
         // points.setLayers(2);
         // points.setStorage('variables', 'Variable', false, ShaderType.COMPUTE);
