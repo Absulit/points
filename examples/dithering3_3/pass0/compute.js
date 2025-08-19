@@ -20,7 +20,7 @@ fn main(
     @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
 ) {
     //--------------------------------------------------
-    let dims = textureDimensions(image);
+    // let dims = textureDimensions(image);
     var point = textureLoad(image, GlobalId.xy, 0); // image
     // var point = textureLoad(image, GlobalId.xy); // video
     //--------------------------------------------------
@@ -33,11 +33,11 @@ fn main(
     textureStore(outputTex, GlobalId.xy, point);
 
 
-    let rightPosition = GlobalId.xy + vec2(distance, 0);
-    var rightPoint = textureLoad(image, rightPosition, 0); // image
-    // var rightPoint = textureLoad(image, rightPosition); // video
-    rightPoint = vec4(brightness(rightPoint) + (.5 * quant_error * params.quantError));
-    textureStore(outputTex, rightPosition, rightPoint);
+    // let rightPosition = GlobalId.xy + vec2(distance, 0);
+    // var rightPoint = textureLoad(image, rightPosition, 0); // image
+    // // var rightPoint = textureLoad(image, rightPosition); // video
+    // rightPoint = vec4(brightness(rightPoint) + (.5 * quant_error * params.quantError));
+    // textureStore(outputTex, rightPosition, rightPoint);
 
     // storageBarrier();
     // workgroupBarrier();

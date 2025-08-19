@@ -14,7 +14,8 @@ fn main(
         @builtin(position) position: vec4f
     ) -> @location(0) vec4f {
 
-    return texture(computeTexture, imageSampler, uv / params.scale, false); //* .998046;
+    // return texture(computeTexture, imageSampler, uv / params.scale, false); //* .998046;
+    return vec4();
 
 }
 `;
