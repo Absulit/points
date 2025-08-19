@@ -884,7 +884,7 @@ class Points {
      * @param {boolean} internal
      * @returns {String} string with bindings
      */
-    #createDynamicGroupBindings(shaderType, internal) {
+    #createDynamicGroupBindings(shaderType, { internal, index: renderPassIndex }) {
         // `internal` here is a flag for a custom pass
         internal = internal || false;
         if (!shaderType) {
@@ -948,6 +948,7 @@ class Points {
                 bindingIndex += 1;
             }
         });
+        // TODO: internalcheck can be a filter
         this.#bindingTextures.forEach(bindingTexture => {
             const internalCheck = internal == bindingTexture.internal;
             if (bindingTexture.compute.shaderType == shaderType && internalCheck) {
@@ -1008,9 +1009,9 @@ class Points {
         renderPass.hasVertexShader && (dynamicGroupBindingsVertex += dynamicStructParams);
         renderPass.hasComputeShader && (dynamicGroupBindingsCompute += dynamicStructParams);
         renderPass.hasFragmentShader && (dynamicGroupBindingsFragment += dynamicStructParams);
-        renderPass.hasVertexShader && (dynamicGroupBindingsVertex += this.#createDynamicGroupBindings(ShaderType.VERTEX, renderPass.internal));
-        renderPass.hasComputeShader && (dynamicGroupBindingsCompute += this.#createDynamicGroupBindings(ShaderType.COMPUTE, renderPass.internal));
-        dynamicGroupBindingsFragment += this.#createDynamicGroupBindings(ShaderType.FRAGMENT, renderPass.internal);
+        renderPass.hasVertexShader && (dynamicGroupBindingsVertex += this.#createDynamicGroupBindings(ShaderType.VERTEX, renderPass));
+        renderPass.hasComputeShader && (dynamicGroupBindingsCompute += this.#createDynamicGroupBindings(ShaderType.COMPUTE, renderPass));
+        dynamicGroupBindingsFragment += this.#createDynamicGroupBindings(ShaderType.FRAGMENT, renderPass);
         renderPass.hasVertexShader && (colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + defaultVertexBody + colorsVertWGSL);
         renderPass.hasComputeShader && (colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + colorsComputeWGSL);
         renderPass.hasFragmentShader && (colorsFragWGSL = dynamicGroupBindingsFragment + defaultStructs + colorsFragWGSL);
@@ -1409,7 +1410,7 @@ class Points {
     #createComputeBindGroup() {
         this.#renderPasses.forEach((renderPass, index) => {
             if (renderPass.hasComputeShader) {
-                const entries = this.#createEntries(ShaderType.COMPUTE);
+                const entries = this.#createEntries(ShaderType.COMPUTE, renderPass);
                 if (entries.length) {
                     const bglEntries = [];
                     entries.forEach((entry, index) => {
@@ -1451,7 +1452,7 @@ class Points {
      * only if the texture is updated.
      */
     #passComputeBindingGroup(renderPass) {
-        const entries = this.#createEntries(ShaderType.COMPUTE);
+        const entries = this.#createEntries(ShaderType.COMPUTE, renderPass);
         if (entries.length) {
             renderPass.entries = entries;
             /**
@@ -1572,7 +1573,7 @@ class Points {
      * Creates the entries for the pipeline
      * @returns an array with the entries
      */
-    #createEntries(shaderType, internal) {
+    #createEntries(shaderType, {internal, index: renderPassIndex}) {
         internal = internal || false;
         let entries = [];
         let bindingIndex = 0;
@@ -1722,6 +1723,8 @@ class Points {
                 }
             });
         }
+        // TODO: remove if and use a single foreach
+        // TODO: internalcheck can be filtered
         if (this.#bindingTextures.length) {
             this.#bindingTextures.forEach(bindingTexture => {
                 let internalCheck = internal == bindingTexture.internal;
@@ -1762,7 +1765,7 @@ class Points {
 
     #createParams() {
         this.#renderPasses.forEach(renderPass => {
-            const entries = this.#createEntries(ShaderType.FRAGMENT, renderPass.internal);
+            const entries = this.#createEntries(ShaderType.FRAGMENT, renderPass);
             if (entries.length) {
                 let bglEntries = [];
                 entries.forEach((entry, index) => {
@@ -1771,6 +1774,9 @@ class Points {
                         visibility: GPUShaderStage.FRAGMENT
                     }
                     bglEntry[entry.type.name] = { 'type': entry.type.type };
+                    if (entry.type.format) {
+                        bglEntry[entry.type.name].format = entry.type.format
+                    }
                     if (entry.type.viewDimension) {
                         bglEntry[entry.type.name].viewDimension = entry.type.viewDimension
                     }
@@ -1807,7 +1813,7 @@ class Points {
      * only if the texture is updated.
      */
     #passParams(renderPass) {
-        const entries = this.#createEntries(ShaderType.FRAGMENT, renderPass.internal);
+        const entries = this.#createEntries(ShaderType.FRAGMENT, renderPass);
         if (entries.length) {
             renderPass.entries = entries;
             renderPass.uniformBindGroup = this.#device.createBindGroup({
