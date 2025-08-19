@@ -953,22 +953,22 @@ class Points {
             const { usesRenderPass, internal: i } = bindingTexture;
             const internalCheck = internal == i;
             if (usesRenderPass) {
-                if (renderPassIndex === bindingTexture.compute.renderPassIndex) {
+                if (renderPassIndex === bindingTexture.compute.renderPassIndex && internalCheck) {
                     dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.compute.name}: texture_storage_2d<rgba8unorm, write>;\n`;
                     bindingIndex += 1;
                 }
-                if (renderPassIndex === bindingTexture.fragment.renderPassIndex) {
+                if (renderPassIndex === bindingTexture.fragment.renderPassIndex && internalCheck) {
                     dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.fragment.name}: texture_2d<f32>;\n`;
                     bindingIndex += 1;
                 }
 
                 return;
             }
-            if (bindingTexture.compute.shaderType == shaderType && internalCheck) {
+            if (bindingTexture.compute.shaderType === shaderType && internalCheck) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.compute.name}: texture_storage_2d<rgba8unorm, write>;\n`;
                 bindingIndex += 1;
             }
-            if (bindingTexture.fragment.shaderType == shaderType && internalCheck) {
+            if (bindingTexture.fragment.shaderType === shaderType && internalCheck) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.fragment.name}: texture_2d<f32>;\n`;
                 bindingIndex += 1;
             }
@@ -1424,6 +1424,8 @@ class Points {
         this.#renderPasses.forEach((renderPass, index) => {
             if (renderPass.hasComputeShader) {
                 const entries = this.#createEntries(ShaderType.COMPUTE, renderPass);
+                console.log(renderPass.index, entries);
+
                 if (entries.length) {
                     const bglEntries = [];
                     entries.forEach((entry, index) => {
@@ -1586,7 +1588,7 @@ class Points {
      * Creates the entries for the pipeline
      * @returns an array with the entries
      */
-    #createEntries(shaderType, {internal, index: renderPassIndex}) {
+    #createEntries(shaderType, { internal, index: renderPassIndex }) {
         internal = internal || false;
         let entries = [];
         let bindingIndex = 0;
@@ -1736,15 +1738,30 @@ class Points {
                 }
             });
         }
-        // TODO: remove if and use a single foreach
+        // TODO: repeated entry blocks
         // TODO: internalcheck can be filtered
-        if (this.#bindingTextures.length) {
-            this.#bindingTextures.forEach(bindingTexture => {
-                let internalCheck = internal == bindingTexture.internal;
-                if (bindingTexture.compute.shaderType == shaderType && internalCheck) {
+        this.#bindingTextures.forEach(bindingTexture => {
+
+            const { usesRenderPass, internal: i } = bindingTexture;
+            const internalCheck = internal == i;
+            if (usesRenderPass) {
+                if (bindingTexture.fragment.renderPassIndex === renderPassIndex && internalCheck) {
                     entries.push(
                         {
-                            label: 'binding texture',
+                            label: `binding texture 2: name: ${bindingTexture.fragment.name}`,
+                            binding: bindingIndex++,
+                            resource: bindingTexture.texture.createView(),
+                            type: {
+                                name: 'texture',
+                                type: 'float'
+                            }
+                        }
+                    );
+                }
+                if (bindingTexture.compute.renderPassIndex === renderPassIndex && internalCheck) {
+                    entries.push(
+                        {
+                            label: `binding texture: name: ${bindingTexture.compute.name}`,
                             binding: bindingIndex++,
                             resource: bindingTexture.texture.createView(),
                             type: {
@@ -1755,24 +1772,41 @@ class Points {
                         }
                     );
                 }
-            });
-            this.#bindingTextures.forEach(bindingTexture => {
-                const internalCheck = internal == bindingTexture.internal;
-                if (bindingTexture.fragment.shaderType == shaderType && internalCheck) {
-                    entries.push(
-                        {
-                            label: 'binding texture 2',
-                            binding: bindingIndex++,
-                            resource: bindingTexture.texture.createView(),
-                            type: {
-                                name: 'texture',
-                                type: 'float'
-                            }
+                return;
+            }
+
+            if (bindingTexture.fragment.shaderType == shaderType && internalCheck) {
+                entries.push(
+                    {
+                        label: `binding texture 2: name: ${bindingTexture.fragment.name}`,
+                        binding: bindingIndex++,
+                        resource: bindingTexture.texture.createView(),
+                        type: {
+                            name: 'texture',
+                            type: 'float'
                         }
-                    );
-                }
-            });
-        }
+                    }
+                );
+            }
+
+            if (bindingTexture.compute.shaderType == shaderType && internalCheck) {
+                entries.push(
+                    {
+                        label: `binding texture: name: ${bindingTexture.compute.name}`,
+                        binding: bindingIndex++,
+                        resource: bindingTexture.texture.createView(),
+                        type: {
+                            name: 'storageTexture',
+                            type: 'write-only',
+                            format: 'rgba8unorm'
+                        }
+                    }
+                );
+            }
+
+
+        });
+
         return entries;
     }
 
