@@ -1,6 +1,9 @@
 import vert from './vert.js';
 import compute from './pass0/compute.js';
 import frag from './pass0/frag.js';
+
+import compute1 from './pass1/compute.js';
+import frag1 from './pass1/frag.js';
 import Points, { RenderPass, ShaderType } from 'points';
 
 const options = {
@@ -10,7 +13,8 @@ const options = {
 
 const dithering3 = {
     renderPasses: [
-        new RenderPass(vert, frag, compute, 800, 800)
+        new RenderPass(vert, frag, compute, 800, 800),
+        new RenderPass(vert, frag1, compute1, 800, 800),
     ],
     /**
      * @param {Points} points
