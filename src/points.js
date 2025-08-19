@@ -785,12 +785,13 @@ class Points {
 
     /**
      * Special texture where data can be written to it in the Compute Shader and
-     * read from in the Fragment Shader.
+     * read from in the Fragment Shader OR from a {@link RenderPass} to another.
+     * If you use writeIndex and readIndex it will share data between `RenderPasse`s
      * Is a one way communication method.
      * Ideal to store data to it in the Compute Shader and later visualize it in
      * the Fragment Shader.
-     * @param {string} computeName name of the variable in the compute shader
-     * @param {string} fragmentName name of the variable in the fragment shader
+     * @param {string} writeName name of the variable in the compute shader
+     * @param {string} readName name of the variable in the fragment shader
      * @param {number} writeIndex RenderPass allowed to write into `outputTex`
      * @param {number} readIndex RenderPass allowed to read from `computeTexture`
      * @param {Array<number, 2>} size dimensions of the texture, by default screen
@@ -808,7 +809,7 @@ class Points {
      * //// fragment
      * let value = texturePosition(computeTexture, imageSampler, position, uv, false);
      */
-    setBindingTexture(computeName, fragmentName, writeIndex, readIndex, size) {
+    setBindingTexture(writeName, readName, writeIndex, readIndex, size) {
         if ((Number.isInteger(writeIndex) && !Number.isInteger(readIndex)) || (!Number.isInteger(writeIndex) && Number.isInteger(readIndex))) {
             throw 'The parameters writeIndex and readIndex must both be declared.';
         }
@@ -816,12 +817,12 @@ class Points {
         // TODO: validate that names don't exist already
         const bindingTexture = {
             compute: {
-                name: computeName,
+                name: writeName,
                 shaderType: ShaderType.COMPUTE,
                 renderPassIndex: writeIndex
             },
             fragment: {
-                name: fragmentName,
+                name: readName,
                 shaderType: ShaderType.FRAGMENT,
                 renderPassIndex: readIndex
             },
@@ -1424,7 +1425,6 @@ class Points {
         this.#renderPasses.forEach((renderPass, index) => {
             if (renderPass.hasComputeShader) {
                 const entries = this.#createEntries(ShaderType.COMPUTE, renderPass);
-                console.log(renderPass.index, entries);
 
                 if (entries.length) {
                     const bglEntries = [];
