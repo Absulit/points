@@ -21,7 +21,6 @@ fn main(
 
     let numColumns:f32 = f32(dims.x);
     let numRows:f32 = f32(dims.y);
-    //let constant = u32(numColumns) / 93u;
 
     let numColumnsPiece:i32 = i32(numColumns / f32(workgroupSize));
     let numRowsPiece:i32 = i32(numRows / f32(workgroupSize));
@@ -79,10 +78,7 @@ fn main(
 
             var point = layers[layerIndex][pointIndex];
             let b = brightness(point);
-            var newBrightness = 0.;
-            if(b > .5){
-                newBrightness = 1.;
-            }
+            let newBrightness = step(.5, b); // if(b > .5){newBrightness = 1.;}
 
             let quant_error = b - newBrightness;
             let distance = 1;
@@ -90,24 +86,21 @@ fn main(
             let distanceF = f32(distance);
             point = vec4(newBrightness);
 
-            let pointP = &layers[layerIndex][pointIndex];
-            (*pointP) = point;
+            layers[layerIndex][pointIndex] = point;
 
 
             let pointIndexC = i32(y + ((x+distanceF) * numColumns));
             var rightPoint = layers[layerIndex][pointIndexC];
             rightPoint = vec4(brightness(rightPoint) + (.5 * quant_error));
 
-            let pointPC = &layers[layerIndex][pointIndexC];
-            (*pointPC) = rightPoint;
+            layers[layerIndex][pointIndexC] = rightPoint;
 
 
             let pointIndexR = i32((y+distanceF) + (x * numColumns));
             var bottomPoint = layers[layerIndex][pointIndexR];
             bottomPoint = vec4(brightness(bottomPoint) + (.5 * quant_error));
 
-            let pointPR = &layers[layerIndex][pointIndexR];
-            (*pointPR) = bottomPoint;
+            layers[layerIndex][pointIndexR] = bottomPoint;
 
             point = layers[layerIndex][pointIndex];
             let positionU = vec2u(ux,uy);
