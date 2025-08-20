@@ -5,6 +5,7 @@ import { ShaderType, RenderPass } from 'points';
 
 const options = {
     scale: 1,
+    quantError: 1,
 }
 
 
@@ -29,12 +30,15 @@ const dithering3 = {
         points.setStorage('variables', 'Variable', false, ShaderType.COMPUTE);
 
         points.setUniform('scale', options.scale);
+        points.setUniform('quantError', options.quantError);
 
         folder.add(options, 'scale', 0, 1, .0001).name('Scale');
+        folder.add(options, 'quantError', -1, 1, .0001).name('quantError');
         folder.open();
     },
     update: points => {
         points.setUniform('scale', options.scale);
+        points.setUniform('quantError', options.quantError);
     }
 }
 

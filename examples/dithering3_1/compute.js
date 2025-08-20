@@ -82,14 +82,14 @@ fn main(
 
             let pointIndexC = y + (x + distance) * numColumns;
             var rightPoint = layers[layerIndex][pointIndexC];
-            rightPoint = vec4(rightPoint.r + (.5 * quant_error));
+            rightPoint = vec4(rightPoint.r + (.5 * quant_error * params.quantError));
 
             layers[layerIndex][pointIndexC] = rightPoint;
 
 
             let pointIndexR = y + distance + (x * numColumns);
             var bottomPoint = layers[layerIndex][pointIndexR];
-            bottomPoint = vec4(bottomPoint.r + (.5 * quant_error));
+            bottomPoint = vec4(bottomPoint.r + (.5 * quant_error * params.quantError));
 
             layers[layerIndex][pointIndexR] = bottomPoint;
 
