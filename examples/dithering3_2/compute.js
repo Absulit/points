@@ -9,8 +9,6 @@ struct Variable{
 ${brightness}
 
 const distance = 1;
-const layerIndex = 0;
-
 const workgroupSize = 1;
 
 @compute @workgroup_size(workgroupSize,workgroupSize,1)
@@ -21,10 +19,7 @@ fn main(
 ) {
     //--------------------------------------------------
     let dims = textureDimensions(image);
-
-
-
-    var pointIndex = i32(GlobalId.y + (GlobalId.x * dims.x));
+    var pointIndex = GlobalId.y + (GlobalId.x * dims.x);
 
     var point = textureLoad(image, GlobalId.yx, 0); // image
     // var point = textureLoad(image, GlobalId.yx); // video
@@ -32,7 +27,7 @@ fn main(
 
     //--------------------------------------------------
 
-    pointIndex = i32(GlobalId.x + (GlobalId.y * dims.y));
+    pointIndex = GlobalId.x + (GlobalId.y * dims.y);
 
     point = points[pointIndex];
     let b = brightness(point);
@@ -40,22 +35,17 @@ fn main(
 
     let quant_error = b - newBrightness;
 
-    point = vec4(newBrightness);
-
-    points[pointIndex] = point;
+    points[pointIndex] = vec4(newBrightness);
 
 
-    let pointIndexC = i32(GlobalId.x + (GlobalId.y+distance) * dims.y);
-    var rightPoint = points[pointIndexC];
-    rightPoint = vec4(brightness(rightPoint) + (.5 * quant_error * params.quantError * 2));
-
-    points[pointIndexC] = rightPoint;
-
+    let pointIndexC = GlobalId.x + (GlobalId.y + distance) * dims.y;
+    let rightPoint = points[pointIndexC];
+    points[pointIndexC] = vec4(rightPoint + (.5 * quant_error * params.quantError * 2));
 
 
     point = points[pointIndex];
     textureStore(outputTex, GlobalId.xy, point);
-    storageBarrier();
+    // storageBarrier();
     // workgroupBarrier();
 }
 `;
