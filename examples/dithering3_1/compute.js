@@ -42,8 +42,8 @@ fn main(
 
                 var point = textureLoad(image, vec2(x,y), 0); // image
                 //var point = textureLoad(image, vec2<i32>(ix,iy)); // video
-                layers[0][pointIndex] = point;
-                layers[1][pointIndex] = point;
+                points[pointIndex] = point;
+                // points[pointIndex] = point;
             }
         }
 
@@ -60,16 +60,13 @@ fn main(
 
     for (var indexColumns:u32 = 0; indexColumns < numColumnsPiece; indexColumns++) {
         let x = WorkGroupID.x * numColumnsPiece + indexColumns;
-        let nx = x / numColumns;
         for (var indexRows:u32 = 0; indexRows < numRowsPiece; indexRows++) {
 
             let y = WorkGroupID.y * numRowsPiece + indexRows;
-            let ny = y / numRows;
-            let uv = vec2(nx,ny);
 
             let pointIndex = i32(y + (x * numColumns));
 
-            var point = layers[layerIndex][pointIndex];
+            var point = points[pointIndex];
             let b = brightness(point);
             let newBrightness = step(.5, b); // if(b > .5){newBrightness = 1.;}
 
@@ -77,23 +74,23 @@ fn main(
 
             point = vec4(newBrightness);
 
-            layers[layerIndex][pointIndex] = point;
+            points[pointIndex] = point;
 
 
             let pointIndexC = y + (x + distance) * numColumns;
-            var rightPoint = layers[layerIndex][pointIndexC];
+            var rightPoint = points[pointIndexC];
             rightPoint = vec4(rightPoint.r + (.5 * quant_error * params.quantError));
 
-            layers[layerIndex][pointIndexC] = rightPoint;
+            points[pointIndexC] = rightPoint;
 
 
             let pointIndexR = y + distance + (x * numColumns);
-            var bottomPoint = layers[layerIndex][pointIndexR];
+            var bottomPoint = points[pointIndexR];
             bottomPoint = vec4(bottomPoint.r + (.5 * quant_error * params.quantError));
 
-            layers[layerIndex][pointIndexR] = bottomPoint;
+            points[pointIndexR] = bottomPoint;
 
-            point = layers[layerIndex][pointIndex];
+            point = points[pointIndex];
             let positionU = vec2u(x,y);
             textureStore(outputTex, positionU, point);
             storageBarrier();
