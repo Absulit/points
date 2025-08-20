@@ -21,32 +21,26 @@ fn main(
     let dims = textureDimensions(image);
     var pointIndex = GlobalId.y + (GlobalId.x * dims.x);
 
-    var point = textureLoad(image, GlobalId.yx, 0); // image
-    // var point = textureLoad(image, GlobalId.yx); // video
-    points[pointIndex] = point;
+    points[pointIndex] = textureLoad(image, GlobalId.yx, 0); // image
+    // points[pointIndex] = textureLoad(image, GlobalId.yx); // video
 
     //--------------------------------------------------
 
     pointIndex = GlobalId.x + (GlobalId.y * dims.y);
 
-    point = points[pointIndex];
-    let b = brightness(point);
+    let b = brightness(points[pointIndex]);
     let newBrightness = step(.5, b); // if(b > .5){newBrightness = 1.;}
 
     let quant_error = b - newBrightness;
 
     points[pointIndex] = vec4(newBrightness);
 
-
     let pointIndexC = GlobalId.x + (GlobalId.y + distance) * dims.y;
     let rightPoint = points[pointIndexC];
     points[pointIndexC] = vec4(rightPoint + (.5 * quant_error * params.quantError * 2));
 
 
-    point = points[pointIndex];
-    textureStore(outputTex, GlobalId.xy, point);
-    // storageBarrier();
-    // workgroupBarrier();
+    textureStore(outputTex, GlobalId.xy, points[pointIndex]);
 }
 `;
 
