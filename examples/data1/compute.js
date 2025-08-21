@@ -10,9 +10,9 @@ struct Matrix {
 
 @compute @workgroup_size(8,8,1)
 fn main(
-    @builtin(global_invocation_id) GlobalId: vec3<u32>,
-    @builtin(workgroup_id) WorkGroupID: vec3<u32>,
-    @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
+    @builtin(global_invocation_id) GlobalId: vec3u,
+    @builtin(workgroup_id) WorkGroupID: vec3u,
+    @builtin(local_invocation_id) LocalInvocationID: vec3u
 ) {
     // Guard against out-of-bounds work group sizes
     if (GlobalId.x >= u32(firstMatrix.size.x) || GlobalId.y >= u32(secondMatrix.size.y)) {
@@ -21,7 +21,7 @@ fn main(
 
     resultMatrix.size = vec2(firstMatrix.size.x, secondMatrix.size.y);
 
-    let resultCell = vec2(GlobalId.x, GlobalId.y);
+    let resultCell = GlobalId.xy;
     var result = 0.0;
     for (var i = 0u; i < u32(firstMatrix.size.y); i = i + 1u) {
       let a = i + resultCell.x * u32(firstMatrix.size.y);
