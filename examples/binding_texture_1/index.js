@@ -7,16 +7,6 @@ import compute2 from './pass1/compute.js';
 import frag2 from './pass1/frag.js';
 import Points, { RenderPass } from 'points';
 
-const options = {
-    val: 0,
-    bool: false,
-    color1: '#FF0000', // CSS string
-    color2: [0, 128, 255], // RGB array
-    color3: [0, 128, 255, 0.3], // RGB with alpha
-    color4: { h: 350, s: 0.9, v: 0.3 }, // Hue, saturation, value
-    color5: { r: 115, g: 50.9, b: 20.3, a: .1 }, // r, g, b object
-}
-
 const base = {
 
     renderPasses: [

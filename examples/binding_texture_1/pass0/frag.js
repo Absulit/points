@@ -17,8 +17,6 @@ fn main(
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
 
-
-
     let finalColor = texture(readTexture, imageSampler, uvr, true);
 
     return finalColor;
