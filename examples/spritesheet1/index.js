@@ -4,7 +4,7 @@ const spritesheet1 = {
     vert,
     frag,
     init: async points => {
-        let descriptor = {
+        const descriptor = {
             addressModeU: 'clamp-to-edge',
             addressModeV: 'clamp-to-edge',
             magFilter: 'nearest',

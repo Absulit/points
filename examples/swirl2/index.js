@@ -43,7 +43,7 @@ const base = {
         folder.add(options, 'sliderB', -1, 1, .0001).name('sliderB');
         folder.add(options, 'sliderC', -1, 1, .0001).name('sliderC');
 
-        let descriptor = {
+        const descriptor = {
             addressModeU: 'repeat',
             addressModeV: 'repeat',
         }
