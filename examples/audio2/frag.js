@@ -1,21 +1,16 @@
-import { fnusin } from 'points/animation';
 import { sdfCircle } from 'points/sdf';
 import { WHITE, RED, GREEN, YELLOW, layer } from 'points/color';
-import { audioAverage, audioAverageSegments } from 'points/audio';
-import { texturePosition } from 'points/image';
+import { texture } from 'points/image';
 
 const frag = /*wgsl*/`
 
-${fnusin}
 ${sdfCircle}
 ${layer}
-${audioAverage}
-${audioAverageSegments}
 ${WHITE}
 ${RED}
 ${GREEN}
 ${YELLOW}
-${texturePosition}
+${texture}
 
 @fragment
 fn main(
@@ -29,12 +24,10 @@ fn main(
 
     if(params.mouseClick == 1.){
         click_event.updated = 1;
+        // other actions
     }
 
-    // let audioAverage = audioAverage(audio);
-    // let audioAverageSegments = audioAverageSegments(2);
-
-    let feedbackColor = texturePosition(feedbackTexture, imageSampler, vec2(0.), uvr * vec2f(1, 1.01), true);
+    let feedbackColor = texture(feedbackTexture, imageSampler, uvr * vec2f(1, 1.01), true);
 
     let segmentNum = 4;
     let subSegmentLength = i32(params.audioLength) / segmentNum;
@@ -50,16 +43,11 @@ fn main(
         result[index] = audioAverage / f32(subSegmentLength);
     }
 
-
-    let circle1 = sdfCircle(vec2(.5), result[0] * .4, .0, uvr) * WHITE;
-    let circle2 = sdfCircle(vec2(.5), result[1] * .4, .0, uvr) * GREEN;
-    let circle3 = sdfCircle(vec2(.5), result[2] * .4, .0, uvr) * YELLOW;
-    let circle4 = sdfCircle(vec2(.5), result[3] * .4, .0, uvr) * RED;
-
-
-    // return c;
-    // return layer(circle2 * WHITE, c + circle);
-    // return c + circle - circle2;
+    let center = vec2(.5) * ratio;
+    let circle1 = sdfCircle(center, result[0] * .4, .0, uvr) * WHITE;
+    let circle2 = sdfCircle(center, result[1] * .4, .0, uvr) * GREEN;
+    let circle3 = sdfCircle(center, result[2] * .4, .0, uvr) * YELLOW;
+    let circle4 = sdfCircle(center, result[3] * .4, .0, uvr) * RED;
 
     return  layer(feedbackColor * .9, layer(circle1, layer(circle2, layer(circle3, circle4))));
 }

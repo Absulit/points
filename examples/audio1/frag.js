@@ -18,12 +18,7 @@ fn main(
         // other actions
     }
 
-
-    var c = vec4f();
-    c.r = audioX;
-    c.a = 1.;
-
-    return c;
+    return vec4f(audioX, 0, 0, 1);;
 }
 `;
 
