@@ -1,7 +1,4 @@
-import { structs } from '../structs.js';
 const frag = /*wgsl*/`
-
-${structs}
 
 fn opSmoothSubtraction(d1: f32, d2: f32, k: f32) -> f32{
     let h = clamp(.5 - .5 * (d2 + d1) / k, 0., 1.);

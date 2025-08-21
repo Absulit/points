@@ -1,8 +1,8 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
-import Points from '.points';
-import { dataSize } from 'datasize';
+import Points from 'points';
+import { dataSize } from '../../src/data-size.js';
 
 const base = {
   vert,

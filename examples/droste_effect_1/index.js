@@ -1,9 +1,7 @@
 import vert0 from './renderpass0/vert.js';
-import compute0 from './renderpass0/compute.js';
 import frag0 from './renderpass0/frag.js';
 
 import vert1 from './renderpass1/vert.js';
-import compute1 from './renderpass1/compute.js';
 import frag1 from './renderpass1/frag.js';
 
 import Points from 'points';
@@ -17,21 +15,29 @@ import { RenderPass } from 'points';
  * https://github.com/ruby-processing/picrate-examples/blob/master/library/video/capture/data/droste.glsl
  */
 
+// TODO: does colors requires a 0 at the end? (padding)
+const colors = [
+    248,208,146, 0,
+    21, 144, 151, 0,
+    56, 164, 140, 0,
+    26, 86, 120, 0,
+    37, 36, 93, 0,
+    87, 28, 86, 0,
+].map(i => i / 255);
+
 const base = {
 
     renderPasses: [
-        new RenderPass(vert0, frag0, compute0),
-        new RenderPass(vert1, frag1, compute1)
+        new RenderPass(vert0, frag0),
+        new RenderPass(vert1, frag1)
     ],
     /**
-     *
      * @param {Points} points
      */
     init: async (points, folder) => {
         points.setSampler('imageSampler', null, ShaderType.FRAGMENT);
         points.setTexture2d('feedbackTexture', true);
-        points.setStorage('variables', 'Variables');
-        points.setStorage('colors', 'array<vec3f, 6>');
+        points.setStorageMap('colors', colors, 'array<vec3f, 6>');
     },
     update: points => {
     }
