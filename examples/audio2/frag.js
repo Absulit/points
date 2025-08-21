@@ -44,10 +44,11 @@ fn main(
     }
 
     let center = vec2(.5) * ratio;
-    let circle1 = sdfCircle(center, result[0] * .4, .0, uvr) * WHITE;
-    let circle2 = sdfCircle(center, result[1] * .4, .0, uvr) * GREEN;
-    let circle3 = sdfCircle(center, result[2] * .4, .0, uvr) * YELLOW;
-    let circle4 = sdfCircle(center, result[3] * .4, .0, uvr) * RED;
+    let size = .4 * ratio.x;
+    let circle1 = sdfCircle(center, result[0] * size, .0, uvr) * WHITE;
+    let circle2 = sdfCircle(center, result[1] * size, .0, uvr) * GREEN;
+    let circle3 = sdfCircle(center, result[2] * size, .0, uvr) * YELLOW;
+    let circle4 = sdfCircle(center, result[3] * size, .0, uvr) * RED;
 
     return  layer(feedbackColor * .9, layer(circle1, layer(circle2, layer(circle3, circle4))));
 }
