@@ -6,15 +6,14 @@ let audio = null;
 
 const base = {
     vert,
-    compute: null,
     frag,
     /**
      *
      * @param {Points} points
      */
     init: async points => {
-        let volume = 1;
-        let loop = true;
+        const volume = 1;
+        const loop = true;
         // audio = points.setAudio('audio', './../../audio/generative_audio_test.ogg', volume, loop);
         audio = points.setAudio('audio', './../../audio/cognitive_dissonance.mp3', volume, loop, false);
         points.addEventListener('click_event', data => {
