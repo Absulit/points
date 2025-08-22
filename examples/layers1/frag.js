@@ -1,4 +1,5 @@
 import { fnusin } from 'points/animation';
+
 const frag = /*wgsl*/`
 
 ${fnusin}
