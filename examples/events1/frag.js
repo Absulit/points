@@ -1,12 +1,12 @@
 import { sdfCircle } from 'points/sdf';
-import { WHITE, BLUE, GREEN, RED, YELLOW } from 'points/color';
+import { WHITE } from 'points/color';
 import { fnusin } from 'points/animation';
 
 const frag = /*wgsl*/`
 
 ${sdfCircle}
 ${fnusin}
-${WHITE + RED + GREEN + BLUE + YELLOW}
+${WHITE}
 
 @fragment
 fn main(
