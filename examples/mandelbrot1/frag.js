@@ -1,6 +1,7 @@
 import { fusin } from 'points/animation';
 import { layer, RED, GREEN, BLUE } from 'points/color';
 import { showDebugCross } from 'points/debug';
+import { polar } from 'points/math';
 import { sdfCircle, sdfLine, sdfSegment } from 'points/sdf';
 const frag = /*wgsl*/`
 
@@ -9,7 +10,9 @@ struct Variable{
     zoom:f32,
     isClicked:u32,
     mouseStart:vec2f,
-    mouseEnd:vec2f
+    mouseEnd:vec2f,
+    fragtalCenter:vec2f,
+    finalPosition:vec2f,
 }
 
 ${fusin}
@@ -21,6 +24,7 @@ ${sdfLine}
 ${sdfSegment}
 ${layer}
 ${sdfCircle}
+${polar}
 
 const NUMITERATIONS = 40;
 
@@ -42,6 +46,12 @@ fn main(
 ) -> @location(0) vec4f {
     let center = vec2(.5,.5) * ratio;
 
+    if(variables.init == 0){
+        variables.fragtalCenter = center;
+        variables.finalPosition = center;
+        variables.init = 1;
+    }
+
     // is mouse zooming in or out
     let direction = mix(-1, 1, step(0, params.mouseDelta.y));
     // add or remove to zoom if wheel is actually being moved
@@ -52,22 +62,28 @@ fn main(
         variables.mouseStart = mouse * ratio;
         variables.isClicked = 1;
     }
-    if(params.mouseDown == 1){
-        variables.mouseEnd = mouse * ratio;
-    }
 
-    if(params.mouseClick == 1){
-        variables.isClicked = 0;
-    }
+    let d = distance(variables.mouseStart, variables.mouseEnd);
+    let a = angle(variables.mouseStart, variables.mouseEnd);
+    let p = polar(d, a);
+
 
     let new_scale = params.scale / variables.zoom;
 
-    let fragtalCenter = center;
+    if(params.mouseClick == 1){
+        variables.isClicked = 0;
+        variables.fragtalCenter = variables.finalPosition;
+    }
 
-    let cross = showDebugCross(fragtalCenter, RED, uvr);
+    if(params.mouseDown == 1){
+        variables.mouseEnd = mouse * ratio;
+        variables.finalPosition = variables.fragtalCenter + p;
+    }
 
-    let c_re = (uvr.x - fragtalCenter.x) / new_scale;
-    let c_im = (uvr.y - fragtalCenter.y) / new_scale;
+    let cross = showDebugCross(variables.finalPosition, RED, uvr);
+
+    let c_re = (uvr.x - variables.finalPosition.x) / new_scale;
+    let c_im = (uvr.y - variables.finalPosition.y) / new_scale;
 
     var x = 0.;
     var y = 0.;
