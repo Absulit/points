@@ -1,23 +1,35 @@
 import { fusin } from 'points/animation';
-import { layer, RED } from 'points/color';
+import { layer, RED, GREEN, BLUE } from 'points/color';
 import { showDebugCross } from 'points/debug';
-import { sdfLine, sdfSegment } from 'points/sdf';
+import { sdfCircle, sdfLine, sdfSegment } from 'points/sdf';
 const frag = /*wgsl*/`
 
 struct Variable{
     init: f32,
     zoom:f32,
-    circlePosition:vec2f
+    isClicked:u32,
+    mouseStart:vec2f,
+    mouseEnd:vec2f
 }
 
 ${fusin}
 ${showDebugCross}
 ${RED}
+${GREEN}
+${BLUE}
 ${sdfLine}
 ${sdfSegment}
 ${layer}
+${sdfCircle}
 
 const NUMITERATIONS = 40;
+
+//
+fn angle(p1:vec2f, p2:vec2f) -> f32 {
+    let delta = p2 - p1;
+    let distance = length(delta);
+    return atan2(delta.y, delta.x);
+}
 
 @fragment
 fn main(
@@ -28,7 +40,7 @@ fn main(
     @location(4) mouse: vec2f,
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
-
+    let center = vec2(.5,.5) * ratio;
 
     // is mouse zooming in or out
     let direction = mix(-1, 1, step(0, params.mouseDelta.y));
@@ -36,21 +48,26 @@ fn main(
     variables.zoom += .0001 * direction * params.mouseWheel;
 
 
-    if(params.mouseDown == 1){
-
+    if(params.mouseDown == 1 && variables.isClicked == 0){
+        variables.mouseStart = mouse * ratio;
+        variables.isClicked = 1;
     }
-    if(params.mouseClick == 1){
+    if(params.mouseDown == 1){
+        variables.mouseEnd = mouse * ratio;
+    }
 
+    if(params.mouseClick == 1){
+        variables.isClicked = 0;
     }
 
     let new_scale = params.scale / variables.zoom;
 
-    let center = vec2(.5,.5) * ratio;
-    let cross = showDebugCross(center, RED, uvr);
-    // let center = mouse * ratio;
+    let fragtalCenter = center;
 
-    let c_re = (uvr.x - center.x) / new_scale;
-    let c_im = (uvr.y - center.y) / new_scale;
+    let cross = showDebugCross(fragtalCenter, RED, uvr);
+
+    let c_re = (uvr.x - fragtalCenter.x) / new_scale;
+    let c_im = (uvr.y - fragtalCenter.y) / new_scale;
 
     var x = 0.;
     var y = 0.;
@@ -83,7 +100,10 @@ fn main(
         );
     }
 
-    return layer(finalColor, cross);
+    let startCircle = sdfCircle(variables.mouseStart, .01,.01, uvr) * GREEN;
+    let endCircle = sdfCircle(variables.mouseEnd, .01,.01, uvr) * BLUE;
+
+    return layer(layer(layer(finalColor, cross), startCircle), endCircle);
 }
 `;
 
