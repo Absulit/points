@@ -6,6 +6,7 @@ const frag = /*wgsl*/`
 ${brightness}
 ${texture}
 
+const WAVENUMBER = 8;
 
 @fragment
 fn main(
@@ -17,15 +18,15 @@ fn main(
         @builtin(position) position: vec4f
     ) -> @location(0) vec4f {
 
-    let color0 = vec4(params.color0/255, 1.);
-    let color1 = vec4(params.color1/255, 1.);
+    let color0 = vec4(params.color0 / 255, 1.);
+    let color1 = vec4(params.color1 / 255, 1.);
 
     let rgbaImage = texture(image, feedbackSampler, uvr / params.scale, false);
 
     let b = brightness(rgbaImage);
     let d = distance(uv, rgbaImage.xy);
 
-    let finalColor = mix(color0, color1, b) * sin(d * 8 + params.time) ;
+    let finalColor = mix(color0, color1, b) * sin(d * WAVENUMBER + params.time) ;
 
     return finalColor;
 }

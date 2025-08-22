@@ -16,11 +16,9 @@ const imagetexture2 = {
         // await points.setTextureImage('image', './../img/old_king_600x600.jpg');
         await points.setTextureImage('image', './../img/absulit_800x800.jpg');
 
-        // TODO: error if scale is placed before the colors
         points.setUniform('color0', options.color0, 'vec3f');
         points.setUniform('color1', options.color1, 'vec3f');
         points.setUniform('scale', options.scale, 'f32');
-
 
         folder.add(options, 'scale', 0, 1, .0001).name('Scale');
         folder.addColor(options, 'color0');
