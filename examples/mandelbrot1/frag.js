@@ -33,12 +33,22 @@ fn main(
     let percentageIteration = f32(iteration) / NUMITERATIONS;
 
 
-    var finalColor:vec4f = vec4();
+    var finalColor = vec4f();
 
     if(iteration < NUMITERATIONS){
-        finalColor = vec4(percentageIteration, percentageIteration * uvr.x * fusin(1), percentageIteration * uvr.y, 1);
+        finalColor = vec4(
+            percentageIteration,
+            percentageIteration * uvr.x * fusin(1),
+            percentageIteration * uvr.y,
+            1
+        );
     }else{
-        finalColor = vec4(percentageIteration, percentageIteration * uvr.x, 1 - percentageIteration * uvr.y, 1);
+        finalColor = vec4(
+            percentageIteration,
+            percentageIteration * uvr.x,
+            1 - percentageIteration * uvr.y,
+            1
+        );
     }
 
     return finalColor;
