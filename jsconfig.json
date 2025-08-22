@@ -5,24 +5,18 @@
     "paths": {
       "points": ["./src/points.js"],
 
-      "datasize": ["./src/data-size.js"],
-      "renderpass": ["./src/RenderPass.js"],
-      "shadertype": ["./src/ShaderType.js"],
-
-      "animation": ["./src/core/animation.js"],
-      "audio": ["./src/core/audio.js"],
-      "color": ["./src/core/color.js"],
-      "debug": ["./src/core/debug.js"],
-      "effects": ["./src/core/effects.js"],
-      "image": ["./src/core/image.js"],
-      "math": ["./src/core/math.js"],
-      "noise2d": ["./src/core/noise2d.js"],
-      "classicnoise2d": ["./src/core/classicnoise2d.js"],
-      "random": ["./src/core/random.js"],
-      "renderpasses": ["./src/RenderPasses.js"],
-      "sdf": ["./src/core/sdf.js"],
-
-      "datgui": ["./src/vendor/datgui/dat.gui.module.js"]
+      "points/animation": ["./src/core/animation.js"],
+      "points/audio": ["./src/core/audio.js"],
+      "points/color": ["./src/core/color.js"],
+      "points/debug": ["./src/core/debug.js"],
+      "points/effects": ["./src/core/effects.js"],
+      "points/image": ["./src/core/image.js"],
+      "points/math": ["./src/core/math.js"],
+      "points/noise2d": ["./src/core/noise2d.js"],
+      "points/classicnoise2d": ["./src/core/classicnoise2d.js"],
+      "points/random": ["./src/core/random.js"],
+      "points/renderpasses": ["./src/RenderPasses.js"],
+      "points/sdf": ["./src/core/sdf.js"],
     }
   }
 }
