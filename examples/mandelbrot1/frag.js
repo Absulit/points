@@ -1,7 +1,21 @@
 import { fusin } from 'points/animation';
+import { layer, RED } from 'points/color';
+import { showDebugCross } from 'points/debug';
+import { sdfLine, sdfSegment } from 'points/sdf';
 const frag = /*wgsl*/`
 
+struct Variable{
+    init: f32,
+    zoom:f32,
+    circlePosition:vec2f
+}
+
 ${fusin}
+${showDebugCross}
+${RED}
+${sdfLine}
+${sdfSegment}
+${layer}
 
 const NUMITERATIONS = 40;
 
@@ -15,10 +29,28 @@ fn main(
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
 
-    let center = vec2(.5,.5) * ratio;
 
-    let c_re = (uvr.x - center.x) / params.scale;
-    let c_im = (uvr.y - center.y) / params.scale;
+    // is mouse zooming in or out
+    let direction = mix(-1, 1, step(0, params.mouseDelta.y));
+    // add or remove to zoom if wheel is actually being moved
+    variables.zoom += .0001 * direction * params.mouseWheel;
+
+
+    if(params.mouseDown == 1){
+
+    }
+    if(params.mouseClick == 1){
+
+    }
+
+    let new_scale = params.scale / variables.zoom;
+
+    let center = vec2(.5,.5) * ratio;
+    let cross = showDebugCross(center, RED, uvr);
+    // let center = mouse * ratio;
+
+    let c_re = (uvr.x - center.x) / new_scale;
+    let c_im = (uvr.y - center.y) / new_scale;
 
     var x = 0.;
     var y = 0.;
@@ -51,7 +83,7 @@ fn main(
         );
     }
 
-    return finalColor;
+    return layer(finalColor, cross);
 }
 `;
 
