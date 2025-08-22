@@ -82,15 +82,14 @@ fn main(
 
     let cross = showDebugCross(variables.finalPosition, RED, uvr);
 
-    let c_re = (uvr.x - variables.finalPosition.x) / new_scale;
-    let c_im = (uvr.y - variables.finalPosition.y) / new_scale;
+    let c = (uvr - variables.finalPosition) / new_scale;
 
     var x = 0.;
     var y = 0.;
     var iteration = 0;
     while(x * x + y * y <= 4 && iteration < NUMITERATIONS){
-        var x_new = x * x - y * y + c_re;
-        y = 2 * x * y + c_im;
+        var x_new = x * x - y * y + c.x;
+        y = 2 * x * y + c.y;
         x = x_new;
         iteration++;
     }
