@@ -53,12 +53,18 @@ fn main(
         variables.fragtalCenter = center;
         variables.finalPosition = center;
         variables.init = 1;
+        variables.zoom = .5;
     }
 
     // is mouse zooming in or out
     let direction = mix(-1, 1, step(0, params.mouseDelta.y));
     // add or remove to zoom if wheel is actually being moved
-    variables.zoom += .001 * direction * params.mouseWheel;
+    // variables.zoom += .0001 * direction * params.mouseWheel;
+    variables.zoom *= 1.0 + direction * params.mouseWheel * .0001;
+    if(variables.zoom < 0.){
+        variables.zoom = .01;
+    }
+    // variables.zoom = variables.zoom *  mix(1.0001, 1, step(0, params.mouseWheel));
 
 
     if(params.mouseDown == 1 && variables.isClicked == 0){
@@ -66,7 +72,7 @@ fn main(
         variables.isClicked = 1;
     }
 
-    let new_scale = params.scale * variables.zoom;
+    let new_scale = /*params.scale * */ variables.zoom;
 
     // if we zoom in too much the distance on the drag is way bigger
     // so we have to scale it with new_scale
@@ -129,7 +135,7 @@ fn main(
     let startCircle = sdfCircle(variables.mouseStart, .01,.01, uvr) * GREEN;
     let endCircle = sdfCircle(variables.mouseEnd, .01,.01, uvr) * BLUE;
 
-    return layer(layer(layer(finalColor, layer(cross, cross_center)), startCircle), endCircle);
+    return layer(layer(finalColor, startCircle), endCircle);
 }
 `;
 
