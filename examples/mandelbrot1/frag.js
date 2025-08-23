@@ -27,7 +27,7 @@ ${layer}
 ${sdfCircle}
 ${polar}
 
-const NUMITERATIONS = 1024;
+// const NUMITERATIONS = 1024;
 
 //
 fn angle(p1:vec2f, p2:vec2f) -> f32 {
@@ -47,7 +47,7 @@ fn main(
 ) -> @location(0) vec4f {
     let center = vec2(.5,.5) * ratio;
 
-    // let NUMITERATIONS = u32(params.numIterations);
+    let NUMITERATIONS = i32(params.numIterations);
 
     if(variables.init == 0){
         variables.fragtalCenter = center;
@@ -58,7 +58,7 @@ fn main(
     // is mouse zooming in or out
     let direction = mix(-1, 1, step(0, params.mouseDelta.y));
     // add or remove to zoom if wheel is actually being moved
-    variables.zoom += .0001 * direction * params.mouseWheel;
+    variables.zoom += .001 * direction * params.mouseWheel;
 
 
     if(params.mouseDown == 1 && variables.isClicked == 0){
@@ -66,7 +66,7 @@ fn main(
         variables.isClicked = 1;
     }
 
-    let new_scale = params.scale / variables.zoom;
+    let new_scale = params.scale * variables.zoom;
 
     // if we zoom in too much the distance on the drag is way bigger
     // so we have to scale it with new_scale
@@ -105,7 +105,7 @@ fn main(
         iteration++;
     }
 
-    let percentageIteration = f32(iteration) / NUMITERATIONS;
+    let percentageIteration = f32(iteration) / f32(NUMITERATIONS);
 
 
     var finalColor = vec4f();
