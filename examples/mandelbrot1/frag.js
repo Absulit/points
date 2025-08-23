@@ -28,9 +28,9 @@ ${layer}
 ${sdfCircle}
 ${polar}
 
-// const NUMITERATIONS = 1024;
+const NUMITERATIONS = 614;
+const MAXWHEELMOVEMENTS = 162000;
 
-//
 fn angle(p1:vec2f, p2:vec2f) -> f32 {
     let delta = p2 - p1;
     let distance = length(delta);
@@ -47,7 +47,6 @@ fn main(
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
     let center = vec2(.5,.5) * ratio;
-
 
     if(variables.init == 0){
         variables.fragtalCenter = center;
@@ -71,14 +70,13 @@ fn main(
         variables.wheelMovements = 1.;
     }
 
-
     if(params.mouseDown == 1 && variables.isClicked == 0){
         variables.mouseStart = mouse * ratio;
         variables.isClicked = 1;
     }
 
     let new_scale = variables.zoom;
-    let NUMITERATIONS = i32( 40 + 614 * (variables.wheelMovements / 162000)); // 192000
+    let numIterations = i32( 40 + NUMITERATIONS * (variables.wheelMovements / MAXWHEELMOVEMENTS)); // 192000
     // logger = variables.wheelMovements;
 
     // if we zoom in too much the distance on the drag is way bigger
@@ -86,7 +84,6 @@ fn main(
     let d = distance(variables.mouseStart, variables.mouseEnd) / new_scale;
     let a = angle(variables.mouseStart, variables.mouseEnd);
     let p = polar(d, a);
-
 
     if(params.mouseClick == 1){
         variables.isClicked = 0;
@@ -97,28 +94,25 @@ fn main(
         variables.mouseEnd = mouse * ratio;
         variables.finalPosition = variables.fragtalCenter + p;
     }
-    // let offset = (variables.mouseStart*ratio) - variables.finalPosition;
-    // Transform = T * Translate(C) * S * Translate(-C)
+
     let fp = variables.finalPosition;
 
     let cross = showDebugCross(fp, RED, uvr);
     let cross_center = showDebugCross(center, YELLOW, uvr);
 
     let c = (uvr - center) / new_scale - fp + center;
-    // let c = (uvr/ new_scale) + center;
-    // let c = ((uvr - fp) / new_scale)+(-mouse*ratio);
 
     var x = 0.;
     var y = 0.;
     var iteration = 0;
-    while(x * x + y * y <= 4 && iteration < NUMITERATIONS){
+    while(x * x + y * y <= 4 && iteration < numIterations){
         var x_new = x * x - y * y + c.x;
         y = 2 * x * y + c.y;
         x = x_new;
         iteration++;
     }
 
-    let percentageIteration = f32(iteration) / f32(NUMITERATIONS);
+    let percentageIteration = f32(iteration) / f32(numIterations);
 
 
     var finalColor = vec4f();
@@ -139,10 +133,11 @@ fn main(
         );
     }
 
+    // to draw a couple of circles to debug the touch
     // let startCircle = sdfCircle(variables.mouseStart, .01,.01, uvr) * GREEN;
     // let endCircle = sdfCircle(variables.mouseEnd, .01,.01, uvr) * BLUE;
-
     // return layer(layer(finalColor, startCircle), endCircle);
+
     return finalColor;
 }
 `;
