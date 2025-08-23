@@ -8,6 +8,7 @@ const frag = /*wgsl*/`
 struct Variable{
     init: f32,
     zoom:f32,
+    wheelMovements:f32,
     isClicked:u32,
     mouseStart:vec2f,
     mouseEnd:vec2f,
@@ -47,24 +48,28 @@ fn main(
 ) -> @location(0) vec4f {
     let center = vec2(.5,.5) * ratio;
 
-    let NUMITERATIONS = i32(params.numIterations);
 
     if(variables.init == 0){
         variables.fragtalCenter = center;
         variables.finalPosition = center;
         variables.init = 1;
         variables.zoom = .5;
+        variables.wheelMovements = 1.;
     }
 
     // is mouse zooming in or out
     let direction = mix(-1, 1, step(0, params.mouseDelta.y));
-    // add or remove to zoom if wheel is actually being moved
-    // variables.zoom += .0001 * direction * params.mouseWheel;
+    // Add or remove to zoom if wheel is actually being moved.
+    // Increments and decreases exponentially to compensate speed.
     variables.zoom *= 1.0 + direction * params.mouseWheel * .0001;
     if(variables.zoom < 0.){
         variables.zoom = .01;
     }
-    // variables.zoom = variables.zoom *  mix(1.0001, 1, step(0, params.mouseWheel));
+
+    variables.wheelMovements += 1. * direction * params.mouseWheel;
+    if(variables.wheelMovements < 0.){
+        variables.wheelMovements = 1.;
+    }
 
 
     if(params.mouseDown == 1 && variables.isClicked == 0){
@@ -72,7 +77,9 @@ fn main(
         variables.isClicked = 1;
     }
 
-    let new_scale = /*params.scale * */ variables.zoom;
+    let new_scale = variables.zoom;
+    let NUMITERATIONS = i32( 40 + 614 * (variables.wheelMovements / 162000)); // 192000
+    // logger = variables.wheelMovements;
 
     // if we zoom in too much the distance on the drag is way bigger
     // so we have to scale it with new_scale
@@ -132,10 +139,11 @@ fn main(
         );
     }
 
-    let startCircle = sdfCircle(variables.mouseStart, .01,.01, uvr) * GREEN;
-    let endCircle = sdfCircle(variables.mouseEnd, .01,.01, uvr) * BLUE;
+    // let startCircle = sdfCircle(variables.mouseStart, .01,.01, uvr) * GREEN;
+    // let endCircle = sdfCircle(variables.mouseEnd, .01,.01, uvr) * BLUE;
 
-    return layer(layer(finalColor, startCircle), endCircle);
+    // return layer(layer(finalColor, startCircle), endCircle);
+    return finalColor;
 }
 `;
 
