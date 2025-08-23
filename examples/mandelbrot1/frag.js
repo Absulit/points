@@ -66,12 +66,14 @@ fn main(
         variables.isClicked = 1;
     }
 
-    let d = distance(variables.mouseStart, variables.mouseEnd);
+    let new_scale = params.scale / variables.zoom;
+
+    // if we zoom in too much the distance on the drag is way bigger
+    // so we have to scale it with new_scale
+    let d = distance(variables.mouseStart, variables.mouseEnd) / new_scale;
     let a = angle(variables.mouseStart, variables.mouseEnd);
     let p = polar(d, a);
 
-
-    let new_scale = params.scale / variables.zoom;
 
     if(params.mouseClick == 1){
         variables.isClicked = 0;
