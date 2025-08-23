@@ -89,7 +89,7 @@ fn main(
     let cross = showDebugCross(fp, RED, uvr);
     let cross_center = showDebugCross(center, YELLOW, uvr);
 
-    let c = (uvr - center) / new_scale - fp ;
+    let c = (uvr - center) / new_scale - fp + center;
     // let c = (uvr/ new_scale) + center;
     // let c = ((uvr - fp) / new_scale)+(-mouse*ratio);
 
