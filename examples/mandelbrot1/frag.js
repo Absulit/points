@@ -117,7 +117,7 @@ fn main(
 
     var finalColor = vec4f();
 
-    if(iteration < NUMITERATIONS){
+    if(iteration < numIterations){
         finalColor = vec4(
             percentageIteration,
             percentageIteration * uvr.x * fusin(1),
