@@ -1,5 +1,5 @@
 import { fusin } from 'points/animation';
-import { layer, RED, GREEN, BLUE } from 'points/color';
+import { layer, RED, GREEN, BLUE, YELLOW } from 'points/color';
 import { showDebugCross } from 'points/debug';
 import { polar } from 'points/math';
 import { sdfCircle, sdfLine, sdfSegment } from 'points/sdf';
@@ -20,13 +20,14 @@ ${showDebugCross}
 ${RED}
 ${GREEN}
 ${BLUE}
+${YELLOW}
 ${sdfLine}
 ${sdfSegment}
 ${layer}
 ${sdfCircle}
 ${polar}
 
-const NUMITERATIONS = 40;
+const NUMITERATIONS = 1024;
 
 //
 fn angle(p1:vec2f, p2:vec2f) -> f32 {
@@ -45,6 +46,8 @@ fn main(
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
     let center = vec2(.5,.5) * ratio;
+
+    // let NUMITERATIONS = u32(params.numIterations);
 
     if(variables.init == 0){
         variables.fragtalCenter = center;
@@ -79,10 +82,16 @@ fn main(
         variables.mouseEnd = mouse * ratio;
         variables.finalPosition = variables.fragtalCenter + p;
     }
+    // let offset = (variables.mouseStart*ratio) - variables.finalPosition;
+    // Transform = T * Translate(C) * S * Translate(-C)
+    let fp = variables.finalPosition;
 
-    let cross = showDebugCross(variables.finalPosition, RED, uvr);
+    let cross = showDebugCross(fp, RED, uvr);
+    let cross_center = showDebugCross(center, YELLOW, uvr);
 
-    let c = (uvr - variables.finalPosition) / new_scale;
+    let c = (uvr - fp) / new_scale;
+    // let c = (uvr/ new_scale) + center;
+    // let c = ((uvr - fp) / new_scale)+(-mouse*ratio);
 
     var x = 0.;
     var y = 0.;
@@ -118,7 +127,7 @@ fn main(
     let startCircle = sdfCircle(variables.mouseStart, .01,.01, uvr) * GREEN;
     let endCircle = sdfCircle(variables.mouseEnd, .01,.01, uvr) * BLUE;
 
-    return layer(layer(layer(finalColor, cross), startCircle), endCircle);
+    return layer(layer(layer(finalColor, layer(cross, cross_center)), startCircle), endCircle);
 }
 `;
 
