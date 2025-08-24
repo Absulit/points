@@ -133,6 +133,16 @@ fn main(
         );
     }
 
+    // let smoothColor = f32(iteration) + 1.0 - log(log(length(f32(numIterations)))) / log(2.0);
+    // let normalized = smoothColor / f32(numIterations);
+    // finalColor = vec4(
+    //     0.5 + 0.5 * cos(3.0 + normalized * 5.0),
+    //     0.5 + 0.5 * cos(3.0 + normalized * 5.0 + 2.0),
+    //     0.5 + 0.5 * cos(3.0 + normalized * 5.0 + 4.0),
+    //     1.0
+    // );
+
+
     // to draw a couple of circles to debug the touch
     // let startCircle = sdfCircle(variables.mouseStart, .01,.01, uvr) * GREEN;
     // let endCircle = sdfCircle(variables.mouseEnd, .01,.01, uvr) * BLUE;
