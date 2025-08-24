@@ -1,3 +1,4 @@
+import { RED } from 'points/color';
 import { showDebugCross, showDebugFrame } from 'points/debug';
 import { sdfLine, sdfSegment } from 'points/sdf';
 
@@ -7,7 +8,7 @@ ${sdfSegment}
 ${sdfLine}
 ${showDebugCross}
 ${showDebugFrame}
-
+${RED}
 
 @fragment
 fn main(
@@ -19,13 +20,13 @@ fn main(
         @builtin(position) position: vec4f
     ) -> @location(0) vec4f {
 
-    let startPosition = mouse * ratio;//vec2(.0);
+    let startPosition = mouse * ratio;
 
-    let positionCross = showDebugCross(startPosition, vec4(1,0,0,1.), uvr);
+    let positionCross = showDebugCross(startPosition, RED, uvr);
 
-    let frame = showDebugFrame(vec4(1,0,0,1.), uvr);
+    let frame = showDebugFrame(RED, uvr);
 
-    let finalColor:vec4f = positionCross + frame;
+    let finalColor = positionCross + frame;
 
     return finalColor;
 }
