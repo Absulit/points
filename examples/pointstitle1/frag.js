@@ -21,6 +21,7 @@ const NUMCHARS = 6;
 const chars = array<u32, NUMCHARS>(15, 14, 8, 13, 19, 18);
 const fontPosition = vec2(0., 0.);
 const charSize = vec2(8u, 22u);
+const charSizeF = vec2f(charSize);
 const charAIndex = 33u; // A
 
 @fragment
@@ -47,12 +48,12 @@ fn main(
     let pixeleduv = vec2(dx * floor(uvr.x / dx), dy * floor(uvr.y / dy));
     let pixeleduvColor = vec4(pixeleduv, 0, 1);
 
-    let charSizeF32 = vec2(f32(charSize.x) / params.screen.x, f32(charSize.y) / params.screen.y);
+    let charSizeF32 = charSizeF / params.screen;
 
-    var stringColor = vec4(0.);
+    var stringColor = vec4f();
     for (var index = 0; index < NUMCHARS; index++) {
         let charIndex = chars[index];
-        let charPosition = charSizeF32 * vec2(f32(index), 0) * ratio;
+        let charPosition = charSizeF32 * vec2f(f32(index), 0) * ratio;
         let space = 0.;
         stringColor += sprite(
             font,
@@ -66,7 +67,7 @@ fn main(
     let b = brightness(stringColor);
 
     let cdv = vec2(.332, 0.);
-    let circlePosition = vec2(.5, .5);
+    let circlePosition = vec2(.5);
     let circleColor = sdfCircle(circlePosition, .4 * b, 0.1, subuv);
     let circleColorR = sdfCircle(circlePosition, .4 * b, 0.1, subuv + cdv);
     let circleColorB = sdfCircle(circlePosition, .4 * b, 0.1, subuv - cdv);

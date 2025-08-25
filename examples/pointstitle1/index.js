@@ -6,7 +6,6 @@ const pointstitle1 = {
     vert,
     frag,
     /**
-     *
      * @param {Points} points
      */
     init: async points => {
