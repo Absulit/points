@@ -15,7 +15,12 @@ fn main(
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
 
-    let feedbackTextureColor = texture(feedbackTexture, imageSampler, uvr, false);
+    let feedbackTextureColor = texture(
+        feedbackTexture,
+        imageSampler,
+        uvr,
+        false
+    );
     let b = brightness(feedbackTextureColor);
 
     return vec4(vec3(b), 1);

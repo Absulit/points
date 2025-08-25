@@ -34,11 +34,12 @@ fn main(
         bind = sqrtDotCenter;
     } else {
         //stick to borders
-        if (ratio.x < 1.0) {
-            bind = center.x;
-        } else {
-            bind = center.y;
-        };
+        bind = mix(center.x, center.y, step(ratio.x, 1));
+        // if (ratio.x < 1.0) {
+        //     bind = center.x;
+        // } else {
+        //     bind = center.y;
+        // };
     }
 
     //Weird formulas

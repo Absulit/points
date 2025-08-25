@@ -30,8 +30,8 @@ const base = {
 
     renderPasses: [
         new RenderPass(vert0, frag0),
-        new RenderPass(vert4, frag4), // filmgrain
-        // new RenderPass(vert2, frag2), // lens distortion
+        // new RenderPass(vert4, frag4), // filmgrain
+        new RenderPass(vert2, frag2), // lens distortion
         new RenderPass(vert1, frag1), // black and white
         new RenderPass(vert5, frag5), // bloom
         new RenderPass(vert3, frag3), // chromatic aberration
