@@ -15,14 +15,17 @@ fn main(
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
 
-
-    let feedbackTextureColor = texture(feedbackTexture, imageSampler, uvr, false);
+    let feedbackTextureColor = texture(
+        feedbackTexture,
+        imageSampler,
+        uvr,
+        false
+    );
 
     rand_seed = uvr + params.time;
 
-    var noise = rand();
-    noise = noise * .5 + .5;
-    let finalColor = (feedbackTextureColor + feedbackTextureColor * noise)  * .5;
+    let noise = rand() * .5 + .5;
+    let finalColor = (feedbackTextureColor + feedbackTextureColor * noise) * .5;
 
     return finalColor;
 }

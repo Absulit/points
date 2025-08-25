@@ -18,9 +18,24 @@ fn main(
     // --------- chromatic displacement vector
     let cdv = vec2(params.sliderB, 0.);
     let d = distance(vec2(.5), uvr);
-    let imageColorR = texture(feedbackTexture, imageSampler, uvr + cdv * d, true).r;
-    let imageColorG = texture(feedbackTexture, imageSampler, uvr, true).g;
-    let imageColorB = texture(feedbackTexture, imageSampler, uvr - cdv * d, true).b;
+    let imageColorR = texture(
+        feedbackTexture,
+        imageSampler,
+        uvr + cdv * d,
+        true
+    ).r;
+    let imageColorG = texture(
+        feedbackTexture,
+        imageSampler,
+        uvr,
+        true
+    ).g;
+    let imageColorB = texture(
+        feedbackTexture,
+        imageSampler,
+        uvr - cdv * d,
+        true
+    ).b;
 
     let finalColor = vec4(imageColorR, imageColorG, imageColorB, 1);
 

@@ -37,25 +37,66 @@ fn main(
 
     // let imageColor = texture(image, imageSampler, vec2(0,0), uvr / scale, true);
     let imageColor = textureExternal(image, imageSampler, uvr / scale, true);
-    let feedbackTextureColor1 = texture(feedbackTexture1, imageSampler, (uvr / scale) - vec2(1,0), true);
-    let feedbackTextureColor2 = texture(feedbackTexture2, imageSampler, (uvr / scale) - vec2(2,0), true);
-    let feedbackTextureColor3 = texture(feedbackTexture3, imageSampler, (uvr / scale) - vec2(3,0), true);
-    let feedbackTextureColor4 = texture(feedbackTexture4, imageSampler, (uvr / scale) - vec2(4,0), true);
+    let feedbackTextureColor1 = texture(feedbackTexture1,
+        imageSampler,
+        (uvr / scale) - vec2(1, 0),
+        true
+    );
+    let feedbackTextureColor2 = texture(feedbackTexture2,
+        imageSampler,
+        (uvr / scale) - vec2(2, 0),
+        true
+    );
+    let feedbackTextureColor3 = texture(feedbackTexture3,
+        imageSampler,
+        (uvr / scale) - vec2(3, 0),
+        true
+    );
+    let feedbackTextureColor4 = texture(feedbackTexture4,
+        imageSampler,
+        (uvr / scale) - vec2(4, 0),
+        true
+    );
 
-
-    let images = layer(layer(layer(layer(layer(feedbackTextureColor, imageColor), feedbackTextureColor1), feedbackTextureColor2), feedbackTextureColor3), feedbackTextureColor4);
-
+    var images = layer(feedbackTextureColor, imageColor);
+    images = layer(images, feedbackTextureColor1);
+    images = layer(images, feedbackTextureColor2);
+    images = layer(images, feedbackTextureColor3);
+    images = layer(images, feedbackTextureColor4);
 
     let scaleDigits = .25;
     let startPosition = vec2(.3, 0) * ratio * scaleDigits;
     let start0char = 16u;
     let size = vec2(8u,22u);
 
-    var digits = RED * decodeNumberSprite(params.sliderA * 100, start0char, text, imageSampler, startPosition, uvr * scaleDigits, ratio, size).r;
-    digits += RED * decodeNumberSprite(params.sliderB * 100, start0char, text, imageSampler, startPosition + vec2(.05 * 3,0), uvr * scaleDigits, ratio, size).r;
-    digits += RED * decodeNumberSprite(params.sliderC * 100, start0char, text, imageSampler, startPosition + vec2(.05 * 2,0), uvr * scaleDigits, ratio, size).r;
+    var digits = RED * decodeNumberSprite(
+        params.sliderA * 100,
+        start0char,
+        text,
+        imageSampler,
+        startPosition,
+        uvr * scaleDigits,
+        ratio, size
+    ).r;
+    digits += RED * decodeNumberSprite(
+        params.sliderB * 100, start0char,
+        text, imageSampler,
+        startPosition + vec2(.05 * 3, 0),
+        uvr * scaleDigits,
+        ratio,
+        size
+    ).r;
+    digits += RED * decodeNumberSprite(
+        params.sliderC * 100,
+        start0char,
+        text,
+        imageSampler,
+        startPosition + vec2(.05 * 2,0),
+        uvr * scaleDigits,
+        ratio,
+        size
+    ).r;
     digits = sdfSmooth(digits);
-
 
     return layer(images, digits);
 }
