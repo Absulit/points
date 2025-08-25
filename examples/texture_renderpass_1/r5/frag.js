@@ -1,27 +1,12 @@
-import { fnusin } from 'points/animation';
-import { bloom, brightness, layer, RED, WHITE } from 'points/color';
-import { TAU, PI, rotateVector, polar } from 'points/math';
-import { snoise } from 'points/noise2d';
-import { sdfLine, sdfSegment } from 'points/sdf';
-import { pixelateTexturePosition, texturePosition } from 'points/image';
-import { rand } from 'points/random';
+import { bloom, brightness } from 'points/color';
+import { texture } from 'points/image';
+import { PI } from 'points/math';
 const frag = /*wgsl*/`
 
-${sdfSegment}
-${sdfLine}
-${rotateVector}
-${PI}
-${TAU}
-${polar}
-${snoise}
-${layer}
-${RED}
-${WHITE}
-${texturePosition}
+${texture}
 ${brightness}
-${rand}
-${pixelateTexturePosition}
 ${bloom}
+${PI}
 
 @fragment
 fn main(
@@ -33,15 +18,13 @@ fn main(
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
 
-
-    let imageColor = texturePosition(feedbackTexture, imageSampler, vec2(0,0), uvr, false);
+    let imageColor = texture(feedbackTexture, imageSampler, uvr, false);
     let b = brightness(imageColor);
     let bloomVal = bloom(b, i32(10.), params.sliderC);
     let rgbaBloom = vec4(bloomVal);
 
-    let finalColor:vec4<f32> = imageColor + rgbaBloom;
+    let finalColor = imageColor + rgbaBloom;
 
-    // return WHITE * b;
     return finalColor;
 }
 `;

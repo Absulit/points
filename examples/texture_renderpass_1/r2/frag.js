@@ -1,25 +1,11 @@
-import { fnusin } from 'points/animation';
-import { brightness, layer, RED, WHITE } from 'points/color';
-import { TAU, PI, rotateVector, polar } from 'points/math';
+import { PI } from 'points/math';
 import { snoise } from 'points/noise2d';
-import { sdfLine, sdfSegment } from 'points/sdf';
-import { texturePosition } from 'points/image';
+import { texture } from 'points/image';
 const frag = /*wgsl*/`
 
-${sdfSegment}
-${sdfLine}
-${rotateVector}
 ${PI}
-${TAU}
-${polar}
 ${snoise}
-${layer}
-${RED}
-${WHITE}
-${texturePosition}
-${brightness}
-
-
+${texture}
 
 @fragment
 fn main(
@@ -32,8 +18,7 @@ fn main(
 ) -> @location(0) vec4f {
 
     let n1 = snoise(uv / params.sliderA);
-    let imagePosition = vec2(0.0,0.0) * ratio;
-    let center = vec2(.5,.5) * ratio;
+    let center = vec2(.5) * ratio;
     let d = distance(center, uvr); // sqrt(dot(d, d));
 
     //vector from center to current fragment
@@ -41,7 +26,7 @@ fn main(
     let sqrtDotCenter = sqrt(dot(center, center));
 
     //amount of effect
-    let power =  2.0 * PI / (2.0 * sqrtDotCenter )  * (params.sliderA - 0.5);
+    let power =  2.0 * PI / (2.0 * sqrtDotCenter) * (params.sliderA - 0.5);
     //radius of 1:1 effect
     var bind = .0;
     if (power > 0.0){
@@ -62,14 +47,9 @@ fn main(
         nuv = center + normalize(vectorToCenter) * tan(d * power) * bind / tan( bind * power);
     } else if (power < 0.0){//antifisheye
         nuv = center + normalize(vectorToCenter) * atan(d * -power * 10.0) * bind / atan(-power * bind * 10.0);
-    } else {
-        nuv = uvr;
     }
 
-    let imageColor = texturePosition(feedbackTexture, imageSampler, imagePosition, nuv, false);
-
-    let finalColor = imageColor;
-    // let finalColor = vec4(nuv,0,1) * WHITE;
+    let finalColor = texture(feedbackTexture, imageSampler, nuv, false);
 
     return finalColor;
 }

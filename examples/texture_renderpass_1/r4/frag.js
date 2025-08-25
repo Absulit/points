@@ -1,27 +1,9 @@
-import { fnusin } from 'points/animation';
-import { brightness, layer, RED, WHITE } from 'points/color';
-import { TAU, PI, rotateVector, polar } from 'points/math';
-import { snoise } from 'points/noise2d';
-import { sdfLine, sdfSegment } from 'points/sdf';
-import { texturePosition } from 'points/image';
+import { texture } from 'points/image';
 import { rand } from 'points/random';
 const frag = /*wgsl*/`
 
-${sdfSegment}
-${sdfLine}
-${rotateVector}
-${PI}
-${TAU}
-${polar}
-${snoise}
-${layer}
-${RED}
-${WHITE}
-${texturePosition}
-${brightness}
+${texture}
 ${rand}
-
-
 
 @fragment
 fn main(
@@ -34,8 +16,7 @@ fn main(
 ) -> @location(0) vec4f {
 
 
-    let feedbackTextureColor = texturePosition(feedbackTexture, imageSampler, vec2(0,0), uvr, false);
-
+    let feedbackTextureColor = texture(feedbackTexture, imageSampler, uvr, false);
 
     rand_seed = uvr + params.time;
 
@@ -43,7 +24,6 @@ fn main(
     noise = noise * .5 + .5;
     let finalColor = (feedbackTextureColor + feedbackTextureColor * noise)  * .5;
 
-    // return WHITE * b;
     return finalColor;
 }
 `;

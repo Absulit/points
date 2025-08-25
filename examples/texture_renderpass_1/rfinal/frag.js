@@ -1,28 +1,23 @@
-import { fnusin } from 'points/animation';
-import { layer, RED, WHITE } from 'points/color';
-import { TAU, PI, rotateVector, polar } from 'points/math';
-import { snoise } from 'points/noise2d';
-import { sdfLine, sdfSegment, sdfSmooth } from 'points/sdf';
-import { decodeNumberSprite, sprite, textureExternal, texture } from 'points/image';
+import { layer, RED } from 'points/color';
+import { rotateVector } from 'points/math';
+import { sdfSmooth } from 'points/sdf';
+import {
+    decodeNumberSprite,
+    sprite,
+    textureExternal,
+    texture
+} from 'points/image';
+
 const frag = /*wgsl*/`
 
-${sdfSegment}
-${sdfLine}
 ${rotateVector}
-${PI}
-${TAU}
-${polar}
-${snoise}
 ${layer}
 ${RED}
 ${texture}
 ${textureExternal}
 ${sprite}
 ${decodeNumberSprite}
-${WHITE}
 ${sdfSmooth}
-
-
 
 @fragment
 fn main(

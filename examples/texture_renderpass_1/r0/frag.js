@@ -1,24 +1,9 @@
-import { fnusin } from 'points/animation';
-import { layer, RED } from 'points/color';
-import { TAU, PI, rotateVector, polar } from 'points/math';
-import { snoise } from 'points/noise2d';
-import { sdfLine, sdfSegment } from 'points/sdf';
-import { textureExternalPosition, texturePosition } from 'points/image';
+
+import { textureExternal, texture } from 'points/image';
 const frag = /*wgsl*/`
 
-${sdfSegment}
-${sdfLine}
-${rotateVector}
-${PI}
-${TAU}
-${polar}
-${snoise}
-${layer}
-${RED}
-${texturePosition}
-${textureExternalPosition}
-
-
+${texture}
+${textureExternal}
 
 @fragment
 fn main(
@@ -30,11 +15,8 @@ fn main(
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
 
-
-    // let imageColor = texturePosition(image, imageSampler, vec2(0,0), uvr, false);
-    let imageColor = textureExternalPosition(image, imageSampler, vec2(0,0), uvr, false);
-
-    let finalColor = vec4(1.);
+    // let imageColor = texture(image, imageSampler, uvr, false);
+    let imageColor = textureExternal(image, imageSampler, uvr, false);
 
     return imageColor;
 }
