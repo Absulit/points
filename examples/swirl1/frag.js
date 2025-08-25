@@ -1,13 +1,9 @@
-import { fnusin } from 'points/animation';
 import { PI, rotateVector } from 'points/math';
 import { snoise } from 'points/noise2d';
-import { sdfCircle } from 'points/sdf';
 import { structs } from './structs.js';
 
 const frag = /*wgsl*/`
 
-${fnusin}
-${sdfCircle}
 ${rotateVector}
 ${PI}
 ${snoise}
