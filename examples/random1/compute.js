@@ -9,7 +9,10 @@ fn main(
     let r = params.randNumber;
     let r2 = params.randNumber2;
 
-    textureStore(outputTex, vec2<u32>( u32(r * 800.) ,  u32(r2 * 800.) ), vec4f(1, params.sliderA,0,1));
+    textureStore(
+        outputTex,
+        vec2u(u32(r * 800.), u32(r2 * 800.)), vec4f(1, params.sliderA, 0, 1)
+    );
 }
 `;
 
