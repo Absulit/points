@@ -1,9 +1,9 @@
 import { fusin } from 'points/animation';
-import { texturePosition } from 'points/image';
+import { texture } from 'points/image';
 
 const frag = /*wgsl*/`
 
-${texturePosition}
+${texture}
 ${fusin}
 
 @fragment
@@ -16,15 +16,12 @@ fn main(
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
 
-    let imageColor = texturePosition(image, imageSampler, vec2(0., 0), uvr, true);
+    let imageColor = texture(image, imageSampler, uvr, true);
     // first render pass doesn't use the feedback texture, it's the second pass
-    // _ = texturePosition(feedbackTexture, feedbackSampler, vec2(0,0), uvr, true);
+    // _ = texture(feedbackTexture, feedbackSampler, uvr, true);
 
     let d = distance(uvr, vec2(.5 + .1 * fusin(2.), .5  + .1 * fusin(4.123)));
-    var c = 1.;
-    if(d > .1){
-        c = 0.;
-    }
+    let c = step(d, .1); // if(d > .1){c = 0.;}
 
     let finalColor = imageColor + c * vec4(1);
 
