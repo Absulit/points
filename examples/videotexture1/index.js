@@ -15,7 +15,10 @@ const videotexture1 = {
     frag,
     init: async (points, folder) => {
         points.setSampler('feedbackSampler', null);
-        await points.setTextureVideo('video', './../img/pexels-shubh-haque-4746616-960x540-30fps.mp4');
+        await points.setTextureVideo(
+            'video',
+            './../img/pexels-shubh-haque-4746616-960x540-30fps.mp4'
+        );
 
         points.setUniform('scale', options.scale, 'f32');
 
