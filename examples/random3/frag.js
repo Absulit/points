@@ -1,8 +1,8 @@
-import { texturePosition } from 'points/image';
+import { texture } from 'points/image';
 
 const frag = /*wgsl*/`
 
-${texturePosition}
+${texture}
 
 @fragment
 fn main(
@@ -14,11 +14,9 @@ fn main(
         @builtin(position) position: vec4f
     ) -> @location(0) vec4f {
 
-    let startPosition = vec2(0.);
-    let texColorCompute = texturePosition(computeTexture, feedbackSampler, startPosition, uvr, false);
-    let finalColor:vec4f = texColorCompute;
+    let texColorCompute = texture(computeTexture, feedbackSampler, uvr, false);
 
-    return finalColor;
+    return texColorCompute;
 }
 `;
 
