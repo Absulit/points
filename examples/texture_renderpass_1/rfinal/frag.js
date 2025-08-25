@@ -29,11 +29,10 @@ fn main(
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
 
-    let scale = .2 * ratio;
     // let scale = params.sliderC;
+    let scale = .2 * ratio;
 
     let feedbackTextureColor = texture(feedbackTexture, imageSampler, uvr, true);
-
 
     // let imageColor = texture(image, imageSampler, vec2(0,0), uvr / scale, true);
     let imageColor = textureExternal(image, imageSampler, uvr / scale, true);
