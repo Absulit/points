@@ -19,10 +19,16 @@ fn main(
     let center = vec2f(.5) * ratio;
 
     let dims = vec2f(textureDimensions(textImg, 0));
-    let imageWidth = dims / params.screen * ratio; // if you are using uvr you have to multiply by ratio
+    // if you are using uvr you have to multiply by ratio
+    let imageWidth = dims / params.screen * ratio;
     let halfImageWidth = imageWidth * .5 * SCALE;
 
-    let textColors = texture(textImg, imageSampler, (uvr / SCALE) - (center - halfImageWidth) / SCALE, true);
+    let textColors = texture(
+        textImg,
+        imageSampler,
+        (uvr / SCALE) - (center - halfImageWidth) / SCALE,
+        true
+    );
 
     return textColors;
 }

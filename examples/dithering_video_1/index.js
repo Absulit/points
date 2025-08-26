@@ -7,7 +7,7 @@ import Points from 'points';
 
 const options = {
     scale: 1,
-    quantError: .15,
+    quantError: 1,
 }
 
 const base = {
@@ -20,15 +20,14 @@ const base = {
      * @param {*} folder
      */
     init: async (points, folder) => {
-        let descriptor = {
+        const descriptor = {
             addressModeU: 'repeat',
             addressModeV: 'repeat',
         }
         points.setSampler('imageSampler', descriptor);
         await points.setTextureVideo('image', './../img/6982698-hd_1440_1080_25fps_800x800.mp4');
         points.setBindingTexture('outputTex', 'computeTexture');
-        points.setLayers(2);
-        points.setStorage('variables', 'Variable', false, ShaderType.COMPUTE);
+        points.setStorage('points', 'array<vec4f, 640000>', false, ShaderType.COMPUTE);
 
         points.setUniform('scale', options.scale);
         points.setUniform('quantError', options.quantError);

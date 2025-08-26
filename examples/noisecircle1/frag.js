@@ -18,17 +18,16 @@ fn main(
         @builtin(position) position: vec4f
     ) -> @location(0) vec4f {
 
-    let time = params.time;
+    let center = vec2(.5) * ratio;
+    let circle = sdfCircle(center, .2, .1, uvr);
 
-    var circle = sdfCircle(vec2(.5,.5) * ratio, .2, .1, uvr);
-
-    var n1 = (snoise(uvr * 5.14 + 200. * fract(time * -.01))+1.)*.5;
-    //var n2 = (snoise(uvr * 15.14 + 200. * fract(time * -.01))+1.)*.5;
+    let n1 = (snoise(uvr * 5.14 + 200. * fract(params.time * -.01)) + 1.) * .5;
     let skewMask = vec2(1, 1.1);
-    let mask = (1.-sdfCircle(vec2(.5,.5) * ratio, .0999, .5, uvr * skewMask ));
+    let mask = 1. -sdfCircle(vec2(.5, .5) * ratio, .0999, .5, uvr * skewMask);
     let result = vec4(1.) * mask * n1 * circle + circle;
 
-    var finalColor:vec4f = mask * vec4(1,.5,0,1) + mix(  vec4(1,0,0,result.a),  vec4(1,.5,0,1), result );
+    var finalColor = mask * vec4(1, .5, 0, 1);
+    finalColor += mix(vec4(1, 0, 0, result.a), vec4(1, .5, 0, 1), result);
 
     return finalColor;
 }

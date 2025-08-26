@@ -22,9 +22,7 @@ const imagetexture4 = {
         }
 
         points.setSampler('imageSampler', descriptor);
-        // await points.setTextureImage('image', './../img/carmen_lyra_423x643.jpg');
         await points.setTextureImage('image', './../img/old_king_600x600.jpg');
-        // await points.setTextureImage('image', './../img/absulit_800x800.jpg');
 
         points.setUniform('scale', options.scale, 'f32');
 

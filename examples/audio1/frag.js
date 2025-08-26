@@ -1,19 +1,5 @@
-import { fnusin } from 'points/animation';
-import { snoise } from 'points/noise2d';
-import { sdfCircle } from 'points/sdf';
-import { WHITE, RED, layer } from 'points/color';
-import { audioAverage, audioAverageSegments } from 'points/audio';
-
 const frag = /*wgsl*/`
 
-${fnusin}
-${snoise}
-${sdfCircle}
-${layer}
-${audioAverage}
-${audioAverageSegments}
-${WHITE}
-${RED}
 
 @fragment
 fn main(
@@ -25,18 +11,14 @@ fn main(
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
 
-    let audioX = audio.data[ u32(uvr.x * params.audioLength)] / 256;
+    let audioX = audio.data[u32(uvr.x * params.audioLength)] / 256;
 
     if(params.mouseClick == 1.){
         click_event.updated = 1;
+        // other actions
     }
 
-
-    var c = vec4f();
-    c.r = audioX;
-    c.a = 1.;
-
-    return c;
+    return vec4f(audioX, 0, 0, 1);;
 }
 `;
 

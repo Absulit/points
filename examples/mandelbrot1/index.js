@@ -1,9 +1,9 @@
 import vert from './vert.js';
 import frag from './frag.js';
-import Points from 'points';
+import Points, { ShaderType } from 'points';
 
 const options = {
-    scale: 0.53,
+    numIterations: 40,
 }
 
 const base = {
@@ -15,11 +15,19 @@ const base = {
      */
     init: async (points, folder) => {
         points.setUniform('scale', options.scale);
-        folder.add(options, 'scale', -1, 1, .0001).name('scale');
+        points.setUniform('numIterations', options.numIterations);
+        points.setStorage('variables', 'Variable', false, ShaderType.FRAGMENT);
+        // folder.add(options, 'numIterations', 1, 1024, .0001).name('numIterations');
         folder.open();
+
+        // points.setStorage('logger', 'f32', true, ShaderType.FRAGMENT);
     },
     update: points => {
-        points.setUniform('scale', options.scale);
+        // points.setUniform('numIterations', options.numIterations);
+    },
+    read: async points => {
+        // const result = await points.readStorage('logger');
+        // console.log(result[0]);
     }
 }
 

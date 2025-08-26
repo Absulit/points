@@ -1,17 +1,15 @@
 import { getClosestColorInPalette, orderedDithering, orderedDithering_threshold_map } from 'points/effects';
-import { texturePosition } from 'points/image';
-import { brightness } from 'points/color';
+import { texture } from 'points/image';
 
 const frag = /*wgsl*/`
 
-${brightness}
 ${getClosestColorInPalette}
 ${orderedDithering}
-${texturePosition}
+${texture}
 ${orderedDithering_threshold_map}
 
 const numPaletteItems = 21;
-const getClosestColorInPalette_palette = array< vec4f, numPaletteItems>(
+const getClosestColorInPalette_palette = array<vec4f, numPaletteItems>(
     vec4(255./255., 69./255., 0., 1.),
     vec4(255./255., 168./255., 0, 1.),
     vec4(255./255., 214./255., 53./255., 1.),
@@ -35,7 +33,6 @@ const getClosestColorInPalette_palette = array< vec4f, numPaletteItems>(
     vec4(212./255., 215./255., 217./255., 1.),
 );
 
-
 @fragment
 fn main(
         @location(0) color: vec4f,
@@ -46,14 +43,13 @@ fn main(
         @builtin(position) position: vec4f
     ) -> @location(0) vec4f {
 
-    let dims: vec2<u32> = textureDimensions(image, 0);
-    var rgbaImage = texturePosition(image, feedbackSampler, vec2(0.), uvr / params.scale, false); //* .998046;
-    let br = brightness(rgbaImage);
+    let dims = textureDimensions(image, 0);
+    var rgbaImage = texture(image, feedbackSampler, uvr / params.scale, false);
 
     // from 8 to 40
     let depth = floor(8 + 32. * params.depth);
 
-    rgbaImage = orderedDithering(rgbaImage, depth, dims, uv); // ⬆⬇ swap these lines or uncomment
+    rgbaImage = orderedDithering(rgbaImage, depth, dims, uv);
 
     return rgbaImage;
 }

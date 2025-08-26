@@ -41,8 +41,14 @@ fn main(
         variables.circlePosition = mouse * ratio;
     }
 
-    let circleValue = sdfCircle(variables.circlePosition, variables.circleRadius, 0., uvr);
-    var finalColor = vec4(1.) * circleValue;
+    let circleValue = sdfCircle(
+        variables.circlePosition,
+        variables.circleRadius,
+        0.,
+        uvr
+    );
+
+    var finalColor = vec4(circleValue);
 
     if(params.mouseDown == 1.){
         finalColor *= GREEN;

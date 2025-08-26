@@ -14,7 +14,7 @@ const dithering3 = {
         new RenderPass(vert, frag, compute, 8, 8, 1),
     ],
     init: async (points, folder) => {
-        let descriptor = {
+        const descriptor = {
             addressModeU: 'repeat',
             addressModeV: 'repeat',
         }

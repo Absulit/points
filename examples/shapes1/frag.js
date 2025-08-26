@@ -1,4 +1,5 @@
 import { fnusin } from 'points/animation';
+import { RED } from 'points/color';
 import { rotateVector } from 'points/math';
 import { sdfLine2, sdfCircle, sdfSquare, sdfSegment } from 'points/sdf';
 
@@ -11,6 +12,7 @@ ${sdfCircle}
 ${rotateVector}
 ${sdfSquare}
 ${sdfLine2}
+${RED}
 
 @fragment
 fn main(
@@ -24,20 +26,25 @@ fn main(
 
     let point = points[0];
 
-    var orangeBall = sdfCircle(vec2(.4, .5), .1, 0., uvr) * vec4(1,.5,0,1);
-    var redBall = sdfCircle(vec2(.6, .5), .1, .1, uvr) * vec4(1,0,0,1);
+    let orangeBall = sdfCircle(vec2(.4, .5) * ratio, .1, 0., uvr) *
+        vec4(1, .5, 0, 1);
+    let redBall = sdfCircle(vec2(.6, .5) * ratio, .1, .1, uvr) * RED;
 
-    var finalColor:vec4f = mix(orangeBall, redBall, uvr.x);
+    var finalColor = mix(orangeBall, redBall, uvr.x);
 
-    //finalColor += sdfSquare(uvr, vec2(.9, .5  ),  10);
-    //finalColor += sdfLine(vec2(.5,.5), vec2(.6,.6), .001, uvr );
-    finalColor += sdfLine2( vec2(.5,.5), vec2(.6,.6), .001, uvr / ratio);
+    finalColor += sdfLine2( vec2(.5) * ratio, vec2(.6), .001, uvr / ratio);
 
 
     for(var i:u32; i<10;i++){
         let fi = f32(i);
         let p = vec2(fnusin(1.1 + .1 * fi) + .5, fnusin(.98 + .1 * fi) + .5);
-        finalColor += sdfSquare(p, params.squareSize, params.squareFeather, radians(360.) * fnusin(2.), uvr) * vec4(uvr.x, 1 - uvr.y, 0, fi / 10);
+        finalColor += sdfSquare(
+            p,
+            params.squareSize,
+            params.squareFeather,
+            radians(360.) * fnusin(2.),
+            uvr
+        ) * vec4(uvr.x, 1 - uvr.y, 0, fi / 10);
     }
 
     //----
@@ -51,9 +58,12 @@ fn main(
         let pointPosition = vec2(point.x, point.y + .5);
         let pointPosition2 = vec2(point2.x, point2.y + .5);
 
-        //finalColor += sdfSquare(pointPosition, .001 * 4, 0, 0, uvr) * vec4(1,1,0,  1);
-        finalColor += sdfLine2(pointPosition, pointPosition2, .001 + .1 * params.lineWidth, uvr / ratio);
-        //finalColor += sdfLine(pointPosition, pointPosition2, .001 + 10 * params.lineWidth, uvr  );
+        finalColor += sdfLine2(
+            pointPosition,
+            pointPosition2,
+            .001 + .1 * params.lineWidth,
+            uvr / ratio
+        );
     }
 
     return finalColor;

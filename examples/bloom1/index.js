@@ -7,7 +7,7 @@ const bloom1 = {
     vert,
     frag,
     init: async (points, folder) => {
-        let descriptor = {
+        const descriptor = {
             addressModeU: 'repeat',
             addressModeV: 'repeat',
         }

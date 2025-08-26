@@ -1,13 +1,11 @@
-import { fnusin } from 'points/animation';
-import { texturePosition } from 'points/image';
+import { texture } from 'points/image';
 import { PI } from 'points/math';
 import { snoise } from 'points/noise2d';
 
 const frag = /*wgsl*/`
 
-${fnusin}
 ${snoise}
-${texturePosition}
+${texture}
 ${PI}
 
 @fragment
@@ -27,7 +25,7 @@ fn main(
     let a = atan2(uvr2.y, uvr2.x);
     let r = length(uvr2);
     let st = vec2(a / PI, .1 / r * params.sliderA) + params.time * .1;
-    let imageColor = texturePosition(image, imageSampler, vec2f(), st, false);
+    let imageColor = texture(image, imageSampler, st, false);
 
     return imageColor;
 }

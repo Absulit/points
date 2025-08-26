@@ -6,12 +6,14 @@ const pointstitle1 = {
     vert,
     frag,
     /**
-     *
      * @param {Points} points
      */
     init: async points => {
 
-        await points.setTextureImage('font', './../img/inconsolata_regular_8x22.png');
+        await points.setTextureImage(
+            'font',
+            './../img/inconsolata_regular_8x22.png'
+        );
 
         points.setSampler('imageSampler', null);
 

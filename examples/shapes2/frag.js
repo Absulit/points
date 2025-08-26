@@ -1,7 +1,9 @@
 import { fnusin } from 'points/animation';
+import { texture } from 'points/image';
 const frag = /*wgsl*/`
 
 ${fnusin}
+${texture}
 
 const CHROMATIC_DISPLACEMENT = 0.003695;
 
@@ -15,11 +17,19 @@ fn main(
         @builtin(position) position: vec4f
     ) -> @location(0) vec4f {
 
-    let texColorCompute = textureSample(computeTexture, feedbackSampler, uvr).g;
+    let texColorCompute = texture(computeTexture, feedbackSampler, uvr, true).g;
 
-    let texColorComputeR = textureSample(computeTexture, feedbackSampler, uvr + vec2(CHROMATIC_DISPLACEMENT, 0.)).r;
-    let texColorComputeB = textureSample(computeTexture, feedbackSampler, uvr - vec2(CHROMATIC_DISPLACEMENT, 0.)).b;
-
+    let texColorComputeR = texture(
+        computeTexture,
+        feedbackSampler,
+        uvr + vec2(CHROMATIC_DISPLACEMENT, 0.),
+        true
+    ).r;
+    let texColorComputeB = texture(
+        computeTexture,
+        feedbackSampler,
+        uvr - vec2(CHROMATIC_DISPLACEMENT, 0.), true
+    ).b;
 
     return (texColorCompute + vec4(texColorComputeR,0,0,1) + vec4(0,0,texColorComputeB,1));
 }
