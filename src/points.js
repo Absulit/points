@@ -104,7 +104,7 @@ class Points {
             this.#originalCanvasWidth = this.#canvas.clientWidth;
             this.#originalCanvasHeigth = this.#canvas.clientHeight;
             window.addEventListener('resize', this.#resizeCanvasToFitWindow, false);
-            document.addEventListener("fullscreenchange", e => {
+            document.addEventListener('fullscreenchange', e => {
                 this.#fullscreen = !!document.fullscreenElement;
                 if (!this.#fullscreen && !this.#fitWindow) {
                     this.#resizeCanvasToDefault();
@@ -132,22 +132,29 @@ class Points {
     }
 
     #setScreenSize = () => {
+        // assigning size here because both sizes must match for the full screen
+        // this was not happening before the speed up refactor
+        this.#canvas.width = canvas.clientWidth;
+        this.#canvas.height = canvas.clientHeight;
+
         this.#presentationSize = [
             this.#canvas.clientWidth,
             this.#canvas.clientHeight,
         ];
         this.#context.configure({
+            label: '_context',
             device: this.#device,
             format: this.#presentationFormat,
             //size: this.#presentationSize,
-            width: this.#canvas.clientWidth,
-            height: this.#canvas.clientHeight,
+            width: this.#presentationSize[0],
+            height: this.#presentationSize[1],
             alphaMode: 'premultiplied',
             // Specify we want both RENDER_ATTACHMENT and COPY_SRC since we
             // will copy out of the swapchain texture.
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
         });
         this.#depthTexture = this.#device.createTexture({
+            label: '_depthTexture',
             size: this.#presentationSize,
             format: 'depth24plus',
             usage: GPUTextureUsage.RENDER_ATTACHMENT,
