@@ -1109,8 +1109,31 @@ class Points {
         } catch (err) {
             console.log(err);
         }
+
+        // https://markaicode.com/webgpu-2-chrome-2025-performance/
+        const hasExtentedPipelineCache = adapter.features.has('extended-pipeline-cache');
+        console.log(hasExtentedPipelineCache);
+        console.log(adapter.limits.maxComputeInvocationsPerWorkgroup);
+
+
         if (!adapter) { return false; }
-        this.#device = await adapter.requestDevice();
+        this.#device = await adapter.requestDevice({
+            requiredFeatures: [
+                'texture-compression-bc',
+                'timestamp-query',
+                'depth-clip-control',
+                hasExtentedPipelineCache ? 'extended-pipeline-cache' : undefined,
+                hasExtentedPipelineCache ? 'memory-mapping-control' : undefined
+            ].filter(Boolean),
+
+            // Request maximum resource limits
+            requiredLimits: {
+                maxStorageBufferBindingSize: adapter.limits.maxStorageBufferBindingSize,
+                maxBufferSize: adapter.limits.maxBufferSize,
+                maxComputeWorkgroupSizeX: adapter.limits.maxComputeWorkgroupSizeX,
+                maxComputeInvocationsPerWorkgroup: adapter.limits.maxComputeInvocationsPerWorkgroup
+            }
+        });
         this.#device.lost.then(info => {
             console.log(info);
         });
