@@ -1,4 +1,7 @@
 'use strict';
+
+import Points from "points";
+
 /**
  * A RenderPass is a way to have a block of shaders to pass to your application pipeline and
  * these render passes will be executed in the order you pass them in the {@link Points#init} method.
@@ -35,6 +38,8 @@ class RenderPass {
     #workgroupCountX;
     #workgroupCountY;
     #workgroupCountZ;
+
+    #callback = null;
 
     /**
      * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
@@ -180,6 +185,33 @@ class RenderPass {
 
     get workgroupCountZ() {
         return this.#workgroupCountZ;
+    }
+
+    /**
+     * Method to add custom uniforms or storage (points.set* methods).
+     * This is made for post processing `RenderPass`es
+     * The method `init` will be called to initialize the variables.
+     * @param {(points:Points, params:Object)=>{}} callback function to
+     * initialize the RenderPass variables.
+     *
+     * @example
+     * const grayscale = new RenderPass(vertexShader, fragmentShader);
+     * grayscale.setInit((points, params) => {
+     *     points.setSampler('renderpass_feedbackSampler', null);
+     *     points.setTexture2d('renderpass_feedbackTexture', true);
+     * });
+     *
+     */
+    setInit(callback) {
+        this.#callback = callback;
+    }
+    /**
+     *
+     * @param {Points} points
+     * @param {Object} params
+     */
+    init(points, params) {
+        this.#callback(points, params);
     }
 }
 

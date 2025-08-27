@@ -1123,9 +1123,11 @@ class Points {
         if (this.renderPasses?.length) {
             throw '`addPostRenderPass` should be called prior `Points.init()`';
         }
+
         if(!params && renderPass.required?.length){
             throw 'params is required';
         }
+
         const requiredNotFound = renderPass.required?.filter(i => !params[i]);
         if(requiredNotFound?.length){
             const paramsRequired = requiredNotFound.join(', ')
