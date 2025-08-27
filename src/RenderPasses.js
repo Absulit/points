@@ -43,44 +43,15 @@ import RenderPass from './RenderPass.js';
  * }
  */
 class RenderPasses {
-    static COLOR = 1;
-    static GRAYSCALE = 2;
-    static CHROMATIC_ABERRATION = 3;
-    static PIXELATE = 4;
-    static LENS_DISTORTION = 5;
-    static FILM_GRAIN = 6;
-    static BLOOM = 7;
-    static BLUR = 8;
-    static WAVES = 9;
-
-    static #LIST = {
-        1: color,
-        2: grayscale,
-        3: chromaticAberration,
-        4: pixelate,
-        5: lensDistortion,
-        6: filmgrain,
-        7: bloom,
-        8: blur,
-        9: waves,
-    };
-
-    /**
-     * Adds a `RenderPass` from the `RenderPasses` list
-     * @param {Points} points References a `Points` instance
-     * @param {RenderPasses} renderPassId Select a static property from `RenderPasses`
-     * @param {Object} params An object with the params needed by the `RenderPass`
-     * @returns {Promise<void>}
-     */
-    static async add(points, renderPassId, params) {
-        if (points.renderPasses?.length) {
-            throw '`addPostRenderPass` should be called prior `Points.init()`';
-        }
-        let shaders = this.#LIST[renderPassId];
-        let renderPass = new RenderPass(shaders.vertexShader, shaders.fragmentShader, shaders.computeShader);
-        points.addRenderPass(renderPass);
-        await shaders.init(points, params)
-    }
+    static COLOR = color;
+    static GRAYSCALE = grayscale;
+    static CHROMATIC_ABERRATION = chromaticAberration;
+    static PIXELATE = pixelate;
+    static LENS_DISTORTION = lensDistortion;
+    static FILM_GRAIN = filmgrain;
+    static BLOOM = bloom;
+    static BLUR = blur;
+    static WAVES = waves;
 
     /**
      * Color postprocessing

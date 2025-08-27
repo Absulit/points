@@ -883,7 +883,7 @@ class Points {
             bindingIndex += 1;
         }
         this.#storage.forEach(storageItem => {
-            if (!storageItem.shaderType  || storageItem.shaderType == shaderType) {
+            if (!storageItem.shaderType || storageItem.shaderType == shaderType) {
                 const T = storageItem.structName;
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, read_write> ${storageItem.name}: ${T};\n`
                 bindingIndex += 1;
@@ -1115,13 +1115,17 @@ class Points {
     }
 
     /**
-     * Mainly to be used with {@link RenderPasses}<br>
      * Injects a render pass after all the render passes added by the user.
-     * @param {RenderPass} renderPass
-     * @ignore
+     * @param {RenderPasses} renderPass
+     * @param {Object} params
      */
-    addRenderPass(renderPass) {
-        this.#postRenderPasses.push(renderPass);
+    addRenderPass(renderPass, params) {
+        if (this.renderPasses?.length) {
+            throw '`addPostRenderPass` should be called prior `Points.init()`';
+        }
+        const { vertexShader: v, fragmentShader: f, computeShader: c } = renderPass;
+        this.#postRenderPasses.push(new RenderPass(v, f, c));
+        renderPass.init(this, params);
     }
 
     /**
