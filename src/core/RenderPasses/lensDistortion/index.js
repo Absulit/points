@@ -5,12 +5,10 @@ const lensDistortion = {
     vertexShader,
     fragmentShader,
     init: async (points, params) => {
-        points._setInternal(true);
         points.setSampler('renderpass_feedbackSampler', null);
         points.setTexture2d('renderpass_feedbackTexture', true);
         points.setUniform('lensDistortion_amount', params?.amount || .4)
         points.setUniform('lensDistortion_distance', params?.distance || .01);
-        points._setInternal(false);
     },
     update: async points => {
 

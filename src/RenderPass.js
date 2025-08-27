@@ -28,7 +28,6 @@ class RenderPass {
     #bindGroupLayout = null;
     #bindGroupLayoutCompute = null;
     #entries = null;
-    #internal = false;
     #hasComputeShader;
     #hasVertexShader;
     #hasFragmentShader;
@@ -73,18 +72,6 @@ class RenderPass {
 
     set index(value) {
         this.#index = value;
-    }
-
-    /**
-     * To use with {link RenderPasses} so it's internal
-     * @ignore
-     */
-    get internal() {
-        return this.#internal;
-    }
-
-    set internal(value) {
-        this.#internal = value;
     }
 
     /**
