@@ -40,6 +40,7 @@ class RenderPass {
     #workgroupCountZ;
 
     #callback = null;
+    #required = null;
 
     /**
      * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
@@ -212,6 +213,19 @@ class RenderPass {
      */
     init(points, params) {
         this.#callback(points, params);
+    }
+
+
+    get required(){
+        return this.#required;
+    }
+    /**
+     * @param {Array<String>} val names of the parameters `params` in
+     * {@link RenderPass#setInit} that are required.
+     * This is only  used for a post processing RenderPass.
+     */
+    set required(val){
+        this.#required = val;
     }
 }
 

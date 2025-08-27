@@ -1131,7 +1131,7 @@ class Points {
         const requiredNotFound = renderPass.required?.filter(i => !params[i]);
         if(requiredNotFound?.length){
             const paramsRequired = requiredNotFound.join(', ')
-            throw `Error adding post render pass, the following parameters are required: ${paramsRequired}`
+            throw `Error adding post processinbg RenderPass, the following parameters are required: ${paramsRequired}`
         }
 
         const { vertexShader: v, fragmentShader: f, computeShader: c } = renderPass;
