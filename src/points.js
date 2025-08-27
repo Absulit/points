@@ -1123,6 +1123,15 @@ class Points {
         if (this.renderPasses?.length) {
             throw '`addPostRenderPass` should be called prior `Points.init()`';
         }
+        if(!params && renderPass.required?.length){
+            throw 'params is required';
+        }
+        const requiredNotFound = renderPass.required?.filter(i => !params[i]);
+        if(requiredNotFound?.length){
+            const paramsRequired = requiredNotFound.join(', ')
+            throw `Error adding post render pass, the following parameters are required: ${paramsRequired}`
+        }
+
         const { vertexShader: v, fragmentShader: f, computeShader: c } = renderPass;
         this.#postRenderPasses.push(new RenderPass(v, f, c));
         renderPass.init(this, params);

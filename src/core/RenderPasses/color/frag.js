@@ -1,7 +1,7 @@
-import { texturePosition } from '../../image.js';
+import { texture } from '../../image.js';
 const frag = /*wgsl*/`
 
-${texturePosition}
+${texture}
 
 @fragment
 fn main(
@@ -13,9 +13,8 @@ fn main(
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
 
-    let imageColor = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0., 0), uvr, true);
-    let colorParam = vec4(params.color_r, params.color_g, params.color_b, params.color_a);
-    let finalColor:vec4f = (imageColor + colorParam) * params.color_blendAmount;
+    let imageColor = texture(renderpass_feedbackTexture, renderpass_feedbackSampler, uvr, true);
+    let finalColor = (imageColor + params.color_color) * params.color_blendAmount;
 
     return finalColor;
 }
