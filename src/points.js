@@ -1076,6 +1076,8 @@ class Points {
         if (!hasComputeShaders && this.#bindingTextures.length) {
             throw ' `setBindingTexture` requires at least one Compute Shader in a `RenderPass`'
         }
+
+        this.#renderPasses.forEach( r => r.init?.(this));
         this.#renderPasses.forEach(this.#compileRenderPass);
         this.#generateDataSize();
         //
@@ -1121,7 +1123,7 @@ class Points {
 
     /**
      * Injects a render pass after all the render passes added by the user.
-     * @param {RenderPasses} renderPass
+     * @param {RenderPass} renderPass
      * @param {Object} params
      */
     addRenderPass(renderPass, params) {
@@ -1129,15 +1131,13 @@ class Points {
             throw '`addPostRenderPass` should be called prior `Points.init()`';
         }
 
-        if(!params && renderPass.required?.length){
-            throw 'params is required';
-        }
+        params ||= {};
 
         const requiredNotFound = renderPass.required?.filter(i => !params[i] && !Number.isInteger(params[i]));
 
         if(requiredNotFound?.length){
-            const paramsRequired = requiredNotFound.join(', ')
-            throw `Error adding post processing RenderPass, the following parameters are required: ${paramsRequired}`
+            const paramsRequired = requiredNotFound.join(', ');
+            console.warn(`addRenderPass: parameters required: ${paramsRequired}`);
         }
 
         const { vertexShader: v, fragmentShader: f, computeShader: c } = renderPass;

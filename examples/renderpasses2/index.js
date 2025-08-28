@@ -9,11 +9,17 @@ const renderpasses1 = {
      */
     renderPasses: [
         new RenderPass(vert1, frag1),
-        // new RenderPass(yellow.vertexShader, yellow.fragmentShader),
-        // RenderPasses.GRAYSCALE
+        // RenderPasses.GRAYSCALE,
+        // RenderPasses.CHROMATIC_ABERRATION,
+        // RenderPasses.COLOR,
+        // RenderPasses.PIXELATE,
+        // RenderPasses.LENS_DISTORTION,
+        // RenderPasses.FILM_GRAIN,
+        // RenderPasses.BLOOM,
+        // RenderPasses.BLUR,
+        // RenderPasses.WAVES,
     ],
     init: async points => {
-        // await yellow.init(points, {blendAmount: .5});
         points.setSampler('imageSampler', null);
         // await points.setTextureImage('image', './../img/carmen_lyra_423x643.jpg');
         // await points.setTextureImage('image', './../img/old_king_600x600.jpg');
@@ -21,16 +27,15 @@ const renderpasses1 = {
         points.setSampler('feedbackSampler');
         points.setTexture2d('feedbackTexture', true);
 
-        // TODO: restore defaults so you just need to add the pass and that's it
         points.addRenderPass(RenderPasses.GRAYSCALE);
         points.addRenderPass(RenderPasses.CHROMATIC_ABERRATION, { distance: .02 });
         points.addRenderPass(RenderPasses.COLOR, { color: [.5, 1, 0, 1], blendAmount: .5 });
-        points.addRenderPass(RenderPasses.PIXELATE, { pixelDimensions: [10, 10] });
-        points.addRenderPass(RenderPasses.LENS_DISTORTION, { amount: .4, distance: .01 });
+        points.addRenderPass(RenderPasses.PIXELATE);
+        points.addRenderPass(RenderPasses.LENS_DISTORTION);
         points.addRenderPass(RenderPasses.FILM_GRAIN);
-        points.addRenderPass(RenderPasses.BLOOM, { amount: .5, iterations: 2 });
+        points.addRenderPass(RenderPasses.BLOOM);
         points.addRenderPass(RenderPasses.BLUR, { resolution: [100, 100], direction: [.4, 0], radians: 0 });
-        points.addRenderPass(RenderPasses.WAVES, { scale: .05, intensity: .03 });
+        points.addRenderPass(RenderPasses.WAVES, { scale: .05 });
     },
     update: points => {
 
