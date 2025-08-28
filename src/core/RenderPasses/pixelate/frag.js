@@ -19,8 +19,8 @@ fn main(
         renderpass_feedbackTexture,
         renderpass_feedbackSampler,
         vec2(0.),
-        params.pixelate_pixelsWidth,
-        params.pixelate_pixelsHeight,
+        params.pixelate_pixelDims.x,
+        params.pixelate_pixelDims.y,
         uvr
     );
 

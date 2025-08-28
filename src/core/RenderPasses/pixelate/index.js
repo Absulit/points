@@ -5,9 +5,8 @@ import { RenderPass } from 'points';
 const pixelate = new RenderPass(vertexShader, fragmentShader, null, 8, 8, 1, (points, params) => {
     points.setSampler('renderpass_feedbackSampler', null);
     points.setTexture2d('renderpass_feedbackTexture', true);
-    points.setUniform('pixelate_pixelsWidth', params.pixelsWidth);
-    points.setUniform('pixelate_pixelsHeight', params.pixelsHeight);
+    points.setUniform('pixelate_pixelDims', params.pixelDimensions, 'vec2f');
 });
-pixelate.required = ['pixelsWidth', 'pixelsHeight']
+pixelate.required = ['pixelDimensions'];
 
 export default pixelate;
