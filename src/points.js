@@ -1134,7 +1134,6 @@ class Points {
         }
 
         const requiredNotFound = renderPass.required?.filter(i => !params[i] && !Number.isInteger(params[i]));
-        console.log(requiredNotFound);
 
         if(requiredNotFound?.length){
             const paramsRequired = requiredNotFound.join(', ')
