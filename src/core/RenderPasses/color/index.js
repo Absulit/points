@@ -7,7 +7,7 @@ const color = new RenderPass(vertexShader, fragmentShader, null, 8, 8, 1, (point
     points.setSampler('renderpass_feedbackSampler', null);
     points.setTexture2d('renderpass_feedbackTexture', true);
     points.setUniform('color_blendAmount', params.blendAmount || .5);
-    points.setUniform('color_color', params.color || [1,.75,.79,1], 'vec4f');
+    points.setUniform('color_color', params.color || [1, .75, .79, 1], 'vec4f');
 });
 color.required = ['color', 'blendAmount'];
 

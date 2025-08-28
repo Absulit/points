@@ -18,18 +18,15 @@ fn main(
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
 
-    let feedbackColor = blur9(
+    return blur9(
         renderpass_feedbackTexture,
         renderpass_feedbackSampler,
-        vec2(0.,0),
+        vec2(),
         uvr,
         params.blur_resolution, // resolution
         rotateVector(params.blur_direction, params.blur_radians) // direction
     );
 
-    let finalColor = feedbackColor;
-
-    return finalColor;
 }
 `;
 
