@@ -41,6 +41,8 @@ class RenderPass {
 
     #callback = null;
     #required = null;
+    #isolated = false;
+    #name = null;
 
     /**
      * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
@@ -219,8 +221,7 @@ class RenderPass {
         this.#callback?.(points, params);
     }
 
-
-    get required(){
+    get required() {
         return this.#required;
     }
     /**
@@ -228,8 +229,23 @@ class RenderPass {
      * {@link RenderPass#setInit} that are required.
      * This is only  used for a post processing RenderPass.
      */
-    set required(val){
+    set required(val) {
         this.#required = val;
+    }
+
+    get isolated() {
+        return this.#isolated;
+    }
+
+    set isolated(val) {
+        this.#isolated = val;
+    }
+
+    get name() {
+        return this.#name;
+    }
+    set name(val) {
+        this.#name = val;
     }
 }
 
