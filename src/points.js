@@ -1133,7 +1133,9 @@ class Points {
             throw 'params is required';
         }
 
-        const requiredNotFound = renderPass.required?.filter(i => !params[i]);
+        const requiredNotFound = renderPass.required?.filter(i => !params[i] && !Number.isInteger(params[i]));
+        console.log(requiredNotFound);
+
         if(requiredNotFound?.length){
             const paramsRequired = requiredNotFound.join(', ')
             throw `Error adding post processing RenderPass, the following parameters are required: ${paramsRequired}`
