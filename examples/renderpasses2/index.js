@@ -24,7 +24,7 @@ const renderpasses1 = {
         // TODO: restore defaults so you just need to add the pass and that's it
         points.addRenderPass(RenderPasses.GRAYSCALE);
         points.addRenderPass(RenderPasses.CHROMATIC_ABERRATION, { distance: .02 });
-        points.addRenderPass(RenderPasses.COLOR, {color:[.5, 1, 0, 1], blendAmount: .5});
+        points.addRenderPass(RenderPasses.COLOR, { color: [.5, 1, 0, 1], blendAmount: .5 });
         points.addRenderPass(RenderPasses.PIXELATE, { pixelsWidth: 10, pixelsHeight: 10 });
         points.addRenderPass(RenderPasses.LENS_DISTORTION, { amount: .4, distance: .01 });
         points.addRenderPass(RenderPasses.FILM_GRAIN);

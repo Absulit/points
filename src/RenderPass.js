@@ -48,11 +48,28 @@ class RenderPass {
      * @param {String} vertexShader  WGSL Vertex Shader in a String.
      * @param {String} fragmentShader  WGSL Fragment Shader in a String.
      * @param {String} computeShader  WGSL Compute Shader in a String.
+     * @param {String} workgroupCountX  Workgroup amount in X.
+     * @param {String} workgroupCountY  Workgroup amount in Y.
+     * @param {String} workgroupCountZ  Workgroup amount in Z.
+     * @param {(points:Points, params:Object)=>{}} init Method to add custom
+     * uniforms or storage (points.set* methods).
+     * This is made for post processing `RenderPass`es
+     * The method `init` will be called to initialize the variables.
+     *
+     * @example
+     * // init param example
+     * const grayscale = new RenderPass(vertexShader, fragmentShader);
+     * grayscale.setInit((points, params) => {
+     *     points.setSampler('renderpass_feedbackSampler', null);
+     *     points.setTexture2d('renderpass_feedbackTexture', true);
+     * });
      */
-    constructor(vertexShader, fragmentShader, computeShader, workgroupCountX, workgroupCountY, workgroupCountZ) {
+    constructor(vertexShader, fragmentShader, computeShader, workgroupCountX, workgroupCountY, workgroupCountZ, init) {
         this.#vertexShader = vertexShader;
         this.#computeShader = computeShader;
         this.#fragmentShader = fragmentShader;
+
+        this.#callback = init;
 
         this.#compiledShaders = {
             vertex: '',
@@ -188,24 +205,10 @@ class RenderPass {
         return this.#workgroupCountZ;
     }
 
-    /**
-     * Method to add custom uniforms or storage (points.set* methods).
-     * This is made for post processing `RenderPass`es
-     * The method `init` will be called to initialize the variables.
-     * @param {(points:Points, params:Object)=>{}} callback function to
-     * initialize the RenderPass variables.
-     *
-     * @example
-     * const grayscale = new RenderPass(vertexShader, fragmentShader);
-     * grayscale.setInit((points, params) => {
-     *     points.setSampler('renderpass_feedbackSampler', null);
-     *     points.setTexture2d('renderpass_feedbackTexture', true);
-     * });
-     *
-     */
-    setInit(callback) {
-        this.#callback = callback;
-    }
+    // setInit(callback) {
+    //     this.#callback = callback;
+    // }
+
     /**
      *
      * @param {Points} points
