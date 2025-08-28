@@ -23,8 +23,8 @@ fn main(
         renderpass_feedbackSampler,
         vec2(0.,0),
         uvr,
-        vec2(params.blur_resolution_x, params.blur_resolution_y), // resolution
-        rotateVector(vec2(params.blur_direction_x, params.blur_direction_y), params.blur_radians) // direction
+        params.blur_resolution, // resolution
+        rotateVector(params.blur_direction, params.blur_radians) // direction
     );
 
     let finalColor = feedbackColor;
