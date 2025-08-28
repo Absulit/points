@@ -27,7 +27,7 @@ const renderpasses1 = {
         points.addRenderPass(RenderPasses.COLOR, {color:[.5, 1, 0, 1], blendAmount: .5});
         points.addRenderPass(RenderPasses.PIXELATE, { pixelsWidth: 10, pixelsHeight: 10 });
         points.addRenderPass(RenderPasses.LENS_DISTORTION, { amount: .4, distance: .01 });
-        // points.addRenderPass(RenderPasses.FILM_GRAIN);
+        points.addRenderPass(RenderPasses.FILM_GRAIN);
         // points.addRenderPass(RenderPasses.BLOOM, { amount: .5 });
         // points.addRenderPass(RenderPasses.BLUR, { resolution: [100, 100], direction: [.4, 0], radians: 0 });
         // points.addRenderPass(RenderPasses.WAVES, { scale: .05, intensity: .03 });
