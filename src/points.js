@@ -979,6 +979,11 @@ class Points {
         this.#numRows = numRows;
     }
 
+    /**
+     *
+     * @param {RenderPass} renderPass
+     * @param {Number} index
+     */
     #compileRenderPass = (renderPass, index) => {
         let vertexShader = renderPass.vertexShader;
         let computeShader = renderPass.computeShader;
