@@ -215,7 +215,7 @@ class RenderPass {
      * @param {Object} params
      */
     init(points, params) {
-        this.#callback(points, params);
+        this.#callback?.(points, params);
     }
 
 
