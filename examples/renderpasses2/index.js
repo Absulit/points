@@ -27,15 +27,17 @@ const renderpasses1 = {
         points.setSampler('feedbackSampler');
         points.setTexture2d('feedbackTexture', true);
 
+        // TODO: agregar documentación de nuevo parámetro isolated en set*
+        // TODO: checl setAudio since it doesn't return a isolated
         points.addRenderPass(RenderPasses.GRAYSCALE);
-        points.addRenderPass(RenderPasses.CHROMATIC_ABERRATION, { distance: .02 });
-        points.addRenderPass(RenderPasses.COLOR, { color: [.5, 1, 0, 1], blendAmount: .5 });
-        points.addRenderPass(RenderPasses.PIXELATE);
-        points.addRenderPass(RenderPasses.LENS_DISTORTION);
-        points.addRenderPass(RenderPasses.FILM_GRAIN);
-        points.addRenderPass(RenderPasses.BLOOM);
-        points.addRenderPass(RenderPasses.BLUR, { resolution: [100, 100], direction: [.4, 0], radians: 0 });
-        points.addRenderPass(RenderPasses.WAVES, { scale: .05 });
+        // points.addRenderPass(RenderPasses.CHROMATIC_ABERRATION, { distance: .02 });
+        // points.addRenderPass(RenderPasses.COLOR, { color: [.5, 1, 0, 1], blendAmount: .5 });
+        // points.addRenderPass(RenderPasses.PIXELATE);
+        // points.addRenderPass(RenderPasses.LENS_DISTORTION);
+        // points.addRenderPass(RenderPasses.FILM_GRAIN);
+        // points.addRenderPass(RenderPasses.BLOOM);
+        // points.addRenderPass(RenderPasses.BLUR, { resolution: [100, 100], direction: [.4, 0], radians: 0 });
+        // points.addRenderPass(RenderPasses.WAVES, { scale: .05 });
     },
     update: points => {
 
