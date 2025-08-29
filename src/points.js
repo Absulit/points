@@ -879,6 +879,23 @@ class Points {
     }
 
     /**
+     * From all the uniforms, storage, etc,
+     * we check if we need to add per {@link ShaderType}
+     * and also verify if the variable is "isolated"
+     * (only shows on current RenderPass)
+     * @param {Object} val from the #uniforms #storage and others, variables
+     * @param {ShaderType} shaderType
+     * @param {Boolean} renderPassIsolated is the RenderPass isolated?
+     * @returns {Boolean}
+     */
+    #addVarPerShaderTypeAndCheckIsolated(val, shaderType, renderPassIsolated) {
+        const shaderTypeIsCurrent = !val.shaderType || val.shaderType == shaderType;
+        // ir var is not isolated then we added even if RenderPass wants to isolate
+        const addIsolatedVar = !val.isolated ? val.isolated == renderPassIsolated : true;
+        return shaderTypeIsCurrent && addIsolatedVar;
+    }
+
+    /**
      * @param {ShaderType} shaderType
      * @param {RenderPass} renderPass
      * @returns {String} string with bindings
@@ -910,9 +927,11 @@ class Points {
             }
         }
         this.#samplers.forEach((sampler, index) => {
-            console.log({name, shaderType, samplerIsolated: sampler.isolated, isolated, res:sampler.isolated == isolated});
+            console.log({ samp: sampler.name, name, shaderType, 'sampler?': sampler.isolated, isolated, res: sampler.isolated == isolated });
+            const add = this.#addVarPerShaderTypeAndCheckIsolated(sampler, shaderType, isolated);
+            if (add) {
+                console.log('added ', sampler.name);
 
-            if ( (!sampler.shaderType || sampler.shaderType == shaderType) && sampler.isolated == isolated) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${sampler.name}: sampler;\n`;
                 bindingIndex += 1;
             }
@@ -924,6 +943,8 @@ class Points {
             }
         });
         this.#textures2d.forEach((texture, index) => {
+            // console.log({tex: texture.name, name, shaderType, 'texture isolated': texture.isolated, isolated, res:texture.isolated == isolated});
+
             if ((!texture.shaderType || texture.shaderType == shaderType) && texture.isolated == isolated) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d<f32>;\n`;
                 bindingIndex += 1;
@@ -1014,6 +1035,8 @@ class Points {
         if (this.#uniforms.length) {
             dynamicStructParams = /*wgsl*/`struct Params {\n\t${dynamicStructParams}\n}\n`;
         }
+        console.log(renderPass);
+
         renderPass.index = index;
         renderPass.hasVertexShader && (dynamicGroupBindingsVertex += dynamicStructParams);
         renderPass.hasComputeShader && (dynamicGroupBindingsCompute += dynamicStructParams);
@@ -1089,7 +1112,7 @@ class Points {
             throw ' `setBindingTexture` requires at least one Compute Shader in a `RenderPass`'
         }
 
-        this.#renderPasses.forEach( r => r.init?.(this));
+        this.#renderPasses.forEach(r => r.init?.(this));
         this.#renderPasses.forEach(this.#compileRenderPass);
         this.#generateDataSize();
         //
@@ -1147,7 +1170,7 @@ class Points {
 
         const requiredNotFound = renderPass.required?.filter(i => !params[i] && !Number.isInteger(params[i]));
 
-        if(requiredNotFound?.length){
+        if (requiredNotFound?.length) {
             const paramsRequired = requiredNotFound.join(', ');
             console.warn(`addRenderPass: parameters required: ${paramsRequired}`);
         }
@@ -1654,7 +1677,8 @@ class Points {
         }
         if (this.#samplers.length) {
             this.#samplers.forEach((sampler, index) => {
-                if ((!sampler.shaderType || sampler.shaderType == shaderType) && sampler.isolated == isolated) {
+                const add = this.#addVarPerShaderTypeAndCheckIsolated(sampler, shaderType, isolated);
+                if (add) {
                     entries.push(
                         {
                             binding: bindingIndex++,
