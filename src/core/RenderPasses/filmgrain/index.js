@@ -1,19 +1,10 @@
 import vertexShader from './vert.js';
 import fragmentShader from './frag.js';
+import { RenderPass } from 'points';
 
-const filmgrain = {
-    vertexShader,
-    fragmentShader,
-    init: async (points, params) => {
-        points._setInternal(true);
-        points.setSampler('renderpass_feedbackSampler', null);
-        points.setTexture2d('renderpass_feedbackTexture', true);
-        points._setInternal(false);
-
-    },
-    update: points => {
-
-    }
-}
+const filmgrain = new RenderPass(vertexShader, fragmentShader, null, 8, 8, 1, (points, params) => {
+    points.setSampler('renderpass_feedbackSampler', null);
+    points.setTexture2d('renderpass_feedbackTexture', true);
+});
 
 export default filmgrain;

@@ -1,9 +1,9 @@
-import { texturePosition } from '../../image.js';
+import { texture } from '../../image.js';
 import { rand } from '../../random.js';
 import { snoise } from './../../noise2d.js';
 const frag = /*wgsl*/`
 
-${texturePosition}
+${texture}
 ${rand}
 ${snoise}
 
@@ -17,16 +17,12 @@ fn main(
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
 
-
-    let imageColor = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0., 0), uvr, true);
+    let imageColor = texture(renderpass_feedbackTexture, renderpass_feedbackSampler, uvr, true);
 
     rand_seed = uvr + params.time;
 
-    var noise = rand();
-    noise = noise * .5 + .5;
-    let finalColor = (imageColor + imageColor * noise)  * .5;
-
-    return finalColor;
+    let noise = rand() * .5 + .5;
+    return (imageColor + imageColor * noise)  * .5;
 }
 `;
 
