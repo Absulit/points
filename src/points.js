@@ -912,7 +912,8 @@ class Points {
             bindingIndex += 1;
         }
         this.#storage.forEach(storageItem => {
-            if (!storageItem.shaderType || storageItem.shaderType == shaderType) {
+            const add = this.#addVarPerShaderTypeAndCheckIsolated(storageItem, shaderType, isolated);
+            if (add) {
                 const T = storageItem.structName;
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, read_write> ${storageItem.name}: ${T};\n`
                 bindingIndex += 1;
@@ -937,27 +938,30 @@ class Points {
             }
         });
         this.#texturesStorage2d.forEach((texture, index) => {
-            if (!texture.shaderType || texture.shaderType == shaderType) {
+            const add = this.#addVarPerShaderTypeAndCheckIsolated(texture, shaderType, isolated);
+            if (add) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_storage_2d<rgba8unorm, write>;\n`;
                 bindingIndex += 1;
             }
         });
         this.#textures2d.forEach((texture, index) => {
             // console.log({tex: texture.name, name, shaderType, 'texture isolated': texture.isolated, isolated, res:texture.isolated == isolated});
-
-            if ((!texture.shaderType || texture.shaderType == shaderType) && texture.isolated == isolated) {
+            const add = this.#addVarPerShaderTypeAndCheckIsolated(texture, shaderType, isolated);
+            if (add) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d<f32>;\n`;
                 bindingIndex += 1;
             }
         });
         this.#textures2dArray.forEach((texture, index) => {
-            if (!texture.shaderType || texture.shaderType == shaderType) {
+            const add = this.#addVarPerShaderTypeAndCheckIsolated(texture, shaderType, isolated);
+            if (add) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d_array<f32>;\n`;
                 bindingIndex += 1;
             }
         });
         this.#texturesExternal.forEach(externalTexture => {
-            if (!externalTexture.shaderType || externalTexture.shaderType == shaderType) {
+            const add = this.#addVarPerShaderTypeAndCheckIsolated(externalTexture, shaderType, isolated);
+            if (add) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${externalTexture.name}: texture_external;\n`;
                 bindingIndex += 1;
             }
