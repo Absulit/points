@@ -67,13 +67,13 @@ class RenderPass {
      *     points.setTexture2d('renderpass_feedbackTexture', true);
      * });
      */
-    constructor(vertexShader, fragmentShader, computeShader, workgroupCountX, workgroupCountY, workgroupCountZ, isolated = false, init) {
+    constructor(vertexShader, fragmentShader, computeShader, workgroupCountX, workgroupCountY, workgroupCountZ, init) {
         this.#vertexShader = vertexShader;
         this.#computeShader = computeShader;
         this.#fragmentShader = fragmentShader;
 
         this.#callback = init;
-        this.#isolated = isolated;
+        // this.#isolated = isolated;
 
         this.#compiledShaders = {
             vertex: '',
@@ -239,9 +239,9 @@ class RenderPass {
         return this.#isolated;
     }
 
-    // set isolated(val) {
-    //     this.#isolated = val;
-    // }
+    set isolated(val) {
+        this.#isolated = val;
+    }
 
     get name() {
         return this.#name;

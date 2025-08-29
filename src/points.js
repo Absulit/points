@@ -82,6 +82,8 @@ class Points {
     #events_ids = 0;
     #dataSize = null;
 
+    #isolated = false;
+
     constructor(canvasId) {
         this.#canvasId = canvasId;
         this.#canvas = document.getElementById(this.#canvasId);
@@ -113,6 +115,18 @@ class Points {
                 }
             });
         }
+    }
+
+    get isolated() {
+        return this.#isolated;
+    }
+
+    /**
+     * To isolate the buffers to the current {@link RenderPass} assigned.
+     * @param {Boolean} val
+     */
+    set isolated(val) {
+        this.#isolated = val;
     }
 
     #resizeCanvasToFitWindow = () => {
@@ -205,7 +219,7 @@ class Points {
         // }
         if (uniformToUpdate) {
             uniformToUpdate.value = value;
-            if(structName){
+            if (structName) {
                 console.warn(`\`setUniform()\` (${name}) can\'t set the structName (${structName}) of an already defined uniform.`);
             }
             return;
@@ -218,7 +232,7 @@ class Points {
             value: value,
             type: structName,
             size: null,
-            isolated: false
+            isolated: this.#isolated
         }
         this.#uniforms.push(uniform);
         return uniform;
@@ -276,7 +290,7 @@ class Points {
             shaderType: shaderType,
             read: read,
             buffer: null,
-            isolated: false
+            isolated: this.#isolated
         }
         this.#storage.push(storage);
         return storage;
@@ -341,7 +355,7 @@ class Points {
             array: arrayData,
             buffer: null,
             read: read,
-            isolated: false
+            isolated: this.#isolated
         }
         this.#storage.push(storage);
         return storage;
@@ -442,7 +456,7 @@ class Points {
             descriptor: descriptor,
             shaderType: shaderType,
             resource: null,
-            isolated: false
+            isolated: this.#isolated
         };
         this.#samplers.push(sampler);
         return sampler;
@@ -486,7 +500,7 @@ class Points {
             shaderType,
             texture: null,
             renderPassIndex,
-            isolated: false
+            isolated: this.#isolated
         }
         this.#textures2d.push(texture2d);
         return texture2d;
@@ -563,7 +577,7 @@ class Points {
             imageTexture: {
                 bitmap: imageBitmap
             },
-            isolated: false
+            isolated: this.#isolated
         }
         this.#textures2d.push(texture2d);
         return texture2d;
@@ -631,7 +645,7 @@ class Points {
             imageTextures: {
                 bitmaps: imageBitmaps
             },
-            isolated: false
+            isolated: this.#isolated
         });
     }
 
@@ -665,7 +679,7 @@ class Points {
             name: name,
             shaderType: shaderType,
             video: video,
-            isolated: false
+            isolated: this.#isolated
         };
         this.#texturesExternal.push(textureExternal);
         return textureExternal;
@@ -708,7 +722,7 @@ class Points {
             name: name,
             shaderType: shaderType,
             video: video,
-            isolated: false
+            isolated: this.#isolated
         };
         this.#texturesExternal.push(textureExternal);
         return textureExternal;
@@ -786,7 +800,7 @@ class Points {
             name: name,
             shaderType: shaderType,
             texture: null,
-            isolated: false
+            isolated: this.#isolated
         };
         this.#texturesStorage2d.push(texturesStorage2d);
         return texturesStorage2d;
@@ -838,7 +852,7 @@ class Points {
             texture: null,
             size: size,
             usesRenderPass,
-            isolated: false
+            isolated: this.#isolated
         }
         this.#bindingTextures.push(bindingTexture);
         return bindingTexture;
@@ -893,11 +907,10 @@ class Points {
      */
     #addVarPerShaderTypeAndCheckIsolated(val, shaderType, renderPassIsolated) {
         const shaderTypeIsCurrent = !val.shaderType || val.shaderType == shaderType;
-        // ir var is not isolated then we added even if RenderPass wants to isolate
-        const addIsolatedVar = val.isolated ? val.isolated == renderPassIsolated : true;
-        if(val.name == 'renderpass_feedbackTexture') console.log({name:val.name, addIsolatedVar}, val.isolated, renderPassIsolated);
+        // ir buffer is not isolated then we added even if RenderPass wants to isolate
+        const add = shaderTypeIsCurrent && renderPassIsolated == val.isolated
 
-        return shaderTypeIsCurrent && addIsolatedVar;
+        return add;
     }
 
     /**
@@ -905,7 +918,7 @@ class Points {
      * @param {RenderPass} renderPass
      * @returns {String} string with bindings
      */
-    #createDynamicGroupBindings(shaderType, { index: renderPassIndex, isolated, name }) {
+    #createDynamicGroupBindings(shaderType, { index: renderPassIndex, name, isolated }) {
         if (!shaderType) {
             throw '`ShaderType` is required';
         }
@@ -935,7 +948,7 @@ class Points {
         }
         this.#samplers.forEach((sampler, index) => {
             const add = this.#addVarPerShaderTypeAndCheckIsolated(sampler, shaderType, isolated);
-            // console.log({ buff: sampler.name, name, shaderType, 'buff iso?': sampler.isolated, isolated, add });
+            // console.log({ buff: sampler.name, name, shaderType, 'buff iso?': sampler.isolated, add });
             if (add) {
                 // console.log('added ', sampler.name);
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${sampler.name}: sampler;\n`;
@@ -951,7 +964,7 @@ class Points {
         });
         this.#textures2d.forEach((texture, index) => {
             const add = this.#addVarPerShaderTypeAndCheckIsolated(texture, shaderType, isolated);
-            console.log({ buff: texture.name, name, shaderType, 'buff iso?': texture.isolated, isolated, add });
+            // console.log({ buff: texture.name, name, shaderType, 'buff iso?': texture.isolated, add });
             if (add) {
                 console.log('added ', texture.name);
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d<f32>;\n`;
