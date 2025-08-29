@@ -924,7 +924,7 @@ class Points {
             }
         });
         this.#textures2d.forEach((texture, index) => {
-            if (!texture.shaderType || texture.shaderType == shaderType) {
+            if ((!texture.shaderType || texture.shaderType == shaderType) && texture.isolated == isolated) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d<f32>;\n`;
                 bindingIndex += 1;
             }
@@ -1687,7 +1687,7 @@ class Points {
         }
         if (this.#textures2d.length) {
             this.#textures2d.forEach((texture2d, index) => {
-                if (!texture2d.shaderType || texture2d.shaderType == shaderType) {
+                if ((!texture2d.shaderType || texture2d.shaderType == shaderType) && texture2d.isolated == isolated) {
                     entries.push(
                         {
                             label: 'texture 2d',

@@ -53,6 +53,7 @@ class RenderPass {
      * @param {String} workgroupCountX  Workgroup amount in X.
      * @param {String} workgroupCountY  Workgroup amount in Y.
      * @param {String} workgroupCountZ  Workgroup amount in Z.
+     * @param {Boolean} isolated  Keep the variables on this RenderPass only.
      * @param {(points:Points, params:Object)=>{}} init Method to add custom
      * uniforms or storage (points.set* methods).
      * This is made for post processing `RenderPass`es
@@ -66,12 +67,13 @@ class RenderPass {
      *     points.setTexture2d('renderpass_feedbackTexture', true);
      * });
      */
-    constructor(vertexShader, fragmentShader, computeShader, workgroupCountX, workgroupCountY, workgroupCountZ, init) {
+    constructor(vertexShader, fragmentShader, computeShader, workgroupCountX, workgroupCountY, workgroupCountZ, isolated = false, init) {
         this.#vertexShader = vertexShader;
         this.#computeShader = computeShader;
         this.#fragmentShader = fragmentShader;
 
         this.#callback = init;
+        this.#isolated = isolated;
 
         this.#compiledShaders = {
             vertex: '',
@@ -237,9 +239,9 @@ class RenderPass {
         return this.#isolated;
     }
 
-    set isolated(val) {
-        this.#isolated = val;
-    }
+    // set isolated(val) {
+    //     this.#isolated = val;
+    // }
 
     get name() {
         return this.#name;
