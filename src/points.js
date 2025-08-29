@@ -214,7 +214,8 @@ class Points {
             name: name,
             value: value,
             type: structName,
-            size: null
+            size: null,
+            isolated: false
         }
         this.#uniforms.push(uniform);
         return uniform;
@@ -271,7 +272,8 @@ class Points {
             // structSize: null,
             shaderType: shaderType,
             read: read,
-            buffer: null
+            buffer: null,
+            isolated: false
         }
         this.#storage.push(storage);
         return storage;
@@ -335,7 +337,8 @@ class Points {
             shaderType: shaderType,
             array: arrayData,
             buffer: null,
-            read: read
+            read: read,
+            isolated: false
         }
         this.#storage.push(storage);
         return storage;
@@ -380,7 +383,8 @@ class Points {
                 structName: 'vec4f',
                 structSize: 16,
                 array: null,
-                buffer: null
+                buffer: null,
+                isolated: false
             });
         }
     }
@@ -412,7 +416,7 @@ class Points {
      * let value = texturePosition(image, imageSampler, position, uvr, true);
      */
 
-    setSampler(name, descriptor, shaderType) {
+    setSampler(name, descriptor, shaderType = null) {
         if ('sampler' == name) {
             throw 'setSampler: `name` can not be sampler since is a WebGPU keyword.';
         }
@@ -434,7 +438,8 @@ class Points {
             name: name,
             descriptor: descriptor,
             shaderType: shaderType,
-            resource: null
+            resource: null,
+            isolated: false
         };
         this.#samplers.push(sampler);
         return sampler;
@@ -477,7 +482,8 @@ class Points {
             copyCurrentTexture,
             shaderType,
             texture: null,
-            renderPassIndex
+            renderPassIndex,
+            isolated: false
         }
         this.#textures2d.push(texture2d);
         return texture2d;
@@ -553,7 +559,8 @@ class Points {
             texture: null,
             imageTexture: {
                 bitmap: imageBitmap
-            }
+            },
+            isolated: false
         }
         this.#textures2d.push(texture2d);
         return texture2d;
@@ -620,7 +627,8 @@ class Points {
             texture: null,
             imageTextures: {
                 bitmaps: imageBitmaps
-            }
+            },
+            isolated: false
         });
     }
 
@@ -653,7 +661,8 @@ class Points {
         const textureExternal = {
             name: name,
             shaderType: shaderType,
-            video: video
+            video: video,
+            isolated: false
         };
         this.#texturesExternal.push(textureExternal);
         return textureExternal;
@@ -695,7 +704,8 @@ class Points {
         const textureExternal = {
             name: name,
             shaderType: shaderType,
-            video: video
+            video: video,
+            isolated: false
         };
         this.#texturesExternal.push(textureExternal);
         return textureExternal;
@@ -772,7 +782,8 @@ class Points {
         const texturesStorage2d = {
             name: name,
             shaderType: shaderType,
-            texture: null
+            texture: null,
+            isolated: false
         };
         this.#texturesStorage2d.push(texturesStorage2d);
         return texturesStorage2d;
@@ -823,7 +834,8 @@ class Points {
             },
             texture: null,
             size: size,
-            usesRenderPass
+            usesRenderPass,
+            isolated: false
         }
         this.#bindingTextures.push(bindingTexture);
         return bindingTexture;
@@ -871,7 +883,7 @@ class Points {
      * @param {RenderPass} renderPass
      * @returns {String} string with bindings
      */
-    #createDynamicGroupBindings(shaderType, { index: renderPassIndex }) {
+    #createDynamicGroupBindings(shaderType, { index: renderPassIndex, isolated, name }) {
         if (!shaderType) {
             throw '`ShaderType` is required';
         }
@@ -898,7 +910,9 @@ class Points {
             }
         }
         this.#samplers.forEach((sampler, index) => {
-            if (!sampler.shaderType || sampler.shaderType == shaderType) {
+            console.log({name, shaderType, samplerIsolated: sampler.isolated, isolated, res:sampler.isolated == isolated});
+
+            if ( (!sampler.shaderType || sampler.shaderType == shaderType) && sampler.isolated == isolated) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${sampler.name}: sampler;\n`;
                 bindingIndex += 1;
             }
@@ -922,13 +936,11 @@ class Points {
             }
         });
         this.#texturesExternal.forEach(externalTexture => {
-            // const internalCheck = internal == externalTexture.internal;
             if (!externalTexture.shaderType || externalTexture.shaderType == shaderType) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${externalTexture.name}: texture_external;\n`;
                 bindingIndex += 1;
             }
         });
-        // TODO: internalcheck can be a filter
         this.#bindingTextures.forEach(bindingTexture => {
             const { usesRenderPass } = bindingTexture;
             if (usesRenderPass) {
@@ -1586,8 +1598,7 @@ class Points {
      * Creates the entries for the pipeline
      * @returns an array with the entries
      */
-    #createEntries(shaderType, { internal, index: renderPassIndex }) {
-        internal = internal || false;
+    #createEntries(shaderType, { index: renderPassIndex, isolated }) {
         let entries = [];
         let bindingIndex = 0;
         if (this.#uniforms.length) {
@@ -1643,7 +1654,7 @@ class Points {
         }
         if (this.#samplers.length) {
             this.#samplers.forEach((sampler, index) => {
-                if (!sampler.shaderType || sampler.shaderType == shaderType) {
+                if ((!sampler.shaderType || sampler.shaderType == shaderType) && sampler.isolated == isolated) {
                     entries.push(
                         {
                             binding: bindingIndex++,
@@ -1731,7 +1742,6 @@ class Points {
             });
         }
         // TODO: repeated entry blocks
-        // TODO: internalcheck can be filtered
         this.#bindingTextures.forEach(bindingTexture => {
 
             const { usesRenderPass } = bindingTexture;
