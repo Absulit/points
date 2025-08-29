@@ -1140,8 +1140,7 @@ class Points {
             console.warn(`addRenderPass: parameters required: ${paramsRequired}`);
         }
 
-        const { vertexShader: v, fragmentShader: f, computeShader: c } = renderPass;
-        this.#postRenderPasses.push(new RenderPass(v, f, c));
+        this.#postRenderPasses.push(renderPass);
         renderPass.init(this, params);
     }
 
