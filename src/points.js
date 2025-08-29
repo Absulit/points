@@ -891,7 +891,7 @@ class Points {
     #addVarPerShaderTypeAndCheckIsolated(val, shaderType, renderPassIsolated) {
         const shaderTypeIsCurrent = !val.shaderType || val.shaderType == shaderType;
         // ir var is not isolated then we added even if RenderPass wants to isolate
-        const addIsolatedVar = !val.isolated ? val.isolated == renderPassIsolated : true;
+        const addIsolatedVar = val.isolated ? val.isolated == renderPassIsolated : true;
         return shaderTypeIsCurrent && addIsolatedVar;
     }
 
@@ -920,7 +920,8 @@ class Points {
             }
         });
         if (this.#layers.length) {
-            if (!this.#layers.shaderType || this.#layers.shaderType == shaderType) {
+            const add = this.#addVarPerShaderTypeAndCheckIsolated(this.#layers, shaderType, isolated);
+            if (add) {
                 let totalSize = 0;
                 this.#layers.forEach(layerItem => totalSize += layerItem.size);
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, read_write> layers: array<array<vec4f, ${totalSize}>>;\n`
@@ -928,11 +929,10 @@ class Points {
             }
         }
         this.#samplers.forEach((sampler, index) => {
-            console.log({ samp: sampler.name, name, shaderType, 'sampler?': sampler.isolated, isolated, res: sampler.isolated == isolated });
+            // console.log({ buff: sampler.name, name, shaderType, 'buff iso?': sampler.isolated, isolated, res: sampler.isolated == isolated });
             const add = this.#addVarPerShaderTypeAndCheckIsolated(sampler, shaderType, isolated);
             if (add) {
-                console.log('added ', sampler.name);
-
+                // console.log('added ', sampler.name);
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${sampler.name}: sampler;\n`;
                 bindingIndex += 1;
             }
@@ -945,7 +945,7 @@ class Points {
             }
         });
         this.#textures2d.forEach((texture, index) => {
-            // console.log({tex: texture.name, name, shaderType, 'texture isolated': texture.isolated, isolated, res:texture.isolated == isolated});
+            // console.log({ buff: texture.name, name, shaderType, 'buff iso?': texture.isolated, isolated, res: texture.isolated == isolated });
             const add = this.#addVarPerShaderTypeAndCheckIsolated(texture, shaderType, isolated);
             if (add) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d<f32>;\n`;
@@ -1039,7 +1039,6 @@ class Points {
         if (this.#uniforms.length) {
             dynamicStructParams = /*wgsl*/`struct Params {\n\t${dynamicStructParams}\n}\n`;
         }
-        console.log(renderPass);
 
         renderPass.index = index;
         renderPass.hasVertexShader && (dynamicGroupBindingsVertex += dynamicStructParams);
@@ -1645,7 +1644,8 @@ class Points {
         }
         if (this.#storage.length) {
             this.#storage.forEach(storageItem => {
-                if (!storageItem.shaderType || storageItem.shaderType == shaderType) {
+                const add = this.#addVarPerShaderTypeAndCheckIsolated(storageItem, shaderType, isolated);
+                if (add) {
                     entries.push(
                         {
                             binding: bindingIndex++,
@@ -1663,7 +1663,8 @@ class Points {
             });
         }
         if (this.#layers.length) {
-            if (!this.#layers.shaderType || this.#layers.shaderType == shaderType) {
+            const add = this.#addVarPerShaderTypeAndCheckIsolated(this.#layers, shaderType, isolated);
+            if (add) {
                 entries.push(
                     {
                         binding: bindingIndex++,
@@ -1698,7 +1699,8 @@ class Points {
         }
         if (this.#texturesStorage2d.length) {
             this.#texturesStorage2d.forEach((textureStorage2d, index) => {
-                if (!textureStorage2d.shaderType || textureStorage2d.shaderType == shaderType) {
+                const add = this.#addVarPerShaderTypeAndCheckIsolated(textureStorage2d, shaderType, isolated);
+                if (add) {
                     entries.push(
                         {
                             label: 'texture storage 2d',
@@ -1715,7 +1717,8 @@ class Points {
         }
         if (this.#textures2d.length) {
             this.#textures2d.forEach((texture2d, index) => {
-                if ((!texture2d.shaderType || texture2d.shaderType == shaderType) && texture2d.isolated == isolated) {
+                const add = this.#addVarPerShaderTypeAndCheckIsolated(texture2d, shaderType, isolated);
+                if (add) {
                     entries.push(
                         {
                             label: 'texture 2d',
@@ -1732,7 +1735,8 @@ class Points {
         }
         if (this.#textures2dArray.length) {
             this.#textures2dArray.forEach((texture2dArray, index) => {
-                if (!texture2dArray.shaderType || texture2dArray.shaderType == shaderType) {
+                const add = this.#addVarPerShaderTypeAndCheckIsolated(texture2dArray, shaderType, isolated);
+                if (add) {
                     entries.push(
                         {
                             label: 'texture 2d array',
@@ -1754,7 +1758,8 @@ class Points {
         }
         if (this.#texturesExternal.length) {
             this.#texturesExternal.forEach(externalTexture => {
-                if (!externalTexture.shaderType || externalTexture.shaderType == shaderType) {
+                const add = this.#addVarPerShaderTypeAndCheckIsolated(externalTexture, shaderType, isolated);
+                if (add) {
                     entries.push(
                         {
                             label: 'external texture',
