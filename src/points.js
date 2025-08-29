@@ -199,12 +199,15 @@ class Points {
      */
     setUniform(name, value, structName = null) {
         const uniformToUpdate = this.#nameExists(this.#uniforms, name);
-        if (uniformToUpdate && structName) {
-            // if name exists is an update
-            throw '`setUniform()` can\'t set the structName of an already defined uniform.';
-        }
+        // if (uniformToUpdate && structName) {
+        //     // if name exists is an update
+        //     throw `\`setUniform()\` (${name}) can\'t set the structName (${structName}) of an already defined uniform.`;
+        // }
         if (uniformToUpdate) {
             uniformToUpdate.value = value;
+            if(structName){
+                console.warn(`\`setUniform()\` (${name}) can\'t set the structName (${structName}) of an already defined uniform.`);
+            }
             return;
         }
         if (structName && isArray(structName)) {
@@ -892,6 +895,8 @@ class Points {
         const shaderTypeIsCurrent = !val.shaderType || val.shaderType == shaderType;
         // ir var is not isolated then we added even if RenderPass wants to isolate
         const addIsolatedVar = val.isolated ? val.isolated == renderPassIsolated : true;
+        if(val.name == 'renderpass_feedbackTexture') console.log({name:val.name, addIsolatedVar}, val.isolated, renderPassIsolated);
+
         return shaderTypeIsCurrent && addIsolatedVar;
     }
 
@@ -929,8 +934,8 @@ class Points {
             }
         }
         this.#samplers.forEach((sampler, index) => {
-            // console.log({ buff: sampler.name, name, shaderType, 'buff iso?': sampler.isolated, isolated, res: sampler.isolated == isolated });
             const add = this.#addVarPerShaderTypeAndCheckIsolated(sampler, shaderType, isolated);
+            // console.log({ buff: sampler.name, name, shaderType, 'buff iso?': sampler.isolated, isolated, add });
             if (add) {
                 // console.log('added ', sampler.name);
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${sampler.name}: sampler;\n`;
@@ -945,9 +950,10 @@ class Points {
             }
         });
         this.#textures2d.forEach((texture, index) => {
-            // console.log({ buff: texture.name, name, shaderType, 'buff iso?': texture.isolated, isolated, res: texture.isolated == isolated });
             const add = this.#addVarPerShaderTypeAndCheckIsolated(texture, shaderType, isolated);
+            console.log({ buff: texture.name, name, shaderType, 'buff iso?': texture.isolated, isolated, add });
             if (add) {
+                console.log('added ', texture.name);
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d<f32>;\n`;
                 bindingIndex += 1;
             }

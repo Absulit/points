@@ -32,7 +32,7 @@ const renderpasses1 = {
         points.addRenderPass(RenderPasses.GRAYSCALE);
         // points.addRenderPass(RenderPasses.CHROMATIC_ABERRATION, { distance: .02 });
         // points.addRenderPass(RenderPasses.COLOR, { color: [.5, 1, 0, 1], blendAmount: .5 });
-        // points.addRenderPass(RenderPasses.PIXELATE);
+        points.addRenderPass(RenderPasses.PIXELATE);
         // points.addRenderPass(RenderPasses.LENS_DISTORTION);
         // points.addRenderPass(RenderPasses.FILM_GRAIN);
         // points.addRenderPass(RenderPasses.BLOOM);
