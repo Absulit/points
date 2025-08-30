@@ -1,4 +1,6 @@
 /* @ts-self-types="./points.d.ts" */
+import { RenderPass as RenderPass$1 } from 'points';
+
 /**
  * In different calls to the main {@link Points} class, it is used to
  * tell the library in what stage of the shaders the data to be sent.
@@ -43,9 +45,20 @@ class ShaderType {
 
  * // we pass the array of renderPasses
  * await points.init(renderPasses);
+ *
+ * @example
+ * // init param example
+ * const waves = new RenderPass(vertexShader, fragmentShader, null, 8, 8, 1, (points, params) => {
+ *     points.setSampler('renderpass_feedbackSampler', null);
+ *     points.setTexture2d('renderpass_feedbackTexture', true);
+ *     points.setUniform('waves_scale', params.scale || .45);
+ *     points.setUniform('waves_intensity', params.intensity || .03);
+ * });
+ * waves.required = ['scale', 'intensity'];
  */
 
 class RenderPass {
+    #index = null;
     #vertexShader;
     #computeShader;
     #fragmentShader;
@@ -57,7 +70,6 @@ class RenderPass {
     #bindGroupLayout = null;
     #bindGroupLayoutCompute = null;
     #entries = null;
-    #internal = false;
     #hasComputeShader;
     #hasVertexShader;
     #hasFragmentShader;
@@ -66,17 +78,30 @@ class RenderPass {
     #workgroupCountY;
     #workgroupCountZ;
 
+    #callback = null;
+    #required = null;
+
     /**
      * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
      * This is useful for PostProcessing.
      * @param {String} vertexShader  WGSL Vertex Shader in a String.
      * @param {String} fragmentShader  WGSL Fragment Shader in a String.
      * @param {String} computeShader  WGSL Compute Shader in a String.
+     * @param {String} workgroupCountX  Workgroup amount in X.
+     * @param {String} workgroupCountY  Workgroup amount in Y.
+     * @param {String} workgroupCountZ  Workgroup amount in Z.
+     * @param {function(points:Points, params:Object):void} init Method to add custom
+     * uniforms or storage (points.set* methods).
+     * This is made for post processing multiple `RenderPass`.
+     * The method `init` will be called to initialize the buffer parameters.
+     *
      */
-    constructor(vertexShader, fragmentShader, computeShader, workgroupCountX, workgroupCountY, workgroupCountZ) {
+    constructor(vertexShader, fragmentShader, computeShader, workgroupCountX, workgroupCountY, workgroupCountZ, init) {
         this.#vertexShader = vertexShader;
         this.#computeShader = computeShader;
         this.#fragmentShader = fragmentShader;
+
+        this.#callback = init;
 
         this.#compiledShaders = {
             vertex: '',
@@ -97,15 +122,16 @@ class RenderPass {
     }
 
     /**
-     * To use with {link RenderPasses} so it's internal
-     * @ignore
+     * Get the current RenderPass index order in the pipeline.
+     * When you add a RenderPass to the constructor or via
+     * {@link Points#addRenderPass}, this is the order it receives.
      */
-    get internal() {
-        return this.#internal;
+    get index() {
+        return this.#index;
     }
 
-    set internal(value) {
-        this.#internal = value;
+    set index(value) {
+        this.#index = value;
     }
 
     /**
@@ -204,16 +230,53 @@ class RenderPass {
         return this.#hasVertexAndFragmentShader;
     }
 
+    /**
+     * How many workgroups are in the X dimension.
+     */
     get workgroupCountX() {
         return this.#workgroupCountX;
     }
 
+    /**
+     * How many workgroups are in the Y dimension.
+     */
     get workgroupCountY() {
         return this.#workgroupCountY;
     }
 
+    /**
+     * How many workgroups are in the Z dimension.
+     */
     get workgroupCountZ() {
         return this.#workgroupCountZ;
+    }
+
+    /**
+     * Function where the `init` parameter (set in the constructor) is executed
+     * and this call will pass the parameters that the RenderPass
+     * requires to run.
+     * @param {Points} points instance of {@link Points} to call set* functions
+     * like {@link Points#setUniform}  and others.
+     * @param {Object} params data that can be assigned to the RenderPass when
+     * the {@link Points#addRenderPass} method is called.
+     */
+    init(points, params) {
+        params ||= {};
+        this.#callback?.(points, params);
+    }
+
+    get required(){
+        return this.#required;
+    }
+    /**
+     * List of buffer names that are required for this RenderPass so if it shows
+     * them in the console.
+     * @param {Array<String>} val names of the parameters `params` in
+     * {@link RenderPass#setInit} that are required.
+     * This is only  used for a post processing RenderPass.
+     */
+    set required(val){
+        this.#required = val;
     }
 }
 
@@ -320,7 +383,7 @@ fn texturePosition(texture:texture_2d<f32>, aSampler:sampler, position:vec2f, uv
     var rgbaImage = textureSample(texture, aSampler, imageUV);
 
     // e.g. if uv.x < 0. OR uv.y < 0. || uv.x > imageRatio.x OR uv.y > imageRatio.y
-    if (crop && (any(uv < vec2(0.0)) || any(uv > imageRatio))) {
+    if (crop && (any(uv < position) || any(uv > position + imageRatio))) {
         rgbaImage = vec4(0.);
     }
 
@@ -362,7 +425,7 @@ fn pixelateTexturePosition(texture:texture_2d<f32>, textureSampler:sampler, posi
 
 const frag$8 = /*wgsl*/`
 
-${texturePosition}
+${texture}
 
 @fragment
 fn main(
@@ -374,32 +437,20 @@ fn main(
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
 
-    let imageColor = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0., 0), uvr, true);
-    let colorParam = vec4(params.color_r, params.color_g, params.color_b, params.color_a);
-    let finalColor:vec4f = (imageColor + colorParam) * params.color_blendAmount;
+    let imageColor = texture(renderpass_feedbackTexture, renderpass_feedbackSampler, uvr, true);
+    let finalColor = (imageColor + params.color_color) * params.color_blendAmount;
 
     return finalColor;
 }
 `;
 
-const color = {
-    vertexShader: vert$8,
-    fragmentShader: frag$8,
-    init: async (points, params) => {
-        points._setInternal(true);
-        points.setSampler('renderpass_feedbackSampler', null);
-        points.setTexture2d('renderpass_feedbackTexture', true);
-        points.setUniform('color_blendAmount', params?.blendAmount || .5);
-        points.setUniform('color_r', params?.color[0] || 1);
-        points.setUniform('color_g', params?.color[1] || 1);
-        points.setUniform('color_b', params?.color[2] || 0);
-        points.setUniform('color_a', params?.color[3] || 1);
-        points._setInternal(false);
-    },
-    update: points => {
-
-    }
-};
+const color = new RenderPass$1(vert$8, frag$8, null, 8, 8, 1, (points, params) => {
+    points.setSampler('renderpass_feedbackSampler', null);
+    points.setTexture2d('renderpass_feedbackTexture', true);
+    points.setUniform('color_blendAmount', params.blendAmount || .5);
+    points.setUniform('color_color', params.color || [1, .75, .79, 1], 'vec4f');
+});
+color.required = ['color', 'blendAmount'];
 
 const vert$7 = /*wgsl*/`
 
@@ -557,19 +608,10 @@ fn main(
 }
 `;
 
-const grayscale = {
-    vertexShader: vert$7,
-    fragmentShader: frag$7,
-    init: async (points, params) => {
-        points._setInternal(true);
-        points.setSampler('renderpass_feedbackSampler', null);
-        points.setTexture2d('renderpass_feedbackTexture', true);
-        points._setInternal(false);
-    },
-    update: points => {
-
-    }
-};
+const grayscale = new RenderPass$1(vert$7, frag$7, null, 8, 8, 1, (points, params) => {
+    points.setSampler('renderpass_feedbackSampler', null);
+    points.setTexture2d('renderpass_feedbackTexture', true);
+});
 
 const vert$6 = /*wgsl*/`
 
@@ -615,20 +657,12 @@ fn main(
 }
 `;
 
-const chromaticAberration = {
-    vertexShader: vert$6,
-    fragmentShader: frag$6,
-    init: async (points, params) => {
-        points._setInternal(true);
-        points.setSampler('renderpass_feedbackSampler', null);
-        points.setTexture2d('renderpass_feedbackTexture', true);
-        points.setUniform('chromaticAberration_distance', params.distance);
-        points._setInternal(false);
-    },
-    update: points => {
-
-    }
-};
+const chromaticAberration = new RenderPass$1(vert$6, frag$6, null, 8, 8, 1, (points, params) => {
+    points.setSampler('renderpass_feedbackSampler', null);
+    points.setTexture2d('renderpass_feedbackTexture', true);
+    points.setUniform('chromaticAberration_distance', params.distance || .02);
+});
+chromaticAberration.required = ['distance'];
 
 const vert$5 = /*wgsl*/`
 
@@ -664,8 +698,8 @@ fn main(
         renderpass_feedbackTexture,
         renderpass_feedbackSampler,
         vec2(0.),
-        params.pixelate_pixelsWidth,
-        params.pixelate_pixelsHeight,
+        params.pixelate_pixelDims.x,
+        params.pixelate_pixelDims.y,
         uvr
     );
 
@@ -675,21 +709,12 @@ fn main(
 }
 `;
 
-const pixelate = {
-    vertexShader: vert$5,
-    fragmentShader: frag$5,
-    init: async (points, params) => {
-        points._setInternal(true);
-        points.setSampler('renderpass_feedbackSampler', null);
-        points.setTexture2d('renderpass_feedbackTexture', true);
-        points.setUniform('pixelate_pixelsWidth', params.pixelsWidth);
-        points.setUniform('pixelate_pixelsHeight', params.pixelsHeight);
-        points._setInternal(false);
-    },
-    update: points => {
-
-    }
-};
+const pixelate = new RenderPass$1(vert$5, frag$5, null, 8, 8, 1, (points, params) => {
+    points.setSampler('renderpass_feedbackSampler', null);
+    points.setTexture2d('renderpass_feedbackTexture', true);
+    points.setUniform('pixelate_pixelDims', params.pixelDimensions || [10, 10], 'vec2f');
+});
+pixelate.required = ['pixelDimensions'];
 
 const vert$4 = /*wgsl*/`
 
@@ -946,21 +971,13 @@ fn main(
 }
 `;
 
-const lensDistortion = {
-    vertexShader: vert$4,
-    fragmentShader: frag$4,
-    init: async (points, params) => {
-        points._setInternal(true);
-        points.setSampler('renderpass_feedbackSampler', null);
-        points.setTexture2d('renderpass_feedbackTexture', true);
-        points.setUniform('lensDistortion_amount', params?.amount || .4);
-        points.setUniform('lensDistortion_distance', params?.distance || .01);
-        points._setInternal(false);
-    },
-    update: async points => {
-
-    }
-};
+const lensDistortion = new RenderPass$1(vert$4, frag$4, null, 8, 8, 1, (points, params) => {
+    points.setSampler('renderpass_feedbackSampler', null);
+    points.setTexture2d('renderpass_feedbackTexture', true);
+    points.setUniform('lensDistortion_amount', params.amount || .4);
+    points.setUniform('lensDistortion_distance', params.distance || .01);
+});
+lensDistortion.required = ['amount', 'distance'];
 
 const vert$3 = /*wgsl*/`
 
@@ -1013,7 +1030,7 @@ fn rand() -> f32 {
 
 const frag$3 = /*wgsl*/`
 
-${texturePosition}
+${texture}
 ${rand}
 ${snoise}
 
@@ -1027,33 +1044,19 @@ fn main(
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
 
-
-    let imageColor = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0., 0), uvr, true);
+    let imageColor = texture(renderpass_feedbackTexture, renderpass_feedbackSampler, uvr, true);
 
     rand_seed = uvr + params.time;
 
-    var noise = rand();
-    noise = noise * .5 + .5;
-    let finalColor = (imageColor + imageColor * noise)  * .5;
-
-    return finalColor;
+    let noise = rand() * .5 + .5;
+    return (imageColor + imageColor * noise)  * .5;
 }
 `;
 
-const filmgrain = {
-    vertexShader: vert$3,
-    fragmentShader: frag$3,
-    init: async (points, params) => {
-        points._setInternal(true);
-        points.setSampler('renderpass_feedbackSampler', null);
-        points.setTexture2d('renderpass_feedbackTexture', true);
-        points._setInternal(false);
-
-    },
-    update: points => {
-
-    }
-};
+const filmgrain = new RenderPass$1(vert$3, frag$3, null, 8, 8, 1, (points, params) => {
+    points.setSampler('renderpass_feedbackSampler', null);
+    points.setTexture2d('renderpass_feedbackTexture', true);
+});
 
 const vert$2 = /*wgsl*/`
 
@@ -1099,27 +1102,13 @@ fn main(
 }
 `;
 
-const bloom = {
-    vertexShader: vert$2,
-    fragmentShader: frag$2,
-    /**
-     *
-     * @param {Points} points
-     * @param {*} params
-     */
-    init: async (points, params) => {
-        points._setInternal(true);
-        points.setSampler('renderpass_feedbackSampler', null);
-        points.setTexture2d('renderpass_feedbackTexture', true);
-        points.setUniform('bloom_amount', params?.amount || .5);
-        points.setUniform('bloom_iterations', params?.iterations || 2);
-        points._setInternal(false);
-
-    },
-    update: points => {
-
-    }
-};
+const bloom = new RenderPass$1(vert$2, frag$2, null, 8, 8, 1, (points, params) => {
+    points.setSampler('renderpass_feedbackSampler', null);
+    points.setTexture2d('renderpass_feedbackTexture', true);
+    points.setUniform('bloom_amount', params.amount || .5);
+    points.setUniform('bloom_iterations', params.iterations || 2);
+});
+bloom.required = ['amount', 'iterations'];
 
 const vert$1 = /*wgsl*/`
 
@@ -1203,39 +1192,26 @@ fn main(
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
 
-    let feedbackColor = blur9(
+    return blur9(
         renderpass_feedbackTexture,
         renderpass_feedbackSampler,
-        vec2(0.,0),
+        vec2(),
         uvr,
-        vec2(params.blur_resolution_x, params.blur_resolution_y), // resolution
-        rotateVector(vec2(params.blur_direction_x, params.blur_direction_y), params.blur_radians) // direction
+        params.blur_resolution, // resolution
+        rotateVector(params.blur_direction, params.blur_radians) // direction
     );
 
-    let finalColor = feedbackColor;
-
-    return finalColor;
 }
 `;
 
-const blur = {
-    vertexShader: vert$1,
-    fragmentShader: frag$1,
-    init: async (points, params) => {
-        points._setInternal(true);
-        points.setSampler('renderpass_feedbackSampler', null);
-        points.setTexture2d('renderpass_feedbackTexture', true);
-        points.setUniform('blur_resolution_x', params?.resolution[0] || 50);
-        points.setUniform('blur_resolution_y', params?.resolution[1] || 50);
-        points.setUniform('blur_direction_x', params?.direction[0] || .4);
-        points.setUniform('blur_direction_y', params?.direction[1] || .4);
-        points.setUniform('blur_radians', params?.radians || 0);
-        points._setInternal(false);
-    },
-    update: points => {
-
-    }
-};
+const blur = new RenderPass$1(vert$1, frag$1, null, 8, 8, 1, (points, params) => {
+    points.setSampler('renderpass_feedbackSampler', null);
+    points.setTexture2d('renderpass_feedbackTexture', true);
+    points.setUniform('blur_resolution', params.resolution || [50, 50], 'vec2f');
+    points.setUniform('blur_direction', params.direction || [.4, .4], 'vec2f');
+    points.setUniform('blur_radians', params.radians || 0);
+});
+blur.required = ['resolution', 'direction', 'radians'];
 
 const vert = /*wgsl*/`
 
@@ -1279,44 +1255,39 @@ fn main(
 }
 `;
 
-const waves = {
-    vertexShader: vert,
-    fragmentShader: frag,
-    init: async (points, params) => {
-        points._setInternal(true);
-        points.setSampler('renderpass_feedbackSampler', null);
-        points.setTexture2d('renderpass_feedbackTexture', true);
-        points.setUniform('waves_scale', params?.scale || .45);
-        points.setUniform('waves_intensity', params?.intensity || .03);
-        points._setInternal(false);
-    },
-    update: points => {
-
-    }
-};
+const waves = new RenderPass$1(vert, frag, null, 8, 8, 1, (points, params) => {
+    points.setSampler('renderpass_feedbackSampler', null);
+    points.setTexture2d('renderpass_feedbackTexture', true);
+    points.setUniform('waves_scale', params.scale || .45);
+    points.setUniform('waves_intensity', params.intensity || .03);
+});
+waves.required = ['scale', 'intensity'];
 
 /**
  * List of predefined Render Passes for Post Processing.
+ * Parameters required are shown as a warning in the JS console.
  * @class
  *
  * @example
  * import Points, { RenderPass, RenderPasses } from 'points';
  * const points = new Points('canvas');
  *
+ * // option 1: along with the RenderPasses pased into `Points.init()`
  * let renderPasses = [
  *     new RenderPass(vert1, frag1, compute1),
  *     new RenderPass(vert2, frag2, compute2)
  * ];
  *
- * RenderPasses.grayscale(points);
- * RenderPasses.chromaticAberration(points, .02);
- * RenderPasses.color(points, .5, 1, 0, 1, .5);
- * RenderPasses.pixelate(points, 10, 10);
- * RenderPasses.lensDistortion(points, .4, .01);
- * RenderPasses.filmgrain(points);
- * RenderPasses.bloom(points, .5);
- * RenderPasses.blur(points, 100, 100, .4, 0, 0.0);
- * RenderPasses.waves(points, .05, .03);
+ * // option 2: calling `points.addRenderPass()` method
+ * points.addRenderPass(RenderPasses.GRAYSCALE);
+ * points.addRenderPass(RenderPasses.CHROMATIC_ABERRATION, { distance: .02 });
+ * points.addRenderPass(RenderPasses.COLOR, { color: [.5, 1, 0, 1], blendAmount: .5 });
+ * points.addRenderPass(RenderPasses.PIXELATE);
+ * points.addRenderPass(RenderPasses.LENS_DISTORTION);
+ * points.addRenderPass(RenderPasses.FILM_GRAIN);
+ * points.addRenderPass(RenderPasses.BLOOM);
+ * points.addRenderPass(RenderPasses.BLUR, { resolution: [100, 100], direction: [.4, 0], radians: 0 });
+ * points.addRenderPass(RenderPasses.WAVES, { scale: .05 });
  *
  * await points.init(renderPasses);
  *
@@ -1328,144 +1299,60 @@ const waves = {
  * }
  */
 class RenderPasses {
-    static COLOR = 1;
-    static GRAYSCALE = 2;
-    static CHROMATIC_ABERRATION = 3;
-    static PIXELATE = 4;
-    static LENS_DISTORTION = 5;
-    static FILM_GRAIN = 6;
-    static BLOOM = 7;
-    static BLUR = 8;
-    static WAVES = 9;
-
-    static #LIST = {
-        1: color,
-        2: grayscale,
-        3: chromaticAberration,
-        4: pixelate,
-        5: lensDistortion,
-        6: filmgrain,
-        7: bloom,
-        8: blur,
-        9: waves,
-    };
-
     /**
-     * Adds a `RenderPass` from the `RenderPasses` list
-     * @param {Points} points References a `Points` instance
-     * @param {RenderPasses} renderPassId Select a static property from `RenderPasses`
-     * @param {Object} params An object with the params needed by the `RenderPass`
-     * @returns {Promise<void>}
+     * Apply a color {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.COLOR, { color: [.5, 1, 0, 1], blendAmount: .5 });
      */
-    static async add(points, renderPassId, params) {
-        if (points.renderPasses?.length) {
-            throw '`addPostRenderPass` should be called prior `Points.init()`';
-        }
-        let shaders = this.#LIST[renderPassId];
-        let renderPass = new RenderPass(shaders.vertexShader, shaders.fragmentShader, shaders.computeShader);
-        renderPass.internal = true;
-        points.addRenderPass(renderPass);
-        await shaders.init(points, params);
-    }
-
+    static COLOR = color;
     /**
-     * Color postprocessing
-     * @param {Points} points a `Points` reference
-     * @param {Number} r red
-     * @param {Number} g green
-     * @param {Number} b blue
-     * @param {Number} a alpha
-     * @param {Number} blendAmount how much you want to blend it from 0..1
-     * @returns {Promise<void>}
+     * Apply a grayscale {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.GRAYSCALE);
      */
-    static async color(points, r, g, b, a, blendAmount) {
-        return await RenderPasses.add(points, RenderPasses.COLOR, { color: [r, g, b, a], blendAmount });
-    }
-
+    static GRAYSCALE = grayscale;
     /**
-     * Grayscale postprocessing. Takes the brightness of an image and returns it; that makes the grayscale result.
-     * @param {Points} points a `Points` reference
-     * @returns {Promise<void>}
+     * Apply a chromatic aberration {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.CHROMATIC_ABERRATION, { distance: .02 });
      */
-    static async grayscale(points) {
-        return await RenderPasses.add(points, RenderPasses.GRAYSCALE);
-    }
-
+    static CHROMATIC_ABERRATION = chromaticAberration;
     /**
-     * Chromatic Aberration postprocessing. Color bleeds simulating a lens effect without distortion.
-     * @param {Points} points a `Points` reference
-     * @param {Number} distance from 0..1 how far the channels are visually apart from each other in the screen, but the value can be greater and negative
-     * @returns {Promise<void>}
+     * Apply a pixelation {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.PIXELATE);
      */
-    static async chromaticAberration(points, distance) {
-        return await RenderPasses.add(points, RenderPasses.CHROMATIC_ABERRATION, { distance });
-    }
-
+    static PIXELATE = pixelate;
     /**
-     * Pixelate postprocessing. It reduces the amount of pixels in the output preserving the scale.
-     * @param {Points} points a `Points` reference
-     * @param {Number} width width of the pixel in pixels
-     * @param {Number} height width of the pixel in pixels
-     * @returns {Promise<void>}
+     * Apply a lens distortion {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.LENS_DISTORTION);
      */
-    static async pixelate(points, width, height) {
-        return await RenderPasses.add(points, RenderPasses.PIXELATE, { pixelsWidth: width, pixelsHeight: height });
-    }
-
+    static LENS_DISTORTION = lensDistortion;
     /**
-     * Lens Distortion postprocessing. A fisheye distortion with chromatic aberration.
-     * @param {Points} points a `Points` reference
-     * @param {Number} amount positive or negative value on how distorted the image will be
-     * @param {Number} distance of chromatic aberration: from 0..1 how far the channels are visually apart from each other in the screen, but the value can be greater and negative
-     * @returns {Promise<void>}
+     * Apply a film grain {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.FILM_GRAIN);
      */
-    static async lensDistortion(points, amount, distance) {
-        return await RenderPasses.add(points, RenderPasses.LENS_DISTORTION, { amount, distance });
-    }
-
+    static FILM_GRAIN = filmgrain;
     /**
-     * Film grain postprocessing. White noise added to the output to simulate film irregularities.
-     * @param {Points} points a `Points` reference
-     * @returns {Promise<void>}
+     * Apply a bloom {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.BLOOM);
      */
-    static async filmgrain(points) {
-        return await RenderPasses.add(points, RenderPasses.FILM_GRAIN);
-    }
-
+    static BLOOM = bloom;
     /**
-     * Bloom postprocessing. Increases brightness of already bright areas to create a haze effect.
-     * @param {Points} points a `Points` reference
-     * @param {Number} amount how bright the effect will be
-     * @returns {Promise<void>}
+     * Apply a blur {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.BLUR, { resolution: [100, 100], direction: [.4, 0], radians: 0 });
      */
-    static async bloom(points, amount) {
-        return await RenderPasses.add(points, RenderPasses.BLOOM, { amount });
-    }
-
+    static BLUR = blur;
     /**
-     * Blur postprocessing. Softens an image by creating multiple samples.
-     * @param {Points} points a `Points` reference
-     * @param {Number} resolutionX Samples in X
-     * @param {Number} resolutionY Samples in Y
-     * @param {Number} directionX direction in X
-     * @param {Number} directionY directon in Y
-     * @param {Number} radians rotation in radians
-     * @returns {Promise<void>}
+     * Apply a waives noise {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.WAVES, { scale: .05 });
      */
-    static async blur(points, resolutionX, resolutionY, directionX, directionY, radians) {
-        return await RenderPasses.add(points, RenderPasses.BLUR, { resolution: [resolutionX, resolutionY], direction: [directionX, directionY], radians });
-    }
-
-    /**
-     * Waves postprocessing. Distorts the image with noise to create a water like effect.
-     * @param {Points} points a `Points` reference
-     * @param {Number} scale how big the wave noise is
-     * @param {Number} intensity a soft or hard effect
-     * @returns {Promise<void>}
-     */
-    static async waves(points, scale, intensity) {
-        return await RenderPasses.add(points, RenderPasses.WAVES, { scale, intensity });
-    }
+    static WAVES = waves;
 }
 
 /**
@@ -2446,7 +2333,6 @@ class Points {
     #postRenderPasses = [];
     #vertexBufferInfo = null;
     #buffer = null;
-    #internal = false;
     #presentationSize = null;
     #depthTexture = null;
     #vertexArray = [];
@@ -2506,7 +2392,7 @@ class Points {
             this.#originalCanvasWidth = this.#canvas.clientWidth;
             this.#originalCanvasHeigth = this.#canvas.clientHeight;
             window.addEventListener('resize', this.#resizeCanvasToFitWindow, false);
-            document.addEventListener("fullscreenchange", e => {
+            document.addEventListener('fullscreenchange', e => {
                 this.#fullscreen = !!document.fullscreenElement;
                 if (!this.#fullscreen && !this.#fitWindow) {
                     this.#resizeCanvasToDefault();
@@ -2534,22 +2420,29 @@ class Points {
     }
 
     #setScreenSize = () => {
+        // assigning size here because both sizes must match for the full screen
+        // this was not happening before the speed up refactor
+        this.#canvas.width = canvas.clientWidth;
+        this.#canvas.height = canvas.clientHeight;
+
         this.#presentationSize = [
             this.#canvas.clientWidth,
             this.#canvas.clientHeight,
         ];
         this.#context.configure({
+            label: '_context',
             device: this.#device,
             format: this.#presentationFormat,
             //size: this.#presentationSize,
-            width: this.#canvas.clientWidth,
-            height: this.#canvas.clientHeight,
+            width: this.#presentationSize[0],
+            height: this.#presentationSize[1],
             alphaMode: 'premultiplied',
             // Specify we want both RENDER_ATTACHMENT and COPY_SRC since we
             // will copy out of the swapchain texture.
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
         });
         this.#depthTexture = this.#device.createTexture({
+            label: '_depthTexture',
             size: this.#presentationSize,
             format: 'depth24plus',
             usage: GPUTextureUsage.RENDER_ATTACHMENT,
@@ -2610,8 +2503,7 @@ class Points {
             name: name,
             value: value,
             type: structName,
-            size: null,
-            internal: this.#internal
+            size: null
         };
         this.#uniforms.push(uniform);
         return uniform;
@@ -2668,8 +2560,7 @@ class Points {
             // structSize: null,
             shaderType: shaderType,
             read: read,
-            buffer: null,
-            internal: this.#internal
+            buffer: null
         };
         this.#storage.push(storage);
         return storage;
@@ -2733,8 +2624,7 @@ class Points {
             shaderType: shaderType,
             array: arrayData,
             buffer: null,
-            read: read,
-            internal: this.#internal
+            read: read
         };
         this.#storage.push(storage);
         return storage;
@@ -2779,8 +2669,7 @@ class Points {
                 structName: 'vec4f',
                 structSize: 16,
                 array: null,
-                buffer: null,
-                internal: this.#internal
+                buffer: null
             });
         }
     }
@@ -2834,8 +2723,7 @@ class Points {
             name: name,
             descriptor: descriptor,
             shaderType: shaderType,
-            resource: null,
-            internal: this.#internal
+            resource: null
         };
         this.#samplers.push(sampler);
         return sampler;
@@ -2850,6 +2738,9 @@ class Points {
      *
      * @param {String} name Name to call the texture in the shaders.
      * @param {boolean} copyCurrentTexture If you want the fragment output to be copied here.
+     * @param {String} shaderType To what {@link ShaderType} you want to exclusively use this variable.
+     * @param {Number} renderPassIndex If using `copyCurrentTexture`
+     * this tells which RenderPass it should get the data from. If not set then it will grab the last pass.
      * @returns {Object}
      *
      * @example
@@ -2871,12 +2762,11 @@ class Points {
             return exists;
         }
         const texture2d = {
-            name: name,
-            copyCurrentTexture: copyCurrentTexture,
-            shaderType: shaderType,
+            name,
+            copyCurrentTexture,
+            shaderType,
             texture: null,
-            renderPassIndex: renderPassIndex,
-            internal: this.#internal
+            renderPassIndex
         };
         this.#textures2d.push(texture2d);
         return texture2d;
@@ -2952,8 +2842,7 @@ class Points {
             texture: null,
             imageTexture: {
                 bitmap: imageBitmap
-            },
-            internal: this.#internal
+            }
         };
         this.#textures2d.push(texture2d);
         return texture2d;
@@ -2971,7 +2860,7 @@ class Points {
      * @param {String} path atlas to grab characters from, image address in a web server
      * @param {{x: number, y: number}} size size of a individual character e.g.: `{x:10, y:20}`
      * @param {Number} offset how many characters back or forward it must move to start
-     * @param {String} shaderType
+     * @param {String} shaderType To what {@link ShaderType} you want to exclusively use this variable.
      * @returns {Object}
      *
      * @example
@@ -3020,8 +2909,7 @@ class Points {
             texture: null,
             imageTextures: {
                 bitmaps: imageBitmaps
-            },
-            internal: this.#internal,
+            }
         });
     }
 
@@ -3054,8 +2942,7 @@ class Points {
         const textureExternal = {
             name: name,
             shaderType: shaderType,
-            video: video,
-            internal: this.#internal
+            video: video
         };
         this.#texturesExternal.push(textureExternal);
         return textureExternal;
@@ -3097,8 +2984,7 @@ class Points {
         const textureExternal = {
             name: name,
             shaderType: shaderType,
-            video: video,
-            internal: this.#internal
+            video: video
         };
         this.#texturesExternal.push(textureExternal);
         return textureExternal;
@@ -3175,8 +3061,7 @@ class Points {
         const texturesStorage2d = {
             name: name,
             shaderType: shaderType,
-            texture: null,
-            internal: this.#internal
+            texture: null
         };
         this.#texturesStorage2d.push(texturesStorage2d);
         return texturesStorage2d;
@@ -3184,11 +3069,15 @@ class Points {
 
     /**
      * Special texture where data can be written to it in the Compute Shader and
+     * read from in the Fragment Shader OR from a {@link RenderPass} to another.
+     * If you use writeIndex and readIndex it will share data between `RenderPasse`s
      * Is a one way communication method.
      * Ideal to store data to it in the Compute Shader and later visualize it in
      * the Fragment Shader.
-     * @param {string} computeName name of the variable in the compute shader
-     * @param {string} fragmentName name of the variable in the fragment shader
+     * @param {string} writeName name of the variable in the compute shader
+     * @param {string} readName name of the variable in the fragment shader
+     * @param {number} writeIndex RenderPass allowed to write into `outputTex`
+     * @param {number} readIndex RenderPass allowed to read from `computeTexture`
      * @param {Array<number, 2>} size dimensions of the texture, by default screen
      * size
      * @returns {Object}
@@ -3204,20 +3093,26 @@ class Points {
      * //// fragment
      * let value = texturePosition(computeTexture, imageSampler, position, uv, false);
      */
-    setBindingTexture(computeName, fragmentName, size) {
+    setBindingTexture(writeName, readName, writeIndex, readIndex, size) {
+        if ((Number.isInteger(writeIndex) && !Number.isInteger(readIndex)) || (!Number.isInteger(writeIndex) && Number.isInteger(readIndex))) {
+            throw 'The parameters writeIndex and readIndex must both be declared.';
+        }
+        const usesRenderPass = Number.isInteger(writeIndex) && Number.isInteger(readIndex);
         // TODO: validate that names don't exist already
         const bindingTexture = {
-            compute: {
-                name: computeName,
-                shaderType: ShaderType.COMPUTE
+            write: {
+                name: writeName,
+                shaderType: ShaderType.COMPUTE,
+                renderPassIndex: writeIndex
             },
-            fragment: {
-                name: fragmentName,
-                shaderType: ShaderType.FRAGMENT
+            read: {
+                name: readName,
+                shaderType: ShaderType.FRAGMENT,
+                renderPassIndex: readIndex
             },
             texture: null,
             size: size,
-            internal: this.#internal
+            usesRenderPass
         };
         this.#bindingTextures.push(bindingTexture);
         return bindingTexture;
@@ -3259,23 +3154,13 @@ class Points {
         );
         ++this.#events_ids;
     }
-    /**
-     * for internal use:
-     * to flag add* methods and variables as part of the RenderPasses
-     * @private
-     * @ignore
-     */
-    _setInternal(value) {
-        this.#internal = value;
-    }
+
     /**
      * @param {ShaderType} shaderType
-     * @param {boolean} internal
+     * @param {RenderPass} renderPass
      * @returns {String} string with bindings
      */
-    #createDynamicGroupBindings(shaderType, internal) {
-        // `internal` here is a flag for a custom pass
-        internal = internal || false;
+    #createDynamicGroupBindings(shaderType, { index: renderPassIndex }) {
         if (!shaderType) {
             throw '`ShaderType` is required';
         }
@@ -3287,8 +3172,7 @@ class Points {
             bindingIndex += 1;
         }
         this.#storage.forEach(storageItem => {
-            const internalCheck = internal == storageItem.internal;
-            if (!storageItem.shaderType && internalCheck || storageItem.shaderType == shaderType && internalCheck) {
+            if (!storageItem.shaderType || storageItem.shaderType == shaderType) {
                 const T = storageItem.structName;
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, read_write> ${storageItem.name}: ${T};\n`;
                 bindingIndex += 1;
@@ -3303,48 +3187,57 @@ class Points {
             }
         }
         this.#samplers.forEach((sampler, index) => {
-            const internalCheck = internal == sampler.internal;
-            if (!sampler.shaderType && internalCheck || sampler.shaderType == shaderType && internalCheck) {
+            if (!sampler.shaderType || sampler.shaderType == shaderType) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${sampler.name}: sampler;\n`;
                 bindingIndex += 1;
             }
         });
         this.#texturesStorage2d.forEach((texture, index) => {
-            const internalCheck = internal && texture.internal;
-            if (!texture.shaderType && internalCheck || texture.shaderType == shaderType && internalCheck) {
+            if (!texture.shaderType || texture.shaderType == shaderType) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_storage_2d<rgba8unorm, write>;\n`;
                 bindingIndex += 1;
             }
         });
         this.#textures2d.forEach((texture, index) => {
-            const internalCheck = internal == texture.internal;
-            if (!texture.shaderType && internalCheck || texture.shaderType == shaderType && internalCheck) {
+            if (!texture.shaderType || texture.shaderType == shaderType) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d<f32>;\n`;
                 bindingIndex += 1;
             }
         });
         this.#textures2dArray.forEach((texture, index) => {
-            const internalCheck = internal == texture.internal;
-            if (!texture.shaderType && internalCheck || texture.shaderType == shaderType && internalCheck) {
+            if (!texture.shaderType || texture.shaderType == shaderType) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d_array<f32>;\n`;
                 bindingIndex += 1;
             }
         });
         this.#texturesExternal.forEach(externalTexture => {
-            const internalCheck = internal == externalTexture.internal;
-            if (!externalTexture.shaderType && internalCheck || externalTexture.shaderType == shaderType && internalCheck) {
+            // const internalCheck = internal == externalTexture.internal;
+            if (!externalTexture.shaderType || externalTexture.shaderType == shaderType) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${externalTexture.name}: texture_external;\n`;
                 bindingIndex += 1;
             }
         });
+        // TODO: internalcheck can be a filter
         this.#bindingTextures.forEach(bindingTexture => {
-            const internalCheck = internal == bindingTexture.internal;
-            if (bindingTexture.compute.shaderType == shaderType && internalCheck) {
-                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.compute.name}: texture_storage_2d<rgba8unorm, write>;\n`;
+            const { usesRenderPass } = bindingTexture;
+            if (usesRenderPass) {
+                if (renderPassIndex === bindingTexture.write.renderPassIndex) {
+                    dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.write.name}: texture_storage_2d<rgba8unorm, write>;\n`;
+                    bindingIndex += 1;
+                }
+                if (renderPassIndex === bindingTexture.read.renderPassIndex) {
+                    dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.read.name}: texture_2d<f32>;\n`;
+                    bindingIndex += 1;
+                }
+
+                return;
+            }
+            if (bindingTexture.write.shaderType === shaderType) {
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.write.name}: texture_storage_2d<rgba8unorm, write>;\n`;
                 bindingIndex += 1;
             }
-            if (bindingTexture.fragment.shaderType == shaderType && internalCheck) {
-                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.fragment.name}: texture_2d<f32>;\n`;
+            if (bindingTexture.read.shaderType === shaderType) {
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.read.name}: texture_2d<f32>;\n`;
                 bindingIndex += 1;
             }
         });
@@ -3375,6 +3268,11 @@ class Points {
         this.#numRows = numRows;
     }
 
+    /**
+     *
+     * @param {RenderPass} renderPass
+     * @param {Number} index
+     */
     #compileRenderPass = (renderPass, index) => {
         let vertexShader = renderPass.vertexShader;
         let computeShader = renderPass.computeShader;
@@ -3393,12 +3291,13 @@ class Points {
         if (this.#uniforms.length) {
             dynamicStructParams = /*wgsl*/`struct Params {\n\t${dynamicStructParams}\n}\n`;
         }
+        renderPass.index = index;
         renderPass.hasVertexShader && (dynamicGroupBindingsVertex += dynamicStructParams);
         renderPass.hasComputeShader && (dynamicGroupBindingsCompute += dynamicStructParams);
         renderPass.hasFragmentShader && (dynamicGroupBindingsFragment += dynamicStructParams);
-        renderPass.hasVertexShader && (dynamicGroupBindingsVertex += this.#createDynamicGroupBindings(ShaderType.VERTEX, renderPass.internal));
-        renderPass.hasComputeShader && (dynamicGroupBindingsCompute += this.#createDynamicGroupBindings(ShaderType.COMPUTE, renderPass.internal));
-        dynamicGroupBindingsFragment += this.#createDynamicGroupBindings(ShaderType.FRAGMENT, renderPass.internal);
+        renderPass.hasVertexShader && (dynamicGroupBindingsVertex += this.#createDynamicGroupBindings(ShaderType.VERTEX, renderPass));
+        renderPass.hasComputeShader && (dynamicGroupBindingsCompute += this.#createDynamicGroupBindings(ShaderType.COMPUTE, renderPass));
+        dynamicGroupBindingsFragment += this.#createDynamicGroupBindings(ShaderType.FRAGMENT, renderPass);
         renderPass.hasVertexShader && (colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + defaultVertexBody + colorsVertWGSL);
         renderPass.hasComputeShader && (colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + colorsComputeWGSL);
         renderPass.hasFragmentShader && (colorsFragWGSL = dynamicGroupBindingsFragment + defaultStructs + colorsFragWGSL);
@@ -3465,6 +3364,8 @@ class Points {
         if (!hasComputeShaders && this.#bindingTextures.length) {
             throw ' `setBindingTexture` requires at least one Compute Shader in a `RenderPass`'
         }
+
+        this.#renderPasses.forEach( r => r.init?.(this));
         this.#renderPasses.forEach(this.#compileRenderPass);
         this.#generateDataSize();
         //
@@ -3509,13 +3410,27 @@ class Points {
     }
 
     /**
-     * Mainly to be used with {@link RenderPasses}<br>
      * Injects a render pass after all the render passes added by the user.
      * @param {RenderPass} renderPass
-     * @ignore
+     * @param {Object} params
      */
-    addRenderPass(renderPass) {
-        this.#postRenderPasses.push(renderPass);
+    addRenderPass(renderPass, params) {
+        if (this.renderPasses?.length) {
+            throw '`addPostRenderPass` should be called prior `Points.init()`';
+        }
+
+        params ||= {};
+
+        const requiredNotFound = renderPass.required?.filter(i => !params[i] && !Number.isInteger(params[i]));
+
+        if(requiredNotFound?.length){
+            const paramsRequired = requiredNotFound.join(', ');
+            console.warn(`addRenderPass: parameters required: ${paramsRequired}`);
+        }
+
+        const { vertexShader: v, fragmentShader: f, computeShader: c } = renderPass;
+        this.#postRenderPasses.push(new RenderPass(v, f, c));
+        renderPass.init(this, params);
     }
 
     /**
@@ -3796,7 +3711,8 @@ class Points {
     #createComputeBindGroup() {
         this.#renderPasses.forEach((renderPass, index) => {
             if (renderPass.hasComputeShader) {
-                const entries = this.#createEntries(ShaderType.COMPUTE);
+                const entries = this.#createEntries(ShaderType.COMPUTE, renderPass);
+
                 if (entries.length) {
                     const bglEntries = [];
                     entries.forEach((entry, index) => {
@@ -3837,8 +3753,8 @@ class Points {
      * is not being updated at all. I have to make the createBindGroup call
      * only if the texture is updated.
      */
-    #passComputeBindingGroup(renderPass){
-        const entries = this.#createEntries(ShaderType.COMPUTE);
+    #passComputeBindingGroup(renderPass) {
+        const entries = this.#createEntries(ShaderType.COMPUTE, renderPass);
         if (entries.length) {
             renderPass.entries = entries;
             /**
@@ -3959,7 +3875,7 @@ class Points {
      * Creates the entries for the pipeline
      * @returns an array with the entries
      */
-    #createEntries(shaderType, internal) {
+    #createEntries(shaderType, { internal, index: renderPassIndex }) {
         internal = internal || false;
         let entries = [];
         let bindingIndex = 0;
@@ -3980,8 +3896,7 @@ class Points {
         }
         if (this.#storage.length) {
             this.#storage.forEach(storageItem => {
-                let internalCheck = internal == storageItem.internal;
-                if (!storageItem.shaderType && internalCheck || storageItem.shaderType == shaderType && internalCheck) {
+                if (!storageItem.shaderType || storageItem.shaderType == shaderType) {
                     entries.push(
                         {
                             binding: bindingIndex++,
@@ -4017,8 +3932,7 @@ class Points {
         }
         if (this.#samplers.length) {
             this.#samplers.forEach((sampler, index) => {
-                let internalCheck = internal == sampler.internal;
-                if (!sampler.shaderType && internalCheck || sampler.shaderType == shaderType && internalCheck) {
+                if (!sampler.shaderType || sampler.shaderType == shaderType) {
                     entries.push(
                         {
                             binding: bindingIndex++,
@@ -4034,8 +3948,7 @@ class Points {
         }
         if (this.#texturesStorage2d.length) {
             this.#texturesStorage2d.forEach((textureStorage2d, index) => {
-                let internalCheck = internal == textureStorage2d.internal;
-                if (!textureStorage2d.shaderType && internalCheck || textureStorage2d.shaderType == shaderType && internalCheck) {
+                if (!textureStorage2d.shaderType || textureStorage2d.shaderType == shaderType) {
                     entries.push(
                         {
                             label: 'texture storage 2d',
@@ -4052,8 +3965,7 @@ class Points {
         }
         if (this.#textures2d.length) {
             this.#textures2d.forEach((texture2d, index) => {
-                let internalCheck = internal == texture2d.internal;
-                if (!texture2d.shaderType && internalCheck || texture2d.shaderType == shaderType && internalCheck) {
+                if (!texture2d.shaderType || texture2d.shaderType == shaderType) {
                     entries.push(
                         {
                             label: 'texture 2d',
@@ -4070,8 +3982,7 @@ class Points {
         }
         if (this.#textures2dArray.length) {
             this.#textures2dArray.forEach((texture2dArray, index) => {
-                let internalCheck = internal == texture2dArray.internal;
-                if (!texture2dArray.shaderType && internalCheck || texture2dArray.shaderType == shaderType && internalCheck) {
+                if (!texture2dArray.shaderType || texture2dArray.shaderType == shaderType) {
                     entries.push(
                         {
                             label: 'texture 2d array',
@@ -4093,8 +4004,7 @@ class Points {
         }
         if (this.#texturesExternal.length) {
             this.#texturesExternal.forEach(externalTexture => {
-                let internalCheck = internal == externalTexture.internal;
-                if (!externalTexture.shaderType && internalCheck || externalTexture.shaderType == shaderType && internalCheck) {
+                if (!externalTexture.shaderType || externalTexture.shaderType == shaderType) {
                     entries.push(
                         {
                             label: 'external texture',
@@ -4109,13 +4019,29 @@ class Points {
                 }
             });
         }
-        if (this.#bindingTextures.length) {
-            this.#bindingTextures.forEach(bindingTexture => {
-                let internalCheck = internal == bindingTexture.internal;
-                if (bindingTexture.compute.shaderType == shaderType && internalCheck) {
+        // TODO: repeated entry blocks
+        // TODO: internalcheck can be filtered
+        this.#bindingTextures.forEach(bindingTexture => {
+
+            const { usesRenderPass } = bindingTexture;
+            if (usesRenderPass) {
+                if (bindingTexture.read.renderPassIndex === renderPassIndex) {
                     entries.push(
                         {
-                            label: 'binding texture',
+                            label: `binding texture 2: name: ${bindingTexture.read.name}`,
+                            binding: bindingIndex++,
+                            resource: bindingTexture.texture.createView(),
+                            type: {
+                                name: 'texture',
+                                type: 'float'
+                            }
+                        }
+                    );
+                }
+                if (bindingTexture.write.renderPassIndex === renderPassIndex) {
+                    entries.push(
+                        {
+                            label: `binding texture: name: ${bindingTexture.write.name}`,
                             binding: bindingIndex++,
                             resource: bindingTexture.texture.createView(),
                             type: {
@@ -4126,30 +4052,47 @@ class Points {
                         }
                     );
                 }
-            });
-            this.#bindingTextures.forEach(bindingTexture => {
-                const internalCheck = internal == bindingTexture.internal;
-                if (bindingTexture.fragment.shaderType == shaderType && internalCheck) {
-                    entries.push(
-                        {
-                            label: 'binding texture 2',
-                            binding: bindingIndex++,
-                            resource: bindingTexture.texture.createView(),
-                            type: {
-                                name: 'texture',
-                                type: 'float'
-                            }
+                return;
+            }
+
+            if (bindingTexture.read.shaderType == shaderType) {
+                entries.push(
+                    {
+                        label: `binding texture 2: name: ${bindingTexture.read.name}`,
+                        binding: bindingIndex++,
+                        resource: bindingTexture.texture.createView(),
+                        type: {
+                            name: 'texture',
+                            type: 'float'
                         }
-                    );
-                }
-            });
-        }
+                    }
+                );
+            }
+
+            if (bindingTexture.write.shaderType == shaderType) {
+                entries.push(
+                    {
+                        label: `binding texture: name: ${bindingTexture.write.name}`,
+                        binding: bindingIndex++,
+                        resource: bindingTexture.texture.createView(),
+                        type: {
+                            name: 'storageTexture',
+                            type: 'write-only',
+                            format: 'rgba8unorm'
+                        }
+                    }
+                );
+            }
+
+
+        });
+
         return entries;
     }
 
     #createParams() {
         this.#renderPasses.forEach(renderPass => {
-            const entries = this.#createEntries(ShaderType.FRAGMENT, renderPass.internal);
+            const entries = this.#createEntries(ShaderType.FRAGMENT, renderPass);
             if (entries.length) {
                 let bglEntries = [];
                 entries.forEach((entry, index) => {
@@ -4158,6 +4101,9 @@ class Points {
                         visibility: GPUShaderStage.FRAGMENT
                     };
                     bglEntry[entry.type.name] = { 'type': entry.type.type };
+                    if (entry.type.format) {
+                        bglEntry[entry.type.name].format = entry.type.format;
+                    }
                     if (entry.type.viewDimension) {
                         bglEntry[entry.type.name].viewDimension = entry.type.viewDimension;
                     }
@@ -4194,7 +4140,7 @@ class Points {
      * only if the texture is updated.
      */
     #passParams(renderPass) {
-        const entries = this.#createEntries(ShaderType.FRAGMENT, renderPass.internal);
+        const entries = this.#createEntries(ShaderType.FRAGMENT, renderPass);
         if (entries.length) {
             renderPass.entries = entries;
             renderPass.uniformBindGroup = this.#device.createBindGroup({
@@ -4255,7 +4201,7 @@ class Points {
         this.#renderPassDescriptor.colorAttachments[0].view = swapChainTexture.createView();
         this.#renderPassDescriptor.depthStencilAttachment.view = this.#depthTexture.createView();
 
-        this.#renderPasses.forEach((renderPass, renderPassIndex) => {
+        this.#renderPasses.forEach(renderPass => {
             if (renderPass.hasVertexAndFragmentShader) {
                 this.#passParams(renderPass);
                 const passEncoder = commandEncoder.beginRenderPass(this.#renderPassDescriptor);
@@ -4276,7 +4222,7 @@ class Points {
                 passEncoder.end();
                 // Copy the rendering results from the swapchain into |texture2d.texture|.
                 this.#textures2d.forEach(texture2d => {
-                    if (texture2d.renderPassIndex === renderPassIndex || !texture2d.renderPassIndex) {
+                    if (texture2d.renderPassIndex === renderPass.index || !texture2d.renderPassIndex) {
                         if (texture2d.copyCurrentTexture) {
                             commandEncoder.copyTextureToTexture(
                                 {
@@ -4321,18 +4267,16 @@ class Points {
             }
         });
 
-        if (this.#readStorage.length) {
-            this.#readStorage.forEach(readStorageItem => {
-                let storageItem = this.#storage.find(storageItem => storageItem.name === readStorageItem.name);
-                commandEncoder.copyBufferToBuffer(
-                    storageItem.buffer /* source buffer */,
-                    0 /* source offset */,
-                    readStorageItem.buffer /* destination buffer */,
-                    0 /* destination offset */,
-                    readStorageItem.buffer.size /* size */
-                );
-            });
-        }
+        this.#readStorage.forEach(readStorageItem => {
+            let storageItem = this.#storage.find(storageItem => storageItem.name === readStorageItem.name);
+            commandEncoder.copyBufferToBuffer(
+                storageItem.buffer /* source buffer */,
+                0 /* source offset */,
+                readStorageItem.buffer /* destination buffer */,
+                0 /* destination offset */,
+                readStorageItem.buffer.size /* size */
+            );
+        });
         // ---------------------
         this.#commandsFinished.push(commandEncoder.finish());
         this.#device.queue.submit(this.#commandsFinished);

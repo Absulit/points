@@ -12,26 +12,29 @@ import RenderPass from './RenderPass.js';
 
 /**
  * List of predefined Render Passes for Post Processing.
+ * Parameters required are shown as a warning in the JS console.
  * @class
  *
  * @example
  * import Points, { RenderPass, RenderPasses } from 'points';
  * const points = new Points('canvas');
  *
+ * // option 1: along with the RenderPasses pased into `Points.init()`
  * let renderPasses = [
  *     new RenderPass(vert1, frag1, compute1),
  *     new RenderPass(vert2, frag2, compute2)
  * ];
  *
- * RenderPasses.grayscale(points);
- * RenderPasses.chromaticAberration(points, .02);
- * RenderPasses.color(points, .5, 1, 0, 1, .5);
- * RenderPasses.pixelate(points, 10, 10);
- * RenderPasses.lensDistortion(points, .4, .01);
- * RenderPasses.filmgrain(points);
- * RenderPasses.bloom(points, .5);
- * RenderPasses.blur(points, 100, 100, .4, 0, 0.0);
- * RenderPasses.waves(points, .05, .03);
+ * // option 2: calling `points.addRenderPass()` method
+ * points.addRenderPass(RenderPasses.GRAYSCALE);
+ * points.addRenderPass(RenderPasses.CHROMATIC_ABERRATION, { distance: .02 });
+ * points.addRenderPass(RenderPasses.COLOR, { color: [.5, 1, 0, 1], blendAmount: .5 });
+ * points.addRenderPass(RenderPasses.PIXELATE);
+ * points.addRenderPass(RenderPasses.LENS_DISTORTION);
+ * points.addRenderPass(RenderPasses.FILM_GRAIN);
+ * points.addRenderPass(RenderPasses.BLOOM);
+ * points.addRenderPass(RenderPasses.BLUR, { resolution: [100, 100], direction: [.4, 0], radians: 0 });
+ * points.addRenderPass(RenderPasses.WAVES, { scale: .05 });
  *
  * await points.init(renderPasses);
  *
@@ -43,114 +46,60 @@ import RenderPass from './RenderPass.js';
  * }
  */
 class RenderPasses {
+    /**
+     * Apply a color {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.COLOR, { color: [.5, 1, 0, 1], blendAmount: .5 });
+     */
     static COLOR = color;
+    /**
+     * Apply a grayscale {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.GRAYSCALE);
+     */
     static GRAYSCALE = grayscale;
+    /**
+     * Apply a chromatic aberration {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.CHROMATIC_ABERRATION, { distance: .02 });
+     */
     static CHROMATIC_ABERRATION = chromaticAberration;
+    /**
+     * Apply a pixelation {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.PIXELATE);
+     */
     static PIXELATE = pixelate;
+    /**
+     * Apply a lens distortion {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.LENS_DISTORTION);
+     */
     static LENS_DISTORTION = lensDistortion;
+    /**
+     * Apply a film grain {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.FILM_GRAIN);
+     */
     static FILM_GRAIN = filmgrain;
+    /**
+     * Apply a bloom {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.BLOOM);
+     */
     static BLOOM = bloom;
+    /**
+     * Apply a blur {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.BLUR, { resolution: [100, 100], direction: [.4, 0], radians: 0 });
+     */
     static BLUR = blur;
+    /**
+     * Apply a waives noise {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.WAVES, { scale: .05 });
+     */
     static WAVES = waves;
-
-    /**
-     * Color postprocessing
-     * @param {Points} points a `Points` reference
-     * @param {Number} r red
-     * @param {Number} g green
-     * @param {Number} b blue
-     * @param {Number} a alpha
-     * @param {Number} blendAmount how much you want to blend it from 0..1
-     * @returns {Promise<void>}
-     */
-    static async color(points, r, g, b, a, blendAmount) {
-        return await RenderPasses.add(points, RenderPasses.COLOR, { color: [r, g, b, a], blendAmount });
-    }
-
-    /**
-     * Grayscale postprocessing. Takes the brightness of an image and returns it; that makes the grayscale result.
-     * @param {Points} points a `Points` reference
-     * @returns {Promise<void>}
-     */
-    static async grayscale(points) {
-        return await RenderPasses.add(points, RenderPasses.GRAYSCALE);
-    }
-
-    /**
-     * Chromatic Aberration postprocessing. Color bleeds simulating a lens effect without distortion.
-     * @param {Points} points a `Points` reference
-     * @param {Number} distance from 0..1 how far the channels are visually apart from each other in the screen, but the value can be greater and negative
-     * @returns {Promise<void>}
-     */
-    static async chromaticAberration(points, distance) {
-        return await RenderPasses.add(points, RenderPasses.CHROMATIC_ABERRATION, { distance });
-    }
-
-    /**
-     * Pixelate postprocessing. It reduces the amount of pixels in the output preserving the scale.
-     * @param {Points} points a `Points` reference
-     * @param {Number} width width of the pixel in pixels
-     * @param {Number} height width of the pixel in pixels
-     * @returns {Promise<void>}
-     */
-    static async pixelate(points, width, height) {
-        return await RenderPasses.add(points, RenderPasses.PIXELATE, { pixelsWidth: width, pixelsHeight: height });
-    }
-
-    /**
-     * Lens Distortion postprocessing. A fisheye distortion with chromatic aberration.
-     * @param {Points} points a `Points` reference
-     * @param {Number} amount positive or negative value on how distorted the image will be
-     * @param {Number} distance of chromatic aberration: from 0..1 how far the channels are visually apart from each other in the screen, but the value can be greater and negative
-     * @returns {Promise<void>}
-     */
-    static async lensDistortion(points, amount, distance) {
-        return await RenderPasses.add(points, RenderPasses.LENS_DISTORTION, { amount, distance });
-    }
-
-    /**
-     * Film grain postprocessing. White noise added to the output to simulate film irregularities.
-     * @param {Points} points a `Points` reference
-     * @returns {Promise<void>}
-     */
-    static async filmgrain(points) {
-        return await RenderPasses.add(points, RenderPasses.FILM_GRAIN);
-    }
-
-    /**
-     * Bloom postprocessing. Increases brightness of already bright areas to create a haze effect.
-     * @param {Points} points a `Points` reference
-     * @param {Number} amount how bright the effect will be
-     * @returns {Promise<void>}
-     */
-    static async bloom(points, amount) {
-        return await RenderPasses.add(points, RenderPasses.BLOOM, { amount });
-    }
-
-    /**
-     * Blur postprocessing. Softens an image by creating multiple samples.
-     * @param {Points} points a `Points` reference
-     * @param {Number} resolutionX Samples in X
-     * @param {Number} resolutionY Samples in Y
-     * @param {Number} directionX direction in X
-     * @param {Number} directionY directon in Y
-     * @param {Number} radians rotation in radians
-     * @returns {Promise<void>}
-     */
-    static async blur(points, resolutionX, resolutionY, directionX, directionY, radians) {
-        return await RenderPasses.add(points, RenderPasses.BLUR, { resolution: [resolutionX, resolutionY], direction: [directionX, directionY], radians });
-    }
-
-    /**
-     * Waves postprocessing. Distorts the image with noise to create a water like effect.
-     * @param {Points} points a `Points` reference
-     * @param {Number} scale how big the wave noise is
-     * @param {Number} intensity a soft or hard effect
-     * @returns {Promise<void>}
-     */
-    static async waves(points, scale, intensity) {
-        return await RenderPasses.add(points, RenderPasses.WAVES, { scale, intensity });
-    }
 }
 
 export default RenderPasses;

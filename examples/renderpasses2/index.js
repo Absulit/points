@@ -24,8 +24,6 @@ const renderpasses1 = {
         // await points.setTextureImage('image', './../img/carmen_lyra_423x643.jpg');
         // await points.setTextureImage('image', './../img/old_king_600x600.jpg');
         await points.setTextureImage('image', './../img/absulit_800x800.jpg');
-        points.setSampler('feedbackSampler');
-        points.setTexture2d('feedbackTexture', true);
 
         points.addRenderPass(RenderPasses.GRAYSCALE);
         points.addRenderPass(RenderPasses.CHROMATIC_ABERRATION, { distance: .02 });
