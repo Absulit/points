@@ -124,7 +124,7 @@ shaderProjects
 
         menuSections.forEach(section => {
             const {name, el} = section;
-            if (item.tax.indexOf(name) !== -1) {
+            if (item.tax.split(' ').find(t => t === name)) {
                 el.appendChild(createListItem(item, index));
             }
         })
