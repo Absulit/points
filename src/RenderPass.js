@@ -220,8 +220,9 @@ class RenderPass {
     }
 
     /**
-     * Function where the `init` parameter is executed and this call will pass
-     * the parameters that the RenderPass requires to run.
+     * Function where the `init` parameter (set in the constructor) is executed
+     * and this call will pass the parameters that the RenderPass
+     * requires to run.
      * @param {Points} points
      * @param {Object} params
      */
