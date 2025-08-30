@@ -37,6 +37,7 @@ fn main(
     ) -> @location(0) vec4f {
 
     let center = vec2(.5) * ratio ;
+    let mouser = mouse * ratio;
     let startPosition = center * scaleDigits;
     let cellRatio =
         vec2(sizeF32.x / params.screen.x, sizeF32.y / params.screen.y) * ratio;
@@ -72,7 +73,7 @@ fn main(
     ).r;
 
     //let debugTop = showDebugCross(startPosition + cellRatio, YELLOW, uvr);
-    let debugPosition = mouse * ratio;
+    let debugPosition = mouser;
     let debugBottom = showDebugCross(debugPosition, RED, uvr);
 
     var finalColor = layer(layer(digits, digits2), debugBottom);
@@ -80,7 +81,7 @@ fn main(
     finalColor = sdfSmooth(finalColor);
     // -----------------------------------------------
     var scaleAnim = 8.;
-    var positionAnim = mouse*ratio / scaleAnim;
+    var positionAnim = mouser / scaleAnim;
     var indexAnim = u32(4 * fnusin(4.));
     let animColor = sprite(
         bobbles,
@@ -92,7 +93,7 @@ fn main(
     );
     // -----------------------------------------------
     scaleAnim = 10.;
-    positionAnim = (mouse+vec2(.1,0))*ratio / scaleAnim;
+    positionAnim = (mouser + vec2(.1, 0) * ratio) / scaleAnim;
     indexAnim = u32(51 * fract(params.time * .15));
     let animPenguin = sprite(
         penguin,
@@ -104,7 +105,7 @@ fn main(
     );
 
     let square = sdfSquare(
-        mouse * ratio + vec2(.3, 0.14),
+        mouser + vec2(.3, 0.14),
         .14,
         0.,
         0.,
