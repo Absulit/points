@@ -46,14 +46,41 @@ import RenderPass from './RenderPass.js';
  * }
  */
 class RenderPasses {
+    /**
+     * Apply a color {@link RenderPass}
+     */
     static COLOR = color;
+    /**
+     * Apply a grayscale {@link RenderPass}
+     */
     static GRAYSCALE = grayscale;
+    /**
+     * Apply a chromatic aberration {@link RenderPass}
+     */
     static CHROMATIC_ABERRATION = chromaticAberration;
+    /**
+     * Apply a pixelation {@link RenderPass}
+     */
     static PIXELATE = pixelate;
+    /**
+     * Apply a lens distortion {@link RenderPass}
+     */
     static LENS_DISTORTION = lensDistortion;
+    /**
+     * Apply a film grain {@link RenderPass}
+     */
     static FILM_GRAIN = filmgrain;
+    /**
+     * Apply a bloom {@link RenderPass}
+     */
     static BLOOM = bloom;
+    /**
+     * Apply a blur {@link RenderPass}
+     */
     static BLUR = blur;
+    /**
+     * Apply a waives noise {@link RenderPass}
+     */
     static WAVES = waves;
 }
 
