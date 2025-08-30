@@ -63,7 +63,7 @@ class RenderPass {
      * @param {String} workgroupCountZ  Workgroup amount in Z.
      * @param {function(points:Points, params:Object):void} init Method to add custom
      * uniforms or storage (points.set* methods).
-     * This is made for post processing `RenderPass`es
+     * This is made for post processing multiple `RenderPass`.
      * The method `init` will be called to initialize the buffer parameters.
      *
      */
@@ -226,8 +226,10 @@ class RenderPass {
      * Function where the `init` parameter (set in the constructor) is executed
      * and this call will pass the parameters that the RenderPass
      * requires to run.
-     * @param {Points} points
-     * @param {Object} params
+     * @param {Points} points instance of {@link Points} to call set* functions
+     * like {@link Points#setUniform}  and others.
+     * @param {Object} params data that can be assigned to the RenderPass when
+     * the {@link Points#addRenderPass} method is called.
      */
     init(points, params) {
         params ||= {};
@@ -238,6 +240,8 @@ class RenderPass {
         return this.#required;
     }
     /**
+     * List of buffer names that are required for this RenderPass so if it shows
+     * them in the console.
      * @param {Array<String>} val names of the parameters `params` in
      * {@link RenderPass#setInit} that are required.
      * This is only  used for a post processing RenderPass.

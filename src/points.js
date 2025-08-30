@@ -1,4 +1,3 @@
-'strict mode'
 import UniformKeys from './UniformKeys.js';
 import VertexBufferInfo from './VertexBufferInfo.js';
 import ShaderType from './ShaderType.js';
