@@ -21,14 +21,25 @@ declare class RenderPass {
      * @param {String} vertexShader  WGSL Vertex Shader in a String.
      * @param {String} fragmentShader  WGSL Fragment Shader in a String.
      * @param {String} computeShader  WGSL Compute Shader in a String.
+     * @param {String} workgroupCountX  Workgroup amount in X.
+     * @param {String} workgroupCountY  Workgroup amount in Y.
+     * @param {String} workgroupCountZ  Workgroup amount in Z.
+     * @param {(points:Points, params:Object)=>{}} init Method to add custom
+     * uniforms or storage (points.set* methods).
+     * This is made for post processing `RenderPass`es
+     * The method `init` will be called to initialize the variables.
+     *
+     * @example
+     * // init param example
+     * const grayscale = new RenderPass(vertexShader, fragmentShader);
+     * grayscale.setInit((points, params) => {
+     *     points.setSampler('renderpass_feedbackSampler', null);
+     *     points.setTexture2d('renderpass_feedbackTexture', true);
+     * });
      */
-    constructor(vertexShader: string, fragmentShader: string, computeShader: string, workgroupCountX: any, workgroupCountY: any, workgroupCountZ: any);
-    set internal(value: boolean);
-    /**
-     * To use with {link RenderPasses} so it's internal
-     * @ignore
-     */
-    get internal(): boolean;
+    constructor(vertexShader: string, fragmentShader: string, computeShader: string, workgroupCountX: string, workgroupCountY: string, workgroupCountZ: string, init: (points: Points, params: any) => {});
+    set index(value: any);
+    get index(): any;
     /**
      * get the vertex shader content
      */
@@ -64,8 +75,21 @@ declare class RenderPass {
     get hasVertexShader(): boolean;
     get hasFragmentShader(): boolean;
     get hasVertexAndFragmentShader(): boolean;
-    get workgroupCountX(): any;
-    get workgroupCountY(): any;
-    get workgroupCountZ(): any;
+    get workgroupCountX(): string | number;
+    get workgroupCountY(): string | number;
+    get workgroupCountZ(): string | number;
+    /**
+     *
+     * @param {Points} points
+     * @param {Object} params
+     */
+    init(points: Points, params: any): void;
+    /**
+     * @param {Array<String>} val names of the parameters `params` in
+     * {@link RenderPass#setInit} that are required.
+     * This is only  used for a post processing RenderPass.
+     */
+    set required(val: Array<string>);
+    get required(): Array<string>;
     #private;
 }

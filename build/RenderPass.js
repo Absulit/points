@@ -1,4 +1,6 @@
 /* @ts-self-types="./RenderPass.d.ts" */
+import 'points';
+
 /**
  * A RenderPass is a way to have a block of shaders to pass to your application pipeline and
  * these render passes will be executed in the order you pass them in the {@link Points#init} method.
@@ -16,6 +18,7 @@
  */
 
 class RenderPass {
+    #index = null;
     #vertexShader;
     #computeShader;
     #fragmentShader;
@@ -27,7 +30,6 @@ class RenderPass {
     #bindGroupLayout = null;
     #bindGroupLayoutCompute = null;
     #entries = null;
-    #internal = false;
     #hasComputeShader;
     #hasVertexShader;
     #hasFragmentShader;
@@ -36,17 +38,37 @@ class RenderPass {
     #workgroupCountY;
     #workgroupCountZ;
 
+    #callback = null;
+    #required = null;
+
     /**
      * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
      * This is useful for PostProcessing.
      * @param {String} vertexShader  WGSL Vertex Shader in a String.
      * @param {String} fragmentShader  WGSL Fragment Shader in a String.
      * @param {String} computeShader  WGSL Compute Shader in a String.
+     * @param {String} workgroupCountX  Workgroup amount in X.
+     * @param {String} workgroupCountY  Workgroup amount in Y.
+     * @param {String} workgroupCountZ  Workgroup amount in Z.
+     * @param {(points:Points, params:Object)=>{}} init Method to add custom
+     * uniforms or storage (points.set* methods).
+     * This is made for post processing `RenderPass`es
+     * The method `init` will be called to initialize the variables.
+     *
+     * @example
+     * // init param example
+     * const grayscale = new RenderPass(vertexShader, fragmentShader);
+     * grayscale.setInit((points, params) => {
+     *     points.setSampler('renderpass_feedbackSampler', null);
+     *     points.setTexture2d('renderpass_feedbackTexture', true);
+     * });
      */
-    constructor(vertexShader, fragmentShader, computeShader, workgroupCountX, workgroupCountY, workgroupCountZ) {
+    constructor(vertexShader, fragmentShader, computeShader, workgroupCountX, workgroupCountY, workgroupCountZ, init) {
         this.#vertexShader = vertexShader;
         this.#computeShader = computeShader;
         this.#fragmentShader = fragmentShader;
+
+        this.#callback = init;
 
         this.#compiledShaders = {
             vertex: '',
@@ -66,16 +88,12 @@ class RenderPass {
         Object.seal(this);
     }
 
-    /**
-     * To use with {link RenderPasses} so it's internal
-     * @ignore
-     */
-    get internal() {
-        return this.#internal;
+    get index() {
+        return this.#index;
     }
 
-    set internal(value) {
-        this.#internal = value;
+    set index(value) {
+        this.#index = value;
     }
 
     /**
@@ -184,6 +202,33 @@ class RenderPass {
 
     get workgroupCountZ() {
         return this.#workgroupCountZ;
+    }
+
+    // setInit(callback) {
+    //     this.#callback = callback;
+    // }
+
+    /**
+     *
+     * @param {Points} points
+     * @param {Object} params
+     */
+    init(points, params) {
+        params ||= {};
+        this.#callback?.(points, params);
+    }
+
+
+    get required(){
+        return this.#required;
+    }
+    /**
+     * @param {Array<String>} val names of the parameters `params` in
+     * {@link RenderPass#setInit} that are required.
+     * This is only  used for a post processing RenderPass.
+     */
+    set required(val){
+        this.#required = val;
     }
 }
 
