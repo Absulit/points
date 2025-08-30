@@ -37,7 +37,8 @@ fn main(
     ) -> @location(0) vec4f {
 
     let center = vec2(.5) * ratio ;
-    let mouser = mouse * ratio;
+    // start in center if mouse is not moving yet
+    let mouser = mix(mouse * ratio, center, select(0., 1., any(mouse == vec2f())));
     let startPosition = center * scaleDigits;
     let cellRatio =
         vec2(sizeF32.x / params.screen.x, sizeF32.y / params.screen.y) * ratio;
