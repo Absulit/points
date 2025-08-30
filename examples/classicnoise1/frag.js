@@ -1,9 +1,19 @@
 import { fnusin } from 'points/animation';
+import { cnoise } from 'points/classicnoise2d';
+import { BLUE, GREEN, layer, WHITE } from 'points/color';
+import { PI, rotateVector, TAU } from 'points/math';
 
 const frag = /*wgsl*/`
 
 ${fnusin}
-
+${cnoise}
+${rotateVector}
+${PI}
+${TAU}
+${BLUE}
+${WHITE}
+${GREEN}
+${layer}
 
 @fragment
 fn main(
@@ -15,13 +25,11 @@ fn main(
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
 
-    let cellSize = 20. + 10. * fnusin(1.);
-    let a = sin(uvr.x  * cellSize) * sin(uvr.y * cellSize);
-    let b = sin(uvr.x * uvr.y * 10. * 9.1 * .25 );
-    let c = fnusin(uvr.x * uvr.y * 10.);
-    let d = distance(a,b);
-    let f = d * uvr.x * uvr.y;
-    let finalColor:vec4f = vec4(a*d,f*c*a,f, 1.);
+    let globalScale = .5;
+    let n0 = cnoise(rotateVector(uvr + params.time * .01, TAU * .25 + params.time * .01) * 50 * globalScale) * .5 + .5;
+    let n1 = cnoise(rotateVector(uvr, TAU * .75 + params.time * .03) * 100 * globalScale) * .5 + .5;
+    let n2 = cnoise(rotateVector(uvr, TAU * .95 + params.time * .04) * 150 * globalScale) * .5 + .5;
+    let finalColor = layer(vec4f(0,.5,.5,1), layer(n0 * GREEN, layer(BLUE * n2, WHITE * n1)));
 
     return finalColor;
 }
