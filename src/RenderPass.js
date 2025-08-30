@@ -54,7 +54,7 @@ class RenderPass {
      * @param {(points:Points, params:Object)=>{}} init Method to add custom
      * uniforms or storage (points.set* methods).
      * This is made for post processing `RenderPass`es
-     * The method `init` will be called to initialize the variables.
+     * The method `init` will be called to initialize the buffer parameters.
      *
      * @example
      * // init param example
@@ -89,6 +89,11 @@ class RenderPass {
         Object.seal(this);
     }
 
+    /**
+     * Get the current RenderPass index order in the pipeline.
+     * When you add a RenderPass to the constructor or via
+     * {@link Points#addRenderPass}, this is the order it receives.
+     */
     get index() {
         return this.#index;
     }
@@ -193,24 +198,30 @@ class RenderPass {
         return this.#hasVertexAndFragmentShader;
     }
 
+    /**
+     * How many workgroups are in the X dimension.
+     */
     get workgroupCountX() {
         return this.#workgroupCountX;
     }
 
+    /**
+     * How many workgroups are in the Y dimension.
+     */
     get workgroupCountY() {
         return this.#workgroupCountY;
     }
 
+    /**
+     * How many workgroups are in the Z dimension.
+     */
     get workgroupCountZ() {
         return this.#workgroupCountZ;
     }
 
-    // setInit(callback) {
-    //     this.#callback = callback;
-    // }
-
     /**
-     *
+     * Function where the `init` parameter is executed and this call will pass
+     * the parameters that the RenderPass requires to run.
      * @param {Points} points
      * @param {Object} params
      */
@@ -218,7 +229,6 @@ class RenderPass {
         params ||= {};
         this.#callback?.(points, params);
     }
-
 
     get required(){
         return this.#required;
