@@ -29,6 +29,7 @@ const renderpasses1 = {
 
         // TODO: agregar documentación de nuevo parámetro isolated en set*
         // TODO: checl setAudio since it doesn't return a isolated
+        // original internal/isolated https://github.com/Absulit/points/commit/c87022d34908cb952fe0fd29b16c2dbd5950b371
         // points.addRenderPass(RenderPasses.GRAYSCALE);
         points.addRenderPass(RenderPasses.CHROMATIC_ABERRATION, { distance: .02 });
         // points.addRenderPass(RenderPasses.COLOR, { color: [.5, 1, 0, 1], blendAmount: .5 });
