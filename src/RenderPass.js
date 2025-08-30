@@ -16,6 +16,16 @@ import Points from "points";
 
  * // we pass the array of renderPasses
  * await points.init(renderPasses);
+ *
+ * @example
+ * // init param example
+ * const waves = new RenderPass(vertexShader, fragmentShader, null, 8, 8, 1, (points, params) => {
+ *     points.setSampler('renderpass_feedbackSampler', null);
+ *     points.setTexture2d('renderpass_feedbackTexture', true);
+ *     points.setUniform('waves_scale', params.scale || .45);
+ *     points.setUniform('waves_intensity', params.intensity || .03);
+ * });
+ * waves.required = ['scale', 'intensity'];
  */
 
 class RenderPass {
@@ -51,18 +61,11 @@ class RenderPass {
      * @param {String} workgroupCountX  Workgroup amount in X.
      * @param {String} workgroupCountY  Workgroup amount in Y.
      * @param {String} workgroupCountZ  Workgroup amount in Z.
-     * @param {(points:Points, params:Object)=>{}} init Method to add custom
+     * @param {function(points:Points, params:Object):void} init Method to add custom
      * uniforms or storage (points.set* methods).
      * This is made for post processing `RenderPass`es
      * The method `init` will be called to initialize the buffer parameters.
      *
-     * @example
-     * // init param example
-     * const grayscale = new RenderPass(vertexShader, fragmentShader);
-     * grayscale.setInit((points, params) => {
-     *     points.setSampler('renderpass_feedbackSampler', null);
-     *     points.setTexture2d('renderpass_feedbackTexture', true);
-     * });
      */
     constructor(vertexShader, fragmentShader, computeShader, workgroupCountX, workgroupCountY, workgroupCountZ, init) {
         this.#vertexShader = vertexShader;
