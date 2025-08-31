@@ -6,6 +6,27 @@ const mouseclickscroll1 = {
     frag,
     init: async points => {
         points.setStorage('variables', 'Variable');
+
+        const size = { x: 8, y: 22 };
+        await points.setTextureString(
+            'cta',
+            'Click and scroll',
+            './../img/inconsolata_regular_8x22.png',
+            size,
+            -32
+        );
+
+        const descriptor = {
+            addressModeU: 'clamp-to-edge',
+            addressModeV: 'clamp-to-edge',
+            magFilter: 'nearest',
+            minFilter: 'nearest',
+            mipmapFilter: 'nearest',
+            //maxAnisotropy: 10,
+        }
+
+        points.setSampler('imageSampler', descriptor);
+
     },
     update: points => {
 

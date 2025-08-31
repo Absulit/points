@@ -12,6 +12,8 @@ ${GREEN}
 ${YELLOW}
 ${texture}
 
+const SCALE = 2.;
+
 @fragment
 fn main(
     @location(0) color: vec4f,
@@ -25,6 +27,7 @@ fn main(
     if(params.mouseClick == 1.){
         click_event.updated = 1;
         // other actions
+        showMessage = 1.;
     }
 
     let feedbackColor = texture(feedbackTexture, imageSampler, uvr * vec2f(1, 1.01), true);
@@ -50,7 +53,20 @@ fn main(
     let circle3 = sdfCircle(center, result[2] * size, .0, uvr) * YELLOW;
     let circle4 = sdfCircle(center, result[3] * size, .0, uvr) * RED;
 
-    return  layer(feedbackColor * .9, layer(circle1, layer(circle2, layer(circle3, circle4))));
+    // click to play message
+    let dims = vec2f(textureDimensions(cta, 0));
+    // if you are using uvr you have to multiply by ratio
+    let imageWidth = dims / params.screen * ratio;
+    let halfImageWidth = imageWidth * .5 * SCALE;
+
+    let ctaColor = texture(
+        cta,
+        imageSampler,
+        (uvr / SCALE) - (center - halfImageWidth) / SCALE,
+        true
+    );
+
+    return  layer(feedbackColor * .9, layer(circle1, layer(circle2, layer(circle3, circle4)))) + ctaColor * (1 - showMessage);;
 }
 `;
 

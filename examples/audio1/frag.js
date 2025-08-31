@@ -1,5 +1,10 @@
+import { texture } from "points/image";
+
 const frag = /*wgsl*/`
 
+${texture}
+
+const SCALE = 2.;
 
 @fragment
 fn main(
@@ -16,9 +21,25 @@ fn main(
     if(params.mouseClick == 1.){
         click_event.updated = 1;
         // other actions
+        showMessage = 1.;
     }
 
-    return vec4f(audioX, 0, 0, 1);;
+    // click to play message
+    let center = vec2f(.5) * ratio;
+
+    let dims = vec2f(textureDimensions(cta, 0));
+    // if you are using uvr you have to multiply by ratio
+    let imageWidth = dims / params.screen * ratio;
+    let halfImageWidth = imageWidth * .5 * SCALE;
+
+    let ctaColor = texture(
+        cta,
+        imageSampler,
+        (uvr / SCALE) - (center - halfImageWidth) / SCALE,
+        true
+    );
+
+    return vec4f(audioX, 0, 0, 1) + ctaColor * (1 - showMessage);
 }
 `;
 

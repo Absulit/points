@@ -6,12 +6,7 @@ fn main(
     @builtin(workgroup_id) WorkGroupID: vec3<u32>,
     @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
 ) {
-    let r = params.randPosition;
-
-    textureStore(
-        outputTex,
-        vec2u(r * 800.), vec4f(1, params.sliderA, 0, 1)
-    );
+    let time = params.time;
 }
 `;
 
