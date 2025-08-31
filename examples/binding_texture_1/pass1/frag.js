@@ -1,11 +1,10 @@
 import { texture } from 'points/image';
-import { fnusin } from 'points/animation';
+import { layer } from 'points/color';
 
 const frag = /*wgsl*/`
 
-${fnusin}
 ${texture}
-
+${layer}
 
 @fragment
 fn main(
@@ -19,7 +18,10 @@ fn main(
 
     let renderLayer0Color = texture(renderLayer0, imageSampler, uvr, true);
     let bColor = texture(b, imageSampler, uvr, true);
-    let finalColor = renderLayer0Color + bColor * .1;
+    let finalColor = layer(
+        bColor,
+        vec4f(renderLayer0Color.rgb, renderLayer0Color.r)
+    );
 
     return finalColor;
 }

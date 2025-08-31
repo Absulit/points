@@ -10,7 +10,7 @@ import Points, { RenderPass } from 'points';
 const base = {
 
     renderPasses: [
-        new RenderPass(vert, frag, compute, 800,800,1),
+        new RenderPass(vert, frag, compute, 800, 800, 1),
         new RenderPass(vert, frag2, compute2),
     ],
     /**
