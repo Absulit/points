@@ -21,7 +21,6 @@ const random1 = {
     },
     update: points => {
         points.setUniform('randPosition', [Math.random(), Math.random()]);
-
         points.setUniform('sliderA', options.sliderA);
     }
 }
