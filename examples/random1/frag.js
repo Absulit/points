@@ -1,10 +1,10 @@
 import { fusin } from 'points/animation';
-import { texturePosition } from 'points/image';
+import { texture } from 'points/image';
 
 const frag = /*wgsl*/`
 
 ${fusin}
-${texturePosition}
+${texture}
 
 @fragment
 fn main(
@@ -16,21 +16,9 @@ fn main(
         @builtin(position) position: vec4f
     ) -> @location(0) vec4f {
 
+    let texColorCompute = texture(computeTexture, computeTextureSampler, uvr, false);
 
-    let startPosition = vec2(0.);
-    let texColorCompute = texturePosition(computeTexture, computeTextureSampler, startPosition, uvr, false);
-
-
-    let d = distance(uvr, vec2(.5 + .1 * fusin(2.), .5  + .1 * fusin(4.123)));
-    var c = 1.;
-    if(d > .1){
-        c = 0.;
-    }
-
-
-    let finalColor:vec4f = vec4(c) + texColorCompute;
-
-    return finalColor;
+    return texColorCompute;
 }
 `;
 
