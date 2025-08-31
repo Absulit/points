@@ -1,5 +1,6 @@
 import { sdfCircle } from 'points/sdf';
 import { GREEN, RED } from 'points/color';
+import { texture } from 'points/image';
 
 const frag = /*wgsl*/`
 
@@ -11,6 +12,9 @@ struct Variable{
 
 ${sdfCircle}
 ${RED + GREEN}
+${texture}
+
+const SCALE = 2.;
 
 @fragment
 fn main(
@@ -56,7 +60,23 @@ fn main(
         finalColor *= RED;
     }
 
-    return finalColor;
+    // click to play message
+    let center = vec2f(.5) * ratio;
+    let showMessage = select(0.,1, any(mouse * ratio <= vec2f()));
+
+    let dims = vec2f(textureDimensions(cta, 0));
+    // if you are using uvr you have to multiply by ratio
+    let imageWidth = dims / params.screen * ratio;
+    let halfImageWidth = imageWidth * .5 * SCALE;
+
+    let ctaColor = texture(
+        cta,
+        imageSampler,
+        (uvr / SCALE) - (center - halfImageWidth) / SCALE,
+        true
+    );
+
+    return finalColor + showMessage * ctaColor;
 }
 `;
 
