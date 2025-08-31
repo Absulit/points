@@ -30,6 +30,29 @@ const base = {
         points.setStorage('result', 'array<f32, 10>', 4);
         points.setSampler('imageSampler', null);
         points.setTexture2d('feedbackTexture', true);
+
+
+        points.setStorage('showMessage', 'f32');
+
+        const size = { x: 8, y: 22 };
+        await points.setTextureString(
+            'cta',
+            'Click to Play',
+            './../img/inconsolata_regular_8x22.png',
+            size,
+            -32
+        );
+
+        const descriptor = {
+            addressModeU: 'clamp-to-edge',
+            addressModeV: 'clamp-to-edge',
+            magFilter: 'nearest',
+            minFilter: 'nearest',
+            mipmapFilter: 'nearest',
+            //maxAnisotropy: 10,
+        }
+
+        points.setSampler('imageSampler', descriptor);
     },
     /**
      *

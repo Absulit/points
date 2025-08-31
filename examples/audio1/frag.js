@@ -6,7 +6,6 @@ ${texture}
 
 const SCALE = 2.;
 
-
 @fragment
 fn main(
     @location(0) color: vec4f,
@@ -25,6 +24,7 @@ fn main(
         showMessage = 1.;
     }
 
+    // click to play message
     let center = vec2f(.5) * ratio;
 
     let dims = vec2f(textureDimensions(cta, 0));

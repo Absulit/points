@@ -24,6 +24,7 @@ const base = {
         points.addEventListener('click_event', data => {
             audio.play();
         }, 4);
+
         points.setStorage('showMessage', 'f32');
 
         const size = { x: 8, y: 22 };
