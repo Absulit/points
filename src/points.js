@@ -1605,25 +1605,23 @@ class Points {
                 }
             );
         }
-        if (this.#storage.length) {
-            this.#storage.forEach(storageItem => {
-                if (!storageItem.shaderType || storageItem.shaderType == shaderType) {
-                    entries.push(
-                        {
-                            binding: bindingIndex++,
-                            resource: {
-                                label: 'storage',
-                                buffer: storageItem.buffer
-                            },
-                            type: {
-                                name: 'buffer',
-                                type: 'storage'
-                            }
+        this.#storage.forEach(storageItem => {
+            if (!storageItem.shaderType || storageItem.shaderType == shaderType) {
+                entries.push(
+                    {
+                        binding: bindingIndex++,
+                        resource: {
+                            label: 'storage',
+                            buffer: storageItem.buffer
+                        },
+                        type: {
+                            name: 'buffer',
+                            type: 'storage'
                         }
-                    );
-                }
-            });
-        }
+                    }
+                );
+            }
+        });
         if (this.#layers.length) {
             if (!this.#layers.shaderType || this.#layers.shaderType == shaderType) {
                 entries.push(
