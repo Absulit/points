@@ -26,7 +26,6 @@ const base = {
             audio.play();
         }, 4);
 
-
         points.setStorage('result', 'array<f32, 10>', 4);
         points.setSampler('imageSampler', null);
         points.setTexture2d('feedbackTexture', true);
@@ -43,19 +42,8 @@ const base = {
             -32
         );
 
-        const descriptor = {
-            addressModeU: 'clamp-to-edge',
-            addressModeV: 'clamp-to-edge',
-            magFilter: 'nearest',
-            minFilter: 'nearest',
-            mipmapFilter: 'nearest',
-            //maxAnisotropy: 10,
-        }
-
-        points.setSampler('imageSampler', descriptor);
     },
     /**
-     *
      * @param {Points} points
      */
     update: points => {
