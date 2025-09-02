@@ -287,7 +287,7 @@ class Points {
      * The difference with {@link Points#setStorage|setStorage} is that this can be initialized
      * with data.
      * @param {string} name Name that the Storage will have in the shader.
-     * @param {Uint8Array<ArrayBuffer>} arrayData array with the data that must match the struct.
+     * @param {Uint8Array<ArrayBuffer>|Array<Number>|Number} arrayData array with the data that must match the struct.
      * @param {string} structName Name of the struct already existing on the
      * shader. This will be the type of the Storage.
      * @param {boolean} read if this is going to be used to read data back.
@@ -323,6 +323,11 @@ class Points {
      */
     setStorageMap(name, arrayData, structName, read = false, shaderType = null) {
         const storageToUpdate = this.#nameExists(this.#storage, name)
+
+        if(!Array.isArray(arrayData) && arrayData.constructor !== Uint8Array){
+            arrayData = new Uint8Array([arrayData]);
+        }
+
         if (storageToUpdate) {
             storageToUpdate.array = arrayData;
             storageToUpdate.updated = true;
@@ -863,7 +868,7 @@ class Points {
     addEventListener(name, callback, structSize) {
         // TODO: remove structSize
         // this extra 4 is for the boolean flag in the Event struct
-        const data = new Uint8Array(Array(structSize + 4).fill(0));
+        const data = Array(structSize + 4).fill(0);
         this.setStorageMap(name, data, 'Event', true);
         this.#events.set(this.#events_ids,
             {
