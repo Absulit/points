@@ -325,9 +325,19 @@ class Points {
         const storageToUpdate = this.#nameExists(this.#storage, name)
         if (storageToUpdate) {
             storageToUpdate.array = arrayData;
+            storageToUpdate.updated = true;
             return storageToUpdate;
         }
+        // TODO document the stream feature
+        /**
+         * `updated` is set to true in data updates, but this is not true in
+         * something like audio, where the data streams and needs to be updated
+         * constantly, so if the storage map needs to be updated constantly then
+         * `stream` needs to be set to true.
+         */
         const storage = {
+            stream: false, // permanently updated as true
+            updated: true,
             mapped: true,
             name: name,
             structName: structName,
@@ -753,7 +763,7 @@ class Points {
         this.setStorageMap(name, data,
             // `array<f32, ${bufferLength}>`
             'Sound' // custom struct in defaultStructs.js
-        );
+        ).stream = true;
         // uniform that will have the data length as a quick reference
         this.setUniform(`${name}Length`, analyser.frequencyBinCount);
         sound.analyser = analyser;
@@ -1076,7 +1086,7 @@ class Points {
             throw ' `setBindingTexture` requires at least one Compute Shader in a `RenderPass`'
         }
 
-        this.#renderPasses.forEach( r => r.init?.(this));
+        this.#renderPasses.forEach(r => r.init?.(this));
         this.#renderPasses.forEach(this.#compileRenderPass);
         this.#generateDataSize();
         //
@@ -1134,7 +1144,7 @@ class Points {
 
         const requiredNotFound = renderPass.required?.filter(i => !params[i] && !Number.isInteger(params[i]));
 
-        if(requiredNotFound?.length){
+        if (requiredNotFound?.length) {
             const paramsRequired = requiredNotFound.join(', ');
             console.warn(`addRenderPass: parameters required: ${paramsRequired}`);
         }
@@ -1272,9 +1282,15 @@ class Points {
      */
     #writeStorages() {
         this.#storage.forEach(storageItem => {
-            if (storageItem.mapped) {
+            // since audio is something constant
+            // the stream flag allows to keep this write open
+            const { updated, stream } = storageItem;
+            if (storageItem.mapped && (updated || stream)) {
                 const values = new Float32Array(storageItem.array);
                 this.#writeBuffer(storageItem.buffer, values);
+                if (!stream) {
+                    storageItem.updated = false;
+                }
             }
         });
     }

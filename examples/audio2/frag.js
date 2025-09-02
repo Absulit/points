@@ -28,7 +28,7 @@ fn main(
     if(params.mouseClick == 1.){
         click_event.updated = 1;
         // other actions
-        showMessage = 1.;
+        showMessage = 0.;
     }
 
     let feedbackColor = texture(feedbackTexture, imageSampler, uvr * vec2f(1, 1.01), true);
@@ -65,7 +65,7 @@ fn main(
         imageSampler,
         (uvr / SCALE) - (center - halfImageWidth) / SCALE,
         true
-    ) * (1 - showMessage);
+    ) * showMessage;
 
     let layer0 = layer(circle3, circle4);
     let layer1 = layer(circle2, layer0);

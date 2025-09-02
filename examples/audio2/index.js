@@ -31,7 +31,7 @@ const base = {
         points.setTexture2d('feedbackTexture', true);
 
 
-        points.setStorage('showMessage', 'f32');
+        points.setStorageMap('showMessage', [1], 'f32');
 
         const size = { x: 8, y: 22 };
         await points.setTextureString(
