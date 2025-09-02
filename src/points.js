@@ -322,9 +322,9 @@ class Points {
      * resultMatrix.size = vec2(firstMatrix.size.x, secondMatrix.size.y);
      */
     setStorageMap(name, arrayData, structName, read = false, shaderType = null) {
-        const storageToUpdate = this.#nameExists(this.#storage, name)
+        const storageToUpdate = this.#nameExists(this.#storage, name);
 
-        if(!Array.isArray(arrayData) && arrayData.constructor !== Uint8Array){
+        if (!Array.isArray(arrayData) && arrayData.constructor !== Uint8Array) {
             arrayData = new Uint8Array([arrayData]);
         }
 
@@ -847,7 +847,7 @@ class Points {
      * Listens for an event dispatched from WGSL code
      * @param {String} name Number that represents an event Id
      * @param {Function} callback function to be called when the event occurs
-     * @param {Number} structSize size of the data to be returned
+     * @param {Number} structSize size of the array data to be returned
      *
      * @example
      * // js
@@ -858,6 +858,9 @@ class Points {
      *
      * // wgsl string
      *  if(params.mouseClick == 1.){
+     *      // we update our event response data with something we need
+     *      // on the js side
+     *      click_event.data[0] = params.time;
      *      // Same name of the Event
      *      // we fire the event with a 1
      *      // it will be set to 0 in the next frame
@@ -865,10 +868,10 @@ class Points {
      *  }
      *
      */
-    addEventListener(name, callback, structSize) {
+    addEventListener(name, callback, structSize = 1) {
         // TODO: remove structSize
-        // this extra 4 is for the boolean flag in the Event struct
-        const data = Array(structSize + 4).fill(0);
+        // this extra 1 is for the boolean flag in the Event struct
+        const data = Array().fill(0);
         this.setStorageMap(name, data, 'Event', true);
         this.#events.set(this.#events_ids,
             {
@@ -2021,11 +2024,16 @@ class Points {
     }
     async read() {
         for (const [key, event] of this.#events) {
-            let eventRead = await this.readStorage(event.name);
+            const { name } = event;
+            const eventRead = await this.readStorage(name);
             if (eventRead) {
-                let id = eventRead[0];
+                const id = eventRead[0];
                 if (id != 0) {
-                    event.callback && event.callback(eventRead.slice(1, -1));
+                    event?.callback(eventRead.slice(1, -1));
+                    const storageToUpdate = this.#nameExists(this.#storage, name);
+                    const data = storageToUpdate.array;
+                    data[0] = 0;
+                    this.setStorageMap(name, data);
                 }
             }
         }
