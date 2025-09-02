@@ -873,8 +873,8 @@ class Points {
         this.#events.set(this.#events_ids,
             {
                 id: this.#events_ids,
-                name: name,
-                callback: callback,
+                name,
+                callback,
             }
         );
         ++this.#events_ids;
