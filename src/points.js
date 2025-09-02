@@ -871,7 +871,7 @@ class Points {
     addEventListener(name, callback, structSize = 1) {
         // TODO: remove structSize
         // this extra 1 is for the boolean flag in the Event struct
-        const data = Array().fill(0);
+        const data = Array((structSize + 1) * 4).fill(0);
         this.setStorageMap(name, data, 'Event', true);
         this.#events.set(this.#events_ids,
             {
