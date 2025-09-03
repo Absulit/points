@@ -1,7 +1,7 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
-import Points from 'points';
+import Points, { RenderPass } from 'points';
 
 const options = {
     val: 0,
@@ -14,9 +14,9 @@ const options = {
 }
 
 const base = {
-    vert,
-    compute,
-    frag,
+    renderPasses: [
+        new RenderPass(vert, frag, compute, 800, 800, 1)
+    ],
     /**
      * @param {Points} points
      */
