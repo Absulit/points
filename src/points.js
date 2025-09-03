@@ -852,15 +852,19 @@ class Points {
      * @example
      * // js
      * // the event name will be reflected as a variable name in the shader
+     * // and a data variable that starts with the name
      * points.addEventListener('click_event', data => {
      *     // response action in JS
-     * }, 4);
+     *      const [a, b, c, d] = data;
+     *      console.log({a, b, c, d});
+     * }, 4); // data will have 4 items
      *
      * // wgsl string
      *  if(params.mouseClick == 1.){
      *      // we update our event response data with something we need
      *      // on the js side
-     *      click_event.data[0] = params.time;
+     *      // click_event_data has 4 items to fill
+     *      click_event_data[0] = params.time;
      *      // Same name of the Event
      *      // we fire the event with a 1
      *      // it will be set to 0 in the next frame
