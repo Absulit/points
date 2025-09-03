@@ -18,7 +18,6 @@ const base = {
     compute,
     frag,
     /**
-     *
      * @param {Points} points
      */
     init: async (points, folder) => {
@@ -39,7 +38,13 @@ const base = {
         folder.addColor(options, 'color5');
 
         folder.open();
+
+        points.setSampler('imageSampler', null);
+        await points.setTextureImage('image', './../img/absulit_800x800.jpg');
     },
+    /**
+     * @param {Points} points
+     */
     update: points => {
         points.setUniform('val', options.val);
     }
