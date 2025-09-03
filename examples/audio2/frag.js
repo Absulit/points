@@ -13,6 +13,7 @@ ${YELLOW}
 ${texture}
 
 const SCALE = 2.;
+const segmentNum = 4;
 
 @fragment
 fn main(
@@ -27,12 +28,12 @@ fn main(
     if(params.mouseClick == 1.){
         click_event.updated = 1;
         // other actions
-        showMessage = 1.;
+        showMessage = 0.;
     }
 
     let feedbackColor = texture(feedbackTexture, imageSampler, uvr * vec2f(1, 1.01), true);
 
-    let segmentNum = 4;
+
     let subSegmentLength = i32(params.audioLength) / segmentNum;
 
     for (var index = 0; index < segmentNum ; index++) {
@@ -64,9 +65,15 @@ fn main(
         imageSampler,
         (uvr / SCALE) - (center - halfImageWidth) / SCALE,
         true
-    );
+    ) * showMessage;
 
-    return  layer(feedbackColor * .9, layer(circle1, layer(circle2, layer(circle3, circle4)))) + ctaColor * (1 - showMessage);;
+    let layer0 = layer(circle3, circle4);
+    let layer1 = layer(circle2, layer0);
+    let layer2 = layer(circle1, layer1);
+    let layer3 = layer(feedbackColor * .9, layer2);
+    let layer4 = layer(layer3, vec4f(ctaColor.rgb, ctaColor.r));
+
+    return layer4;
 }
 `;
 
