@@ -35,8 +35,8 @@ fn main(
         right_blink.updated = 1u;
     }
 
-    let circleValue1 = sdfCircle(vec2f(.2,.5), .01 + f0 * .09, 0., uvr);
-    let circleValue2 = sdfCircle(vec2f(.8,.5), .01 + f1 * .09, 0., uvr);
+    let circleValue1 = sdfCircle(vec2f(.2,.5) * ratio, .01 + f0 * .09, 0., uvr);
+    let circleValue2 = sdfCircle(vec2f(.8,.5) * ratio, .01 + f1 * .09, 0., uvr);
 
     var circle1Color = circleValue1 * WHITE;
     var circle2Color = circleValue2 * WHITE;
