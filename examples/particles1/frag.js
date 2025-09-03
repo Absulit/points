@@ -1,8 +1,10 @@
-import { fnusin } from 'points/animation';
+import { texture } from 'points/image';
+import { structs } from './structs.js';
 
 const frag = /*wgsl*/`
 
-${fnusin}
+${structs}
+${texture}
 
 
 @fragment
@@ -16,7 +18,7 @@ fn main(
 ) -> @location(0) vec4f {
 
 
-    let finalColor:vec4f = vec4(.5);
+    let finalColor = texture(readTexture, imageSampler, uvr, true);
 
     return finalColor;
 }

@@ -6,5 +6,9 @@ struct Particle {
     direction: f32,
 }
 
+struct Variables {
+    init: u32,
+}
+
 `;
 

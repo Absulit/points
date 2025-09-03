@@ -1,4 +1,9 @@
+import { structs } from './structs.js';
+
 const compute = /*wgsl*/`
+
+${structs}
+
 
 @compute @workgroup_size(1,1,1)
 fn main(
@@ -7,6 +12,10 @@ fn main(
     @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
 ) {
 
+    let point = textureLoad(image, GlobalId.xy, 0); // image
+    // var point = textureLoad(image, GlobalId.xy); // video
+
+    textureStore(writeTexture, GlobalId.xy, point);
 }
 `;
 
