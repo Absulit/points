@@ -11,13 +11,13 @@ const base = {
      */
     init: async points => {
         points.addEventListener('left_blink', data => {
-            console.log('---- Left Circle');
-        }, 4);
+            console.log('---- Left Circle', data);
+        }, 2);
 
         points.addEventListener(
             'right_blink', // name of the event (and name of a storage)
             data => { // data returned after the event and callback
-                console.log('---- Right Circle');
+                console.log('---- Right Circle', data);
             },
             4 // size of the data to return
         );

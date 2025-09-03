@@ -871,8 +871,9 @@ class Points {
     addEventListener(name, callback, structSize = 1) {
         // TODO: remove structSize
         // this extra 1 is for the boolean flag in the Event struct
-        const data = Array((structSize + 1) * 4).fill(0);
+        const data = Array(4).fill(0);
         this.setStorageMap(name, data, 'Event', true);
+        this.setStorage(`${name}_data`, `array<f32, ${structSize}>`, true);
         this.#events.set(this.#events_ids,
             {
                 id: this.#events_ids,
@@ -2029,7 +2030,8 @@ class Points {
             if (eventRead) {
                 const id = eventRead[0];
                 if (id != 0) {
-                    event?.callback(eventRead.slice(1, -1));
+                    const dataRead = await this.readStorage(`${name}_data`)
+                    event?.callback(dataRead);
                     const storageToUpdate = this.#nameExists(this.#storage, name);
                     const data = storageToUpdate.array;
                     data[0] = 0;

@@ -24,14 +24,14 @@ fn main(
     // < ------------ TWO PULSATING CIRCLES
 
     if(f0 >= .9999){
-        left_blink.data[0] = 11.;
-        left_blink.data[1] = 22.;
+        left_blink_data[0] = 11.;
+        left_blink_data[1] = 22.;
         left_blink.updated = 1u;
     }
 
     if(f1 >= .9999){
-        right_blink.data[0] = 33.;
-        right_blink.data[1] = params.time;
+        right_blink_data[0] = 33.;
+        right_blink_data[1] = params.time;
         right_blink.updated = 1u;
     }
 
