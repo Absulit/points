@@ -51,6 +51,7 @@ class Points {
     #commandsFinished = [];
     #renderPassDescriptor = null;
     #uniforms = new UniformsArray();
+    #constants = [];
     #storage = [];
     #readStorage = [];
     #samplers = [];
@@ -230,6 +231,34 @@ class Points {
             }
             variable.value = uniform.value;
         })
+    }
+
+    /**
+     * Create a WGSL `const` initialized from JS.
+     * Useful to set a value you can't initialize in WGSL because you don't have
+     * the value yet.
+     * @param {String} name
+     * @param {string|Number} value
+     * @param {String} structName
+     * @returns
+     */
+    setConstant(name, value, structName){
+        const constantToUpdate = this.#nameExists(this.#constants, name);
+
+        if (constantToUpdate) {
+            // if name exists is an update
+            throw '`setConstant()` can\'t update a const after it has been set.';
+        }
+
+        const constant = {
+            name,
+            value,
+            structName,
+        }
+
+        this.#constants.push(constant);
+
+        return constant;
     }
 
     /**
