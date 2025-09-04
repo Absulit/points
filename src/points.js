@@ -1066,6 +1066,9 @@ class Points {
         if (this.#uniforms.length) {
             dynamicStructParams = /*wgsl*/`struct Params {\n\t${dynamicStructParams}\n}\n`;
         }
+        this.#constants.forEach(c => {
+            dynamicStructParams += /*wgsl*/`const ${c.name}:${c.structName} = ${c.value};\n`;
+        })
         renderPass.index = index;
         renderPass.hasVertexShader && (dynamicGroupBindingsVertex += dynamicStructParams);
         renderPass.hasComputeShader && (dynamicGroupBindingsCompute += dynamicStructParams);
