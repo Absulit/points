@@ -10,9 +10,5 @@ struct Particle {
     speed: f32,
 }
 
-struct Variables {
-    init: u32,
-}
-
 `;
 

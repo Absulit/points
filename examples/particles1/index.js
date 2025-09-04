@@ -28,9 +28,8 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
-        points.setStorage('variables', 'Variables');
         points.setStorage('particles', `array<Particle, ${numParticles}>`);
-        points.setUniform('numParticles', numParticles);
+        points.setConstant('NUMPARTICLES', numParticles, 'u32');
 
         points.setSampler('imageSampler', null);
         await points.setTextureImage('image', './../img/webgpu_800x800.png');
