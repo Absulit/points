@@ -1,7 +1,7 @@
 import vert from './vert.js';
 import compute0 from './r0/compute.js';
 import compute1 from './r1/compute.js';
-import frag0 from './r0/frag.js';
+import frag1 from './r1/frag.js';
 import Points, { RenderPass } from 'points';
 
 const options = {
@@ -20,7 +20,7 @@ const numParticles = WORKGROUP_X * WORKGROUP_Y * THREADS;
 const base = {
     renderPasses: [
         new RenderPass(vert, null, compute0, WORKGROUP_X, WORKGROUP_Y, 1),
-        new RenderPass(vert, frag0, compute1, 800, 800, 1)
+        new RenderPass(vert, frag1, compute1, 800, 800, 1)
     ],
     /**
      * @param {Points} points
