@@ -18,6 +18,28 @@ ${snoise}
 
 const SIZE = vec2f(800.,800.);
 const speed = 1.1; // .0001
+// const NUMPARTICLES = params.numParticles; // TODO add new method setConstant()
+
+fn particleInit(particles: ptr<storage, array<Particle,1048576>, read_write>, index:u32, wgid:vec3u) {
+    let particle = &particles[index];
+    rand_seed.x = f32(index) + .8945 + fract(params.time) + random() + f32(wgid.x);
+    rand();
+    let start_position = rand_seed.xy * SIZE;
+    rand();
+    let angle = TAU * rand_seed.y;
+
+    let particleColor = textureLoad(image, vec2i(start_position), 0); // image
+    // var point = textureLoad(image, GlobalId.xy); // video
+
+    rand();
+    (*particle).position = start_position;
+    (*particle).start_position = start_position;
+    (*particle).color = particleColor;
+    (*particle).angle = angle;
+    (*particle).life = 0;
+    (*particle).speed = rand_seed.x;
+}
+
 
 @compute @workgroup_size(256,1,1)
 fn main(
@@ -33,24 +55,25 @@ fn main(
     }
 
     if((*particle).init == 0){
-        // rand_seed.y = .019876544 + params.time;
-        rand_seed.x = f32(index) + .8945 + fract(params.time) + random() + f32(WorkGroupID.x);
-        rand();
-        let start_position = rand_seed.xy * SIZE;
-        rand();
-        let angle = TAU * rand_seed.y;
+        // // rand_seed.y = .019876544 + params.time;
+        // rand_seed.x = f32(index) + .8945 + fract(params.time) + random() + f32(WorkGroupID.x);
+        // rand();
+        // let start_position = rand_seed.xy * SIZE;
+        // rand();
+        // let angle = TAU * rand_seed.y;
 
-        let particleColor = textureLoad(image, vec2i(start_position), 0); // image
-        // var point = textureLoad(image, GlobalId.xy); // video
+        // let particleColor = textureLoad(image, vec2i(start_position), 0); // image
+        // // var point = textureLoad(image, GlobalId.xy); // video
 
-        rand();
-        (*particle).position = start_position;
-        (*particle).start_position = start_position;
-        (*particle).color = particleColor;
-        (*particle).angle = angle;
-        (*particle).life = 0;
-        (*particle).speed = rand_seed.x;
+        // rand();
+        // (*particle).position = start_position;
+        // (*particle).start_position = start_position;
+        // (*particle).color = particleColor;
+        // (*particle).angle = angle;
+        // (*particle).life = 0;
+        // (*particle).speed = rand_seed.x;
 
+        particleInit(&particles, index, WorkGroupID);
         (*particle).init = 1;
     }
 
