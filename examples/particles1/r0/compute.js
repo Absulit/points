@@ -71,7 +71,7 @@ fn main(
 
     let particle_position = (*particle).position;
     rand();
-    let life_limit = rand_seed.x * 32. + 1;
+    let life_limit = rand_seed.x * params.maxLife;
     if((*particle).life >= life_limit || any(particle_position > SIZE) || any(particle_position < vec2f()) || (*particle).color.a == 0.){
         particleInit(&particles, index, WorkGroupID);
     }

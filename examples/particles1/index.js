@@ -5,7 +5,7 @@ import frag1 from './r1/frag.js';
 import Points, { RenderPass } from 'points';
 
 const options = {
-    val: 0,
+    maxLife: 34,
     useVideo: false,
 }
 
@@ -47,7 +47,8 @@ const base = {
         }, 4);
 
 
-        folder.add(options, 'val', -1, 1, .0001).name('Val');
+        points.setUniform('maxLife', options.maxLife);
+        folder.add(options, 'maxLife', 1, 600, .0001).name('Val');
 
         points.setUniform('useVideo', false);
         folder.add(options, 'useVideo').name('useVideo');
@@ -59,6 +60,7 @@ const base = {
      */
     update: points => {
         points.setUniform('useVideo', options.useVideo);
+        points.setUniform('maxLife', options.maxLife);
     }
 }
 
