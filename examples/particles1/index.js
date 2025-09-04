@@ -13,8 +13,8 @@ const options = {
     color5: { r: 115, g: 50.9, b: 20.3, a: .1 }, // r, g, b object
 }
 
-const WORKGROUP_X = 2;
-const WORKGROUP_Y = 2;
+const WORKGROUP_X = 800;
+const WORKGROUP_Y = 800;
 
 const numParticles = WORKGROUP_X * WORKGROUP_Y;
 
@@ -29,6 +29,7 @@ const base = {
     init: async (points, folder) => {
         points.setStorage('variables', 'Variables');
         points.setStorage('particles', `array<Particle, ${numParticles}>`);
+        points.setUniform('numParticles', numParticles);
 
         points.setSampler('imageSampler', null);
         await points.setTextureImage('image', './../img/absulit_800x800.jpg');
