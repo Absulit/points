@@ -1,21 +1,8 @@
-import { BLACK, RED } from 'points/color';
 import { structs } from './../structs.js';
-import { PI, polar, TAU } from 'points/math';
-import { rand, random } from 'points/random';
 
 const compute = /*wgsl*/`
 
 ${structs}
-${BLACK}
-${RED}
-${PI}
-${TAU}
-${polar}
-${rand}
-${random}
-
-const SIZE = vec2f(800.,800.);
-const speed = .01; // .0001
 
 @compute @workgroup_size(16,16,1)
 fn main(
@@ -28,7 +15,6 @@ fn main(
     let particleColor = textureLoad(pass0Texture, index, 0); // image
 
     textureStore(writeTexture, index, particleColor * .98999999);
-
 }
 `;
 

@@ -28,7 +28,7 @@ fn particleInit(particles: ptr<storage, array<Particle,NUMPARTICLES>, read_write
     let angle = TAU * rand_seed.y;
 
     let particleColor = textureLoad(image, vec2i(start_position), 0); // image
-    // var point = textureLoad(image, GlobalId.xy); // video
+    // let particleColor = textureLoad(image, vec2i(start_position)); // video
 
     rand();
     (*particle).position = start_position;
@@ -62,12 +62,12 @@ fn main(
     let n = snoise((*particle).position / 100 + params.time * .1);
     let increment = polar((*particle).speed + .1, (*particle).angle * n) ;
     (*particle).position += increment;
-    (*particle).life += (*particle).speed;
+    (*particle).life += 1 + (*particle).speed;
 
 
     let particle_position = (*particle).position;
     rand();
-    let life_limit = rand_seed.x * 10. + 1;
+    let life_limit = rand_seed.x * 32. + 1;
     if((*particle).life >= life_limit || any(particle_position > SIZE) || any(particle_position < vec2f()) || (*particle).color.a == 0.){
         particleInit(&particles, index, WorkGroupID);
     }
