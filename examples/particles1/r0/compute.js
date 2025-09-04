@@ -2,6 +2,7 @@ import { BLACK, RED } from 'points/color';
 import { structs } from './../structs.js';
 import { PI, polar, TAU } from 'points/math';
 import { rand, random } from 'points/random';
+import { snoise } from 'points/noise2d';
 
 const compute = /*wgsl*/`
 
@@ -13,6 +14,7 @@ ${TAU}
 ${polar}
 ${rand}
 ${random}
+${snoise}
 
 const SIZE = vec2f(800.,800.);
 const speed = .01; // .0001
@@ -51,6 +53,7 @@ fn main(
         (*particle).init = 1;
     }
 
+    // let n = snoise(vec2f(GlobalId.xy));
     let increment = polar(1, (*particle).angle) * (*particle).speed * speed;
     (*particle).position += increment;
     (*particle).life += (*particle).speed * speed;
