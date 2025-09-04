@@ -6,6 +6,7 @@ import Points, { RenderPass } from 'points';
 
 const options = {
     maxLife: 34,
+    turbulenceScale: 100,
     useVideo: false,
 }
 
@@ -48,7 +49,10 @@ const base = {
 
 
         points.setUniform('maxLife', options.maxLife);
-        folder.add(options, 'maxLife', 1, 600, .0001).name('Val');
+        folder.add(options, 'maxLife', 1, 600, .0001).name('maxLife');
+
+        points.setUniform('turbulenceScale', options.turbulenceScale);
+        folder.add(options, 'turbulenceScale', 10, 1024, .0001).name('turbulenceScale');
 
         points.setUniform('useVideo', false);
         folder.add(options, 'useVideo').name('useVideo');
@@ -61,6 +65,7 @@ const base = {
     update: points => {
         points.setUniform('useVideo', options.useVideo);
         points.setUniform('maxLife', options.maxLife);
+        points.setUniform('turbulenceScale', options.turbulenceScale);
     }
 }
 

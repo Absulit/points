@@ -63,7 +63,7 @@ fn main(
         (*particle).init = 1;
     }
 
-    let n = snoise((*particle).position / 100 + params.time * .1);
+    let n = snoise((*particle).position / params.turbulenceScale + params.time * .1);
     let increment = polar((*particle).speed + .1, (*particle).angle * n) ;
     (*particle).position += increment;
     (*particle).life += 1 + (*particle).speed;
@@ -78,8 +78,6 @@ fn main(
 
     let particle_position_i = vec2i((*particle).position);
     textureStore(writeTexture, particle_position_i, (*particle).color);
-    // textureStore(writeTexture, particle_position_i, RED);
-
 
     // debug
     // log_data[0] = (*particle).position.x;
