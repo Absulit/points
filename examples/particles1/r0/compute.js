@@ -27,8 +27,12 @@ fn particleInit(particles: ptr<storage, array<Particle,NUMPARTICLES>, read_write
     rand();
     let angle = TAU * rand_seed.y;
 
-    let particleColor = textureLoad(image, vec2i(start_position), 0); // image
-    // let particleColor = textureLoad(image, vec2i(start_position)); // video
+    var particleColor = vec4f();
+    if(params.useVideo == 1){
+        particleColor = textureLoad(video, vec2i(start_position)); // video
+    }else{
+        particleColor = textureLoad(image, vec2i(start_position), 0); // image
+    }
 
     rand();
     (*particle).position = start_position;

@@ -6,7 +6,7 @@ import Points, { RenderPass } from 'points';
 
 const options = {
     val: 0,
-    bool: false,
+    useVideo: false,
 }
 
 const WORKGROUP_X = 4096;
@@ -33,6 +33,8 @@ const base = {
 
         points.setSampler('imageSampler', null);
         await points.setTextureImage('image', './../img/webgpu_800x800.png');
+        // await points.setTextureImage('image', './../img/absulit_800x800.jpg');
+        await points.setTextureVideo('video', './../img/6982698-hd_1440_1080_25fps_800x800.mp4');
 
         points.setBindingTexture('writeTexture', 'readTexture');
 
@@ -46,14 +48,17 @@ const base = {
 
 
         folder.add(options, 'val', -1, 1, .0001).name('Val');
-        folder.add(options, 'bool').name('Bool');
+
+        points.setUniform('useVideo', false);
+        folder.add(options, 'useVideo').name('useVideo');
+
         folder.open();
     },
     /**
      * @param {Points} points
      */
     update: points => {
-        // points.setUniform('val', options.val);
+        points.setUniform('useVideo', options.useVideo);
     }
 }
 
