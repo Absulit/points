@@ -33,7 +33,7 @@ const base = {
         points.setUniform('numParticles', numParticles);
 
         points.setSampler('imageSampler', null);
-        await points.setTextureImage('image', './../img/absulit_800x800.jpg');
+        await points.setTextureImage('image', './../img/webgpu_800x800.png');
 
         points.setBindingTexture('writeTexture', 'readTexture');
 
