@@ -17,7 +17,7 @@ ${random}
 const SIZE = vec2f(800.,800.);
 const speed = .01; // .0001
 
-@compute @workgroup_size(1,1,1)
+@compute @workgroup_size(16,16,1)
 fn main(
     @builtin(global_invocation_id) GlobalId: vec3u,
     @builtin(workgroup_id) WorkGroupID: vec3u,
@@ -27,7 +27,7 @@ fn main(
 
     let particleColor = textureLoad(pass0Texture, index, 0); // image
 
-    textureStore(writeTexture, index, particleColor * .98999999);
+    textureStore(writeTexture, index, particleColor * .98899999);
 
 }
 `;

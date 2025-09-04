@@ -17,7 +17,7 @@ ${random}
 ${snoise}
 
 const SIZE = vec2f(800.,800.);
-const speed = .01; // .0001
+const speed = .001; // .0001
 
 @compute @workgroup_size(2,2,1)
 fn main(
@@ -53,7 +53,7 @@ fn main(
         (*particle).init = 1;
     }
 
-    // let n = snoise(vec2f(GlobalId.xy));
+    // let n = snoise((*particle).position);
     let increment = polar(1, (*particle).angle) * (*particle).speed * speed;
     (*particle).position += increment;
     (*particle).life += (*particle).speed * speed;
@@ -84,7 +84,7 @@ fn main(
         (*particle).color = particleColor;
         (*particle).angle = angle;
         (*particle).life = 0;
-        (*particle).speed = rand_seed.x * 10;
+        (*particle).speed = rand_seed.x;
     }
 
 

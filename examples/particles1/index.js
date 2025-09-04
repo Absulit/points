@@ -20,7 +20,7 @@ const numParticles = WORKGROUP_X * WORKGROUP_Y * THREADS;
 const base = {
     renderPasses: [
         new RenderPass(vert, null, compute0, WORKGROUP_X, WORKGROUP_Y, 1),
-        new RenderPass(vert, frag1, compute1, 800, 800, 1)
+        new RenderPass(vert, frag1, compute1, 50, 50, 1)
     ],
     /**
      * @param {Points} points
