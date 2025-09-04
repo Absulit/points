@@ -34,7 +34,7 @@ fn main(
 
     if((*particle).init == 0){
         // rand_seed.y = .019876544 + params.time;
-        rand_seed.x = f32(index) + .8945 + fract(params.time) + random();
+        rand_seed.x = f32(index) + .8945 + fract(params.time) + random() + f32(WorkGroupID.x);
         rand();
         let start_position = rand_seed.xy * SIZE;
         rand();
@@ -54,7 +54,7 @@ fn main(
         (*particle).init = 1;
     }
 
-    let n = snoise((*particle).position / 100 + params.time);
+    let n = snoise((*particle).position / 100 + params.time * .1);
     let increment = polar((*particle).speed + .1, (*particle).angle * n) ;
     (*particle).position += increment;
     (*particle).life += (*particle).speed;
@@ -70,9 +70,9 @@ fn main(
     // log.updated = 1;
 
     rand();
-    let life_limit = rand_seed.x * 1. + 10;
-    if((*particle).life >= life_limit ){
-        rand_seed.x = f32(index) + .0001 + params.time + random();
+    let life_limit = rand_seed.x * 10. + 1;
+    if((*particle).life >= life_limit || any(particle_position > SIZE) || any(particle_position < vec2f()) ){
+        rand_seed.x = f32(index) + .0001 + params.time + random() + f32(WorkGroupID.x);
         rand();
         let start_position = rand_seed.xy * SIZE;
         rand();
