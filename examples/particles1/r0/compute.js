@@ -46,11 +46,13 @@ fn main(
     @builtin(local_invocation_id) LocalInvocationID: vec3u
 ) {
     let index = GlobalId.x;
-    let particle = &particles[index];
+
 
     if (index >= NUMPARTICLES) {
         return;
     }
+
+    let particle = &particles[index];
 
     if((*particle).init == 0){
         particleInit(&particles, index, WorkGroupID);
@@ -66,7 +68,7 @@ fn main(
     let particle_position = (*particle).position;
     rand();
     let life_limit = rand_seed.x * 10. + 1;
-    if((*particle).life >= life_limit || any(particle_position > SIZE) || any(particle_position < vec2f()) ){
+    if((*particle).life >= life_limit || any(particle_position > SIZE) || any(particle_position < vec2f()) || (*particle).color.a == 0.){
         particleInit(&particles, index, WorkGroupID);
     }
 
