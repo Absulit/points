@@ -16,9 +16,9 @@ const options = {
 const WORKGROUP_X = 800;
 const WORKGROUP_Y = 800;
 
-const THREADS = 8;
+const THREADS = 4;
 
-const numParticles = WORKGROUP_X * WORKGROUP_Y;
+const numParticles = WORKGROUP_X * WORKGROUP_Y * THREADS;
 
 
 const base = {
@@ -30,7 +30,7 @@ const base = {
      */
     init: async (points, folder) => {
         points.setStorage('variables', 'Variables');
-        points.setStorage('particles', `array<Particle, ${numParticles * 4}>`);
+        points.setStorage('particles', `array<Particle, ${numParticles}>`);
         points.setUniform('numParticles', numParticles);
 
         points.setSampler('imageSampler', null);

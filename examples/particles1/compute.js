@@ -17,7 +17,7 @@ ${random}
 const SIZE = vec2f(800.,800.);
 const speed = .01; // .0001
 
-@compute @workgroup_size(4,4,1)
+@compute @workgroup_size(2,2,1)
 fn main(
     @builtin(global_invocation_id) GlobalId: vec3u,
     @builtin(workgroup_id) WorkGroupID: vec3u,
@@ -65,7 +65,9 @@ fn main(
     // log_data[3] = f32(any(particle_position <= vec2f()));
     // log.updated = 1;
 
-    if((*particle).life >= (100 * rand_seed.y) + 10){
+    rand();
+    let life_limit = rand_seed.x * 10.;
+    if((*particle).life >= life_limit ){
         rand_seed.x = f32(index) + .0001 + fract(params.time);
         rand();
         let start_position = rand_seed.xy * SIZE;
@@ -79,7 +81,7 @@ fn main(
         (*particle).color = particleColor;
         (*particle).angle = angle;
         (*particle).life = 0;
-        (*particle).speed = rand_seed.x;
+        (*particle).speed = rand_seed.x * 10;
     }
 
 
