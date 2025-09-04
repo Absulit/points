@@ -9,12 +9,14 @@ const options = {
     bool: false,
 }
 
-const WORKGROUP_X = 800;
-const WORKGROUP_Y = 800;
+const WORKGROUP_X = 4096;
+const WORKGROUP_Y = 1;
 
-const THREADS = 4;
+const THREADS = 256;
 
 const numParticles = WORKGROUP_X * WORKGROUP_Y * THREADS;
+
+console.log(numParticles);
 
 
 const base = {

@@ -27,7 +27,7 @@ fn main(
 
     let particleColor = textureLoad(pass0Texture, index, 0); // image
 
-    textureStore(writeTexture, index, particleColor * .98899999);
+    textureStore(writeTexture, index, particleColor * .98999999);
 
 }
 `;
