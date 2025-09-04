@@ -237,10 +237,23 @@ class Points {
      * Create a WGSL `const` initialized from JS.
      * Useful to set a value you can't initialize in WGSL because you don't have
      * the value yet.
+     * The constant will be ready to use on the WGSL shder string.
      * @param {String} name
      * @param {string|Number} value
      * @param {String} structName
-     * @returns
+     * @returns {Object}
+     *
+     * @example
+     *
+     * // js side
+     * points.setConstant('NUMPARTICLES', 64, 'f32')
+     *
+     * // wgsl string
+     * // this should print `NUMPARTICLES` and be ready to use.
+     * const NUMPARTICLES:f32 = 64; // this will be hidden to the developer
+     *
+     * // your code:
+     * const particles = array<Particle, NUMPARTICLES>();
      */
     setConstant(name, value, structName){
         const constantToUpdate = this.#nameExists(this.#constants, name);
