@@ -7,6 +7,7 @@ struct Particle {
     angle: f32,
     life: f32,
     init: u32,
+    speed: f32,
 }
 
 struct Variables {
