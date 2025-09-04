@@ -1,5 +1,5 @@
 import { texture } from 'points/image';
-import { structs } from './structs.js';
+import { structs } from './../structs.js';
 
 const frag = /*wgsl*/`
 

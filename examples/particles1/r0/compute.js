@@ -1,5 +1,5 @@
 import { BLACK, RED } from 'points/color';
-import { structs } from './structs.js';
+import { structs } from './../structs.js';
 import { PI, polar, TAU } from 'points/math';
 import { rand, random } from 'points/random';
 
