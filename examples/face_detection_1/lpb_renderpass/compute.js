@@ -25,6 +25,10 @@ fn main(
 ) {
     let grayscale = textureLoad(grayscalePassTexture, GlobalId.xy, 0); // image
 
+    let g = GlobalId.xy / (SIZE / BUCKETWIDTH);
+    let arrayIndex = g.x + (g.y * BUCKETWIDTH);
+    buckets[arrayIndex] = 0;
+
     var color = vec4f(1,0,0,1);
     if(  !(any(GlobalId.xy <= vec2()) || any(GlobalId.xy > SIZE-2))){
         // here we use the coordinate GlobalId.xy ignoring the borders
@@ -38,14 +42,14 @@ fn main(
         let g6 = textureLoad(grayscalePassTexture, index + vec2i( 0,  1), 0);
         let g7 = textureLoad(grayscalePassTexture, index + vec2i( 1,  1), 0);
 
-        let r0 = (g0.r > grayscale.r);
-        let r1 = (g1.r > grayscale.r);
-        let r2 = (g2.r > grayscale.r);
-        let r3 = (g3.r > grayscale.r);
-        let r4 = (g4.r > grayscale.r);
-        let r5 = (g5.r > grayscale.r);
-        let r6 = (g6.r > grayscale.r);
-        let r7 = (g7.r > grayscale.r);
+        let r0 = (g0.r >= grayscale.r);
+        let r1 = (g1.r >= grayscale.r);
+        let r2 = (g2.r >= grayscale.r);
+        let r3 = (g3.r >= grayscale.r);
+        let r4 = (g4.r >= grayscale.r);
+        let r5 = (g5.r >= grayscale.r);
+        let r6 = (g6.r >= grayscale.r);
+        let r7 = (g7.r >= grayscale.r);
 
         let a = array<bool, 8>(r0, r1, r2, r3, r4, r5, r6, r7);
 
