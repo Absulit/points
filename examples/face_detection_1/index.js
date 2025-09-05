@@ -7,6 +7,7 @@ import grayscaleFragment from './grayscale_renderpass/frag.js';
 import lbp_renderpass from './lpb_renderpass/index.js';
 import histogram_renderpass from './histogram_renderpass/index.js';
 import reset_histogram_renderpass from './reset_histogram_renderpass/index.js';
+import compare_histograms_renderpass from './compare_histograms_renderpass/index.js';
 
 
 const options = {
@@ -14,13 +15,14 @@ const options = {
     bool: false,
 }
 
-const bucketWidth = 8;
+const bucketWidth = 16;
 const numBuckets = bucketWidth * bucketWidth;
 
-/** @type {RenderPass} */
 reset_histogram_renderpass.workgroupCountX = numBuckets;
 reset_histogram_renderpass.workgroupCountY = 256;
-reset_histogram_renderpass.set
+
+compare_histograms_renderpass.workgroupCountX = numBuckets;
+compare_histograms_renderpass.workgroupCountY = 256;
 
 const base = {
     renderPasses: [
@@ -28,6 +30,7 @@ const base = {
         lbp_renderpass,
         reset_histogram_renderpass,
         histogram_renderpass,
+        compare_histograms_renderpass,
         new RenderPass(vert, frag, compute),
     ],
     /**
@@ -47,8 +50,8 @@ const base = {
         await points.setTextureImage('image', './../img/pexels-ketut-subiyanto-4350315.jpg');
 
         points.setTexture2d('grayscalePassTexture', true, null, 0); // avail this texture to next render passes
-        points.setBindingTexture('lpbWriteTexture', 'lpbReadTexture', 1, base.renderPasses.length-2); // from lbp to histogram
-        points.setBindingTexture('histogramWriteTexture', 'histogramReadTexture', base.renderPasses.length-2, base.renderPasses.length-1); // from histogram to final
+        points.setBindingTexture('lpbWriteTexture', 'lpbReadTexture', 1, 3); // from lbp to histogram
+        points.setBindingTexture('histogramWriteTexture', 'histogramReadTexture', 3, base.renderPasses.length-1); // from histogram to final
 
 
 
