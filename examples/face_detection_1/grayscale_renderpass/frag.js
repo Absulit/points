@@ -1,8 +1,10 @@
+import { brightness } from 'points/color';
 import { texture } from 'points/image';
 
 const frag = /*wgsl*/`
 
 ${texture}
+${brightness}
 
 
 @fragment
@@ -15,9 +17,9 @@ fn main(
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
 
-    let imageColor = texture(grayscalePassTexture, imageSampler, uvr, true);
+    let imageColor = texture(image, imageSampler, uvr, true);
 
-    let finalColor:vec4f = imageColor;
+    let finalColor:vec4f = vec4f(brightness(imageColor));
 
     return finalColor;
 }
