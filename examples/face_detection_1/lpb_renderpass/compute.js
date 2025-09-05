@@ -55,7 +55,7 @@ fn main(
     }
 
 
-    textureStore(writeTexture, GlobalId.xy, color);
+    textureStore(lpbWriteTexture, GlobalId.xy, color);
 
 }
 `;

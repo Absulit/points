@@ -15,7 +15,7 @@ fn main(
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
 
-    let imageColor = texture(readTexture, imageSampler, uvr, true);
+    let imageColor = texture(lpbReadTexture, imageSampler, uvr, true);
 
     let finalColor:vec4f = imageColor;
 

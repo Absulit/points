@@ -11,7 +11,7 @@ fn main(
     let grayscale = textureLoad(grayscalePassTexture, GlobalId.xy, 0); // image
 
 
-    textureStore(writeTexture, GlobalId.xy, grayscale);
+    // textureStore(writeTexture, GlobalId.xy, grayscale);
 
 }
 `;

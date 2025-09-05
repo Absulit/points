@@ -5,6 +5,7 @@ import Points, { RenderPass } from 'points';
 
 import grayscaleFragment from './grayscale_renderpass/frag.js';
 import lbp_renderpass from './lpb_renderpass/index.js';
+import histogram_renderpass from './histogram_renderpass/index.js';
 
 
 const options = {
@@ -16,6 +17,7 @@ const base = {
     renderPasses: [
         new RenderPass(vert, grayscaleFragment, null),
         lbp_renderpass,
+        histogram_renderpass,
         new RenderPass(vert, frag, compute),
     ],
     /**
@@ -35,7 +37,13 @@ const base = {
         await points.setTextureImage('image', './../img/pexels-ketut-subiyanto-4350315.jpg');
 
         points.setTexture2d('grayscalePassTexture', true, null, 0);
-        points.setBindingTexture('writeTexture', 'readTexture', 1, 2);
+        points.setBindingTexture('lpbWriteTexture', 'lpbReadTexture', 1, base.renderPasses.length - 1);
+
+
+        const bucketWidth = 8;
+        const numBuckets = bucketWidth * bucketWidth;
+        points.setConstant('NUMBUCKETS', numBuckets, 'f32');
+        points.setStorage('buckets', `array<f32, ${numBuckets}>`);
 
         folder.open();
     },
