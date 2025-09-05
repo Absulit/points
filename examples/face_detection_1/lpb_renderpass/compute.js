@@ -3,11 +3,11 @@ const compute = /*wgsl*/`
 const SIZE = vec2u(800, 800);
 
 fn pack_bools_to_f32(bits: array<bool, 8>) -> f32 {
-    var packed: u32 = 0u;
+    var packed = 0u;
 
-    for (var i: u32 = 0u; i < 8u; i = i + 1u) {
-        let bit: u32 = select(0u, 1u, bits[i]); // true → 1, false → 0
-        packed = packed | (bit << (7u - i));    // MSB first
+    for (var i = 0u; i < 8u; i = i + 1u) {
+        let bit = select(0u, 1u, bits[i]); // true → 1, false → 0
+        packed = packed | (bit << (7u - i)); // MSB first
     }
 
     // Option 1: Normalize to [0.0, 1.0]
