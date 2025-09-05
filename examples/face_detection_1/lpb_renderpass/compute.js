@@ -34,10 +34,10 @@ fn main(
     // let arrayIndex = g.x + (g.y * BUCKETWIDTH);
     // buckets[arrayIndex] = 0;
 
-    let i = GlobalId.x;
-    if (i < 256u) {
-        hist[i] = 0;
-    }
+    // let i = GlobalId.x;
+    // if (i < 256u) {
+    //     hist[i] = 0;
+    // }
 
 
     var color = vec4f(1,0,0,1);

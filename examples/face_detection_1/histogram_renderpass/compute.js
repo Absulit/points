@@ -20,13 +20,13 @@ fn main(
     buckets[arrayIndex] += lpb;
     hist[u32(lpb)] += .0001;
 
-    // histograms[arrayIndex][u32(lpb)] += 1;
+    histograms[arrayIndex].data[u32(lpb)] += 1;
 
-    log_data[0] = f32(arrayIndex);
-    log.updated = 1;
+    // log_data[0] = f32(arrayIndex);
+    // log.updated = 1;
 
 
-    textureStore(histogramWriteTexture, GlobalId.xy, vec4f(hist[u32(lpb)]) );
+    textureStore(histogramWriteTexture, GlobalId.xy, vec4f( histograms[arrayIndex].data[u32(lpb)] *.00001 ) );
 
 }
 `;
