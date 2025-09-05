@@ -1,4 +1,8 @@
+import { structs } from "../structs.js";
+
 const compute = /*wgsl*/`
+
+${structs}
 
 const SIZE = vec2u(800, 800);
 
@@ -8,17 +12,21 @@ fn main(
     @builtin(workgroup_id) WorkGroupID: vec3u,
     @builtin(local_invocation_id) LocalInvocationID: vec3u
 ) {
-    let lbp = textureLoad(lpbReadTexture, GlobalId.xy, 0).r; // image
+    let lpb = textureLoad(lpbReadTexture, GlobalId.xy, 0).r; // image
 
     let g = GlobalId.xy / (SIZE / BUCKETWIDTH);
 
     let arrayIndex = g.x + (g.y * BUCKETWIDTH);
-    buckets[arrayIndex] += lbp;
-    // log_data[0] = f32(arrayIndex);
-    // log.updated = 1;
+    buckets[arrayIndex] += lpb;
+    hist[u32(lpb)] += .0001;
+
+    // histograms[arrayIndex][u32(lpb)] += 1;
+
+    log_data[0] = f32(arrayIndex);
+    log.updated = 1;
 
 
-    textureStore(histogramWriteTexture, GlobalId.xy, vec4f(buckets[arrayIndex]/ f32(SIZE.x/BUCKETWIDTH)) );
+    textureStore(histogramWriteTexture, GlobalId.xy, vec4f(hist[u32(lpb)]) );
 
 }
 `;

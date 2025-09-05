@@ -1,4 +1,8 @@
+import { structs } from "../structs.js";
+
 const compute = /*wgsl*/`
+
+${structs}
 
 const SIZE = vec2u(800, 800);
 
@@ -11,7 +15,8 @@ fn pack_bools_to_f32(bits: array<bool, 8>) -> f32 {
     }
 
     // Option 1: Normalize to [0.0, 1.0]
-    return f32(packed) / 255.0;
+    // return f32(packed) / 255.0;
+    return f32(packed);
 
     // Option 2: Reinterpret as float (if padded to full 32-bit)
     // return bitcast<f32>(packed << 24);
@@ -25,9 +30,15 @@ fn main(
 ) {
     let grayscale = textureLoad(grayscalePassTexture, GlobalId.xy, 0); // image
 
-    let g = GlobalId.xy / (SIZE / BUCKETWIDTH);
-    let arrayIndex = g.x + (g.y * BUCKETWIDTH);
-    buckets[arrayIndex] = 0;
+    // let g = GlobalId.xy / (SIZE / BUCKETWIDTH);
+    // let arrayIndex = g.x + (g.y * BUCKETWIDTH);
+    // buckets[arrayIndex] = 0;
+
+    let i = GlobalId.x;
+    if (i < 256u) {
+        hist[i] = 0;
+    }
+
 
     var color = vec4f(1,0,0,1);
     if(  !(any(GlobalId.xy <= vec2()) || any(GlobalId.xy > SIZE-2))){

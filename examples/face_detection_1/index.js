@@ -47,6 +47,10 @@ const base = {
         points.setConstant('NUMBUCKETS', numBuckets, 'u32');
         points.setStorage('buckets', `array<f32, ${numBuckets}>`);
 
+        points.setStorage('hist', `array<f32, 256>`);
+
+        points.setStorage('histograms', `array<Hist, ${numBuckets}>`)
+
         points.addEventListener('log', data => {
             console.log(data[0]);
         });
