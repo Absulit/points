@@ -37,7 +37,8 @@ const base = {
         await points.setTextureImage('image', './../img/pexels-ketut-subiyanto-4350315.jpg');
 
         points.setTexture2d('grayscalePassTexture', true, null, 0);
-        points.setBindingTexture('lpbWriteTexture', 'lpbReadTexture', 1, base.renderPasses.length - 1);
+        points.setBindingTexture('lpbWriteTexture', 'lpbReadTexture', 1, 2); // from lbp to histogram
+        points.setBindingTexture('histogramWriteTexture', 'histogramReadTexture', 2, base.renderPasses.length-1); // from histogram to final
 
 
         const bucketWidth = 8;

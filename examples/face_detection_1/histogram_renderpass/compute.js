@@ -8,10 +8,10 @@ fn main(
     @builtin(workgroup_id) WorkGroupID: vec3u,
     @builtin(local_invocation_id) LocalInvocationID: vec3u
 ) {
-    let grayscale = textureLoad(grayscalePassTexture, GlobalId.xy, 0); // image
+    let grayscale = textureLoad(lpbReadTexture, GlobalId.xy, 0); // image
 
 
-    // textureStore(writeTexture, GlobalId.xy, grayscale);
+    textureStore(histogramWriteTexture, GlobalId.xy, grayscale);
 
 }
 `;
