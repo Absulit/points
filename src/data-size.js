@@ -5,6 +5,7 @@
  * @ignore
  */
 
+const size_2_align_2 = { size: 2, align: 2 };
 const size_4_align_4 = { size: 4, align: 4 };
 const size_8_align_8 = { size: 8, align: 8 };
 const size_12_align_16 = { size: 12, align: 16 };
@@ -21,6 +22,8 @@ export const typeSizes = {
     'f32': size_4_align_4,
     'i32': size_4_align_4,
     'u32': size_4_align_4,
+
+    'f16': size_2_align_2,
 
     'vec2<bool>': size_8_align_8,
     'vec2<f32>': size_8_align_8,
