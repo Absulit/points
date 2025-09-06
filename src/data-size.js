@@ -69,6 +69,9 @@ export const typeSizes = {
     'mat4x2f': size_32_align_16,
     'mat4x3f': size_64_align_16,
     'mat4x4f': size_64_align_16,
+
+    'atomic<u32>': size_4_align_4,
+    'atomic<i32>': size_4_align_4,
 }
 
 
