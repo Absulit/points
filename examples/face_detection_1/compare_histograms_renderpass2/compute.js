@@ -45,7 +45,7 @@ fn main(
 
     // log_data[0] = f32(GlobalId.x);
     // log.updated = 1;
-    // let index = vec2(GlobalId.x * BUCKETWIDTH, GlobalId.y);
+    let index = vec2(GlobalId.x * BUCKETWIDTH, GlobalId.y);
 
     // atomicAdd(&counter.value, 1);
 
