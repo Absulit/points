@@ -18,7 +18,6 @@ const base = {
     compute,
     frag,
     /**
-     *
      * @param {Points} points
      */
     init: async (points, folder) => {
@@ -40,6 +39,9 @@ const base = {
 
         folder.open();
     },
+    /**
+     * @param {Points} points
+     */
     update: points => {
         points.setUniform('val', options.val);
     }

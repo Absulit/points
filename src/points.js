@@ -51,6 +51,7 @@ class Points {
     #commandsFinished = [];
     #renderPassDescriptor = null;
     #uniforms = new UniformsArray();
+    #constants = [];
     #storage = [];
     #readStorage = [];
     #samplers = [];
@@ -230,6 +231,47 @@ class Points {
             }
             variable.value = uniform.value;
         })
+    }
+
+    /**
+     * Create a WGSL `const` initialized from JS.
+     * Useful to set a value you can't initialize in WGSL because you don't have
+     * the value yet.
+     * The constant will be ready to use on the WGSL shder string.
+     * @param {String} name
+     * @param {string|Number} value
+     * @param {String} structName
+     * @returns {Object}
+     *
+     * @example
+     *
+     * // js side
+     * points.setConstant('NUMPARTICLES', 64, 'f32')
+     *
+     * // wgsl string
+     * // this should print `NUMPARTICLES` and be ready to use.
+     * const NUMPARTICLES:f32 = 64; // this will be hidden to the developer
+     *
+     * // your code:
+     * const particles = array<Particle, NUMPARTICLES>();
+     */
+    setConstant(name, value, structName){
+        const constantToUpdate = this.#nameExists(this.#constants, name);
+
+        if (constantToUpdate) {
+            // if name exists is an update
+            throw '`setConstant()` can\'t update a const after it has been set.';
+        }
+
+        const constant = {
+            name,
+            value,
+            structName,
+        }
+
+        this.#constants.push(constant);
+
+        return constant;
     }
 
     /**
@@ -1024,6 +1066,9 @@ class Points {
         if (this.#uniforms.length) {
             dynamicStructParams = /*wgsl*/`struct Params {\n\t${dynamicStructParams}\n}\n`;
         }
+        this.#constants.forEach(c => {
+            dynamicStructParams += /*wgsl*/`const ${c.name}:${c.structName} = ${c.value};\n`;
+        })
         renderPass.index = index;
         renderPass.hasVertexShader && (dynamicGroupBindingsVertex += dynamicStructParams);
         renderPass.hasComputeShader && (dynamicGroupBindingsCompute += dynamicStructParams);
