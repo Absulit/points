@@ -8,6 +8,7 @@ import lbp_renderpass from './lpb_renderpass/index.js';
 import histogram_renderpass from './histogram_renderpass/index.js';
 import reset_histogram_renderpass from './reset_histogram_renderpass/index.js';
 import compare_histograms_renderpass from './compare_histograms_renderpass/index.js';
+import compare_histograms_renderpass2 from './compare_histograms_renderpass2/index.js';
 
 
 const options = {
@@ -24,6 +25,9 @@ reset_histogram_renderpass.workgroupCountY = 256;
 compare_histograms_renderpass.workgroupCountX = numBuckets;
 compare_histograms_renderpass.workgroupCountY = 256;
 
+compare_histograms_renderpass2.workgroupCountX = 256;
+compare_histograms_renderpass2.workgroupCountY = 1;
+
 const base = {
     renderPasses: [
         new RenderPass(vert, grayscaleFragment, null),
@@ -31,6 +35,7 @@ const base = {
         reset_histogram_renderpass,
         histogram_renderpass,
         compare_histograms_renderpass,
+        // compare_histograms_renderpass2,
         new RenderPass(vert, frag, compute),
     ],
     /**
