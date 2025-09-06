@@ -17,7 +17,7 @@ fn main(
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
 
-    let imageColor = texture(histogramReadTexture, imageSampler, uvr, true);
+    let imageColor = texture(compareReadTexture, imageSampler, uvr, true);
 
     let finalColor:vec4f = imageColor;
 

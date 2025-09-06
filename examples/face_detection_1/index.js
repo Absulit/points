@@ -53,6 +53,8 @@ const base = {
         points.setBindingTexture('lpbWriteTexture', 'lpbReadTexture', 1, 3); // from lbp to histogram
         points.setBindingTexture('histogramWriteTexture', 'histogramReadTexture', 3, base.renderPasses.length-1); // from histogram to final
 
+        points.setBindingTexture('compareWriteTexture', 'compareReadTexture', 4, base.renderPasses.length-1); // from compare to final
+
 
 
         points.setConstant('BUCKETWIDTH', bucketWidth, 'u32');
@@ -61,7 +63,8 @@ const base = {
 
         points.setStorage('hist', `array<f32, 256>`);
 
-        points.setStorage('histograms', `array<Hist, ${numBuckets}>`)
+        points.setStorage('histograms', `array<Hist, ${numBuckets}>`);
+        points.setStorage('distances', `array<f32, 256>`);
 
         points.addEventListener('log', data => {
             console.log(data[0]);
