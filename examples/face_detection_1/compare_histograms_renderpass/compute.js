@@ -36,17 +36,22 @@ fn main(
     if(GlobalId.x + 1 >= NUMBUCKETS){
         return;
     }
-    let a = histograms[GlobalId.x].data[GlobalId.y];
-    let b = histograms[GlobalId.x + 1].data[GlobalId.y];
+    let a = i32(histograms[GlobalId.x].data[GlobalId.y] * 255);
+    let b = i32(histograms[GlobalId.x + 1].data[GlobalId.y] * 255);
 
-    distances[GlobalId.y] = a - b;
+    // distances[GlobalId.y] = a - b;
+    let diff = a - b;
+    atomicAdd(&blockDistance.value, diff * diff);
 
     // log_data[0] = f32(GlobalId.x);
     // log.updated = 1;
     let index = vec2(GlobalId.x * BUCKETWIDTH, GlobalId.y);
 
+    // atomicAdd(&counter.value, 1);
 
-    textureStore(compareWriteTexture, index, vec4f(distances[GlobalId.y]));
+
+    // let raw_i32: i32 = atomicLoad(&counter.value);
+    // textureStore(compareWriteTexture, GlobalId.xy, vec4f(f32(raw_i32)/255 * .0000001) );
 
 }
 `;

@@ -66,6 +66,8 @@ const base = {
         points.setStorage('histograms', `array<Hist, ${numBuckets}>`);
         points.setStorage('distances', `array<f32, 256>`);
 
+        points.setStorage('blockDistance', 'Counter');
+
         points.addEventListener('log', data => {
             console.log(data[0]);
         });
