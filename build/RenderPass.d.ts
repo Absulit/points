@@ -84,17 +84,29 @@ declare class RenderPass {
     get hasFragmentShader(): boolean;
     get hasVertexAndFragmentShader(): boolean;
     /**
+     * @param {Number} val
+     */
+    set workgroupCountX(val: number);
+    /**
      * How many workgroups are in the X dimension.
      */
-    get workgroupCountX(): string | number;
+    get workgroupCountX(): number;
+    /**
+     * @param {Number} val
+     */
+    set workgroupCountY(val: number);
     /**
      * How many workgroups are in the Y dimension.
      */
-    get workgroupCountY(): string | number;
+    get workgroupCountY(): number;
+    /**
+     * @param {Number} val
+     */
+    set workgroupCountZ(val: number);
     /**
      * How many workgroups are in the Z dimension.
      */
-    get workgroupCountZ(): string | number;
+    get workgroupCountZ(): number;
     /**
      * Function where the `init` parameter (set in the constructor) is executed
      * and this call will pass the parameters that the RenderPass

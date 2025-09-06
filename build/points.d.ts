@@ -87,17 +87,29 @@ export class RenderPass {
     get hasFragmentShader(): boolean;
     get hasVertexAndFragmentShader(): boolean;
     /**
+     * @param {Number} val
+     */
+    set workgroupCountX(val: number);
+    /**
      * How many workgroups are in the X dimension.
      */
-    get workgroupCountX(): string | number;
+    get workgroupCountX(): number;
+    /**
+     * @param {Number} val
+     */
+    set workgroupCountY(val: number);
     /**
      * How many workgroups are in the Y dimension.
      */
-    get workgroupCountY(): string | number;
+    get workgroupCountY(): number;
+    /**
+     * @param {Number} val
+     */
+    set workgroupCountZ(val: number);
     /**
      * How many workgroups are in the Z dimension.
      */
-    get workgroupCountZ(): string | number;
+    get workgroupCountZ(): number;
     /**
      * Function where the `init` parameter (set in the constructor) is executed
      * and this call will pass the parameters that the RenderPass
@@ -306,6 +318,29 @@ declare class Points {
         value: number;
     }>): void;
     /**
+     * Create a WGSL `const` initialized from JS.
+     * Useful to set a value you can't initialize in WGSL because you don't have
+     * the value yet.
+     * The constant will be ready to use on the WGSL shder string.
+     * @param {String} name
+     * @param {string|Number} value
+     * @param {String} structName
+     * @returns {Object}
+     *
+     * @example
+     *
+     * // js side
+     * points.setConstant('NUMPARTICLES', 64, 'f32')
+     *
+     * // wgsl string
+     * // this should print `NUMPARTICLES` and be ready to use.
+     * const NUMPARTICLES:f32 = 64; // this will be hidden to the developer
+     *
+     * // your code:
+     * const particles = array<Particle, NUMPARTICLES>();
+     */
+    setConstant(name: string, value: string | number, structName: string): any;
+    /**
      * Creates a persistent memory buffer across every frame call. See [GPUBuffer](https://www.w3.org/TR/webgpu/#gpubuffer)
      * <br>
      * Meaning it can be updated in the shaders across the execution of every frame.
@@ -344,7 +379,7 @@ declare class Points {
      * The difference with {@link Points#setStorage|setStorage} is that this can be initialized
      * with data.
      * @param {string} name Name that the Storage will have in the shader.
-     * @param {Uint8Array<ArrayBuffer>} arrayData array with the data that must match the struct.
+     * @param {Uint8Array<ArrayBuffer>|Array<Number>|Number} arrayData array with the data that must match the struct.
      * @param {string} structName Name of the struct already existing on the
      * shader. This will be the type of the Storage.
      * @param {boolean} read if this is going to be used to read data back.
@@ -378,7 +413,7 @@ declare class Points {
      *
      * resultMatrix.size = vec2(firstMatrix.size.x, secondMatrix.size.y);
      */
-    setStorageMap(name: string, arrayData: Uint8Array<ArrayBuffer>, structName: string, read?: boolean, shaderType?: ShaderType): any;
+    setStorageMap(name: string, arrayData: Uint8Array<ArrayBuffer> | Array<number> | number, structName: string, read?: boolean, shaderType?: ShaderType): any;
     readStorage(name: any): Promise<Float32Array<any>>;
     /**
      * Layers of data made of `vec4f`.
@@ -592,17 +627,24 @@ declare class Points {
      * Listens for an event dispatched from WGSL code
      * @param {String} name Number that represents an event Id
      * @param {Function} callback function to be called when the event occurs
-     * @param {Number} structSize size of the data to be returned
+     * @param {Number} structSize size of the array data to be returned
      *
      * @example
      * // js
      * // the event name will be reflected as a variable name in the shader
+     * // and a data variable that starts with the name
      * points.addEventListener('click_event', data => {
      *     // response action in JS
-     * }, 4);
+     *      const [a, b, c, d] = data;
+     *      console.log({a, b, c, d});
+     * }, 4); // data will have 4 items
      *
      * // wgsl string
      *  if(params.mouseClick == 1.){
+     *      // we update our event response data with something we need
+     *      // on the js side
+     *      // click_event_data has 4 items to fill
+     *      click_event_data[0] = params.time;
      *      // Same name of the Event
      *      // we fire the event with a 1
      *      // it will be set to 0 in the next frame
@@ -610,7 +652,7 @@ declare class Points {
      *  }
      *
      */
-    addEventListener(name: string, callback: Function, structSize: number): void;
+    addEventListener(name: string, callback: Function, structSize?: number): void;
     /**
      * Establishes the density of the base mesh, by default 1x1, meaning two triangles.
      * The final number of triangles is `numColumns` * `numRows` * `2` ( 2 being the triangles )

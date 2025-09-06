@@ -209,6 +209,13 @@ class RenderPass {
     }
 
     /**
+     * @param {Number} val
+     */
+    set workgroupCountX(val){
+        this.#workgroupCountX = val;
+    }
+
+    /**
      * How many workgroups are in the Y dimension.
      */
     get workgroupCountY() {
@@ -216,10 +223,24 @@ class RenderPass {
     }
 
     /**
+     * @param {Number} val
+     */
+    set workgroupCountY(val){
+        this.#workgroupCountY = val;
+    }
+
+    /**
      * How many workgroups are in the Z dimension.
      */
     get workgroupCountZ() {
         return this.#workgroupCountZ;
+    }
+
+    /**
+     * @param {Number} val
+     */
+    set workgroupCountZ(val){
+        this.#workgroupCountZ = val;
     }
 
     /**

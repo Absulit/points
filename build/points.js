@@ -238,6 +238,13 @@ class RenderPass {
     }
 
     /**
+     * @param {Number} val
+     */
+    set workgroupCountX(val){
+        this.#workgroupCountX = val;
+    }
+
+    /**
      * How many workgroups are in the Y dimension.
      */
     get workgroupCountY() {
@@ -245,10 +252,24 @@ class RenderPass {
     }
 
     /**
+     * @param {Number} val
+     */
+    set workgroupCountY(val){
+        this.#workgroupCountY = val;
+    }
+
+    /**
      * How many workgroups are in the Z dimension.
      */
     get workgroupCountZ() {
         return this.#workgroupCountZ;
+    }
+
+    /**
+     * @param {Number} val
+     */
+    set workgroupCountZ(val){
+        this.#workgroupCountZ = val;
     }
 
     /**
@@ -1799,7 +1820,7 @@ struct Sound {
 
 struct Event {
     updated: u32,
-    data: array<f32>
+    // data: array<f32>
 }
 `;
 
@@ -1860,6 +1881,7 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f) -> Fragment {
  * @ignore
  */
 
+const size_2_align_2 = { size: 2, align: 2 };
 const size_4_align_4 = { size: 4, align: 4 };
 const size_8_align_8 = { size: 8, align: 8 };
 const size_12_align_16 = { size: 12, align: 16 };
@@ -1876,6 +1898,8 @@ const typeSizes = {
     'f32': size_4_align_4,
     'i32': size_4_align_4,
     'u32': size_4_align_4,
+
+    'f16': size_2_align_2,
 
     'vec2<bool>': size_8_align_8,
     'vec2<f32>': size_8_align_8,
@@ -1924,6 +1948,9 @@ const typeSizes = {
     'mat4x2f': size_32_align_16,
     'mat4x3f': size_64_align_16,
     'mat4x4f': size_64_align_16,
+
+    'atomic<u32>': size_4_align_4,
+    'atomic<i32>': size_4_align_4,
 };
 
 
@@ -2341,6 +2368,7 @@ class Points {
     #commandsFinished = [];
     #renderPassDescriptor = null;
     #uniforms = new UniformsArray();
+    #constants = [];
     #storage = [];
     #readStorage = [];
     #samplers = [];
@@ -2523,6 +2551,47 @@ class Points {
     }
 
     /**
+     * Create a WGSL `const` initialized from JS.
+     * Useful to set a value you can't initialize in WGSL because you don't have
+     * the value yet.
+     * The constant will be ready to use on the WGSL shder string.
+     * @param {String} name
+     * @param {string|Number} value
+     * @param {String} structName
+     * @returns {Object}
+     *
+     * @example
+     *
+     * // js side
+     * points.setConstant('NUMPARTICLES', 64, 'f32')
+     *
+     * // wgsl string
+     * // this should print `NUMPARTICLES` and be ready to use.
+     * const NUMPARTICLES:f32 = 64; // this will be hidden to the developer
+     *
+     * // your code:
+     * const particles = array<Particle, NUMPARTICLES>();
+     */
+    setConstant(name, value, structName){
+        const constantToUpdate = this.#nameExists(this.#constants, name);
+
+        if (constantToUpdate) {
+            // if name exists is an update
+            throw '`setConstant()` can\'t update a const after it has been set.';
+        }
+
+        const constant = {
+            name,
+            value,
+            structName,
+        };
+
+        this.#constants.push(constant);
+
+        return constant;
+    }
+
+    /**
      * Creates a persistent memory buffer across every frame call. See [GPUBuffer](https://www.w3.org/TR/webgpu/#gpubuffer)
      * <br>
      * Meaning it can be updated in the shaders across the execution of every frame.
@@ -2577,7 +2646,7 @@ class Points {
      * The difference with {@link Points#setStorage|setStorage} is that this can be initialized
      * with data.
      * @param {string} name Name that the Storage will have in the shader.
-     * @param {Uint8Array<ArrayBuffer>} arrayData array with the data that must match the struct.
+     * @param {Uint8Array<ArrayBuffer>|Array<Number>|Number} arrayData array with the data that must match the struct.
      * @param {string} structName Name of the struct already existing on the
      * shader. This will be the type of the Storage.
      * @param {boolean} read if this is going to be used to read data back.
@@ -2613,11 +2682,26 @@ class Points {
      */
     setStorageMap(name, arrayData, structName, read = false, shaderType = null) {
         const storageToUpdate = this.#nameExists(this.#storage, name);
+
+        if (!Array.isArray(arrayData) && arrayData.constructor !== Uint8Array) {
+            arrayData = new Uint8Array([arrayData]);
+        }
+
         if (storageToUpdate) {
             storageToUpdate.array = arrayData;
+            storageToUpdate.updated = true;
             return storageToUpdate;
         }
+        // TODO document the stream feature
+        /**
+         * `updated` is set to true in data updates, but this is not true in
+         * something like audio, where the data streams and needs to be updated
+         * constantly, so if the storage map needs to be updated constantly then
+         * `stream` needs to be set to true.
+         */
         const storage = {
+            stream: false, // permanently updated as true
+            updated: true,
             mapped: true,
             name: name,
             structName: structName,
@@ -3043,7 +3127,7 @@ class Points {
         this.setStorageMap(name, data,
             // `array<f32, ${bufferLength}>`
             'Sound' // custom struct in defaultStructs.js
-        );
+        ).stream = true;
         // uniform that will have the data length as a quick reference
         this.setUniform(`${name}Length`, analyser.frequencyBinCount);
         sound.analyser = analyser;
@@ -3122,17 +3206,24 @@ class Points {
      * Listens for an event dispatched from WGSL code
      * @param {String} name Number that represents an event Id
      * @param {Function} callback function to be called when the event occurs
-     * @param {Number} structSize size of the data to be returned
+     * @param {Number} structSize size of the array data to be returned
      *
      * @example
      * // js
      * // the event name will be reflected as a variable name in the shader
+     * // and a data variable that starts with the name
      * points.addEventListener('click_event', data => {
      *     // response action in JS
-     * }, 4);
+     *      const [a, b, c, d] = data;
+     *      console.log({a, b, c, d});
+     * }, 4); // data will have 4 items
      *
      * // wgsl string
      *  if(params.mouseClick == 1.){
+     *      // we update our event response data with something we need
+     *      // on the js side
+     *      // click_event_data has 4 items to fill
+     *      click_event_data[0] = params.time;
      *      // Same name of the Event
      *      // we fire the event with a 1
      *      // it will be set to 0 in the next frame
@@ -3140,16 +3231,17 @@ class Points {
      *  }
      *
      */
-    addEventListener(name, callback, structSize) {
+    addEventListener(name, callback, structSize = 1) {
         // TODO: remove structSize
-        // this extra 4 is for the boolean flag in the Event struct
-        const data = new Uint8Array(Array(structSize + 4).fill(0));
+        // this extra 1 is for the boolean flag in the Event struct
+        const data = Array(4).fill(0);
         this.setStorageMap(name, data, 'Event', true);
+        this.setStorage(`${name}_data`, `array<f32, ${structSize}>`, true);
         this.#events.set(this.#events_ids,
             {
                 id: this.#events_ids,
-                name: name,
-                callback: callback,
+                name,
+                callback,
             }
         );
         ++this.#events_ids;
@@ -3291,6 +3383,9 @@ class Points {
         if (this.#uniforms.length) {
             dynamicStructParams = /*wgsl*/`struct Params {\n\t${dynamicStructParams}\n}\n`;
         }
+        this.#constants.forEach(c => {
+            dynamicStructParams += /*wgsl*/`const ${c.name}:${c.structName} = ${c.value};\n`;
+        });
         renderPass.index = index;
         renderPass.hasVertexShader && (dynamicGroupBindingsVertex += dynamicStructParams);
         renderPass.hasComputeShader && (dynamicGroupBindingsCompute += dynamicStructParams);
@@ -3365,7 +3460,7 @@ class Points {
             throw ' `setBindingTexture` requires at least one Compute Shader in a `RenderPass`'
         }
 
-        this.#renderPasses.forEach( r => r.init?.(this));
+        this.#renderPasses.forEach(r => r.init?.(this));
         this.#renderPasses.forEach(this.#compileRenderPass);
         this.#generateDataSize();
         //
@@ -3423,7 +3518,7 @@ class Points {
 
         const requiredNotFound = renderPass.required?.filter(i => !params[i] && !Number.isInteger(params[i]));
 
-        if(requiredNotFound?.length){
+        if (requiredNotFound?.length) {
             const paramsRequired = requiredNotFound.join(', ');
             console.warn(`addRenderPass: parameters required: ${paramsRequired}`);
         }
@@ -3561,9 +3656,15 @@ class Points {
      */
     #writeStorages() {
         this.#storage.forEach(storageItem => {
-            if (storageItem.mapped) {
+            // since audio is something constant
+            // the stream flag allows to keep this write open
+            const { updated, stream } = storageItem;
+            if (storageItem.mapped && (updated || stream)) {
                 const values = new Float32Array(storageItem.array);
                 this.#writeBuffer(storageItem.buffer, values);
+                if (!stream) {
+                    storageItem.updated = false;
+                }
             }
         });
     }
@@ -3894,25 +3995,23 @@ class Points {
                 }
             );
         }
-        if (this.#storage.length) {
-            this.#storage.forEach(storageItem => {
-                if (!storageItem.shaderType || storageItem.shaderType == shaderType) {
-                    entries.push(
-                        {
-                            binding: bindingIndex++,
-                            resource: {
-                                label: 'storage',
-                                buffer: storageItem.buffer
-                            },
-                            type: {
-                                name: 'buffer',
-                                type: 'storage'
-                            }
+        this.#storage.forEach(storageItem => {
+            if (!storageItem.shaderType || storageItem.shaderType == shaderType) {
+                entries.push(
+                    {
+                        binding: bindingIndex++,
+                        resource: {
+                            label: 'storage',
+                            buffer: storageItem.buffer
+                        },
+                        type: {
+                            name: 'buffer',
+                            type: 'storage'
                         }
-                    );
-                }
-            });
-        }
+                    }
+                );
+            }
+        });
         if (this.#layers.length) {
             if (!this.#layers.shaderType || this.#layers.shaderType == shaderType) {
                 entries.push(
@@ -4291,11 +4390,17 @@ class Points {
     }
     async read() {
         for (const [key, event] of this.#events) {
-            let eventRead = await this.readStorage(event.name);
+            const { name } = event;
+            const eventRead = await this.readStorage(name);
             if (eventRead) {
-                let id = eventRead[0];
+                const id = eventRead[0];
                 if (id != 0) {
-                    event.callback && event.callback(eventRead.slice(1, -1));
+                    const dataRead = await this.readStorage(`${name}_data`);
+                    event?.callback(dataRead);
+                    const storageToUpdate = this.#nameExists(this.#storage, name);
+                    const data = storageToUpdate.array;
+                    data[0] = 0;
+                    this.setStorageMap(name, data);
                 }
             }
         }
