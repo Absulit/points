@@ -13,6 +13,15 @@ const options = {
     color5: { r: 115, g: 50.9, b: 20.3, a: .1 }, // r, g, b object
 }
 
+const colors = [
+    248,208,146, 0,
+    21, 144, 151, 0,
+    56, 164, 140, 0,
+    26, 86, 120, 0,
+    37, 36, 93, 0,
+    87, 28, 86, 0,
+].map(i => i / 255);
+
 const base = {
     vert,
     compute,
@@ -22,8 +31,8 @@ const base = {
      */
     init: async (points, folder) => {
 
-        // Add elements to dat gui
-        // create an uniform and get value from options
+        points.setStorageMap('colors', colors, 'array<vec3f, 6>');
+
         points.setUniform('val', options.val);
 
         folder.add(options, 'val', -1, 1, .0001).name('Val');
