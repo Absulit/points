@@ -51,7 +51,8 @@ fn main(
     let dopplerStrength = .3;
     let doppler = clamp(1.0 / (1.0 - vDot * dopplerStrength), 0.5, 2.0);
 
-    let ringGlow = 1-smoothstep(b_photon - ε, b_photon + ε, b);
+    // let ringGlow = smoothstep(b_photon - ε, b_photon + ε, b);
+    let ringGlow = exp(-pow((b - b_photon) / ε, 2.0));
     finalColor += ringGlow * vec4f(1.0, 0.9, 0.7, 1) * doppler; // Warm glow
 
     if ( b < b_photon) {
