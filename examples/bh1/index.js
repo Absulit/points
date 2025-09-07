@@ -10,6 +10,7 @@ const options = {
     outerRadius: 2.3,
     mouseY: -.301,
     roDistance: -5.2,
+    diskSpeed: .1,
 
     sliderA: .200,
     sliderB: .089,
@@ -43,6 +44,7 @@ const base = {
         points.setUniform('outerRadius', options.outerRadius);
         points.setUniform('mouseY', options.mouseY);
         points.setUniform('roDistance', options.roDistance);
+        points.setUniform('diskSpeed', options.diskSpeed);
 
         points.setUniform('sliderA', options.sliderA);
         points.setUniform('sliderB', options.sliderB);
@@ -54,6 +56,7 @@ const base = {
         folder.add(options, 'outerRadius', .1, 10, .0001).name('outerRadius');
         folder.add(options, 'mouseY', -1, 1, .0001).name('mouseY');
         folder.add(options, 'roDistance', -10, 1, .0001).name('roDistance');
+        folder.add(options, 'diskSpeed', .1, 1, .0001).name('diskSpeed');
 
         folder.add(options, 'sliderA', -1, 1, .0001).name('sliderA');
         folder.add(options, 'sliderB', -1, 1, .0001).name('sliderB');
@@ -70,6 +73,7 @@ const base = {
         points.setUniform('outerRadius', options.outerRadius);
         points.setUniform('mouseY', options.mouseY);
         points.setUniform('roDistance', options.roDistance);
+        points.setUniform('diskSpeed', options.diskSpeed);
 
         points.setUniform('sliderA', options.sliderA);
         points.setUniform('sliderB', options.sliderB);

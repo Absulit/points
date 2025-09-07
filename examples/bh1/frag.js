@@ -111,6 +111,10 @@ fn main(
 
     // Raymarching
     var i = 0;
+
+    var hitDisk = false;
+    var finalP = vec3f(0.0); // to store the hit position
+
     for (; i < 80; i++) {
         let p = ro + rd * t; // position along the ray
         if(params.enabled == 1){
@@ -126,11 +130,29 @@ fn main(
 
         // early stop if close enough, test this .001 value with others to test
         // early stop if too far
-        if(d < .001 || d > 100.){
+        if (d < .001 || t > 100.0) {
+            hitDisk = d < .001;
+            finalP = p;
             break;
         }
     }
-    let value = (t * sliderA * f32(i) * params.sliderC); // sliderC .005)
+    var value = (t * sliderA * f32(i) * params.sliderC); // sliderC .005)
+
+    if (hitDisk) {
+        let v = normalize(vec3f(-finalP.z, 0.0, finalP.x)); // tangential velocity
+        let toObserver = normalize(ro - finalP);
+        let beta = params.diskSpeed; // .1 - .9
+        // let gamma = 1.0 / sqrt(1.0 - beta * beta);
+        let gamma = clamp(1.0 / sqrt(1.0 - beta * beta), 1.0, 10.0); // clamp gama for safety
+        let cosTheta = dot(v, toObserver);
+        let dopplerFactor = 1.0 / (gamma * (1.0 - beta * cosTheta));
+        // let dopplerBoost = clamp(dopplerFactor, 0.5, 2.0);
+        let dopplerBoost = clamp(dopplerFactor * 2.0, 0.5, 4.0);
+
+        value *= dopplerBoost;
+        value += dopplerBoost * 0.3; // optional hue shift
+    }
+
     col = paletteLerp(colors, value);
 
     return vec4(col, 1);
