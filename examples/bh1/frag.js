@@ -85,8 +85,8 @@ fn main(
     @location(4) mouse: vec2f,
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
-    let sliderA = 1.;
-    let sliderB = .1116;
+    let sliderA = params.sliderA; // 1.;
+    let sliderB = params.sliderB; // .1116;
     let uv2 = uvr * 4 - (vec2(2) * ratio); // clip space
     // let m = mouse * ratio * 4 - (vec2(2) * ratio);
     let m = vec2f(0, params.mouseY) * ratio * 4 - (vec2(2) * ratio);
@@ -102,17 +102,12 @@ fn main(
 
     // Vertical camera rotation
     let mouseRotY = rot2d(-m.y);
-    // ro.xz *= rot2d(-m.x);
-    ro = vec3(ro.x, ro.yz * mouseRotY);
-    // rd.xz *= rot2d(-m.x);
-    rd = vec3(rd.x, rd.yz * mouseRotY);
+    ro = vec3(ro.x, ro.yz * mouseRotY); // ro.xz *= rot2d(-m.x);
+    rd = vec3(rd.x, rd.yz * mouseRotY); // rd.xz *= rot2d(-m.x);
 
-    // Horizontal camera rotation
-    let mouseRotX = rot2d(-m.x);
-    // ro.xz *= rot2d(-m.x);
-    ro = vec3(ro.xz * mouseRotX, ro.y).xzy;
-    // rd.xz *= rot2d(-m.x);
-    rd = vec3(rd.xz * mouseRotX, rd.y).xzy;
+    let mouseRotX = rot2d(-m.x); // Horizontal camera rotation
+    ro = vec3(ro.xz * mouseRotX, ro.y).xzy; // ro.xz *= rot2d(-m.x);
+    rd = vec3(rd.xz * mouseRotX, rd.y).xzy; // rd.xz *= rot2d(-m.x);
 
     // Raymarching
     var i = 0;
@@ -120,9 +115,14 @@ fn main(
         let p = ro + rd * t; // position along the ray
         if(params.enabled == 1){
             rd = bendRay(rd, ro + rd * t, vec3f(0, 0, 0), params.mass); // mass = 1.0 for now
+
+            // let bend = bendRay(rd, ro + rd * t, vec3f(0, 0, 0), params.mass); // mass = 1.0 for now
+            // rd = normalize(mix(rd, bend, 0.5)); // smooth transition
         }
         let d = map(p, f32(i)); // current distance to the scene
-        t += d; // "march" the ray
+        // t += d; // "march" the ray
+        // t += d * .5; // "march" the ray
+        t += min(d, 0.1);
 
         // early stop if close enough, test this .001 value with others to test
         // early stop if too far
@@ -130,7 +130,7 @@ fn main(
             break;
         }
     }
-    let value = (t * sliderA * f32(i) * .005);
+    let value = (t * sliderA * f32(i) * params.sliderC); // sliderC .005)
     col = paletteLerp(colors, value);
 
     return vec4(col, 1);

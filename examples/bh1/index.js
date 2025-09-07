@@ -5,11 +5,15 @@ import Points from 'points';
 
 const options = {
     enabled: true,
-    mass: 1,
+    mass: .005,
     innerRadius: 1.,
     outerRadius: 2.3,
-    mouseY: -.395,
-    roDistance: -3,
+    mouseY: -.301,
+    roDistance: -5.2,
+
+    sliderA: .200,
+    sliderB: .089,
+    sliderC: .005,
 
 }
 
@@ -40,13 +44,20 @@ const base = {
         points.setUniform('mouseY', options.mouseY);
         points.setUniform('roDistance', options.roDistance);
 
+        points.setUniform('sliderA', options.sliderA);
+        points.setUniform('sliderB', options.sliderB);
+        points.setUniform('sliderC', options.sliderC);
+
         folder.add(options, 'enabled').name('enable');
-        folder.add(options, 'mass', 1, 10, .0001).name('mass');
+        folder.add(options, 'mass', 0, 5, .0001).name('mass');
         folder.add(options, 'innerRadius', .1, 10, .0001).name('innerRadius');
         folder.add(options, 'outerRadius', .1, 10, .0001).name('outerRadius');
         folder.add(options, 'mouseY', -1, 1, .0001).name('mouseY');
         folder.add(options, 'roDistance', -10, 1, .0001).name('roDistance');
 
+        folder.add(options, 'sliderA', -1, 1, .0001).name('sliderA');
+        folder.add(options, 'sliderB', -1, 1, .0001).name('sliderB');
+        folder.add(options, 'sliderC', -1, 1, .0001).name('sliderC');
         folder.open();
     },
     /**
@@ -59,6 +70,10 @@ const base = {
         points.setUniform('outerRadius', options.outerRadius);
         points.setUniform('mouseY', options.mouseY);
         points.setUniform('roDistance', options.roDistance);
+
+        points.setUniform('sliderA', options.sliderA);
+        points.setUniform('sliderB', options.sliderB);
+        points.setUniform('sliderC', options.sliderC);
     }
 }
 
