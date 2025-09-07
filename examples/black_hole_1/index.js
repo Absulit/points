@@ -4,8 +4,10 @@ import frag from './frag.js';
 import Points from 'points';
 
 const options = {
-    mass: 100,
+    mass: .048,
     radius: .1,
+    distortionScale: .1,
+    falloffFactor: 1,
 }
 
 const base = {
@@ -19,9 +21,13 @@ const base = {
 
         points.setUniform('mass', options.mass);
         points.setUniform('radius', options.radius);
+        points.setUniform('distortionScale', options.distortionScale);
+        points.setUniform('falloffFactor', options.falloffFactor);
 
-        folder.add(options, 'mass', 0, 200, .0001).name('mass');
+        folder.add(options, 'mass', 0, .5, .0001).name('mass');
         folder.add(options, 'radius', 0, 2, .0001).name('radius');
+        folder.add(options, 'distortionScale', 0, 1, .0001).name('distortionScale');
+        folder.add(options, 'falloffFactor', 0, 100, .0001).name('falloffFactor');
 
         const descriptor = {
             addressModeU: 'repeat',
@@ -44,6 +50,8 @@ const base = {
     update: points => {
         points.setUniform('mass', options.mass);
         points.setUniform('radius', options.radius);
+        points.setUniform('distortionScale', options.distortionScale);
+        points.setUniform('falloffFactor', options.falloffFactor);
     }
 }
 
