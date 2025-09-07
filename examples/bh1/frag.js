@@ -61,7 +61,7 @@ fn map(p:vec3f, step:f32) -> f32 {
     // let boxBase = sdBox(q * scale, vec3(.5)) / scale; // cube sdf
     // let ground = p.y + .75;
 
-    let disk = sdfDisk(q, .1, .5, .01);
+    let disk = sdfDisk(p, .1, .5, .01);
 
     // closest distance to the scene
     return disk;
@@ -79,8 +79,8 @@ fn main(
     let sliderA = 1.;
     let sliderB = .1116;
     let uv2 = uvr * 4 - (vec2(2) * ratio); // clip space
-    // let m = mouse * 4 - (vec2(2) * ratio);
-    let m = vec2f(.5, .5) * 4 - (vec2(2) * ratio);
+    let m = mouse * ratio * 4 - (vec2(2) * ratio);
+    // let m = vec2f(.5, .5) * 4 - (vec2(2) * ratio);
 
     // initialization
     var ro = vec3f(0, 0, -3); // ray origin
