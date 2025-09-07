@@ -20,11 +20,20 @@ const base = {
         points.setUniform('mass', options.mass);
         points.setUniform('radius', options.radius);
 
-        folder.add(options, 'mass', 0, 1000, .0001).name('mass');
+        folder.add(options, 'mass', 0, 200, .0001).name('mass');
         folder.add(options, 'radius', 0, 2, .0001).name('radius');
 
+        const descriptor = {
+            addressModeU: 'repeat',
+            addressModeV: 'repeat',
+            magFilter: 'nearest',
+            minFilter: 'nearest',
+            mipmapFilter: 'nearest',
+            //maxAnisotropy: 10,
+        }
+        points.setSampler('imageSampler', descriptor);
+
         await points.setTextureImage('image', './../img/absulit_800x800.jpg');
-        points.setSampler('imageSampler', null);
 
 
         folder.open();

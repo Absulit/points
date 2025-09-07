@@ -15,32 +15,25 @@ fn main(
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
 
-    // let uv = fragCoord.xy / uniforms.resolution;
 
-    // Convert UV to screen space
-    // let screenPos = uv * uniforms.resolution;
-    // let toCenter = vec2f(400) - position;
-
-    let center = vec2f(.5) * ratio;
+    let center = mouse * ratio;
     // let center = params.screen*.5;;
     let r = length(uvr - center);
 
-
-
     // Simulate gravitational lensing: bend UVs toward black hole
     let strength = params.mass / (r * r); // Inverse-square falloff
-    let bendDir = normalize(center);
-    let distortedPos = uvr - bendDir * strength * .001; // Scale factor
+    let bendDir = normalize(center - uvr);
+    let distortedPos = uvr + bendDir * strength * .0001; // Scale factor
 
     // Convert back to UV space
-    let distortedUV = distortedPos / uvr;
+    let distortedUV = distortedPos / params.screen;
 
     // Sample background texture
-    var c = texture(image, imageSampler, distortedUV, false);
-    // Avoid singularity
+    var c = texture(image, imageSampler, distortedPos, false);
 
+    // Avoid singularity
     if (r < params.radius) {
-        c = vec4f(0.0, 0.0, 0.0, 1.0); // Black hole core
+        c = vec4f(0); // Black hole core
     }
 
     return c;
