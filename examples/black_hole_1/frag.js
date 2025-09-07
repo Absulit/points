@@ -1,8 +1,8 @@
-import { fnusin } from 'points/animation';
+import { texture } from 'points/image';
 
 const frag = /*wgsl*/`
 
-${fnusin}
+${texture}
 
 
 @fragment
@@ -15,28 +15,35 @@ fn main(
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
 
-    let center = params.screen*.5;
-    // let uv = pos.xy;
-    let r = distance(position.xy, center);
+    // let uv = fragCoord.xy / uniforms.resolution;
 
-    let M = params.mass;
-    let diskRadius = params.radius;
+    // Convert UV to screen space
+    // let screenPos = uv * uniforms.resolution;
+    // let toCenter = vec2f(400) - position;
 
-    // Impact parameter approximation
-    let b = r / sqrt(1.0 - (2.0 * M) / r);
+    let center = vec2f(.5) * ratio;
+    // let center = params.screen*.5;;
+    let r = length(uvr - center);
 
-    // Normalize b to [0, 1]
-    let bNorm = clamp(b / diskRadius, 0.0, 1.0);
 
-    // Doppler brightening (simulate rotation)
-    let angle = atan2(position.y - center.y, position.x - center.x);
-    let brightness = 0.6 + 0.4 * cos(angle);
 
-    // Color gradient from white to orange to black
-    var finalColor = mix(vec3f(1.0, 1.0, 1.0), vec3f(1.0, 0.5, 0.0), bNorm);
-    finalColor = mix(finalColor, vec3f(0.0, 0.0, 0.0), bNorm * bNorm);
+    // Simulate gravitational lensing: bend UVs toward black hole
+    let strength = params.mass / (r * r); // Inverse-square falloff
+    let bendDir = normalize(center);
+    let distortedPos = uvr - bendDir * strength * .001; // Scale factor
 
-    return vec4f(finalColor * brightness, 1.0);
+    // Convert back to UV space
+    let distortedUV = distortedPos / uvr;
+
+    // Sample background texture
+    var c = texture(image, imageSampler, distortedUV, false);
+    // Avoid singularity
+
+    if (r < params.radius) {
+        c = vec4f(0.0, 0.0, 0.0, 1.0); // Black hole core
+    }
+
+    return c;
 }
 `;
 
