@@ -50,7 +50,8 @@ fn bendRay(rayDir: vec3f, rayPos: vec3f, blackHolePos: vec3f, mass: f32) -> vec3
     let dist = length(blackHolePos - rayPos);
     // let gravity = mass / (dist * dist); // inverse square falloff
     let epsilon = .01;
-    let gravity = clamp(mass / (dist * dist + epsilon), 0.0, 0.2);// limit bending near horizon
+    // let gravity = clamp(mass / (dist * dist + epsilon), 0.0, 0.2);// limit bending near horizon
+    let gravity = clamp(mass / (dist * sqrt(dist + epsilon)), 0.0, 0.2); // smoother falloff
     return normalize(rayDir + gravity * toBH);
 }
 
@@ -139,20 +140,26 @@ fn main(
     var value = (t * sliderA * f32(i) * params.sliderC); // sliderC .005)
 
     if (hitDisk) {
-        let v = normalize(vec3f(-finalP.z, 0.0, finalP.x)); // tangential velocity
-        let toObserver = normalize(ro - finalP);
-        let beta = params.diskSpeed; // .1 - .9
-        // let gamma = 1.0 / sqrt(1.0 - beta * beta);
-        let gamma = clamp(1.0 / sqrt(1.0 - beta * beta), 1.0, 10.0); // clamp gama for safety
+        // Rotate the disk position around Y-axis to simulate spinning
+        let angle = params.time * 1;//params.diskRotationSpeed; // e.g., diskRotationSpeed = 1.0
+        let rotatedXZ = vec2f(finalP.x, finalP.z) * rot2d(angle);
+        let rotatedP = vec3f(rotatedXZ.x, finalP.y, rotatedXZ.y);
+
+        // Compute tangential velocity at rotated position
+        let v = normalize(vec3f(-rotatedP.z, 0.0, rotatedP.x)); // velocity direction
+        let toObserver = normalize(ro - finalP); // observer direction stays the same
+
+        let beta = clamp(params.diskSpeed, 0.0, 0.99); // velocity fraction of light
+        let gamma = clamp(1.0 / sqrt(1.0 - beta * beta), 1.0, 10.0);
         let cosTheta = dot(v, toObserver);
         let dopplerFactor = 1.0 / (gamma * (1.0 - beta * cosTheta));
-        // let dopplerBoost = clamp(dopplerFactor, 0.5, 2.0);
         let dopplerBoost = clamp(dopplerFactor * 2.0, 0.5, 4.0);
 
         value *= dopplerBoost;
         value += dopplerBoost * 0.3; // optional hue shift
     }
 
+    value = clamp(value, 0.0, 1.0);
     col = paletteLerp(colors, value);
 
     return vec4(col, 1);

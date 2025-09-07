@@ -10,7 +10,7 @@ const options = {
     outerRadius: 2.3,
     mouseY: -.301,
     roDistance: -5.2,
-    diskSpeed: .1,
+    diskSpeed: .9,
 
     sliderA: .200,
     sliderB: .089,
