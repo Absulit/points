@@ -4,13 +4,13 @@ import frag from './frag.js';
 import Points from 'points';
 
 const options = {
-    val: 0,
-    bool: false,
-    color1: '#FF0000', // CSS string
-    color2: [0, 128, 255], // RGB array
-    color3: [0, 128, 255, 0.3], // RGB with alpha
-    color4: { h: 350, s: 0.9, v: 0.3 }, // Hue, saturation, value
-    color5: { r: 115, g: 50.9, b: 20.3, a: .1 }, // r, g, b object
+    enabled: true,
+    mass: 1,
+    innerRadius: 1.,
+    outerRadius: 2.3,
+    mouseY: -.395,
+    roDistance: -3,
+
 }
 
 const colors = [
@@ -33,11 +33,19 @@ const base = {
 
         points.setStorageMap('colors', colors, 'array<vec3f, 6>');
 
-        points.setUniform('val', options.val);
+        points.setUniform('enabled', options.enabled);
+        points.setUniform('mass', options.mass);
+        points.setUniform('innerRadius', options.innerRadius);
+        points.setUniform('outerRadius', options.outerRadius);
+        points.setUniform('mouseY', options.mouseY);
+        points.setUniform('roDistance', options.roDistance);
 
-        folder.add(options, 'val', -1, 1, .0001).name('Val');
-        folder.add(options, 'bool').name('Bool');
-
+        folder.add(options, 'enabled').name('enable');
+        folder.add(options, 'mass', 1, 10, .0001).name('mass');
+        folder.add(options, 'innerRadius', .1, 10, .0001).name('innerRadius');
+        folder.add(options, 'outerRadius', .1, 10, .0001).name('outerRadius');
+        folder.add(options, 'mouseY', -1, 1, .0001).name('mouseY');
+        folder.add(options, 'roDistance', -10, 1, .0001).name('roDistance');
 
         folder.open();
     },
@@ -45,7 +53,12 @@ const base = {
      * @param {Points} points
      */
     update: points => {
-        points.setUniform('val', options.val);
+        points.setUniform('enabled', options.enabled);
+        points.setUniform('mass', options.mass);
+        points.setUniform('innerRadius', options.innerRadius);
+        points.setUniform('outerRadius', options.outerRadius);
+        points.setUniform('mouseY', options.mouseY);
+        points.setUniform('roDistance', options.roDistance);
     }
 }
 
