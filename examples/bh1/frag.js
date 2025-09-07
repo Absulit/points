@@ -116,8 +116,17 @@ fn main(
     var hitDisk = false;
     var finalP = vec3f(0.0); // to store the hit position
 
+    let eventHorizon = 2.0 * params.mass;
+    // let photonSphereRadius = 3.0 * params.mass;
+
     for (; i < 80; i++) {
         let p = ro + rd * t; // position along the ray
+
+        let r = length(p); // distance from black hole center
+        if (r < eventHorizon) {
+            break; // ray fell into the black hole
+        }
+
         if(params.enabled == 1){
             rd = bendRay(rd, ro + rd * t, vec3f(0, 0, 0), params.mass); // mass = 1.0 for now
 
@@ -139,6 +148,14 @@ fn main(
     }
     var value = (t * sliderA * f32(i) * params.sliderC); // sliderC .005)
 
+    let photonSphereRadius = 3.0 * params.mass;
+    let r = length(finalP); // distance from black hole center
+    let nearPhotonSphere = abs(r - photonSphereRadius) < 10.1;//0.02; // tweak threshold
+
+    if (nearPhotonSphere) {
+        value += 0.2; // subtle glow boost
+    }
+
     if (hitDisk) {
         // Rotate the disk position around Y-axis to simulate spinning
         let angle = params.time * 1;//params.diskRotationSpeed; // e.g., diskRotationSpeed = 1.0
@@ -159,8 +176,13 @@ fn main(
         value += dopplerBoost * 0.3; // optional hue shift
     }
 
+
     value = clamp(value, 0.0, 1.0);
     col = paletteLerp(colors, value);
+
+    // if (!hitDisk && length(finalP) < eventHorizon) {
+    //     col = vec3f(0.0); // pure black
+    // }
 
     return vec4(col, 1);
 }
