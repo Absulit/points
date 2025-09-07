@@ -48,18 +48,11 @@ fn map(p: vec3f, step:f32) -> f32 {
 
     // for repetition
     let boxBase = sdBox(q * scale, vec3(.5)) / scale; // cube sdf
-    let boxHollow1 = sdBox(q * scale, vec3(.4,.4, 1.)) / scale; // cube sdf
-    let boxHollow2 = sdBox(q * scale, vec3(1.,.4, .4)) / scale; // cube sdf
-    let boxHollow3 = sdBox(q * scale, vec3(.4,1., .4)) / scale; // cube sdf
-
-    var box = opSmoothSubtraction(boxHollow1, boxBase, .1);
-    box = opSmoothSubtraction(boxHollow2, box, .1);
-    box = opSmoothSubtraction(boxHollow3, box, .1);
 
     let ground = p.y + .75;
 
     // closest distance to the scene
-    return smin(ground, box, 1.);
+    return boxBase;
 }
 
 @fragment
