@@ -3,6 +3,9 @@ import compute from './compute.js';
 import frag from './frag.js';
 import Points from 'points';
 
+// https://articles.adsabs.harvard.edu/pdf/1979A%26A....75..228L
+// https://arxiv.org/pdf/1902.11196
+
 const options = {
     mass: .048,
     radius: .1,
