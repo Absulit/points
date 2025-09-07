@@ -34,7 +34,18 @@ fn paletteLerp(a:array<vec3f,6>, value:f32) -> vec3f {
     return mix(a0, a1, fract(index));
 }
 
-fn map(p: vec3f, step:f32) -> f32 {
+fn sdfDisk(p:vec3f, innerRadius:f32, outerRadius:f32, thickness:f32) -> f32 {
+    let radialDist = length(vec2f(p.x, p.z));
+    let verticalDist = abs(p.y);
+    let inRing = max(innerRadius - radialDist, radialDist - outerRadius);
+    return max(inRing, verticalDist - thickness);
+}
+
+fn impactParameter(r:f32, M:f32) -> f32 {
+  return r / sqrt(1 - (2 * M) / r);
+}
+
+fn map(p:vec3f, step:f32) -> f32 {
     // input copy to rotate
     var q = p;
     var qRotated = q.xy * rot2d(params.time * .53);
@@ -47,12 +58,13 @@ fn map(p: vec3f, step:f32) -> f32 {
     let scale = .5;
 
     // for repetition
-    let boxBase = sdBox(q * scale, vec3(.5)) / scale; // cube sdf
+    // let boxBase = sdBox(q * scale, vec3(.5)) / scale; // cube sdf
+    // let ground = p.y + .75;
 
-    let ground = p.y + .75;
+    let disk = sdfDisk(q, .1, .5, .01);
 
     // closest distance to the scene
-    return boxBase;
+    return disk;
 }
 
 @fragment
