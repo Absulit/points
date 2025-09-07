@@ -31,7 +31,13 @@ fn main(
     let distortedUV = uvr + bendDir * strength * params.distortionScale;
 
     let b_photon = 5.196 * params.mass;
+
     var finalColor = texture(image, imageSampler, distortedUV, false);
+
+    let ringGlow = smoothstep(b_photon - params.ε, b_photon + params.ε, b);
+    finalColor += ringGlow * vec4f(1.0, 0.9, 0.7, 1); // Warm glow
+
+
     if ( b < b_photon) {
         finalColor = vec4f();
     }
