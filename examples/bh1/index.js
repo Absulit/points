@@ -16,7 +16,7 @@ const options = {
     hueShift: .001,
 
     sliderA: .0677,
-    sliderB: .089,
+    scale: .089,
     sliderC: .005,
 
 }
@@ -71,7 +71,7 @@ const base = {
         points.setUniform('hueShift', options.hueShift);
 
         points.setUniform('sliderA', options.sliderA);
-        points.setUniform('sliderB', options.sliderB);
+        points.setUniform('scale', options.scale);
         points.setUniform('sliderC', options.sliderC);
 
         folder.add(options, 'enabled').name('enable');
@@ -86,7 +86,7 @@ const base = {
         folder.add(options, 'hueShift', .001, 10, .0001).name('hueShift');
 
         folder.add(options, 'sliderA', -1, 1, .0001).name('sliderA');
-        folder.add(options, 'sliderB', -1, 1, .0001).name('sliderB');
+        folder.add(options, 'scale', -1, 1, .0001).name('scale');
         folder.add(options, 'sliderC', -1, 1, .0001).name('sliderC');
         folder.open();
     },
@@ -106,7 +106,7 @@ const base = {
         points.setUniform('hueShift', options.hueShift);
 
         points.setUniform('sliderA', options.sliderA);
-        points.setUniform('sliderB', options.sliderB);
+        points.setUniform('scale', options.scale);
         points.setUniform('sliderC', options.sliderC);
     }
 }
