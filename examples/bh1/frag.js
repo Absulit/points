@@ -38,14 +38,23 @@ fn impactParameter(r:f32, M:f32) -> f32 {
   return r / sqrt(1 - (2 * M) / r);
 }
 
-fn bendRay(rayDir: vec3f, rayPos: vec3f, blackHolePos: vec3f, mass: f32) -> vec3f {
+fn bendRay(rayDir: vec3f, rayPos: vec3f, blackHolePos: vec3f, mass: f32, spin:f32) -> vec3f {
     let toBH = normalize(blackHolePos - rayPos);
     let dist = length(blackHolePos - rayPos);
     // let gravity = mass / (dist * dist); // inverse square falloff
     let epsilon = .01;
     // let gravity = clamp(mass / (dist * dist + epsilon), 0.0, 0.2);// limit bending near horizon
     let gravity = clamp(mass / (dist * sqrt(dist + epsilon)), 0.0, 0.2); // smoother falloff
-    return normalize(rayDir + gravity * toBH);
+    // return normalize(rayDir + gravity * toBH);
+
+
+    // Frame dragging: add tangential swirl
+    let tangent = normalize(vec3f(-toBH.z, 0.0, toBH.x)); // perpendicular in XZ plane
+    let dragging = spin / (dist + 0.01); // stronger near BH
+
+    return normalize(rayDir + gravity * toBH + dragging * tangent);
+
+
 }
 
 fn map(p:vec3f, step:f32) -> f32 {
@@ -122,9 +131,9 @@ fn main(
         }
 
         if(params.enabled == 1){
-            rd = bendRay(rd, ro + rd * t, vec3f(0, 0, 0), params.mass); // mass = 1.0 for now
+            rd = bendRay(rd, ro + rd * t, vec3f(0, 0, 0), params.mass, params.spin); // mass = 1.0 for now
 
-            // let bend = bendRay(rd, ro + rd * t, vec3f(0, 0, 0), params.mass); // mass = 1.0 for now
+            // let bend = bendRay(rd, ro + rd * t, vec3f(0, 0, 0), params.mass, params.spin); // mass = 1.0 for now
             // rd = normalize(mix(rd, bend, 0.5)); // smooth transition
         }
         let d = map(p, f32(i)); // current distance to the scene
@@ -160,14 +169,14 @@ fn main(
         let v = normalize(vec3f(-rotatedP.z, 0.0, rotatedP.x)); // velocity direction
         let toObserver = normalize(ro - finalP); // observer direction stays the same
 
-        let beta = clamp(params.diskSpeed, 0.0, 0.99); // velocity fraction of light
+        let beta = clamp(params.diskSpeed + params.spin * .5, 0.0, 0.99); // velocity fraction of light
         let gamma = clamp(1.0 / sqrt(1.0 - beta * beta), 1.0, 10.0);
         let cosTheta = dot(v, toObserver);
         let dopplerFactor = 1.0 / (gamma * (1.0 - beta * cosTheta));
         let dopplerBoost = clamp(dopplerFactor * 2.0, 0.5, 4.0);
 
         value *= dopplerBoost;
-        value += dopplerBoost * 0.3; // optional hue shift
+        value += dopplerBoost * params.hueShift;//0.3; // optional hue shift
     }
 
 

@@ -11,7 +11,9 @@ const options = {
     mouseY: -.301,
     roDistance: -4.3702,
     diskSpeed: .9,
-    threshold: 1.7,
+    threshold: 1.4,
+    spin: .0032,
+    hueShift: .001,
 
     sliderA: .0677,
     sliderB: .089,
@@ -65,6 +67,8 @@ const base = {
         points.setUniform('roDistance', options.roDistance);
         points.setUniform('diskSpeed', options.diskSpeed);
         points.setUniform('threshold', options.threshold);
+        points.setUniform('spin', options.spin);
+        points.setUniform('hueShift', options.hueShift);
 
         points.setUniform('sliderA', options.sliderA);
         points.setUniform('sliderB', options.sliderB);
@@ -78,6 +82,8 @@ const base = {
         folder.add(options, 'roDistance', -10, 1, .0001).name('roDistance');
         folder.add(options, 'diskSpeed', .1, 1, .0001).name('diskSpeed');
         folder.add(options, 'threshold', .1, 11, .0001).name('threshold');
+        folder.add(options, 'spin', 0, 1, .0001).name('spin');
+        folder.add(options, 'hueShift', .001, 10, .0001).name('hueShift');
 
         folder.add(options, 'sliderA', -1, 1, .0001).name('sliderA');
         folder.add(options, 'sliderB', -1, 1, .0001).name('sliderB');
@@ -96,6 +102,8 @@ const base = {
         points.setUniform('roDistance', options.roDistance);
         points.setUniform('diskSpeed', options.diskSpeed);
         points.setUniform('threshold', options.threshold);
+        points.setUniform('spin', options.spin);
+        points.setUniform('hueShift', options.hueShift);
 
         points.setUniform('sliderA', options.sliderA);
         points.setUniform('sliderB', options.sliderB);
