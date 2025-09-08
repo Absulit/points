@@ -5,14 +5,15 @@ import Points from 'points';
 
 const options = {
     enabled: true,
-    mass: .005,
+    mass: .0065,
     innerRadius: 1.,
     outerRadius: 2.3,
     mouseY: -.301,
-    roDistance: -5.2,
+    roDistance: -4.3702,
     diskSpeed: .9,
+    threshold: 1.7,
 
-    sliderA: .200,
+    sliderA: .0677,
     sliderB: .089,
     sliderC: .005,
 
@@ -26,6 +27,14 @@ const colors = [
     37, 36, 93, 0,
     87, 28, 86, 0,
 ].map(i => i / 255);
+// const colors = [
+//     255, 255, 255, 0,
+//     255, 220, 150, 0,
+//     255, 140, 60, 0,
+//     180, 60, 30, 0,
+//     80, 30, 20, 0,
+//     0, 0, 0, 0
+// ].map(i => i / 255);
 
 const base = {
     vert,
@@ -45,6 +54,7 @@ const base = {
         points.setUniform('mouseY', options.mouseY);
         points.setUniform('roDistance', options.roDistance);
         points.setUniform('diskSpeed', options.diskSpeed);
+        points.setUniform('threshold', options.threshold);
 
         points.setUniform('sliderA', options.sliderA);
         points.setUniform('sliderB', options.sliderB);
@@ -57,6 +67,7 @@ const base = {
         folder.add(options, 'mouseY', -1, 1, .0001).name('mouseY');
         folder.add(options, 'roDistance', -10, 1, .0001).name('roDistance');
         folder.add(options, 'diskSpeed', .1, 1, .0001).name('diskSpeed');
+        folder.add(options, 'threshold', .1, 11, .0001).name('threshold');
 
         folder.add(options, 'sliderA', -1, 1, .0001).name('sliderA');
         folder.add(options, 'sliderB', -1, 1, .0001).name('sliderB');
@@ -74,6 +85,7 @@ const base = {
         points.setUniform('mouseY', options.mouseY);
         points.setUniform('roDistance', options.roDistance);
         points.setUniform('diskSpeed', options.diskSpeed);
+        points.setUniform('threshold', options.threshold);
 
         points.setUniform('sliderA', options.sliderA);
         points.setUniform('sliderB', options.sliderB);

@@ -150,7 +150,7 @@ fn main(
 
     let photonSphereRadius = 3.0 * params.mass;
     let r = length(finalP); // distance from black hole center
-    let nearPhotonSphere = abs(r - photonSphereRadius) < 10.1;//0.02; // tweak threshold
+    let nearPhotonSphere = abs(r - photonSphereRadius) < params.threshold;//10.1;//0.02; // tweak threshold
 
     if (nearPhotonSphere) {
         value += 0.2; // subtle glow boost
