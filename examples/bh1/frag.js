@@ -59,24 +59,8 @@ fn bendRay(rayDir: vec3f, rayPos: vec3f, blackHolePos: vec3f, mass: f32, spin:f3
 }
 
 fn map(p:vec3f, step:f32) -> f32 {
-    // input copy to rotate
     var q = p;
-    // var qRotated = q.xy * rot2d(params.time * .53);
-    // q = vec3(qRotated, q.z);
-
-    // qRotated = q.xz * rot2d(params.time * .633);
-    // q = vec3(qRotated, q.y);
-
-    // scale down by 4 with  p*4 and correcting distotrion dividing by 4
-    let scale = .5;
-
-    // for repetition
-    // let boxBase = sdBox(q * scale, vec3(.5)) / scale; // cube sdf
-    // let ground = p.y + .75;
-
     let disk = sdfDisk(p, params.innerRadius, params.outerRadius, .001);
-
-    // closest distance to the scene
     return disk;
 }
 
@@ -121,9 +105,7 @@ fn main(
     var finalP = vec3f(0.0); // to store the hit position
 
     let eventHorizon = params.eventHorizon * params.mass; // 2.0
-    // let photonSphereRadius = 3.0 * params.mass;
     var fellIntoBlackHole = false;
-
 
     for (; i < 128; i++) {
         let p = ro + rd * t; // position along the ray
