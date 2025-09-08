@@ -1,19 +1,8 @@
+import { fnusin } from "points/animation";
+
 const frag = /*wgsl*/`
 
-fn opSmoothSubtraction(d1: f32, d2: f32, k: f32) -> f32{
-    let h = clamp(.5 - .5 * (d2 + d1) / k, 0., 1.);
-    return mix(d2, -d1, h) + k * h * (1. - h);
-}
-
-fn smin(d1: f32, d2: f32, k: f32) -> f32{
-    let h = max(k-abs(d1-d2), 0.)/k;
-    return min(d1, d2) - h*h*h*k*(1./6.);
-}
-
-fn sdBox(p:vec3f, b: vec3f) -> f32 {
-    let q = abs(p) - b;
-    return length(max(q, vec3f(0.) )) + min(max(q.x, max(q.y, q.z)), 0.);
-}
+${fnusin}
 
 fn rot2d(angle: f32) -> mat2x2<f32> {
     let s = sin(angle);
@@ -58,11 +47,11 @@ fn bendRay(rayDir: vec3f, rayPos: vec3f, blackHolePos: vec3f, mass: f32) -> vec3
 fn map(p:vec3f, step:f32) -> f32 {
     // input copy to rotate
     var q = p;
-    var qRotated = q.xy * rot2d(params.time * .53);
-    q = vec3(qRotated, q.z);
+    // var qRotated = q.xy * rot2d(params.time * .53);
+    // q = vec3(qRotated, q.z);
 
-    qRotated = q.xz * rot2d(params.time * .633);
-    q = vec3(qRotated, q.y);
+    // qRotated = q.xz * rot2d(params.time * .633);
+    // q = vec3(qRotated, q.y);
 
     // scale down by 4 with  p*4 and correcting distotrion dividing by 4
     let scale = .5;
@@ -90,7 +79,8 @@ fn main(
     let sliderB = params.sliderB; // .1116;
     let uv2 = uvr * 4 - (vec2(2) * ratio); // clip space
     // let m = mouse * ratio * 4 - (vec2(2) * ratio);
-    let m = vec2f(0, params.mouseY) * ratio * 4 - (vec2(2) * ratio);
+    // let m = vec2f(0, params.mouseY) * ratio * 4 - (vec2(2) * ratio);
+    let m = vec2f(0, -0.3009 - fnusin(.1) * .2 ) * ratio * 4 - (vec2(2) * ratio);
     // let m = vec2f(.5, .5) * 4 - (vec2(2) * ratio);
 
     // initialization
