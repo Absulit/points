@@ -1,8 +1,12 @@
 import { fnusin } from "points/animation";
+import { texture } from "points/image";
+import { PI } from "points/math";
 
 const frag = /*wgsl*/`
 
 ${fnusin}
+${texture}
+${PI}
 
 fn rot2d(angle: f32) -> mat2x2<f32> {
     let s = sin(angle);
@@ -80,7 +84,7 @@ fn main(
     let uv2 = uvr * 4 - (vec2(2) * ratio); // clip space
     // let m = mouse * ratio * 4 - (vec2(2) * ratio);
     // let m = vec2f(0, params.mouseY) * ratio * 4 - (vec2(2) * ratio);
-    let m = vec2f(0, -0.3009 - fnusin(.1) * .2 ) * ratio * 4 - (vec2(2) * ratio);
+    let m = vec2f(0, -0.3009 - fnusin(.1) * .1 ) * ratio * 4 - (vec2(2) * ratio);
     // let m = vec2f(.5, .5) * 4 - (vec2(2) * ratio);
 
     // initialization
@@ -109,7 +113,7 @@ fn main(
     let eventHorizon = 2.0 * params.mass;
     // let photonSphereRadius = 3.0 * params.mass;
 
-    for (; i < 80; i++) {
+    for (; i < 128; i++) {
         let p = ro + rd * t; // position along the ray
 
         let r = length(p); // distance from black hole center
@@ -173,6 +177,17 @@ fn main(
     // if (!hitDisk && length(finalP) < eventHorizon) {
     //     col = vec3f(0.0); // pure black
     // }
+    // let imageColor = texture(image, imageSampler, uv, false).rgb;
+    // if (!hitDisk) {
+    //     let dir = normalize(rd); // final bent direction
+    //     let uv = vec2f(
+    //         0.5 + atan2(dir.x, dir.z) / (2.0 * PI),
+    //         0.5 - asin(dir.y) / PI
+    //     ); // spherical mapping
+
+    //     col = imageColor;
+    // }
+
 
     return vec4(col, 1);
 }
