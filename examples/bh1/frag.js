@@ -1,10 +1,11 @@
-import { fnusin } from "points/animation";
+import { fnusin, fusin } from "points/animation";
 import { texture } from "points/image";
 import { PI } from "points/math";
 
 const frag = /*wgsl*/`
 
 ${fnusin}
+${fusin}
 ${texture}
 ${PI}
 
@@ -93,11 +94,11 @@ fn main(
     let uv2 = uvr * 4 - (vec2(2) * ratio); // clip space
     // let m = mouse * ratio * 4 + (vec2(.5) * ratio);
     // let m = vec2f(0, params.mouseY) * ratio * 4 - (vec2(2) * ratio);
-    let m = vec2f(0, -0.3009 - fnusin(.2) * .02 ) * ratio * 4 - (vec2(2) * ratio);
+    let m = vec2f(0, fusin(.3) * .05 ) * ratio * 4 - vec2(-3); // -.2
     // let m = vec2f(.5, .5) * 4 - (vec2(2) * ratio);
 
     // initialization
-    var ro = vec3f(0, 0, params.roDistance); // ray origin
+    var ro = vec3f(0, 0, fusin(.15) * 1 +  -4.3/*params.roDistance*/); // ray origin
     var rd = normalize(vec3(uv2 * scale * 5, 1)); // ray direction one ray per uv position
 
     var t = 0.; // total distance traveled // travel distance
@@ -190,17 +191,16 @@ fn main(
         col = vec3f(0.0); // pure black
     }
 
-    // let imageColor = texture(image, imageSampler, uv, false).rgb;
-    // if (!hitDisk) {
-    //     let dir = normalize(rd); // final bent direction
-    //     let uv = vec2f(
-    //         0.5 + atan2(dir.x, dir.z) / (2.0 * PI),
-    //         0.5 - asin(dir.y) / PI
-    //     ); // spherical mapping
+    let dir = normalize(rd);
 
-    //     col = imageColor;
-    // }
-
+    let uv3 = vec2f(
+        0.5 + atan2(dir.x, dir.z) / (2.0 * PI),
+        0.5 - asin(clamp(dir.y, -1.0, 1.0)) / PI
+    );
+    let imageColor = texture(image, imageSampler, uv3 * 3, false).rgb;
+    if (!hitDisk && !fellIntoBlackHole) {
+        col = mix(col, imageColor.rgb, 1.0);
+    }
 
     return vec4(col, 1);
 }

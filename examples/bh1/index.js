@@ -51,13 +51,13 @@ const base = {
         const descriptor = {
             addressModeU: 'repeat',
             addressModeV: 'repeat',
-            magFilter: 'nearest',
-            minFilter: 'nearest',
-            mipmapFilter: 'nearest',
+            magFilter: 'linear',
+            minFilter: 'linear',
+            mipmapFilter: 'linear',
             //maxAnisotropy: 10,
         }
         points.setSampler('imageSampler', descriptor);
-        await points.setTextureImage('image', './../img/absulit_800x800.jpg');
+        await points.setTextureImage('image', './../img/pexels-philippedonn-1169754.jpg');
         points.setStorageMap('colors', colors, 'array<vec3f, 6>');
 
         points.setUniform('enabled', options.enabled);
