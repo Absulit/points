@@ -84,7 +84,7 @@ fn main(
     let uv2 = uvr * 4 - (vec2(2) * ratio); // clip space
     // let m = mouse * ratio * 4 - (vec2(2) * ratio);
     // let m = vec2f(0, params.mouseY) * ratio * 4 - (vec2(2) * ratio);
-    let m = vec2f(0, -0.3009 - fnusin(.1) * .1 ) * ratio * 4 - (vec2(2) * ratio);
+    let m = vec2f(0, -0.3009 - fnusin(.1) * .02 ) * ratio * 4 - (vec2(2) * ratio);
     // let m = vec2f(.5, .5) * 4 - (vec2(2) * ratio);
 
     // initialization
