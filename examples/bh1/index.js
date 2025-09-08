@@ -18,6 +18,7 @@ const options = {
     sliderA: .0677,
     scale: .089,
     sliderC: .005,
+    eventHorizon: 25.8,
 
 }
 
@@ -69,6 +70,7 @@ const base = {
         points.setUniform('threshold', options.threshold);
         points.setUniform('spin', options.spin);
         points.setUniform('hueShift', options.hueShift);
+        points.setUniform('eventHorizon', options.eventHorizon);
 
         points.setUniform('sliderA', options.sliderA);
         points.setUniform('scale', options.scale);
@@ -84,6 +86,7 @@ const base = {
         folder.add(options, 'threshold', .1, 11, .0001).name('threshold');
         folder.add(options, 'spin', 0, 1, .0001).name('spin');
         folder.add(options, 'hueShift', .001, 10, .0001).name('hueShift');
+        folder.add(options, 'eventHorizon', .001, 100, .0001).name('eventHorizon');
 
         folder.add(options, 'sliderA', -1, 1, .0001).name('sliderA');
         folder.add(options, 'scale', -1, 1, .0001).name('scale');
@@ -104,6 +107,7 @@ const base = {
         points.setUniform('threshold', options.threshold);
         points.setUniform('spin', options.spin);
         points.setUniform('hueShift', options.hueShift);
+        points.setUniform('eventHorizon', options.eventHorizon);
 
         points.setUniform('sliderA', options.sliderA);
         points.setUniform('scale', options.scale);

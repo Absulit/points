@@ -119,14 +119,17 @@ fn main(
     var hitDisk = false;
     var finalP = vec3f(0.0); // to store the hit position
 
-    let eventHorizon = 2.0 * params.mass;
+    let eventHorizon = params.eventHorizon * params.mass; // 2.0
     // let photonSphereRadius = 3.0 * params.mass;
+    var fellIntoBlackHole = false;
+
 
     for (; i < 128; i++) {
         let p = ro + rd * t; // position along the ray
 
         let r = length(p); // distance from black hole center
         if (r < eventHorizon) {
+            fellIntoBlackHole = true;
             break; // ray fell into the black hole
         }
 
@@ -183,9 +186,10 @@ fn main(
     value = clamp(value, 0.0, 1.0);
     col = paletteLerp(colors, value);
 
-    // if (!hitDisk && length(finalP) < eventHorizon) {
-    //     col = vec3f(0.0); // pure black
-    // }
+    if (fellIntoBlackHole) {
+        col = vec3f(0.0); // pure black
+    }
+
     // let imageColor = texture(image, imageSampler, uv, false).rgb;
     // if (!hitDisk) {
     //     let dir = normalize(rd); // final bent direction
