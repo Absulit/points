@@ -1,6 +1,7 @@
 import { fnusin, fusin } from "points/animation";
 import { texture } from "points/image";
 import { PI } from "points/math";
+import { snoise } from "points/noise2d";
 
 const frag = /*wgsl*/`
 
@@ -8,6 +9,7 @@ ${fnusin}
 ${fusin}
 ${texture}
 ${PI}
+${snoise}
 
 fn rot2d(angle: f32) -> mat2x2<f32> {
     let s = sin(angle);
@@ -33,7 +35,6 @@ fn sdfDisk(p:vec3f, innerRadius:f32, outerRadius:f32, thickness:f32) -> f32 {
     let verticalDist = abs(p.y);
     let inRing = max(innerRadius - radialDist, radialDist - outerRadius);
     return max(inRing, verticalDist - thickness);
-
 }
 
 fn bendRay(rayDir: vec3f, rayPos: vec3f, blackHolePos: vec3f, mass: f32, spin:f32) -> vec3f {
@@ -149,6 +150,7 @@ fn main(
         value += 0.2; // subtle glow boost
     }
 
+    var diskUV = vec2f();
     if (hitDisk) {
         // Rotate the disk position around Y-axis to simulate spinning
         let angle = params.time * 1;//params.diskRotationSpeed; // e.g., diskRotationSpeed = 1.0
@@ -167,11 +169,32 @@ fn main(
 
         value *= dopplerBoost;
         value += dopplerBoost * params.hueShift;//0.3; // optional hue shift
+
+        //----------------
+        let diskPos = finalP; // point where ray hit the disk
+        let radial = length(vec2f(diskPos.x, diskPos.z));
+        let rotationSpeed = 2.;
+        let angle2 = atan2(diskPos.z, diskPos.x) + params.time * params.diskSpeed;
+
+        // Normalize to [0,1]
+        let u = (angle2 + PI) / (2.0 * PI);
+        let v2 = (radial - params.innerRadius) / (params.outerRadius - params.innerRadius);
+        diskUV = vec2f(u, v2/ params.val);
+
     }
+
 
 
     value = clamp(value, 0.0, 1.0);
     col = paletteLerp(colors, value);
+
+    // let diskColor = texture(diskTexture, imageSampler, diskUV / params.val / 10, false).rgb;
+    let n = snoise(diskUV / .097 );
+    let diskColor = paletteLerp(colors, n);
+    if(hitDisk){
+        // col = diskColor;
+        col = mix(paletteLerp(colors, value), diskColor, 0.5);
+    }
 
     if (fellIntoBlackHole) {
         col = vec3f(0.0); // pure black
