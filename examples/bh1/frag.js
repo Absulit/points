@@ -1,7 +1,6 @@
 import { fnusin, fusin } from "points/animation";
 import { texture } from "points/image";
 import { PI } from "points/math";
-import { snoise } from "points/noise2d";
 
 const frag = /*wgsl*/`
 
@@ -9,7 +8,6 @@ ${fnusin}
 ${fusin}
 ${texture}
 ${PI}
-${snoise}
 
 fn rot2d(angle: f32) -> mat2x2<f32> {
     let s = sin(angle);
@@ -179,8 +177,7 @@ fn main(
         // Normalize to [0,1]
         let u = (angle2 + PI) / (2.0 * PI);
         let v2 = (radial - params.innerRadius) / (params.outerRadius - params.innerRadius);
-        diskUV = vec2f(fract(u * .1037), fract(v2 * .127));
-
+        diskUV = vec2f(u * 4.3019 * .125, v2 * .265); // scaled to squash the clouds
     }
 
 
@@ -188,12 +185,11 @@ fn main(
     value = clamp(value, 0.0, 1.0);
     col = paletteLerp(colors, value);
 
-    var diskColor = texture(diskTexture, imageSampler, diskUV / .097, false);
-    let n = snoise(diskUV);
+    var diskColor = texture(diskTexture, imageSampler, diskUV, false);
     diskColor = paletteLerp(colors, diskColor.r);
     if(hitDisk){
         // col = diskColor;
-        col = mix(paletteLerp(colors, value), diskColor, n);
+        col = mix(paletteLerp(colors, value), diskColor, 1-diskColor.g);
     }
 
     if (fellIntoBlackHole) {
