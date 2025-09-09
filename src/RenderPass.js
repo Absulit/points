@@ -1,7 +1,5 @@
 'use strict';
 
-import Points from "points";
-
 /**
  * A RenderPass is a way to have a block of shaders to pass to your application pipeline and
  * these render passes will be executed in the order you pass them in the {@link Points#init} method.
