@@ -86,7 +86,7 @@ const base = {
 
         folder.add(options, 'sliderA', -1, 1, .0001).name('color shift A');
         folder.add(options, 'sliderC', -1, 1, .0001).name('color shift B');
-        folder.add(options, 'scale', -1, 1, .0001).name('scale');
+        folder.add(options, 'scale', -1, 1, .0001).name('fov');
         // folder.add(options, 'val', 0, 1, .0001).name('val'); // to debug
         // folder.add(options, 'val2', 0, 1, .0001).name('val2'); // to debug
         folder.open();
