@@ -42,8 +42,7 @@ fn bendRay(rayDir: vec3f, rayPos: vec3f, blackHolePos: vec3f, mass: f32, spin:f3
     let epsilon = .01;
     // let gravity = clamp(mass / (dist * dist + epsilon), 0.0, 0.2);// limit bending near horizon
     let gravity = clamp(mass / (dist * sqrt(dist + epsilon)), 0.0, 0.2); // smoother falloff
-    // return normalize(rayDir + gravity * toBH);
-
+    // return normalize(rayDir + gravity * toBH); // if lines below not used, then use this
 
     // Frame dragging: add tangential swirl
     let tangent = normalize(vec3f(-toBH.z, 0.0, toBH.x)); // perpendicular in XZ plane
@@ -116,9 +115,6 @@ fn main(
         }
 
         let d = map(p, f32(i)); // current distance to the scene
-        // t += d; // "march" the ray
-        // t += d * .5; // "march" the ray
-        // t += min(d, 0.1);// "march" the ray
 
         // Check if we're near the disk vertically
         let nearDisk = abs(d) < 0.04;
@@ -142,7 +138,7 @@ fn main(
 
     let photonSphereRadius = 3.0 * params.mass;
     let r = length(finalP); // distance from black hole center
-    let nearPhotonSphere = abs(r - photonSphereRadius) < params.threshold;//10.1;//0.02; // tweak threshold
+    let nearPhotonSphere = abs(r - photonSphereRadius) < params.threshold;
 
     if (nearPhotonSphere) {
         value += 0.2; // subtle glow boost
@@ -151,7 +147,7 @@ fn main(
     var diskUV = vec2f();
     if (hitDisk) {
         // Rotate the disk position around Y-axis to simulate spinning
-        let angle = params.time * 1;//params.diskRotationSpeed; // e.g., diskRotationSpeed = 1.0
+        let angle = 1.; // params.time
         let rotatedXZ = vec2f(finalP.x, finalP.z) * rot2d(angle);
         let rotatedP = vec3f(rotatedXZ.x, finalP.y, rotatedXZ.y);
 
@@ -180,15 +176,12 @@ fn main(
         diskUV = vec2f(u * 4.3019 * .125, v2 * .265); // scaled to squash the clouds
     }
 
-
-
     value = clamp(value, 0., 1.);
     col = paletteLerp(colors, value);
 
     var diskColor = texture(diskTexture, imageSampler, diskUV, false);
     diskColor = paletteLerp(colors, diskColor.r);
     if(hitDisk){
-        // col = diskColor;
         col = mix(paletteLerp(colors, value), diskColor, 1-diskColor.g);
     }
 
@@ -206,7 +199,6 @@ fn main(
     if (!hitDisk && !fellIntoBlackHole) {
         col = mix(col, imageColor, 1.);
     }
-    // col = abs(rd);
 
     return col;
 }

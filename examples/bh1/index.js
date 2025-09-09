@@ -1,7 +1,6 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
-import Points, { RenderPasses } from 'points';
 
 const options = {
     enabled: true,
@@ -78,21 +77,19 @@ const base = {
         folder.add(options, 'innerRadius', .1, 10, .0001).name('innerRadius');
         folder.add(options, 'outerRadius', .1, 10, .0001).name('outerRadius');
         // folder.add(options, 'mouseY', -1, 1, .0001).name('mouseY');
-        folder.add(options, 'roDistance', -10, 1, .0001).name('roDistance');
+        // folder.add(options, 'roDistance', -10, 1, .0001).name('roDistance');
         folder.add(options, 'diskSpeed', .1, 10, .0001).name('diskSpeed');
-        folder.add(options, 'threshold', .1, 11, .0001).name('threshold');
+        folder.add(options, 'threshold', -10.1, 11, .0001).name('threshold');
         folder.add(options, 'spin', 0, 1, .0001).name('spin');
         folder.add(options, 'hueShift', .001, 10, .0001).name('hueShift');
         folder.add(options, 'eventHorizon', .001, 100, .0001).name('eventHorizon');
 
-        folder.add(options, 'sliderA', -1, 1, .0001).name('sliderA');
+        folder.add(options, 'sliderA', -1, 1, .0001).name('color shift A');
+        folder.add(options, 'sliderC', -1, 1, .0001).name('color shift B');
         folder.add(options, 'scale', -1, 1, .0001).name('scale');
-        folder.add(options, 'sliderC', -1, 1, .0001).name('sliderC');
-        folder.add(options, 'val', 0, 1, .0001).name('val'); // to debug
-        folder.add(options, 'val2', 0, 1, .0001).name('val2'); // to debug
+        // folder.add(options, 'val', 0, 1, .0001).name('val'); // to debug
+        // folder.add(options, 'val2', 0, 1, .0001).name('val2'); // to debug
         folder.open();
-
-        // points.addRenderPass(RenderPasses.BLOOM, {amount:.1})
     },
     /**
      * @param {Points} points
