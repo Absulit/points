@@ -1,19 +1,10 @@
-import { fnusin } from 'points/animation';
-import { snoise } from 'points/noise2d';
-import { sdfCircle } from 'points/sdf';
-import { WHITE, RED, layer } from 'points/color';
-import { audioAverage, audioAverageSegments } from 'points/audio';
+import { texture } from "points/image";
 
 const frag = /*wgsl*/`
 
-${fnusin}
-${snoise}
-${sdfCircle}
-${layer}
-${audioAverage}
-${audioAverageSegments}
-${WHITE}
-${RED}
+${texture}
+
+const SCALE = 2.;
 
 @fragment
 fn main(
@@ -25,18 +16,30 @@ fn main(
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
 
-    let audioX = audio.data[ u32(uvr.x * params.audioLength)] / 256;
+    let audioX = audio.data[u32(uvr.x * params.audioLength)] / 256;
 
     if(params.mouseClick == 1.){
         click_event.updated = 1;
+        // other actions
+        showMessage = 1.;
     }
 
+    // click to play message
+    let center = vec2f(.5) * ratio;
 
-    var c = vec4f();
-    c.r = audioX;
-    c.a = 1.;
+    let dims = vec2f(textureDimensions(cta, 0));
+    // if you are using uvr you have to multiply by ratio
+    let imageWidth = dims / params.screen * ratio;
+    let halfImageWidth = imageWidth * .5 * SCALE;
 
-    return c;
+    let ctaColor = texture(
+        cta,
+        imageSampler,
+        (uvr / SCALE) - (center - halfImageWidth) / SCALE,
+        true
+    );
+
+    return vec4f(audioX, 0, 0, 1) + ctaColor * (1 - showMessage);
 }
 `;
 

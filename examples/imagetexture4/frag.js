@@ -14,10 +14,7 @@ fn main(
         @builtin(position) position: vec4f
     ) -> @location(0) vec4f {
 
-    let rgbaImage = texture(image, imageSampler, uvr * params.scale, false);
-    let finalColor:vec4f = rgbaImage;
-
-    return finalColor;
+    return texture(image, imageSampler, uvr * params.scale, false);
 }
 `;
 

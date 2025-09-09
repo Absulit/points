@@ -1,21 +1,19 @@
-import { fnusin } from 'points/animation';
 import { sdfCircle } from 'points/sdf';
 import { WHITE, RED, GREEN, YELLOW, layer } from 'points/color';
-import { audioAverage, audioAverageSegments } from 'points/audio';
-import { texturePosition } from 'points/image';
+import { texture } from 'points/image';
 
 const frag = /*wgsl*/`
 
-${fnusin}
 ${sdfCircle}
 ${layer}
-${audioAverage}
-${audioAverageSegments}
 ${WHITE}
 ${RED}
 ${GREEN}
 ${YELLOW}
-${texturePosition}
+${texture}
+
+const SCALE = 2.;
+const segmentNum = 4;
 
 @fragment
 fn main(
@@ -29,14 +27,13 @@ fn main(
 
     if(params.mouseClick == 1.){
         click_event.updated = 1;
+        // other actions
+        showMessage = 0.;
     }
 
-    // let audioAverage = audioAverage(audio);
-    // let audioAverageSegments = audioAverageSegments(2);
+    let feedbackColor = texture(feedbackTexture, imageSampler, uvr * vec2f(1, 1.01), true);
 
-    let feedbackColor = texturePosition(feedbackTexture, imageSampler, vec2(0.), uvr * vec2f(1, 1.01), true);
 
-    let segmentNum = 4;
     let subSegmentLength = i32(params.audioLength) / segmentNum;
 
     for (var index = 0; index < segmentNum ; index++) {
@@ -50,18 +47,33 @@ fn main(
         result[index] = audioAverage / f32(subSegmentLength);
     }
 
+    let center = vec2(.5) * ratio;
+    let size = .4 * ratio.x;
+    let circle1 = sdfCircle(center, result[0] * size, .0, uvr) * WHITE;
+    let circle2 = sdfCircle(center, result[1] * size, .0, uvr) * GREEN;
+    let circle3 = sdfCircle(center, result[2] * size, .0, uvr) * YELLOW;
+    let circle4 = sdfCircle(center, result[3] * size, .0, uvr) * RED;
 
-    let circle1 = sdfCircle(vec2(.5), result[0] * .4, .0, uvr) * WHITE;
-    let circle2 = sdfCircle(vec2(.5), result[1] * .4, .0, uvr) * GREEN;
-    let circle3 = sdfCircle(vec2(.5), result[2] * .4, .0, uvr) * YELLOW;
-    let circle4 = sdfCircle(vec2(.5), result[3] * .4, .0, uvr) * RED;
+    // click to play message
+    let dims = vec2f(textureDimensions(cta, 0));
+    // if you are using uvr you have to multiply by ratio
+    let imageWidth = dims / params.screen * ratio;
+    let halfImageWidth = imageWidth * .5 * SCALE;
 
+    let ctaColor = texture(
+        cta,
+        imageSampler,
+        (uvr / SCALE) - (center - halfImageWidth) / SCALE,
+        true
+    ) * showMessage;
 
-    // return c;
-    // return layer(circle2 * WHITE, c + circle);
-    // return c + circle - circle2;
+    let layer0 = layer(circle3, circle4);
+    let layer1 = layer(circle2, layer0);
+    let layer2 = layer(circle1, layer1);
+    let layer3 = layer(feedbackColor * .9, layer2);
+    let layer4 = layer(layer3, vec4f(ctaColor.rgb, ctaColor.r));
 
-    return  layer(feedbackColor * .9, layer(circle1, layer(circle2, layer(circle3, circle4))));
+    return layer4;
 }
 `;
 

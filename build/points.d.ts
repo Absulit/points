@@ -16,6 +16,16 @@ export type SignedNumber = number;
 
  * // we pass the array of renderPasses
  * await points.init(renderPasses);
+ *
+ * @example
+ * // init param example
+ * const waves = new RenderPass(vertexShader, fragmentShader, null, 8, 8, 1, (points, params) => {
+ *     points.setSampler('renderpass_feedbackSampler', null);
+ *     points.setTexture2d('renderpass_feedbackTexture', true);
+ *     points.setUniform('waves_scale', params.scale || .45);
+ *     points.setUniform('waves_intensity', params.intensity || .03);
+ * });
+ * waves.required = ['scale', 'intensity'];
  */
 export class RenderPass {
     /**
@@ -24,14 +34,23 @@ export class RenderPass {
      * @param {String} vertexShader  WGSL Vertex Shader in a String.
      * @param {String} fragmentShader  WGSL Fragment Shader in a String.
      * @param {String} computeShader  WGSL Compute Shader in a String.
+     * @param {String} workgroupCountX  Workgroup amount in X.
+     * @param {String} workgroupCountY  Workgroup amount in Y.
+     * @param {String} workgroupCountZ  Workgroup amount in Z.
+     * @param {function(points:Points, params:Object):void} init Method to add custom
+     * uniforms or storage (points.set* methods).
+     * This is made for post processing multiple `RenderPass`.
+     * The method `init` will be called to initialize the buffer parameters.
+     *
      */
-    constructor(vertexShader: string, fragmentShader: string, computeShader: string, workgroupCountX: any, workgroupCountY: any, workgroupCountZ: any);
-    set internal(value: boolean);
+    constructor(vertexShader: string, fragmentShader: string, computeShader: string, workgroupCountX: string, workgroupCountY: string, workgroupCountZ: string, init: any);
+    set index(value: any);
     /**
-     * To use with {link RenderPasses} so it's internal
-     * @ignore
+     * Get the current RenderPass index order in the pipeline.
+     * When you add a RenderPass to the constructor or via
+     * {@link Points#addRenderPass}, this is the order it receives.
      */
-    get internal(): boolean;
+    get index(): any;
     /**
      * get the vertex shader content
      */
@@ -67,33 +86,76 @@ export class RenderPass {
     get hasVertexShader(): boolean;
     get hasFragmentShader(): boolean;
     get hasVertexAndFragmentShader(): boolean;
-    get workgroupCountX(): any;
-    get workgroupCountY(): any;
-    get workgroupCountZ(): any;
+    /**
+     * @param {Number} val
+     */
+    set workgroupCountX(val: number);
+    /**
+     * How many workgroups are in the X dimension.
+     */
+    get workgroupCountX(): number;
+    /**
+     * @param {Number} val
+     */
+    set workgroupCountY(val: number);
+    /**
+     * How many workgroups are in the Y dimension.
+     */
+    get workgroupCountY(): number;
+    /**
+     * @param {Number} val
+     */
+    set workgroupCountZ(val: number);
+    /**
+     * How many workgroups are in the Z dimension.
+     */
+    get workgroupCountZ(): number;
+    /**
+     * Function where the `init` parameter (set in the constructor) is executed
+     * and this call will pass the parameters that the RenderPass
+     * requires to run.
+     * @param {Points} points instance of {@link Points} to call set* functions
+     * like {@link Points#setUniform}  and others.
+     * @param {Object} params data that can be assigned to the RenderPass when
+     * the {@link Points#addRenderPass} method is called.
+     */
+    init(points: Points, params: any): void;
+    /**
+     * List of buffer names that are required for this RenderPass so if it shows
+     * them in the console.
+     * @param {Array<String>} val names of the parameters `params` in
+     * {@link RenderPass#setInit} that are required.
+     * This is only  used for a post processing RenderPass.
+     */
+    set required(val: Array<string>);
+    get required(): Array<string>;
     #private;
 }
 /**
  * List of predefined Render Passes for Post Processing.
+ * Parameters required are shown as a warning in the JS console.
  * @class
  *
  * @example
  * import Points, { RenderPass, RenderPasses } from 'points';
  * const points = new Points('canvas');
  *
+ * // option 1: along with the RenderPasses pased into `Points.init()`
  * let renderPasses = [
  *     new RenderPass(vert1, frag1, compute1),
  *     new RenderPass(vert2, frag2, compute2)
  * ];
  *
- * RenderPasses.grayscale(points);
- * RenderPasses.chromaticAberration(points, .02);
- * RenderPasses.color(points, .5, 1, 0, 1, .5);
- * RenderPasses.pixelate(points, 10, 10);
- * RenderPasses.lensDistortion(points, .4, .01);
- * RenderPasses.filmgrain(points);
- * RenderPasses.bloom(points, .5);
- * RenderPasses.blur(points, 100, 100, .4, 0, 0.0);
- * RenderPasses.waves(points, .05, .03);
+ * // option 2: calling `points.addRenderPass()` method
+ * points.addRenderPass(RenderPasses.GRAYSCALE);
+ * points.addRenderPass(RenderPasses.CHROMATIC_ABERRATION, { distance: .02 });
+ * points.addRenderPass(RenderPasses.COLOR, { color: [.5, 1, 0, 1], blendAmount: .5 });
+ * points.addRenderPass(RenderPasses.PIXELATE);
+ * points.addRenderPass(RenderPasses.LENS_DISTORTION);
+ * points.addRenderPass(RenderPasses.FILM_GRAIN);
+ * points.addRenderPass(RenderPasses.BLOOM);
+ * points.addRenderPass(RenderPasses.BLUR, { resolution: [100, 100], direction: [.4, 0], radians: 0 });
+ * points.addRenderPass(RenderPasses.WAVES, { scale: .05 });
  *
  * await points.init(renderPasses);
  *
@@ -105,156 +167,60 @@ export class RenderPass {
  * }
  */
 export class RenderPasses {
-    static COLOR: number;
-    static GRAYSCALE: number;
-    static CHROMATIC_ABERRATION: number;
-    static PIXELATE: number;
-    static LENS_DISTORTION: number;
-    static FILM_GRAIN: number;
-    static BLOOM: number;
-    static BLUR: number;
-    static WAVES: number;
-    static #LIST: {
-        1: {
-            vertexShader: string;
-            fragmentShader: string;
-            init: (points: any, params: any) => Promise<void>;
-            update: (points: any) => void;
-        };
-        2: {
-            vertexShader: string;
-            fragmentShader: string;
-            init: (points: any, params: any) => Promise<void>;
-            update: (points: any) => void;
-        };
-        3: {
-            vertexShader: string;
-            fragmentShader: string;
-            init: (points: any, params: any) => Promise<void>;
-            update: (points: any) => void;
-        };
-        4: {
-            vertexShader: string;
-            fragmentShader: string;
-            init: (points: any, params: any) => Promise<void>;
-            update: (points: any) => void;
-        };
-        5: {
-            vertexShader: string;
-            fragmentShader: string;
-            init: (points: any, params: any) => Promise<void>;
-            update: (points: any) => Promise<void>;
-        };
-        6: {
-            vertexShader: string;
-            fragmentShader: string;
-            init: (points: any, params: any) => Promise<void>;
-            update: (points: any) => void;
-        };
-        7: {
-            vertexShader: string;
-            fragmentShader: string;
-            /**
-             *
-             * @param {Points} points
-             * @param {*} params
-             */
-            init: (points: Points, params: any) => Promise<void>;
-            update: (points: any) => void;
-        };
-        8: {
-            vertexShader: string;
-            fragmentShader: string;
-            init: (points: any, params: any) => Promise<void>;
-            update: (points: any) => void;
-        };
-        9: {
-            vertexShader: string;
-            fragmentShader: string;
-            init: (points: any, params: any) => Promise<void>;
-            update: (points: any) => void;
-        };
-    };
     /**
-     * Adds a `RenderPass` from the `RenderPasses` list
-     * @param {Points} points References a `Points` instance
-     * @param {RenderPasses} renderPassId Select a static property from `RenderPasses`
-     * @param {Object} params An object with the params needed by the `RenderPass`
-     * @returns {Promise<void>}
+     * Apply a color {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.COLOR, { color: [.5, 1, 0, 1], blendAmount: .5 });
      */
-    static add(points: Points, renderPassId: RenderPasses, params: any): Promise<void>;
+    static COLOR: RenderPass;
     /**
-     * Color postprocessing
-     * @param {Points} points a `Points` reference
-     * @param {Number} r red
-     * @param {Number} g green
-     * @param {Number} b blue
-     * @param {Number} a alpha
-     * @param {Number} blendAmount how much you want to blend it from 0..1
-     * @returns {Promise<void>}
+     * Apply a grayscale {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.GRAYSCALE);
      */
-    static color(points: Points, r: number, g: number, b: number, a: number, blendAmount: number): Promise<void>;
+    static GRAYSCALE: RenderPass;
     /**
-     * Grayscale postprocessing. Takes the brightness of an image and returns it; that makes the grayscale result.
-     * @param {Points} points a `Points` reference
-     * @returns {Promise<void>}
+     * Apply a chromatic aberration {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.CHROMATIC_ABERRATION, { distance: .02 });
      */
-    static grayscale(points: Points): Promise<void>;
+    static CHROMATIC_ABERRATION: RenderPass;
     /**
-     * Chromatic Aberration postprocessing. Color bleeds simulating a lens effect without distortion.
-     * @param {Points} points a `Points` reference
-     * @param {Number} distance from 0..1 how far the channels are visually apart from each other in the screen, but the value can be greater and negative
-     * @returns {Promise<void>}
+     * Apply a pixelation {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.PIXELATE);
      */
-    static chromaticAberration(points: Points, distance: number): Promise<void>;
+    static PIXELATE: RenderPass;
     /**
-     * Pixelate postprocessing. It reduces the amount of pixels in the output preserving the scale.
-     * @param {Points} points a `Points` reference
-     * @param {Number} width width of the pixel in pixels
-     * @param {Number} height width of the pixel in pixels
-     * @returns {Promise<void>}
+     * Apply a lens distortion {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.LENS_DISTORTION);
      */
-    static pixelate(points: Points, width: number, height: number): Promise<void>;
+    static LENS_DISTORTION: RenderPass;
     /**
-     * Lens Distortion postprocessing. A fisheye distortion with chromatic aberration.
-     * @param {Points} points a `Points` reference
-     * @param {Number} amount positive or negative value on how distorted the image will be
-     * @param {Number} distance of chromatic aberration: from 0..1 how far the channels are visually apart from each other in the screen, but the value can be greater and negative
-     * @returns {Promise<void>}
+     * Apply a film grain {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.FILM_GRAIN);
      */
-    static lensDistortion(points: Points, amount: number, distance: number): Promise<void>;
+    static FILM_GRAIN: RenderPass;
     /**
-     * Film grain postprocessing. White noise added to the output to simulate film irregularities.
-     * @param {Points} points a `Points` reference
-     * @returns {Promise<void>}
+     * Apply a bloom {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.BLOOM);
      */
-    static filmgrain(points: Points): Promise<void>;
+    static BLOOM: RenderPass;
     /**
-     * Bloom postprocessing. Increases brightness of already bright areas to create a haze effect.
-     * @param {Points} points a `Points` reference
-     * @param {Number} amount how bright the effect will be
-     * @returns {Promise<void>}
+     * Apply a blur {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.BLUR, { resolution: [100, 100], direction: [.4, 0], radians: 0 });
      */
-    static bloom(points: Points, amount: number): Promise<void>;
+    static BLUR: RenderPass;
     /**
-     * Blur postprocessing. Softens an image by creating multiple samples.
-     * @param {Points} points a `Points` reference
-     * @param {Number} resolutionX Samples in X
-     * @param {Number} resolutionY Samples in Y
-     * @param {Number} directionX direction in X
-     * @param {Number} directionY directon in Y
-     * @param {Number} radians rotation in radians
-     * @returns {Promise<void>}
+     * Apply a waives noise {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.WAVES, { scale: .05 });
      */
-    static blur(points: Points, resolutionX: number, resolutionY: number, directionX: number, directionY: number, radians: number): Promise<void>;
-    /**
-     * Waves postprocessing. Distorts the image with noise to create a water like effect.
-     * @param {Points} points a `Points` reference
-     * @param {Number} scale how big the wave noise is
-     * @param {Number} intensity a soft or hard effect
-     * @returns {Promise<void>}
-     */
-    static waves(points: Points, scale: number, intensity: number): Promise<void>;
+    static WAVES: RenderPass;
 }
 /**
  * In different calls to the main {@link Points} class, it is used to
@@ -352,6 +318,29 @@ declare class Points {
         value: number;
     }>): void;
     /**
+     * Create a WGSL `const` initialized from JS.
+     * Useful to set a value you can't initialize in WGSL because you don't have
+     * the value yet.
+     * The constant will be ready to use on the WGSL shder string.
+     * @param {String} name
+     * @param {string|Number} value
+     * @param {String} structName
+     * @returns {Object}
+     *
+     * @example
+     *
+     * // js side
+     * points.setConstant('NUMPARTICLES', 64, 'f32')
+     *
+     * // wgsl string
+     * // this should print `NUMPARTICLES` and be ready to use.
+     * const NUMPARTICLES:f32 = 64; // this will be hidden to the developer
+     *
+     * // your code:
+     * const particles = array<Particle, NUMPARTICLES>();
+     */
+    setConstant(name: string, value: string | number, structName: string): any;
+    /**
      * Creates a persistent memory buffer across every frame call. See [GPUBuffer](https://www.w3.org/TR/webgpu/#gpubuffer)
      * <br>
      * Meaning it can be updated in the shaders across the execution of every frame.
@@ -390,7 +379,7 @@ declare class Points {
      * The difference with {@link Points#setStorage|setStorage} is that this can be initialized
      * with data.
      * @param {string} name Name that the Storage will have in the shader.
-     * @param {Uint8Array<ArrayBuffer>} arrayData array with the data that must match the struct.
+     * @param {Uint8Array<ArrayBuffer>|Array<Number>|Number} arrayData array with the data that must match the struct.
      * @param {string} structName Name of the struct already existing on the
      * shader. This will be the type of the Storage.
      * @param {boolean} read if this is going to be used to read data back.
@@ -424,7 +413,7 @@ declare class Points {
      *
      * resultMatrix.size = vec2(firstMatrix.size.x, secondMatrix.size.y);
      */
-    setStorageMap(name: string, arrayData: Uint8Array<ArrayBuffer>, structName: string, read?: boolean, shaderType?: ShaderType): any;
+    setStorageMap(name: string, arrayData: Uint8Array<ArrayBuffer> | Array<number> | number, structName: string, read?: boolean, shaderType?: ShaderType): any;
     readStorage(name: any): Promise<Float32Array<any>>;
     /**
      * Layers of data made of `vec4f`.
@@ -475,6 +464,9 @@ declare class Points {
      *
      * @param {String} name Name to call the texture in the shaders.
      * @param {boolean} copyCurrentTexture If you want the fragment output to be copied here.
+     * @param {String} shaderType To what {@link ShaderType} you want to exclusively use this variable.
+     * @param {Number} renderPassIndex If using `copyCurrentTexture`
+     * this tells which RenderPass it should get the data from. If not set then it will grab the last pass.
      * @returns {Object}
      *
      * @example
@@ -489,7 +481,7 @@ declare class Points {
      * );
      *
      */
-    setTexture2d(name: string, copyCurrentTexture: boolean, shaderType: any, renderPassIndex: any): any;
+    setTexture2d(name: string, copyCurrentTexture: boolean, shaderType: string, renderPassIndex: number): any;
     copyTexture(nameTextureA: any, nameTextureB: any): void;
     /**
      * Loads an image as `texture_2d` and then it will be available to read
@@ -520,7 +512,7 @@ declare class Points {
      * @param {String} path atlas to grab characters from, image address in a web server
      * @param {{x: number, y: number}} size size of a individual character e.g.: `{x:10, y:20}`
      * @param {Number} offset how many characters back or forward it must move to start
-     * @param {String} shaderType
+     * @param {String} shaderType To what {@link ShaderType} you want to exclusively use this variable.
      * @returns {Object}
      *
      * @example
@@ -603,15 +595,18 @@ declare class Points {
         name: any;
         shaderType: any;
         texture: any;
-        internal: boolean;
     };
     /**
      * Special texture where data can be written to it in the Compute Shader and
+     * read from in the Fragment Shader OR from a {@link RenderPass} to another.
+     * If you use writeIndex and readIndex it will share data between `RenderPasse`s
      * Is a one way communication method.
      * Ideal to store data to it in the Compute Shader and later visualize it in
      * the Fragment Shader.
-     * @param {string} computeName name of the variable in the compute shader
-     * @param {string} fragmentName name of the variable in the fragment shader
+     * @param {string} writeName name of the variable in the compute shader
+     * @param {string} readName name of the variable in the fragment shader
+     * @param {number} writeIndex RenderPass allowed to write into `outputTex`
+     * @param {number} readIndex RenderPass allowed to read from `computeTexture`
      * @param {Array<number, 2>} size dimensions of the texture, by default screen
      * size
      * @returns {Object}
@@ -627,22 +622,29 @@ declare class Points {
      * //// fragment
      * let value = texturePosition(computeTexture, imageSampler, position, uv, false);
      */
-    setBindingTexture(computeName: string, fragmentName: string, size: Array<number, 2>): any;
+    setBindingTexture(writeName: string, readName: string, writeIndex: number, readIndex: number, size: Array<number, 2>): any;
     /**
      * Listens for an event dispatched from WGSL code
      * @param {String} name Number that represents an event Id
      * @param {Function} callback function to be called when the event occurs
-     * @param {Number} structSize size of the data to be returned
+     * @param {Number} structSize size of the array data to be returned
      *
      * @example
      * // js
      * // the event name will be reflected as a variable name in the shader
+     * // and a data variable that starts with the name
      * points.addEventListener('click_event', data => {
      *     // response action in JS
-     * }, 4);
+     *      const [a, b, c, d] = data;
+     *      console.log({a, b, c, d});
+     * }, 4); // data will have 4 items
      *
      * // wgsl string
      *  if(params.mouseClick == 1.){
+     *      // we update our event response data with something we need
+     *      // on the js side
+     *      // click_event_data has 4 items to fill
+     *      click_event_data[0] = params.time;
      *      // Same name of the Event
      *      // we fire the event with a 1
      *      // it will be set to 0 in the next frame
@@ -650,14 +652,7 @@ declare class Points {
      *  }
      *
      */
-    addEventListener(name: string, callback: Function, structSize: number): void;
-    /**
-     * for internal use:
-     * to flag add* methods and variables as part of the RenderPasses
-     * @private
-     * @ignore
-     */
-    private _setInternal;
+    addEventListener(name: string, callback: Function, structSize?: number): void;
     /**
      * Establishes the density of the base mesh, by default 1x1, meaning two triangles.
      * The final number of triangles is `numColumns` * `numRows` * `2` ( 2 being the triangles )
@@ -686,12 +681,11 @@ declare class Points {
      */
     init(renderPasses: Array<RenderPass>): boolean;
     /**
-     * Mainly to be used with {@link RenderPasses}<br>
      * Injects a render pass after all the render passes added by the user.
      * @param {RenderPass} renderPass
-     * @ignore
+     * @param {Object} params
      */
-    addRenderPass(renderPass: RenderPass): void;
+    addRenderPass(renderPass: RenderPass, params: any): void;
     /**
      * Get the active list of {@link RenderPass}
      */

@@ -1,13 +1,9 @@
-import { fnusin } from 'points/animation';
 import { PI, rotateVector } from 'points/math';
 import { snoise } from 'points/noise2d';
-import { sdfCircle } from 'points/sdf';
 import { structs } from './structs.js';
 
 const frag = /*wgsl*/`
 
-${fnusin}
-${sdfCircle}
 ${rotateVector}
 ${PI}
 ${snoise}
@@ -39,6 +35,7 @@ fn main(
 
     if(variables.init == 0){
         var index = 0;
+        // TODO: initialize with StorageMap from JS
         colors[index] = vec3f(248, 208, 146) / 255; index++;
         colors[index] = vec3f(21, 144, 151) / 255; index++;
         colors[index] = vec3f(56, 164, 140) / 255; index++;
@@ -52,17 +49,24 @@ fn main(
     let center = vec2f(.5) * ratio;
 
     let d = 1 - distance(uvr, center);
-    let uvrRotated = rotateVector(  (uvr - center) / params.scale, params.time * .1);
-    let uvrTwisted = rotateVector(uvrRotated, params.rotation * 2 * PI * d);
+    let uvrRotated = rotateVector(
+        (uvr - center) / params.scale,
+        params.time * .1
+    );
+    let uvrTwisted = rotateVector(
+        uvrRotated,
+        params.rotation * 2 * PI * d
+    );
 
-    var displaceValue = 0.;
-    if(params.displace == 1){
-        displaceValue = params.time;
-    }
+    //if(params.displace == 1){displaceValue = params.time;}
+    let displaceValue = params.time * params.displace;
 
     let n = snoise(displaceValue + uvrTwisted ) * .5 + .5;
 
-    let finalColor = vec4(paletteLerp(colors, fract(n + params.time * .01 + uvr.x)), 1);
+    let finalColor = vec4(
+        paletteLerp(colors, fract(n + params.time * .01 + uvr.x)),
+        1
+    );
 
     return finalColor;
 }

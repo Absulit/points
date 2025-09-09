@@ -1,5 +1,5 @@
-import { fnusin, fusin } from 'points/animation';
-import { texturePosition } from 'points/image';
+import { fusin } from 'points/animation';
+import { texture } from 'points/image';
 
 const frag = /*wgsl*/`
 
@@ -8,9 +8,8 @@ struct Particle{
     y: f32
 }
 
-${fnusin}
 ${fusin}
-${texturePosition}
+${texture}
 
 @fragment
 fn main(
@@ -22,12 +21,11 @@ fn main(
         @builtin(position) position: vec4f
     ) -> @location(0) vec4f {
 
-    let startPosition = vec2(0.);
-    let texColor = texturePosition(feedbackTexture, feedbackSampler, startPosition, uvr, false);
-    let texColor2 = texturePosition(feedbackTexture, feedbackSampler, startPosition, uvr + vec2(-.001,1), false);
-    let texColor3 = texturePosition(feedbackTexture, feedbackSampler, startPosition, uvr + vec2(.001,1), false);
+    let texColor = texture(feedbackTexture, feedbackSampler, uvr, false);
+    let texColor2 = texture(feedbackTexture, feedbackSampler, uvr + vec2(-.001,1), false);
+    let texColor3 = texture(feedbackTexture, feedbackSampler, uvr + vec2(.001,1), false);
 
-    let texColorCompute = texturePosition(computeTexture, feedbackSampler, startPosition, uv, false);
+    let texColorCompute = texture(computeTexture, feedbackSampler, uvr, false);
 
     let d = distance(uvr, vec2(.5 + .1 * fusin(2.), .5  + .1 * fusin(4.123)) * ratio);
     let c = step(d, .1); // if(d > .1){c = 0.;}

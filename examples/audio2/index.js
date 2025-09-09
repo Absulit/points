@@ -6,7 +6,6 @@ let audio = null;
 
 const base = {
     vert,
-    compute: null,
     frag,
     /**
      *
@@ -15,27 +14,36 @@ const base = {
     init: async points => {
         let volume = 1;
         let loop = true;
-        // let audio = points.setAudio('audio', './../../audio/generative_audio_test.ogg', volume, loop);
-        audio = points.setAudio('audio', './../../audio/cognitive_dissonance.mp3', volume, loop, false);
-        // audio = points.setAudio('audio', 'https://mdn.github.io/voice-change-o-matic/audio/concert-crowd.ogg', volume, loop);
+        audio = points.setAudio(
+            'audio',
+            './../../audio/cognitive_dissonance.mp3',
+            volume,
+            loop,
+            false
+        );
 
         points.addEventListener('click_event', data => {
             audio.play();
         }, 4);
 
-
         points.setStorage('result', 'array<f32, 10>', 4);
-
-        // RenderPasses.filmgrain(points);
-        // RenderPasses.bloom(points, .1);
-        // RenderPasses.lensDistortion(points, .5, .01);
-        // RenderPasses.blur(points, 100, 100, .1,0);
-
         points.setSampler('imageSampler', null);
         points.setTexture2d('feedbackTexture', true);
+
+
+        points.setStorageMap('showMessage', 1, 'f32');
+
+        const size = { x: 8, y: 22 };
+        await points.setTextureString(
+            'cta',
+            'Click to Play',
+            './../img/inconsolata_regular_8x22.png',
+            size,
+            -32
+        );
+
     },
     /**
-     *
      * @param {Points} points
      */
     update: points => {

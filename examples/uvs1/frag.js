@@ -11,15 +11,13 @@ fn main(
     ) -> @location(0) vec4f {
 
     // stretched uv if canvas dimensions are non squared
-    let uvColor:vec4f = vec4( fract(uv * 10), 0,1);
+    let uvColor = vec4(fract(uv * 10), 0, 1);
 
     // always square dimensions
-    let uvrColor:vec4f = vec4( fract(uvr * 20), 0,1).rbga;
+    let uvrColor = vec4(fract(uvr * 20), 0, 1).rbga;
 
-    var factor = 0.;
-    if(uv.x > mouse.x){
-        factor = 1.;
-    }
+    // if(uv.x > mouse.x){factor = 1.;}
+    let factor = step(uv.x, mouse.x);
 
     return mix(uvColor, uvrColor, factor);
 }

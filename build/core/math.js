@@ -111,4 +111,20 @@ fn rotateVector(p:vec2f, rads:f32 ) -> vec2f {
 }
 `;
 
-export { E, PHI, PI, TAU, polar, rotateVector };
+/**
+ * Angle between two points.
+ * @type {String}
+ * @param {vec2f} p1 first point position
+ * @param {vec2f} p2 second poin position
+ * @returns {f32} angle in radians
+ */
+const angle = /*wgsl*/`
+fn angle(p1:vec2f, p2:vec2f) -> f32 {
+    let delta = p2 - p1;
+    let distance = length(delta);
+    return atan2(delta.y, delta.x);
+}
+
+`;
+
+export { E, PHI, PI, TAU, angle, polar, rotateVector };

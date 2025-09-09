@@ -1,23 +1,12 @@
-import { snoise } from 'points/noise2d';
-import { texturePosition } from 'points/image';
-import { bloom, brightness } from 'points/color';
-import { sdfCircle, sdfLine, sdfSegment } from 'points/sdf';
-import { fnusin, fusin } from 'points/animation';
-import { polar, PI } from 'points/math';
+import { texture } from 'points/image';
+import { bloom } from 'points/color';
+import { PI } from 'points/math';
 
 const frag = /*wgsl*/`
 
-${fnusin}
-${fusin}
-${sdfCircle}
-${sdfSegment}
-${sdfLine}
-${brightness}
-${polar}
-${snoise}
-${PI}
-${texturePosition}
+${texture}
 ${bloom}
+${PI}
 
 
 @fragment
@@ -30,16 +19,14 @@ fn main(
         @builtin(position) position: vec4f
     ) -> @location(0) vec4f {
 
-    let startPosition = vec2(0.,0.);
-    let rgbaImage = texturePosition(image, imageSampler, startPosition, uvr / params.scale, true); //* .998046;
+    let rgbaImage = texture(image, imageSampler, uvr / params.scale, false);
 
     let input = rgbaImage.r;
     let bloomVal = bloom(input, 2, params.bloom);
     let rgbaBloom = vec4(bloomVal);
 
 
-    let finalColor:vec4f = rgbaImage + rgbaBloom;
-
+    let finalColor = rgbaImage + rgbaBloom;
 
     return finalColor;
 }

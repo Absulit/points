@@ -1,12 +1,12 @@
 import { fnusin } from 'points/animation';
 import { brightness } from 'points/color';
-import { texturePosition } from 'points/image';
+import { texture } from 'points/image';
 
 const frag = /*wgsl*/`
 
 ${fnusin}
 ${brightness}
-${texturePosition}
+${texture}
 
 @fragment
 fn main(
@@ -18,14 +18,17 @@ fn main(
         @builtin(position) position: vec4f
     ) -> @location(0) vec4f {
 
-    let lines = sin( uv.x*(uv.x + 3. * fnusin(1.))  ) ;
-    let startPosition = vec2(0.);
-    let rgbaImage = texturePosition(image, feedbackSampler, startPosition, uvr * lines / params.scale, false); //* .998046;
+    let lines = sin(uv.x * (uv.x + 3. * fnusin(1.))) ;
+    let rgbaImage = texture(
+        image,
+        feedbackSampler,
+        uvr * lines / params.scale,
+        false
+    );
 
     let b = brightness(rgbaImage);
 
     let finalColor:vec4f = vec4(b);
-
 
     return finalColor;
 }

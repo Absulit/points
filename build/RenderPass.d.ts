@@ -13,6 +13,16 @@ export { RenderPass as default };
 
  * // we pass the array of renderPasses
  * await points.init(renderPasses);
+ *
+ * @example
+ * // init param example
+ * const waves = new RenderPass(vertexShader, fragmentShader, null, 8, 8, 1, (points, params) => {
+ *     points.setSampler('renderpass_feedbackSampler', null);
+ *     points.setTexture2d('renderpass_feedbackTexture', true);
+ *     points.setUniform('waves_scale', params.scale || .45);
+ *     points.setUniform('waves_intensity', params.intensity || .03);
+ * });
+ * waves.required = ['scale', 'intensity'];
  */
 declare class RenderPass {
     /**
@@ -21,14 +31,23 @@ declare class RenderPass {
      * @param {String} vertexShader  WGSL Vertex Shader in a String.
      * @param {String} fragmentShader  WGSL Fragment Shader in a String.
      * @param {String} computeShader  WGSL Compute Shader in a String.
+     * @param {String} workgroupCountX  Workgroup amount in X.
+     * @param {String} workgroupCountY  Workgroup amount in Y.
+     * @param {String} workgroupCountZ  Workgroup amount in Z.
+     * @param {function(points:Points, params:Object):void} init Method to add custom
+     * uniforms or storage (points.set* methods).
+     * This is made for post processing multiple `RenderPass`.
+     * The method `init` will be called to initialize the buffer parameters.
+     *
      */
-    constructor(vertexShader: string, fragmentShader: string, computeShader: string, workgroupCountX: any, workgroupCountY: any, workgroupCountZ: any);
-    set internal(value: boolean);
+    constructor(vertexShader: string, fragmentShader: string, computeShader: string, workgroupCountX: string, workgroupCountY: string, workgroupCountZ: string, init: any);
+    set index(value: any);
     /**
-     * To use with {link RenderPasses} so it's internal
-     * @ignore
+     * Get the current RenderPass index order in the pipeline.
+     * When you add a RenderPass to the constructor or via
+     * {@link Points#addRenderPass}, this is the order it receives.
      */
-    get internal(): boolean;
+    get index(): any;
     /**
      * get the vertex shader content
      */
@@ -64,8 +83,48 @@ declare class RenderPass {
     get hasVertexShader(): boolean;
     get hasFragmentShader(): boolean;
     get hasVertexAndFragmentShader(): boolean;
-    get workgroupCountX(): any;
-    get workgroupCountY(): any;
-    get workgroupCountZ(): any;
+    /**
+     * @param {Number} val
+     */
+    set workgroupCountX(val: number);
+    /**
+     * How many workgroups are in the X dimension.
+     */
+    get workgroupCountX(): number;
+    /**
+     * @param {Number} val
+     */
+    set workgroupCountY(val: number);
+    /**
+     * How many workgroups are in the Y dimension.
+     */
+    get workgroupCountY(): number;
+    /**
+     * @param {Number} val
+     */
+    set workgroupCountZ(val: number);
+    /**
+     * How many workgroups are in the Z dimension.
+     */
+    get workgroupCountZ(): number;
+    /**
+     * Function where the `init` parameter (set in the constructor) is executed
+     * and this call will pass the parameters that the RenderPass
+     * requires to run.
+     * @param {Points} points instance of {@link Points} to call set* functions
+     * like {@link Points#setUniform}  and others.
+     * @param {Object} params data that can be assigned to the RenderPass when
+     * the {@link Points#addRenderPass} method is called.
+     */
+    init(points: Points, params: any): void;
+    /**
+     * List of buffer names that are required for this RenderPass so if it shows
+     * them in the console.
+     * @param {Array<String>} val names of the parameters `params` in
+     * {@link RenderPass#setInit} that are required.
+     * This is only  used for a post processing RenderPass.
+     */
+    set required(val: Array<string>);
+    get required(): Array<string>;
     #private;
 }

@@ -24,14 +24,3 @@ const imagescale1 = {
 }
 
 export default imagescale1;
-
-// enum GPUCompareFunction {
-//     "never",
-//     "less",
-//     "equal",
-//     "less-equal",
-//     "greater",
-//     "not-equal",
-//     "greater-equal",
-//     "always",
-// };

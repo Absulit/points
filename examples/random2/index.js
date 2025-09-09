@@ -16,6 +16,8 @@ const random2 = {
         for (let k = 0; k < 800*800; k++) {
             data.push(Math.random());
         }
+        // .stream if the data is going to be updated constantly
+        // points.setStorageMap('rands', data, 'array<f32>').stream = true;
         points.setStorageMap('rands', data, 'array<f32>');
         points.setSampler('feedbackSampler');
         points.setTexture2d('feedbackTexture', true);
@@ -28,7 +30,8 @@ const random2 = {
         for (let k = 0; k < 800*800; k++) {
             data[k] = Math.random();
         }
-        // points.updateStorageMap('rands', data);
+        // alternative to update use .stream
+        points.setStorageMap('rands', data);
     }
 }
 

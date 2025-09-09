@@ -10,7 +10,7 @@ const dithering4 = {
     vert,
     frag,
     init: async (points, folder) => {
-        let descriptor = {
+        const descriptor = {
             addressModeU: 'clamp-to-edge',
             addressModeV: 'clamp-to-edge',
         }

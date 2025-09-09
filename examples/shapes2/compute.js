@@ -66,21 +66,17 @@ fn main(
     var x = 450.;
     var y = 450.;
     var index = u32(y + (x * numColumns));
-    let point = &points[index];
-
-    (*point) = vec4(1,0,0,1);
+    points[index] = vec4(1,0,0,1);
 
 
     x = 555.;
     y = 455.;
     index = u32(y + (x * numColumns));
-    let point2 = &points[index];
-
-    (*point2) = vec4(1,0,1,1);
+    points[index] = vec4(1,0,1,1);
 
 
     var rgba = vec4(0.);
-    var colorsAround = array<  vec4f, 4  >();
+    var colorsAround = array<vec4f,4>();
 
     let nx = f32(GlobalId.x) / numColumns;
     let ny = f32(GlobalId.y) / numRows;
@@ -88,9 +84,6 @@ fn main(
     let positionU = GlobalId.xy;
 
     let uIndex = getPointsIndex(positionU);
-    // let rgba = &points[uIndex];
-    // let a = sin(uv.x * params.time);
-    // (*rgba) = vec4(a * uv.x, 1-uv.y, a, 1);
 
     rgba = points[uIndex];
     colorsAround = getColorsAround4Layer(positionU, 1);

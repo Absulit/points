@@ -1,11 +1,5 @@
 const compute = /*wgsl*/`
 
-struct Variable{
-    init: f32,
-    circleRadius:f32,
-    circlePosition:vec2f
-}
-
 @compute @workgroup_size(8,8,1)
 fn main(
     @builtin(global_invocation_id) GlobalId: vec3<u32>,

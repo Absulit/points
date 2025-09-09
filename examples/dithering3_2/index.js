@@ -14,7 +14,7 @@ const dithering3 = {
         new RenderPass(vert, frag, compute, 800, 800)
     ],
     init: async (points, folder) => {
-        let descriptor = {
+        const descriptor = {
             addressModeU: 'repeat',
             addressModeV: 'repeat',
         }
@@ -26,8 +26,8 @@ const dithering3 = {
         // await points.setTextureImage('image', './../img/gratia_800x800.jpg');
         await points.setTextureImage('image', './../img/absulit_800x800.jpg');
         points.setBindingTexture('outputTex', 'computeTexture');
-        points.setLayers(2);
         points.setStorage('variables', 'Variable', false, ShaderType.COMPUTE);
+        points.setStorage('points', 'array<vec4f, 640000>', false, ShaderType.COMPUTE);
 
         points.setUniform('scale', options.scale);
         points.setUniform('quantError', options.quantError);

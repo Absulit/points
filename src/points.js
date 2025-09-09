@@ -1,4 +1,3 @@
-'strict mode'
 import UniformKeys from './UniformKeys.js';
 import VertexBufferInfo from './VertexBufferInfo.js';
 import ShaderType from './ShaderType.js';
@@ -44,7 +43,6 @@ class Points {
     #postRenderPasses = [];
     #vertexBufferInfo = null;
     #buffer = null;
-    #internal = false;
     #presentationSize = null;
     #depthTexture = null;
     #vertexArray = [];
@@ -53,6 +51,7 @@ class Points {
     #commandsFinished = [];
     #renderPassDescriptor = null;
     #uniforms = new UniformsArray();
+    #constants = [];
     #storage = [];
     #readStorage = [];
     #samplers = [];
@@ -104,7 +103,7 @@ class Points {
             this.#originalCanvasWidth = this.#canvas.clientWidth;
             this.#originalCanvasHeigth = this.#canvas.clientHeight;
             window.addEventListener('resize', this.#resizeCanvasToFitWindow, false);
-            document.addEventListener("fullscreenchange", e => {
+            document.addEventListener('fullscreenchange', e => {
                 this.#fullscreen = !!document.fullscreenElement;
                 if (!this.#fullscreen && !this.#fitWindow) {
                     this.#resizeCanvasToDefault();
@@ -132,22 +131,29 @@ class Points {
     }
 
     #setScreenSize = () => {
+        // assigning size here because both sizes must match for the full screen
+        // this was not happening before the speed up refactor
+        this.#canvas.width = canvas.clientWidth;
+        this.#canvas.height = canvas.clientHeight;
+
         this.#presentationSize = [
             this.#canvas.clientWidth,
             this.#canvas.clientHeight,
         ];
         this.#context.configure({
+            label: '_context',
             device: this.#device,
             format: this.#presentationFormat,
             //size: this.#presentationSize,
-            width: this.#canvas.clientWidth,
-            height: this.#canvas.clientHeight,
+            width: this.#presentationSize[0],
+            height: this.#presentationSize[1],
             alphaMode: 'premultiplied',
             // Specify we want both RENDER_ATTACHMENT and COPY_SRC since we
             // will copy out of the swapchain texture.
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
         });
         this.#depthTexture = this.#device.createTexture({
+            label: '_depthTexture',
             size: this.#presentationSize,
             format: 'depth24plus',
             usage: GPUTextureUsage.RENDER_ATTACHMENT,
@@ -208,8 +214,7 @@ class Points {
             name: name,
             value: value,
             type: structName,
-            size: null,
-            internal: this.#internal
+            size: null
         }
         this.#uniforms.push(uniform);
         return uniform;
@@ -226,6 +231,47 @@ class Points {
             }
             variable.value = uniform.value;
         })
+    }
+
+    /**
+     * Create a WGSL `const` initialized from JS.
+     * Useful to set a value you can't initialize in WGSL because you don't have
+     * the value yet.
+     * The constant will be ready to use on the WGSL shder string.
+     * @param {String} name
+     * @param {string|Number} value
+     * @param {String} structName
+     * @returns {Object}
+     *
+     * @example
+     *
+     * // js side
+     * points.setConstant('NUMPARTICLES', 64, 'f32')
+     *
+     * // wgsl string
+     * // this should print `NUMPARTICLES` and be ready to use.
+     * const NUMPARTICLES:f32 = 64; // this will be hidden to the developer
+     *
+     * // your code:
+     * const particles = array<Particle, NUMPARTICLES>();
+     */
+    setConstant(name, value, structName){
+        const constantToUpdate = this.#nameExists(this.#constants, name);
+
+        if (constantToUpdate) {
+            // if name exists is an update
+            throw '`setConstant()` can\'t update a const after it has been set.';
+        }
+
+        const constant = {
+            name,
+            value,
+            structName,
+        }
+
+        this.#constants.push(constant);
+
+        return constant;
     }
 
     /**
@@ -266,8 +312,7 @@ class Points {
             // structSize: null,
             shaderType: shaderType,
             read: read,
-            buffer: null,
-            internal: this.#internal
+            buffer: null
         }
         this.#storage.push(storage);
         return storage;
@@ -284,7 +329,7 @@ class Points {
      * The difference with {@link Points#setStorage|setStorage} is that this can be initialized
      * with data.
      * @param {string} name Name that the Storage will have in the shader.
-     * @param {Uint8Array<ArrayBuffer>} arrayData array with the data that must match the struct.
+     * @param {Uint8Array<ArrayBuffer>|Array<Number>|Number} arrayData array with the data that must match the struct.
      * @param {string} structName Name of the struct already existing on the
      * shader. This will be the type of the Storage.
      * @param {boolean} read if this is going to be used to read data back.
@@ -319,20 +364,34 @@ class Points {
      * resultMatrix.size = vec2(firstMatrix.size.x, secondMatrix.size.y);
      */
     setStorageMap(name, arrayData, structName, read = false, shaderType = null) {
-        const storageToUpdate = this.#nameExists(this.#storage, name)
+        const storageToUpdate = this.#nameExists(this.#storage, name);
+
+        if (!Array.isArray(arrayData) && arrayData.constructor !== Uint8Array) {
+            arrayData = new Uint8Array([arrayData]);
+        }
+
         if (storageToUpdate) {
             storageToUpdate.array = arrayData;
+            storageToUpdate.updated = true;
             return storageToUpdate;
         }
+        // TODO document the stream feature
+        /**
+         * `updated` is set to true in data updates, but this is not true in
+         * something like audio, where the data streams and needs to be updated
+         * constantly, so if the storage map needs to be updated constantly then
+         * `stream` needs to be set to true.
+         */
         const storage = {
+            stream: false, // permanently updated as true
+            updated: true,
             mapped: true,
             name: name,
             structName: structName,
             shaderType: shaderType,
             array: arrayData,
             buffer: null,
-            read: read,
-            internal: this.#internal
+            read: read
         }
         this.#storage.push(storage);
         return storage;
@@ -377,8 +436,7 @@ class Points {
                 structName: 'vec4f',
                 structSize: 16,
                 array: null,
-                buffer: null,
-                internal: this.#internal
+                buffer: null
             });
         }
     }
@@ -432,8 +490,7 @@ class Points {
             name: name,
             descriptor: descriptor,
             shaderType: shaderType,
-            resource: null,
-            internal: this.#internal
+            resource: null
         };
         this.#samplers.push(sampler);
         return sampler;
@@ -448,6 +505,9 @@ class Points {
      *
      * @param {String} name Name to call the texture in the shaders.
      * @param {boolean} copyCurrentTexture If you want the fragment output to be copied here.
+     * @param {String} shaderType To what {@link ShaderType} you want to exclusively use this variable.
+     * @param {Number} renderPassIndex If using `copyCurrentTexture`
+     * this tells which RenderPass it should get the data from. If not set then it will grab the last pass.
      * @returns {Object}
      *
      * @example
@@ -469,12 +529,11 @@ class Points {
             return exists;
         }
         const texture2d = {
-            name: name,
-            copyCurrentTexture: copyCurrentTexture,
-            shaderType: shaderType,
+            name,
+            copyCurrentTexture,
+            shaderType,
             texture: null,
-            renderPassIndex: renderPassIndex,
-            internal: this.#internal
+            renderPassIndex
         }
         this.#textures2d.push(texture2d);
         return texture2d;
@@ -550,8 +609,7 @@ class Points {
             texture: null,
             imageTexture: {
                 bitmap: imageBitmap
-            },
-            internal: this.#internal
+            }
         }
         this.#textures2d.push(texture2d);
         return texture2d;
@@ -569,7 +627,7 @@ class Points {
      * @param {String} path atlas to grab characters from, image address in a web server
      * @param {{x: number, y: number}} size size of a individual character e.g.: `{x:10, y:20}`
      * @param {Number} offset how many characters back or forward it must move to start
-     * @param {String} shaderType
+     * @param {String} shaderType To what {@link ShaderType} you want to exclusively use this variable.
      * @returns {Object}
      *
      * @example
@@ -618,8 +676,7 @@ class Points {
             texture: null,
             imageTextures: {
                 bitmaps: imageBitmaps
-            },
-            internal: this.#internal,
+            }
         });
     }
 
@@ -652,8 +709,7 @@ class Points {
         const textureExternal = {
             name: name,
             shaderType: shaderType,
-            video: video,
-            internal: this.#internal
+            video: video
         };
         this.#texturesExternal.push(textureExternal);
         return textureExternal;
@@ -695,8 +751,7 @@ class Points {
         const textureExternal = {
             name: name,
             shaderType: shaderType,
-            video: video,
-            internal: this.#internal
+            video: video
         };
         this.#texturesExternal.push(textureExternal);
         return textureExternal;
@@ -755,7 +810,7 @@ class Points {
         this.setStorageMap(name, data,
             // `array<f32, ${bufferLength}>`
             'Sound' // custom struct in defaultStructs.js
-        );
+        ).stream = true;
         // uniform that will have the data length as a quick reference
         this.setUniform(`${name}Length`, analyser.frequencyBinCount);
         sound.analyser = analyser;
@@ -773,8 +828,7 @@ class Points {
         const texturesStorage2d = {
             name: name,
             shaderType: shaderType,
-            texture: null,
-            internal: this.#internal
+            texture: null
         };
         this.#texturesStorage2d.push(texturesStorage2d);
         return texturesStorage2d;
@@ -782,11 +836,15 @@ class Points {
 
     /**
      * Special texture where data can be written to it in the Compute Shader and
+     * read from in the Fragment Shader OR from a {@link RenderPass} to another.
+     * If you use writeIndex and readIndex it will share data between `RenderPasse`s
      * Is a one way communication method.
      * Ideal to store data to it in the Compute Shader and later visualize it in
      * the Fragment Shader.
-     * @param {string} computeName name of the variable in the compute shader
-     * @param {string} fragmentName name of the variable in the fragment shader
+     * @param {string} writeName name of the variable in the compute shader
+     * @param {string} readName name of the variable in the fragment shader
+     * @param {number} writeIndex RenderPass allowed to write into `outputTex`
+     * @param {number} readIndex RenderPass allowed to read from `computeTexture`
      * @param {Array<number, 2>} size dimensions of the texture, by default screen
      * size
      * @returns {Object}
@@ -802,20 +860,26 @@ class Points {
      * //// fragment
      * let value = texturePosition(computeTexture, imageSampler, position, uv, false);
      */
-    setBindingTexture(computeName, fragmentName, size) {
+    setBindingTexture(writeName, readName, writeIndex, readIndex, size) {
+        if ((Number.isInteger(writeIndex) && !Number.isInteger(readIndex)) || (!Number.isInteger(writeIndex) && Number.isInteger(readIndex))) {
+            throw 'The parameters writeIndex and readIndex must both be declared.';
+        }
+        const usesRenderPass = Number.isInteger(writeIndex) && Number.isInteger(readIndex);
         // TODO: validate that names don't exist already
         const bindingTexture = {
-            compute: {
-                name: computeName,
-                shaderType: ShaderType.COMPUTE
+            write: {
+                name: writeName,
+                shaderType: ShaderType.COMPUTE,
+                renderPassIndex: writeIndex
             },
-            fragment: {
-                name: fragmentName,
-                shaderType: ShaderType.FRAGMENT
+            read: {
+                name: readName,
+                shaderType: ShaderType.FRAGMENT,
+                renderPassIndex: readIndex
             },
             texture: null,
             size: size,
-            internal: this.#internal
+            usesRenderPass
         }
         this.#bindingTextures.push(bindingTexture);
         return bindingTexture;
@@ -825,17 +889,24 @@ class Points {
      * Listens for an event dispatched from WGSL code
      * @param {String} name Number that represents an event Id
      * @param {Function} callback function to be called when the event occurs
-     * @param {Number} structSize size of the data to be returned
+     * @param {Number} structSize size of the array data to be returned
      *
      * @example
      * // js
      * // the event name will be reflected as a variable name in the shader
+     * // and a data variable that starts with the name
      * points.addEventListener('click_event', data => {
      *     // response action in JS
-     * }, 4);
+     *      const [a, b, c, d] = data;
+     *      console.log({a, b, c, d});
+     * }, 4); // data will have 4 items
      *
      * // wgsl string
      *  if(params.mouseClick == 1.){
+     *      // we update our event response data with something we need
+     *      // on the js side
+     *      // click_event_data has 4 items to fill
+     *      click_event_data[0] = params.time;
      *      // Same name of the Event
      *      // we fire the event with a 1
      *      // it will be set to 0 in the next frame
@@ -843,37 +914,28 @@ class Points {
      *  }
      *
      */
-    addEventListener(name, callback, structSize) {
+    addEventListener(name, callback, structSize = 1) {
         // TODO: remove structSize
-        // this extra 4 is for the boolean flag in the Event struct
-        const data = new Uint8Array(Array(structSize + 4).fill(0));
+        // this extra 1 is for the boolean flag in the Event struct
+        const data = Array(4).fill(0);
         this.setStorageMap(name, data, 'Event', true);
+        this.setStorage(`${name}_data`, `array<f32, ${structSize}>`, true);
         this.#events.set(this.#events_ids,
             {
                 id: this.#events_ids,
-                name: name,
-                callback: callback,
+                name,
+                callback,
             }
         );
         ++this.#events_ids;
     }
-    /**
-     * for internal use:
-     * to flag add* methods and variables as part of the RenderPasses
-     * @private
-     * @ignore
-     */
-    _setInternal(value) {
-        this.#internal = value;
-    }
+
     /**
      * @param {ShaderType} shaderType
-     * @param {boolean} internal
+     * @param {RenderPass} renderPass
      * @returns {String} string with bindings
      */
-    #createDynamicGroupBindings(shaderType, internal) {
-        // `internal` here is a flag for a custom pass
-        internal = internal || false;
+    #createDynamicGroupBindings(shaderType, { index: renderPassIndex }) {
         if (!shaderType) {
             throw '`ShaderType` is required';
         }
@@ -885,8 +947,7 @@ class Points {
             bindingIndex += 1;
         }
         this.#storage.forEach(storageItem => {
-            const internalCheck = internal == storageItem.internal;
-            if (!storageItem.shaderType && internalCheck || storageItem.shaderType == shaderType && internalCheck) {
+            if (!storageItem.shaderType || storageItem.shaderType == shaderType) {
                 const T = storageItem.structName;
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, read_write> ${storageItem.name}: ${T};\n`
                 bindingIndex += 1;
@@ -901,48 +962,57 @@ class Points {
             }
         }
         this.#samplers.forEach((sampler, index) => {
-            const internalCheck = internal == sampler.internal;
-            if (!sampler.shaderType && internalCheck || sampler.shaderType == shaderType && internalCheck) {
+            if (!sampler.shaderType || sampler.shaderType == shaderType) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${sampler.name}: sampler;\n`;
                 bindingIndex += 1;
             }
         });
         this.#texturesStorage2d.forEach((texture, index) => {
-            const internalCheck = internal && texture.internal;
-            if (!texture.shaderType && internalCheck || texture.shaderType == shaderType && internalCheck) {
+            if (!texture.shaderType || texture.shaderType == shaderType) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_storage_2d<rgba8unorm, write>;\n`;
                 bindingIndex += 1;
             }
         });
         this.#textures2d.forEach((texture, index) => {
-            const internalCheck = internal == texture.internal;
-            if (!texture.shaderType && internalCheck || texture.shaderType == shaderType && internalCheck) {
+            if (!texture.shaderType || texture.shaderType == shaderType) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d<f32>;\n`;
                 bindingIndex += 1;
             }
         });
         this.#textures2dArray.forEach((texture, index) => {
-            const internalCheck = internal == texture.internal;
-            if (!texture.shaderType && internalCheck || texture.shaderType == shaderType && internalCheck) {
+            if (!texture.shaderType || texture.shaderType == shaderType) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d_array<f32>;\n`;
                 bindingIndex += 1;
             }
         });
         this.#texturesExternal.forEach(externalTexture => {
-            const internalCheck = internal == externalTexture.internal;
-            if (!externalTexture.shaderType && internalCheck || externalTexture.shaderType == shaderType && internalCheck) {
+            // const internalCheck = internal == externalTexture.internal;
+            if (!externalTexture.shaderType || externalTexture.shaderType == shaderType) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${externalTexture.name}: texture_external;\n`;
                 bindingIndex += 1;
             }
         });
+        // TODO: internalcheck can be a filter
         this.#bindingTextures.forEach(bindingTexture => {
-            const internalCheck = internal == bindingTexture.internal;
-            if (bindingTexture.compute.shaderType == shaderType && internalCheck) {
-                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.compute.name}: texture_storage_2d<rgba8unorm, write>;\n`;
+            const { usesRenderPass } = bindingTexture;
+            if (usesRenderPass) {
+                if (renderPassIndex === bindingTexture.write.renderPassIndex) {
+                    dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.write.name}: texture_storage_2d<rgba8unorm, write>;\n`;
+                    bindingIndex += 1;
+                }
+                if (renderPassIndex === bindingTexture.read.renderPassIndex) {
+                    dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.read.name}: texture_2d<f32>;\n`;
+                    bindingIndex += 1;
+                }
+
+                return;
+            }
+            if (bindingTexture.write.shaderType === shaderType) {
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.write.name}: texture_storage_2d<rgba8unorm, write>;\n`;
                 bindingIndex += 1;
             }
-            if (bindingTexture.fragment.shaderType == shaderType && internalCheck) {
-                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.fragment.name}: texture_2d<f32>;\n`;
+            if (bindingTexture.read.shaderType === shaderType) {
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.read.name}: texture_2d<f32>;\n`;
                 bindingIndex += 1;
             }
         });
@@ -973,6 +1043,11 @@ class Points {
         this.#numRows = numRows;
     }
 
+    /**
+     *
+     * @param {RenderPass} renderPass
+     * @param {Number} index
+     */
     #compileRenderPass = (renderPass, index) => {
         let vertexShader = renderPass.vertexShader;
         let computeShader = renderPass.computeShader;
@@ -991,12 +1066,16 @@ class Points {
         if (this.#uniforms.length) {
             dynamicStructParams = /*wgsl*/`struct Params {\n\t${dynamicStructParams}\n}\n`;
         }
+        this.#constants.forEach(c => {
+            dynamicStructParams += /*wgsl*/`const ${c.name}:${c.structName} = ${c.value};\n`;
+        })
+        renderPass.index = index;
         renderPass.hasVertexShader && (dynamicGroupBindingsVertex += dynamicStructParams);
         renderPass.hasComputeShader && (dynamicGroupBindingsCompute += dynamicStructParams);
         renderPass.hasFragmentShader && (dynamicGroupBindingsFragment += dynamicStructParams);
-        renderPass.hasVertexShader && (dynamicGroupBindingsVertex += this.#createDynamicGroupBindings(ShaderType.VERTEX, renderPass.internal));
-        renderPass.hasComputeShader && (dynamicGroupBindingsCompute += this.#createDynamicGroupBindings(ShaderType.COMPUTE, renderPass.internal));
-        dynamicGroupBindingsFragment += this.#createDynamicGroupBindings(ShaderType.FRAGMENT, renderPass.internal);
+        renderPass.hasVertexShader && (dynamicGroupBindingsVertex += this.#createDynamicGroupBindings(ShaderType.VERTEX, renderPass));
+        renderPass.hasComputeShader && (dynamicGroupBindingsCompute += this.#createDynamicGroupBindings(ShaderType.COMPUTE, renderPass));
+        dynamicGroupBindingsFragment += this.#createDynamicGroupBindings(ShaderType.FRAGMENT, renderPass);
         renderPass.hasVertexShader && (colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + defaultVertexBody + colorsVertWGSL);
         renderPass.hasComputeShader && (colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + colorsComputeWGSL);
         renderPass.hasFragmentShader && (colorsFragWGSL = dynamicGroupBindingsFragment + defaultStructs + colorsFragWGSL);
@@ -1064,6 +1143,8 @@ class Points {
         if (!hasComputeShaders && this.#bindingTextures.length) {
             throw ' `setBindingTexture` requires at least one Compute Shader in a `RenderPass`'
         }
+
+        this.#renderPasses.forEach(r => r.init?.(this));
         this.#renderPasses.forEach(this.#compileRenderPass);
         this.#generateDataSize();
         //
@@ -1108,13 +1189,27 @@ class Points {
     }
 
     /**
-     * Mainly to be used with {@link RenderPasses}<br>
      * Injects a render pass after all the render passes added by the user.
      * @param {RenderPass} renderPass
-     * @ignore
+     * @param {Object} params
      */
-    addRenderPass(renderPass) {
-        this.#postRenderPasses.push(renderPass);
+    addRenderPass(renderPass, params) {
+        if (this.renderPasses?.length) {
+            throw '`addPostRenderPass` should be called prior `Points.init()`';
+        }
+
+        params ||= {};
+
+        const requiredNotFound = renderPass.required?.filter(i => !params[i] && !Number.isInteger(params[i]));
+
+        if (requiredNotFound?.length) {
+            const paramsRequired = requiredNotFound.join(', ');
+            console.warn(`addRenderPass: parameters required: ${paramsRequired}`);
+        }
+
+        const { vertexShader: v, fragmentShader: f, computeShader: c } = renderPass;
+        this.#postRenderPasses.push(new RenderPass(v, f, c));
+        renderPass.init(this, params);
     }
 
     /**
@@ -1245,9 +1340,15 @@ class Points {
      */
     #writeStorages() {
         this.#storage.forEach(storageItem => {
-            if (storageItem.mapped) {
+            // since audio is something constant
+            // the stream flag allows to keep this write open
+            const { updated, stream } = storageItem;
+            if (storageItem.mapped && (updated || stream)) {
                 const values = new Float32Array(storageItem.array);
                 this.#writeBuffer(storageItem.buffer, values);
+                if (!stream) {
+                    storageItem.updated = false;
+                }
             }
         });
     }
@@ -1395,7 +1496,8 @@ class Points {
     #createComputeBindGroup() {
         this.#renderPasses.forEach((renderPass, index) => {
             if (renderPass.hasComputeShader) {
-                const entries = this.#createEntries(ShaderType.COMPUTE);
+                const entries = this.#createEntries(ShaderType.COMPUTE, renderPass);
+
                 if (entries.length) {
                     const bglEntries = [];
                     entries.forEach((entry, index) => {
@@ -1436,8 +1538,8 @@ class Points {
      * is not being updated at all. I have to make the createBindGroup call
      * only if the texture is updated.
      */
-    #passComputeBindingGroup(renderPass){
-        const entries = this.#createEntries(ShaderType.COMPUTE);
+    #passComputeBindingGroup(renderPass) {
+        const entries = this.#createEntries(ShaderType.COMPUTE, renderPass);
         if (entries.length) {
             renderPass.entries = entries;
             /**
@@ -1558,7 +1660,7 @@ class Points {
      * Creates the entries for the pipeline
      * @returns an array with the entries
      */
-    #createEntries(shaderType, internal) {
+    #createEntries(shaderType, { internal, index: renderPassIndex }) {
         internal = internal || false;
         let entries = [];
         let bindingIndex = 0;
@@ -1577,26 +1679,23 @@ class Points {
                 }
             );
         }
-        if (this.#storage.length) {
-            this.#storage.forEach(storageItem => {
-                let internalCheck = internal == storageItem.internal;
-                if (!storageItem.shaderType && internalCheck || storageItem.shaderType == shaderType && internalCheck) {
-                    entries.push(
-                        {
-                            binding: bindingIndex++,
-                            resource: {
-                                label: 'storage',
-                                buffer: storageItem.buffer
-                            },
-                            type: {
-                                name: 'buffer',
-                                type: 'storage'
-                            }
+        this.#storage.forEach(storageItem => {
+            if (!storageItem.shaderType || storageItem.shaderType == shaderType) {
+                entries.push(
+                    {
+                        binding: bindingIndex++,
+                        resource: {
+                            label: 'storage',
+                            buffer: storageItem.buffer
+                        },
+                        type: {
+                            name: 'buffer',
+                            type: 'storage'
                         }
-                    );
-                }
-            });
-        }
+                    }
+                );
+            }
+        });
         if (this.#layers.length) {
             if (!this.#layers.shaderType || this.#layers.shaderType == shaderType) {
                 entries.push(
@@ -1616,8 +1715,7 @@ class Points {
         }
         if (this.#samplers.length) {
             this.#samplers.forEach((sampler, index) => {
-                let internalCheck = internal == sampler.internal;
-                if (!sampler.shaderType && internalCheck || sampler.shaderType == shaderType && internalCheck) {
+                if (!sampler.shaderType || sampler.shaderType == shaderType) {
                     entries.push(
                         {
                             binding: bindingIndex++,
@@ -1633,8 +1731,7 @@ class Points {
         }
         if (this.#texturesStorage2d.length) {
             this.#texturesStorage2d.forEach((textureStorage2d, index) => {
-                let internalCheck = internal == textureStorage2d.internal;
-                if (!textureStorage2d.shaderType && internalCheck || textureStorage2d.shaderType == shaderType && internalCheck) {
+                if (!textureStorage2d.shaderType || textureStorage2d.shaderType == shaderType) {
                     entries.push(
                         {
                             label: 'texture storage 2d',
@@ -1651,8 +1748,7 @@ class Points {
         }
         if (this.#textures2d.length) {
             this.#textures2d.forEach((texture2d, index) => {
-                let internalCheck = internal == texture2d.internal;
-                if (!texture2d.shaderType && internalCheck || texture2d.shaderType == shaderType && internalCheck) {
+                if (!texture2d.shaderType || texture2d.shaderType == shaderType) {
                     entries.push(
                         {
                             label: 'texture 2d',
@@ -1669,8 +1765,7 @@ class Points {
         }
         if (this.#textures2dArray.length) {
             this.#textures2dArray.forEach((texture2dArray, index) => {
-                let internalCheck = internal == texture2dArray.internal;
-                if (!texture2dArray.shaderType && internalCheck || texture2dArray.shaderType == shaderType && internalCheck) {
+                if (!texture2dArray.shaderType || texture2dArray.shaderType == shaderType) {
                     entries.push(
                         {
                             label: 'texture 2d array',
@@ -1692,8 +1787,7 @@ class Points {
         }
         if (this.#texturesExternal.length) {
             this.#texturesExternal.forEach(externalTexture => {
-                let internalCheck = internal == externalTexture.internal;
-                if (!externalTexture.shaderType && internalCheck || externalTexture.shaderType == shaderType && internalCheck) {
+                if (!externalTexture.shaderType || externalTexture.shaderType == shaderType) {
                     entries.push(
                         {
                             label: 'external texture',
@@ -1708,13 +1802,29 @@ class Points {
                 }
             });
         }
-        if (this.#bindingTextures.length) {
-            this.#bindingTextures.forEach(bindingTexture => {
-                let internalCheck = internal == bindingTexture.internal;
-                if (bindingTexture.compute.shaderType == shaderType && internalCheck) {
+        // TODO: repeated entry blocks
+        // TODO: internalcheck can be filtered
+        this.#bindingTextures.forEach(bindingTexture => {
+
+            const { usesRenderPass } = bindingTexture;
+            if (usesRenderPass) {
+                if (bindingTexture.read.renderPassIndex === renderPassIndex) {
                     entries.push(
                         {
-                            label: 'binding texture',
+                            label: `binding texture 2: name: ${bindingTexture.read.name}`,
+                            binding: bindingIndex++,
+                            resource: bindingTexture.texture.createView(),
+                            type: {
+                                name: 'texture',
+                                type: 'float'
+                            }
+                        }
+                    );
+                }
+                if (bindingTexture.write.renderPassIndex === renderPassIndex) {
+                    entries.push(
+                        {
+                            label: `binding texture: name: ${bindingTexture.write.name}`,
                             binding: bindingIndex++,
                             resource: bindingTexture.texture.createView(),
                             type: {
@@ -1725,30 +1835,47 @@ class Points {
                         }
                     );
                 }
-            });
-            this.#bindingTextures.forEach(bindingTexture => {
-                const internalCheck = internal == bindingTexture.internal;
-                if (bindingTexture.fragment.shaderType == shaderType && internalCheck) {
-                    entries.push(
-                        {
-                            label: 'binding texture 2',
-                            binding: bindingIndex++,
-                            resource: bindingTexture.texture.createView(),
-                            type: {
-                                name: 'texture',
-                                type: 'float'
-                            }
+                return;
+            }
+
+            if (bindingTexture.read.shaderType == shaderType) {
+                entries.push(
+                    {
+                        label: `binding texture 2: name: ${bindingTexture.read.name}`,
+                        binding: bindingIndex++,
+                        resource: bindingTexture.texture.createView(),
+                        type: {
+                            name: 'texture',
+                            type: 'float'
                         }
-                    );
-                }
-            });
-        }
+                    }
+                );
+            }
+
+            if (bindingTexture.write.shaderType == shaderType) {
+                entries.push(
+                    {
+                        label: `binding texture: name: ${bindingTexture.write.name}`,
+                        binding: bindingIndex++,
+                        resource: bindingTexture.texture.createView(),
+                        type: {
+                            name: 'storageTexture',
+                            type: 'write-only',
+                            format: 'rgba8unorm'
+                        }
+                    }
+                );
+            }
+
+
+        });
+
         return entries;
     }
 
     #createParams() {
         this.#renderPasses.forEach(renderPass => {
-            const entries = this.#createEntries(ShaderType.FRAGMENT, renderPass.internal);
+            const entries = this.#createEntries(ShaderType.FRAGMENT, renderPass);
             if (entries.length) {
                 let bglEntries = [];
                 entries.forEach((entry, index) => {
@@ -1757,6 +1884,9 @@ class Points {
                         visibility: GPUShaderStage.FRAGMENT
                     }
                     bglEntry[entry.type.name] = { 'type': entry.type.type };
+                    if (entry.type.format) {
+                        bglEntry[entry.type.name].format = entry.type.format
+                    }
                     if (entry.type.viewDimension) {
                         bglEntry[entry.type.name].viewDimension = entry.type.viewDimension
                     }
@@ -1793,7 +1923,7 @@ class Points {
      * only if the texture is updated.
      */
     #passParams(renderPass) {
-        const entries = this.#createEntries(ShaderType.FRAGMENT, renderPass.internal);
+        const entries = this.#createEntries(ShaderType.FRAGMENT, renderPass);
         if (entries.length) {
             renderPass.entries = entries;
             renderPass.uniformBindGroup = this.#device.createBindGroup({
@@ -1854,7 +1984,7 @@ class Points {
         this.#renderPassDescriptor.colorAttachments[0].view = swapChainTexture.createView();
         this.#renderPassDescriptor.depthStencilAttachment.view = this.#depthTexture.createView();
 
-        this.#renderPasses.forEach((renderPass, renderPassIndex) => {
+        this.#renderPasses.forEach(renderPass => {
             if (renderPass.hasVertexAndFragmentShader) {
                 this.#passParams(renderPass);
                 const passEncoder = commandEncoder.beginRenderPass(this.#renderPassDescriptor);
@@ -1875,7 +2005,7 @@ class Points {
                 passEncoder.end();
                 // Copy the rendering results from the swapchain into |texture2d.texture|.
                 this.#textures2d.forEach(texture2d => {
-                    if (texture2d.renderPassIndex === renderPassIndex || !texture2d.renderPassIndex) {
+                    if (texture2d.renderPassIndex === renderPass.index || !texture2d.renderPassIndex) {
                         if (texture2d.copyCurrentTexture) {
                             commandEncoder.copyTextureToTexture(
                                 {
@@ -1920,18 +2050,16 @@ class Points {
             }
         });
 
-        if (this.#readStorage.length) {
-            this.#readStorage.forEach(readStorageItem => {
-                let storageItem = this.#storage.find(storageItem => storageItem.name === readStorageItem.name);
-                commandEncoder.copyBufferToBuffer(
-                    storageItem.buffer /* source buffer */,
-                    0 /* source offset */,
-                    readStorageItem.buffer /* destination buffer */,
-                    0 /* destination offset */,
-                    readStorageItem.buffer.size /* size */
-                );
-            });
-        }
+        this.#readStorage.forEach(readStorageItem => {
+            let storageItem = this.#storage.find(storageItem => storageItem.name === readStorageItem.name);
+            commandEncoder.copyBufferToBuffer(
+                storageItem.buffer /* source buffer */,
+                0 /* source offset */,
+                readStorageItem.buffer /* destination buffer */,
+                0 /* destination offset */,
+                readStorageItem.buffer.size /* size */
+            );
+        });
         // ---------------------
         this.#commandsFinished.push(commandEncoder.finish());
         this.#device.queue.submit(this.#commandsFinished);
@@ -1946,11 +2074,17 @@ class Points {
     }
     async read() {
         for (const [key, event] of this.#events) {
-            let eventRead = await this.readStorage(event.name);
+            const { name } = event;
+            const eventRead = await this.readStorage(name);
             if (eventRead) {
-                let id = eventRead[0];
+                const id = eventRead[0];
                 if (id != 0) {
-                    event.callback && event.callback(eventRead.slice(1, -1));
+                    const dataRead = await this.readStorage(`${name}_data`)
+                    event?.callback(dataRead);
+                    const storageToUpdate = this.#nameExists(this.#storage, name);
+                    const data = storageToUpdate.array;
+                    data[0] = 0;
+                    this.setStorageMap(name, data);
                 }
             }
         }

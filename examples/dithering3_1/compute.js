@@ -8,6 +8,7 @@ struct Variable{
 
 ${brightness}
 
+const distance:u32 = 1;
 const workgroupSize = 8;
 
 @compute @workgroup_size(workgroupSize,workgroupSize,1)
@@ -19,35 +20,30 @@ fn main(
     //--------------------------------------------------
     let dims = textureDimensions(image);
 
-    let numColumns:f32 = f32(dims.x);
-    let numRows:f32 = f32(dims.y);
-    //let constant = u32(numColumns) / 93u;
+    let numColumns = dims.x;
+    let numRows = dims.y;
 
-    let numColumnsPiece:i32 = i32(numColumns / f32(workgroupSize));
-    let numRowsPiece:i32 = i32(numRows / f32(workgroupSize));
+    let numColumnsPiece = numColumns / workgroupSize;
+    let numRowsPiece = numRows / workgroupSize;
 
     var layerIndex = 0;
     if(variables.init == 0){
 
-        for (var indexColumns:i32 = 0; indexColumns < numColumnsPiece; indexColumns++) {
-            let x:f32 = f32(WorkGroupID.x) * f32(numColumnsPiece) + f32(indexColumns);
-            let ux = u32(x);
-            let ix = i32(x);
+        for (var indexColumns:u32 = 0; indexColumns < numColumnsPiece; indexColumns++) {
+            let x = WorkGroupID.x * numColumnsPiece + indexColumns;
             let nx = x / numColumns;
-            for (var indexRows:i32 = 0; indexRows < numRowsPiece; indexRows++) {
+            for (var indexRows:u32 = 0; indexRows < numRowsPiece; indexRows++) {
 
-                let y:f32 = f32(WorkGroupID.y) * f32(numRowsPiece) + f32(indexRows);
-                let uy = u32(y);
-                let iy = i32(y);
+                let y = WorkGroupID.y * numRowsPiece + indexRows;
                 let ny = y / numRows;
                 let uv = vec2(nx,ny);
 
                 let pointIndex = i32(y + (x * numColumns));
 
-                var point = textureLoad(image, vec2<i32>(ix,iy), 0); // image
+                var point = textureLoad(image, vec2(x,y), 0); // image
                 //var point = textureLoad(image, vec2<i32>(ix,iy)); // video
-                layers[0][pointIndex] = point;
-                layers[1][pointIndex] = point;
+                points[pointIndex] = point;
+                // points[pointIndex] = point;
             }
         }
 
@@ -62,55 +58,40 @@ fn main(
 
     //--------------------------------------------------
 
-    for (var indexColumns:i32 = 0; indexColumns < numColumnsPiece; indexColumns++) {
-        let x:f32 = f32(WorkGroupID.x) * f32(numColumnsPiece) + f32(indexColumns);
-        let ux = u32(x);
-        let ix = i32(x);
-        let nx = x / numColumns;
-        for (var indexRows:i32 = 0; indexRows < numRowsPiece; indexRows++) {
+    for (var indexColumns:u32 = 0; indexColumns < numColumnsPiece; indexColumns++) {
+        let x = WorkGroupID.x * numColumnsPiece + indexColumns;
+        for (var indexRows:u32 = 0; indexRows < numRowsPiece; indexRows++) {
 
-            let y:f32 = f32(WorkGroupID.y) * f32(numRowsPiece) + f32(indexRows);
-            let uy = u32(y);
-            let iy = i32(y);
-            let ny = y / numRows;
-            let uv = vec2(nx,ny);
+            let y = WorkGroupID.y * numRowsPiece + indexRows;
 
             let pointIndex = i32(y + (x * numColumns));
 
-            var point = layers[layerIndex][pointIndex];
+            var point = points[pointIndex];
             let b = brightness(point);
-            var newBrightness = 0.;
-            if(b > .5){
-                newBrightness = 1.;
-            }
+            let newBrightness = step(.5, b); // if(b > .5){newBrightness = 1.;}
 
             let quant_error = b - newBrightness;
-            let distance = 1;
-            let distanceU = u32(distance);
-            let distanceF = f32(distance);
+
             point = vec4(newBrightness);
 
-            let pointP = &layers[layerIndex][pointIndex];
-            (*pointP) = point;
+            points[pointIndex] = point;
 
 
-            let pointIndexC = i32(y + ((x+distanceF) * numColumns));
-            var rightPoint = layers[layerIndex][pointIndexC];
-            rightPoint = vec4(brightness(rightPoint) + (.5 * quant_error));
+            let pointIndexC = y + (x + distance) * numColumns;
+            var rightPoint = points[pointIndexC];
+            rightPoint = vec4(rightPoint.r + (.5 * quant_error * params.quantError));
 
-            let pointPC = &layers[layerIndex][pointIndexC];
-            (*pointPC) = rightPoint;
+            points[pointIndexC] = rightPoint;
 
 
-            let pointIndexR = i32((y+distanceF) + (x * numColumns));
-            var bottomPoint = layers[layerIndex][pointIndexR];
-            bottomPoint = vec4(brightness(bottomPoint) + (.5 * quant_error));
+            let pointIndexR = y + distance + (x * numColumns);
+            var bottomPoint = points[pointIndexR];
+            bottomPoint = vec4(bottomPoint.r + (.5 * quant_error * params.quantError));
 
-            let pointPR = &layers[layerIndex][pointIndexR];
-            (*pointPR) = bottomPoint;
+            points[pointIndexR] = bottomPoint;
 
-            point = layers[layerIndex][pointIndex];
-            let positionU = vec2u(ux,uy);
+            point = points[pointIndex];
+            let positionU = vec2u(x,y);
             textureStore(outputTex, positionU, point);
             storageBarrier();
         }

@@ -1,4 +1,7 @@
-import { getClosestColorInPalette, orderedDithering_threshold_map } from 'points/effects';
+import {
+    getClosestColorInPalette,
+    orderedDithering_threshold_map
+} from 'points/effects';
 import { texture } from 'points/image';
 import { brightness } from 'points/color';
 
@@ -44,14 +47,17 @@ fn main(
         @builtin(position) position: vec4f
     ) -> @location(0) vec4f {
 
-    let dims:vec2u = textureDimensions(image, 0);
+    let dims = textureDimensions(image, 0);
     var rgbaImage = texture(image, feedbackSampler, uvr / params.scale, false);
     let br = brightness(rgbaImage);
 
     // from 8 to 40
     let depth = floor(8 + 32. * params.depth);
 
-    rgbaImage = getClosestColorInPalette(rgbaImage, u32(numPaletteItems * br * params.depth) + 2, params.distance);
+    rgbaImage = getClosestColorInPalette(
+        rgbaImage,
+        u32(numPaletteItems * br * params.depth) + 2, params.distance
+    );
 
     return rgbaImage;
 }

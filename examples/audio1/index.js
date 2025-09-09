@@ -6,25 +6,48 @@ let audio = null;
 
 const base = {
     vert,
-    compute: null,
     frag,
     /**
      *
      * @param {Points} points
      */
     init: async points => {
-        let volume = 1;
-        let loop = true;
-        // audio = points.setAudio('audio', './../../audio/generative_audio_test.ogg', volume, loop);
-        audio = points.setAudio('audio', './../../audio/cognitive_dissonance.mp3', volume, loop, false);
+        const volume = 1;
+        const loop = true;
+        audio = points.setAudio(
+            'audio',
+            './../../audio/cognitive_dissonance.mp3',
+            volume,
+            loop,
+            false
+        );
         points.addEventListener('click_event', data => {
             audio.play();
         }, 4);
-        // points.setAudio('audio', 'https://mdn.github.io/voice-change-o-matic/audio/concert-crowd.ogg', volume, loop);
-        points.setStorage('result', 'f32');
+
+        points.setStorage('showMessage', 'f32');
+
+        const size = { x: 8, y: 22 };
+        await points.setTextureString(
+            'cta',
+            'Click to Play',
+            './../img/inconsolata_regular_8x22.png',
+            size,
+            -32
+        );
+
+        const descriptor = {
+            addressModeU: 'clamp-to-edge',
+            addressModeV: 'clamp-to-edge',
+            magFilter: 'nearest',
+            minFilter: 'nearest',
+            mipmapFilter: 'nearest',
+            //maxAnisotropy: 10,
+        }
+
+        points.setSampler('imageSampler', descriptor);
     },
     /**
-     *
      * @param {Points} points
      */
     update: points => {

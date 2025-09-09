@@ -65,6 +65,14 @@ export const PI: "const PI = 3.14159265;";
  */
 export const TAU: "const TAU = PI * 2;";
 /**
+ * Angle between two points.
+ * @type {String}
+ * @param {vec2f} p1 first point position
+ * @param {vec2f} p2 second poin position
+ * @returns {f32} angle in radians
+ */
+export const angle: string;
+/**
  * Using polar coordinates, calculates the final point as `vec2f`
  * @type {String}
  * @param {f32} distance distance from origin

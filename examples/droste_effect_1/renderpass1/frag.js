@@ -3,10 +3,8 @@ import { fnusin } from 'points/animation';
 import { PI } from 'points/math';
 import { texturePosition } from 'points/image';
 import { RGBAFromHSV } from 'points/color';
-import { structs } from '../structs.js';
 const frag = /*wgsl*/`
 
-${structs}
 ${fnusin}
 ${sdfSegment}
 ${sdfLine2}
