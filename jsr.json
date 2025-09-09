@@ -44,6 +44,7 @@
         "./dev/random": "./build/core/random.js",
         "./dev/sdf": "./build/core/sdf.js"
     },
+    "importMap": "./importmap.json",
     "publish": {
         "include": [
             "./build/",

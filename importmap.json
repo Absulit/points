@@ -1,0 +1,16 @@
+{
+    "imports": {
+        "points": "./build/points.min.js",
+        "poins/animation": "./build/core/animation.min.js",
+        "poins/audio": "./build/core/audio.min.js",
+        "poins/color": "./build/core/color.min.js",
+        "poins/debug": "./build/core/debug.min.js",
+        "poins/effects": "./build/core/effects.min.js",
+        "poins/image": "./build/core/image.min.js",
+        "poins/math": "./build/core/math.min.js",
+        "poins/noise2d": "./build/core/noise2d.min.js",
+        "poins/classicnoise2d": "./build/core/classicnoise2d.min.js",
+        "poins/random": "./build/core/random.min.js",
+        "poins/sdf": "./build/core/sdf.min.js"
+    }
+}
