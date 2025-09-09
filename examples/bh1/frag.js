@@ -182,7 +182,7 @@ fn main(
 
 
 
-    value = clamp(value, 0.0, 1.0);
+    value = clamp(value, 0., 1.);
     col = paletteLerp(colors, value);
 
     var diskColor = texture(diskTexture, imageSampler, diskUV, false);
@@ -199,12 +199,12 @@ fn main(
     let dir = normalize(rd);
 
     let uv3 = vec2f(
-        0.5 + atan2(dir.x, dir.z) / (2.0 * PI),
-        0.5 - asin(clamp(dir.y, -1.0, 1.0)) / PI
+        0.5 + atan2(dir.x, dir.z) / (2. * PI),
+        0.5 - asin(clamp(dir.y, -1., 1.)) / PI
     );
     let imageColor = texture(image, imageSampler, uv3 * 3, false);
     if (!hitDisk && !fellIntoBlackHole) {
-        col = mix(col, imageColor, 1.0);
+        col = mix(col, imageColor, 1.);
     }
     // col = abs(rd);
 
