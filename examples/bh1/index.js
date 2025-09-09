@@ -1,7 +1,7 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
-import Points from 'points';
+import Points, { RenderPasses } from 'points';
 
 const options = {
     enabled: true,
@@ -20,16 +20,17 @@ const options = {
     sliderC: .005,
     eventHorizon: 25.8,
 
-    val: 1,
+    val: 0.1037,
+    val2: .127,
 }
 
 const colors = [
-    255, 255, 255, 0,
-    255, 220, 150, 0,
-    255, 140, 60, 0,
-    180, 60, 30, 0,
-    80, 30, 20, 0,
-    0, 0, 0, 0
+    255, 255, 255, 255,
+    255, 220, 150, 255,
+    255, 140, 60, 255,
+    180, 60, 30, 255,
+    80, 30, 20, 255,
+    0, 0, 0, 1
 ].map(i => i / 255);
 
 const base = {
@@ -51,7 +52,8 @@ const base = {
         }
         points.setSampler('imageSampler', descriptor);
         await points.setTextureImage('image', './../img/pexels-philippedonn-1169754.jpg');
-        points.setStorageMap('colors', colors, 'array<vec3f, 6>');
+        await points.setTextureImage('diskTexture', './../img/000.png');
+        points.setStorageMap('colors', colors, 'array<vec4f, 6>');
 
         points.setUniform('enabled', options.enabled);
         points.setUniform('mass', options.mass);
@@ -68,7 +70,8 @@ const base = {
         points.setUniform('sliderA', options.sliderA);
         points.setUniform('scale', options.scale);
         points.setUniform('sliderC', options.sliderC);
-        // points.setUniform('val', options.val); // to debug
+        points.setUniform('val', options.val); // to debug
+        points.setUniform('val2', options.val2); // to debug
 
         folder.add(options, 'enabled').name('enable');
         folder.add(options, 'mass', 0, 5, .0001).name('mass');
@@ -76,7 +79,7 @@ const base = {
         folder.add(options, 'outerRadius', .1, 10, .0001).name('outerRadius');
         // folder.add(options, 'mouseY', -1, 1, .0001).name('mouseY');
         folder.add(options, 'roDistance', -10, 1, .0001).name('roDistance');
-        folder.add(options, 'diskSpeed', .1, 1, .0001).name('diskSpeed');
+        folder.add(options, 'diskSpeed', .1, 10, .0001).name('diskSpeed');
         folder.add(options, 'threshold', .1, 11, .0001).name('threshold');
         folder.add(options, 'spin', 0, 1, .0001).name('spin');
         folder.add(options, 'hueShift', .001, 10, .0001).name('hueShift');
@@ -85,8 +88,11 @@ const base = {
         folder.add(options, 'sliderA', -1, 1, .0001).name('sliderA');
         folder.add(options, 'scale', -1, 1, .0001).name('scale');
         folder.add(options, 'sliderC', -1, 1, .0001).name('sliderC');
-        // folder.add(options, 'val', -1, 1, .0001).name('val'); // to debug
+        folder.add(options, 'val', 0, 1, .0001).name('val'); // to debug
+        folder.add(options, 'val2', 0, 1, .0001).name('val2'); // to debug
         folder.open();
+
+        // points.addRenderPass(RenderPasses.BLOOM, {amount:.1})
     },
     /**
      * @param {Points} points
@@ -107,7 +113,8 @@ const base = {
         points.setUniform('sliderA', options.sliderA);
         points.setUniform('scale', options.scale);
         points.setUniform('sliderC', options.sliderC);
-        // points.setUniform('val', options.val); // to debug
+        points.setUniform('val', options.val); // to debug
+        points.setUniform('val2', options.val2); // to debug
     }
 }
 

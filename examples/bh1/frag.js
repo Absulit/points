@@ -17,7 +17,7 @@ fn rot2d(angle: f32) -> mat2x2<f32> {
     return mat2x2(c, -s, s, c);
 }
 
-fn paletteLerp(a:array<vec3f,6>, value:f32) -> vec3f {
+fn paletteLerp(a:array<vec4f,6>, value:f32) -> vec4f {
     let numElements = 6.;
     let elementPercent = 1 / numElements;
     let index = value / elementPercent;
@@ -83,7 +83,7 @@ fn main(
 
     var t = 0.; // total distance traveled // travel distance
 
-    var col = vec3f();
+    var col = vec4f();
 
     // Vertical camera rotation
     let mouseRotY = rot2d(-m.y);
@@ -179,7 +179,7 @@ fn main(
         // Normalize to [0,1]
         let u = (angle2 + PI) / (2.0 * PI);
         let v2 = (radial - params.innerRadius) / (params.outerRadius - params.innerRadius);
-        diskUV = vec2f(u, v2/ params.val);
+        diskUV = vec2f(fract(u * .1037), fract(v2 * .127));
 
     }
 
@@ -188,16 +188,16 @@ fn main(
     value = clamp(value, 0.0, 1.0);
     col = paletteLerp(colors, value);
 
-    // let diskColor = texture(diskTexture, imageSampler, diskUV / params.val / 10, false).rgb;
-    let n = snoise(diskUV / .097 );
-    let diskColor = paletteLerp(colors, n);
+    var diskColor = texture(diskTexture, imageSampler, diskUV / .097, false);
+    let n = snoise(diskUV);
+    diskColor = paletteLerp(colors, diskColor.r);
     if(hitDisk){
         // col = diskColor;
-        col = mix(paletteLerp(colors, value), diskColor, 0.5);
+        col = mix(paletteLerp(colors, value), diskColor, n);
     }
 
     if (fellIntoBlackHole) {
-        col = vec3f(0.0); // pure black
+        col = vec4f(); // pure black
     }
 
     let dir = normalize(rd);
@@ -206,13 +206,13 @@ fn main(
         0.5 + atan2(dir.x, dir.z) / (2.0 * PI),
         0.5 - asin(clamp(dir.y, -1.0, 1.0)) / PI
     );
-    let imageColor = texture(image, imageSampler, uv3 * 3, false).rgb;
+    let imageColor = texture(image, imageSampler, uv3 * 3, false);
     if (!hitDisk && !fellIntoBlackHole) {
-        col = mix(col, imageColor.rgb, 1.0);
+        col = mix(col, imageColor, 1.0);
     }
     // col = abs(rd);
 
-    return vec4(col, 1);
+    return col;
 }
 `;
 
