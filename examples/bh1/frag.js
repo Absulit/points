@@ -33,10 +33,7 @@ fn sdfDisk(p:vec3f, innerRadius:f32, outerRadius:f32, thickness:f32) -> f32 {
     let verticalDist = abs(p.y);
     let inRing = max(innerRadius - radialDist, radialDist - outerRadius);
     return max(inRing, verticalDist - thickness);
-}
 
-fn impactParameter(r:f32, M:f32) -> f32 {
-  return r / sqrt(1 - (2 * M) / r);
 }
 
 fn bendRay(rayDir: vec3f, rayPos: vec3f, blackHolePos: vec3f, mass: f32, spin:f32) -> vec3f {
@@ -54,13 +51,11 @@ fn bendRay(rayDir: vec3f, rayPos: vec3f, blackHolePos: vec3f, mass: f32, spin:f3
     let dragging = spin / (dist + 0.01); // stronger near BH
 
     return normalize(rayDir + gravity * toBH + dragging * tangent);
-
-
 }
 
 fn map(p:vec3f, step:f32) -> f32 {
     var q = p;
-    let disk = sdfDisk(p, params.innerRadius, params.outerRadius, .001);
+    let disk = sdfDisk(p, params.innerRadius, params.outerRadius, .004);
     return disk;
 }
 
@@ -102,14 +97,13 @@ fn main(
     var i = 0;
 
     var hitDisk = false;
-    var finalP = vec3f(0.0); // to store the hit position
+    var finalP = vec3f(); // to store the hit position
 
     let eventHorizon = params.eventHorizon * params.mass; // 2.0
     var fellIntoBlackHole = false;
 
     for (; i < 128; i++) {
         let p = ro + rd * t; // position along the ray
-
         let r = length(p); // distance from black hole center
         if (r < eventHorizon) {
             fellIntoBlackHole = true;
@@ -117,15 +111,25 @@ fn main(
         }
 
         if(params.enabled == 1){
-            rd = bendRay(rd, ro + rd * t, vec3f(0, 0, 0), params.mass, params.spin); // mass = 1.0 for now
-
+            rd = bendRay(rd, ro + rd * t, vec3f(), params.mass, params.spin); // mass = 1.0 for now
             // let bend = bendRay(rd, ro + rd * t, vec3f(0, 0, 0), params.mass, params.spin); // mass = 1.0 for now
             // rd = normalize(mix(rd, bend, 0.5)); // smooth transition
         }
+
         let d = map(p, f32(i)); // current distance to the scene
         // t += d; // "march" the ray
         // t += d * .5; // "march" the ray
-        t += min(d, 0.1);
+        // t += min(d, 0.1);// "march" the ray
+
+        // Check if we're near the disk vertically
+        let nearDisk = abs(d) < 0.04;
+
+        // Use smaller step size near the disk to reduce banding
+        if (nearDisk) {
+            t += max(d, 0.01); // finer steps
+        } else {
+            t += min(d, 0.1);  // normal steps
+        }
 
         // early stop if close enough, test this .001 value with others to test
         // early stop if too far
@@ -183,6 +187,7 @@ fn main(
     if (!hitDisk && !fellIntoBlackHole) {
         col = mix(col, imageColor.rgb, 1.0);
     }
+    // col = abs(rd);
 
     return vec4(col, 1);
 }

@@ -20,16 +20,9 @@ const options = {
     sliderC: .005,
     eventHorizon: 25.8,
 
+    val: 1,
 }
 
-// const colors = [
-//     248,208,146, 0,
-//     21, 144, 151, 0,
-//     56, 164, 140, 0,
-//     26, 86, 120, 0,
-//     37, 36, 93, 0,
-//     87, 28, 86, 0,
-// ].map(i => i / 255);
 const colors = [
     255, 255, 255, 0,
     255, 220, 150, 0,
@@ -64,7 +57,7 @@ const base = {
         points.setUniform('mass', options.mass);
         points.setUniform('innerRadius', options.innerRadius);
         points.setUniform('outerRadius', options.outerRadius);
-        points.setUniform('mouseY', options.mouseY);
+        // points.setUniform('mouseY', options.mouseY);
         points.setUniform('roDistance', options.roDistance);
         points.setUniform('diskSpeed', options.diskSpeed);
         points.setUniform('threshold', options.threshold);
@@ -75,12 +68,13 @@ const base = {
         points.setUniform('sliderA', options.sliderA);
         points.setUniform('scale', options.scale);
         points.setUniform('sliderC', options.sliderC);
+        // points.setUniform('val', options.val); // to debug
 
         folder.add(options, 'enabled').name('enable');
         folder.add(options, 'mass', 0, 5, .0001).name('mass');
         folder.add(options, 'innerRadius', .1, 10, .0001).name('innerRadius');
         folder.add(options, 'outerRadius', .1, 10, .0001).name('outerRadius');
-        folder.add(options, 'mouseY', -1, 1, .0001).name('mouseY');
+        // folder.add(options, 'mouseY', -1, 1, .0001).name('mouseY');
         folder.add(options, 'roDistance', -10, 1, .0001).name('roDistance');
         folder.add(options, 'diskSpeed', .1, 1, .0001).name('diskSpeed');
         folder.add(options, 'threshold', .1, 11, .0001).name('threshold');
@@ -91,6 +85,7 @@ const base = {
         folder.add(options, 'sliderA', -1, 1, .0001).name('sliderA');
         folder.add(options, 'scale', -1, 1, .0001).name('scale');
         folder.add(options, 'sliderC', -1, 1, .0001).name('sliderC');
+        // folder.add(options, 'val', -1, 1, .0001).name('val'); // to debug
         folder.open();
     },
     /**
@@ -101,7 +96,7 @@ const base = {
         points.setUniform('mass', options.mass);
         points.setUniform('innerRadius', options.innerRadius);
         points.setUniform('outerRadius', options.outerRadius);
-        points.setUniform('mouseY', options.mouseY);
+        // points.setUniform('mouseY', options.mouseY);
         points.setUniform('roDistance', options.roDistance);
         points.setUniform('diskSpeed', options.diskSpeed);
         points.setUniform('threshold', options.threshold);
@@ -112,6 +107,7 @@ const base = {
         points.setUniform('sliderA', options.sliderA);
         points.setUniform('scale', options.scale);
         points.setUniform('sliderC', options.sliderC);
+        // points.setUniform('val', options.val); // to debug
     }
 }
 
