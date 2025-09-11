@@ -30,12 +30,9 @@ const base = {
         folder.add(options, 'val', -1, 1, .0001).name('Val');
         folder.add(options, 'bool').name('Bool');
 
-        // https://github.com/dataarts/dat.gui/blob/master/API.md#GUI+addColor
-        folder.addColor(options, 'color1');
-        folder.addColor(options, 'color2');
-        folder.addColor(options, 'color3');
-        folder.addColor(options, 'color4');
-        folder.addColor(options, 'color5');
+        points.setSampler('imageSampler', null);
+        points.setTexture2d('inputTex', true);
+        // points.setBindingTexture('outputTex', 'computeTexture');
 
         folder.open();
     },
