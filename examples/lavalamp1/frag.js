@@ -7,7 +7,6 @@ ${PI}
 ${rand}
 
 const NUMOBJECTS = 10;
-const RADIAN = 0.0174533;
 const sliderA = -.549;
 const sliderB = .111;
 const sliderC = .685;
@@ -47,19 +46,20 @@ fn map(p: vec3f, step:f32) -> RayInfo {
     let roof = p.y - 1.5;
 
     var result = 1.;
-    var o = Object();
+    var colorResult = vec3f();
     for (var i = 0; i < NUMOBJECTS; i++) {
-        o = objects[i];
+        let o = objects[i];
         let animPosition = o.position + vec3f(0, sin(params.time * o.speed) * o.vertical, 0);
-        o.currentPosition = animPosition;
-        o.sdf = sdSphere(p - animPosition, o.scale); // sphere sdf
-
-        result = smin(result, o.sdf, .530);
-        o.colorResult = mix(o.color, o.colorResult, result);
+        let sdf = sdSphere(p - animPosition, o.scale); // sphere sdf
+        result = smin(result, sdf, .530);
+        colorResult = mix(o.color, o.colorResult, result);
     }
-    let info = RayInfo(smin(ground, result, 1.), o.colorResult);
-    return info;
+
+    return RayInfo(smin(ground, result, 1.), colorResult);
 }
+
+const VEC2F2 = vec2f(2);
+const RO = vec3f(0, 0, -3);
 
 @fragment
 fn main(
@@ -74,7 +74,7 @@ fn main(
     rand_seed.x = .01835255;
     if(variables.init == 0){
         for (var i = 0; i < NUMOBJECTS; i++) {
-            var o = Object();
+            let o = &objects[i];
             rand();
             o.position = vec3f(rand_seed * 4 - 2, rand() - .5);
             o.scale = rand_seed.x;
@@ -85,16 +85,15 @@ fn main(
             o.speed = .1 + rand_seed.x;
             rand();
             o.color = vec3f(rand_seed, rand());
-            objects[i] = o;
         }
         variables.init = 1;
     }
 
-    let uv2 = uvr * 4 - (vec2(2) * ratio); // clip space
-    let m = mouse * 4 - (vec2(2) * ratio);
+    let uv2 = uvr * 4 - (VEC2F2 * ratio); // clip space
+    let m = mouse * 4 - (VEC2F2 * ratio);
 
     // initialization
-    var ro = vec3f(0, 0, -3); // ray origin
+    var ro = RO; // ray origin
     var rd = normalize(vec3(uv2 * sliderB * 5, 1)); // ray direction one ray per uv position
     var t = 0.; // total distance traveled // travel distance
     var col = vec3f();
@@ -104,6 +103,7 @@ fn main(
     var rayValue = 0.;
     var d = RayInfo();
     for (; i < 80; i++) {
+    for (; i < 32; i++) {
         let p = ro + rd * t; // position along the ray
         d = map(p, f32(i)); // current distance to the scene
         t += d.distance; // "march" the ray
@@ -118,9 +118,9 @@ fn main(
     var a = (1-rayValue * t * sliderA);
 
     var selectedColor = vec3f();
-    var lastDistance = 1000.;
+    // var lastDistance = 1000.;
     for (var i = 0; i < NUMOBJECTS ; i++) {
-        let o = objects[i];
+        let o = &objects[i];
         if( distance(o.currentPosition, rd) > 0){
             selectedColor = mix(o.color, selectedColor, rd);
         }
