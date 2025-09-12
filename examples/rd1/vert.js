@@ -1,4 +1,8 @@
+import { structs } from './structs.js';
+
 const vert = /*wgsl*/`
+
+${structs}
 
 @vertex
 fn main(

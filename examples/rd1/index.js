@@ -34,6 +34,11 @@ const base = {
         points.setTexture2d('inputTex', true);
         // points.setBindingTexture('outputTex', 'computeTexture');
 
+        await points.setTextureImage('startTexture', './../img/absulit_800x800.jpg');
+        // await points.setTextureImage('startTexture', './../img/carmen_lyra_800x800.jpg');
+
+        points.setStorage('variables', 'Variables');
+
         folder.open();
     },
     /**

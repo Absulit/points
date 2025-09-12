@@ -1,9 +1,10 @@
-import { fnusin } from 'points/animation';
+import { texture } from 'points/image';
+import { structs } from './structs.js';
 
 const frag = /*wgsl*/`
 
-${fnusin}
-
+${structs}
+${texture}
 
 @fragment
 fn main(
@@ -19,20 +20,28 @@ fn main(
 
     // Sample neighbors for diffusion
     let offset = 1. / vec2f(textureDimensions(inputTex, 0));
-    let center = textureSample(inputTex, imageSampler, uv);
-    let north  = textureSample(inputTex, imageSampler, uv + vec2f(0, offset.y));
-    let south  = textureSample(inputTex, imageSampler, uv - vec2f(0, offset.y));
-    let east   = textureSample(inputTex, imageSampler, uv + vec2f(offset.x, 0));
-    let west   = textureSample(inputTex, imageSampler, uv - vec2f(offset.x, 0));
+    let center = texture(inputTex, imageSampler, uvr, true);
+    let north  = texture(inputTex, imageSampler, uvr + vec2f(0, offset.y), true);
+    let south  = texture(inputTex, imageSampler, uvr - vec2f(0, offset.y), true);
+    let east   = texture(inputTex, imageSampler, uvr + vec2f(offset.x, 0), true);
+    let west   = texture(inputTex, imageSampler, uvr - vec2f(offset.x, 0), true);
 
     // Simple diffusion (blur)
     let diffusion = (north + south + east + west - 4.0 * center) * 0.25;
 
     // Nonlinear reaction (e.g., threshold or oscillation)
-    let reaction = sin(center.r * 10. + params.time) * 0.05;
+    let reaction = sin(center.r * 10. + params.time) * diffusion.x + .00165;
 
     // Combine
-    let result = center + diffusion + vec4f(reaction, reaction, reaction, 0.0);
+    var startColor = texture(startTexture, imageSampler, uvr, true);
+    // if(variables.init == 1){
+    //     startColor = vec4f();
+    // }
+    var result = center + diffusion + vec4f(reaction, reaction, reaction, 0.0);
+
+    let decay = max(0.001, exp(-params.time * .156)); // .98 .156 or any decay curve
+    result = mix(result, startColor, decay);
+    // variables.init = 1;
 
     return clamp(result, vec4f(), vec4f(1));
 }
