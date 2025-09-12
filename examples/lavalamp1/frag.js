@@ -48,7 +48,7 @@ fn map(p: vec3f, step:f32) -> RayInfo {
     var result = 1.;
     var colorResult = vec3f();
     for (var i = 0; i < NUMOBJECTS; i++) {
-        let o = objects[i];
+        let o = &objects[i];
         let animPosition = o.position + vec3f(0, sin(params.time * o.speed) * o.vertical, 0);
         let sdf = sdSphere(p - animPosition, o.scale); // sphere sdf
         result = smin(result, sdf, .530);
@@ -90,7 +90,7 @@ fn main(
     }
 
     let uv2 = uvr * 4 - (VEC2F2 * ratio); // clip space
-    let m = mouse * 4 - (VEC2F2 * ratio);
+    // let m = mouse * 4 - (VEC2F2 * ratio);
 
     // initialization
     var ro = RO; // ray origin
@@ -115,15 +115,12 @@ fn main(
         }
     }
     rayValue = f32(i) / 80.; // to visualize the ray
-    var a = (1-rayValue * t * sliderA);
+    let a = (1-rayValue * t * sliderA);
 
     var selectedColor = vec3f();
-    // var lastDistance = 1000.;
     for (var i = 0; i < NUMOBJECTS ; i++) {
         let o = &objects[i];
-        if( distance(o.currentPosition, rd) > 0){
-            selectedColor = mix(o.color, selectedColor, rd);
-        }
+        selectedColor = mix(o.color, selectedColor, rd) * f32(distance(o.currentPosition, rd) > 0);
     }
 
     return vec4( selectedColor * a, 1);
