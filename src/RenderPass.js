@@ -35,7 +35,7 @@ class RenderPass {
     #computePipeline = null;
     #renderPipeline = null;
     #computeBindGroup = null;
-    #uniformBindGroup = null;
+    #renderBindGroup = null;
     #bindGroupLayout = null;
     #bindGroupLayoutCompute = null;
     #entries = null;
@@ -148,12 +148,12 @@ class RenderPass {
         return this.#computeBindGroup;
     }
 
-    set uniformBindGroup(value) {
-        this.#uniformBindGroup = value;
+    set renderBindGroup(value) {
+        this.#renderBindGroup = value;
     }
 
-    get uniformBindGroup() {
-        return this.#uniformBindGroup;
+    get renderBindGroup() {
+        return this.#renderBindGroup;
     }
 
     set bindGroupLayout(value) {

@@ -1903,7 +1903,7 @@ class Points {
                 });
                 renderPass.entries = entries;
                 renderPass.bindGroupLayout = this.#device.createBindGroupLayout({ entries: bglEntries });
-                renderPass.uniformBindGroup = this.#device.createBindGroup({
+                renderPass.renderBindGroup = this.#device.createBindGroup({
                     label: '_createParams() 0',
                     layout: renderPass.bindGroupLayout,
                     entries: renderPass.entries
@@ -1926,7 +1926,7 @@ class Points {
         const entries = this.#createEntries(ShaderType.FRAGMENT, renderPass);
         if (entries.length) {
             renderPass.entries = entries;
-            renderPass.uniformBindGroup = this.#device.createBindGroup({
+            renderPass.renderBindGroup = this.#device.createBindGroup({
                 label: '_passParams() 0',
                 layout: renderPass.bindGroupLayout,
                 entries: renderPass.entries
@@ -1991,7 +1991,7 @@ class Points {
                 passEncoder.setPipeline(renderPass.renderPipeline);
 
                 if (this.#uniforms.length) {
-                    passEncoder.setBindGroup(0, renderPass.uniformBindGroup);
+                    passEncoder.setBindGroup(0, renderPass.renderBindGroup);
                 }
                 passEncoder.setVertexBuffer(0, this.#buffer);
                 /**
