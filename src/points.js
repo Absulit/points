@@ -1516,9 +1516,6 @@ class Points {
                         bglEntries.push(bglEntry);
                     });
                     renderPass.bindGroupLayoutCompute = this.#device.createBindGroupLayout({ entries: bglEntries });
-                    /**
-                     * @type {GPUBindGroup}
-                     */
                     renderPass.computeBindGroup = this.#device.createBindGroup({
                         label: `_createComputeBindGroup 0 - ${index}`,
                         layout: renderPass.bindGroupLayoutCompute,

@@ -34,7 +34,13 @@ class RenderPass {
     #compiledShaders
     #computePipeline = null;
     #renderPipeline = null;
+    /**
+     * @type {GPUBindGroup}
+     */
     #computeBindGroup = null;
+    /**
+     * @type {GPUBindGroup}
+     */
     #renderBindGroup = null;
     #bindGroupLayoutRender = null;
     #bindGroupLayoutCompute = null;
@@ -209,7 +215,7 @@ class RenderPass {
     /**
      * @param {Number} val
      */
-    set workgroupCountX(val){
+    set workgroupCountX(val) {
         this.#workgroupCountX = val;
     }
 
@@ -223,7 +229,7 @@ class RenderPass {
     /**
      * @param {Number} val
      */
-    set workgroupCountY(val){
+    set workgroupCountY(val) {
         this.#workgroupCountY = val;
     }
 
@@ -237,7 +243,7 @@ class RenderPass {
     /**
      * @param {Number} val
      */
-    set workgroupCountZ(val){
+    set workgroupCountZ(val) {
         this.#workgroupCountZ = val;
     }
 
@@ -255,7 +261,7 @@ class RenderPass {
         this.#callback?.(points, params);
     }
 
-    get required(){
+    get required() {
         return this.#required;
     }
     /**
@@ -265,7 +271,7 @@ class RenderPass {
      * {@link RenderPass#setInit} that are required.
      * This is only  used for a post processing RenderPass.
      */
-    set required(val){
+    set required(val) {
         this.#required = val;
     }
 }
