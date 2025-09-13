@@ -1572,7 +1572,7 @@ class Points {
 
         //--------------------------------------
 
-        this.#createParams();
+        this.#createRenderBindGroup();
         //this.createVertexBuffer(new Float32Array(this.#vertexArray));
         // enum GPUPrimitiveTopology {
         //     'point-list',
@@ -1871,7 +1871,7 @@ class Points {
         return entries;
     }
 
-    #createParams() {
+    #createRenderBindGroup() {
         this.#renderPasses.forEach(renderPass => {
             const entries = this.#createEntries(ShaderType.FRAGMENT, renderPass);
             if (entries.length) {
@@ -1902,7 +1902,7 @@ class Points {
                 renderPass.entries = entries;
                 renderPass.bindGroupLayoutRender = this.#device.createBindGroupLayout({ entries: bglEntries });
                 renderPass.renderBindGroup = this.#device.createBindGroup({
-                    label: '_createParams() 0',
+                    label: '_createRenderBindGroup() 0',
                     layout: renderPass.bindGroupLayoutRender,
                     entries: renderPass.entries
                 });
@@ -1911,7 +1911,7 @@ class Points {
     }
 
     /**
-     * This is a slimmed down version of {@link #createParams}.
+     * This is a slimmed down version of {@link #createRenderBindGroup}.
      * We don't create the bindingGroupLayout since it already exists.
      * We do update the entries. We have to update them because of
      * changing textures like videos.
@@ -1921,12 +1921,12 @@ class Points {
      * only if the texture is updated.
      * @param {RenderPass} renderPass
      */
-    #passParams(renderPass) {
+    #passRenderBindGroup(renderPass) {
         const entries = this.#createEntries(ShaderType.FRAGMENT, renderPass);
         if (entries.length) {
             renderPass.entries = entries;
             renderPass.renderBindGroup = this.#device.createBindGroup({
-                label: '_passParams() 0',
+                label: '_passRenderBindGroup() 0',
                 layout: renderPass.bindGroupLayoutRender,
                 entries: renderPass.entries
             });
@@ -1985,7 +1985,7 @@ class Points {
 
         this.#renderPasses.forEach(renderPass => {
             if (renderPass.hasVertexAndFragmentShader) {
-                this.#passParams(renderPass);
+                this.#passRenderBindGroup(renderPass);
                 const passEncoder = commandEncoder.beginRenderPass(this.#renderPassDescriptor);
                 passEncoder.setPipeline(renderPass.renderPipeline);
 
