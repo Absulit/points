@@ -36,7 +36,7 @@ class RenderPass {
     #renderPipeline = null;
     #computeBindGroup = null;
     #renderBindGroup = null;
-    #bindGroupLayout = null;
+    #bindGroupLayoutRender = null;
     #bindGroupLayoutCompute = null;
     #entries = null;
     #hasComputeShader;
@@ -156,12 +156,12 @@ class RenderPass {
         return this.#renderBindGroup;
     }
 
-    set bindGroupLayout(value) {
-        this.#bindGroupLayout = value;
+    set bindGroupLayoutRender(value) {
+        this.#bindGroupLayoutRender = value;
     }
 
-    get bindGroupLayout() {
-        return this.#bindGroupLayout;
+    get bindGroupLayoutRender() {
+        return this.#bindGroupLayoutRender;
     }
     set bindGroupLayoutCompute(value) {
         this.#bindGroupLayoutCompute = value;

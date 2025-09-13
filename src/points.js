@@ -39,6 +39,7 @@ class Points {
     #device = null;
     #context = null;
     #presentationFormat = null;
+    /** @type {Array<RenderPass>} */
     #renderPasses = null;
     #postRenderPasses = [];
     #vertexBufferInfo = null;
@@ -1588,7 +1589,7 @@ class Points {
                 renderPass.renderPipeline = this.#device.createRenderPipeline({
                     // layout: 'auto',
                     layout: this.#device.createPipelineLayout({
-                        bindGroupLayouts: [renderPass.bindGroupLayout]
+                        bindGroupLayouts: [renderPass.bindGroupLayoutRender]
                     }),
                     //primitive: { topology: 'triangle-strip' },
                     primitive: { topology: 'triangle-list' },
@@ -1902,10 +1903,10 @@ class Points {
                     bglEntries.push(bglEntry);
                 });
                 renderPass.entries = entries;
-                renderPass.bindGroupLayout = this.#device.createBindGroupLayout({ entries: bglEntries });
+                renderPass.bindGroupLayoutRender = this.#device.createBindGroupLayout({ entries: bglEntries });
                 renderPass.renderBindGroup = this.#device.createBindGroup({
                     label: '_createParams() 0',
-                    layout: renderPass.bindGroupLayout,
+                    layout: renderPass.bindGroupLayoutRender,
                     entries: renderPass.entries
                 });
             }
@@ -1921,6 +1922,7 @@ class Points {
      * NOT CALL the createBindGroup if the texture (video/other)
      * is not being updated at all. I have to make the createBindGroup call
      * only if the texture is updated.
+     * @param {RenderPass} renderPass
      */
     #passParams(renderPass) {
         const entries = this.#createEntries(ShaderType.FRAGMENT, renderPass);
@@ -1928,7 +1930,7 @@ class Points {
             renderPass.entries = entries;
             renderPass.renderBindGroup = this.#device.createBindGroup({
                 label: '_passParams() 0',
-                layout: renderPass.bindGroupLayout,
+                layout: renderPass.bindGroupLayoutRender,
                 entries: renderPass.entries
             });
         }
