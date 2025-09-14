@@ -1654,7 +1654,7 @@ class Points {
                     buffer: {
                         type: 'uniform'
                     },
-                    visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT
+                    // visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT
                 }
             );
         }
