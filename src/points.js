@@ -505,7 +505,7 @@ class Points {
      *
      * @param {String} name Name to call the texture in the shaders.
      * @param {boolean} copyCurrentTexture If you want the fragment output to be copied here.
-     * @param {String} shaderType To what {@link ShaderType} you want to exclusively use this variable.
+     * @param {GPUShaderStage} shaderType To what {@link GPUShaderStage} you want to exclusively use this variable.
      * @param {Number} renderPassIndex If using `copyCurrentTexture`
      * this tells which RenderPass it should get the data from. If not set then it will grab the last pass.
      * @returns {Object}
@@ -627,7 +627,7 @@ class Points {
      * @param {String} path atlas to grab characters from, image address in a web server
      * @param {{x: number, y: number}} size size of a individual character e.g.: `{x:10, y:20}`
      * @param {Number} offset how many characters back or forward it must move to start
-     * @param {String} shaderType To what {@link ShaderType} you want to exclusively use this variable.
+     * @param {GPUShaderStage} shaderType To what {@link GPUShaderStage} you want to exclusively use this variable.
      * @returns {Object}
      *
      * @example
@@ -937,7 +937,7 @@ class Points {
      */
     #createDynamicGroupBindings(shaderType, { index: renderPassIndex }) {
         if (!shaderType) {
-            throw '`ShaderType` is required';
+            throw '`GPUShaderStage` is required';
         }
         const groupId = 0;
         let dynamicGroupBindings = '';
