@@ -1493,11 +1493,7 @@ class Points {
         this.#renderPasses.forEach((renderPass, index) => {
             if (renderPass.hasComputeShader) {
                 const entries = this.#createEntries(GPUShaderStage.COMPUTE, renderPass);
-
                 if (entries.length) {
-                    entries.forEach(entry => {
-                        entry.visibility = GPUShaderStage.COMPUTE
-                    });
                     renderPass.bindGroupLayoutCompute = this.#device.createBindGroupLayout({ entries });
                     renderPass.computeBindGroup = this.#device.createBindGroup({
                         label: `_createComputeBindGroup 0 - ${index}`,
@@ -1643,6 +1639,18 @@ class Points {
         let entries = [];
         let bindingIndex = 0;
         if (this.#uniforms.length) {
+            // TODO: 1262
+            // if you remove this there's an error that I think is not explained right
+            // it talks about a storage in index 1 but it was actually the 0
+            // and so is to this uniform you have to change the visibility
+            // not remove the type and leaving it empty as it seems you have to do here:
+            // https://gpuweb.github.io/gpuweb/#bindgroup-examples
+            // originally:
+            // if (entry.buffer?.type === 'uniform') {
+            //     entry.visibility = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT
+            // }
+            // the call is split here and at the end of the method with the foreach |= assignment
+            const visibility = shaderType === GPUShaderStage.FRAGMENT ? GPUShaderStage.VERTEX : null;
             entries.push(
                 {
                     binding: bindingIndex++,
@@ -1653,7 +1661,7 @@ class Points {
                     buffer: {
                         type: 'uniform'
                     },
-                    // visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT
+                    visibility
                 }
             );
         }
@@ -1835,6 +1843,8 @@ class Points {
 
         });
 
+        entries.forEach(entry => entry.visibility |= shaderType);
+
         return entries;
     }
 
@@ -1842,19 +1852,6 @@ class Points {
         this.#renderPasses.forEach(renderPass => {
             const entries = this.#createEntries(GPUShaderStage.FRAGMENT, renderPass);
             if (entries.length) {
-                entries.forEach(entry => {
-                    entry.visibility = GPUShaderStage.FRAGMENT;
-                    // TODO: 1262
-                    // if you remove this there's an error that I think is not explained right
-                    // it talks about a storage in index 1 but it was actually the 0
-                    // and so is to this uniform you have to change the visibility
-                    // not remove the type and leaving it empty as it seems you have to do here:
-                    // https://gpuweb.github.io/gpuweb/#bindgroup-examples
-                    if (entry.buffer?.type === 'uniform') {
-                        entry.visibility = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT
-                    }
-                });
-
                 renderPass.entries = entries;
                 renderPass.bindGroupLayoutRender = this.#device.createBindGroupLayout({ entries });
                 renderPass.renderBindGroup = this.#device.createBindGroup({
