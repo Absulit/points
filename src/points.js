@@ -256,7 +256,7 @@ class Points {
      * // your code:
      * const particles = array<Particle, NUMPARTICLES>();
      */
-    setConstant(name, value, structName){
+    setConstant(name, value, structName) {
         const constantToUpdate = this.#nameExists(this.#constants, name);
 
         if (constantToUpdate) {
@@ -1496,22 +1496,17 @@ class Points {
                 const entries = this.#createEntries(ShaderType.COMPUTE, renderPass);
 
                 if (entries.length) {
-                    const bglEntries = [];
-                    entries.forEach((entry, index) => {
-                        const bglEntry = {
-                            binding: index,
-                            visibility: GPUShaderStage.COMPUTE
-                        }
-                        bglEntry[entry.type.name] = { 'type': entry.type.type };
+                    entries.forEach(entry => {
+                        entry.visibility = GPUShaderStage.COMPUTE
+                        entry[entry.type.name] = { 'type': entry.type.type };
                         if (entry.type.format) {
-                            bglEntry[entry.type.name].format = entry.type.format
+                            entry[entry.type.name].format = entry.type.format
                         }
                         if (entry.type.viewDimension) {
-                            bglEntry[entry.type.name].viewDimension = entry.type.viewDimension
+                            entry[entry.type.name].viewDimension = entry.type.viewDimension
                         }
-                        bglEntries.push(bglEntry);
                     });
-                    renderPass.bindGroupLayoutCompute = this.#device.createBindGroupLayout({ entries: bglEntries });
+                    renderPass.bindGroupLayoutCompute = this.#device.createBindGroupLayout({ entries });
                     renderPass.computeBindGroup = this.#device.createBindGroup({
                         label: `_createComputeBindGroup 0 - ${index}`,
                         layout: renderPass.bindGroupLayoutCompute,
@@ -1868,18 +1863,15 @@ class Points {
         this.#renderPasses.forEach(renderPass => {
             const entries = this.#createEntries(ShaderType.FRAGMENT, renderPass);
             if (entries.length) {
-                let bglEntries = [];
-                entries.forEach((entry, index) => {
-                    let bglEntry = {
-                        binding: index,
-                        visibility: GPUShaderStage.FRAGMENT
-                    }
-                    bglEntry[entry.type.name] = { 'type': entry.type.type };
+                entries.forEach(entry => {
+                    entry.visibility = GPUShaderStage.FRAGMENT;
+
+                    entry[entry.type.name] = { 'type': entry.type.type };
                     if (entry.type.format) {
-                        bglEntry[entry.type.name].format = entry.type.format
+                        entry[entry.type.name].format = entry.type.format
                     }
                     if (entry.type.viewDimension) {
-                        bglEntry[entry.type.name].viewDimension = entry.type.viewDimension
+                        entry[entry.type.name].viewDimension = entry.type.viewDimension
                     }
                     // TODO: 1262
                     // if you remove this there's an error that I think is not explained right
@@ -1888,12 +1880,12 @@ class Points {
                     // not remove the type and leaving it empty as it seems you have to do here:
                     // https://gpuweb.github.io/gpuweb/#bindgroup-examples
                     if (entry.type.type == 'uniform') {
-                        bglEntry.visibility = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT
+                        entry.visibility = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT
                     }
-                    bglEntries.push(bglEntry);
                 });
+
                 renderPass.entries = entries;
-                renderPass.bindGroupLayoutRender = this.#device.createBindGroupLayout({ entries: bglEntries });
+                renderPass.bindGroupLayoutRender = this.#device.createBindGroupLayout({ entries });
                 renderPass.renderBindGroup = this.#device.createBindGroup({
                     label: '_createRenderBindGroup() 0',
                     layout: renderPass.bindGroupLayoutRender,
