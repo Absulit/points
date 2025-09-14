@@ -1220,7 +1220,7 @@ class Points {
      * @ignore
      */
     createScreen() {
-        let hasVertexAndFragmentShader = this.#renderPasses.some(renderPass => renderPass.hasVertexAndFragmentShader)
+        const hasVertexAndFragmentShader = this.#renderPasses.some(renderPass => renderPass.hasVertexAndFragmentShader)
         if (hasVertexAndFragmentShader) {
             let colors = [
                 new RGBAColor(1, 0, 0),
