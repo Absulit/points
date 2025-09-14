@@ -1519,11 +1519,10 @@ class Points {
     #passComputeBindingGroup(renderPass) {
         const entries = this.#createEntries(GPUShaderStage.COMPUTE, renderPass);
         if (entries.length) {
-            renderPass.entries = entries;
             renderPass.computeBindGroup = this.#device.createBindGroup({
                 label: `_passComputeBindingGroup 0`,
                 layout: renderPass.bindGroupLayoutCompute,
-                entries: renderPass.entries
+                entries
             });
         }
     }
@@ -1852,12 +1851,11 @@ class Points {
         this.#renderPasses.forEach(renderPass => {
             const entries = this.#createEntries(GPUShaderStage.FRAGMENT, renderPass);
             if (entries.length) {
-                renderPass.entries = entries;
                 renderPass.bindGroupLayoutRender = this.#device.createBindGroupLayout({ entries });
                 renderPass.renderBindGroup = this.#device.createBindGroup({
                     label: '_createRenderBindGroup() 0',
                     layout: renderPass.bindGroupLayoutRender,
-                    entries: renderPass.entries
+                    entries
                 });
             }
         });
@@ -1877,11 +1875,10 @@ class Points {
     #passRenderBindGroup(renderPass) {
         const entries = this.#createEntries(GPUShaderStage.FRAGMENT, renderPass);
         if (entries.length) {
-            renderPass.entries = entries;
             renderPass.renderBindGroup = this.#device.createBindGroup({
                 label: '_passRenderBindGroup() 0',
                 layout: renderPass.bindGroupLayoutRender,
-                entries: renderPass.entries
+                entries
             });
         }
     }

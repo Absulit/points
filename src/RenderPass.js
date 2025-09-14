@@ -177,14 +177,6 @@ class RenderPass {
         return this.#bindGroupLayoutCompute;
     }
 
-    set entries(value) {
-        this.#entries = value;
-    }
-
-    get entries() {
-        return this.#entries;
-    }
-
     get compiledShaders() {
         return this.#compiledShaders;
     }
