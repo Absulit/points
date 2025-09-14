@@ -1,6 +1,5 @@
 import UniformKeys from './UniformKeys.js';
 import VertexBufferInfo from './VertexBufferInfo.js';
-import ShaderType from './ShaderType.js';
 import RenderPass from './RenderPass.js';
 import RenderPasses from './RenderPasses.js';
 import Coordinate from './coordinate.js';
@@ -39,6 +38,7 @@ class Points {
     #device = null;
     #context = null;
     #presentationFormat = null;
+    /** @type {Array<RenderPass>} */
     #renderPasses = null;
     #postRenderPasses = [];
     #vertexBufferInfo = null;
@@ -255,7 +255,7 @@ class Points {
      * // your code:
      * const particles = array<Particle, NUMPARTICLES>();
      */
-    setConstant(name, value, structName){
+    setConstant(name, value, structName) {
         const constantToUpdate = this.#nameExists(this.#constants, name);
 
         if (constantToUpdate) {
@@ -284,7 +284,7 @@ class Points {
      * @param {string} structName Name of the struct already existing on the
      * shader. This will be the type of the Storage.
      * @param {boolean} read if this is going to be used to read data back
-     * @param {ShaderType} shaderType this tells to what shader the storage is bound
+     * @param {GPUShaderStage} shaderType this tells to what shader the storage is bound
      * @returns {Object}
      *
      * @example
@@ -333,7 +333,7 @@ class Points {
      * @param {string} structName Name of the struct already existing on the
      * shader. This will be the type of the Storage.
      * @param {boolean} read if this is going to be used to read data back.
-     * @param {ShaderType} shaderType this tells to what shader the storage is bound
+     * @param {GPUShaderStage} shaderType this tells to what shader the storage is bound
      *
      * @example
      * // js examples/data1
@@ -414,7 +414,7 @@ class Points {
      * This creates a storage array named `layers` of the size
      * of the screen in pixels;
      * @param {Number} numLayers
-     * @param {ShaderType} shaderType
+     * @param {GPUShaderStage} shaderType
      *
      * @example
      * // js
@@ -505,7 +505,7 @@ class Points {
      *
      * @param {String} name Name to call the texture in the shaders.
      * @param {boolean} copyCurrentTexture If you want the fragment output to be copied here.
-     * @param {String} shaderType To what {@link ShaderType} you want to exclusively use this variable.
+     * @param {GPUShaderStage} shaderType To what {@link GPUShaderStage} you want to exclusively use this variable.
      * @param {Number} renderPassIndex If using `copyCurrentTexture`
      * this tells which RenderPass it should get the data from. If not set then it will grab the last pass.
      * @returns {Object}
@@ -565,7 +565,7 @@ class Points {
      * Supports web formats like JPG, PNG.
      * @param {string} name identifier it will have in the shaders
      * @param {string} path image address in a web server
-     * @param {ShaderType} shaderType in what shader type it will exist only
+     * @param {GPUShaderStage} shaderType in what shader type it will exist only
      * @returns {Object}
      *
      * @example
@@ -627,7 +627,7 @@ class Points {
      * @param {String} path atlas to grab characters from, image address in a web server
      * @param {{x: number, y: number}} size size of a individual character e.g.: `{x:10, y:20}`
      * @param {Number} offset how many characters back or forward it must move to start
-     * @param {String} shaderType To what {@link ShaderType} you want to exclusively use this variable.
+     * @param {GPUShaderStage} shaderType To what {@link GPUShaderStage} you want to exclusively use this variable.
      * @returns {Object}
      *
      * @example
@@ -654,7 +654,7 @@ class Points {
      * Load images as texture_2d_array
      * @param {string} name id of the wgsl variable in the shader
      * @param {Array} paths image addresses in a web server
-     * @param {ShaderType} shaderType
+     * @param {GPUShaderStage} shaderType
      */
     // TODO: verify if this can be updated after creation
     // TODO: return texture2dArray object
@@ -686,7 +686,7 @@ class Points {
      * Supports web formats like mp4 and webm.
      * @param {string} name id of the wgsl variable in the shader
      * @param {string} path video address in a web server
-     * @param {ShaderType} shaderType
+     * @param {GPUShaderStage} shaderType
      * @returns {Object}
      *
      * @example
@@ -719,7 +719,7 @@ class Points {
      * Loads webcam as `texture_external`and then
      * it will be available to read data from in the shaders.
      * @param {String} name id of the wgsl variable in the shader
-     * @param {ShaderType} shaderType
+     * @param {GPUShaderStage} shaderType
      * @returns {Object}
      *
      * @example
@@ -869,12 +869,12 @@ class Points {
         const bindingTexture = {
             write: {
                 name: writeName,
-                shaderType: ShaderType.COMPUTE,
+                shaderType: GPUShaderStage.COMPUTE,
                 renderPassIndex: writeIndex
             },
             read: {
                 name: readName,
-                shaderType: ShaderType.FRAGMENT,
+                shaderType: GPUShaderStage.FRAGMENT,
                 renderPassIndex: readIndex
             },
             texture: null,
@@ -931,13 +931,13 @@ class Points {
     }
 
     /**
-     * @param {ShaderType} shaderType
+     * @param {GPUShaderStage} shaderType
      * @param {RenderPass} renderPass
      * @returns {String} string with bindings
      */
     #createDynamicGroupBindings(shaderType, { index: renderPassIndex }) {
         if (!shaderType) {
-            throw '`ShaderType` is required';
+            throw '`GPUShaderStage` is required';
         }
         const groupId = 0;
         let dynamicGroupBindings = '';
@@ -986,13 +986,11 @@ class Points {
             }
         });
         this.#texturesExternal.forEach(externalTexture => {
-            // const internalCheck = internal == externalTexture.internal;
             if (!externalTexture.shaderType || externalTexture.shaderType == shaderType) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${externalTexture.name}: texture_external;\n`;
                 bindingIndex += 1;
             }
         });
-        // TODO: internalcheck can be a filter
         this.#bindingTextures.forEach(bindingTexture => {
             const { usesRenderPass } = bindingTexture;
             if (usesRenderPass) {
@@ -1073,9 +1071,9 @@ class Points {
         renderPass.hasVertexShader && (dynamicGroupBindingsVertex += dynamicStructParams);
         renderPass.hasComputeShader && (dynamicGroupBindingsCompute += dynamicStructParams);
         renderPass.hasFragmentShader && (dynamicGroupBindingsFragment += dynamicStructParams);
-        renderPass.hasVertexShader && (dynamicGroupBindingsVertex += this.#createDynamicGroupBindings(ShaderType.VERTEX, renderPass));
-        renderPass.hasComputeShader && (dynamicGroupBindingsCompute += this.#createDynamicGroupBindings(ShaderType.COMPUTE, renderPass));
-        dynamicGroupBindingsFragment += this.#createDynamicGroupBindings(ShaderType.FRAGMENT, renderPass);
+        renderPass.hasVertexShader && (dynamicGroupBindingsVertex += this.#createDynamicGroupBindings(GPUShaderStage.VERTEX, renderPass));
+        renderPass.hasComputeShader && (dynamicGroupBindingsCompute += this.#createDynamicGroupBindings(GPUShaderStage.COMPUTE, renderPass));
+        dynamicGroupBindingsFragment += this.#createDynamicGroupBindings(GPUShaderStage.FRAGMENT, renderPass);
         renderPass.hasVertexShader && (colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + defaultVertexBody + colorsVertWGSL);
         renderPass.hasComputeShader && (colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + colorsComputeWGSL);
         renderPass.hasFragmentShader && (colorsFragWGSL = dynamicGroupBindingsFragment + defaultStructs + colorsFragWGSL);
@@ -1156,9 +1154,7 @@ class Points {
         }
         if (!adapter) { return false; }
         this.#device = await adapter.requestDevice();
-        this.#device.lost.then(info => {
-            console.log(info);
-        });
+        this.#device.lost.then(info => console.log(info));
         if (this.#canvas !== null) this.#context = this.#canvas.getContext('webgpu');
         this.#presentationFormat = navigator.gpu.getPreferredCanvasFormat();
         if (this.#canvasId) {
@@ -1224,7 +1220,7 @@ class Points {
      * @ignore
      */
     createScreen() {
-        let hasVertexAndFragmentShader = this.#renderPasses.some(renderPass => renderPass.hasVertexAndFragmentShader)
+        const hasVertexAndFragmentShader = this.#renderPasses.some(renderPass => renderPass.hasVertexAndFragmentShader)
         if (hasVertexAndFragmentShader) {
             let colors = [
                 new RGBAColor(1, 0, 0),
@@ -1240,7 +1236,7 @@ class Points {
             }
             this.#createVertexBuffer(new Float32Array(this.#vertexArray));
         }
-        this.#createComputeBuffers();
+        this.#createBuffers();
         this.#createPipeline();
     }
     /**
@@ -1353,7 +1349,11 @@ class Points {
         });
     }
 
-    #createComputeBuffers() {
+    /**
+     * For each set of arrays with set* data, it creates their corresponding
+     * buffer
+     */
+    #createBuffers() {
         //--------------------------------------------
         this.#createParametersUniforms();
         //--------------------------------------------
@@ -1496,28 +1496,9 @@ class Points {
     #createComputeBindGroup() {
         this.#renderPasses.forEach((renderPass, index) => {
             if (renderPass.hasComputeShader) {
-                const entries = this.#createEntries(ShaderType.COMPUTE, renderPass);
-
+                const entries = this.#createEntries(GPUShaderStage.COMPUTE, renderPass);
                 if (entries.length) {
-                    const bglEntries = [];
-                    entries.forEach((entry, index) => {
-                        const bglEntry = {
-                            binding: index,
-                            visibility: GPUShaderStage.COMPUTE
-                        }
-                        bglEntry[entry.type.name] = { 'type': entry.type.type };
-                        if (entry.type.format) {
-                            bglEntry[entry.type.name].format = entry.type.format
-                        }
-                        if (entry.type.viewDimension) {
-                            bglEntry[entry.type.name].viewDimension = entry.type.viewDimension
-                        }
-                        bglEntries.push(bglEntry);
-                    });
-                    renderPass.bindGroupLayoutCompute = this.#device.createBindGroupLayout({ entries: bglEntries });
-                    /**
-                     * @type {GPUBindGroup}
-                     */
+                    renderPass.bindGroupLayoutCompute = this.#device.createBindGroupLayout({ entries });
                     renderPass.computeBindGroup = this.#device.createBindGroup({
                         label: `_createComputeBindGroup 0 - ${index}`,
                         layout: renderPass.bindGroupLayoutCompute,
@@ -1537,18 +1518,15 @@ class Points {
      * NOT CALL the createBindGroup if the texture (video/other)
      * is not being updated at all. I have to make the createBindGroup call
      * only if the texture is updated.
+     * @param {RenderPass} renderPass
      */
     #passComputeBindingGroup(renderPass) {
-        const entries = this.#createEntries(ShaderType.COMPUTE, renderPass);
+        const entries = this.#createEntries(GPUShaderStage.COMPUTE, renderPass);
         if (entries.length) {
-            renderPass.entries = entries;
-            /**
-             * @type {GPUBindGroup}
-             */
             renderPass.computeBindGroup = this.#device.createBindGroup({
                 label: `_passComputeBindingGroup 0`,
                 layout: renderPass.bindGroupLayoutCompute,
-                entries: renderPass.entries
+                entries
             });
         }
     }
@@ -1574,7 +1552,7 @@ class Points {
 
         //--------------------------------------
 
-        this.#createParams();
+        this.#createRenderBindGroup();
         //this.createVertexBuffer(new Float32Array(this.#vertexArray));
         // enum GPUPrimitiveTopology {
         //     'point-list',
@@ -1588,7 +1566,7 @@ class Points {
                 renderPass.renderPipeline = this.#device.createRenderPipeline({
                     // layout: 'auto',
                     layout: this.#device.createPipelineLayout({
-                        bindGroupLayouts: [renderPass.bindGroupLayout]
+                        bindGroupLayouts: [renderPass.bindGroupLayoutRender]
                     }),
                     //primitive: { topology: 'triangle-strip' },
                     primitive: { topology: 'triangle-list' },
@@ -1660,11 +1638,22 @@ class Points {
      * Creates the entries for the pipeline
      * @returns an array with the entries
      */
-    #createEntries(shaderType, { internal, index: renderPassIndex }) {
-        internal = internal || false;
+    #createEntries(shaderType, { index: renderPassIndex }) {
         let entries = [];
         let bindingIndex = 0;
         if (this.#uniforms.length) {
+            // TODO: 1262
+            // if you remove this there's an error that I think is not explained right
+            // it talks about a storage in index 1 but it was actually the 0
+            // and so is to this uniform you have to change the visibility
+            // not remove the type and leaving it empty as it seems you have to do here:
+            // https://gpuweb.github.io/gpuweb/#bindgroup-examples
+            // originally:
+            // if (entry.buffer?.type === 'uniform') {
+            //     entry.visibility = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT
+            // }
+            // the call is split here and at the end of the method with the foreach |= assignment
+            const visibility = shaderType === GPUShaderStage.FRAGMENT ? GPUShaderStage.VERTEX : null;
             entries.push(
                 {
                     binding: bindingIndex++,
@@ -1672,10 +1661,10 @@ class Points {
                         label: 'uniform',
                         buffer: this.#uniforms.buffer
                     },
-                    type: {
-                        name: 'buffer',
+                    buffer: {
                         type: 'uniform'
-                    }
+                    },
+                    visibility
                 }
             );
         }
@@ -1688,8 +1677,7 @@ class Points {
                             label: 'storage',
                             buffer: storageItem.buffer
                         },
-                        type: {
-                            name: 'buffer',
+                        buffer: {
                             type: 'storage'
                         }
                     }
@@ -1705,8 +1693,7 @@ class Points {
                             label: 'layer',
                             buffer: this.#layers.buffer
                         },
-                        type: {
-                            name: 'buffer',
+                        buffer: {
                             type: 'storage'
                         }
                     }
@@ -1720,8 +1707,7 @@ class Points {
                         {
                             binding: bindingIndex++,
                             resource: sampler.resource,
-                            type: {
-                                name: 'sampler',
+                            sampler: {
                                 type: 'filtering'
                             }
                         }
@@ -1737,8 +1723,7 @@ class Points {
                             label: 'texture storage 2d',
                             binding: bindingIndex++,
                             resource: textureStorage2d.texture.createView(),
-                            type: {
-                                name: 'storageTexture',
+                            storageTexture: {
                                 type: 'write-only'
                             }
                         }
@@ -1754,8 +1739,7 @@ class Points {
                             label: 'texture 2d',
                             binding: bindingIndex++,
                             resource: texture2d.texture.createView(),
-                            type: {
-                                name: 'texture',
+                            texture: {
                                 type: 'float'
                             }
                         }
@@ -1775,8 +1759,7 @@ class Points {
                                 baseArrayLayer: 0,
                                 arrayLayerCount: texture2dArray.imageTextures.bitmaps.length
                             }),
-                            type: {
-                                name: 'texture',
+                            texture: {
                                 type: 'float',
                                 viewDimension: '2d-array'
                             }
@@ -1793,8 +1776,7 @@ class Points {
                             label: 'external texture',
                             binding: bindingIndex++,
                             resource: externalTexture.texture,
-                            type: {
-                                name: 'externalTexture',
+                            externalTexture: {
                                 // type: 'write-only'
                             }
                         }
@@ -1803,9 +1785,7 @@ class Points {
             });
         }
         // TODO: repeated entry blocks
-        // TODO: internalcheck can be filtered
         this.#bindingTextures.forEach(bindingTexture => {
-
             const { usesRenderPass } = bindingTexture;
             if (usesRenderPass) {
                 if (bindingTexture.read.renderPassIndex === renderPassIndex) {
@@ -1814,8 +1794,7 @@ class Points {
                             label: `binding texture 2: name: ${bindingTexture.read.name}`,
                             binding: bindingIndex++,
                             resource: bindingTexture.texture.createView(),
-                            type: {
-                                name: 'texture',
+                            texture: {
                                 type: 'float'
                             }
                         }
@@ -1827,8 +1806,7 @@ class Points {
                             label: `binding texture: name: ${bindingTexture.write.name}`,
                             binding: bindingIndex++,
                             resource: bindingTexture.texture.createView(),
-                            type: {
-                                name: 'storageTexture',
+                            storageTexture: {
                                 type: 'write-only',
                                 format: 'rgba8unorm'
                             }
@@ -1844,8 +1822,7 @@ class Points {
                         label: `binding texture 2: name: ${bindingTexture.read.name}`,
                         binding: bindingIndex++,
                         resource: bindingTexture.texture.createView(),
-                        type: {
-                            name: 'texture',
+                        texture: {
                             type: 'float'
                         }
                     }
@@ -1858,8 +1835,7 @@ class Points {
                         label: `binding texture: name: ${bindingTexture.write.name}`,
                         binding: bindingIndex++,
                         resource: bindingTexture.texture.createView(),
-                        type: {
-                            name: 'storageTexture',
+                        storageTexture: {
                             type: 'write-only',
                             format: 'rgba8unorm'
                         }
@@ -1870,50 +1846,27 @@ class Points {
 
         });
 
+        entries.forEach(entry => entry.visibility |= shaderType);
+
         return entries;
     }
 
-    #createParams() {
+    #createRenderBindGroup() {
         this.#renderPasses.forEach(renderPass => {
-            const entries = this.#createEntries(ShaderType.FRAGMENT, renderPass);
+            const entries = this.#createEntries(GPUShaderStage.FRAGMENT, renderPass);
             if (entries.length) {
-                let bglEntries = [];
-                entries.forEach((entry, index) => {
-                    let bglEntry = {
-                        binding: index,
-                        visibility: GPUShaderStage.FRAGMENT
-                    }
-                    bglEntry[entry.type.name] = { 'type': entry.type.type };
-                    if (entry.type.format) {
-                        bglEntry[entry.type.name].format = entry.type.format
-                    }
-                    if (entry.type.viewDimension) {
-                        bglEntry[entry.type.name].viewDimension = entry.type.viewDimension
-                    }
-                    // TODO: 1262
-                    // if you remove this there's an error that I think is not explained right
-                    // it talks about a storage in index 1 but it was actually the 0
-                    // and so is to this uniform you have to change the visibility
-                    // not remove the type and leaving it empty as it seems you have to do here:
-                    // https://gpuweb.github.io/gpuweb/#bindgroup-examples
-                    if (entry.type.type == 'uniform') {
-                        bglEntry.visibility = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT
-                    }
-                    bglEntries.push(bglEntry);
-                });
-                renderPass.entries = entries;
-                renderPass.bindGroupLayout = this.#device.createBindGroupLayout({ entries: bglEntries });
-                renderPass.uniformBindGroup = this.#device.createBindGroup({
-                    label: '_createParams() 0',
-                    layout: renderPass.bindGroupLayout,
-                    entries: renderPass.entries
+                renderPass.bindGroupLayoutRender = this.#device.createBindGroupLayout({ entries });
+                renderPass.renderBindGroup = this.#device.createBindGroup({
+                    label: '_createRenderBindGroup() 0',
+                    layout: renderPass.bindGroupLayoutRender,
+                    entries
                 });
             }
         });
     }
 
     /**
-     * This is a slimmed down version of {@link #createParams}.
+     * This is a slimmed down version of {@link #createRenderBindGroup}.
      * We don't create the bindingGroupLayout since it already exists.
      * We do update the entries. We have to update them because of
      * changing textures like videos.
@@ -1921,15 +1874,15 @@ class Points {
      * NOT CALL the createBindGroup if the texture (video/other)
      * is not being updated at all. I have to make the createBindGroup call
      * only if the texture is updated.
+     * @param {RenderPass} renderPass
      */
-    #passParams(renderPass) {
-        const entries = this.#createEntries(ShaderType.FRAGMENT, renderPass);
+    #passRenderBindGroup(renderPass) {
+        const entries = this.#createEntries(GPUShaderStage.FRAGMENT, renderPass);
         if (entries.length) {
-            renderPass.entries = entries;
-            renderPass.uniformBindGroup = this.#device.createBindGroup({
-                label: '_passParams() 0',
-                layout: renderPass.bindGroupLayout,
-                entries: renderPass.entries
+            renderPass.renderBindGroup = this.#device.createBindGroup({
+                label: '_passRenderBindGroup() 0',
+                layout: renderPass.bindGroupLayoutRender,
+                entries
             });
         }
     }
@@ -1986,12 +1939,12 @@ class Points {
 
         this.#renderPasses.forEach(renderPass => {
             if (renderPass.hasVertexAndFragmentShader) {
-                this.#passParams(renderPass);
+                this.#passRenderBindGroup(renderPass);
                 const passEncoder = commandEncoder.beginRenderPass(this.#renderPassDescriptor);
                 passEncoder.setPipeline(renderPass.renderPipeline);
 
                 if (this.#uniforms.length) {
-                    passEncoder.setBindGroup(0, renderPass.uniformBindGroup);
+                    passEncoder.setBindGroup(0, renderPass.renderBindGroup);
                 }
                 passEncoder.setVertexBuffer(0, this.#buffer);
                 /**
@@ -2174,7 +2127,7 @@ class Points {
     /**
      * If the canvas has a fixed size e.g. `800x800`, `fitWindow` will fill
      * the available window space.
-     * @type {Boolean}
+     * @param {Boolean} value
      * @throws {String} {@link Points#init} has not been called
      *
      * @example
@@ -2197,4 +2150,4 @@ class Points {
 }
 
 export default Points;
-export { ShaderType, RenderPass, RenderPasses };
+export { RenderPass, RenderPasses };

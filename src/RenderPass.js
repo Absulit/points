@@ -34,11 +34,22 @@ class RenderPass {
     #compiledShaders
     #computePipeline = null;
     #renderPipeline = null;
+    /**
+     * @type {GPUBindGroup}
+     */
     #computeBindGroup = null;
-    #uniformBindGroup = null;
-    #bindGroupLayout = null;
+    /**
+     * @type {GPUBindGroup}
+     */
+    #renderBindGroup = null;
+    /**
+     * @type {GPUBindGroupLayout}
+     */
+    #bindGroupLayoutRender = null;
+    /**
+     * @type {GPUBindGroupLayout}
+     */
     #bindGroupLayoutCompute = null;
-    #entries = null;
     #hasComputeShader;
     #hasVertexShader;
     #hasFragmentShader;
@@ -148,20 +159,20 @@ class RenderPass {
         return this.#computeBindGroup;
     }
 
-    set uniformBindGroup(value) {
-        this.#uniformBindGroup = value;
+    set renderBindGroup(value) {
+        this.#renderBindGroup = value;
     }
 
-    get uniformBindGroup() {
-        return this.#uniformBindGroup;
+    get renderBindGroup() {
+        return this.#renderBindGroup;
     }
 
-    set bindGroupLayout(value) {
-        this.#bindGroupLayout = value;
+    set bindGroupLayoutRender(value) {
+        this.#bindGroupLayoutRender = value;
     }
 
-    get bindGroupLayout() {
-        return this.#bindGroupLayout;
+    get bindGroupLayoutRender() {
+        return this.#bindGroupLayoutRender;
     }
     set bindGroupLayoutCompute(value) {
         this.#bindGroupLayoutCompute = value;
@@ -169,14 +180,6 @@ class RenderPass {
 
     get bindGroupLayoutCompute() {
         return this.#bindGroupLayoutCompute;
-    }
-
-    set entries(value) {
-        this.#entries = value;
-    }
-
-    get entries() {
-        return this.#entries;
     }
 
     get compiledShaders() {
@@ -209,7 +212,7 @@ class RenderPass {
     /**
      * @param {Number} val
      */
-    set workgroupCountX(val){
+    set workgroupCountX(val) {
         this.#workgroupCountX = val;
     }
 
@@ -223,7 +226,7 @@ class RenderPass {
     /**
      * @param {Number} val
      */
-    set workgroupCountY(val){
+    set workgroupCountY(val) {
         this.#workgroupCountY = val;
     }
 
@@ -237,7 +240,7 @@ class RenderPass {
     /**
      * @param {Number} val
      */
-    set workgroupCountZ(val){
+    set workgroupCountZ(val) {
         this.#workgroupCountZ = val;
     }
 
@@ -255,7 +258,7 @@ class RenderPass {
         this.#callback?.(points, params);
     }
 
-    get required(){
+    get required() {
         return this.#required;
     }
     /**
@@ -265,7 +268,7 @@ class RenderPass {
      * {@link RenderPass#setInit} that are required.
      * This is only  used for a post processing RenderPass.
      */
-    set required(val){
+    set required(val) {
         this.#required = val;
     }
 }

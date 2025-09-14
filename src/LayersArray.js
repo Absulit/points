@@ -22,7 +22,7 @@ class LayersArray extends Array {
     }
 
     /**
-     * @param {ShaderType} v
+     * @param {GPUShaderStage} v
      */
     set shaderType(v) {
         this.#shaderType = v;

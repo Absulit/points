@@ -5,7 +5,6 @@ import vert1 from './renderpass1/vert.js';
 import frag1 from './renderpass1/frag.js';
 
 import Points from 'points';
-import { ShaderType } from 'points';
 import { RenderPass } from 'points';
 
 
@@ -35,7 +34,7 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
-        points.setSampler('imageSampler', null, ShaderType.FRAGMENT);
+        points.setSampler('imageSampler', null, GPUShaderStage.FRAGMENT);
         points.setTexture2d('feedbackTexture', true);
         points.setStorageMap('colors', colors, 'array<vec3f, 6>');
     },
