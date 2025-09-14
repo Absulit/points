@@ -1,5 +1,5 @@
 import { texture } from 'points/image';
-import { structs } from './../structs.js';
+import { structs } from './structs.js';
 
 const frag = /*wgsl*/`
 
@@ -18,7 +18,7 @@ fn main(
 ) -> @location(0) vec4f {
 
 
-    let finalColor = texture(readTexture, imageSampler, uvr, true);
+    let finalColor = vec4f();
 
     return finalColor;
 }
