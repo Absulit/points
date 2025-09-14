@@ -1498,13 +1498,6 @@ class Points {
                 if (entries.length) {
                     entries.forEach(entry => {
                         entry.visibility = GPUShaderStage.COMPUTE
-                        entry[entry.type.name] = { 'type': entry.type.type };
-                        if (entry.type.format) {
-                            entry[entry.type.name].format = entry.type.format
-                        }
-                        if (entry.type.viewDimension) {
-                            entry[entry.type.name].viewDimension = entry.type.viewDimension
-                        }
                     });
                     renderPass.bindGroupLayoutCompute = this.#device.createBindGroupLayout({ entries });
                     renderPass.computeBindGroup = this.#device.createBindGroup({
@@ -1526,14 +1519,12 @@ class Points {
      * NOT CALL the createBindGroup if the texture (video/other)
      * is not being updated at all. I have to make the createBindGroup call
      * only if the texture is updated.
+     * @param {RenderPass} renderPass
      */
     #passComputeBindingGroup(renderPass) {
         const entries = this.#createEntries(ShaderType.COMPUTE, renderPass);
         if (entries.length) {
             renderPass.entries = entries;
-            /**
-             * @type {GPUBindGroup}
-             */
             renderPass.computeBindGroup = this.#device.createBindGroup({
                 label: `_passComputeBindingGroup 0`,
                 layout: renderPass.bindGroupLayoutCompute,
@@ -1660,10 +1651,10 @@ class Points {
                         label: 'uniform',
                         buffer: this.#uniforms.buffer
                     },
-                    type: {
-                        name: 'buffer',
+                    buffer: {
                         type: 'uniform'
-                    }
+                    },
+                    visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT
                 }
             );
         }
@@ -1676,8 +1667,7 @@ class Points {
                             label: 'storage',
                             buffer: storageItem.buffer
                         },
-                        type: {
-                            name: 'buffer',
+                        buffer: {
                             type: 'storage'
                         }
                     }
@@ -1693,8 +1683,7 @@ class Points {
                             label: 'layer',
                             buffer: this.#layers.buffer
                         },
-                        type: {
-                            name: 'buffer',
+                        buffer: {
                             type: 'storage'
                         }
                     }
@@ -1708,8 +1697,7 @@ class Points {
                         {
                             binding: bindingIndex++,
                             resource: sampler.resource,
-                            type: {
-                                name: 'sampler',
+                            sampler: {
                                 type: 'filtering'
                             }
                         }
@@ -1725,8 +1713,7 @@ class Points {
                             label: 'texture storage 2d',
                             binding: bindingIndex++,
                             resource: textureStorage2d.texture.createView(),
-                            type: {
-                                name: 'storageTexture',
+                            storageTexture: {
                                 type: 'write-only'
                             }
                         }
@@ -1742,8 +1729,7 @@ class Points {
                             label: 'texture 2d',
                             binding: bindingIndex++,
                             resource: texture2d.texture.createView(),
-                            type: {
-                                name: 'texture',
+                            texture: {
                                 type: 'float'
                             }
                         }
@@ -1763,8 +1749,7 @@ class Points {
                                 baseArrayLayer: 0,
                                 arrayLayerCount: texture2dArray.imageTextures.bitmaps.length
                             }),
-                            type: {
-                                name: 'texture',
+                            texture: {
                                 type: 'float',
                                 viewDimension: '2d-array'
                             }
@@ -1781,8 +1766,7 @@ class Points {
                             label: 'external texture',
                             binding: bindingIndex++,
                             resource: externalTexture.texture,
-                            type: {
-                                name: 'externalTexture',
+                            externalTexture: {
                                 // type: 'write-only'
                             }
                         }
@@ -1800,8 +1784,7 @@ class Points {
                             label: `binding texture 2: name: ${bindingTexture.read.name}`,
                             binding: bindingIndex++,
                             resource: bindingTexture.texture.createView(),
-                            type: {
-                                name: 'texture',
+                            texture: {
                                 type: 'float'
                             }
                         }
@@ -1813,8 +1796,7 @@ class Points {
                             label: `binding texture: name: ${bindingTexture.write.name}`,
                             binding: bindingIndex++,
                             resource: bindingTexture.texture.createView(),
-                            type: {
-                                name: 'storageTexture',
+                            storageTexture: {
                                 type: 'write-only',
                                 format: 'rgba8unorm'
                             }
@@ -1830,8 +1812,7 @@ class Points {
                         label: `binding texture 2: name: ${bindingTexture.read.name}`,
                         binding: bindingIndex++,
                         resource: bindingTexture.texture.createView(),
-                        type: {
-                            name: 'texture',
+                        texture: {
                             type: 'float'
                         }
                     }
@@ -1844,8 +1825,7 @@ class Points {
                         label: `binding texture: name: ${bindingTexture.write.name}`,
                         binding: bindingIndex++,
                         resource: bindingTexture.texture.createView(),
-                        type: {
-                            name: 'storageTexture',
+                        storageTexture: {
                             type: 'write-only',
                             format: 'rgba8unorm'
                         }
@@ -1865,21 +1845,13 @@ class Points {
             if (entries.length) {
                 entries.forEach(entry => {
                     entry.visibility = GPUShaderStage.FRAGMENT;
-
-                    entry[entry.type.name] = { 'type': entry.type.type };
-                    if (entry.type.format) {
-                        entry[entry.type.name].format = entry.type.format
-                    }
-                    if (entry.type.viewDimension) {
-                        entry[entry.type.name].viewDimension = entry.type.viewDimension
-                    }
                     // TODO: 1262
                     // if you remove this there's an error that I think is not explained right
                     // it talks about a storage in index 1 but it was actually the 0
                     // and so is to this uniform you have to change the visibility
                     // not remove the type and leaving it empty as it seems you have to do here:
                     // https://gpuweb.github.io/gpuweb/#bindgroup-examples
-                    if (entry.type.type == 'uniform') {
+                    if (entry.buffer?.type === 'uniform') {
                         entry.visibility = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT
                     }
                 });
