@@ -1236,7 +1236,7 @@ class Points {
             }
             this.#createVertexBuffer(new Float32Array(this.#vertexArray));
         }
-        this.#createComputeBuffers();
+        this.#createBuffers();
         this.#createPipeline();
     }
     /**
@@ -1349,7 +1349,11 @@ class Points {
         });
     }
 
-    #createComputeBuffers() {
+    /**
+     * For each set of arrays with set* data, it creates their corresponding
+     * buffer
+     */
+    #createBuffers() {
         //--------------------------------------------
         this.#createParametersUniforms();
         //--------------------------------------------
