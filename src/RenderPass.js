@@ -42,9 +42,14 @@ class RenderPass {
      * @type {GPUBindGroup}
      */
     #renderBindGroup = null;
+    /**
+     * @type {GPUBindGroupLayout}
+     */
     #bindGroupLayoutRender = null;
+    /**
+     * @type {GPUBindGroupLayout}
+     */
     #bindGroupLayoutCompute = null;
-    #entries = null;
     #hasComputeShader;
     #hasVertexShader;
     #hasFragmentShader;
