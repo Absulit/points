@@ -987,13 +987,11 @@ class Points {
             }
         });
         this.#texturesExternal.forEach(externalTexture => {
-            // const internalCheck = internal == externalTexture.internal;
             if (!externalTexture.shaderType || externalTexture.shaderType == shaderType) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${externalTexture.name}: texture_external;\n`;
                 bindingIndex += 1;
             }
         });
-        // TODO: internalcheck can be a filter
         this.#bindingTextures.forEach(bindingTexture => {
             const { usesRenderPass } = bindingTexture;
             if (usesRenderPass) {
@@ -1656,8 +1654,7 @@ class Points {
      * Creates the entries for the pipeline
      * @returns an array with the entries
      */
-    #createEntries(shaderType, { internal, index: renderPassIndex }) {
-        internal = internal || false;
+    #createEntries(shaderType, { index: renderPassIndex }) {
         let entries = [];
         let bindingIndex = 0;
         if (this.#uniforms.length) {
@@ -1799,9 +1796,7 @@ class Points {
             });
         }
         // TODO: repeated entry blocks
-        // TODO: internalcheck can be filtered
         this.#bindingTextures.forEach(bindingTexture => {
-
             const { usesRenderPass } = bindingTexture;
             if (usesRenderPass) {
                 if (bindingTexture.read.renderPassIndex === renderPassIndex) {
