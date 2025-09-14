@@ -1,8 +1,7 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
-import { RenderPass } from 'points';
-import { ShaderType } from 'points';
+import Points, { RenderPass } from 'points';
 
 const options = {
     scale: 1,
@@ -13,6 +12,10 @@ const dithering3 = {
     renderPasses: [
         new RenderPass(vert, frag, compute, 800, 800)
     ],
+    /**
+     * @param {Points} points
+     * @param {*} folder
+     */
     init: async (points, folder) => {
         const descriptor = {
             addressModeU: 'repeat',
@@ -26,8 +29,8 @@ const dithering3 = {
         // await points.setTextureImage('image', './../img/gratia_800x800.jpg');
         await points.setTextureImage('image', './../img/absulit_800x800.jpg');
         points.setBindingTexture('outputTex', 'computeTexture');
-        points.setStorage('variables', 'Variable', false, ShaderType.COMPUTE);
-        points.setStorage('points', 'array<vec4f, 640000>', false, ShaderType.COMPUTE);
+        points.setStorage('variables', 'Variable', false, GPUShaderStage.COMPUTE);
+        points.setStorage('points', 'array<vec4f, 640000>', false, GPUShaderStage.COMPUTE);
 
         points.setUniform('scale', options.scale);
         points.setUniform('quantError', options.quantError);

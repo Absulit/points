@@ -1,6 +1,5 @@
 import UniformKeys from './UniformKeys.js';
 import VertexBufferInfo from './VertexBufferInfo.js';
-import ShaderType from './ShaderType.js';
 import RenderPass from './RenderPass.js';
 import RenderPasses from './RenderPasses.js';
 import Coordinate from './coordinate.js';
@@ -285,7 +284,7 @@ class Points {
      * @param {string} structName Name of the struct already existing on the
      * shader. This will be the type of the Storage.
      * @param {boolean} read if this is going to be used to read data back
-     * @param {ShaderType} shaderType this tells to what shader the storage is bound
+     * @param {GPUShaderStage} shaderType this tells to what shader the storage is bound
      * @returns {Object}
      *
      * @example
@@ -334,7 +333,7 @@ class Points {
      * @param {string} structName Name of the struct already existing on the
      * shader. This will be the type of the Storage.
      * @param {boolean} read if this is going to be used to read data back.
-     * @param {ShaderType} shaderType this tells to what shader the storage is bound
+     * @param {GPUShaderStage} shaderType this tells to what shader the storage is bound
      *
      * @example
      * // js examples/data1
@@ -415,7 +414,7 @@ class Points {
      * This creates a storage array named `layers` of the size
      * of the screen in pixels;
      * @param {Number} numLayers
-     * @param {ShaderType} shaderType
+     * @param {GPUShaderStage} shaderType
      *
      * @example
      * // js
@@ -566,7 +565,7 @@ class Points {
      * Supports web formats like JPG, PNG.
      * @param {string} name identifier it will have in the shaders
      * @param {string} path image address in a web server
-     * @param {ShaderType} shaderType in what shader type it will exist only
+     * @param {GPUShaderStage} shaderType in what shader type it will exist only
      * @returns {Object}
      *
      * @example
@@ -655,7 +654,7 @@ class Points {
      * Load images as texture_2d_array
      * @param {string} name id of the wgsl variable in the shader
      * @param {Array} paths image addresses in a web server
-     * @param {ShaderType} shaderType
+     * @param {GPUShaderStage} shaderType
      */
     // TODO: verify if this can be updated after creation
     // TODO: return texture2dArray object
@@ -687,7 +686,7 @@ class Points {
      * Supports web formats like mp4 and webm.
      * @param {string} name id of the wgsl variable in the shader
      * @param {string} path video address in a web server
-     * @param {ShaderType} shaderType
+     * @param {GPUShaderStage} shaderType
      * @returns {Object}
      *
      * @example
@@ -720,7 +719,7 @@ class Points {
      * Loads webcam as `texture_external`and then
      * it will be available to read data from in the shaders.
      * @param {String} name id of the wgsl variable in the shader
-     * @param {ShaderType} shaderType
+     * @param {GPUShaderStage} shaderType
      * @returns {Object}
      *
      * @example
@@ -870,12 +869,12 @@ class Points {
         const bindingTexture = {
             write: {
                 name: writeName,
-                shaderType: ShaderType.COMPUTE,
+                shaderType: GPUShaderStage.COMPUTE,
                 renderPassIndex: writeIndex
             },
             read: {
                 name: readName,
-                shaderType: ShaderType.FRAGMENT,
+                shaderType: GPUShaderStage.FRAGMENT,
                 renderPassIndex: readIndex
             },
             texture: null,
@@ -932,7 +931,7 @@ class Points {
     }
 
     /**
-     * @param {ShaderType} shaderType
+     * @param {GPUShaderStage} shaderType
      * @param {RenderPass} renderPass
      * @returns {String} string with bindings
      */
@@ -1072,9 +1071,9 @@ class Points {
         renderPass.hasVertexShader && (dynamicGroupBindingsVertex += dynamicStructParams);
         renderPass.hasComputeShader && (dynamicGroupBindingsCompute += dynamicStructParams);
         renderPass.hasFragmentShader && (dynamicGroupBindingsFragment += dynamicStructParams);
-        renderPass.hasVertexShader && (dynamicGroupBindingsVertex += this.#createDynamicGroupBindings(ShaderType.VERTEX, renderPass));
-        renderPass.hasComputeShader && (dynamicGroupBindingsCompute += this.#createDynamicGroupBindings(ShaderType.COMPUTE, renderPass));
-        dynamicGroupBindingsFragment += this.#createDynamicGroupBindings(ShaderType.FRAGMENT, renderPass);
+        renderPass.hasVertexShader && (dynamicGroupBindingsVertex += this.#createDynamicGroupBindings(GPUShaderStage.VERTEX, renderPass));
+        renderPass.hasComputeShader && (dynamicGroupBindingsCompute += this.#createDynamicGroupBindings(GPUShaderStage.COMPUTE, renderPass));
+        dynamicGroupBindingsFragment += this.#createDynamicGroupBindings(GPUShaderStage.FRAGMENT, renderPass);
         renderPass.hasVertexShader && (colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + defaultVertexBody + colorsVertWGSL);
         renderPass.hasComputeShader && (colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + colorsComputeWGSL);
         renderPass.hasFragmentShader && (colorsFragWGSL = dynamicGroupBindingsFragment + defaultStructs + colorsFragWGSL);
@@ -1493,7 +1492,7 @@ class Points {
     #createComputeBindGroup() {
         this.#renderPasses.forEach((renderPass, index) => {
             if (renderPass.hasComputeShader) {
-                const entries = this.#createEntries(ShaderType.COMPUTE, renderPass);
+                const entries = this.#createEntries(GPUShaderStage.COMPUTE, renderPass);
 
                 if (entries.length) {
                     entries.forEach(entry => {
@@ -1522,7 +1521,7 @@ class Points {
      * @param {RenderPass} renderPass
      */
     #passComputeBindingGroup(renderPass) {
-        const entries = this.#createEntries(ShaderType.COMPUTE, renderPass);
+        const entries = this.#createEntries(GPUShaderStage.COMPUTE, renderPass);
         if (entries.length) {
             renderPass.entries = entries;
             renderPass.computeBindGroup = this.#device.createBindGroup({
@@ -1841,7 +1840,7 @@ class Points {
 
     #createRenderBindGroup() {
         this.#renderPasses.forEach(renderPass => {
-            const entries = this.#createEntries(ShaderType.FRAGMENT, renderPass);
+            const entries = this.#createEntries(GPUShaderStage.FRAGMENT, renderPass);
             if (entries.length) {
                 entries.forEach(entry => {
                     entry.visibility = GPUShaderStage.FRAGMENT;
@@ -1879,7 +1878,7 @@ class Points {
      * @param {RenderPass} renderPass
      */
     #passRenderBindGroup(renderPass) {
-        const entries = this.#createEntries(ShaderType.FRAGMENT, renderPass);
+        const entries = this.#createEntries(GPUShaderStage.FRAGMENT, renderPass);
         if (entries.length) {
             renderPass.entries = entries;
             renderPass.renderBindGroup = this.#device.createBindGroup({
@@ -2130,7 +2129,7 @@ class Points {
     /**
      * If the canvas has a fixed size e.g. `800x800`, `fitWindow` will fill
      * the available window space.
-     * @type {Boolean}
+     * @param {Boolean} value
      * @throws {String} {@link Points#init} has not been called
      *
      * @example
@@ -2153,4 +2152,4 @@ class Points {
 }
 
 export default Points;
-export { ShaderType, RenderPass, RenderPasses };
+export { RenderPass, RenderPasses };
