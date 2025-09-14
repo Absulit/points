@@ -1564,6 +1564,7 @@ class Points {
         this.#renderPasses.forEach(renderPass => {
             if (renderPass.hasVertexAndFragmentShader) {
                 renderPass.renderPipeline = this.#device.createRenderPipeline({
+                    label: `render pipeline: renderPass ${renderPass.index}`,
                     // layout: 'auto',
                     layout: this.#device.createPipelineLayout({
                         bindGroupLayouts: [renderPass.bindGroupLayoutRender]
