@@ -951,8 +951,14 @@ class Points {
                 const T = storageItem.structName;
                 const isVertexFragmentStage = shaderType & (GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT);
                 // access mode was added to set storage as read on vertex only
-                const accessMode = isVertexFragmentStage ? 'read' : 'read_write';
+                let accessMode = isVertexFragmentStage ? 'read' : 'read_write';
                 // const accessMode = 'read_write';
+                if(storageItem.WRITE_FRAGMENT && shaderType & GPUShaderStage.VERTEX){
+                    return
+                }
+                if(storageItem.WRITE_FRAGMENT && shaderType & GPUShaderStage.FRAGMENT){
+                    accessMode = 'read_write';
+                }
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, ${accessMode}> ${storageItem.name}: ${T};\n`
                 bindingIndex += 1;
             }
@@ -1676,9 +1682,17 @@ class Points {
         this.#storage.forEach(storageItem => {
             if (!storageItem.shaderType || storageItem.shaderType == shaderType) {
                 const isVertexFragmentStage = shaderType & (GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT);
-                const type = isVertexFragmentStage ? 'read-only-storage' : 'storage';
+                let type = isVertexFragmentStage ? 'read-only-storage' : 'storage';
                 // const type = 'storage';
                 // const visibility = shaderType === GPUShaderStage.FRAGMENT ? GPUShaderStage.VERTEX : null;
+                if(storageItem.WRITE_FRAGMENT && shaderType & GPUShaderStage.VERTEX){
+                    return
+                }
+                if(storageItem.WRITE_FRAGMENT && shaderType & GPUShaderStage.FRAGMENT){
+                    type = 'storage';
+                    // console.log(storageItem.WRITE_FRAGMENT, shaderType);
+                }
+
                 entries.push(
                     {
                         binding: bindingIndex++,
