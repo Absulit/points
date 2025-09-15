@@ -29,9 +29,9 @@ fn main(
     let index = GlobalId.x;
 
 
-    if (index >= NUMPARTICLES) {
-        return;
-    }
+    // if (index >= NUMPARTICLES) {
+    //     return;
+    // }
 
     let particle = &particles[index];
 

@@ -19,7 +19,7 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
-        points.setConstant('NUMPARTICLES', 4, 'u32');
+        // points.setConstant('NUMPARTICLES', 4, 'u32');
         points.setStorage('particles', `array<Particle, 4>`);
 
     },
@@ -27,9 +27,6 @@ const base = {
      * @param {Points} points
      */
     update: points => {
-        points.setUniform('useVideo', options.useVideo);
-        points.setUniform('maxLife', options.maxLife);
-        points.setUniform('turbulenceScale', options.turbulenceScale);
     }
 }
 
