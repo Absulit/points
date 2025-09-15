@@ -22,7 +22,7 @@ const base = {
         // points.setConstant('NUMPARTICLES', 4, 'u32');
         points
             .setStorage('particles', `array<Particle, 4>`)
-            .FLAG = true;
+            .WRITE_FRAGMENT = true;
 
     },
     /**
