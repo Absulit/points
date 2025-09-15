@@ -43,9 +43,17 @@ class RenderPass {
      */
     #renderBindGroup = null;
     /**
+     * @type {GPUBindGroup}
+     */
+    #vertexBindGroup = null;
+    /**
      * @type {GPUBindGroupLayout}
      */
     #bindGroupLayoutRender = null;
+    /**
+     * @type {GPUBindGroupLayout}
+     */
+    #bindGroupLayoutVertex = null;
     /**
      * @type {GPUBindGroupLayout}
      */
@@ -167,6 +175,14 @@ class RenderPass {
         return this.#renderBindGroup;
     }
 
+    set vertexBindGroup(value) {
+        this.#vertexBindGroup = value;
+    }
+
+    get vertexBindGroup() {
+        return this.#vertexBindGroup;
+    }
+
     set bindGroupLayoutRender(value) {
         this.#bindGroupLayoutRender = value;
     }
@@ -174,6 +190,15 @@ class RenderPass {
     get bindGroupLayoutRender() {
         return this.#bindGroupLayoutRender;
     }
+
+    set bindGroupLayoutVertex(value) {
+        this.#bindGroupLayoutVertex = value;
+    }
+
+    get bindGroupLayoutVertex() {
+        return this.#bindGroupLayoutVertex;
+    }
+
     set bindGroupLayoutCompute(value) {
         this.#bindGroupLayoutCompute = value;
     }
