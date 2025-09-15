@@ -949,9 +949,10 @@ class Points {
         this.#storage.forEach(storageItem => {
             if (!storageItem.shaderType || storageItem.shaderType == shaderType) {
                 const T = storageItem.structName;
-                const isVertexFragmentStage = shaderType & GPUShaderStage.VERTEX;
+                const isVertexFragmentStage = shaderType & (GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT);
                 // access mode was added to set storage as read on vertex only
                 const accessMode = isVertexFragmentStage ? 'read' : 'read_write';
+                // const accessMode = 'read_write';
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, ${accessMode}> ${storageItem.name}: ${T};\n`
                 bindingIndex += 1;
             }
@@ -1674,8 +1675,9 @@ class Points {
         }
         this.#storage.forEach(storageItem => {
             if (!storageItem.shaderType || storageItem.shaderType == shaderType) {
-                const isVertexFragmentStage = shaderType & GPUShaderStage.VERTEX;
+                const isVertexFragmentStage = shaderType & (GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT);
                 const type = isVertexFragmentStage ? 'read-only-storage' : 'storage';
+                // const type = 'storage';
                 // const visibility = shaderType === GPUShaderStage.FRAGMENT ? GPUShaderStage.VERTEX : null;
                 entries.push(
                     {
