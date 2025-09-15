@@ -947,7 +947,7 @@ class Points {
             bindingIndex += 1;
         }
         this.#storage.forEach(storageItem => {
-            if (!storageItem.shaderType || storageItem.shaderType == shaderType) {
+            if (!storageItem.shaderType || storageItem.shaderType & shaderType) {
                 const T = storageItem.structName;
                 const isVertexFragmentStage = shaderType & (GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT);
                 // access mode was added to set storage as read on vertex only
@@ -964,7 +964,7 @@ class Points {
             }
         });
         if (this.#layers.length) {
-            if (!this.#layers.shaderType || this.#layers.shaderType == shaderType) {
+            if (!this.#layers.shaderType || this.#layers.shaderType & shaderType) {
                 let totalSize = 0;
                 this.#layers.forEach(layerItem => totalSize += layerItem.size);
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, read_write> layers: array<array<vec4f, ${totalSize}>>;\n`
@@ -972,31 +972,31 @@ class Points {
             }
         }
         this.#samplers.forEach((sampler, index) => {
-            if (!sampler.shaderType || sampler.shaderType == shaderType) {
+            if (!sampler.shaderType || sampler.shaderType & shaderType) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${sampler.name}: sampler;\n`;
                 bindingIndex += 1;
             }
         });
         this.#texturesStorage2d.forEach((texture, index) => {
-            if (!texture.shaderType || texture.shaderType == shaderType) {
+            if (!texture.shaderType || texture.shaderType & shaderType) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_storage_2d<rgba8unorm, write>;\n`;
                 bindingIndex += 1;
             }
         });
         this.#textures2d.forEach((texture, index) => {
-            if (!texture.shaderType || texture.shaderType == shaderType) {
+            if (!texture.shaderType || texture.shaderType & shaderType) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d<f32>;\n`;
                 bindingIndex += 1;
             }
         });
         this.#textures2dArray.forEach((texture, index) => {
-            if (!texture.shaderType || texture.shaderType == shaderType) {
+            if (!texture.shaderType || texture.shaderType & shaderType) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d_array<f32>;\n`;
                 bindingIndex += 1;
             }
         });
         this.#texturesExternal.forEach(externalTexture => {
-            if (!externalTexture.shaderType || externalTexture.shaderType == shaderType) {
+            if (!externalTexture.shaderType || externalTexture.shaderType & shaderType) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${externalTexture.name}: texture_external;\n`;
                 bindingIndex += 1;
             }
@@ -1015,11 +1015,11 @@ class Points {
 
                 return;
             }
-            if (bindingTexture.write.shaderType === shaderType) {
+            if (bindingTexture.write.shaderType & shaderType) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.write.name}: texture_storage_2d<rgba8unorm, write>;\n`;
                 bindingIndex += 1;
             }
-            if (bindingTexture.read.shaderType === shaderType) {
+            if (bindingTexture.read.shaderType & shaderType) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.read.name}: texture_2d<f32>;\n`;
                 bindingIndex += 1;
             }
@@ -1709,7 +1709,7 @@ class Points {
             }
         });
         if (this.#layers.length) {
-            if (!this.#layers.shaderType || this.#layers.shaderType == shaderType) {
+            if (!this.#layers.shaderType || this.#layers.shaderType & shaderType) {
                 entries.push(
                     {
                         binding: bindingIndex++,
@@ -1726,7 +1726,7 @@ class Points {
         }
         if (this.#samplers.length) {
             this.#samplers.forEach((sampler, index) => {
-                if (!sampler.shaderType || sampler.shaderType == shaderType) {
+                if (!sampler.shaderType || sampler.shaderType & shaderType) {
                     entries.push(
                         {
                             binding: bindingIndex++,
@@ -1741,7 +1741,7 @@ class Points {
         }
         if (this.#texturesStorage2d.length) {
             this.#texturesStorage2d.forEach((textureStorage2d, index) => {
-                if (!textureStorage2d.shaderType || textureStorage2d.shaderType == shaderType) {
+                if (!textureStorage2d.shaderType || textureStorage2d.shaderType & shaderType) {
                     entries.push(
                         {
                             label: 'texture storage 2d',
@@ -1757,7 +1757,7 @@ class Points {
         }
         if (this.#textures2d.length) {
             this.#textures2d.forEach((texture2d, index) => {
-                if (!texture2d.shaderType || texture2d.shaderType == shaderType) {
+                if (!texture2d.shaderType || texture2d.shaderType & shaderType) {
                     entries.push(
                         {
                             label: 'texture 2d',
@@ -1773,7 +1773,7 @@ class Points {
         }
         if (this.#textures2dArray.length) {
             this.#textures2dArray.forEach((texture2dArray, index) => {
-                if (!texture2dArray.shaderType || texture2dArray.shaderType == shaderType) {
+                if (!texture2dArray.shaderType || texture2dArray.shaderType & shaderType) {
                     entries.push(
                         {
                             label: 'texture 2d array',
@@ -1794,7 +1794,7 @@ class Points {
         }
         if (this.#texturesExternal.length) {
             this.#texturesExternal.forEach(externalTexture => {
-                if (!externalTexture.shaderType || externalTexture.shaderType == shaderType) {
+                if (!externalTexture.shaderType || externalTexture.shaderType & shaderType) {
                     entries.push(
                         {
                             label: 'external texture',
@@ -1840,7 +1840,7 @@ class Points {
                 return;
             }
 
-            if (bindingTexture.read.shaderType == shaderType) {
+            if (bindingTexture.read.shaderType & shaderType) {
                 entries.push(
                     {
                         label: `binding texture 2: name: ${bindingTexture.read.name}`,
@@ -1853,7 +1853,7 @@ class Points {
                 );
             }
 
-            if (bindingTexture.write.shaderType == shaderType) {
+            if (bindingTexture.write.shaderType & shaderType) {
                 entries.push(
                     {
                         label: `binding texture: name: ${bindingTexture.write.name}`,
