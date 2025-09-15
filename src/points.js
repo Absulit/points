@@ -949,7 +949,7 @@ class Points {
         this.#storage.forEach(storageItem => {
             if (!storageItem.shaderType || storageItem.shaderType == shaderType) {
                 const T = storageItem.structName;
-                const isVertexFragmentStage = shaderType & (GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT);
+                const isVertexFragmentStage = shaderType & GPUShaderStage.VERTEX;
                 // access mode was added to set storage as read on vertex only
                 const accessMode = isVertexFragmentStage ? 'read' : 'read_write';
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, ${accessMode}> ${storageItem.name}: ${T};\n`
@@ -1657,7 +1657,7 @@ class Points {
             //     entry.visibility = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT
             // }
             // the call is split here and at the end of the method with the foreach |= assignment
-            const visibility = shaderType === GPUShaderStage.FRAGMENT ? GPUShaderStage.VERTEX : null;
+            // const visibility = shaderType === GPUShaderStage.FRAGMENT ? GPUShaderStage.VERTEX : null;
             entries.push(
                 {
                     binding: bindingIndex++,
@@ -1668,15 +1668,15 @@ class Points {
                     buffer: {
                         type: 'uniform'
                     },
-                    visibility
+                    // visibility
                 }
             );
         }
         this.#storage.forEach(storageItem => {
             if (!storageItem.shaderType || storageItem.shaderType == shaderType) {
-                const isVertexFragmentStage = shaderType & (GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT);
+                const isVertexFragmentStage = shaderType & GPUShaderStage.VERTEX;
                 const type = isVertexFragmentStage ? 'read-only-storage' : 'storage';
-                const visibility = shaderType === GPUShaderStage.FRAGMENT ? GPUShaderStage.VERTEX : null;
+                // const visibility = shaderType === GPUShaderStage.FRAGMENT ? GPUShaderStage.VERTEX : null;
                 entries.push(
                     {
                         binding: bindingIndex++,
@@ -1687,7 +1687,7 @@ class Points {
                         buffer: {
                             type
                         },
-                        visibility
+                        // visibility
                     }
                 );
             }
@@ -1854,7 +1854,7 @@ class Points {
 
         });
 
-        entries.forEach(entry => entry.visibility |= shaderType);
+        entries.forEach(entry => entry.visibility = shaderType);
 
         return entries;
     }

@@ -17,6 +17,7 @@ fn main(
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
 
+    particles[0] = Particle();
 
     let finalColor = vec4f();
 
