@@ -935,11 +935,11 @@ class Points {
      * @param {RenderPass} renderPass
      * @returns {String} string with bindings
      */
-    #createDynamicGroupBindings(shaderType, { index: renderPassIndex }) {
+    #createDynamicGroupBindings(shaderType, { index: renderPassIndex }, groupId = 0) {
         if (!shaderType) {
             throw '`GPUShaderStage` is required';
         }
-        const groupId = 0;
+        // const groupId = 0;
         let dynamicGroupBindings = '';
         let bindingIndex = 0;
         if (this.#uniforms.length) {
@@ -1074,7 +1074,7 @@ class Points {
         renderPass.hasVertexShader && (dynamicGroupBindingsVertex += dynamicStructParams);
         renderPass.hasComputeShader && (dynamicGroupBindingsCompute += dynamicStructParams);
         renderPass.hasFragmentShader && (dynamicGroupBindingsFragment += dynamicStructParams);
-        renderPass.hasVertexShader && (dynamicGroupBindingsVertex += this.#createDynamicGroupBindings(GPUShaderStage.VERTEX, renderPass));
+        renderPass.hasVertexShader && (dynamicGroupBindingsVertex += this.#createDynamicGroupBindings(GPUShaderStage.VERTEX, renderPass, 1));
         renderPass.hasComputeShader && (dynamicGroupBindingsCompute += this.#createDynamicGroupBindings(GPUShaderStage.COMPUTE, renderPass));
         dynamicGroupBindingsFragment += this.#createDynamicGroupBindings(GPUShaderStage.FRAGMENT, renderPass);
         renderPass.hasVertexShader && (colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + defaultVertexBody + colorsVertWGSL);
@@ -1554,7 +1554,7 @@ class Points {
         });
 
         //--------------------------------------
-
+        this.#createVertexBindGroup();
         this.#createRenderBindGroup();
         //this.createVertexBuffer(new Float32Array(this.#vertexArray));
         // enum GPUPrimitiveTopology {
@@ -1570,7 +1570,7 @@ class Points {
                     label: `render pipeline: renderPass ${renderPass.index}`,
                     // layout: 'auto',
                     layout: this.#device.createPipelineLayout({
-                        bindGroupLayouts: [renderPass.bindGroupLayoutRender]
+                        bindGroupLayouts: [renderPass.bindGroupLayoutRender, renderPass.bindGroupLayoutVertex]
                     }),
                     //primitive: { topology: 'triangle-strip' },
                     primitive: { topology: 'triangle-list' },
@@ -1855,8 +1855,23 @@ class Points {
         });
 
         entries.forEach(entry => entry.visibility = shaderType);
+        // console.log(shaderType, entries);debugger
 
         return entries;
+    }
+
+    #createVertexBindGroup() {
+        this.#renderPasses.forEach(renderPass => {
+            const entries = this.#createEntries(GPUShaderStage.VERTEX, renderPass);
+            if (entries.length) {
+                renderPass.bindGroupLayoutVertex = this.#device.createBindGroupLayout({ entries });
+                renderPass.vertexBindGroup = this.#device.createBindGroup({
+                    label: '_createVertexBindGroup() 0',
+                    layout: renderPass.bindGroupLayoutVertex,
+                    entries
+                });
+            }
+        });
     }
 
     #createRenderBindGroup() {
@@ -1894,6 +1909,22 @@ class Points {
             });
         }
     }
+
+    /**
+     *
+     * @param {RenderPass} renderPass
+     */
+    #passVertexBindGroup(renderPass) {
+        const entries = this.#createEntries(GPUShaderStage.VERTEX, renderPass);
+        if (entries.length) {
+            renderPass.vertexBindGroup = this.#device.createBindGroup({
+                label: '_passVertexBindGroup() 0',
+                layout: renderPass.bindGroupLayoutVertex,
+                entries
+            });
+        }
+    }
+
 
     /**
      * Method executed on each {@link https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame | requestAnimationFrame}.
@@ -1948,10 +1979,12 @@ class Points {
         this.#renderPasses.forEach(renderPass => {
             if (renderPass.hasVertexAndFragmentShader) {
                 this.#passRenderBindGroup(renderPass);
+                this.#passVertexBindGroup(renderPass);
                 const passEncoder = commandEncoder.beginRenderPass(this.#renderPassDescriptor);
                 passEncoder.setPipeline(renderPass.renderPipeline);
 
                 if (this.#uniforms.length) {
+                    passEncoder.setBindGroup(1, renderPass.vertexBindGroup);
                     passEncoder.setBindGroup(0, renderPass.renderBindGroup);
                 }
                 passEncoder.setVertexBuffer(0, this.#buffer);
