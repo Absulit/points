@@ -302,17 +302,17 @@ class Points {
      * // wgsl string
      * colors[index] = vec3f(248, 208, 146) / 255;
      */
-    setStorage(name, structName, read, shaderType, arrayData) {
+    setStorage(name, structName, read, shaderType = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE, arrayData = null) {
         if (this.#nameExists(this.#storage, name)) {
             throw `\`setStorage()\` You have already defined \`${name}\``;
         }
         const storage = {
             mapped: !!arrayData,
-            name: name,
-            structName: structName,
+            name,
+            structName,
             // structSize: null,
-            shaderType: shaderType,
-            read: read,
+            shaderType,
+            read,
             buffer: null
         }
         this.#storage.push(storage);
@@ -364,7 +364,7 @@ class Points {
      *
      * resultMatrix.size = vec2(firstMatrix.size.x, secondMatrix.size.y);
      */
-    setStorageMap(name, arrayData, structName, read = false, shaderType = null) {
+    setStorageMap(name, arrayData, structName, read = false, shaderType = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE) {
         const storageToUpdate = this.#nameExists(this.#storage, name);
 
         if (!Array.isArray(arrayData) && arrayData.constructor !== Uint8Array) {
@@ -387,12 +387,12 @@ class Points {
             stream: false, // permanently updated as true
             updated: true,
             mapped: true,
-            name: name,
-            structName: structName,
-            shaderType: shaderType,
+            name,
+            structName,
+            shaderType,
             array: arrayData,
             buffer: null,
-            read: read
+            read
         }
         this.#storage.push(storage);
         return storage;
@@ -955,9 +955,8 @@ class Points {
                 // shaderType means: this is the current GPUShaderStage we are at
                 // and storageItem.shaderType is the stage required by the buffer in setStorage
 
-                const storageItemShaderType = !storageItem.shaderType ? GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE : storageItem.shaderType
-                let accessMode = getStorageAccessMode(shaderType, storageItemShaderType)
-                accessMode = ({['r']: 'read', ['rw']: 'read_write'})[accessMode]
+                let accessMode = getStorageAccessMode(shaderType, storageItem.shaderType)
+                accessMode = ({ ['r']: 'read', ['rw']: 'read_write' })[accessMode]
 
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, ${accessMode}> ${storageItem.name}: ${T};\n`
                 bindingIndex += 1;
@@ -1682,9 +1681,8 @@ class Points {
         this.#storage.forEach(storageItem => {
             if (!storageItem.shaderType || storageItem.shaderType & shaderType) {
 
-                const storageItemShaderType = !storageItem.shaderType ? GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE : storageItem.shaderType
-                let type = getStorageAccessMode(shaderType, storageItemShaderType)
-                type = ({['r']: 'read-only-storage', ['rw']: 'storage'})[type]
+                let type = getStorageAccessMode(shaderType, storageItem.shaderType)
+                type = ({ ['r']: 'read-only-storage', ['rw']: 'storage' })[type]
 
                 entries.push(
                     {
