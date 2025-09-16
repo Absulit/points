@@ -931,7 +931,7 @@ class Points {
     }
 
     #getAccessMode(currentStage, storageShaderTypes) {
-        console.log(currentStage, storageShaderTypes);
+        // console.log(currentStage, storageShaderTypes);
 
         const cache = {
             [GPUShaderStage.COMPUTE | GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT]: {
@@ -993,41 +993,14 @@ class Points {
         this.#storage.forEach(storageItem => {
             if (!storageItem.shaderType || storageItem.shaderType & shaderType) {
                 const T = storageItem.structName;
-                // access mode was added to set storage as read on vertex only
-                let accessMode = '';
 
                 // note:
                 // shaderType means: this is the current GPUShaderStage we are at
                 // and storageItem.shaderType is the stage required by the buffer in setStorage
 
                 const storageItemShaderType = !storageItem.shaderType ? GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE : storageItem.shaderType
-                const atVertex = shaderType & GPUShaderStage.VERTEX
-                const atFragment = shaderType & GPUShaderStage.FRAGMENT
-                const atCompute = shaderType & GPUShaderStage.COMPUTE
-                const hasVertex = storageItemShaderType & GPUShaderStage.VERTEX
-                const hasFragment = storageItemShaderType & GPUShaderStage.FRAGMENT
-                const hasCompute = storageItemShaderType & GPUShaderStage.COMPUTE
-                console.log('N:', shaderType, hasVertex);
-                if (atVertex && hasVertex && hasFragment) {
-                    console.log('has vertex return');
-                    return
-                } else if (atVertex && hasVertex) {
-                    console.log('vertex as read');
-                    accessMode = 'read';
-                }
-                // estamos en fragment y tiene vertex
-                if (atFragment && hasVertex) {
-                    console.log('fragment as read');
-                    accessMode = 'read';
-                } else if (atFragment && hasFragment) {
-                    console.log('fragment as read_write');
-                    accessMode = 'read_write';
-                }
-
-                if (atCompute && hasCompute) {
-                    console.log('compute as read_write');
-                    accessMode = 'read_write';
-                }
+                let accessMode = this.#getAccessMode(shaderType, storageItemShaderType)
+                accessMode = ({['r']: 'read', ['rw']: 'read_write'})[accessMode]
 
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, ${accessMode}> ${storageItem.name}: ${T};\n`
                 bindingIndex += 1;
@@ -1751,52 +1724,10 @@ class Points {
         }
         this.#storage.forEach(storageItem => {
             if (!storageItem.shaderType || storageItem.shaderType & shaderType) {
-                const isVertexFragmentStage = shaderType & (GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT);
-                let type = isVertexFragmentStage ? 'read-only-storage' : 'storage';
-                // const type = 'storage';
-                // const visibility = shaderType === GPUShaderStage.FRAGMENT ? GPUShaderStage.VERTEX : null;
-
-
 
                 const storageItemShaderType = !storageItem.shaderType ? GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE : storageItem.shaderType
-                const atVertex = shaderType & GPUShaderStage.VERTEX
-                const atFragment = shaderType & GPUShaderStage.FRAGMENT
-                const atCompute = shaderType & GPUShaderStage.COMPUTE
-                const hasVertex = storageItemShaderType & GPUShaderStage.VERTEX
-                const hasFragment = storageItemShaderType & GPUShaderStage.FRAGMENT
-                const hasCompute = storageItemShaderType & GPUShaderStage.COMPUTE
-                // console.log('N:',shaderType, hasVertex);
-                if (atVertex && hasVertex && hasFragment) {
-                    // console.log('has vertex return');
-                    return
-                } else if (atVertex && hasVertex) {
-                    // console.log('vertex as read-only-storage');
-                    type = 'read-only-storage';
-                }
-                // estamos en fragment y tiene vertex
-                if (atFragment && hasVertex) {
-                    // console.log('fragment as read-only-storage');
-                    type = 'read-only-storage';
-                } else if (atFragment && hasFragment) {
-                    // console.log('fragment as storage');
-                    type = 'storage';
-                }
-
-                if (atCompute && hasCompute) {
-                    // console.log('compute as storage');
-                    type = 'storage';
-                }
-
-
-
-
-                // if(storageItem.WRITE_FRAGMENT && shaderType & GPUShaderStage.VERTEX){
-                //     return
-                // }
-                // if(storageItem.WRITE_FRAGMENT && shaderType & GPUShaderStage.FRAGMENT){
-                //     type = 'storage';
-                //     // console.log(storageItem.WRITE_FRAGMENT, shaderType);
-                // }
+                let type = this.#getAccessMode(shaderType, storageItemShaderType)
+                type = ({['r']: 'read-only-storage', ['rw']: 'storage'})[type]
 
                 entries.push(
                     {
