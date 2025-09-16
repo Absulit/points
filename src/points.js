@@ -949,16 +949,38 @@ class Points {
         this.#storage.forEach(storageItem => {
             if (!storageItem.shaderType || storageItem.shaderType & shaderType) {
                 const T = storageItem.structName;
-                const isVertexFragmentStage = shaderType & (GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT);
                 // access mode was added to set storage as read on vertex only
-                let accessMode = isVertexFragmentStage ? 'read' : 'read_write';
-                // const accessMode = 'read_write';
-                if(storageItem.WRITE_FRAGMENT && shaderType & GPUShaderStage.VERTEX){
+                let accessMode = '';
+
+                // note:
+                // shaderType means: this is the current GPUShaderStage we are at
+                // and storageItem.shaderType is the stage required by the buffer in setStorage
+
+                const storageItemShaderType = !storageItem.shaderType? GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE : storageItem.shaderType
+                const hasVertex = storageItemShaderType & GPUShaderStage.VERTEX
+                const hasFragment = storageItemShaderType & GPUShaderStage.FRAGMENT
+                console.log('N:',shaderType, hasVertex);
+                if(shaderType & hasVertex & hasFragment){
+                    console.log('has vertex return');
                     return
+                }else if(shaderType & hasVertex){
+                    console.log('vertex as read');
+                    accessMode = 'read';
                 }
-                if(storageItem.WRITE_FRAGMENT && shaderType & GPUShaderStage.FRAGMENT){
+                // estamos en fragment y tiene vertex
+                if(shaderType & GPUShaderStage.FRAGMENT && hasVertex){
+                    console.log('fragment as read');
+                    accessMode = 'read';
+                }else if(shaderType & GPUShaderStage.FRAGMENT){
+                    console.log('fragment as read_write');
                     accessMode = 'read_write';
                 }
+
+                if(shaderType & GPUShaderStage.COMPUTE){
+                    console.log('compute as read_write');
+                    accessMode = 'read_write';
+                }
+
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, ${accessMode}> ${storageItem.name}: ${T};\n`
                 bindingIndex += 1;
             }
@@ -1685,13 +1707,55 @@ class Points {
                 let type = isVertexFragmentStage ? 'read-only-storage' : 'storage';
                 // const type = 'storage';
                 // const visibility = shaderType === GPUShaderStage.FRAGMENT ? GPUShaderStage.VERTEX : null;
-                if(storageItem.WRITE_FRAGMENT && shaderType & GPUShaderStage.VERTEX){
+
+
+
+                const storageItemShaderType = !storageItem.shaderType? GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE : storageItem.shaderType
+                const hasVertex = storageItemShaderType & GPUShaderStage.VERTEX
+                const hasFragment = storageItemShaderType & GPUShaderStage.FRAGMENT
+                // console.log('N:',shaderType, hasVertex);
+                if(shaderType & hasVertex & hasFragment){
                     return
+                }else if(shaderType & hasVertex){
+                    type = 'read-only-storage';
                 }
-                if(storageItem.WRITE_FRAGMENT && shaderType & GPUShaderStage.FRAGMENT){
+                // estamos en fragment y tiene vertex
+                if(shaderType & GPUShaderStage.FRAGMENT && hasVertex){
+                    type = 'read-only-storage';
+                }else if(shaderType & GPUShaderStage.FRAGMENT){
                     type = 'storage';
-                    // console.log(storageItem.WRITE_FRAGMENT, shaderType);
                 }
+                if(shaderType & GPUShaderStage.COMPUTE){
+                    type = 'storage';
+                }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                // if(storageItem.WRITE_FRAGMENT && shaderType & GPUShaderStage.VERTEX){
+                //     return
+                // }
+                // if(storageItem.WRITE_FRAGMENT && shaderType & GPUShaderStage.FRAGMENT){
+                //     type = 'storage';
+                //     // console.log(storageItem.WRITE_FRAGMENT, shaderType);
+                // }
 
                 entries.push(
                     {

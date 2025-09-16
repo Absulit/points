@@ -33,7 +33,7 @@ fn main(
     //     return;
     // }
 
-    let particle = &particles[index];
+    // let particle = &particles[index];
 
 
 }
