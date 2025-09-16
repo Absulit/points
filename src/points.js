@@ -11,7 +11,7 @@ import { dataSize, getArrayTypeData, isArray, typeSizes } from './data-size.js';
 import { loadImage, strToImage } from './texture-string.js';
 import LayersArray from './LayersArray.js';
 import UniformsArray from './UniformsArray.js';
-import getStorageAccessMode from './storage-accessmode.js';
+import getStorageAccessMode, { bindingModes, entriesModes } from './storage-accessmode.js';
 
 /**
  * Main class Points, this is the entry point of an application with this library.
@@ -955,8 +955,8 @@ class Points {
                 // shaderType means: this is the current GPUShaderStage we are at
                 // and storageItem.shaderType is the stage required by the buffer in setStorage
 
-                let accessMode = getStorageAccessMode(shaderType, storageItem.shaderType)
-                accessMode = ({ ['r']: 'read', ['rw']: 'read_write' })[accessMode]
+                let accessMode = getStorageAccessMode(shaderType, storageItem.shaderType);
+                accessMode = bindingModes[accessMode];
 
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, ${accessMode}> ${storageItem.name}: ${T};\n`
                 bindingIndex += 1;
@@ -1681,8 +1681,8 @@ class Points {
         this.#storage.forEach(storageItem => {
             if (!storageItem.shaderType || storageItem.shaderType & shaderType) {
 
-                let type = getStorageAccessMode(shaderType, storageItem.shaderType)
-                type = ({ ['r']: 'read-only-storage', ['rw']: 'storage' })[type]
+                let type = getStorageAccessMode(shaderType, storageItem.shaderType);
+                type = entriesModes[type];
 
                 entries.push(
                     {
