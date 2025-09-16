@@ -1706,7 +1706,7 @@ class Points {
             );
         }
         this.#storage.forEach(storageItem => {
-            if (!storageItem.shaderType || storageItem.shaderType == shaderType) {
+            if (!storageItem.shaderType || storageItem.shaderType & shaderType) {
                 const isVertexFragmentStage = shaderType & (GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT);
                 let type = isVertexFragmentStage ? 'read-only-storage' : 'storage';
                 // const type = 'storage';
