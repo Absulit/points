@@ -956,31 +956,31 @@ class Points {
                 // shaderType means: this is the current GPUShaderStage we are at
                 // and storageItem.shaderType is the stage required by the buffer in setStorage
 
-                const storageItemShaderType = !storageItem.shaderType? GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE : storageItem.shaderType
+                const storageItemShaderType = !storageItem.shaderType ? GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE : storageItem.shaderType
                 const atVertex = shaderType & GPUShaderStage.VERTEX
                 const atFragment = shaderType & GPUShaderStage.FRAGMENT
                 const atCompute = shaderType & GPUShaderStage.COMPUTE
                 const hasVertex = storageItemShaderType & GPUShaderStage.VERTEX
                 const hasFragment = storageItemShaderType & GPUShaderStage.FRAGMENT
                 const hasCompute = storageItemShaderType & GPUShaderStage.COMPUTE
-                console.log('N:',shaderType, hasVertex);
-                if(atVertex && hasVertex && hasFragment){
+                console.log('N:', shaderType, hasVertex);
+                if (atVertex && hasVertex && hasFragment) {
                     console.log('has vertex return');
                     return
-                }else if(atVertex && hasVertex){
+                } else if (atVertex && hasVertex) {
                     console.log('vertex as read');
                     accessMode = 'read';
                 }
                 // estamos en fragment y tiene vertex
-                if(atFragment && hasVertex){
+                if (atFragment && hasVertex) {
                     console.log('fragment as read');
                     accessMode = 'read';
-                }else if(atFragment){
+                } else if (atFragment && hasFragment) {
                     console.log('fragment as read_write');
                     accessMode = 'read_write';
                 }
 
-                if(atCompute && hasCompute){
+                if (atCompute && hasCompute) {
                     console.log('compute as read_write');
                     accessMode = 'read_write';
                 }
@@ -1714,7 +1714,7 @@ class Points {
 
 
 
-                const storageItemShaderType = !storageItem.shaderType? GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE : storageItem.shaderType
+                const storageItemShaderType = !storageItem.shaderType ? GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE : storageItem.shaderType
                 const atVertex = shaderType & GPUShaderStage.VERTEX
                 const atFragment = shaderType & GPUShaderStage.FRAGMENT
                 const atCompute = shaderType & GPUShaderStage.COMPUTE
@@ -1722,23 +1722,23 @@ class Points {
                 const hasFragment = storageItemShaderType & GPUShaderStage.FRAGMENT
                 const hasCompute = storageItemShaderType & GPUShaderStage.COMPUTE
                 // console.log('N:',shaderType, hasVertex);
-                if(atVertex && hasVertex && hasFragment){
+                if (atVertex && hasVertex && hasFragment) {
                     // console.log('has vertex return');
                     return
-                }else if(atVertex && hasVertex){
+                } else if (atVertex && hasVertex) {
                     // console.log('vertex as read-only-storage');
                     type = 'read-only-storage';
                 }
                 // estamos en fragment y tiene vertex
-                if(atFragment && hasVertex){
+                if (atFragment && hasVertex) {
                     // console.log('fragment as read-only-storage');
                     type = 'read-only-storage';
-                }else if(atFragment){
+                } else if (atFragment && hasFragment) {
                     // console.log('fragment as storage');
                     type = 'storage';
                 }
 
-                if(atCompute && hasCompute){
+                if (atCompute && hasCompute) {
                     // console.log('compute as storage');
                     type = 'storage';
                 }
