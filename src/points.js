@@ -957,26 +957,30 @@ class Points {
                 // and storageItem.shaderType is the stage required by the buffer in setStorage
 
                 const storageItemShaderType = !storageItem.shaderType? GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE : storageItem.shaderType
+                const atVertex = shaderType & GPUShaderStage.VERTEX
+                const atFragment = shaderType & GPUShaderStage.FRAGMENT
+                const atCompute = shaderType & GPUShaderStage.COMPUTE
                 const hasVertex = storageItemShaderType & GPUShaderStage.VERTEX
                 const hasFragment = storageItemShaderType & GPUShaderStage.FRAGMENT
+                const hasCompute = storageItemShaderType & GPUShaderStage.COMPUTE
                 console.log('N:',shaderType, hasVertex);
-                if(shaderType & hasVertex & hasFragment){
+                if(atVertex && hasVertex && hasFragment){
                     console.log('has vertex return');
                     return
-                }else if(shaderType & hasVertex){
+                }else if(atVertex && hasVertex){
                     console.log('vertex as read');
                     accessMode = 'read';
                 }
                 // estamos en fragment y tiene vertex
-                if(shaderType & GPUShaderStage.FRAGMENT && hasVertex){
+                if(atFragment && hasVertex){
                     console.log('fragment as read');
                     accessMode = 'read';
-                }else if(shaderType & GPUShaderStage.FRAGMENT){
+                }else if(atFragment){
                     console.log('fragment as read_write');
                     accessMode = 'read_write';
                 }
 
-                if(shaderType & GPUShaderStage.COMPUTE){
+                if(atCompute && hasCompute){
                     console.log('compute as read_write');
                     accessMode = 'read_write';
                 }
@@ -1711,40 +1715,33 @@ class Points {
 
 
                 const storageItemShaderType = !storageItem.shaderType? GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE : storageItem.shaderType
+                const atVertex = shaderType & GPUShaderStage.VERTEX
+                const atFragment = shaderType & GPUShaderStage.FRAGMENT
+                const atCompute = shaderType & GPUShaderStage.COMPUTE
                 const hasVertex = storageItemShaderType & GPUShaderStage.VERTEX
                 const hasFragment = storageItemShaderType & GPUShaderStage.FRAGMENT
+                const hasCompute = storageItemShaderType & GPUShaderStage.COMPUTE
                 // console.log('N:',shaderType, hasVertex);
-                if(shaderType & hasVertex & hasFragment){
+                if(atVertex && hasVertex && hasFragment){
+                    // console.log('has vertex return');
                     return
-                }else if(shaderType & hasVertex){
+                }else if(atVertex && hasVertex){
+                    // console.log('vertex as read-only-storage');
                     type = 'read-only-storage';
                 }
                 // estamos en fragment y tiene vertex
-                if(shaderType & GPUShaderStage.FRAGMENT && hasVertex){
+                if(atFragment && hasVertex){
+                    // console.log('fragment as read-only-storage');
                     type = 'read-only-storage';
-                }else if(shaderType & GPUShaderStage.FRAGMENT){
+                }else if(atFragment){
+                    // console.log('fragment as storage');
                     type = 'storage';
                 }
-                if(shaderType & GPUShaderStage.COMPUTE){
+
+                if(atCompute && hasCompute){
+                    // console.log('compute as storage');
                     type = 'storage';
                 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
