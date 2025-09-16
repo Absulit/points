@@ -11,6 +11,7 @@ import { dataSize, getArrayTypeData, isArray, typeSizes } from './data-size.js';
 import { loadImage, strToImage } from './texture-string.js';
 import LayersArray from './LayersArray.js';
 import UniformsArray from './UniformsArray.js';
+import getStorageAccessMode from './storage-accessmode.js';
 
 /**
  * Main class Points, this is the entry point of an application with this library.
@@ -930,50 +931,6 @@ class Points {
         ++this.#events_ids;
     }
 
-    #getAccessMode(currentStage, storageShaderTypes) {
-        // console.log(currentStage, storageShaderTypes);
-
-        const cache = {
-            [GPUShaderStage.COMPUTE | GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT]: {
-                [GPUShaderStage.COMPUTE]: 'rw',
-                [GPUShaderStage.VERTEX]: 'r',
-                [GPUShaderStage.FRAGMENT]: 'r'
-            },//
-            [GPUShaderStage.COMPUTE]: {
-                [GPUShaderStage.COMPUTE]: 'rw',
-                [GPUShaderStage.VERTEX]: null,
-                [GPUShaderStage.FRAGMENT]: null
-            },
-            [GPUShaderStage.VERTEX]: {
-                [GPUShaderStage.COMPUTE]: null,
-                [GPUShaderStage.VERTEX]: 'r',
-                [GPUShaderStage.FRAGMENT]: null
-            },
-            [GPUShaderStage.FRAGMENT]: {
-                [GPUShaderStage.COMPUTE]: null,
-                [GPUShaderStage.VERTEX]: null,
-                [GPUShaderStage.FRAGMENT]: 'rw'
-            },//
-            [GPUShaderStage.COMPUTE | GPUShaderStage.VERTEX]: {
-                [GPUShaderStage.COMPUTE]: 'rw',
-                [GPUShaderStage.VERTEX]: 'r',
-                [GPUShaderStage.FRAGMENT]: null
-            },
-            [GPUShaderStage.COMPUTE | GPUShaderStage.FRAGMENT]: {
-                [GPUShaderStage.COMPUTE]: 'rw',
-                [GPUShaderStage.VERTEX]: null,
-                [GPUShaderStage.FRAGMENT]: 'rw'
-            },//
-            [GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT]: {
-                [GPUShaderStage.COMPUTE]: null,
-                [GPUShaderStage.VERTEX]: 'r',
-                [GPUShaderStage.FRAGMENT]: 'r'
-            },
-        }
-
-        return cache[storageShaderTypes][currentStage]
-    }
-
     /**
      * @param {GPUShaderStage} shaderType
      * @param {RenderPass} renderPass
@@ -999,7 +956,7 @@ class Points {
                 // and storageItem.shaderType is the stage required by the buffer in setStorage
 
                 const storageItemShaderType = !storageItem.shaderType ? GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE : storageItem.shaderType
-                let accessMode = this.#getAccessMode(shaderType, storageItemShaderType)
+                let accessMode = getStorageAccessMode(shaderType, storageItemShaderType)
                 accessMode = ({['r']: 'read', ['rw']: 'read_write'})[accessMode]
 
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, ${accessMode}> ${storageItem.name}: ${T};\n`
@@ -1726,7 +1683,7 @@ class Points {
             if (!storageItem.shaderType || storageItem.shaderType & shaderType) {
 
                 const storageItemShaderType = !storageItem.shaderType ? GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE : storageItem.shaderType
-                let type = this.#getAccessMode(shaderType, storageItemShaderType)
+                let type = getStorageAccessMode(shaderType, storageItemShaderType)
                 type = ({['r']: 'read-only-storage', ['rw']: 'storage'})[type]
 
                 entries.push(
