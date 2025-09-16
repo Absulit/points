@@ -918,8 +918,8 @@ class Points {
         // TODO: remove structSize
         // this extra 1 is for the boolean flag in the Event struct
         const data = Array(4).fill(0);
-        this.setStorageMap(name, data, 'Event', true);
-        this.setStorage(`${name}_data`, `array<f32, ${structSize}>`, true);
+        this.setStorageMap(name, data, 'Event', true, GPUShaderStage.FRAGMENT);
+        this.setStorage(`${name}_data`, `array<f32, ${structSize}>`, true, GPUShaderStage.FRAGMENT);
         this.#events.set(this.#events_ids,
             {
                 id: this.#events_ids,
