@@ -2003,7 +2003,7 @@ class Points {
                  * firstInstance?: number | undefined First instance to draw
                  */
                 //passEncoder.draw(3, 1, 0, 0);
-                passEncoder.draw(this.#vertexBufferInfo.vertexCount);
+                passEncoder.draw(this.#vertexBufferInfo.vertexCount, renderPass.instanceCount);
                 passEncoder.end();
                 // Copy the rendering results from the swapchain into |texture2d.texture|.
                 this.#textures2d.forEach(texture2d => {

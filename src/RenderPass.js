@@ -68,6 +68,7 @@ class RenderPass {
 
     #callback = null;
     #required = null;
+    #instanceCount = 1;
 
     /**
      * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
@@ -295,6 +296,21 @@ class RenderPass {
      */
     set required(val) {
         this.#required = val;
+    }
+
+    /**
+     * Number of instances that will be created of the current mesh (Vertex Buffer)
+     * in this RenderPass. This means if you have a quad, it will create
+     * `instanceCount` number of independent quads on the screen.
+     * Useful for instanced particles driven by a Storage buffer.
+     * @param {Number} val
+     */
+    set instanceCount(val) {
+        this.#instanceCount = val;
+    }
+
+    get instanceCount(){
+        return this.#instanceCount;
     }
 }
 

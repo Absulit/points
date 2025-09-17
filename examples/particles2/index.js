@@ -9,19 +9,24 @@ const options = {
     useVideo: false,
 }
 
+const NUMPARTICLES = 1024;
+
+const instancedParticlesRenderPass = new RenderPass(vert, frag1, compute0, 4, 1, 1)
+instancedParticlesRenderPass.instanceCount = NUMPARTICLES;
+
 const base = {
     renderPasses: [
-        new RenderPass(vert, frag1, compute0, 8, 8, 1),
+        instancedParticlesRenderPass,
     ],
     /**
      * @param {Points} points
      */
     init: async (points, folder) => {
         points.depthWriteEnabled = false;
-        points.setConstant('NUMPARTICLES', 1024, 'u32');
+        points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
         points.setStorage(
             'particles',
-            `array<Particle, 1024>`,
+            `array<Particle, ${NUMPARTICLES}>`,
             false,
             GPUShaderStage.VERTEX | GPUShaderStage.COMPUTE
         );
