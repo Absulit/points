@@ -19,10 +19,13 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
-        // points.setConstant('NUMPARTICLES', 4, 'u32');
-        points
-            .setStorage('particles', `array<Particle, 4>`)
-            .WRITE_FRAGMENT = true;
+        points.setConstant('NUMPARTICLES', 4, 'u32');
+        points.setStorage(
+            'particles',
+            `array<Particle, 4>`,
+            false,
+            GPUShaderStage.VERTEX | GPUShaderStage.COMPUTE
+        );
 
     },
     /**

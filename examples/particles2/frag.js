@@ -19,7 +19,7 @@ fn main(
 
     // particles[0] = Particle();
 
-    let p = particles[0];
+    // let p = particles[0];
 
     let finalColor = vec4f();
 
