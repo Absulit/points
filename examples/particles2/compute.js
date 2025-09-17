@@ -33,11 +33,13 @@ fn main(
         return;
     }
 
-    rand_seed.x = f32(index);
+    rand_seed.x = f32(index) + params.time;
     rand();
     let particle = &particles[index];
-    particle.position = rand_seed;
-    particle.color = vec4f(1,0,0,1);
+    particle.position = rand_seed * 2 - 1;
+    if(particle.color.r == 0){
+        particle.color = vec4f(rand_seed,0,1);
+    }
 
 
 }

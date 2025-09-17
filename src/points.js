@@ -82,6 +82,7 @@ class Points {
     #events = new Map();
     #events_ids = 0;
     #dataSize = null;
+    #depthWriteEnabled = true;
 
     constructor(canvasId) {
         this.#canvasId = canvasId;
@@ -1581,7 +1582,7 @@ class Points {
                     //primitive: { topology: 'triangle-strip' },
                     primitive: { topology: 'triangle-list' },
                     depthStencil: {
-                        depthWriteEnabled: true,
+                        depthWriteEnabled: this.#depthWriteEnabled,
                         depthCompare: 'less',
                         format: 'depth24plus',
                     },
@@ -2194,6 +2195,15 @@ class Points {
         } else {
             this.#resizeCanvasToDefault();
         }
+    }
+
+    /**
+     * Depth sort of elements is true by default.
+     * To allow transparency and a custom type of sort, set this as false;
+     * @param {Boolean} val
+     */
+    set depthWriteEnabled(val){
+        this.#depthWriteEnabled = val;
     }
 }
 

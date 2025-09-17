@@ -9,8 +9,6 @@ const options = {
     useVideo: false,
 }
 
-
-
 const base = {
     renderPasses: [
         new RenderPass(vert, frag1, compute0, 8, 8, 1),
@@ -19,10 +17,11 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
-        points.setConstant('NUMPARTICLES', 4, 'u32');
+        points.depthWriteEnabled = false;
+        points.setConstant('NUMPARTICLES', 1024, 'u32');
         points.setStorage(
             'particles',
-            `array<Particle, 4>`,
+            `array<Particle, 1024>`,
             false,
             GPUShaderStage.VERTEX | GPUShaderStage.COMPUTE
         );
