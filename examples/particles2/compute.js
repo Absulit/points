@@ -23,20 +23,23 @@ fn particleInit(particles: ptr<storage, array<Particle,NUMPARTICLES>, read_write
     let particle = &particles[index];
     rand_seed.x = f32(index) + .8945 + fract(params.time) + random() + f32(wgid.x);
     rand();
-    let start_position = (rand_seed.xy * 2 - 1) * SIZE;
+    let flipTexture = vec2(1.,-1.);
+    let flipTextureCoordinates = vec2(-1.,1.);
+    let start_position = rand_seed.xy;
     rand();
     let angle = TAU * rand_seed.y;
 
+
     var particleColor = vec4f();
     if(params.useVideo == 1){
-        particleColor = textureLoad(video, vec2i(start_position)); // video
+        particleColor = textureLoad(video, vec2i(start_position * SIZE)); // video
     }else{
-        particleColor = textureLoad(image, vec2i(start_position), 0); // image
+        particleColor = textureLoad(image, vec2i(start_position * SIZE), 0); // image
     }
 
     rand();
-    particle.position = start_position / SIZE / 1.;
-    particle.start_position = start_position / SIZE / 1.;
+    particle.position = start_position;
+    particle.start_position = start_position;
     particle.color = particleColor;
     particle.angle = angle;
     particle.life = 0;

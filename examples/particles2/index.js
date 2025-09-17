@@ -9,10 +9,10 @@ const options = {
     useVideo: false,
 }
 
-const WORKGROUP_X = 1024;
+const WORKGROUP_X = 8;
 const WORKGROUP_Y = 1;
 
-const THREADS = 1;
+const THREADS = 256;
 
 const NUMPARTICLES = WORKGROUP_X * WORKGROUP_Y * THREADS;
 

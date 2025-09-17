@@ -23,7 +23,7 @@ fn main(
 
     // let p = particles[0];
 
-    let c = sdfCircle(vec2f(.5), .001, .01, uvr);
+    let c = sdfCircle(vec2f(.5), .01, .001, uvr);
 
     let finalColor = vec4f(color.rgb * c, c);
 
