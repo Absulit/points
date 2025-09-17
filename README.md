@@ -2,8 +2,15 @@
 
 `POINTS` is a library that uses WebGPU and allows you to create shaders without worrying too much about the setup.
 
-You can code freely without the use of any of the provided [support modules (math, color, image, effects, noise, sdf, etc)](#support-modules) or you can use them and have a little bit less of code in the shader. You can of course create your own modules and import them in the same way.
+# Main Audience
 
+The library is for Generative Art, so in general for Creative Coders, for Programmers/Software people who like the arts, and Artists who like to code.
+
+People who just want to create nice live graphics and use mathematics to achieve this.
+
+There's also a strong case for people who wants to create an application that harness the power of a Compute Shader. So a Software Engineer or Mathematician who has to make heavy calculations can do it with this library.
+
+You can code freely without the use of any of the provided [support modules (math, color, image, effects, noise, sdf, etc)](#support-modules) or you can use them and have a little bit less of code in the shader. You can of course create your own modules and import them in the same way.
 
 # Gallery
 
@@ -42,12 +49,6 @@ https://github.com/Absulit/points/assets/233719/c7c164be-7b69-4277-a80c-ce458e75
 </div>
 
 All examples are live here: https://absulit.github.io/points/examples/
-
-# Main Audience
-
-The library is for Generative Art, so in general for Creative Coders, for Programmers/Software people who like the arts, and Artists who like to code.
-
-People who just want to create nice live graphics and use mathematics to achieve this.
 
 # Requirements
 
