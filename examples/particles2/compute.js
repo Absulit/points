@@ -19,8 +19,31 @@ ${snoise}
 const SIZE = vec2f(800.,800.);
 const speed = 1.1; // .0001
 
+fn particleInit(particles: ptr<storage, array<Particle,NUMPARTICLES>, read_write>, index:u32, wgid:vec3u) {
+    let particle = &particles[index];
+    rand_seed.x = f32(index) + .8945 + fract(params.time) + random() + f32(wgid.x);
+    rand();
+    let start_position = (rand_seed.xy * 2 - 1) * SIZE;
+    rand();
+    let angle = TAU * rand_seed.y;
 
-@compute @workgroup_size(256,1,1)
+    var particleColor = vec4f();
+    if(params.useVideo == 1){
+        particleColor = textureLoad(video, vec2i(start_position)); // video
+    }else{
+        particleColor = textureLoad(image, vec2i(start_position), 0); // image
+    }
+
+    rand();
+    particle.position = start_position / SIZE / 1.;
+    particle.start_position = start_position / SIZE / 1.;
+    particle.color = particleColor;
+    particle.angle = angle;
+    particle.life = 0;
+    particle.speed = rand_seed.x;
+}
+
+@compute @workgroup_size(THREADS,1,1)
 fn main(
     @builtin(global_invocation_id) GlobalId: vec3u,
     @builtin(workgroup_id) WorkGroupID: vec3u,
@@ -33,15 +56,35 @@ fn main(
         return;
     }
 
-    rand_seed.x = f32(index) + params.time;
-    rand();
     let particle = &particles[index];
-    particle.position = rand_seed * 2 - 1;
-    if(particle.color.r == 0){
-        particle.color = vec4f(rand_seed,0,1);
+
+    if(particle.init == 0){
+        particleInit(&particles, index, WorkGroupID);
+        particle.init = 1;
     }
 
+    let n = snoise(particle.position / params.turbulenceScale + params.time * .1);
+    let increment = polar(particle.speed + .1, particle.angle * n) ;
+    particle.position += increment / SIZE;
+    particle.life += 1 + particle.speed;
 
+
+    let particle_position = particle.position;
+    rand();
+    let life_limit = rand_seed.x * params.maxLife;
+    if(particle.life >= life_limit || any(particle_position > SIZE) || any(particle_position < vec2f()) || particle.color.a == 0.){
+        particleInit(&particles, index, WorkGroupID);
+    }
+
+    // let particle_position_i = vec2i(particle.position);
+    // textureStore(writeTexture, particle_position_i, particle.color);
+
+    // debug
+    // log_data[0] = particle.position.x;
+    // log_data[1] = particle.position.y;
+    // log_data[2] = f32(any(particle_position >= SIZE));
+    // log_data[3] = f32(any(particle_position <= vec2f()));
+    // log.updated = 1;
 }
 `;
 
