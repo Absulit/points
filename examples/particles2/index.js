@@ -9,7 +9,7 @@ const options = {
     useVideo: false,
 }
 
-const WORKGROUP_X = 8;
+const WORKGROUP_X = 16;
 const WORKGROUP_Y = 1;
 
 const THREADS = 256;

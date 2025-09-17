@@ -24,8 +24,8 @@ fn particleInit(particles: ptr<storage, array<Particle,NUMPARTICLES>, read_write
     rand_seed.x = f32(index) + .8945 + fract(params.time) + random() + f32(wgid.x);
     rand();
     let flipTexture = vec2(1.,-1.);
-    let flipTextureCoordinates = vec2(-1.,1.);
-    let start_position = rand_seed.xy;
+    let flipTextureCoordinates = vec2(-.5,.5);
+    var start_position = rand_seed.xy;
     rand();
     let angle = TAU * rand_seed.y;
 
@@ -38,6 +38,8 @@ fn particleInit(particles: ptr<storage, array<Particle,NUMPARTICLES>, read_write
     }
 
     rand();
+    start_position = (start_position * flipTexture + flipTextureCoordinates) * 3.8;
+
     particle.position = start_position;
     particle.start_position = start_position;
     particle.color = particleColor;
@@ -71,11 +73,15 @@ fn main(
     particle.position += increment / SIZE;
     particle.life += 1 + particle.speed;
 
+    // let flipTexture = vec2(1.,-1.);
+    // let flipTextureCoordinates = vec2(-1.,1.);
 
-    let particle_position = particle.position;
+    // particle.position = particle.position * flipTexture;
+
+    // let particle_position = particle.position;
     rand();
     let life_limit = rand_seed.x * params.maxLife;
-    if(particle.life >= life_limit || any(particle_position > SIZE) || any(particle_position < vec2f()) || particle.color.a == 0.){
+    if(particle.life >= life_limit || particle.color.a == 0.){
         particleInit(&particles, index, WorkGroupID);
     }
 
