@@ -1,10 +1,12 @@
 import { texture } from 'points/image';
 import { structs } from './structs.js';
+import { sdfCircle } from 'points/sdf';
 
 const frag = /*wgsl*/`
 
 ${structs}
 ${texture}
+${sdfCircle}
 
 
 @fragment
@@ -21,7 +23,9 @@ fn main(
 
     // let p = particles[0];
 
-    let finalColor = vec4f();
+    let c = sdfCircle(vec2f(.5), .1, .01, uvr);
+
+    let finalColor = vec4f(color.rgb * c, c);
 
     return finalColor;
 }

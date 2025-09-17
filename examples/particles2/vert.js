@@ -16,7 +16,7 @@ fn main(
     let particle = particles[instanceIndex];
     let pos = position + vec4f(particle.position,0,1);
 
-    return defaultVertexBody(pos, color, uv);
+    return defaultVertexBody(pos, particle.color, uv);
 }
 `;
 
