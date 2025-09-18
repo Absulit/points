@@ -6,7 +6,7 @@ import Points, { RenderPass } from 'points';
 const options = {
     maxLife: 100,
     turbulenceScale: 100,
-    useVideo: true,
+    useVideo: false,
     particleSize: 30,
 }
 
