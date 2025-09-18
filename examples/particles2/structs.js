@@ -8,6 +8,7 @@ struct Particle {
     life: f32,
     init: u32,
     speed: f32,
+    scale: f32,
 }
 
 `;

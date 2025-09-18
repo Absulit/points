@@ -4,17 +4,20 @@ import frag1 from './frag.js';
 import Points, { RenderPass } from 'points';
 
 const options = {
-    maxLife: 34,
+    maxLife: 600,
     turbulenceScale: 100,
     useVideo: false,
 }
 
-const WORKGROUP_X = 16;
+const WORKGROUP_X = 256;
 const WORKGROUP_Y = 1;
 
-const THREADS = 256;
+const THREADS_X = 256;
+const THREADS_Y = 1;
 
-const NUMPARTICLES = WORKGROUP_X * WORKGROUP_Y * THREADS;
+const NUMPARTICLES = WORKGROUP_X * WORKGROUP_Y * THREADS_X * THREADS_Y;
+console.log(NUMPARTICLES);
+
 
 const instancedParticlesRenderPass = new RenderPass(vert, frag1, compute0, WORKGROUP_X, WORKGROUP_Y, 1)
 instancedParticlesRenderPass.instanceCount = NUMPARTICLES;
@@ -29,7 +32,8 @@ const base = {
     init: async (points, folder) => {
         points.depthWriteEnabled = false;
         points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
-        points.setConstant('THREADS', THREADS, 'u32');
+        points.setConstant('THREADS_X', THREADS_X, 'u32');
+        points.setConstant('THREADS_Y', THREADS_Y, 'u32');
         points.setStorage(
             'particles',
             `array<Particle, ${NUMPARTICLES}>`,

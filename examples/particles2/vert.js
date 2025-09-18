@@ -14,9 +14,19 @@ fn main(
 ) -> Fragment {
 
     let particle = particles[instanceIndex];
-    let pos = position + vec4f(particle.position,0,1);
+    // original position modification
+    // let pos = position + vec4f(particle.position,0,1);
 
-    return defaultVertexBody(pos, particle.color, uv);
+    // scale local quad position
+    let scaled = position.xy * particle.scale;//.01;
+
+    // Translate to world position
+    let world = scaled + particle.position;
+
+    // Project to clip space (assuming orthographic projection)
+    let clip = vec4f(world, 0.0, 1.0);
+
+    return defaultVertexBody(clip, particle.color, uv);
 }
 `;
 
