@@ -1,4 +1,3 @@
-import { BLACK, RED } from 'points/color';
 import { structs } from './structs.js';
 import { PI, polar, TAU } from 'points/math';
 import { rand, random } from 'points/random';
@@ -7,8 +6,6 @@ import { snoise } from 'points/noise2d';
 const compute = /*wgsl*/`
 
 ${structs}
-${BLACK}
-${RED}
 ${PI}
 ${TAU}
 ${polar}
@@ -18,7 +15,7 @@ ${snoise}
 
 const SIZE = vec2f(800.,800.);
 const speed = 1.1; // .0001
-const SCREENSCALE = 2.;
+const SCREENSCALE = 2;
 const PARTICLE_SCALE = .01;
 
 fn particleInit(particles: ptr<storage, array<Particle,NUMPARTICLES>, read_write>, index:u32, wgid:vec3u) {
@@ -48,7 +45,11 @@ fn particleInit(particles: ptr<storage, array<Particle,NUMPARTICLES>, read_write
     particle.angle = angle;
     particle.life = 0;
     particle.speed = rand_seed.x;
-    particle.scale = rand_seed.y * PARTICLE_SCALE * 4;
+    // particle.scale = rand_seed.y * PARTICLE_SCALE * 4;
+    particle.scale = 0;
+    particle.life_limit = rand_seed.x * params.maxLife;
+    let n = snoise(particle.position / params.turbulenceScale + params.time * .1);
+    particle.noise = n;
 }
 
 @compute @workgroup_size(THREADS_X, THREADS_Y,1)
@@ -70,28 +71,19 @@ fn main(
         particle.init = 1;
     }
 
-    let n = snoise(particle.position / params.turbulenceScale + params.time * .1);
-    let increment = polar(particle.speed + .1, particle.angle * n) ;
+    // let n = snoise(particle.position / params.turbulenceScale + params.time * .1);
+    let increment = polar(particle.speed + .1, particle.angle * particle.noise) ;
     particle.position += increment / SIZE;
     particle.life += 1 + particle.speed;
 
-
     let particle_position = particle.position;
     rand();
-    let life_limit = rand_seed.x * params.maxLife;
-    let life_percent = particle.life / life_limit;
-    particle.color = vec4f(particle.color.rgb, 1. - life_percent);
-    if(particle.life >= life_limit || any(particle_position > vec2f(SCREENSCALE)) || any(particle_position < vec2f(-SCREENSCALE)) || particle.color.a == 0.){
+    let life_percent = particle.life / particle.life_limit;
+    particle.color = vec4f(particle.color.rgb, (1. - life_percent) * life_percent * 2);
+    particle.scale = rand_seed.y * PARTICLE_SCALE * params.particleSize * life_percent;
+    if(particle.life >= particle.life_limit || any(particle_position > vec2f(SCREENSCALE)) || any(particle_position < vec2f(-SCREENSCALE)) || particle.color.a == 0.){
         particleInit(&particles, index, WorkGroupID);
     }
-
-    // debug
-    // log_data[0] = particle.position.x;
-    // log_data[1] = particle.position.y;
-    // log_data[2] = f32(any(particle_position >= SIZE));
-    // log_data[3] = f32(any(particle_position <= vec2f()));
-    // log.updated = 1;
-
 }
 `;
 

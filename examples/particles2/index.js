@@ -4,9 +4,10 @@ import frag1 from './frag.js';
 import Points, { RenderPass } from 'points';
 
 const options = {
-    maxLife: 600,
+    maxLife: 100,
     turbulenceScale: 100,
-    useVideo: false,
+    useVideo: true,
+    particleSize: 30,
 }
 
 const WORKGROUP_X = 256;
@@ -45,8 +46,10 @@ const base = {
         await points.setTextureImage('image', './../img/webgpu_800x800.png');
         // await points.setTextureImage('image', './../img/absulit_800x800.jpg');
         // await points.setTextureImage('image', './../img/absulit_800x800.jpg');
-        await points.setTextureVideo('video', './../img/6982698-hd_1440_1080_25fps_800x800.mp4');
-        // await points.setTextureVideo('video', './../img/pexels-shubh-haque-4746616-960x540-30fps.mp4', GPUShaderStage.COMPUTE);
+        // await points.setTextureVideo('video', './../img/6982698-hd_1440_1080_25fps_800x800.mp4');
+        await points.setTextureVideo('video', './../img/3641672-hd_1920_1080_24fps_800x800.mp4');
+        // await points.setTextureVideo('video', './../img/8056464-hd_1080_1920_30fps_800x800.mp4');
+        // await points.setTextureVideo('video', './../img/pexels-shubh-haque-4746616-960x540-30fps.mp4');
 
 
         points.setUniform('maxLife', options.maxLife);
@@ -58,6 +61,9 @@ const base = {
         points.setUniform('useVideo', false);
         folder.add(options, 'useVideo').name('useVideo');
 
+        points.setUniform('particleSize', options.particleSize);
+        folder.add(options, 'particleSize', 1, 60, .0001).name('particleSize');
+
         folder.open();
     },
     /**
@@ -67,6 +73,7 @@ const base = {
         points.setUniform('useVideo', options.useVideo);
         points.setUniform('maxLife', options.maxLife);
         points.setUniform('turbulenceScale', options.turbulenceScale);
+        points.setUniform('particleSize', options.particleSize);
     }
 }
 

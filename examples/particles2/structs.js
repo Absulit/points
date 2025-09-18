@@ -9,6 +9,8 @@ struct Particle {
     init: u32,
     speed: f32,
     scale: f32,
+    life_limit: f32,
+    noise: f32,
 }
 
 `;
