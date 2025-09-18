@@ -44,7 +44,9 @@ const base = {
         points.setSampler('imageSampler', null);
         await points.setTextureImage('image', './../img/webgpu_800x800.png');
         // await points.setTextureImage('image', './../img/absulit_800x800.jpg');
+        // await points.setTextureImage('image', './../img/absulit_800x800.jpg');
         await points.setTextureVideo('video', './../img/6982698-hd_1440_1080_25fps_800x800.mp4');
+        // await points.setTextureVideo('video', './../img/pexels-shubh-haque-4746616-960x540-30fps.mp4', GPUShaderStage.COMPUTE);
 
 
         points.setUniform('maxLife', options.maxLife);

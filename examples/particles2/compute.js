@@ -19,6 +19,7 @@ ${snoise}
 const SIZE = vec2f(800.,800.);
 const speed = 1.1; // .0001
 const SCREENSCALE = 2.;
+const PARTICLE_SCALE = .01;
 
 fn particleInit(particles: ptr<storage, array<Particle,NUMPARTICLES>, read_write>, index:u32, wgid:vec3u) {
     let particle = &particles[index];
@@ -47,7 +48,7 @@ fn particleInit(particles: ptr<storage, array<Particle,NUMPARTICLES>, read_write
     particle.angle = angle;
     particle.life = 0;
     particle.speed = rand_seed.x;
-    particle.scale = rand_seed.y * .01;
+    particle.scale = rand_seed.y * PARTICLE_SCALE * 4;
 }
 
 @compute @workgroup_size(THREADS_X, THREADS_Y,1)
@@ -78,7 +79,8 @@ fn main(
     let particle_position = particle.position;
     rand();
     let life_limit = rand_seed.x * params.maxLife;
-    particle.color = vec4f(particle.color.rgb, 1. - (particle.life / life_limit));
+    let life_percent = particle.life / life_limit;
+    particle.color = vec4f(particle.color.rgb, 1. - life_percent);
     if(particle.life >= life_limit || any(particle_position > vec2f(SCREENSCALE)) || any(particle_position < vec2f(-SCREENSCALE)) || particle.color.a == 0.){
         particleInit(&particles, index, WorkGroupID);
     }
