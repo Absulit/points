@@ -19,7 +19,8 @@ read_write. Compute is always read_write.
 | compute, fragment         | read_write |           | read_write
 | vertex, fragment          |            | read	     | read
 
-
+* @module storage-accessmode
+* @ignore
 */
 
 const cache = {

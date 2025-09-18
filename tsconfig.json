@@ -20,7 +20,6 @@
         "src/types/index.d.ts",
         "build/RenderPass.js",
         "build/RenderPasses.js",
-        "build/ShaderType.js",
         "build/points.js",
         "build/core/animation.js",
         "build/core/audio.js",

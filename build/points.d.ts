@@ -67,16 +67,18 @@ export class RenderPass {
     get computePipeline(): any;
     set renderPipeline(value: any);
     get renderPipeline(): any;
-    set computeBindGroup(value: any);
-    get computeBindGroup(): any;
-    set uniformBindGroup(value: any);
-    get uniformBindGroup(): any;
-    set bindGroupLayout(value: any);
-    get bindGroupLayout(): any;
-    set bindGroupLayoutCompute(value: any);
-    get bindGroupLayoutCompute(): any;
-    set entries(value: any);
-    get entries(): any;
+    set computeBindGroup(value: GPUBindGroup);
+    get computeBindGroup(): GPUBindGroup;
+    set renderBindGroup(value: GPUBindGroup);
+    get renderBindGroup(): GPUBindGroup;
+    set vertexBindGroup(value: GPUBindGroup);
+    get vertexBindGroup(): GPUBindGroup;
+    set bindGroupLayoutRender(value: GPUBindGroupLayout);
+    get bindGroupLayoutRender(): GPUBindGroupLayout;
+    set bindGroupLayoutVertex(value: GPUBindGroupLayout);
+    get bindGroupLayoutVertex(): GPUBindGroupLayout;
+    set bindGroupLayoutCompute(value: GPUBindGroupLayout);
+    get bindGroupLayoutCompute(): GPUBindGroupLayout;
     get compiledShaders(): {
         vertex: string;
         compute: string;
@@ -129,6 +131,15 @@ export class RenderPass {
      */
     set required(val: Array<string>);
     get required(): Array<string>;
+    /**
+     * Number of instances that will be created of the current mesh (Vertex Buffer)
+     * in this RenderPass. This means if you have a quad, it will create
+     * `instanceCount` number of independent quads on the screen.
+     * Useful for instanced particles driven by a Storage buffer.
+     * @param {Number} val
+     */
+    set instanceCount(val: number);
+    get instanceCount(): number;
     #private;
 }
 /**
@@ -223,35 +234,6 @@ export class RenderPasses {
     static WAVES: RenderPass;
 }
 /**
- * In different calls to the main {@link Points} class, it is used to
- * tell the library in what stage of the shaders the data to be sent.
- * @class ShaderType
- *
- * @example
- * // Send storage data to the Fragment Shaders only
- * points.setStorage('variables', 'Variables', false, ShaderType.FRAGMENT);
- * points.setStorage('objects', `array<Object, ${numObjects}>`, false, ShaderType.FRAGMENT);
- *
- * @example
- * // Send storage data to the Compute Shaders only
- * points.setStorage('variables', 'Variable', false, ShaderType.COMPUTE);
- *
- */
-export class ShaderType {
-    /**
-     * Vertex Shader
-     */
-    static VERTEX: number;
-    /**
-     * Compute Shader
-     */
-    static COMPUTE: number;
-    /**
-     * Fragment Shader
-     */
-    static FRAGMENT: number;
-}
-/**
  * Main class Points, this is the entry point of an application with this library.
  * @example
  * import Points from 'points';
@@ -276,7 +258,7 @@ declare class Points {
     /**
      * If the canvas has a fixed size e.g. `800x800`, `fitWindow` will fill
      * the available window space.
-     * @type {Boolean}
+     * @param {Boolean} value
      * @throws {String} {@link Points#init} has not been called
      *
      * @example
@@ -285,7 +267,7 @@ declare class Points {
      *      update();
      *  }
      */
-    set fitWindow(value: any);
+    set fitWindow(value: boolean);
     /**
      * Sets a `param` (predefined struct already in all shaders)
      * as uniform to send to all shaders.
@@ -350,7 +332,7 @@ declare class Points {
      * @param {string} structName Name of the struct already existing on the
      * shader. This will be the type of the Storage.
      * @param {boolean} read if this is going to be used to read data back
-     * @param {ShaderType} shaderType this tells to what shader the storage is bound
+     * @param {GPUShaderStage} shaderType this tells to what shader the storage is bound
      * @returns {Object}
      *
      * @example
@@ -367,7 +349,7 @@ declare class Points {
      * // wgsl string
      * colors[index] = vec3f(248, 208, 146) / 255;
      */
-    setStorage(name: string, structName: string, read: boolean, shaderType: ShaderType, arrayData: any): any;
+    setStorage(name: string, structName: string, read: boolean, shaderType?: GPUShaderStage, arrayData?: any): any;
     /**
      * Creates a persistent memory buffer across every frame call that can be updated.
      * See [GPUBuffer](https://www.w3.org/TR/webgpu/#gpubuffer)
@@ -383,7 +365,7 @@ declare class Points {
      * @param {string} structName Name of the struct already existing on the
      * shader. This will be the type of the Storage.
      * @param {boolean} read if this is going to be used to read data back.
-     * @param {ShaderType} shaderType this tells to what shader the storage is bound
+     * @param {GPUShaderStage} shaderType this tells to what shader the storage is bound
      *
      * @example
      * // js examples/data1
@@ -413,14 +395,14 @@ declare class Points {
      *
      * resultMatrix.size = vec2(firstMatrix.size.x, secondMatrix.size.y);
      */
-    setStorageMap(name: string, arrayData: Uint8Array<ArrayBuffer> | Array<number> | number, structName: string, read?: boolean, shaderType?: ShaderType): any;
+    setStorageMap(name: string, arrayData: Uint8Array<ArrayBuffer> | Array<number> | number, structName: string, read?: boolean, shaderType?: GPUShaderStage): any;
     readStorage(name: any): Promise<Float32Array<any>>;
     /**
      * Layers of data made of `vec4f`.
      * This creates a storage array named `layers` of the size
      * of the screen in pixels;
      * @param {Number} numLayers
-     * @param {ShaderType} shaderType
+     * @param {GPUShaderStage} shaderType
      *
      * @example
      * // js
@@ -431,7 +413,7 @@ declare class Points {
      * layers[0][pointIndex] = point;
      * layers[1][pointIndex] = point;
      */
-    setLayers(numLayers: number, shaderType: ShaderType): void;
+    setLayers(numLayers: number, shaderType: GPUShaderStage): void;
     /**
      * Creates a `sampler` to be sent to the shaders. Internally it will be a {@link GPUSampler}
      * @param {string} name Name of the `sampler` to be called in the shaders.
@@ -464,7 +446,7 @@ declare class Points {
      *
      * @param {String} name Name to call the texture in the shaders.
      * @param {boolean} copyCurrentTexture If you want the fragment output to be copied here.
-     * @param {String} shaderType To what {@link ShaderType} you want to exclusively use this variable.
+     * @param {GPUShaderStage} shaderType To what {@link GPUShaderStage} you want to exclusively use this variable.
      * @param {Number} renderPassIndex If using `copyCurrentTexture`
      * this tells which RenderPass it should get the data from. If not set then it will grab the last pass.
      * @returns {Object}
@@ -481,7 +463,7 @@ declare class Points {
      * );
      *
      */
-    setTexture2d(name: string, copyCurrentTexture: boolean, shaderType: string, renderPassIndex: number): any;
+    setTexture2d(name: string, copyCurrentTexture: boolean, shaderType: GPUShaderStage, renderPassIndex: number): any;
     copyTexture(nameTextureA: any, nameTextureB: any): void;
     /**
      * Loads an image as `texture_2d` and then it will be available to read
@@ -489,7 +471,7 @@ declare class Points {
      * Supports web formats like JPG, PNG.
      * @param {string} name identifier it will have in the shaders
      * @param {string} path image address in a web server
-     * @param {ShaderType} shaderType in what shader type it will exist only
+     * @param {GPUShaderStage} shaderType in what shader type it will exist only
      * @returns {Object}
      *
      * @example
@@ -499,7 +481,7 @@ declare class Points {
      * // wgsl string
      * let rgba = texturePosition(image, imageSampler, position, uvr, true);
      */
-    setTextureImage(name: string, path: string, shaderType?: ShaderType): any;
+    setTextureImage(name: string, path: string, shaderType?: GPUShaderStage): any;
     /**
      * Loads a text string as a texture.<br>
      * Using an Atlas or a Spritesheet with UTF-16 chars (`path`) it will create a new texture
@@ -512,7 +494,7 @@ declare class Points {
      * @param {String} path atlas to grab characters from, image address in a web server
      * @param {{x: number, y: number}} size size of a individual character e.g.: `{x:10, y:20}`
      * @param {Number} offset how many characters back or forward it must move to start
-     * @param {String} shaderType To what {@link ShaderType} you want to exclusively use this variable.
+     * @param {GPUShaderStage} shaderType To what {@link GPUShaderStage} you want to exclusively use this variable.
      * @returns {Object}
      *
      * @example
@@ -532,21 +514,21 @@ declare class Points {
     setTextureString(name: string, text: string, path: string, size: {
         x: number;
         y: number;
-    }, offset?: number, shaderType?: string): any;
+    }, offset?: number, shaderType?: GPUShaderStage): any;
     /**
      * Load images as texture_2d_array
      * @param {string} name id of the wgsl variable in the shader
      * @param {Array} paths image addresses in a web server
-     * @param {ShaderType} shaderType
+     * @param {GPUShaderStage} shaderType
      */
-    setTextureImageArray(name: string, paths: any[], shaderType: ShaderType): Promise<void>;
+    setTextureImageArray(name: string, paths: any[], shaderType: GPUShaderStage): Promise<void>;
     /**
      * Loads a video as `texture_external`and then
      * it will be available to read data from in the shaders.
      * Supports web formats like mp4 and webm.
      * @param {string} name id of the wgsl variable in the shader
      * @param {string} path video address in a web server
-     * @param {ShaderType} shaderType
+     * @param {GPUShaderStage} shaderType
      * @returns {Object}
      *
      * @example
@@ -556,12 +538,12 @@ declare class Points {
      * // wgsl string
      * let rgba = textureExternalPosition(video, imageSampler, position, uvr, true);
      */
-    setTextureVideo(name: string, path: string, shaderType: ShaderType): any;
+    setTextureVideo(name: string, path: string, shaderType: GPUShaderStage): any;
     /**
      * Loads webcam as `texture_external`and then
      * it will be available to read data from in the shaders.
      * @param {String} name id of the wgsl variable in the shader
-     * @param {ShaderType} shaderType
+     * @param {GPUShaderStage} shaderType
      * @returns {Object}
      *
      * @example
@@ -571,7 +553,7 @@ declare class Points {
      * // wgsl string
      * et rgba = textureExternalPosition(video, imageSampler, position, uvr, true);
      */
-    setTextureWebcam(name: string, shaderType: ShaderType): any;
+    setTextureWebcam(name: string, shaderType: GPUShaderStage): any;
     /**
      * Assigns an audio FrequencyData to a StorageMap.<br>
      * Calling setAudio creates a Storage with `name` in the wgsl shaders.<br>
@@ -689,7 +671,7 @@ declare class Points {
     /**
      * Get the active list of {@link RenderPass}
      */
-    get renderPasses(): any;
+    get renderPasses(): RenderPass[];
     /**
      * Adds two triangles called points per number of columns and rows
      * @ignore
@@ -739,6 +721,12 @@ declare class Points {
      */
     set fullscreen(value: boolean);
     get fullscreen(): boolean;
+    /**
+     * Depth sort of elements is true by default.
+     * To allow transparency and a custom type of sort, set this as false;
+     * @param {Boolean} val
+     */
+    set depthWriteEnabled(val: boolean);
     #private;
 }
 declare class Coordinate {
