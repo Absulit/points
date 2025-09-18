@@ -9,15 +9,6 @@ export default [
     plugins: []
   },
   {
-    input: 'src/ShaderType.js',
-    output: {
-      file: 'build/ShaderType.js',
-      format: 'esm',
-      banner: '/* @ts-self-types="./ShaderType.d.ts" */'
-    },
-    plugins: []
-  },
-  {
     input: 'src/RenderPasses.js',
     output: {
       file: 'build/RenderPasses.js',
