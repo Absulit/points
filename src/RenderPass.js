@@ -43,9 +43,17 @@ class RenderPass {
      */
     #renderBindGroup = null;
     /**
+     * @type {GPUBindGroup}
+     */
+    #vertexBindGroup = null;
+    /**
      * @type {GPUBindGroupLayout}
      */
     #bindGroupLayoutRender = null;
+    /**
+     * @type {GPUBindGroupLayout}
+     */
+    #bindGroupLayoutVertex = null;
     /**
      * @type {GPUBindGroupLayout}
      */
@@ -60,6 +68,7 @@ class RenderPass {
 
     #callback = null;
     #required = null;
+    #instanceCount = 1;
 
     /**
      * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
@@ -167,6 +176,14 @@ class RenderPass {
         return this.#renderBindGroup;
     }
 
+    set vertexBindGroup(value) {
+        this.#vertexBindGroup = value;
+    }
+
+    get vertexBindGroup() {
+        return this.#vertexBindGroup;
+    }
+
     set bindGroupLayoutRender(value) {
         this.#bindGroupLayoutRender = value;
     }
@@ -174,6 +191,15 @@ class RenderPass {
     get bindGroupLayoutRender() {
         return this.#bindGroupLayoutRender;
     }
+
+    set bindGroupLayoutVertex(value) {
+        this.#bindGroupLayoutVertex = value;
+    }
+
+    get bindGroupLayoutVertex() {
+        return this.#bindGroupLayoutVertex;
+    }
+
     set bindGroupLayoutCompute(value) {
         this.#bindGroupLayoutCompute = value;
     }
@@ -270,6 +296,21 @@ class RenderPass {
      */
     set required(val) {
         this.#required = val;
+    }
+
+    /**
+     * Number of instances that will be created of the current mesh (Vertex Buffer)
+     * in this RenderPass. This means if you have a quad, it will create
+     * `instanceCount` number of independent quads on the screen.
+     * Useful for instanced particles driven by a Storage buffer.
+     * @param {Number} val
+     */
+    set instanceCount(val) {
+        this.#instanceCount = val;
+    }
+
+    get instanceCount(){
+        return this.#instanceCount;
     }
 }
 
