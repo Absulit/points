@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Source: core/animation.js | Points</title>
+    <title>Source: storage-accessmode.js | Points</title>
     <meta name="description" content="A Generative Art library made in WebGPU"><meta name="keywords" content="javascript, webgl, crative-coding, shaders, generative-art, webgpu, genart, wgsl">
     <link rel="icon" title="dummy" href="data:image/x-icon;base64,AA">
     <script src="scripts/docolatte.min.js"></script>
@@ -23,7 +23,7 @@
         </div>
         <div class="topbar">
             <h1 class="page-title">
-                <a href="#">Source: core/animation.js</a>
+                <a href="#">Source: storage-accessmode.js</a>
             </h1>
             <a class="light-switch" title="Switch light/dark mode" href="#"><i class="label auto">
 <svg  class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -42,73 +42,74 @@
     
 <article class="src">
     <pre class="prettyprint source linenums lang-js"><span class="_char">_</span><code>/**
- * Utilities for animation.
- * &lt;br>
- * Functions that use sine and `params.time` to increase and decrease a value over time.
- * &lt;br>
- * &lt;br>
- * These are wgsl functions, not js functions.
- * The function is enclosed in a js string constant,
- * to be appended into the code to reference it in the string shader.
- * @module points/animation
- */
 
-/**
- * Animates `sin()` over `params.time` and a provided `speed`.
- * The value is not normalized, so in the range -1..1
- * @type {String}
- * @param {f32} speed
- * @example
- * // js
- * import { fusin } from 'points/animation';
- *
- * // wgsl string
- * ${fusin}
- * let value = fusin(2.);
- */
-export const fusin = /*wgsl*/`
-fn fusin(speed: f32) -> f32{
-    return sin(params.time * speed);
-}
-`;
+The idea here is that the columns are the current stage of the storage
+being checked at entries and dynamic bindings, and the rows are the stage where
+the storage should show; the table then matches both.
+The thing to remember here is, if the storage is required in any combination,
+then the fragment stage (if is included) then there the storage must be
+read access mode; if there's no vertex then the storage during fragment can be
+read_write. Compute is always read_write.
 
-/**
- * Animates `cos()` over `params.time` and a provided `speed`.
- * The value is not normalized, so in the range -1..1
- * @type {String}
- * @param {f32} speed
- * @example
- * // js
- * import { fucos } from 'points/animation';
- *
- * // wgsl string
- * ${fucos}
- * let value = fucos(2.);
- */
-export const fucos = /*wgsl*/`
-fn fucos(speed: f32) -> f32{
-    return cos(params.time * speed);
-}
-`;
 
-/**
- * Animates `sin()` over `params.time` and a provided `speed`.
- * The value is normalized, so in the range 0..1
- * @type {String}
- * @param {f32} speed
- * @example
- * // js
- * import { fnusin } from 'points/animation';
- *
- * // wgsl string
- * ${fnusin}
- * let value = fnusin(2.);
- */
-export const fnusin = /*wgsl*/`
-fn fnusin(speed: f32) -> f32{
-    return (sin(params.time * speed) + 1.) * .5;
+| storage      \     current| COMPUTE    | VERTEX	 | FRAGMENT
+| --------------------------|:-----------|:----------|----------:|
+| compute, vertex, fragment | read_write | read	     | read
+| compute                   | read_write |           |
+| vertex                    |            | read      |
+| fragment                  |            |           | read_write
+| compute, vertex           | read_write | read      |
+| compute, fragment         | read_write |           | read_write
+| vertex, fragment          |            | read	     | read
+
+
+*/
+
+const cache = {
+    [GPUShaderStage.COMPUTE | GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT]: {
+        [GPUShaderStage.COMPUTE]: 'rw',
+        [GPUShaderStage.VERTEX]: 'r',
+        [GPUShaderStage.FRAGMENT]: 'r'
+    },//
+    [GPUShaderStage.COMPUTE]: {
+        [GPUShaderStage.COMPUTE]: 'rw',
+        [GPUShaderStage.VERTEX]: null,
+        [GPUShaderStage.FRAGMENT]: null
+    },
+    [GPUShaderStage.VERTEX]: {
+        [GPUShaderStage.COMPUTE]: null,
+        [GPUShaderStage.VERTEX]: 'r',
+        [GPUShaderStage.FRAGMENT]: null
+    },
+    [GPUShaderStage.FRAGMENT]: {
+        [GPUShaderStage.COMPUTE]: null,
+        [GPUShaderStage.VERTEX]: null,
+        [GPUShaderStage.FRAGMENT]: 'rw'
+    },//
+    [GPUShaderStage.COMPUTE | GPUShaderStage.VERTEX]: {
+        [GPUShaderStage.COMPUTE]: 'rw',
+        [GPUShaderStage.VERTEX]: 'r',
+        [GPUShaderStage.FRAGMENT]: null
+    },
+    [GPUShaderStage.COMPUTE | GPUShaderStage.FRAGMENT]: {
+        [GPUShaderStage.COMPUTE]: 'rw',
+        [GPUShaderStage.VERTEX]: null,
+        [GPUShaderStage.FRAGMENT]: 'rw'
+    },//
+    [GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT]: {
+        [GPUShaderStage.COMPUTE]: null,
+        [GPUShaderStage.VERTEX]: 'r',
+        [GPUShaderStage.FRAGMENT]: 'r'
+    },
 }
-`;
+
+export default function getStorageAccessMode(currentStage, storageShaderTypes) {
+    // console.log(currentStage, storageShaderTypes);
+    return cache[storageShaderTypes][currentStage];
+}
+
+export const bindingModes = { ['r']: 'read', ['rw']: 'read_write' };
+export const entriesModes = { ['r']: 'read-only-storage', ['rw']: 'storage' };
 </code></pre>
 </article>
 
@@ -131,7 +132,7 @@ fn fnusin(speed: f32) -> f32{
                     Documentation generated by <a rel="external" href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a><wbr>
                     using <a rel="external" href="https://github.com/amekusa/docolatte">Docolatte</a> theme
                     
-                    <wbr>on <time datetime="2025-09-18T21:20:05.550Z">Thu, 18 Sep 2025 21:20:05 GMT</time>
+                    <wbr>on <time datetime="2025-09-18T21:20:05.544Z">Thu, 18 Sep 2025 21:20:05 GMT</time>
                     
                 </p>
                 

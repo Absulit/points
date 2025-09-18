@@ -64,16 +64,18 @@ declare class RenderPass {
     get computePipeline(): any;
     set renderPipeline(value: any);
     get renderPipeline(): any;
-    set computeBindGroup(value: any);
-    get computeBindGroup(): any;
-    set uniformBindGroup(value: any);
-    get uniformBindGroup(): any;
-    set bindGroupLayout(value: any);
-    get bindGroupLayout(): any;
-    set bindGroupLayoutCompute(value: any);
-    get bindGroupLayoutCompute(): any;
-    set entries(value: any);
-    get entries(): any;
+    set computeBindGroup(value: GPUBindGroup);
+    get computeBindGroup(): GPUBindGroup;
+    set renderBindGroup(value: GPUBindGroup);
+    get renderBindGroup(): GPUBindGroup;
+    set vertexBindGroup(value: GPUBindGroup);
+    get vertexBindGroup(): GPUBindGroup;
+    set bindGroupLayoutRender(value: GPUBindGroupLayout);
+    get bindGroupLayoutRender(): GPUBindGroupLayout;
+    set bindGroupLayoutVertex(value: GPUBindGroupLayout);
+    get bindGroupLayoutVertex(): GPUBindGroupLayout;
+    set bindGroupLayoutCompute(value: GPUBindGroupLayout);
+    get bindGroupLayoutCompute(): GPUBindGroupLayout;
     get compiledShaders(): {
         vertex: string;
         compute: string;
@@ -126,5 +128,14 @@ declare class RenderPass {
      */
     set required(val: Array<string>);
     get required(): Array<string>;
+    /**
+     * Number of instances that will be created of the current mesh (Vertex Buffer)
+     * in this RenderPass. This means if you have a quad, it will create
+     * `instanceCount` number of independent quads on the screen.
+     * Useful for instanced particles driven by a Storage buffer.
+     * @param {Number} val
+     */
+    set instanceCount(val: number);
+    get instanceCount(): number;
     #private;
 }
