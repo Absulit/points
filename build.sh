@@ -8,7 +8,6 @@ npx rollup -c
 
 ./node_modules/.bin/swc build/points.js --out-file build/points.min.js
 # ./node_modules/.bin/swc build/RenderPass.js --out-file build/RenderPass.min.js
-# ./node_modules/.bin/swc build/ShaderType.js --out-file build/ShaderType.min.js
 # ./node_modules/.bin/swc build/RenderPasses.js --out-file build/RenderPasses.min.js
 
 ./node_modules/.bin/swc build/core/animation.js --out-file build/core/animation.min.js
