@@ -56,7 +56,6 @@ fn main(
 ) {
     let index = GlobalId.x;
 
-
     if (index >= NUMPARTICLES) {
         return;
     }
@@ -73,20 +72,13 @@ fn main(
     particle.position += increment / SIZE;
     particle.life += 1 + particle.speed;
 
-    // let flipTexture = vec2(1.,-1.);
-    // let flipTextureCoordinates = vec2(-1.,1.);
 
-    // particle.position = particle.position * flipTexture;
-
-    // let particle_position = particle.position;
+    let particle_position = particle.position;
     rand();
     let life_limit = rand_seed.x * params.maxLife;
-    if(particle.life >= life_limit || particle.color.a == 0.){
+    if(particle.life >= life_limit || any(particle_position > vec2f(4)) || any(particle_position < vec2f(-4)) || particle.color.a == 0.){
         particleInit(&particles, index, WorkGroupID);
     }
-
-    // let particle_position_i = vec2i(particle.position);
-    // textureStore(writeTexture, particle_position_i, particle.color);
 
     // debug
     // log_data[0] = particle.position.x;
