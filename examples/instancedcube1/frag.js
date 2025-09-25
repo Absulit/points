@@ -5,8 +5,10 @@ import { texturePosition } from 'points/image';
 import { brightness } from 'points/color';
 import { sdfCircle } from 'points/sdf';
 import { RED } from 'points/color';
+import { structs } from './structs.js';
 const frag = /*wgsl*/`
 
+${structs}
 ${fnusin}
 ${snoise}
 ${texturePosition}
@@ -15,12 +17,7 @@ ${rotateVector}
 ${sdfCircle}
 ${RED}
 
-struct Variable{
-    init:f32
-}
-
 const CENTER = vec2(.5,.5);
-const UNIT = 1. / 100.;
 
 fn rotateX(p:vec3<f32>, rads:f32 ) -> vec3<f32> {
     let s = sin(rads);
@@ -56,30 +53,6 @@ fn main(
     @builtin(position) position: vec4<f32>
 ) -> @location(0) vec4<f32> {
 
-    if(variables.init == 0.){
-        // let unit = 1. / 100.;
-        var index = 0;
-
-        let step = 1;
-        let side = i32( params.side / 2 );
-        let sideNegative = -1 * side;
-
-
-        for (var x = sideNegative; x < side; x+=step) {
-            let xF32 = f32(x);
-            for (var y = sideNegative; y < side; y+=step) {
-                let yF32 = f32(y);
-                for (var z = sideNegative; z < side; z+=step) {
-                    let zF32 = f32(z);
-
-                    points[index] = vec3( xF32 * UNIT,  yF32 * UNIT,   (zF32 * UNIT)  );
-                    index++;
-                }
-            }
-        }
-
-        variables.init = 1.;
-    }
 
     var circles = 0.;
     for (var index = 0; index < i32(params.numPoints); index++) {
@@ -96,6 +69,8 @@ fn main(
 
 
     return vec4(uv, circles, 1) * circles;
+
+    // return vec4f();
 }
 `;
 

@@ -20,6 +20,8 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+        points.setConstant('UNIT', 1. / 100., 'f32');
+
         points.setUniform('sliderA', options.sliderA);
         points.setUniform('sliderB', options.sliderB);
         points.setUniform('sliderC', options.sliderC);
@@ -28,18 +30,14 @@ const base = {
         folder.add(options, 'sliderC', -1, 1, .0001).name('sliderC');
         folder.open();
 
-        // points.setSampler('imageSampler', null);
-        // await points.setTextureImage('image', '../../../../assets_ignore/angel_800x800.jpg');
-        // await points.setTextureImage('image', '../../../../assets_ignore/absulit_800x800.jpg');
-        // await points.setTextureImage('image', '../../../../assets_ignore/space_jokey_800x800.png');
 
         let side = 8;
         let numPoints = side * side * side;
         points.setUniform('numPoints', numPoints);
         points.setUniform('side', side);
         console.log(numPoints);
-        points.setStorage('points', `array<vec3f, ${numPoints}>`, false, GPUShaderStage.FRAGMENT);
-        points.setStorage('variables', 'Variable', false, GPUShaderStage.FRAGMENT);
+        points.setStorage('points', `array<vec3f, ${numPoints}>`, false);
+        points.setStorage('variables', 'Variable', false);
 
 
         // RenderPasses.lensDistortion(points, .85, .0);
