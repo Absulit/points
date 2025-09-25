@@ -1,9 +1,7 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
-import Points from 'points';
-import { RenderPass } from 'points';
-import { RenderPasses } from 'points';
+import Points, { RenderPass, RenderPasses }  from 'points';
 
 const options = {
     sliderA: 0.619,
@@ -11,16 +9,33 @@ const options = {
     sliderC: 0.508,
 }
 
+const side = 6;
+
+const WORKGROUPS_X = 1;
+const WORKGROUPS_Y = 1;
+const WORKGROUPS_Z = 1;
+
+const THREADS_X = side;
+const THREADS_Y = side;
+const THREADS_Z = side;
+
+
+const renderPass0 = new RenderPass(vert, frag, compute, WORKGROUPS_X, WORKGROUPS_Y, WORKGROUPS_Z);
+
 const base = {
-    vert,
-    compute,
-    frag,
+    renderPasses: [
+        renderPass0
+    ],
     /**
      *
      * @param {Points} points
      */
     init: async (points, folder) => {
         points.setConstant('UNIT', 1. / 100., 'f32');
+
+        points.setConstant('THREADS_X', THREADS_X, 'u32');
+        points.setConstant('THREADS_Y', THREADS_Y, 'u32');
+        points.setConstant('THREADS_Z', THREADS_Z, 'u32');
 
         points.setUniform('sliderA', options.sliderA);
         points.setUniform('sliderB', options.sliderB);
@@ -31,12 +46,12 @@ const base = {
         folder.open();
 
 
-        let side = 8;
+
         let numPoints = side * side * side;
         points.setUniform('numPoints', numPoints);
         points.setUniform('side', side);
         console.log(numPoints);
-        points.setStorage('points', `array<vec3f, ${numPoints}>`, false);
+        points.setStorage('points', `array<Particle, ${numPoints}>`, false);
         points.setStorage('variables', 'Variable', false);
 
 

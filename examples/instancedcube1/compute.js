@@ -4,7 +4,7 @@ const compute = /*wgsl*/`
 
 ${structs}
 
-@compute @workgroup_size(8,8,1)
+@compute @workgroup_size(THREADS_X, THREADS_Y, THREADS_Z)
 fn main(
     @builtin(global_invocation_id) GlobalId: vec3<u32>,
     @builtin(workgroup_id) WorkGroupID: vec3<u32>,
@@ -26,7 +26,7 @@ fn main(
                 for (var z = sideNegative; z < side; z+=step) {
                     let zF32 = f32(z);
 
-                    points[index] = vec3( xF32 * UNIT,  yF32 * UNIT,   (zF32 * UNIT)  );
+                    points[index] = Particle(vec3( xF32 * UNIT,  yF32 * UNIT,   (zF32 * UNIT)  ), 1);
                     index++;
                 }
             }
