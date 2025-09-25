@@ -4,7 +4,6 @@ import frag from './frag.js';
 import Points from 'points';
 import { RenderPass } from 'points';
 import { RenderPasses } from 'points';
-import { ShaderType }  from 'points';
 
 const options = {
     sliderA: 0.619,
@@ -39,13 +38,14 @@ const base = {
         points.setUniform('numPoints', numPoints);
         points.setUniform('side', side);
         console.log(numPoints);
-        points.setStorage('points', `array<vec3f, ${numPoints}>`);
-        points.setStorage('variables', 'Variable', false, ShaderType.FRAGMENT);
+        points.setStorage('points', `array<vec3f, ${numPoints}>`, false, GPUShaderStage.FRAGMENT);
+        points.setStorage('variables', 'Variable', false, GPUShaderStage.FRAGMENT);
 
-        // RenderPasses.chromaticAberration(points, .01);
-        // RenderPasses.filmgrain(points);
-        RenderPasses.lensDistortion(points, .85, .0);
-        RenderPasses.bloom(points, .1);
+
+        // RenderPasses.lensDistortion(points, .85, .0);
+        // RenderPasses.bloom(points, .1);
+
+        // points.addRenderPass(RenderPasses.LENS_DISTORTION, {amount: .85, distance: 0});
     },
     update: points => {
         points.setUniform('sliderA', options.sliderA);
