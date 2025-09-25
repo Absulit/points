@@ -8,7 +8,6 @@ ${structs}
 ${texture}
 ${sdfCircle}
 
-
 @fragment
 fn main(
     @location(0) color: vec4f,

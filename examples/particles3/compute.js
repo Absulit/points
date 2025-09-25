@@ -20,17 +20,15 @@ const speed = 1.1; // .0001
 const SCREENSCALE = 2;
 const PARTICLE_SCALE = .01;
 
-fn particleInit(particles: ptr<storage, array<Particle,NUMPARTICLES>, read_write>, index:u32, wgid:vec3u, lid: vec3u) {
+fn particleInit(particles: ptr<storage, array<Particle,NUMPARTICLES>, read_write>, index:u32, wgid:vec3u) {
     let particle = &particles[index];
     rand_seed.x = f32(index) + .8945 + fract(params.time) / f32(wgid.x);
-    // rand_seed.x = f32(wgid.x) + f32(wgid.y) * 256 + f32(wgid.z) * 65536 + fract(params.time);
     rand();
     let flipTexture = vec2(1.,-1.);
     let flipTextureCoordinates = vec2(-.5,.5);
     var start_position = rand_seed.xy;
     rand();
-    let angle = TAU * .25;
-
+    let angle = rand_seed.x * TAU;
 
     var particleColor = vec4f();
     if(params.useVideo == 1){
@@ -41,13 +39,7 @@ fn particleInit(particles: ptr<storage, array<Particle,NUMPARTICLES>, read_write
 
     let b = brightness(particleColor);
 
-    let limit = params.limit;
-    particleColor = vec4f(step(limit, b));
-
-    if(b <= limit){
-        particleColor = vec4f();
-    }
-    // particleColor = 1-exp(-particleColor);
+    particleColor = vec4f(b);
 
     rand();
     start_position = (start_position * flipTexture + flipTextureCoordinates) * SCREENSCALE;
@@ -59,10 +51,9 @@ fn particleInit(particles: ptr<storage, array<Particle,NUMPARTICLES>, read_write
     particle.life = b * PARTICLE_SCALE * params.particleSize;
     particle.speed = rand_seed.x;
     // particle.scale = rand_seed.y * PARTICLE_SCALE * 4;
-    particle.scale = 0;
-    particle.life_limit = rand_seed.x * params.maxLife;
-    // let n = snoise(particle.position / params.turbulenceScale + params.time * .1);
-    // particle.noise = n;
+    particle.scale = b * PARTICLE_SCALE * params.particleSize;
+    particle.life_limit = b * params.maxLife;
+    // particle.noise = rand_seed.x * TAU;
 }
 
 @compute @workgroup_size(THREADS_X, THREADS_Y,1)
@@ -80,12 +71,12 @@ fn main(
     let particle = &particles[index];
 
     if(particle.init == 0){
-        particleInit(&particles, index, WorkGroupID, LocalInvocationID);
+        particleInit(&particles, index, WorkGroupID);
         particle.init = 1;
     }
 
-    // let n = snoise(particle.position / params.turbulenceScale + params.time * .1);
-    let increment = polar(particle.speed + .1, particle.angle) ;
+    let n = snoise(particle.position / params.turbulenceScale + params.time * .1);
+    let increment = polar(particle.speed + .1 * n, particle.angle) ;
     particle.position += increment / SIZE;
     particle.life += 1 + particle.speed;
 
@@ -94,9 +85,8 @@ fn main(
     let life_percent = particle.life / particle.life_limit;
     particle.color = vec4f(particle.color.rgb, (1. - life_percent) * life_percent * 2);
 
-    particle.scale = rand_seed.y * PARTICLE_SCALE * params.particleSize * life_percent;
     if(particle.life >= particle.life_limit || any(particle_position > vec2f(SCREENSCALE)) || any(particle_position < vec2f(-SCREENSCALE)) || particle.color.a == 0.){
-        particleInit(&particles, index, WorkGroupID, LocalInvocationID);
+        particleInit(&particles, index, WorkGroupID);
     }
 }
 `;
