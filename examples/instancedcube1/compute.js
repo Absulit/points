@@ -18,6 +18,7 @@ fn main(
     if(particle.init == 0){
         let gidCentered = vec3f(vec3i(GlobalId) - HALFSIDE);
         particle.position = vec3( gidCentered.x * UNIT,  gidCentered.y * UNIT, gidCentered.z * UNIT);
+        particle.color = vec4f(1);
         particle.init = 1;
     }
 }

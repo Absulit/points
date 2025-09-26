@@ -23,6 +23,7 @@ const NUMPARTICLES = WORKGROUPS_X * WORKGROUPS_Y * WORKGROUPS_Z * THREADS_X * TH
 
 
 const renderPass0 = new RenderPass(vert, frag, compute, WORKGROUPS_X, WORKGROUPS_Y, WORKGROUPS_Z);
+renderPass0.instanceCount = NUMPARTICLES;
 
 const base = {
     renderPasses: [
