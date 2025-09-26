@@ -10,12 +10,19 @@ fn main(
     @builtin(workgroup_id) WorkGroupID: vec3<u32>,
     @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
 ) {
+
+    let width = SIDE;
+    let height = SIDE;
+    let index = GlobalId.x + (GlobalId.y * width) + (GlobalId.z * width * height);
+    let particle = particles[index];
+
+
     if(variables.init == 0.){
         // let unit = 1. / 100.;
         var index = 0;
 
         let step = 1;
-        let side = i32( params.side / 2 );
+        let side = i32(SIDE / 2);
         let sideNegative = -1 * side;
 
 

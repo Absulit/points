@@ -9,15 +9,15 @@ const options = {
     sliderC: 0.508,
 }
 
-const side = 6;
+const SIDE = 6;
 
 const WORKGROUPS_X = 1;
 const WORKGROUPS_Y = 1;
 const WORKGROUPS_Z = 1;
 
-const THREADS_X = side;
-const THREADS_Y = side;
-const THREADS_Z = side;
+const THREADS_X = SIDE;
+const THREADS_Y = SIDE;
+const THREADS_Z = SIDE;
 
 const NUMPARTICLES = WORKGROUPS_X * WORKGROUPS_Y * WORKGROUPS_Z * THREADS_X * THREADS_Y * THREADS_Z;
 
@@ -34,6 +34,8 @@ const base = {
      */
     init: async (points, folder) => {
         points.setConstant('UNIT', 1. / 100., 'f32');
+        points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
+        points.setConstant('SIDE', SIDE, 'u32');
 
         points.setConstant('THREADS_X', THREADS_X, 'u32');
         points.setConstant('THREADS_Y', THREADS_Y, 'u32');
@@ -47,8 +49,7 @@ const base = {
         folder.add(options, 'sliderC', -1, 1, .0001).name('sliderC');
         folder.open();
 
-        points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
-        points.setUniform('side', side);
+
         console.log(NUMPARTICLES);
         points.setStorage('particles', `array<Particle, ${NUMPARTICLES}>`, false);
         points.setStorage('variables', 'Variable', false);
