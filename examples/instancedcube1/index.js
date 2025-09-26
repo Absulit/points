@@ -1,7 +1,7 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
-import Points, { RenderPass, RenderPasses }  from 'points';
+import Points, { RenderPass, RenderPasses } from 'points';
 
 const options = {
     sliderA: 0.619,
@@ -57,11 +57,8 @@ const base = {
         points.setStorage('particles', `array<Particle, ${NUMPARTICLES}>`, false);
         points.setStorage('variables', 'Variable', false);
 
-
-        // RenderPasses.lensDistortion(points, .85, .0);
-        // RenderPasses.bloom(points, .1);
-
-        points.addRenderPass(RenderPasses.LENS_DISTORTION, {amount: .85, distance: 0});
+        points.addRenderPass(RenderPasses.LENS_DISTORTION, { amount: .85, distance: 0 });
+        points.addRenderPass(RenderPasses.BLOOM, { amount: .1 });
     },
     update: points => {
         points.setUniform('sliderA', options.sliderA);
