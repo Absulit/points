@@ -34,7 +34,8 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
-        points.setConstant('UNIT', 1. / 100., 'f32');
+        points.depthWriteEnabled = false;
+        points.setConstant('UNIT', 1. / 10., 'f32');
         points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
         points.setConstant('SIDE', SIDE, 'u32');
         points.setConstant('HALFSIDE', 'i32(SIDE / 2)', 'i32');

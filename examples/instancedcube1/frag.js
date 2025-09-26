@@ -45,32 +45,15 @@ fn rotateZ(p:vec3<f32>, rads:f32 ) -> vec3<f32> {
 
 @fragment
 fn main(
-    @location(0) color: vec4<f32>,
-    @location(1) uv: vec2<f32>,
-    @location(2) ratio: vec2<f32>,  // relation between params.screen.x and params.screen.y
-    @location(3) uvr: vec2<f32>,    // uv with aspect ratio corrected
-    @location(4) mouse: vec2<f32>,
-    @builtin(position) position: vec4<f32>
-) -> @location(0) vec4<f32> {
+    @location(0) color: vec4f,
+    @location(1) uv: vec2f,
+    @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
+    @location(3) uvr: vec2f,    // uv with aspect ratio corrected
+    @location(4) mouse: vec2f,
+    @builtin(position) position: vec4f
+) -> @location(0) vec4f {
 
-
-    var circles = 0.;
-    for (var index = 0u; index < NUMPARTICLES; index++) {
-        let startPosition = particles[index].position;
-        // let startPosition = vec3<f32>(.024, .024, 1.);
-        var pt = rotateZ(startPosition, params.time * .9854);
-        pt = rotateY(pt, params.time * .94222);
-        pt = rotateX(pt, params.time * .865);
-
-        pt.z = pt.z + (400 * UNIT * .08);
-
-        circles += sdfCircle(CENTER + pt.xy / pt.z / params.sliderA, .01, .0, uvr);
-    }
-
-
-    return vec4(uv, circles, 1) * circles;
-
-    // return vec4f();
+    return vec4f(sdfCircle(CENTER, .01, .0, uvr));
 }
 `;
 
