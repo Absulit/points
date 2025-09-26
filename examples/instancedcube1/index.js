@@ -36,6 +36,7 @@ const base = {
         points.setConstant('UNIT', 1. / 100., 'f32');
         points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
         points.setConstant('SIDE', SIDE, 'u32');
+        points.setConstant('HALFSIDE', 'i32(SIDE / 2)', 'i32');
 
         points.setConstant('THREADS_X', THREADS_X, 'u32');
         points.setConstant('THREADS_Y', THREADS_Y, 'u32');
