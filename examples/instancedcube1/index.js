@@ -51,7 +51,7 @@ const base = {
         points.setUniform('numPoints', numPoints);
         points.setUniform('side', side);
         console.log(numPoints);
-        points.setStorage('points', `array<Particle, ${numPoints}>`, false);
+        points.setStorage('particles', `array<Particle, ${numPoints}>`, false);
         points.setStorage('variables', 'Variable', false);
 
 

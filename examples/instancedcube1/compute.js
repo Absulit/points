@@ -26,7 +26,7 @@ fn main(
                 for (var z = sideNegative; z < side; z+=step) {
                     let zF32 = f32(z);
 
-                    points[index] = Particle(vec3( xF32 * UNIT,  yF32 * UNIT,   (zF32 * UNIT)  ), 1);
+                    particles[index] = Particle(vec3( xF32 * UNIT,  yF32 * UNIT,   (zF32 * UNIT)  ), 1);
                     index++;
                 }
             }
