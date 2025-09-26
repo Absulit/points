@@ -70,6 +70,7 @@ class RenderPass {
     #callback = null;
     #required = null;
     #instanceCount = 1;
+    #internal = false;
 
     /**
      * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
@@ -320,6 +321,14 @@ class RenderPass {
 
     set name(val) {
         this.#name = val;
+    }
+
+    get internal() {
+        return this.#internal;
+    }
+
+    set internal(val) {
+        this.#internal = val;
     }
 }
 

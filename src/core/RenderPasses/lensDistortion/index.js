@@ -10,5 +10,6 @@ const lensDistortion = new RenderPass(vertexShader, fragmentShader, null, 8, 8, 
 });
 lensDistortion.required = ['amount', 'distance'];
 lensDistortion.name = 'Lens Distortion';
+lensDistortion.internal = true;
 
 export default lensDistortion;

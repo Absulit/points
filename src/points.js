@@ -937,7 +937,7 @@ class Points {
      * @param {RenderPass} renderPass
      * @returns {String} string with bindings
      */
-    #createDynamicGroupBindings(shaderType, { index: renderPassIndex }, groupId = 0) {
+    #createDynamicGroupBindings(shaderType, { index: renderPassIndex, internal }, groupId = 0) {
         if (!shaderType) {
             throw '`GPUShaderStage` is required';
         }
@@ -949,7 +949,7 @@ class Points {
             bindingIndex += 1;
         }
         this.#storage.forEach(storageItem => {
-            if (!storageItem.shaderType || storageItem.shaderType & shaderType) {
+            if (!internal && (!storageItem.shaderType || storageItem.shaderType & shaderType)) {
                 const T = storageItem.structName;
 
                 // note:
@@ -1573,7 +1573,7 @@ class Points {
         this.#renderPasses.forEach(renderPass => {
             if (renderPass.hasVertexAndFragmentShader) {
                 renderPass.renderPipeline = this.#device.createRenderPipeline({
-                    label: `render pipeline: renderPass ${renderPass.index}`,
+                    label: `render pipeline: renderPass ${renderPass.index} (${renderPass.name})`,
                     // layout: 'auto',
                     layout: this.#device.createPipelineLayout({
                         bindGroupLayouts: [renderPass.bindGroupLayoutVertex, renderPass.bindGroupLayoutRender]
@@ -1648,7 +1648,7 @@ class Points {
      * Creates the entries for the pipeline
      * @returns an array with the entries
      */
-    #createEntries(shaderType, { index: renderPassIndex }) {
+    #createEntries(shaderType, { index: renderPassIndex, internal }) {
         let entries = [];
         let bindingIndex = 0;
         if (this.#uniforms.length) {
@@ -1679,7 +1679,7 @@ class Points {
             );
         }
         this.#storage.forEach(storageItem => {
-            if (!storageItem.shaderType || storageItem.shaderType & shaderType) {
+            if (!internal && (!storageItem.shaderType || storageItem.shaderType & shaderType)) {
 
                 let type = getStorageAccessMode(shaderType, storageItem.shaderType);
                 type = entriesModes[type];

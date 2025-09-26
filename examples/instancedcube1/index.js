@@ -61,7 +61,7 @@ const base = {
         // RenderPasses.lensDistortion(points, .85, .0);
         // RenderPasses.bloom(points, .1);
 
-        // points.addRenderPass(RenderPasses.LENS_DISTORTION, {amount: .85, distance: 0});
+        points.addRenderPass(RenderPasses.LENS_DISTORTION, {amount: .85, distance: 0});
     },
     update: points => {
         points.setUniform('sliderA', options.sliderA);
