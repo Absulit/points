@@ -6,5 +6,6 @@ const grayscale = new RenderPass(vertexShader, fragmentShader, null, 8, 8, 1, (p
     points.setSampler('renderpass_feedbackSampler', null);
     points.setTexture2d('renderpass_feedbackTexture', true);
 });
+grayscale.name = 'Grayscale';
 
 export default grayscale;

@@ -9,5 +9,6 @@ const waves = new RenderPass(vertexShader, fragmentShader, null, 8, 8, 1, (point
     points.setUniform('waves_intensity', params.intensity || .03);
 });
 waves.required = ['scale', 'intensity'];
+waves.name = 'Waves';
 
 export default waves;

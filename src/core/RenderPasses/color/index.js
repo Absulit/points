@@ -10,5 +10,6 @@ const color = new RenderPass(vertexShader, fragmentShader, null, 8, 8, 1, (point
     points.setUniform('color_color', params.color || [1, .75, .79, 1], 'vec4f');
 });
 color.required = ['color', 'blendAmount'];
+color.name = 'Color';
 
 export default color;

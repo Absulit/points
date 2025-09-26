@@ -10,5 +10,6 @@ const blur = new RenderPass(vertexShader, fragmentShader, null, 8, 8, 1, (points
     points.setUniform('blur_radians', params.radians || 0);
 });
 blur.required = ['resolution', 'direction', 'radians'];
+blur.name = 'Blur';
 
 export default blur;

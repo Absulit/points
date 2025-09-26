@@ -9,5 +9,6 @@ const bloom = new RenderPass(vertexShader, fragmentShader, null, 8, 8, 1, (point
     points.setUniform('bloom_iterations', params.iterations || 2);
 });
 bloom.required = ['amount', 'iterations'];
+bloom.name = 'Bloom';
 
 export default bloom;

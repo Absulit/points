@@ -8,5 +8,6 @@ const pixelate = new RenderPass(vertexShader, fragmentShader, null, 8, 8, 1, (po
     points.setUniform('pixelate_pixelDims', params.pixelDimensions || [10, 10], 'vec2f');
 });
 pixelate.required = ['pixelDimensions'];
+pixelate.name = 'Pixelate';
 
 export default pixelate;
