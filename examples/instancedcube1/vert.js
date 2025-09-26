@@ -45,7 +45,7 @@ fn main(
         pt.z = pt.z + (400 * UNIT * .008);
 
     // scale local quad position
-    let scaled = position.xyz * .01; // particle.scale;
+    let scaled = position.xyz * .03; // particle.scale;
 
     // Translate to world position
     let world = scaled + pt;
