@@ -93,6 +93,7 @@ class RenderPass {
         this.#fragmentShader = fragmentShader;
 
         this.#callback = init;
+        this.#internal = !!init; // if it has the init then is a external Render Pass (Post Process)
 
         this.#compiledShaders = {
             vertex: '',
@@ -325,10 +326,6 @@ class RenderPass {
 
     get internal() {
         return this.#internal;
-    }
-
-    set internal(val) {
-        this.#internal = val;
     }
 }
 
