@@ -1087,7 +1087,7 @@ class Points {
         renderPass.hasVertexShader && (colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + defaultVertexBody + colorsVertWGSL);
         renderPass.hasComputeShader && (colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + colorsComputeWGSL);
         renderPass.hasFragmentShader && (colorsFragWGSL = dynamicGroupBindingsFragment + defaultStructs + colorsFragWGSL);
-        console.groupCollapsed(`Render Pass ${index}`);
+        console.groupCollapsed(`Render Pass ${index}: (${renderPass.name})`);
         console.groupCollapsed('VERTEX');
         console.log(colorsVertWGSL);
         console.groupEnd();
@@ -1213,8 +1213,7 @@ class Points {
             console.warn(`addRenderPass: parameters required: ${paramsRequired}`);
         }
 
-        const { vertexShader: v, fragmentShader: f, computeShader: c } = renderPass;
-        this.#postRenderPasses.push(new RenderPass(v, f, c));
+        this.#postRenderPasses.push(renderPass);
         renderPass.init(this, params);
     }
 

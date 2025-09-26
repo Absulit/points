@@ -34,6 +34,7 @@ class RenderPass {
     #compiledShaders
     #computePipeline = null;
     #renderPipeline = null;
+    #name = null;
     /**
      * @type {GPUBindGroup}
      */
@@ -309,8 +310,16 @@ class RenderPass {
         this.#instanceCount = val;
     }
 
-    get instanceCount(){
+    get instanceCount() {
         return this.#instanceCount;
+    }
+
+    get name() {
+        return this.#name;
+    }
+
+    set name(val) {
+        this.#name = val;
     }
 }
 
