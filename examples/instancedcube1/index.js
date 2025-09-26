@@ -23,6 +23,7 @@ const NUMPARTICLES = WORKGROUPS_X * WORKGROUPS_Y * WORKGROUPS_Z * THREADS_X * TH
 
 
 const renderPass0 = new RenderPass(vert, frag, compute, WORKGROUPS_X, WORKGROUPS_Y, WORKGROUPS_Z);
+renderPass0.name = 'Main Application';
 renderPass0.instanceCount = NUMPARTICLES;
 
 const base = {
@@ -35,7 +36,7 @@ const base = {
      */
     init: async (points, folder) => {
         // points.depthWriteEnabled = false;
-        points.setConstant('UNIT', 1. / 10., 'f32');
+        points.setConstant('UNIT', 1 / 6, 'f32');
         points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
         points.setConstant('SIDE', SIDE, 'u32');
         points.setConstant('HALFSIDE', 'i32(SIDE / 2)', 'i32');
