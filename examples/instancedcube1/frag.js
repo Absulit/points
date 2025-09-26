@@ -55,7 +55,7 @@ fn main(
 
 
     var circles = 0.;
-    for (var index = 0; index < i32(params.numPoints); index++) {
+    for (var index = 0u; index < NUMPARTICLES; index++) {
         let startPosition = particles[index].position;
         // let startPosition = vec3<f32>(.024, .024, 1.);
         var pt = rotateZ(startPosition, params.time * .9854);

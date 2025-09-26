@@ -19,6 +19,8 @@ const THREADS_X = side;
 const THREADS_Y = side;
 const THREADS_Z = side;
 
+const NUMPARTICLES = WORKGROUPS_X * WORKGROUPS_Y * WORKGROUPS_Z * THREADS_X * THREADS_Y * THREADS_Z;
+
 
 const renderPass0 = new RenderPass(vert, frag, compute, WORKGROUPS_X, WORKGROUPS_Y, WORKGROUPS_Z);
 
@@ -45,13 +47,10 @@ const base = {
         folder.add(options, 'sliderC', -1, 1, .0001).name('sliderC');
         folder.open();
 
-
-
-        let numPoints = side * side * side;
-        points.setUniform('numPoints', numPoints);
+        points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
         points.setUniform('side', side);
-        console.log(numPoints);
-        points.setStorage('particles', `array<Particle, ${numPoints}>`, false);
+        console.log(NUMPARTICLES);
+        points.setStorage('particles', `array<Particle, ${NUMPARTICLES}>`, false);
         points.setStorage('variables', 'Variable', false);
 
 
