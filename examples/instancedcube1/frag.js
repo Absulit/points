@@ -17,31 +17,7 @@ ${rotateVector}
 ${sdfCircle}
 ${RED}
 
-const CENTER = vec2(.5,.5);
-
-fn rotateX(p:vec3<f32>, rads:f32 ) -> vec3<f32> {
-    let s = sin(rads);
-    let c = cos(rads);
-    let znew = p.z * c - p.y * s;
-    let ynew = p.z * s + p.y * c;
-    return vec3(p.x, ynew, znew);
-}
-
-fn rotateY(p:vec3<f32>, rads:f32 ) -> vec3<f32> {
-    let s = sin(rads);
-    let c = cos(rads);
-    let xnew = p.x * c - p.z * s;
-    let znew = p.x * s + p.z * c;
-    return vec3(xnew, p.y, znew);
-}
-
-fn rotateZ(p:vec3<f32>, rads:f32 ) -> vec3<f32> {
-    let s = sin(rads);
-    let c = cos(rads);
-    let xnew = p.x * c - p.y * s;
-    let ynew = p.x * s + p.y * c;
-    return vec3(xnew, ynew, p.z);
-}
+const CENTER = vec2(.5);
 
 @fragment
 fn main(
@@ -52,8 +28,9 @@ fn main(
     @location(4) mouse: vec2f,
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
+    let c = sdfCircle(CENTER, .5, .1, uvr);
 
-    return vec4f(sdfCircle(CENTER, .01, .0, uvr));
+    return vec4(uv * c, c, 1);
 }
 `;
 
