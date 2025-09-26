@@ -14,32 +14,31 @@ fn main(
     let width = SIDE;
     let height = SIDE;
     let index = GlobalId.x + (GlobalId.y * width) + (GlobalId.z * width * height);
-    let particle = particles[index];
+    let particle = &particles[index];
 
 
-    if(variables.init == 0.){
-        // let unit = 1. / 100.;
-        var index = 0;
-
-        let step = 1;
-        let side = i32(SIDE / 2);
-        let sideNegative = -1 * side;
+    if(particle.init == 0){
+        // let step = 1;
+        // let side = i32(SIDE / 2);
+        // let sideNegative = -1 * side;
 
 
-        for (var x = sideNegative; x < side; x+=step) {
-            let xF32 = f32(x);
-            for (var y = sideNegative; y < side; y+=step) {
-                let yF32 = f32(y);
-                for (var z = sideNegative; z < side; z+=step) {
-                    let zF32 = f32(z);
+        // for (var x = sideNegative; x < side; x+=step) {
+        //     let xF32 = f32(x);
+        //     for (var y = sideNegative; y < side; y+=step) {
+        //         let yF32 = f32(y);
+        //         for (var z = sideNegative; z < side; z+=step) {
+        //             let zF32 = f32(z);
 
-                    particles[index] = Particle(vec3( xF32 * UNIT,  yF32 * UNIT,   (zF32 * UNIT)  ), 1);
-                    index++;
-                }
-            }
-        }
+        //             particles[index] = Particle(vec3( xF32 * UNIT,  yF32 * UNIT,   (zF32 * UNIT)  ), 1);
+        //             index++;
+        //         }
+        //     }
+        // }
 
-        variables.init = 1.;
+        particle.position = vec3( f32(GlobalId.x) * UNIT,  f32(GlobalId.y) * UNIT, f32(GlobalId.z) * UNIT);
+
+        particle.init = 1;
     }
 }
 `;
