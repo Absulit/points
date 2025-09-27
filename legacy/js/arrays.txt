@@ -30,7 +30,7 @@
 0,0     1,0
 
 x + (y * numColumns)
-
+index = x + (y * width) + (z * width * height) // for 3d
 -----
 x = index % 3
 y = Math.floor(index / 3)

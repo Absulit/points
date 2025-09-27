@@ -33,7 +33,7 @@ const renderpasses1 = {
         points.addRenderPass(RenderPasses.FILM_GRAIN);
         points.addRenderPass(RenderPasses.BLOOM);
         points.addRenderPass(RenderPasses.BLUR, { resolution: [100, 100], direction: [.4, 0], radians: 0 });
-        points.addRenderPass(RenderPasses.WAVES, { scale: .05 });
+        points.addRenderPass(RenderPasses.WAVES, { scale: .045 });
     },
     update: points => {
 

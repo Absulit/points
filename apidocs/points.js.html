@@ -250,7 +250,7 @@ class Points {
         }
         if (uniformToUpdate) {
             uniformToUpdate.value = value;
-            return;
+            return uniformToUpdate;
         }
         if (structName &amp;&amp; isArray(structName)) {
             throw `${structName} is an array, which is currently not supported for Uniforms.`;
@@ -261,6 +261,7 @@ class Points {
             type: structName,
             size: null
         }
+        Object.seal(uniform);
         this.#uniforms.push(uniform);
         return uniform;
     }
@@ -357,7 +358,8 @@ class Points {
             // structSize: null,
             shaderType,
             read,
-            buffer: null
+            buffer: null,
+            internal: false
         }
         this.#storage.push(storage);
         return storage;
@@ -436,7 +438,8 @@ class Points {
             shaderType,
             array: arrayData,
             buffer: null,
-            read
+            read,
+            internal: false
         }
         this.#storage.push(storage);
         return storage;
@@ -535,7 +538,8 @@ class Points {
             name: name,
             descriptor: descriptor,
             shaderType: shaderType,
-            resource: null
+            resource: null,
+            internal: false
         };
         this.#samplers.push(sampler);
         return sampler;
@@ -578,7 +582,8 @@ class Points {
             copyCurrentTexture,
             shaderType,
             texture: null,
-            renderPassIndex
+            renderPassIndex,
+            internal: false
         }
         this.#textures2d.push(texture2d);
         return texture2d;
@@ -654,7 +659,8 @@ class Points {
             texture: null,
             imageTexture: {
                 bitmap: imageBitmap
-            }
+            },
+            internal: false
         }
         this.#textures2d.push(texture2d);
         return texture2d;
@@ -714,15 +720,20 @@ class Points {
             const blob = await response.blob();
             imageBitmaps.push(await createImageBitmap(blob));
         }
-        this.#textures2dArray.push({
+
+        const texture2dArrayItem = {
             name: name,
             copyCurrentTexture: false,
             shaderType: shaderType,
             texture: null,
             imageTextures: {
                 bitmaps: imageBitmaps
-            }
-        });
+            },
+            internal: false
+        }
+
+        this.#textures2dArray.push(texture2dArrayItem);
+        return texture2dArrayItem;
     }
 
     /**
@@ -754,7 +765,8 @@ class Points {
         const textureExternal = {
             name: name,
             shaderType: shaderType,
-            video: video
+            video: video,
+            internal: false
         };
         this.#texturesExternal.push(textureExternal);
         return textureExternal;
@@ -796,7 +808,8 @@ class Points {
         const textureExternal = {
             name: name,
             shaderType: shaderType,
-            video: video
+            video: video,
+            internal: false
         };
         this.#texturesExternal.push(textureExternal);
         return textureExternal;
@@ -873,7 +886,8 @@ class Points {
         const texturesStorage2d = {
             name: name,
             shaderType: shaderType,
-            texture: null
+            texture: null,
+            internal: false
         };
         this.#texturesStorage2d.push(texturesStorage2d);
         return texturesStorage2d;
@@ -924,7 +938,8 @@ class Points {
             },
             texture: null,
             size: size,
-            usesRenderPass
+            usesRenderPass,
+            internal: false
         }
         this.#bindingTextures.push(bindingTexture);
         return bindingTexture;
@@ -980,7 +995,7 @@ class Points {
      * @param {RenderPass} renderPass
      * @returns {String} string with bindings
      */
-    #createDynamicGroupBindings(shaderType, { index: renderPassIndex }, groupId = 0) {
+    #createDynamicGroupBindings(shaderType, { index: renderPassIndex, internal }, groupId = 0) {
         if (!shaderType) {
             throw '`GPUShaderStage` is required';
         }
@@ -992,7 +1007,8 @@ class Points {
             bindingIndex += 1;
         }
         this.#storage.forEach(storageItem => {
-            if (!storageItem.shaderType || storageItem.shaderType &amp; shaderType) {
+            const isInternal = internal === storageItem.internal;
+            if (isInternal &amp;&amp; (!storageItem.shaderType || storageItem.shaderType &amp; shaderType)) {
                 const T = storageItem.structName;
 
                 // note:
@@ -1014,32 +1030,37 @@ class Points {
                 bindingIndex += 1;
             }
         }
-        this.#samplers.forEach((sampler, index) => {
-            if (!sampler.shaderType || sampler.shaderType &amp; shaderType) {
+        this.#samplers.forEach(sampler => {
+            const isInternal = internal === sampler.internal;
+            if (isInternal &amp;&amp; (!sampler.shaderType || sampler.shaderType &amp; shaderType)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${sampler.name}: sampler;\n`;
                 bindingIndex += 1;
             }
         });
-        this.#texturesStorage2d.forEach((texture, index) => {
-            if (!texture.shaderType || texture.shaderType &amp; shaderType) {
+        this.#texturesStorage2d.forEach(texture => {
+            const isInternal = internal === texture.internal;
+            if (isInternal &amp;&amp; (!texture.shaderType || texture.shaderType &amp; shaderType)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_storage_2d&lt;rgba8unorm, write>;\n`;
                 bindingIndex += 1;
             }
         });
-        this.#textures2d.forEach((texture, index) => {
-            if (!texture.shaderType || texture.shaderType &amp; shaderType) {
+        this.#textures2d.forEach(texture => {
+            const isInternal = internal === texture.internal;
+            if (isInternal &amp;&amp; (!texture.shaderType || texture.shaderType &amp; shaderType)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d&lt;f32>;\n`;
                 bindingIndex += 1;
             }
         });
-        this.#textures2dArray.forEach((texture, index) => {
-            if (!texture.shaderType || texture.shaderType &amp; shaderType) {
+        this.#textures2dArray.forEach(texture => {
+            const isInternal = internal === texture.internal;
+            if (isInternal &amp;&amp; (!texture.shaderType || texture.shaderType &amp; shaderType)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d_array&lt;f32>;\n`;
                 bindingIndex += 1;
             }
         });
         this.#texturesExternal.forEach(externalTexture => {
-            if (!externalTexture.shaderType || externalTexture.shaderType &amp; shaderType) {
+            const isInternal = internal === externalTexture.internal;
+            if (isInternal &amp;&amp; (!externalTexture.shaderType || externalTexture.shaderType &amp; shaderType)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${externalTexture.name}: texture_external;\n`;
                 bindingIndex += 1;
             }
@@ -1047,6 +1068,9 @@ class Points {
         this.#bindingTextures.forEach(bindingTexture => {
             const { usesRenderPass } = bindingTexture;
             if (usesRenderPass) {
+                if (GPUShaderStage.VERTEX === shaderType) { // to avoid binding texture in vertex
+                    return;
+                }
                 if (renderPassIndex === bindingTexture.write.renderPassIndex) {
                     dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.write.name}: texture_storage_2d&lt;rgba8unorm, write>;\n`;
                     bindingIndex += 1;
@@ -1058,11 +1082,13 @@ class Points {
 
                 return;
             }
-            if (bindingTexture.write.shaderType &amp; shaderType) {
+
+            const isInternal = internal === bindingTexture.internal;
+            if (isInternal &amp;&amp; (bindingTexture.write.shaderType &amp; shaderType)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.write.name}: texture_storage_2d&lt;rgba8unorm, write>;\n`;
                 bindingIndex += 1;
             }
-            if (bindingTexture.read.shaderType &amp; shaderType) {
+            if (isInternal &amp;&amp; (bindingTexture.read.shaderType &amp; shaderType)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.read.name}: texture_2d&lt;f32>;\n`;
                 bindingIndex += 1;
             }
@@ -1130,7 +1156,7 @@ class Points {
         renderPass.hasVertexShader &amp;&amp; (colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + defaultVertexBody + colorsVertWGSL);
         renderPass.hasComputeShader &amp;&amp; (colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + colorsComputeWGSL);
         renderPass.hasFragmentShader &amp;&amp; (colorsFragWGSL = dynamicGroupBindingsFragment + defaultStructs + colorsFragWGSL);
-        console.groupCollapsed(`Render Pass ${index}`);
+        console.groupCollapsed(`Render Pass ${index}: (${renderPass.name})`);
         console.groupCollapsed('VERTEX');
         console.log(colorsVertWGSL);
         console.groupEnd();
@@ -1256,8 +1282,7 @@ class Points {
             console.warn(`addRenderPass: parameters required: ${paramsRequired}`);
         }
 
-        const { vertexShader: v, fragmentShader: f, computeShader: c } = renderPass;
-        this.#postRenderPasses.push(new RenderPass(v, f, c));
+        this.#postRenderPasses.push(renderPass);
         renderPass.init(this, params);
     }
 
@@ -1617,7 +1642,7 @@ class Points {
         this.#renderPasses.forEach(renderPass => {
             if (renderPass.hasVertexAndFragmentShader) {
                 renderPass.renderPipeline = this.#device.createRenderPipeline({
-                    label: `render pipeline: renderPass ${renderPass.index}`,
+                    label: `render pipeline: renderPass ${renderPass.index} (${renderPass.name})`,
                     // layout: 'auto',
                     layout: this.#device.createPipelineLayout({
                         bindGroupLayouts: [renderPass.bindGroupLayoutVertex, renderPass.bindGroupLayoutRender]
@@ -1692,7 +1717,7 @@ class Points {
      * Creates the entries for the pipeline
      * @returns an array with the entries
      */
-    #createEntries(shaderType, { index: renderPassIndex }) {
+    #createEntries(shaderType, { index: renderPassIndex, internal }) {
         let entries = [];
         let bindingIndex = 0;
         if (this.#uniforms.length) {
@@ -1723,7 +1748,8 @@ class Points {
             );
         }
         this.#storage.forEach(storageItem => {
-            if (!storageItem.shaderType || storageItem.shaderType &amp; shaderType) {
+            const isInternal = internal === storageItem.internal;
+            if (isInternal &amp;&amp; (!storageItem.shaderType || storageItem.shaderType &amp; shaderType)) {
 
                 let type = getStorageAccessMode(shaderType, storageItem.shaderType);
                 type = entriesModes[type];
@@ -1760,8 +1786,9 @@ class Points {
             }
         }
         if (this.#samplers.length) {
-            this.#samplers.forEach((sampler, index) => {
-                if (!sampler.shaderType || sampler.shaderType &amp; shaderType) {
+            this.#samplers.forEach(sampler => {
+                const isInternal = internal === sampler.internal;
+                if (isInternal &amp;&amp; (!sampler.shaderType || sampler.shaderType &amp; shaderType)) {
                     entries.push(
                         {
                             binding: bindingIndex++,
@@ -1775,8 +1802,9 @@ class Points {
             });
         }
         if (this.#texturesStorage2d.length) {
-            this.#texturesStorage2d.forEach((textureStorage2d, index) => {
-                if (!textureStorage2d.shaderType || textureStorage2d.shaderType &amp; shaderType) {
+            this.#texturesStorage2d.forEach(textureStorage2d => {
+                const isInternal = internal === textureStorage2d.internal;
+                if (isInternal &amp;&amp; (!textureStorage2d.shaderType || textureStorage2d.shaderType &amp; shaderType)) {
                     entries.push(
                         {
                             label: 'texture storage 2d',
@@ -1791,8 +1819,9 @@ class Points {
             });
         }
         if (this.#textures2d.length) {
-            this.#textures2d.forEach((texture2d, index) => {
-                if (!texture2d.shaderType || texture2d.shaderType &amp; shaderType) {
+            this.#textures2d.forEach(texture2d => {
+                const isInternal = internal === texture2d.internal;
+                if (isInternal &amp;&amp; (!texture2d.shaderType || texture2d.shaderType &amp; shaderType)) {
                     entries.push(
                         {
                             label: 'texture 2d',
@@ -1807,8 +1836,9 @@ class Points {
             });
         }
         if (this.#textures2dArray.length) {
-            this.#textures2dArray.forEach((texture2dArray, index) => {
-                if (!texture2dArray.shaderType || texture2dArray.shaderType &amp; shaderType) {
+            this.#textures2dArray.forEach(texture2dArray => {
+                const isInternal = internal === texture2dArray.internal;
+                if (isInternal &amp;&amp; (!texture2dArray.shaderType || texture2dArray.shaderType &amp; shaderType)) {
                     entries.push(
                         {
                             label: 'texture 2d array',
@@ -1829,7 +1859,8 @@ class Points {
         }
         if (this.#texturesExternal.length) {
             this.#texturesExternal.forEach(externalTexture => {
-                if (!externalTexture.shaderType || externalTexture.shaderType &amp; shaderType) {
+                const isInternal = internal === externalTexture.internal;
+                if (isInternal &amp;&amp; (!externalTexture.shaderType || externalTexture.shaderType &amp; shaderType)) {
                     entries.push(
                         {
                             label: 'external texture',
@@ -1847,6 +1878,9 @@ class Points {
         this.#bindingTextures.forEach(bindingTexture => {
             const { usesRenderPass } = bindingTexture;
             if (usesRenderPass) {
+                if (GPUShaderStage.VERTEX === shaderType) { // to avoid binding texture in vertex
+                    return;
+                }
                 if (bindingTexture.read.renderPassIndex === renderPassIndex) {
                     entries.push(
                         {
@@ -1875,7 +1909,8 @@ class Points {
                 return;
             }
 
-            if (bindingTexture.read.shaderType &amp; shaderType) {
+            const isInternal = internal === bindingTexture.internal;
+            if (isInternal &amp;&amp; (bindingTexture.read.shaderType &amp; shaderType)) {
                 entries.push(
                     {
                         label: `binding texture 2: name: ${bindingTexture.read.name}`,
@@ -1888,7 +1923,7 @@ class Points {
                 );
             }
 
-            if (bindingTexture.write.shaderType &amp; shaderType) {
+            if (isInternal &amp;&amp; (bindingTexture.write.shaderType &amp; shaderType)) {
                 entries.push(
                     {
                         label: `binding texture: name: ${bindingTexture.write.name}`,
@@ -2245,7 +2280,7 @@ class Points {
      * To allow transparency and a custom type of sort, set this as false;
      * @param {Boolean} val
      */
-    set depthWriteEnabled(val){
+    set depthWriteEnabled(val) {
         this.#depthWriteEnabled = val;
     }
 }
@@ -2273,7 +2308,7 @@ export { RenderPass, RenderPasses };</code></pre>
                     Documentation generated by <a rel="external" href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a><wbr>
                     using <a rel="external" href="https://github.com/amekusa/docolatte">Docolatte</a> theme
                     
-                    <wbr>on <time datetime="2025-09-18T21:47:57.051Z">Thu, 18 Sep 2025 21:47:57 GMT</time>
+                    <wbr>on <time datetime="2025-09-27T21:04:31.432Z">Sat, 27 Sep 2025 21:04:31 GMT</time>
                     
                 </p>
                 
