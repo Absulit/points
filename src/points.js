@@ -218,6 +218,7 @@ class Points {
             type: structName,
             size: null
         }
+        Object.seal(uniform);
         this.#uniforms.push(uniform);
         return uniform;
     }
@@ -314,7 +315,8 @@ class Points {
             // structSize: null,
             shaderType,
             read,
-            buffer: null
+            buffer: null,
+            internal: false
         }
         this.#storage.push(storage);
         return storage;
@@ -393,7 +395,8 @@ class Points {
             shaderType,
             array: arrayData,
             buffer: null,
-            read
+            read,
+            internal: false
         }
         this.#storage.push(storage);
         return storage;
@@ -492,7 +495,8 @@ class Points {
             name: name,
             descriptor: descriptor,
             shaderType: shaderType,
-            resource: null
+            resource: null,
+            internal: false
         };
         this.#samplers.push(sampler);
         return sampler;
@@ -535,7 +539,8 @@ class Points {
             copyCurrentTexture,
             shaderType,
             texture: null,
-            renderPassIndex
+            renderPassIndex,
+            internal: false
         }
         this.#textures2d.push(texture2d);
         return texture2d;
@@ -611,7 +616,8 @@ class Points {
             texture: null,
             imageTexture: {
                 bitmap: imageBitmap
-            }
+            },
+            internal: false
         }
         this.#textures2d.push(texture2d);
         return texture2d;
@@ -671,15 +677,20 @@ class Points {
             const blob = await response.blob();
             imageBitmaps.push(await createImageBitmap(blob));
         }
-        this.#textures2dArray.push({
+
+        const texture2dArrayItem = {
             name: name,
             copyCurrentTexture: false,
             shaderType: shaderType,
             texture: null,
             imageTextures: {
                 bitmaps: imageBitmaps
-            }
-        });
+            },
+            internal: false
+        }
+
+        this.#textures2dArray.push(texture2dArrayItem);
+        return texture2dArrayItem;
     }
 
     /**
@@ -711,7 +722,8 @@ class Points {
         const textureExternal = {
             name: name,
             shaderType: shaderType,
-            video: video
+            video: video,
+            internal: false
         };
         this.#texturesExternal.push(textureExternal);
         return textureExternal;
@@ -753,7 +765,8 @@ class Points {
         const textureExternal = {
             name: name,
             shaderType: shaderType,
-            video: video
+            video: video,
+            internal: false
         };
         this.#texturesExternal.push(textureExternal);
         return textureExternal;
@@ -830,7 +843,8 @@ class Points {
         const texturesStorage2d = {
             name: name,
             shaderType: shaderType,
-            texture: null
+            texture: null,
+            internal: false
         };
         this.#texturesStorage2d.push(texturesStorage2d);
         return texturesStorage2d;
@@ -881,7 +895,8 @@ class Points {
             },
             texture: null,
             size: size,
-            usesRenderPass
+            usesRenderPass,
+            internal: false
         }
         this.#bindingTextures.push(bindingTexture);
         return bindingTexture;
@@ -949,7 +964,8 @@ class Points {
             bindingIndex += 1;
         }
         this.#storage.forEach(storageItem => {
-            if (!internal && (!storageItem.shaderType || storageItem.shaderType & shaderType)) {
+            const isInternal = internal === storageItem.internal;
+            if (isInternal && (!storageItem.shaderType || storageItem.shaderType & shaderType)) {
                 const T = storageItem.structName;
 
                 // note:
@@ -971,32 +987,37 @@ class Points {
                 bindingIndex += 1;
             }
         }
-        this.#samplers.forEach((sampler, index) => {
-            if (!sampler.shaderType || sampler.shaderType & shaderType) {
+        this.#samplers.forEach(sampler => {
+            const isInternal = internal === sampler.internal;
+            if (isInternal && (!sampler.shaderType || sampler.shaderType & shaderType)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${sampler.name}: sampler;\n`;
                 bindingIndex += 1;
             }
         });
-        this.#texturesStorage2d.forEach((texture, index) => {
-            if (!texture.shaderType || texture.shaderType & shaderType) {
+        this.#texturesStorage2d.forEach(texture => {
+            const isInternal = internal === texture.internal;
+            if (isInternal && (!texture.shaderType || texture.shaderType & shaderType)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_storage_2d<rgba8unorm, write>;\n`;
                 bindingIndex += 1;
             }
         });
-        this.#textures2d.forEach((texture, index) => {
-            if (!texture.shaderType || texture.shaderType & shaderType) {
+        this.#textures2d.forEach(texture => {
+            const isInternal = internal === texture.internal;
+            if (isInternal && (!texture.shaderType || texture.shaderType & shaderType)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d<f32>;\n`;
                 bindingIndex += 1;
             }
         });
-        this.#textures2dArray.forEach((texture, index) => {
-            if (!texture.shaderType || texture.shaderType & shaderType) {
+        this.#textures2dArray.forEach(texture => {
+            const isInternal = internal === texture.internal;
+            if (isInternal && (!texture.shaderType || texture.shaderType & shaderType)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d_array<f32>;\n`;
                 bindingIndex += 1;
             }
         });
         this.#texturesExternal.forEach(externalTexture => {
-            if (!externalTexture.shaderType || externalTexture.shaderType & shaderType) {
+            const isInternal = internal === externalTexture.internal;
+            if (isInternal && (!externalTexture.shaderType || externalTexture.shaderType & shaderType)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${externalTexture.name}: texture_external;\n`;
                 bindingIndex += 1;
             }
@@ -1015,11 +1036,13 @@ class Points {
 
                 return;
             }
-            if (bindingTexture.write.shaderType & shaderType) {
+
+            const isInternal = internal === bindingTexture.internal;
+            if (isInternal && (bindingTexture.write.shaderType & shaderType)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.write.name}: texture_storage_2d<rgba8unorm, write>;\n`;
                 bindingIndex += 1;
             }
-            if (bindingTexture.read.shaderType & shaderType) {
+            if (isInternal && (bindingTexture.read.shaderType & shaderType)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.read.name}: texture_2d<f32>;\n`;
                 bindingIndex += 1;
             }
@@ -1679,7 +1702,8 @@ class Points {
             );
         }
         this.#storage.forEach(storageItem => {
-            if (!internal && (!storageItem.shaderType || storageItem.shaderType & shaderType)) {
+            const isInternal = internal === storageItem.internal;
+            if (isInternal && (!storageItem.shaderType || storageItem.shaderType & shaderType)) {
 
                 let type = getStorageAccessMode(shaderType, storageItem.shaderType);
                 type = entriesModes[type];
@@ -1716,8 +1740,9 @@ class Points {
             }
         }
         if (this.#samplers.length) {
-            this.#samplers.forEach((sampler, index) => {
-                if (!sampler.shaderType || sampler.shaderType & shaderType) {
+            this.#samplers.forEach(sampler => {
+                const isInternal = internal === sampler.internal;
+                if (isInternal && (!sampler.shaderType || sampler.shaderType & shaderType)) {
                     entries.push(
                         {
                             binding: bindingIndex++,
@@ -1731,8 +1756,9 @@ class Points {
             });
         }
         if (this.#texturesStorage2d.length) {
-            this.#texturesStorage2d.forEach((textureStorage2d, index) => {
-                if (!textureStorage2d.shaderType || textureStorage2d.shaderType & shaderType) {
+            this.#texturesStorage2d.forEach(textureStorage2d => {
+                const isInternal = internal === textureStorage2d.internal;
+                if (isInternal && (!textureStorage2d.shaderType || textureStorage2d.shaderType & shaderType)) {
                     entries.push(
                         {
                             label: 'texture storage 2d',
@@ -1747,8 +1773,9 @@ class Points {
             });
         }
         if (this.#textures2d.length) {
-            this.#textures2d.forEach((texture2d, index) => {
-                if (!texture2d.shaderType || texture2d.shaderType & shaderType) {
+            this.#textures2d.forEach(texture2d => {
+                const isInternal = internal === texture2d.internal;
+                if (isInternal && (!texture2d.shaderType || texture2d.shaderType & shaderType)) {
                     entries.push(
                         {
                             label: 'texture 2d',
@@ -1763,8 +1790,9 @@ class Points {
             });
         }
         if (this.#textures2dArray.length) {
-            this.#textures2dArray.forEach((texture2dArray, index) => {
-                if (!texture2dArray.shaderType || texture2dArray.shaderType & shaderType) {
+            this.#textures2dArray.forEach(texture2dArray => {
+                const isInternal = internal === texture2dArray.internal;
+                if (isInternal && (!texture2dArray.shaderType || texture2dArray.shaderType & shaderType)) {
                     entries.push(
                         {
                             label: 'texture 2d array',
@@ -1785,7 +1813,8 @@ class Points {
         }
         if (this.#texturesExternal.length) {
             this.#texturesExternal.forEach(externalTexture => {
-                if (!externalTexture.shaderType || externalTexture.shaderType & shaderType) {
+                const isInternal = internal === externalTexture.internal;
+                if (isInternal && (!externalTexture.shaderType || externalTexture.shaderType & shaderType)) {
                     entries.push(
                         {
                             label: 'external texture',
@@ -1831,7 +1860,8 @@ class Points {
                 return;
             }
 
-            if (bindingTexture.read.shaderType & shaderType) {
+            const isInternal = internal === bindingTexture.internal;
+            if (isInternal && (bindingTexture.read.shaderType & shaderType)) {
                 entries.push(
                     {
                         label: `binding texture 2: name: ${bindingTexture.read.name}`,
@@ -1844,7 +1874,7 @@ class Points {
                 );
             }
 
-            if (bindingTexture.write.shaderType & shaderType) {
+            if (isInternal && (bindingTexture.write.shaderType & shaderType)) {
                 entries.push(
                     {
                         label: `binding texture: name: ${bindingTexture.write.name}`,
@@ -2201,7 +2231,7 @@ class Points {
      * To allow transparency and a custom type of sort, set this as false;
      * @param {Boolean} val
      */
-    set depthWriteEnabled(val){
+    set depthWriteEnabled(val) {
         this.#depthWriteEnabled = val;
     }
 }
