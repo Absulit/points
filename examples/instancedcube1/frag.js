@@ -28,7 +28,7 @@ fn main(
     @location(4) mouse: vec2f,
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
-    let c = sdfCircle(CENTER, .5, .1, uvr);
+    let c = sdfCircle(CENTER, .4, .1, uvr);
 
     return vec4(uv * c, c, c);
 }

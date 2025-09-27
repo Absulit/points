@@ -35,8 +35,8 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
-        // points.depthWriteEnabled = false;
-        points.setConstant('UNIT', 1 / 6, 'f32');
+        points.depthWriteEnabled = false;
+        points.setConstant('UNIT', 1 / 8, 'f32');
         points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
         points.setConstant('SIDE', SIDE, 'u32');
         points.setConstant('HALFSIDE', 'i32(SIDE / 2)', 'i32');
@@ -58,7 +58,7 @@ const base = {
         points.setStorage('particles', `array<Particle, ${NUMPARTICLES}>`, false);
         points.setStorage('variables', 'Variable', false);
 
-        points.addRenderPass(RenderPasses.LENS_DISTORTION, { amount: .85, distance: 0 });
+        points.addRenderPass(RenderPasses.LENS_DISTORTION, { amount: .85, distance: .005 });
         points.addRenderPass(RenderPasses.BLOOM, { amount: .1 });
     },
     update: points => {
