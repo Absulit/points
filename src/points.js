@@ -207,7 +207,7 @@ class Points {
         }
         if (uniformToUpdate) {
             uniformToUpdate.value = value;
-            return;
+            return uniformToUpdate;
         }
         if (structName && isArray(structName)) {
             throw `${structName} is an array, which is currently not supported for Uniforms.`;
