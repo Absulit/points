@@ -3,11 +3,12 @@ import fragmentShader from './frag.js';
 import { RenderPass } from 'points';
 
 const bloom = new RenderPass(vertexShader, fragmentShader, null, 8, 8, 1, (points, params) => {
-    points.setSampler('renderpass_feedbackSampler', null);
-    points.setTexture2d('renderpass_feedbackTexture', true);
+    points.setSampler('renderpass_feedbackSampler', null).internal = true;
+    points.setTexture2d('renderpass_feedbackTexture', true).internal = true;
     points.setUniform('bloom_amount', params.amount || .5);
     points.setUniform('bloom_iterations', params.iterations || 2);
 });
 bloom.required = ['amount', 'iterations'];
+bloom.name = 'Bloom';
 
 export default bloom;

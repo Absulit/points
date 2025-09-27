@@ -34,6 +34,7 @@ class RenderPass {
     #compiledShaders
     #computePipeline = null;
     #renderPipeline = null;
+    #name = null;
     /**
      * @type {GPUBindGroup}
      */
@@ -69,6 +70,8 @@ class RenderPass {
     #callback = null;
     #required = null;
     #instanceCount = 1;
+    #internal = false;
+    #initCalled = false; // to avoid double init call
 
     /**
      * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
@@ -91,6 +94,7 @@ class RenderPass {
         this.#fragmentShader = fragmentShader;
 
         this.#callback = init;
+        this.#internal = !!init; // if it has the init then is a external Render Pass (Post Process)
 
         this.#compiledShaders = {
             vertex: '',
@@ -280,8 +284,11 @@ class RenderPass {
      * the {@link Points#addRenderPass} method is called.
      */
     init(points, params) {
-        params ||= {};
-        this.#callback?.(points, params);
+        if (!this.#initCalled) {
+            this.#initCalled = true;
+            params ||= {};
+            this.#callback?.(points, params);
+        }
     }
 
     get required() {
@@ -309,8 +316,20 @@ class RenderPass {
         this.#instanceCount = val;
     }
 
-    get instanceCount(){
+    get instanceCount() {
         return this.#instanceCount;
+    }
+
+    get name() {
+        return this.#name;
+    }
+
+    set name(val) {
+        this.#name = val;
+    }
+
+    get internal() {
+        return this.#internal;
     }
 }
 
