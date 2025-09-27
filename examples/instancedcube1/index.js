@@ -45,15 +45,6 @@ const base = {
         points.setConstant('THREADS_Y', THREADS_Y, 'u32');
         points.setConstant('THREADS_Z', THREADS_Z, 'u32');
 
-        points.setUniform('sliderA', options.sliderA);
-        points.setUniform('sliderB', options.sliderB);
-        points.setUniform('sliderC', options.sliderC);
-        folder.add(options, 'sliderA', -1, 1, .0001).name('sliderA');
-        folder.add(options, 'sliderB', -1, 1, .0001).name('sliderB');
-        folder.add(options, 'sliderC', -1, 1, .0001).name('sliderC');
-        folder.open();
-
-
         console.log(NUMPARTICLES);
         points.setStorage('particles', `array<Particle, ${NUMPARTICLES}>`, false);
         points.setStorage('variables', 'Variable', false);
@@ -62,9 +53,6 @@ const base = {
         points.addRenderPass(RenderPasses.BLOOM, { amount: .1 });
     },
     update: points => {
-        points.setUniform('sliderA', options.sliderA);
-        points.setUniform('sliderB', options.sliderB);
-        points.setUniform('sliderC', options.sliderC);
     }
 }
 
