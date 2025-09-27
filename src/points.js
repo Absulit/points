@@ -1025,6 +1025,9 @@ class Points {
         this.#bindingTextures.forEach(bindingTexture => {
             const { usesRenderPass } = bindingTexture;
             if (usesRenderPass) {
+                if (GPUShaderStage.VERTEX === shaderType) { // to avoid binding texture in vertex
+                    return;
+                }
                 if (renderPassIndex === bindingTexture.write.renderPassIndex) {
                     dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.write.name}: texture_storage_2d<rgba8unorm, write>;\n`;
                     bindingIndex += 1;
@@ -1832,6 +1835,9 @@ class Points {
         this.#bindingTextures.forEach(bindingTexture => {
             const { usesRenderPass } = bindingTexture;
             if (usesRenderPass) {
+                if (GPUShaderStage.VERTEX === shaderType) { // to avoid binding texture in vertex
+                    return;
+                }
                 if (bindingTexture.read.renderPassIndex === renderPassIndex) {
                     entries.push(
                         {
