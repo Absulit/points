@@ -35,6 +35,7 @@ class RenderPass {
     #compiledShaders
     #computePipeline = null;
     #renderPipeline = null;
+    #name = null;
     /**
      * @type {GPUBindGroup}
      */
@@ -70,6 +71,8 @@ class RenderPass {
     #callback = null;
     #required = null;
     #instanceCount = 1;
+    #internal = false;
+    #initCalled = false; // to avoid double init call
 
     /**
      * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
@@ -92,6 +95,7 @@ class RenderPass {
         this.#fragmentShader = fragmentShader;
 
         this.#callback = init;
+        this.#internal = !!init; // if it has the init then is a external Render Pass (Post Process)
 
         this.#compiledShaders = {
             vertex: '',
@@ -281,8 +285,11 @@ class RenderPass {
      * the {@link Points#addRenderPass} method is called.
      */
     init(points, params) {
-        params ||= {};
-        this.#callback?.(points, params);
+        if (!this.#initCalled) {
+            this.#initCalled = true;
+            params ||= {};
+            this.#callback?.(points, params);
+        }
     }
 
     get required() {
@@ -310,8 +317,20 @@ class RenderPass {
         this.#instanceCount = val;
     }
 
-    get instanceCount(){
+    get instanceCount() {
         return this.#instanceCount;
+    }
+
+    get name() {
+        return this.#name;
+    }
+
+    set name(val) {
+        this.#name = val;
+    }
+
+    get internal() {
+        return this.#internal;
     }
 }
 
@@ -480,12 +499,13 @@ fn main(
 `;
 
 const color = new RenderPass$1(vert$8, frag$8, null, 8, 8, 1, (points, params) => {
-    points.setSampler('renderpass_feedbackSampler', null);
-    points.setTexture2d('renderpass_feedbackTexture', true);
+    points.setSampler('renderpass_feedbackSampler', null).internal = true;
+    points.setTexture2d('renderpass_feedbackTexture', true).internal = true;
     points.setUniform('color_blendAmount', params.blendAmount || .5);
     points.setUniform('color_color', params.color || [1, .75, .79, 1], 'vec4f');
 });
 color.required = ['color', 'blendAmount'];
+color.name = 'Color';
 
 const vert$7 = /*wgsl*/`
 
@@ -644,9 +664,10 @@ fn main(
 `;
 
 const grayscale = new RenderPass$1(vert$7, frag$7, null, 8, 8, 1, (points, params) => {
-    points.setSampler('renderpass_feedbackSampler', null);
-    points.setTexture2d('renderpass_feedbackTexture', true);
+    points.setSampler('renderpass_feedbackSampler', null).internal = true;
+    points.setTexture2d('renderpass_feedbackTexture', true).internal = true;
 });
+grayscale.name = 'Grayscale';
 
 const vert$6 = /*wgsl*/`
 
@@ -693,11 +714,12 @@ fn main(
 `;
 
 const chromaticAberration = new RenderPass$1(vert$6, frag$6, null, 8, 8, 1, (points, params) => {
-    points.setSampler('renderpass_feedbackSampler', null);
-    points.setTexture2d('renderpass_feedbackTexture', true);
+    points.setSampler('renderpass_feedbackSampler', null).internal = true;
+    points.setTexture2d('renderpass_feedbackTexture', true).internal = true;
     points.setUniform('chromaticAberration_distance', params.distance || .02);
 });
 chromaticAberration.required = ['distance'];
+chromaticAberration.name = 'Chromatic Aberration';
 
 const vert$5 = /*wgsl*/`
 
@@ -745,11 +767,12 @@ fn main(
 `;
 
 const pixelate = new RenderPass$1(vert$5, frag$5, null, 8, 8, 1, (points, params) => {
-    points.setSampler('renderpass_feedbackSampler', null);
-    points.setTexture2d('renderpass_feedbackTexture', true);
+    points.setSampler('renderpass_feedbackSampler', null).internal = true;
+    points.setTexture2d('renderpass_feedbackTexture', true).internal = true;
     points.setUniform('pixelate_pixelDims', params.pixelDimensions || [10, 10], 'vec2f');
 });
 pixelate.required = ['pixelDimensions'];
+pixelate.name = 'Pixelate';
 
 const vert$4 = /*wgsl*/`
 
@@ -1007,12 +1030,13 @@ fn main(
 `;
 
 const lensDistortion = new RenderPass$1(vert$4, frag$4, null, 8, 8, 1, (points, params) => {
-    points.setSampler('renderpass_feedbackSampler', null);
-    points.setTexture2d('renderpass_feedbackTexture', true);
+    points.setSampler('renderpass_feedbackSampler', null).internal = true;
+    points.setTexture2d('renderpass_feedbackTexture', true).internal = true;
     points.setUniform('lensDistortion_amount', params.amount || .4);
     points.setUniform('lensDistortion_distance', params.distance || .01);
 });
 lensDistortion.required = ['amount', 'distance'];
+lensDistortion.name = 'Lens Distortion';
 
 const vert$3 = /*wgsl*/`
 
@@ -1089,9 +1113,10 @@ fn main(
 `;
 
 const filmgrain = new RenderPass$1(vert$3, frag$3, null, 8, 8, 1, (points, params) => {
-    points.setSampler('renderpass_feedbackSampler', null);
-    points.setTexture2d('renderpass_feedbackTexture', true);
+    points.setSampler('renderpass_feedbackSampler', null).internal = true;
+    points.setTexture2d('renderpass_feedbackTexture', true).internal = true;
 });
+filmgrain.name = 'Filmgrain';
 
 const vert$2 = /*wgsl*/`
 
@@ -1138,12 +1163,13 @@ fn main(
 `;
 
 const bloom = new RenderPass$1(vert$2, frag$2, null, 8, 8, 1, (points, params) => {
-    points.setSampler('renderpass_feedbackSampler', null);
-    points.setTexture2d('renderpass_feedbackTexture', true);
+    points.setSampler('renderpass_feedbackSampler', null).internal = true;
+    points.setTexture2d('renderpass_feedbackTexture', true).internal = true;
     points.setUniform('bloom_amount', params.amount || .5);
     points.setUniform('bloom_iterations', params.iterations || 2);
 });
 bloom.required = ['amount', 'iterations'];
+bloom.name = 'Bloom';
 
 const vert$1 = /*wgsl*/`
 
@@ -1240,13 +1266,14 @@ fn main(
 `;
 
 const blur = new RenderPass$1(vert$1, frag$1, null, 8, 8, 1, (points, params) => {
-    points.setSampler('renderpass_feedbackSampler', null);
-    points.setTexture2d('renderpass_feedbackTexture', true);
+    points.setSampler('renderpass_feedbackSampler', null).internal = true;
+    points.setTexture2d('renderpass_feedbackTexture', true).internal = true;
     points.setUniform('blur_resolution', params.resolution || [50, 50], 'vec2f');
     points.setUniform('blur_direction', params.direction || [.4, .4], 'vec2f');
     points.setUniform('blur_radians', params.radians || 0);
 });
 blur.required = ['resolution', 'direction', 'radians'];
+blur.name = 'Blur';
 
 const vert = /*wgsl*/`
 
@@ -1291,12 +1318,13 @@ fn main(
 `;
 
 const waves = new RenderPass$1(vert, frag, null, 8, 8, 1, (points, params) => {
-    points.setSampler('renderpass_feedbackSampler', null);
-    points.setTexture2d('renderpass_feedbackTexture', true);
+    points.setSampler('renderpass_feedbackSampler', null).internal = true;
+    points.setTexture2d('renderpass_feedbackTexture', true).internal = true;
     points.setUniform('waves_scale', params.scale || .45);
     points.setUniform('waves_intensity', params.intensity || .03);
 });
 waves.required = ['scale', 'intensity'];
+waves.name = 'Waves';
 
 /**
  * List of predefined Render Passes for Post Processing.
@@ -2609,7 +2637,7 @@ class Points {
         }
         if (uniformToUpdate) {
             uniformToUpdate.value = value;
-            return;
+            return uniformToUpdate;
         }
         if (structName && isArray(structName)) {
             throw `${structName} is an array, which is currently not supported for Uniforms.`;
@@ -2620,6 +2648,7 @@ class Points {
             type: structName,
             size: null
         };
+        Object.seal(uniform);
         this.#uniforms.push(uniform);
         return uniform;
     }
@@ -2716,7 +2745,8 @@ class Points {
             // structSize: null,
             shaderType,
             read,
-            buffer: null
+            buffer: null,
+            internal: false
         };
         this.#storage.push(storage);
         return storage;
@@ -2795,7 +2825,8 @@ class Points {
             shaderType,
             array: arrayData,
             buffer: null,
-            read
+            read,
+            internal: false
         };
         this.#storage.push(storage);
         return storage;
@@ -2894,7 +2925,8 @@ class Points {
             name: name,
             descriptor: descriptor,
             shaderType: shaderType,
-            resource: null
+            resource: null,
+            internal: false
         };
         this.#samplers.push(sampler);
         return sampler;
@@ -2937,7 +2969,8 @@ class Points {
             copyCurrentTexture,
             shaderType,
             texture: null,
-            renderPassIndex
+            renderPassIndex,
+            internal: false
         };
         this.#textures2d.push(texture2d);
         return texture2d;
@@ -3013,7 +3046,8 @@ class Points {
             texture: null,
             imageTexture: {
                 bitmap: imageBitmap
-            }
+            },
+            internal: false
         };
         this.#textures2d.push(texture2d);
         return texture2d;
@@ -3073,15 +3107,20 @@ class Points {
             const blob = await response.blob();
             imageBitmaps.push(await createImageBitmap(blob));
         }
-        this.#textures2dArray.push({
+
+        const texture2dArrayItem = {
             name: name,
             copyCurrentTexture: false,
             shaderType: shaderType,
             texture: null,
             imageTextures: {
                 bitmaps: imageBitmaps
-            }
-        });
+            },
+            internal: false
+        };
+
+        this.#textures2dArray.push(texture2dArrayItem);
+        return texture2dArrayItem;
     }
 
     /**
@@ -3113,7 +3152,8 @@ class Points {
         const textureExternal = {
             name: name,
             shaderType: shaderType,
-            video: video
+            video: video,
+            internal: false
         };
         this.#texturesExternal.push(textureExternal);
         return textureExternal;
@@ -3155,7 +3195,8 @@ class Points {
         const textureExternal = {
             name: name,
             shaderType: shaderType,
-            video: video
+            video: video,
+            internal: false
         };
         this.#texturesExternal.push(textureExternal);
         return textureExternal;
@@ -3232,7 +3273,8 @@ class Points {
         const texturesStorage2d = {
             name: name,
             shaderType: shaderType,
-            texture: null
+            texture: null,
+            internal: false
         };
         this.#texturesStorage2d.push(texturesStorage2d);
         return texturesStorage2d;
@@ -3283,7 +3325,8 @@ class Points {
             },
             texture: null,
             size: size,
-            usesRenderPass
+            usesRenderPass,
+            internal: false
         };
         this.#bindingTextures.push(bindingTexture);
         return bindingTexture;
@@ -3339,7 +3382,7 @@ class Points {
      * @param {RenderPass} renderPass
      * @returns {String} string with bindings
      */
-    #createDynamicGroupBindings(shaderType, { index: renderPassIndex }, groupId = 0) {
+    #createDynamicGroupBindings(shaderType, { index: renderPassIndex, internal }, groupId = 0) {
         if (!shaderType) {
             throw '`GPUShaderStage` is required';
         }
@@ -3351,7 +3394,8 @@ class Points {
             bindingIndex += 1;
         }
         this.#storage.forEach(storageItem => {
-            if (!storageItem.shaderType || storageItem.shaderType & shaderType) {
+            const isInternal = internal === storageItem.internal;
+            if (isInternal && (!storageItem.shaderType || storageItem.shaderType & shaderType)) {
                 const T = storageItem.structName;
 
                 // note:
@@ -3373,32 +3417,37 @@ class Points {
                 bindingIndex += 1;
             }
         }
-        this.#samplers.forEach((sampler, index) => {
-            if (!sampler.shaderType || sampler.shaderType & shaderType) {
+        this.#samplers.forEach(sampler => {
+            const isInternal = internal === sampler.internal;
+            if (isInternal && (!sampler.shaderType || sampler.shaderType & shaderType)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${sampler.name}: sampler;\n`;
                 bindingIndex += 1;
             }
         });
-        this.#texturesStorage2d.forEach((texture, index) => {
-            if (!texture.shaderType || texture.shaderType & shaderType) {
+        this.#texturesStorage2d.forEach(texture => {
+            const isInternal = internal === texture.internal;
+            if (isInternal && (!texture.shaderType || texture.shaderType & shaderType)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_storage_2d<rgba8unorm, write>;\n`;
                 bindingIndex += 1;
             }
         });
-        this.#textures2d.forEach((texture, index) => {
-            if (!texture.shaderType || texture.shaderType & shaderType) {
+        this.#textures2d.forEach(texture => {
+            const isInternal = internal === texture.internal;
+            if (isInternal && (!texture.shaderType || texture.shaderType & shaderType)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d<f32>;\n`;
                 bindingIndex += 1;
             }
         });
-        this.#textures2dArray.forEach((texture, index) => {
-            if (!texture.shaderType || texture.shaderType & shaderType) {
+        this.#textures2dArray.forEach(texture => {
+            const isInternal = internal === texture.internal;
+            if (isInternal && (!texture.shaderType || texture.shaderType & shaderType)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d_array<f32>;\n`;
                 bindingIndex += 1;
             }
         });
         this.#texturesExternal.forEach(externalTexture => {
-            if (!externalTexture.shaderType || externalTexture.shaderType & shaderType) {
+            const isInternal = internal === externalTexture.internal;
+            if (isInternal && (!externalTexture.shaderType || externalTexture.shaderType & shaderType)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${externalTexture.name}: texture_external;\n`;
                 bindingIndex += 1;
             }
@@ -3406,6 +3455,9 @@ class Points {
         this.#bindingTextures.forEach(bindingTexture => {
             const { usesRenderPass } = bindingTexture;
             if (usesRenderPass) {
+                if (GPUShaderStage.VERTEX === shaderType) { // to avoid binding texture in vertex
+                    return;
+                }
                 if (renderPassIndex === bindingTexture.write.renderPassIndex) {
                     dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.write.name}: texture_storage_2d<rgba8unorm, write>;\n`;
                     bindingIndex += 1;
@@ -3417,11 +3469,13 @@ class Points {
 
                 return;
             }
-            if (bindingTexture.write.shaderType & shaderType) {
+
+            const isInternal = internal === bindingTexture.internal;
+            if (isInternal && (bindingTexture.write.shaderType & shaderType)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.write.name}: texture_storage_2d<rgba8unorm, write>;\n`;
                 bindingIndex += 1;
             }
-            if (bindingTexture.read.shaderType & shaderType) {
+            if (isInternal && (bindingTexture.read.shaderType & shaderType)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.read.name}: texture_2d<f32>;\n`;
                 bindingIndex += 1;
             }
@@ -3489,7 +3543,7 @@ class Points {
         renderPass.hasVertexShader && (colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + defaultVertexBody + colorsVertWGSL);
         renderPass.hasComputeShader && (colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + colorsComputeWGSL);
         renderPass.hasFragmentShader && (colorsFragWGSL = dynamicGroupBindingsFragment + defaultStructs + colorsFragWGSL);
-        console.groupCollapsed(`Render Pass ${index}`);
+        console.groupCollapsed(`Render Pass ${index}: (${renderPass.name})`);
         console.groupCollapsed('VERTEX');
         console.log(colorsVertWGSL);
         console.groupEnd();
@@ -3614,8 +3668,7 @@ class Points {
             console.warn(`addRenderPass: parameters required: ${paramsRequired}`);
         }
 
-        const { vertexShader: v, fragmentShader: f, computeShader: c } = renderPass;
-        this.#postRenderPasses.push(new RenderPass(v, f, c));
+        this.#postRenderPasses.push(renderPass);
         renderPass.init(this, params);
     }
 
@@ -3975,7 +4028,7 @@ class Points {
         this.#renderPasses.forEach(renderPass => {
             if (renderPass.hasVertexAndFragmentShader) {
                 renderPass.renderPipeline = this.#device.createRenderPipeline({
-                    label: `render pipeline: renderPass ${renderPass.index}`,
+                    label: `render pipeline: renderPass ${renderPass.index} (${renderPass.name})`,
                     // layout: 'auto',
                     layout: this.#device.createPipelineLayout({
                         bindGroupLayouts: [renderPass.bindGroupLayoutVertex, renderPass.bindGroupLayoutRender]
@@ -4050,7 +4103,7 @@ class Points {
      * Creates the entries for the pipeline
      * @returns an array with the entries
      */
-    #createEntries(shaderType, { index: renderPassIndex }) {
+    #createEntries(shaderType, { index: renderPassIndex, internal }) {
         let entries = [];
         let bindingIndex = 0;
         if (this.#uniforms.length) {
@@ -4081,7 +4134,8 @@ class Points {
             );
         }
         this.#storage.forEach(storageItem => {
-            if (!storageItem.shaderType || storageItem.shaderType & shaderType) {
+            const isInternal = internal === storageItem.internal;
+            if (isInternal && (!storageItem.shaderType || storageItem.shaderType & shaderType)) {
 
                 let type = getStorageAccessMode(shaderType, storageItem.shaderType);
                 type = entriesModes[type];
@@ -4118,8 +4172,9 @@ class Points {
             }
         }
         if (this.#samplers.length) {
-            this.#samplers.forEach((sampler, index) => {
-                if (!sampler.shaderType || sampler.shaderType & shaderType) {
+            this.#samplers.forEach(sampler => {
+                const isInternal = internal === sampler.internal;
+                if (isInternal && (!sampler.shaderType || sampler.shaderType & shaderType)) {
                     entries.push(
                         {
                             binding: bindingIndex++,
@@ -4133,8 +4188,9 @@ class Points {
             });
         }
         if (this.#texturesStorage2d.length) {
-            this.#texturesStorage2d.forEach((textureStorage2d, index) => {
-                if (!textureStorage2d.shaderType || textureStorage2d.shaderType & shaderType) {
+            this.#texturesStorage2d.forEach(textureStorage2d => {
+                const isInternal = internal === textureStorage2d.internal;
+                if (isInternal && (!textureStorage2d.shaderType || textureStorage2d.shaderType & shaderType)) {
                     entries.push(
                         {
                             label: 'texture storage 2d',
@@ -4149,8 +4205,9 @@ class Points {
             });
         }
         if (this.#textures2d.length) {
-            this.#textures2d.forEach((texture2d, index) => {
-                if (!texture2d.shaderType || texture2d.shaderType & shaderType) {
+            this.#textures2d.forEach(texture2d => {
+                const isInternal = internal === texture2d.internal;
+                if (isInternal && (!texture2d.shaderType || texture2d.shaderType & shaderType)) {
                     entries.push(
                         {
                             label: 'texture 2d',
@@ -4165,8 +4222,9 @@ class Points {
             });
         }
         if (this.#textures2dArray.length) {
-            this.#textures2dArray.forEach((texture2dArray, index) => {
-                if (!texture2dArray.shaderType || texture2dArray.shaderType & shaderType) {
+            this.#textures2dArray.forEach(texture2dArray => {
+                const isInternal = internal === texture2dArray.internal;
+                if (isInternal && (!texture2dArray.shaderType || texture2dArray.shaderType & shaderType)) {
                     entries.push(
                         {
                             label: 'texture 2d array',
@@ -4187,7 +4245,8 @@ class Points {
         }
         if (this.#texturesExternal.length) {
             this.#texturesExternal.forEach(externalTexture => {
-                if (!externalTexture.shaderType || externalTexture.shaderType & shaderType) {
+                const isInternal = internal === externalTexture.internal;
+                if (isInternal && (!externalTexture.shaderType || externalTexture.shaderType & shaderType)) {
                     entries.push(
                         {
                             label: 'external texture',
@@ -4205,6 +4264,9 @@ class Points {
         this.#bindingTextures.forEach(bindingTexture => {
             const { usesRenderPass } = bindingTexture;
             if (usesRenderPass) {
+                if (GPUShaderStage.VERTEX === shaderType) { // to avoid binding texture in vertex
+                    return;
+                }
                 if (bindingTexture.read.renderPassIndex === renderPassIndex) {
                     entries.push(
                         {
@@ -4233,7 +4295,8 @@ class Points {
                 return;
             }
 
-            if (bindingTexture.read.shaderType & shaderType) {
+            const isInternal = internal === bindingTexture.internal;
+            if (isInternal && (bindingTexture.read.shaderType & shaderType)) {
                 entries.push(
                     {
                         label: `binding texture 2: name: ${bindingTexture.read.name}`,
@@ -4246,7 +4309,7 @@ class Points {
                 );
             }
 
-            if (bindingTexture.write.shaderType & shaderType) {
+            if (isInternal && (bindingTexture.write.shaderType & shaderType)) {
                 entries.push(
                     {
                         label: `binding texture: name: ${bindingTexture.write.name}`,
@@ -4603,7 +4666,7 @@ class Points {
      * To allow transparency and a custom type of sort, set this as false;
      * @param {Boolean} val
      */
-    set depthWriteEnabled(val){
+    set depthWriteEnabled(val) {
         this.#depthWriteEnabled = val;
     }
 }

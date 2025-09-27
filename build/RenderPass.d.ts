@@ -137,5 +137,8 @@ declare class RenderPass {
      */
     set instanceCount(val: number);
     get instanceCount(): number;
+    set name(val: any);
+    get name(): any;
+    get internal(): boolean;
     #private;
 }

@@ -140,6 +140,9 @@ export class RenderPass {
      */
     set instanceCount(val: number);
     get instanceCount(): number;
+    set name(val: any);
+    get name(): any;
+    get internal(): boolean;
     #private;
 }
 /**
@@ -521,7 +524,16 @@ declare class Points {
      * @param {Array} paths image addresses in a web server
      * @param {GPUShaderStage} shaderType
      */
-    setTextureImageArray(name: string, paths: any[], shaderType: GPUShaderStage): Promise<void>;
+    setTextureImageArray(name: string, paths: any[], shaderType: GPUShaderStage): Promise<{
+        name: string;
+        copyCurrentTexture: boolean;
+        shaderType: GPUShaderStage;
+        texture: any;
+        imageTextures: {
+            bitmaps: ImageBitmap[];
+        };
+        internal: boolean;
+    }>;
     /**
      * Loads a video as `texture_external`and then
      * it will be available to read data from in the shaders.
@@ -577,6 +589,7 @@ declare class Points {
         name: any;
         shaderType: any;
         texture: any;
+        internal: boolean;
     };
     /**
      * Special texture where data can be written to it in the Compute Shader and
