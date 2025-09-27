@@ -38,11 +38,11 @@ fn main(
 ) -> Fragment {
     let particle = particles[instanceIndex];
 
-        var pt = rotateZ(particle.position, params.time * .9854);
-        pt = rotateY(pt, params.time * .94222);
-        pt = rotateX(pt, params.time * .865);
+    var pt = rotateZ(particle.position, params.time * .9854);
+    pt = rotateY(pt, params.time * .94222);
+    pt = rotateX(pt, params.time * .865);
 
-        pt.z = pt.z + (400 * UNIT * .008);
+    pt.z = pt.z + (400 * UNIT * .008);
 
     // scale local quad position
     let scaled = position.xyz * .03; // particle.scale;
@@ -52,11 +52,6 @@ fn main(
 
     // Project to clip space (assuming orthographic projection)
     let clip = vec4f(world, 1.0);
-
-
-
-
-
 
     return defaultVertexBody(clip, particle.color, uv);
 }
