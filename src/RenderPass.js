@@ -71,6 +71,7 @@ class RenderPass {
     #required = null;
     #instanceCount = 1;
     #internal = false;
+    #initCalled = false; // to avoid double init call
 
     /**
      * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
@@ -283,8 +284,11 @@ class RenderPass {
      * the {@link Points#addRenderPass} method is called.
      */
     init(points, params) {
-        params ||= {};
-        this.#callback?.(points, params);
+        if (!this.#initCalled) {
+            this.#initCalled = true;
+            params ||= {};
+            this.#callback?.(points, params);
+        }
     }
 
     get required() {
