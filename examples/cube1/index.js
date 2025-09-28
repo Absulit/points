@@ -22,6 +22,12 @@ const base = {
      */
     init: async (points, folder) => {
 
+        points.addCube(
+            { x: 0, y: 0, z: 0 },
+            { width: 1, height: 1, depth: 1 },
+            { r: 1, g: 0, b: 0, a: 1 }
+        );
+
         // Add elements to dat gui
         // create an uniform and get value from options
         points.setUniform('val', options.val);

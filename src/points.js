@@ -1217,6 +1217,12 @@ class Points {
             }
         };
         this.createScreen();
+        this.#createVertexBuffer(new Float32Array(this.#vertexArray));
+
+        this.#createBuffers();
+        this.#createPipeline();
+
+
         return true;
     }
 
@@ -1255,6 +1261,9 @@ class Points {
      * @ignore
      */
     createScreen() {
+        if (this.#vertexArray.length !== 0) {
+            return;
+        }
         const hasVertexAndFragmentShader = this.#renderPasses.some(renderPass => renderPass.hasVertexAndFragmentShader)
         if (hasVertexAndFragmentShader) {
             let colors = [
@@ -1269,10 +1278,7 @@ class Points {
                     this.addPoint(coordinate, this.#canvas.clientWidth / this.#numColumns, this.#canvas.clientHeight / this.#numRows, colors);
                 }
             }
-            this.#createVertexBuffer(new Float32Array(this.#vertexArray));
         }
-        this.#createBuffers();
-        this.#createPipeline();
     }
     /**
      * @param {Float32Array} vertexArray
@@ -2132,6 +2138,56 @@ class Points {
         const p = value / side;
         return (p * 2 - 1) * direction;
     };
+
+    addCube(coordinate, dimensions, color) {
+        const { x, y, z } = coordinate;
+        const { width, height, depth } = dimensions;
+        const hw = width / 2;
+        const hh = height / 2;
+        const hd = depth / 2;
+
+        const corners = [
+            [x - hw, y - hh, z - hd], // 0: left-bottom-back
+            [x + hw, y - hh, z - hd], // 1: right-bottom-back
+            [x + hw, y + hh, z - hd], // 2: right-top-back
+            [x - hw, y + hh, z - hd], // 3: left-top-back
+            [x - hw, y - hh, z + hd], // 4: left-bottom-front
+            [x + hw, y - hh, z + hd], // 5: right-bottom-front
+            [x + hw, y + hh, z + hd], // 6: right-top-front
+            [x - hw, y + hh, z + hd], // 7: left-top-front
+        ];
+
+        const faces = [
+            [0, 1, 2, 3], // back
+            [5, 4, 7, 6], // front
+            [4, 0, 3, 7], // left
+            [1, 5, 6, 2], // right
+            [3, 2, 6, 7], // top
+            [4, 5, 1, 0], // bottom
+        ];
+
+        for (let i = 0; i < 6; i++) {
+            const [i0, i1, i2, i3] = faces[i];
+            // const color = faceColors[i];
+            const { r, g, b, a } = color;
+
+            const v = [corners[i0], corners[i1], corners[i2], corners[i3]];
+
+            const verts = [
+                v[0], v[1], v[2],
+                v[0], v[2], v[3],
+            ];
+
+            for (const [vx, vy, vz] of verts) {
+                const nx = vx;
+                const ny = vy;
+                const nz = vz;
+                const tx = (+nx + 1) * 0.5;
+                const ty = (+ny + 1) * 0.5;
+                this.#vertexArray.push(+nx, +ny, +nz, 1, r, g, b, a, tx, ty);
+            }
+        }
+    }
     /**
      * - **currently for internal use**<br>
      * - **might be private in the future**<br>
