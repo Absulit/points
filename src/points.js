@@ -2157,6 +2157,15 @@ class Points {
             [x - hw, y + hh, z + hd], // 7: left-top-front
         ];
 
+        const faceUVs = [
+            [[0, 0], [1, 0], [1, 1], [0, 1]], // back
+            [[0, 0], [1, 0], [1, 1], [0, 1]], // front
+            [[0, 0], [1, 0], [1, 1], [0, 1]], // left
+            [[0, 0], [1, 0], [1, 1], [0, 1]], // right
+            [[0, 0], [1, 0], [1, 1], [0, 1]], // top
+            [[0, 0], [1, 0], [1, 1], [0, 1]], // bottom
+        ];
+
         const faces = [
             [0, 1, 2, 3], // back
             [5, 4, 7, 6], // front
@@ -2173,18 +2182,18 @@ class Points {
 
             const v = [corners[i0], corners[i1], corners[i2], corners[i3]];
 
+            const uv = faceUVs[i];
             const verts = [
-                v[0], v[1], v[2],
-                v[0], v[2], v[3],
+                [v[0], uv[0]],
+                [v[1], uv[1]],
+                [v[2], uv[2]],
+                [v[0], uv[0]],
+                [v[2], uv[2]],
+                [v[3], uv[3]],
             ];
 
-            for (const [vx, vy, vz] of verts) {
-                const nx = vx;
-                const ny = vy;
-                const nz = vz;
-                const tx = (+nx + 1) * 0.5;
-                const ty = (+ny + 1) * 0.5;
-                this.#vertexArray.push(+nx, +ny, +nz, 1, r, g, b, a, tx, ty);
+            for (const [[vx, vy, vz], [u, v]] of verts) {
+                this.#vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v);
             }
         }
     }

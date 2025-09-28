@@ -39,8 +39,11 @@ fn main(
 
     pt.z = pt.z;
 
+    let world = pt;
+    let clip = params.projection * params.view * vec4f(world, 1.0);
+
     // Project to clip space (assuming orthographic projection)
-    let clip = vec4f(pt, 1.0);
+    // let clip = vec4f(pt, 1.0);
 
     return defaultVertexBody(clip, color, uv);
 }

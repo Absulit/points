@@ -28,6 +28,34 @@ const base = {
             { r: 1, g: 0, b: 0, a: 1 }
         );
 
+        const near = 0.1, far = 100;
+        const f = 1.0 / Math.tan(Math.PI / 8); // ≈ 2.414
+        const aspect = canvas.width / canvas.height;
+        const nf = 1 / (near - far);
+
+        points.setUniform(
+            'projection',
+            [
+                f / aspect, 0, 0, 0,
+                0, f, 0, 0,
+                0, 0, (far + near) * nf, -1,
+                0, 0, (2 * far * near) * nf, 0
+            ],
+            'mat4x4<f32>'
+        )
+
+        // camera at [0, 0, 5], looking at origin
+        points.setUniform(
+            'view',
+            [
+                1, 0, 0, 0,
+                0, 1, 0, 0,
+                0, 0, 1, 0,
+                0, 0, -5, 1
+            ],
+            'mat4x4<f32>'
+        )
+
         // Add elements to dat gui
         // create an uniform and get value from options
         points.setUniform('val', options.val);
