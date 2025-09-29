@@ -203,7 +203,7 @@ class Points {
         const uniformToUpdate = this.#nameExists(this.#uniforms, name);
         if (uniformToUpdate && structName) {
             // if name exists is an update
-            throw '`setUniform()` can\'t set the structName of an already defined uniform.';
+            console.warn(`setUniform(${name}, [${value}], ${structName}) can't set the structName of an already defined uniform.`);
         }
         if (uniformToUpdate) {
             uniformToUpdate.value = value;
@@ -1241,18 +1241,9 @@ class Points {
             throw '`addPostRenderPass` should be called prior `Points.init()`';
         }
 
-        // const colors = [
-        //     new RGBAColor(1, 0, 0),
-        //     new RGBAColor(0, 1, 0),
-        //     new RGBAColor(0, 0, 1),
-        //     new RGBAColor(1, 1, 0),
-        // ];
-        // renderPass.addPoint({x:0,y:0,z:0}, this.#canvas.clientWidth, this.#canvas.clientHeight , colors, this.#canvas);
+        renderPass.params = params || {};
 
-
-        params ||= {};
-
-        const requiredNotFound = renderPass.required?.filter(i => !params[i] && !Number.isInteger(params[i]));
+        const requiredNotFound = renderPass.required?.filter(i => !renderPass.params[i] && !Number.isInteger(renderPass.params[i]));
 
         if (requiredNotFound?.length) {
             const paramsRequired = requiredNotFound.join(', ');
@@ -1260,7 +1251,7 @@ class Points {
         }
 
         this.#postRenderPasses.push(renderPass);
-        renderPass.init(this, params);
+        renderPass.init(this);
     }
 
     /**

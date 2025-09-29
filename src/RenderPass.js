@@ -78,7 +78,7 @@ class RenderPass {
     #required = null;
     #instanceCount = 1;
     #internal = false;
-    #initCalled = false; // to avoid double init call
+    #params = null;
 
     #vertexArray = [];
     #vertexBuffer = null;
@@ -291,15 +291,10 @@ class RenderPass {
      * requires to run.
      * @param {Points} points instance of {@link Points} to call set* functions
      * like {@link Points#setUniform}  and others.
-     * @param {Object} params data that can be assigned to the RenderPass when
-     * the {@link Points#addRenderPass} method is called.
      */
-    init(points, params) {
-        if (!this.#initCalled) {
-            this.#initCalled = true;
-            params ||= {};
-            this.#callback?.(points, params);
-        }
+    init(points) {
+        this.#params ||= {};
+        this.#callback?.(points, this.#params);
     }
 
     get required() {
@@ -341,6 +336,20 @@ class RenderPass {
 
     get internal() {
         return this.#internal;
+    }
+
+    /**
+     * Parameters specifically for Post RenderPass
+     */
+    get params() {
+        return this.#params;
+    }
+    /**
+     * @param {Object} val data that can be assigned to the RenderPass when
+     * the {@link Points#addRenderPass} method is called.
+     */
+    set params(val) {
+        this.#params = val;
     }
 
     get vertexArray() {
