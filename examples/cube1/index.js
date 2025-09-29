@@ -1,7 +1,7 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
-import Points from 'points';
+import Points, { RenderPass, RenderPasses } from 'points';
 
 const options = {
     val: 0,
@@ -13,16 +13,18 @@ const options = {
     color5: { r: 115, g: 50.9, b: 20.3, a: .1 }, // r, g, b object
 }
 
+const renderPass = new RenderPass(vert, frag, compute);
+
 const base = {
-    vert,
-    compute,
-    frag,
+    renderPasses: [
+        renderPass
+    ],
     /**
      * @param {Points} points
      */
     init: async (points, folder) => {
 
-        points.addCube(
+        renderPass.addCube(
             { x: 0, y: 0, z: 0 },
             { width: 1, height: 1, depth: 1 },
             { r: 1, g: 0, b: 0, a: 1 }
@@ -56,6 +58,8 @@ const base = {
             'mat4x4<f32>'
         )
 
+        // points.addRenderPass(RenderPasses.PIXELATE);
+
         // Add elements to dat gui
         // create an uniform and get value from options
         points.setUniform('val', options.val);
@@ -72,6 +76,8 @@ const base = {
         folder.addColor(options, 'color5');
 
         folder.open();
+
+
     },
     /**
      * @param {Points} points
