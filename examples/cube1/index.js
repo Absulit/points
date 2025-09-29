@@ -15,6 +15,12 @@ const options = {
 
 const renderPass = new RenderPass(vert, frag, compute);
 
+const near = 0.1, far = 100;
+const f = 1.0 / Math.tan(Math.PI / 8); // ≈ 2.414
+let aspect = null
+const nf = 1 / (near - far);
+
+
 const base = {
     renderPasses: [
         renderPass
@@ -30,11 +36,7 @@ const base = {
             { r: 1, g: 0, b: 0, a: 1 }
         );
 
-        const near = 0.1, far = 100;
-        const f = 1.0 / Math.tan(Math.PI / 8); // ≈ 2.414
-        const aspect = canvas.width / canvas.height;
-        const nf = 1 / (near - far);
-
+        aspect = points.canvas.width / points.canvas.height;
         points.setUniform(
             'projection',
             [
@@ -58,7 +60,9 @@ const base = {
             'mat4x4<f32>'
         )
 
+        // points.addRenderPass(RenderPasses.COLOR);
         // points.addRenderPass(RenderPasses.PIXELATE);
+        // points.addRenderPass(RenderPasses.FILM_GRAIN);
 
         // Add elements to dat gui
         // create an uniform and get value from options
@@ -83,6 +87,20 @@ const base = {
      * @param {Points} points
      */
     update: points => {
+
+        aspect = points.canvas.width / points.canvas.height;
+        points.setUniform(
+            'projection',
+            [
+                f / aspect, 0, 0, 0,
+                0, f, 0, 0,
+                0, 0, (far + near) * nf, -1,
+                0, 0, (2 * far * near) * nf, 0
+            ]
+        )
+
+
+
         points.setUniform('val', options.val);
     }
 }
