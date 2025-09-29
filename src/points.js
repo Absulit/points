@@ -46,7 +46,7 @@ class Points {
     #buffer = null;
     #presentationSize = null;
     #depthTexture = null;
-    #vertexArray = [];
+    // #vertexArray = [];
     #numColumns = 1;
     #numRows = 1;
     #commandsFinished = [];
@@ -1216,8 +1216,13 @@ class Points {
                 depthStoreOp: 'store'
             }
         };
-        this.createScreen();
-        this.#createVertexBuffer(new Float32Array(this.#vertexArray));
+        // this.#createVertexBuffer(new Float32Array(this.#vertexArray));
+        // TODO: this should be inside RenderPass, to not call vertexArray outside
+        this.#renderPasses.forEach(renderPass => {
+            this.createScreen(renderPass);
+            renderPass.vertexBufferInfo = new VertexBufferInfo(renderPass.vertexArray);
+            renderPass.vertexBuffer = this.#createAndMapBuffer(renderPass.vertexArray, GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST);
+        })
 
         this.#createBuffers();
         this.#createPipeline();
@@ -1235,6 +1240,15 @@ class Points {
         if (this.renderPasses?.length) {
             throw '`addPostRenderPass` should be called prior `Points.init()`';
         }
+
+        // const colors = [
+        //     new RGBAColor(1, 0, 0),
+        //     new RGBAColor(0, 1, 0),
+        //     new RGBAColor(0, 0, 1),
+        //     new RGBAColor(1, 1, 0),
+        // ];
+        // renderPass.addPoint({x:0,y:0,z:0}, this.#canvas.clientWidth, this.#canvas.clientHeight , colors, this.#canvas);
+
 
         params ||= {};
 
@@ -1260,10 +1274,12 @@ class Points {
      * Adds two triangles called points per number of columns and rows
      * @ignore
      */
-    createScreen() {
-        if (this.#vertexArray.length !== 0) {
+    createScreen(renderPass) {
+        if (renderPass.vertexArray.length !== 0) {
             return;
         }
+        console.log(renderPass.name);
+
         const hasVertexAndFragmentShader = this.#renderPasses.some(renderPass => renderPass.hasVertexAndFragmentShader)
         if (hasVertexAndFragmentShader) {
             let colors = [
@@ -1275,7 +1291,7 @@ class Points {
             for (let xIndex = 0; xIndex < this.#numRows; xIndex++) {
                 for (let yIndex = 0; yIndex < this.#numColumns; yIndex++) {
                     const coordinate = new Coordinate(xIndex * this.#canvas.clientWidth / this.#numColumns, yIndex * this.#canvas.clientHeight / this.#numRows, .3);
-                    this.addPoint(coordinate, this.#canvas.clientWidth / this.#numColumns, this.#canvas.clientHeight / this.#numRows, colors);
+                    renderPass.addPoint(coordinate, this.#canvas.clientWidth / this.#numColumns, this.#canvas.clientHeight / this.#numRows, colors, this.#canvas);
                 }
             }
         }
@@ -1624,24 +1640,24 @@ class Points {
                         entryPoint: 'main', // shader function name
                         buffers: [
                             {
-                                arrayStride: this.#vertexBufferInfo.vertexSize,
+                                arrayStride: renderPass.vertexBufferInfo.vertexSize,
                                 attributes: [
                                     {
                                         // position
                                         shaderLocation: 0,
-                                        offset: this.#vertexBufferInfo.vertexOffset,
+                                        offset: renderPass.vertexBufferInfo.vertexOffset,
                                         format: 'float32x4',
                                     },
                                     {
                                         // colors
                                         shaderLocation: 1,
-                                        offset: this.#vertexBufferInfo.colorOffset,
+                                        offset: renderPass.vertexBufferInfo.colorOffset,
                                         format: 'float32x4',
                                     },
                                     {
                                         // uv
                                         shaderLocation: 2,
-                                        offset: this.#vertexBufferInfo.uvOffset,
+                                        offset: renderPass.vertexBufferInfo.uvOffset,
                                         format: 'float32x2',
                                     },
                                 ],
@@ -2036,7 +2052,7 @@ class Points {
                     passEncoder.setBindGroup(0, renderPass.vertexBindGroup);
                     passEncoder.setBindGroup(1, renderPass.renderBindGroup);
                 }
-                passEncoder.setVertexBuffer(0, this.#buffer);
+                passEncoder.setVertexBuffer(0, renderPass.vertexBuffer);
                 /**
                  * vertexCount: number The number of vertices to draw
                  * instanceCount?: number | undefined The number of instances to draw
@@ -2044,7 +2060,7 @@ class Points {
                  * firstInstance?: number | undefined First instance to draw
                  */
                 //passEncoder.draw(3, 1, 0, 0);
-                passEncoder.draw(this.#vertexBufferInfo.vertexCount, renderPass.instanceCount);
+                passEncoder.draw(renderPass.vertexBufferInfo.vertexCount, renderPass.instanceCount);
                 passEncoder.end();
                 // Copy the rendering results from the swapchain into |texture2d.texture|.
                 this.#textures2d.forEach(texture2d => {
@@ -2133,101 +2149,101 @@ class Points {
         }
     }
 
-    #getWGSLCoordinate(value, side, invert = false) {
-        const direction = invert ? -1 : 1;
-        const p = value / side;
-        return (p * 2 - 1) * direction;
-    };
+    // #getWGSLCoordinate(value, side, invert = false) {
+    //     const direction = invert ? -1 : 1;
+    //     const p = value / side;
+    //     return (p * 2 - 1) * direction;
+    // };
 
-    addCube(coordinate, dimensions, color) {
-        const { x, y, z } = coordinate;
-        const { width, height, depth } = dimensions;
-        const hw = width / 2;
-        const hh = height / 2;
-        const hd = depth / 2;
+    // addCube(coordinate, dimensions, color) {
+    //     const { x, y, z } = coordinate;
+    //     const { width, height, depth } = dimensions;
+    //     const hw = width / 2;
+    //     const hh = height / 2;
+    //     const hd = depth / 2;
 
-        const corners = [
-            [x - hw, y - hh, z - hd], // 0: left-bottom-back
-            [x + hw, y - hh, z - hd], // 1: right-bottom-back
-            [x + hw, y + hh, z - hd], // 2: right-top-back
-            [x - hw, y + hh, z - hd], // 3: left-top-back
-            [x - hw, y - hh, z + hd], // 4: left-bottom-front
-            [x + hw, y - hh, z + hd], // 5: right-bottom-front
-            [x + hw, y + hh, z + hd], // 6: right-top-front
-            [x - hw, y + hh, z + hd], // 7: left-top-front
-        ];
+    //     const corners = [
+    //         [x - hw, y - hh, z - hd], // 0: left-bottom-back
+    //         [x + hw, y - hh, z - hd], // 1: right-bottom-back
+    //         [x + hw, y + hh, z - hd], // 2: right-top-back
+    //         [x - hw, y + hh, z - hd], // 3: left-top-back
+    //         [x - hw, y - hh, z + hd], // 4: left-bottom-front
+    //         [x + hw, y - hh, z + hd], // 5: right-bottom-front
+    //         [x + hw, y + hh, z + hd], // 6: right-top-front
+    //         [x - hw, y + hh, z + hd], // 7: left-top-front
+    //     ];
 
-        const faceUVs = [
-            [[0, 0], [1, 0], [1, 1], [0, 1]], // back
-            [[0, 0], [1, 0], [1, 1], [0, 1]], // front
-            [[0, 0], [1, 0], [1, 1], [0, 1]], // left
-            [[0, 0], [1, 0], [1, 1], [0, 1]], // right
-            [[0, 0], [1, 0], [1, 1], [0, 1]], // top
-            [[0, 0], [1, 0], [1, 1], [0, 1]], // bottom
-        ];
+    //     const faceUVs = [
+    //         [[0, 0], [1, 0], [1, 1], [0, 1]], // back
+    //         [[0, 0], [1, 0], [1, 1], [0, 1]], // front
+    //         [[0, 0], [1, 0], [1, 1], [0, 1]], // left
+    //         [[0, 0], [1, 0], [1, 1], [0, 1]], // right
+    //         [[0, 0], [1, 0], [1, 1], [0, 1]], // top
+    //         [[0, 0], [1, 0], [1, 1], [0, 1]], // bottom
+    //     ];
 
-        const faces = [
-            [0, 1, 2, 3], // back
-            [5, 4, 7, 6], // front
-            [4, 0, 3, 7], // left
-            [1, 5, 6, 2], // right
-            [3, 2, 6, 7], // top
-            [4, 5, 1, 0], // bottom
-        ];
+    //     const faces = [
+    //         [0, 1, 2, 3], // back
+    //         [5, 4, 7, 6], // front
+    //         [4, 0, 3, 7], // left
+    //         [1, 5, 6, 2], // right
+    //         [3, 2, 6, 7], // top
+    //         [4, 5, 1, 0], // bottom
+    //     ];
 
-        for (let i = 0; i < 6; i++) {
-            const [i0, i1, i2, i3] = faces[i];
-            // const color = faceColors[i];
-            const { r, g, b, a } = color;
+    //     for (let i = 0; i < 6; i++) {
+    //         const [i0, i1, i2, i3] = faces[i];
+    //         // const color = faceColors[i];
+    //         const { r, g, b, a } = color;
 
-            const v = [corners[i0], corners[i1], corners[i2], corners[i3]];
+    //         const v = [corners[i0], corners[i1], corners[i2], corners[i3]];
 
-            const uv = faceUVs[i];
-            const verts = [
-                [v[0], uv[0]],
-                [v[1], uv[1]],
-                [v[2], uv[2]],
-                [v[0], uv[0]],
-                [v[2], uv[2]],
-                [v[3], uv[3]],
-            ];
+    //         const uv = faceUVs[i];
+    //         const verts = [
+    //             [v[0], uv[0]],
+    //             [v[1], uv[1]],
+    //             [v[2], uv[2]],
+    //             [v[0], uv[0]],
+    //             [v[2], uv[2]],
+    //             [v[3], uv[3]],
+    //         ];
 
-            for (const [[vx, vy, vz], [u, v]] of verts) {
-                this.#vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v);
-            }
-        }
-    }
-    /**
-     * - **currently for internal use**<br>
-     * - **might be private in the future**<br>
-     * Adds two triangles as a quad called Point
-     * @param {Coordinate} coordinate `x` from 0 to canvas.width, `y` from 0 to canvas.height, `z` it goes from 0.0 to 1.0 and forward
-     * @param {Number} width point width
-     * @param {Number} height point height
-     * @param {Array<RGBAColor>} colors one color per corner
-     * @param {Boolean} useTexture
-     * @ignore
-     */
-    addPoint(coordinate, width, height, colors, useTexture = false) {
-        const { x, y, z } = coordinate;
-        const nx = this.#getWGSLCoordinate(x, this.#canvas.width);
-        const ny = this.#getWGSLCoordinate(y, this.#canvas.height, true);
-        const nz = z;
-        const nw = this.#getWGSLCoordinate(x + width, this.#canvas.width);
-        const nh = this.#getWGSLCoordinate(y + height, this.#canvas.height);
-        const { r: r0, g: g0, b: b0, a: a0 } = colors[0];
-        const { r: r1, g: g1, b: b1, a: a1 } = colors[1];
-        const { r: r2, g: g2, b: b2, a: a2 } = colors[2];
-        const { r: r3, g: g3, b: b3, a: a3 } = colors[3];
-        this.#vertexArray.push(
-            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * .5, (+ny + 1) * .5,// 0 top left
-            +nw, +ny, nz, 1, r1, g1, b1, a1, (+nw + 1) * .5, (+ny + 1) * .5,// 1 top right
-            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * .5, (-nh + 1) * .5,// 2 bottom right
-            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * .5, (+ny + 1) * .5,// 3 top left
-            +nx, -nh, nz, 1, r2, g2, b2, a2, (+nx + 1) * .5, (-nh + 1) * .5,// 4 bottom left
-            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * .5, (-nh + 1) * .5,// 5 bottom right
-        );
-    }
+    //         for (const [[vx, vy, vz], [u, v]] of verts) {
+    //             this.#vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v);
+    //         }
+    //     }
+    // }
+    // /**
+    //  * - **currently for internal use**<br>
+    //  * - **might be private in the future**<br>
+    //  * Adds two triangles as a quad called Point
+    //  * @param {Coordinate} coordinate `x` from 0 to canvas.width, `y` from 0 to canvas.height, `z` it goes from 0.0 to 1.0 and forward
+    //  * @param {Number} width point width
+    //  * @param {Number} height point height
+    //  * @param {Array<RGBAColor>} colors one color per corner
+    //  * @param {Boolean} useTexture
+    //  * @ignore
+    //  */
+    // addPoint(coordinate, width, height, colors, useTexture = false) {
+    //     const { x, y, z } = coordinate;
+    //     const nx = this.#getWGSLCoordinate(x, this.#canvas.width);
+    //     const ny = this.#getWGSLCoordinate(y, this.#canvas.height, true);
+    //     const nz = z;
+    //     const nw = this.#getWGSLCoordinate(x + width, this.#canvas.width);
+    //     const nh = this.#getWGSLCoordinate(y + height, this.#canvas.height);
+    //     const { r: r0, g: g0, b: b0, a: a0 } = colors[0];
+    //     const { r: r1, g: g1, b: b1, a: a1 } = colors[1];
+    //     const { r: r2, g: g2, b: b2, a: a2 } = colors[2];
+    //     const { r: r3, g: g3, b: b3, a: a3 } = colors[3];
+    //     this.#vertexArray.push(
+    //         +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * .5, (+ny + 1) * .5,// 0 top left
+    //         +nw, +ny, nz, 1, r1, g1, b1, a1, (+nw + 1) * .5, (+ny + 1) * .5,// 1 top right
+    //         +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * .5, (-nh + 1) * .5,// 2 bottom right
+    //         +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * .5, (+ny + 1) * .5,// 3 top left
+    //         +nx, -nh, nz, 1, r2, g2, b2, a2, (+nx + 1) * .5, (-nh + 1) * .5,// 4 bottom left
+    //         +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * .5, (-nh + 1) * .5,// 5 bottom right
+    //     );
+    // }
     /**
      * Reference to the canvas assigned in the constructor
      * @type {HTMLCanvasElement}
