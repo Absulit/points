@@ -1,4 +1,5 @@
 
+import Points from 'points';
 import { cube_renderpass } from './cube_renderpass/index.js';
 
 const options = {
@@ -43,6 +44,8 @@ const base = {
             { r: 1, g: 0, b: 0, a: 1 }
         );
 
+        points.setStorage('particles', `array<Particle, ${NUMPARTICLES}>`);
+
         aspect = points.canvas.width / points.canvas.height;
         points.setUniform(
             'projection',
@@ -67,13 +70,10 @@ const base = {
             'mat4x4<f32>'
         )
 
-
         points.setUniform('val', options.val);
         folder.add(options, 'val', -1, 1, .0001).name('Val');
 
         folder.open();
-
-
     },
     /**
      * @param {Points} points

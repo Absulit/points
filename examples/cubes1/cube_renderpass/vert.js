@@ -1,5 +1,8 @@
+import { structs } from '../structs.js';
+
 const vert = /*wgsl*/`
 
+${structs}
 
 fn rotateX(p:vec3<f32>, rads:f32 ) -> vec3<f32> {
     let s = sin(rads);
