@@ -10,7 +10,7 @@ const options = {
     particleSize: 2,
 }
 
-const WORKGROUP_X = 256;
+const WORKGROUP_X = 2;
 const WORKGROUP_Y = 1;
 
 const THREADS_X = 256;
@@ -24,7 +24,7 @@ const instancedParticlesRenderPass = new RenderPass(vert, frag1, compute0, WORKG
 instancedParticlesRenderPass.instanceCount = NUMPARTICLES;
 
 const near = 0.1, far = 100;
-const f = 1.0 / Math.tan(Math.PI / 8); // ≈ 2.414
+const f = 1.0 / Math.tan(Math.PI / 16); //8 // ≈ 2.414
 let aspect = null
 const nf = 1 / (near - far);
 
