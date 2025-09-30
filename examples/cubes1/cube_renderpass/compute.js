@@ -20,9 +20,9 @@ fn main(
 
     if(particle.init == 0){
 
-        particle.position = vec3f();
+        particle.position = vec3f(f32(GlobalId.x), f32(GlobalId.y), -f32(GlobalId.z));
         particle.color = vec4f(1);
-        particle.scale = vec3f(1);
+        particle.scale = vec3f(.51);
 
         particle.init = 1;
     }

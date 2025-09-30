@@ -12,14 +12,15 @@ const WORKGROUP_X = 1;
 const WORKGROUP_Y = 1;
 const WORKGROUP_Z = 1;
 
-const THREADS_X = 1;
-const THREADS_Y = 1;
-const THREADS_Z = 1;
+const THREADS_X = 4;
+const THREADS_Y = 2;
+const THREADS_Z = 2;
 
 const NUMPARTICLES = WORKGROUP_X * WORKGROUP_Y * WORKGROUP_Z * THREADS_X * THREADS_Y * THREADS_Z;
 console.log('NUMPARTICLES: ', NUMPARTICLES);
 
 const cube_renderpass = new RenderPass(vert, frag, compute, WORKGROUP_X, WORKGROUP_Y, WORKGROUP_Z);
+cube_renderpass.instanceCount = NUMPARTICLES;
 
 
 const near = 0.1, far = 100;
