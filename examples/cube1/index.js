@@ -1,6 +1,7 @@
 
 import Points, { RenderPass, RenderPasses } from 'points';
 import { cube_renderpass } from './cube_renderpass/index.js';
+import { staticcube_renderpass } from './staticcube_renderpass/index.js';
 
 const options = {
     val: 0,
@@ -40,9 +41,12 @@ const nf = 1 / (near - far);
 // ];
 
 
+// TODO: loadOp: 'clear', // load
+
 const base = {
     renderPasses: [
-        cube_renderpass
+        cube_renderpass,
+        // staticcube_renderpass,
     ],
     /**
      * @param {Points} points
@@ -50,6 +54,12 @@ const base = {
     init: async (points, folder) => {
 
         cube_renderpass.addCube(
+            { x: 0, y: 0, z: 0 },
+            { width: 1, height: 1, depth: 1 },
+            { r: 1, g: 0, b: 0, a: 1 }
+        );
+
+        staticcube_renderpass.addCube(
             { x: 0, y: 0, z: 0 },
             { width: 1, height: 1, depth: 1 },
             { r: 1, g: 0, b: 0, a: 1 }
