@@ -4,6 +4,7 @@ struct Particle {
     position: vec3f,
     rotation: vec3f,
     color: vec3f,
+    init: u32,
 }
 
 `;

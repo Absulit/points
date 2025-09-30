@@ -1,15 +1,11 @@
 
-import Points from 'points';
-import { cube_renderpass } from './cube_renderpass/index.js';
+import Points, { RenderPass } from 'points';
+import vert from './cube_renderpass/vert.js';
+import frag from './cube_renderpass/frag.js';
+import compute from './cube_renderpass/compute.js';
 
 const options = {
     val: 0,
-    bool: false,
-    color1: '#FF0000', // CSS string
-    color2: [0, 128, 255], // RGB array
-    color3: [0, 128, 255, 0.3], // RGB with alpha
-    color4: { h: 350, s: 0.9, v: 0.3 }, // Hue, saturation, value
-    color5: { r: 115, g: 50.9, b: 20.3, a: .1 }, // r, g, b object
 }
 
 const WORKGROUP_X = 1;
@@ -22,6 +18,8 @@ const THREADS_Z = 1;
 
 const NUMPARTICLES = WORKGROUP_X * WORKGROUP_Y * WORKGROUP_Z * THREADS_X * THREADS_Y * THREADS_Z;
 console.log('NUMPARTICLES: ', NUMPARTICLES);
+
+const cube_renderpass = new RenderPass(vert, frag, compute, WORKGROUP_X, WORKGROUP_Y, WORKGROUP_Z);
 
 
 const near = 0.1, far = 100;
@@ -44,6 +42,10 @@ const base = {
             { r: 1, g: 0, b: 0, a: 1 }
         );
 
+        points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
+        points.setConstant('THREADS_X', THREADS_X, 'u32');
+        points.setConstant('THREADS_Y', THREADS_Y, 'u32');
+        points.setConstant('THREADS_Z', THREADS_Z, 'u32');
         points.setStorage('particles', `array<Particle, ${NUMPARTICLES}>`);
 
         aspect = points.canvas.width / points.canvas.height;

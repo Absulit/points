@@ -4,13 +4,13 @@ const compute = /*wgsl*/`
 
 ${structs}
 
-@compute @workgroup_size(8,8,1)
+@compute @workgroup_size(THREADS_X, THREADS_Y, THREADS_Z)
 fn main(
     @builtin(global_invocation_id) GlobalId: vec3<u32>,
     @builtin(workgroup_id) WorkGroupID: vec3<u32>,
     @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
 ) {
-    let time = params.time;
+    let index = GlobalId.x;
 }
 `;
 
