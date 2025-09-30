@@ -28,6 +28,22 @@ fn rotateZ(p:vec3<f32>, rads:f32 ) -> vec3<f32> {
     return vec3(xnew, ynew, p.z);
 }
 
+fn rotationMatrix(rotation: vec3f) -> mat3x3<f32> {
+    let cx = cos(rotation.x);
+    let sx = sin(rotation.x);
+    let cy = cos(rotation.y);
+    let sy = sin(rotation.y);
+    let cz = cos(rotation.z);
+    let sz = sin(rotation.z);
+
+    // Combined rotation: Rz * Ry * Rx
+    return mat3x3<f32>(
+        vec3f(cy * cz, cy * sz, -sy),
+        vec3f(sx * sy * cz - cx * sz, sx * sy * sz + cx * cz, sx * cy),
+        vec3f(cx * sy * cz + sx * sz, cx * sy * sz - sx * cz, cx * cy)
+    );
+}
+
 @vertex
 fn main(
     @location(0) position: vec4<f32>,
@@ -36,19 +52,27 @@ fn main(
     @builtin(vertex_index) vertexIndex: u32,
     @builtin(instance_index) instanceIndex: u32
 ) -> Fragment {
-    var pt = rotateZ(position.xyz, params.time * .9854);
-    pt = rotateY(pt, params.time * .94222);
-    pt = rotateX(pt, params.time * .865);
+    // var pt = rotateZ(position.xyz, params.time * .9854);
+    // pt = rotateY(pt, params.time * .94222);
+    // pt = rotateX(pt, params.time * .865);
 
-    pt.z = pt.z;
+    // pt.z = pt.z;
 
-    let world = pt;
+    // let world = pt;
+
+
+    let particle = particles[instanceIndex];
+
+    let rotMatrix = rotationMatrix(particle.rotation);
+    let rotated = rotMatrix * position.xyz;
+
+    let scaled = rotated * particle.scale;
+    let world = scaled + particle.position;
+
     let clip = params.projection * params.view * vec4f(world, 1.0);
 
-    // Project to clip space (assuming orthographic projection)
-    // let clip = vec4f(pt, 1.0);
+    return defaultVertexBody(clip, particle.color, uv);
 
-    return defaultVertexBody(clip, color, uv);
 }
 `;
 
