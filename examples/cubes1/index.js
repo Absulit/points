@@ -9,10 +9,10 @@ const options = {
 }
 
 const WORKGROUP_X = 2;
-const WORKGROUP_Y = 1;
-const WORKGROUP_Z = 1;
+const WORKGROUP_Y = 2;
+const WORKGROUP_Z = 2;
 
-const THREADS_X = 2;
+const THREADS_X = 1;
 const THREADS_Y = 1;
 const THREADS_Z = 1;
 

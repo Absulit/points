@@ -17,8 +17,15 @@ fn main(
 ) {
     // index = x + (y * numColumns) + (z * numColumns * numRows)
     // let index = GID.x * WID.x + (GID.y * THREADS_Y * WID.y) + (GID.z * THREADS_Z * THREADS_Z * WID.z);// + (GID.y * THREADS_X) + (GID.z * THREADS_X * THREADS_Y);
-    let X = WID.x * THREADS_X + LID.x;
-    let index = X;
+    let x = WID.x;
+    let y = WID.y * WORKGROUP_X;
+    let z = WID.z * WORKGROUP_X * WORKGROUP_Y;
+
+    let X = x;
+    let Y = y;
+    let Z = z;
+
+    let index = X + Y + Z;
 
     let particle = &particles[index];
 
@@ -32,13 +39,13 @@ fn main(
         rand_seed.x = f32(index);
 
         rand();
-        particle.position = vec3f(f32(X), f32(0), f32(0));
+        particle.position = vec3f(f32(X), f32(Y), -f32(Z));
 
         particle.position = (particle.position * flipTexture + flipTextureCoordinates);
 
         particle.color = vec4f(1);
         particle.scale = vec3f(.51);
-        particle.rotation = vec3f(rand_seed, rand_seed.y);
+        // particle.rotation = vec3f(rand_seed, rand_seed.y);
 
         particle.init = 1;
     }
