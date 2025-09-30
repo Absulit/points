@@ -1,7 +1,6 @@
-import vert from './vert.js';
-import compute from './compute.js';
-import frag from './frag.js';
+
 import Points, { RenderPass, RenderPasses } from 'points';
+import { cube_renderpass } from './cube_renderpass/index.js';
 
 const options = {
     val: 0,
@@ -13,7 +12,6 @@ const options = {
     color5: { r: 115, g: 50.9, b: 20.3, a: .1 }, // r, g, b object
 }
 
-const renderPass = new RenderPass(vert, frag, compute);
 
 const near = 0.1, far = 100;
 const f = 1.0 / Math.tan(Math.PI / 8); // ≈ 2.414
@@ -44,14 +42,14 @@ const nf = 1 / (near - far);
 
 const base = {
     renderPasses: [
-        renderPass
+        cube_renderpass
     ],
     /**
      * @param {Points} points
      */
     init: async (points, folder) => {
 
-        renderPass.addCube(
+        cube_renderpass.addCube(
             { x: 0, y: 0, z: 0 },
             { width: 1, height: 1, depth: 1 },
             { r: 1, g: 0, b: 0, a: 1 }
