@@ -38,17 +38,18 @@ fn main(
 ) -> Fragment {
 
     let particle = particles[instanceIndex];
-    // original position modification
-    // let pos = position + vec4f(particle.position,0,1);
 
-    // scale local quad position
-    let scaled = position.xyz * particle.scale;//.01;
+    var pt = rotateZ(position.xyz, params.time * .9854);
+    pt = rotateY(pt, params.time * .94222);
+    pt = rotateX(pt, params.time * .865);
 
-    // Translate to world position
-    let world = scaled + particle.position.xyz;
+    // Apply scale after rotation
+    let scaled = pt * particle.scale;
+
+    // Translate to world space
+    let world = scaled + particle.position;
 
     let clip = params.projection * params.view * vec4f(world, 1.0);
-
     return defaultVertexBody(clip, particle.color, uv);
 }
 `;

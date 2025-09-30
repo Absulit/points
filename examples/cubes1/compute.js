@@ -18,7 +18,7 @@ ${brightness}
 const SIZE = vec2f(800.,800.);
 const speed = 1.1; // .0001
 const SCREENSCALE = 2;
-const PARTICLE_SCALE = .01;
+const PARTICLE_SCALE = .1;
 
 fn particleInit(particles: ptr<storage, array<Particle,NUMPARTICLES>, read_write>, index:u32, wgid:vec3u) {
     let particle = &particles[index];

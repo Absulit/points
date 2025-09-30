@@ -3,6 +3,7 @@ export const structs = /*wgsl*/`
 struct Particle {
     start_position: vec3f,
     position: vec3f,
+    rotation: vec3f,
     color: vec4f,
     angle: f32,
     life: f32,
