@@ -1,57 +1,35 @@
-import vert from './vert.js';
-import compute0 from './compute.js';
-import frag1 from './frag.js';
-import Points, { RenderPass } from 'points';
+
+import { cube_renderpass } from './cube_renderpass/index.js';
 
 const options = {
-    maxLife: 100,
-    turbulenceScale: 100,
-    useVideo: true,
-    particleSize: 2,
+    val: 0,
+    bool: false,
+    color1: '#FF0000', // CSS string
+    color2: [0, 128, 255], // RGB array
+    color3: [0, 128, 255, 0.3], // RGB with alpha
+    color4: { h: 350, s: 0.9, v: 0.3 }, // Hue, saturation, value
+    color5: { r: 115, g: 50.9, b: 20.3, a: .1 }, // r, g, b object
 }
 
-const WORKGROUP_X = 2;
-const WORKGROUP_Y = 1;
-
-const THREADS_X = 256;
-const THREADS_Y = 1;
-
-const NUMPARTICLES = WORKGROUP_X * WORKGROUP_Y * THREADS_X * THREADS_Y;
-console.log(NUMPARTICLES);
-
-
-const instancedParticlesRenderPass = new RenderPass(vert, frag1, compute0, WORKGROUP_X, WORKGROUP_Y, 1)
-instancedParticlesRenderPass.instanceCount = NUMPARTICLES;
 
 const near = 0.1, far = 100;
-const f = 1.0 / Math.tan(Math.PI / 16); //8 // ≈ 2.414
+const f = 1.0 / Math.tan(Math.PI / 8); // ≈ 2.414
 let aspect = null
 const nf = 1 / (near - far);
 
 const base = {
     renderPasses: [
-        instancedParticlesRenderPass,
+        cube_renderpass,
     ],
     /**
      * @param {Points} points
      */
     init: async (points, folder) => {
 
-        instancedParticlesRenderPass.addCube(
+        cube_renderpass.addCube(
             { x: 0, y: 0, z: 0 },
             { width: 1, height: 1, depth: 1 },
-            { r: 0, b: 0, b: 0, a: 1 },
-        )
-
-        points.depthWriteEnabled = false;
-        points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
-        points.setConstant('THREADS_X', THREADS_X, 'u32');
-        points.setConstant('THREADS_Y', THREADS_Y, 'u32');
-        points.setStorage(
-            'particles',
-            `array<Particle, ${NUMPARTICLES}>`,
-            false,
-            GPUShaderStage.VERTEX | GPUShaderStage.COMPUTE
+            { r: 1, g: 0, b: 0, a: 1 }
         );
 
         aspect = points.canvas.width / points.canvas.height;
@@ -78,24 +56,31 @@ const base = {
             'mat4x4<f32>'
         )
 
-        points.setUniform('maxLife', options.maxLife);
-        folder.add(options, 'maxLife', 1, 600, .0001).name('maxLife');
 
-        points.setUniform('turbulenceScale', options.turbulenceScale);
-        folder.add(options, 'turbulenceScale', 10, 1024, .0001).name('turbulenceScale');
+        // Add elements to dat gui
+        // create an uniform and get value from options
+        points.setUniform('val', options.val);
 
-        points.setUniform('useVideo', false);
-        folder.add(options, 'useVideo').name('useVideo');
+        // https://github.com/dataarts/dat.gui/blob/master/API.md#GUI+add
+        folder.add(options, 'val', -1, 1, .0001).name('Val');
+        folder.add(options, 'bool').name('Bool');
 
-        points.setUniform('particleSize', options.particleSize);
-        folder.add(options, 'particleSize', 1, 10, .0001).name('particleSize');
+        // https://github.com/dataarts/dat.gui/blob/master/API.md#GUI+addColor
+        folder.addColor(options, 'color1');
+        folder.addColor(options, 'color2');
+        folder.addColor(options, 'color3');
+        folder.addColor(options, 'color4');
+        folder.addColor(options, 'color5');
 
         folder.open();
+
+
     },
     /**
      * @param {Points} points
      */
     update: points => {
+
         aspect = points.canvas.width / points.canvas.height;
         points.setUniform(
             'projection',
@@ -107,12 +92,7 @@ const base = {
             ]
         )
 
-
-
-        points.setUniform('useVideo', options.useVideo);
-        points.setUniform('maxLife', options.maxLife);
-        points.setUniform('turbulenceScale', options.turbulenceScale);
-        points.setUniform('particleSize', options.particleSize);
+        points.setUniform('val', options.val);
     }
 }
 
