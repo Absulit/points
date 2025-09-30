@@ -411,6 +411,12 @@ class RenderPass {
     }
 
 
+    /**
+     *
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {{width:Number, height:Number, depth:Number}} dimensions
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     */
     addCube(coordinate, dimensions, color) {
         const { x, y, z } = coordinate;
         const { width, height, depth } = dimensions;
