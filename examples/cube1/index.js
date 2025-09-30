@@ -20,6 +20,27 @@ const f = 1.0 / Math.tan(Math.PI / 8); // ≈ 2.414
 let aspect = null
 const nf = 1 / (near - far);
 
+// const left = -1;
+// const right = 1;
+// const bottom = -1;
+// const top = 1;
+// const near = 0.1;
+// const far = 100;
+
+// const lr = 1 / (right - left);
+// const bt = 1 / (top - bottom);
+// const nf = 1 / (near - far);
+
+// const orthoMatrix = [
+//   2 * lr, 0,       0,              0,
+//   0,      2 * bt,  0,              0,
+//   0,      0,       2 * nf,         0,
+//   -(right + left) * lr,
+//   -(top + bottom) * bt,
+//   (far + near) * nf,
+//   1
+// ];
+
 
 const base = {
     renderPasses: [
@@ -98,8 +119,6 @@ const base = {
                 0, 0, (2 * far * near) * nf, 0
             ]
         )
-
-
 
         points.setUniform('val', options.val);
     }
