@@ -8,13 +8,13 @@ const options = {
     val: 0,
 }
 
-const WORKGROUP_X = 1;
+const WORKGROUP_X = 2;
 const WORKGROUP_Y = 1;
 const WORKGROUP_Z = 1;
 
-const THREADS_X = 4;
-const THREADS_Y = 2;
-const THREADS_Z = 2;
+const THREADS_X = 2;
+const THREADS_Y = 1;
+const THREADS_Z = 1;
 
 const NUMPARTICLES = WORKGROUP_X * WORKGROUP_Y * WORKGROUP_Z * THREADS_X * THREADS_Y * THREADS_Z;
 console.log('NUMPARTICLES: ', NUMPARTICLES);
@@ -44,10 +44,17 @@ const base = {
         );
 
         points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
+        points.setConstant('WORKGROUP_X', WORKGROUP_X, 'u32');
+        points.setConstant('WORKGROUP_Y', WORKGROUP_Y, 'u32');
+        points.setConstant('WORKGROUP_Z', WORKGROUP_Z, 'u32');
         points.setConstant('THREADS_X', THREADS_X, 'u32');
         points.setConstant('THREADS_Y', THREADS_Y, 'u32');
         points.setConstant('THREADS_Z', THREADS_Z, 'u32');
         points.setStorage('particles', `array<Particle, ${NUMPARTICLES}>`);
+
+        points.addEventListener('log', data => {
+            console.log('Array Max:', data[0] + 1);
+        }, 1)
 
         aspect = points.canvas.width / points.canvas.height;
         points.setUniform(

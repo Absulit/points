@@ -1190,6 +1190,8 @@ class Points {
         }
         if (!adapter) { return false; }
         this.#device = await adapter.requestDevice();
+        console.log(this.#device.limits);
+
         this.#device.lost.then(info => console.log(info));
         if (this.#canvas !== null) this.#context = this.#canvas.getContext('webgpu');
         this.#presentationFormat = navigator.gpu.getPreferredCanvasFormat();
