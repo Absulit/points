@@ -23,6 +23,11 @@ console.log(NUMPARTICLES);
 const instancedParticlesRenderPass = new RenderPass(vert, frag1, compute0, WORKGROUP_X, WORKGROUP_Y, 1)
 instancedParticlesRenderPass.instanceCount = NUMPARTICLES;
 
+const near = 0.1, far = 100;
+const f = 1.0 / Math.tan(Math.PI / 8); // ≈ 2.414
+let aspect = null
+const nf = 1 / (near - far);
+
 const base = {
     renderPasses: [
         instancedParticlesRenderPass,
@@ -49,14 +54,29 @@ const base = {
             GPUShaderStage.VERTEX | GPUShaderStage.COMPUTE
         );
 
-        points.setSampler('imageSampler', null);
-        // await points.setTextureImage('image', './../img/webgpu_800x800.png');
-        await points.setTextureImage('image', './../img/absulit_800x800.jpg');
-        // await points.setTextureVideo('video', './../img/6982698-hd_1440_1080_25fps_800x800.mp4');
-        // await points.setTextureVideo('video', './../img/3641672-hd_1920_1080_24fps_800x800.mp4');
-        await points.setTextureVideo('video', './../img/8056464-hd_1080_1920_30fps_800x800.mp4');
-        // await points.setTextureVideo('video', './../img/pexels-shubh-haque-4746616-960x540-30fps.mp4');
+        aspect = points.canvas.width / points.canvas.height;
+        points.setUniform(
+            'projection',
+            [
+                f / aspect, 0, 0, 0,
+                0, f, 0, 0,
+                0, 0, (far + near) * nf, -1,
+                0, 0, (2 * far * near) * nf, 0
+            ],
+            'mat4x4<f32>'
+        )
 
+        // camera at [0, 0, 5], looking at origin
+        points.setUniform(
+            'view',
+            [
+                1, 0, 0, 0,
+                0, 1, 0, 0,
+                0, 0, 1, 0,
+                0, 0, -5, 1
+            ],
+            'mat4x4<f32>'
+        )
 
         points.setUniform('maxLife', options.maxLife);
         folder.add(options, 'maxLife', 1, 600, .0001).name('maxLife');
@@ -76,6 +96,19 @@ const base = {
      * @param {Points} points
      */
     update: points => {
+        aspect = points.canvas.width / points.canvas.height;
+        points.setUniform(
+            'projection',
+            [
+                f / aspect, 0, 0, 0,
+                0, f, 0, 0,
+                0, 0, (far + near) * nf, -1,
+                0, 0, (2 * far * near) * nf, 0
+            ]
+        )
+
+
+
         points.setUniform('useVideo', options.useVideo);
         points.setUniform('maxLife', options.maxLife);
         points.setUniform('turbulenceScale', options.turbulenceScale);

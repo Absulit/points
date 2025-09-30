@@ -26,7 +26,7 @@ fn particleInit(particles: ptr<storage, array<Particle,NUMPARTICLES>, read_write
     rand();
     let flipTexture = vec2(1.,-1.);
     let flipTextureCoordinates = vec2(-.5,.5);
-    var start_position = rand_seed.xy;
+    var start_position = vec3(rand_seed.xy, 0);
     rand();
     let angle = rand_seed.x * TAU;
 
@@ -35,7 +35,7 @@ fn particleInit(particles: ptr<storage, array<Particle,NUMPARTICLES>, read_write
 
 
     rand();
-    start_position = (start_position * flipTexture + flipTextureCoordinates) * SCREENSCALE;
+    // start_position = (start_position * flipTexture + flipTextureCoordinates) * SCREENSCALE;
 
     particle.position = start_position;
     particle.start_position = start_position;
@@ -68,9 +68,9 @@ fn main(
         particle.init = 1;
     }
 
-    let n = snoise(particle.position / params.turbulenceScale + params.time * .1);
+    let n = snoise(particle.position.xy / params.turbulenceScale + params.time * .1);
     let increment = polar(particle.speed + .1 * n, particle.angle) ;
-    particle.position += increment / SIZE;
+    particle.position += vec3(increment / SIZE, 0);
     particle.life += 1 + particle.speed;
 
     let particle_position = particle.position;
@@ -78,7 +78,7 @@ fn main(
     let life_percent = particle.life / particle.life_limit;
     particle.color = vec4f(particle.color.rgb, (1. - life_percent) * life_percent * 2);
 
-    if(particle.life >= particle.life_limit || any(particle_position > vec2f(SCREENSCALE)) || any(particle_position < vec2f(-SCREENSCALE)) || particle.color.a == 0.){
+    if(particle.life >= particle.life_limit || any(particle_position.xy > vec2f(SCREENSCALE)) || any(particle_position.xy < vec2f(-SCREENSCALE)) || particle.color.a == 0.){
         particleInit(&particles, index, WorkGroupID);
     }
 }
