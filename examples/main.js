@@ -44,7 +44,7 @@ stats.dom.style.display = 'inline-block';
 document.getElementsByClassName('right')[0].appendChild(stats.dom);
 
 const capturer = new CCapture({
-    format: 'webm',
+    format: 'jpg',
     //timeLimit: 10,
     verbose: true
 });
