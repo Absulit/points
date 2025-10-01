@@ -56,15 +56,18 @@ fn main(
 
         // particle.position = (particle.position * flipTexture + flipTextureCoordinates);
 
-        particle.color = vec4f(1);
-        particle.scale = vec3f(.51);
+        particle.color = vec4f(rand_seed, rand_seed.y, 1);
+        particle.scale = vec3f(.31);
         particle.rotation = vec3f(rand_seed, rand_seed.y);
 
         particle.init = 1;
     }
-    // let n = snoise(particle.position.xy/65000 + params.time * .0000001);
+    let n = snoise(particle.position.xy/65000 + params.time * .0000001);
     // particle.rotation += vec3f(0,n * TAU,  -(n * TAU));
-    particle.rotation += vec3f(0,params.delta,params.delta);
+    rand_seed.y = f32(index);
+    rand();
+    let dir = mix(-1, 1, step(.5, rand_seed.y));
+    particle.rotation += vec3f(params.delta, params.delta * n * dir, params.delta * dir);
 
     // particle.position += vec3f(0, sin(f32(index) + params.delta),0) * .001;
 

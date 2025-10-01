@@ -44,6 +44,23 @@ fn rotationMatrix(rotation: vec3f) -> mat3x3<f32> {
     );
 }
 
+fn customVertexBody(position:vec4f, color:vec4f, depth:vec4f, uv:vec2f) -> CustomFragment {
+    var result: CustomFragment;
+
+    let ratioX = params.screen.x / params.screen.y;
+    let ratioY = 1. / ratioX / (params.screen.y / params.screen.x);
+    result.ratio = vec2(ratioX, ratioY);
+    result.position = position;
+    result.color = color;
+    result.uv = uv;
+    result.uvr = vec2(uv.x * result.ratio.x, uv.y);
+    result.mouse = vec2(params.mouse.x / params.screen.x, params.mouse.y / params.screen.y);
+    result.mouse = result.mouse * vec2(1.,-1.) - vec2(0., -1.); // flip and move up
+    result.depth = depth;
+
+    return result;
+}
+
 @vertex
 fn main(
     @location(0) position: vec4<f32>,
@@ -51,7 +68,7 @@ fn main(
     @location(2) uv: vec2<f32>,
     @builtin(vertex_index) vertexIndex: u32,
     @builtin(instance_index) instanceIndex: u32
-) -> Fragment {
+) -> CustomFragment {
     let particle = particles[instanceIndex];
 
     let rotMatrix = rotationMatrix(particle.rotation);
@@ -63,7 +80,10 @@ fn main(
     let clip = params.projection * params.view * vec4f(world, 1.0);
 
     // let uvColor = vec4f(uv, 0, 1);
-    return defaultVertexBody(clip, vec4f(-particle.position.z * .09), uv);
+
+    let depth = vec4f(-particle.position.z * .0534);
+
+    return customVertexBody(clip, particle.color, depth, uv);;
 
 }
 `;
