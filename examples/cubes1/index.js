@@ -8,13 +8,13 @@ const options = {
     val: 0,
 }
 
-const WORKGROUP_X = 2;
-const WORKGROUP_Y = 2;
-const WORKGROUP_Z = 2;
+const WORKGROUP_X = 16;
+const WORKGROUP_Y = 4;
+const WORKGROUP_Z = 4;
 
-const THREADS_X = 1;
-const THREADS_Y = 1;
-const THREADS_Z = 1;
+const THREADS_X = 8;
+const THREADS_Y = 8;
+const THREADS_Z = 4;
 
 const NUMPARTICLES = WORKGROUP_X * WORKGROUP_Y * WORKGROUP_Z * THREADS_X * THREADS_Y * THREADS_Z;
 console.log('NUMPARTICLES: ', NUMPARTICLES);

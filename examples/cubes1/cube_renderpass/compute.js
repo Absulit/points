@@ -9,6 +9,12 @@ ${PI}
 ${TAU}
 ${rand}
 
+const WIDTH = 6i;
+const HEIGHT = 6i;
+
+const HWIDTH = WIDTH / 2;
+const HHEIGHT = HEIGHT / 2;
+
 @compute @workgroup_size(THREADS_X, THREADS_Y, THREADS_Z)
 fn main(
     @builtin(global_invocation_id) GID: vec3u,
@@ -16,16 +22,18 @@ fn main(
     @builtin(local_invocation_id) LID: vec3u
 ) {
     // index = x + (y * numColumns) + (z * numColumns * numRows)
-    // let index = GID.x * WID.x + (GID.y * THREADS_Y * WID.y) + (GID.z * THREADS_Z * THREADS_Z * WID.z);// + (GID.y * THREADS_X) + (GID.z * THREADS_X * THREADS_Y);
-    let x = WID.x;
-    let y = WID.y * WORKGROUP_X;
-    let z = WID.z * WORKGROUP_X * WORKGROUP_Y;
+
+    let x = WID.x * THREADS_X + LID.x;
+    let y = WID.y * THREADS_Y + LID.y;
+    let z = WID.z * THREADS_Z + LID.z;
 
     let X = x;
-    let Y = y;
-    let Z = z;
+    let Y = y * (WORKGROUP_X * THREADS_X);
+    let Z = z * (WORKGROUP_X * THREADS_X) * (WORKGROUP_Y * THREADS_Y);
 
-    let index = X + Y + Z;
+    let index = i32(X + Y + Z);
+
+
 
     let particle = &particles[index];
 
@@ -39,19 +47,22 @@ fn main(
         rand_seed.x = f32(index);
 
         rand();
-        particle.position = vec3f(f32(X), f32(Y), -f32(Z));
+        let x = index % WIDTH;
+        let y = (index / WIDTH) % HEIGHT;
+        let z = index / (WIDTH * HEIGHT);
+        particle.position = vec3f(f32(x - HWIDTH), f32(y - HHEIGHT), -f32(z));
 
-        particle.position = (particle.position * flipTexture + flipTextureCoordinates);
+        // particle.position = (particle.position * flipTexture + flipTextureCoordinates);
 
         particle.color = vec4f(1);
         particle.scale = vec3f(.51);
-        // particle.rotation = vec3f(rand_seed, rand_seed.y);
+        particle.rotation = vec3f(rand_seed, rand_seed.y);
 
         particle.init = 1;
     }
-    // particle.rotation = particle.rotation + vec3f(0,TAU*.1,TAU * .1) * .01;
+    particle.rotation = particle.rotation + vec3f(0,TAU*.1,TAU * .1) * .01;
 
-    // particle.position += vec3f(0, sin(params.time),0) * .01;
+    // particle.position += vec3f(0, sin(f32(index) + params.time),0) * .01;
 
 
 }
