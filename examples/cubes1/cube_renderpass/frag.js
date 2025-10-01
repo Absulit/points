@@ -23,7 +23,7 @@ fn main(
     let c = fnusin(uvr.x * uvr.y * 10.);
     let d = distance(a,b);
     let f = d * uvr.x * uvr.y;
-    let finalColor:vec4f = vec4(a*d,f*c*a,f, 1.);
+    let finalColor:vec4f = vec4(a*d,f*c*a,f, 1.) * color * 3;
 
     return finalColor;
 }

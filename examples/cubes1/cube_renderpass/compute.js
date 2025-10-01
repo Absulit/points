@@ -9,8 +9,8 @@ ${PI}
 ${TAU}
 ${rand}
 
-const WIDTH = 6i;
-const HEIGHT = 6i;
+const WIDTH = 15i;
+const HEIGHT = 15i;
 
 const HWIDTH = WIDTH / 2;
 const HHEIGHT = HEIGHT / 2;
@@ -39,10 +39,10 @@ fn main(
 
     let flipTexture = vec3(1.,-1.,1);
     let flipTextureCoordinates = vec3(-.5,.5,1);
-        if(f32(index)>log_data[0]){
-            log_data[0] = f32(index);
-            log.updated = 1;
-        }
+    // if(f32(index)>log_data[0]){
+    //     log_data[0] = f32(index);
+    //     log.updated = 1;
+    // }
     if(particle.init == 0){
         rand_seed.x = f32(index);
 
@@ -60,9 +60,9 @@ fn main(
 
         particle.init = 1;
     }
-    particle.rotation = particle.rotation + vec3f(0,TAU*.1,TAU * .1) * .01;
+    particle.rotation += vec3f(0,params.delta,params.delta);
 
-    // particle.position += vec3f(0, sin(f32(index) + params.time),0) * .01;
+    // particle.position += vec3f(0, sin(f32(index) + params.delta),0) * .001;
 
 
 }

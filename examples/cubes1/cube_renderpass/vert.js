@@ -71,7 +71,8 @@ fn main(
 
     let clip = params.projection * params.view * vec4f(world, 1.0);
 
-    return defaultVertexBody(clip, particle.color, uv);
+    // let uvColor = vec4f(uv, 0, 1);
+    return defaultVertexBody(clip, vec4f(-particle.position.z * .09), uv);
 
 }
 `;
