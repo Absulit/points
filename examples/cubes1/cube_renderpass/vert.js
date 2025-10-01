@@ -44,7 +44,7 @@ fn rotationMatrix(rotation: vec3f) -> mat3x3<f32> {
     );
 }
 
-fn customVertexBody(position:vec4f, color:vec4f, depth:vec4f, uv:vec2f) -> CustomFragment {
+fn customVertexBody(position:vec4f, color:vec4f, depth:vec4f, noise:f32, uv:vec2f) -> CustomFragment {
     var result: CustomFragment;
 
     let ratioX = params.screen.x / params.screen.y;
@@ -57,6 +57,7 @@ fn customVertexBody(position:vec4f, color:vec4f, depth:vec4f, uv:vec2f) -> Custo
     result.mouse = vec2(params.mouse.x / params.screen.x, params.mouse.y / params.screen.y);
     result.mouse = result.mouse * vec2(1.,-1.) - vec2(0., -1.); // flip and move up
     result.depth = depth;
+    result.noise = noise;
 
     return result;
 }
@@ -83,7 +84,7 @@ fn main(
 
     let depth = vec4f(-particle.position.z * .0534);
 
-    return customVertexBody(clip, particle.color, depth, uv);;
+    return customVertexBody(clip, particle.color, depth, particle.noise, uv);;
 
 }
 `;

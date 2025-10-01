@@ -20,7 +20,7 @@ fn main(
     let c = fnusin(input.uvr.x * input.uvr.y * 10.);
     let d = distance(a,b);
     let f = d * input.uvr.x * input.uvr.y;
-    let finalColor:vec4f = vec4(a*d,f*c*a,f, 1.);
+    let finalColor:vec4f = vec4(a*d-input.noise,f*c*a,f, 1.);
 
     // let n = snoise(input.uvr / .5);
     // let finalColor = vec4(n);

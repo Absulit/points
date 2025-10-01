@@ -35,8 +35,6 @@ fn main(
 
     let index = i32(X + Y + Z);
 
-
-
     let particle = &particles[index];
 
     let flipTexture = vec3(1.,-1.,1);
@@ -62,14 +60,14 @@ fn main(
 
         particle.init = 1;
     }
-    let n = snoise(particle.position.xy/65000 + params.time * .0000001);
-    // particle.rotation += vec3f(0,n * TAU,  -(n * TAU));
+    let n = snoise(particle.position.xy + params.time);
+    particle.noise = n;
     rand_seed.y = f32(index);
     rand();
     let dir = mix(-1, 1, step(.5, rand_seed.y));
     particle.rotation += vec3f(params.delta, params.delta * n * dir, params.delta * dir);
 
-    // particle.position += vec3f(0, sin(f32(index) + params.delta),0) * .001;
+    // particle.position += vec3f(0, sin(n),0) * .001;
 
 
 }

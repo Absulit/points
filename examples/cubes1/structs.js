@@ -8,6 +8,7 @@ struct CustomFragment {
     @location(3) uvr: vec2f,
     @location(4) mouse: vec2f,
     @location(5) depth: vec4f,
+    @location(6) noise: f32,
 }
 
 struct Particle {
@@ -15,6 +16,7 @@ struct Particle {
     rotation: vec3f,
     scale: vec3f,
     color: vec4f,
+    noise: f32,
     init: u32,
 }
 
