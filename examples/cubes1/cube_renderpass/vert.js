@@ -90,7 +90,7 @@ fn main(
 
     // let uvColor = vec4f(uv, 0, 1);
 
-    let depth = vec4f(-particle.position.z * .0534);
+    let depth = vec4f(-particle.position.z / 253);
 
     return customVertexBody(clip, particle.color, depth, particle.noise, uv);;
 

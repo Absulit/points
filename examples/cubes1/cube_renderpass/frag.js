@@ -25,7 +25,8 @@ fn main(
     // let n = snoise(input.uvr / .5);
     // let finalColor = vec4(n);
 
-    return finalColor * (1-input.depth);
+    let depth = clamp(input.depth.r * 8, 0, 1);
+    return vec4f(finalColor.rgb * (1-depth), 1);
 }
 `;
 
