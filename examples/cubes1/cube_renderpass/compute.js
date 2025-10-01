@@ -1,6 +1,7 @@
 import { PI, TAU } from 'points/math';
 import { structs } from '../structs.js';
 import { rand } from 'points/random';
+import { snoise } from 'points/noise2d';
 
 const compute = /*wgsl*/`
 
@@ -8,6 +9,7 @@ ${structs}
 ${PI}
 ${TAU}
 ${rand}
+${snoise}
 
 const WIDTH = 15i;
 const HEIGHT = 15i;
@@ -60,6 +62,8 @@ fn main(
 
         particle.init = 1;
     }
+    // let n = snoise(particle.position.xy/65000 + params.time * .0000001);
+    // particle.rotation += vec3f(0,n * TAU,  -(n * TAU));
     particle.rotation += vec3f(0,params.delta,params.delta);
 
     // particle.position += vec3f(0, sin(f32(index) + params.delta),0) * .001;

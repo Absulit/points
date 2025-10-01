@@ -52,15 +52,6 @@ fn main(
     @builtin(vertex_index) vertexIndex: u32,
     @builtin(instance_index) instanceIndex: u32
 ) -> Fragment {
-    // var pt = rotateZ(position.xyz, params.time * .9854);
-    // pt = rotateY(pt, params.time * .94222);
-    // pt = rotateX(pt, params.time * .865);
-
-    // pt.z = pt.z;
-
-    // let world = pt;
-
-
     let particle = particles[instanceIndex];
 
     let rotMatrix = rotationMatrix(particle.rotation);

@@ -81,7 +81,7 @@ const base = {
         )
 
         points.setUniform('val', options.val);
-        folder.add(options, 'val', -1, 1, .0001).name('Val');
+        folder.add(options, 'val', 0, 2, .0001).name('Val');
 
         folder.open();
     },
