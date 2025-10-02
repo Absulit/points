@@ -376,7 +376,6 @@ class RenderPass {
         this.#vertexBuffer = val;
     }
 
-
     /**
      * - **currently for internal use**<br>
      * - **might be private in the future**<br>
@@ -409,7 +408,6 @@ class RenderPass {
             +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * .5, (-nh + 1) * .5,// 5 bottom right
         );
     }
-
 
     /**
      * Adds a mesh cube
@@ -475,20 +473,6 @@ class RenderPass {
             }
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }
 
