@@ -399,13 +399,15 @@ class RenderPass {
         const { r: r1, g: g1, b: b1, a: a1 } = colors[1];
         const { r: r2, g: g2, b: b2, a: a2 } = colors[2];
         const { r: r3, g: g3, b: b3, a: a3 } = colors[3];
+        const normals = [ 0, 0, 1];
+
         this.#vertexArray.push(
-            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * .5, (+ny + 1) * .5,// 0 top left
-            +nw, +ny, nz, 1, r1, g1, b1, a1, (+nw + 1) * .5, (+ny + 1) * .5,// 1 top right
-            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * .5, (-nh + 1) * .5,// 2 bottom right
-            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * .5, (+ny + 1) * .5,// 3 top left
-            +nx, -nh, nz, 1, r2, g2, b2, a2, (+nx + 1) * .5, (-nh + 1) * .5,// 4 bottom left
-            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * .5, (-nh + 1) * .5,// 5 bottom right
+            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * .5, (+ny + 1) * .5, ...normals, // 0 top left
+            +nw, +ny, nz, 1, r1, g1, b1, a1, (+nw + 1) * .5, (+ny + 1) * .5, ...normals, // 1 top right
+            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * .5, (-nh + 1) * .5, ...normals, // 2 bottom right
+            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * .5, (+ny + 1) * .5, ...normals, // 3 top left
+            +nx, -nh, nz, 1, r2, g2, b2, a2, (+nx + 1) * .5, (-nh + 1) * .5, ...normals, // 4 bottom left
+            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * .5, (-nh + 1) * .5, ...normals, // 5 bottom right
         );
     }
 
@@ -442,6 +444,15 @@ class RenderPass {
             [[0, 0], [1, 0], [1, 1], [0, 1]], // bottom
         ];
 
+        const faceNormals = [
+            [0, 0, -1],  // back
+            [0, 0, 1],   // front
+            [-1, 0, 0],  // left
+            [1, 0, 0],   // right
+            [0, 1, 0],   // top
+            [0, -1, 0],  // bottom
+        ];
+
         const faces = [
             [0, 1, 2, 3], // back
             [5, 4, 7, 6], // front
@@ -455,6 +466,9 @@ class RenderPass {
             const [i0, i1, i2, i3] = faces[i];
             // const color = faceColors[i];
             const { r, g, b, a } = color;
+            const normals = faceNormals[i];
+            console.log(normals);
+
 
             const v = [corners[i0], corners[i1], corners[i2], corners[i3]];
 
@@ -469,7 +483,7 @@ class RenderPass {
             ];
 
             for (const [[vx, vy, vz], [u, v]] of verts) {
-                this.#vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v);
+                this.#vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normals);
             }
         }
     }
