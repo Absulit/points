@@ -81,12 +81,12 @@ fn main(
     let scaled = rotated * particle.scale;
     let world = scaled + particle.position;
 
-    var view = params.view;
-    view[3][0] = fnusin(.5); // x
-    view[3][1] = fnusin(.869); // y
-    view[3][2] = fusin(1.1) - 5; // z
+    // var view = params.view;
+    // view[3][0] = fnusin(.5); // x
+    // view[3][1] = fnusin(.869); // y
+    // view[3][2] = fusin(1.1) - 5; // z
 
-    let clip = params.projection * view * vec4f(world, 1.0);
+    let clip = params.projection * params.view * vec4f(world, 1.0);
 
     // let uvColor = vec4f(uv, 0, 1);
 

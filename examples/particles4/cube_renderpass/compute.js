@@ -43,14 +43,17 @@ fn main(
     //     log_data[0] = f32(index);
     //     log.updated = 1;
     // }
+    let MAXHEIGHT = 2.5;
     if(particle.init == 0){
         rand_seed.x = f32(index);
 
         rand();
-        let x = index % WIDTH;
-        let y = (index / WIDTH) % HEIGHT;
-        let z = index / (WIDTH * HEIGHT);
-        particle.position = vec3f(f32(x - HWIDTH), f32(y - HHEIGHT), -f32(z));
+        // let x = index % WIDTH;
+        // let y = (index / WIDTH) % HEIGHT;
+        // let z = index / (WIDTH * HEIGHT);
+        let height = MAXHEIGHT * rand_seed.x * mix(1,0, f32(particle.init_height));
+        particle.position = vec3f(0, height,0);
+        particle.init_height = 1;
 
         // particle.position = (particle.position * flipTexture + flipTextureCoordinates);
 
@@ -60,14 +63,24 @@ fn main(
 
         particle.init = 1;
     }
-    let n = snoise(particle.position.xy + params.time);
+    let n = snoise(particle.position.xy / 200 + params.time * .01);
     particle.noise = n;
     rand_seed.y = f32(index);
     rand();
     let dir = mix(-1, 1, step(.5, rand_seed.y));
+
+
     particle.rotation += vec3f(params.delta, params.delta * n * dir, params.delta * dir);
 
-    // particle.position += vec3f(0, sin(n),0) * .001;
+    let scaleFactor = particle.position.y / MAXHEIGHT;
+    particle.scale = vec3f(mix(.5, .01, 1 - scaleFactor * (1-scaleFactor) * 2));
+    particle.position += vec3f(rand_seed.x * .01 * dir, params.delta * 1 + particle.color.x * .001, rand_seed.y * .01 * dir);
+
+
+
+    if(particle.position.y > MAXHEIGHT){
+        particle.init = 0;
+    }
 
 
 }

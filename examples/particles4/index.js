@@ -8,12 +8,20 @@ const options = {
     val: 0,
 }
 
-const WORKGROUP_X = 16;
-const WORKGROUP_Y = 4;
-const WORKGROUP_Z = 4;
+// const WORKGROUP_X = 16;
+// const WORKGROUP_Y = 4;
+// const WORKGROUP_Z = 4;
 
-const THREADS_X = 8;
-const THREADS_Y = 8;
+// const THREADS_X = 8;
+// const THREADS_Y = 8;
+// const THREADS_Z = 4;
+
+const WORKGROUP_X = 1;
+const WORKGROUP_Y = 1;
+const WORKGROUP_Z = 1;
+
+const THREADS_X = 4;
+const THREADS_Y = 4;
 const THREADS_Z = 4;
 
 const NUMPARTICLES = WORKGROUP_X * WORKGROUP_Y * WORKGROUP_Z * THREADS_X * THREADS_Y * THREADS_Z;
@@ -75,7 +83,7 @@ const base = {
                 1, 0, 0, 0,
                 0, 1, 0, 0,
                 0, 0, 1, 0,
-                0, 0, -5, 1
+                0, -1.5, -5, 1
             ],
             'mat4x4<f32>'
         )

@@ -18,7 +18,7 @@ fn main(
     let c = fnusin(input.uvr.x * input.uvr.y * 10.);
     let d = distance(a,b);
     let f = d * input.uvr.x * input.uvr.y;
-    let finalColor:vec4f = vec4(a*d-input.noise,f*c*a,f, 1.);
+    let finalColor:vec4f = vec4(f,f*c*a,f, 1.);
 
     let depth = clamp(input.depth.r * 8, 0, 1);
     return vec4f(finalColor.rgb * (1-depth), 1);
