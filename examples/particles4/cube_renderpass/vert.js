@@ -67,9 +67,10 @@ fn customVertexBody(position:vec4f, color:vec4f, depth:vec4f, noise:f32, uv:vec2
 
 @vertex
 fn main(
-    @location(0) position: vec4<f32>,
-    @location(1) color: vec4<f32>,
-    @location(2) uv: vec2<f32>,
+    @location(0) position: vec4f,
+    @location(1) color: vec4f,
+    @location(2) uv: vec2f,
+    @location(3) normal: vec3f,
     @builtin(vertex_index) vertexIndex: u32,
     @builtin(instance_index) instanceIndex: u32
 ) -> CustomFragment {
