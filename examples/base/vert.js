@@ -9,7 +9,7 @@ fn main(
     @builtin(vertex_index) vertexIndex: u32
 ) -> Fragment {
 
-    return defaultVertexBody(position, color, uv);
+    return defaultVertexBody(position, color, uv, normal);
 }
 `;
 

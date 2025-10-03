@@ -19,7 +19,8 @@ struct Fragment {
     @location(1) uv: vec2f,
     @location(2) ratio: vec2f,
     @location(3) uvr: vec2f,
-    @location(4) mouse: vec2f
+    @location(4) mouse: vec2f,
+    @location(5) normal: vec3f
 }
 
 struct Sound {

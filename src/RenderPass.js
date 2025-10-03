@@ -467,8 +467,6 @@ class RenderPass {
             // const color = faceColors[i];
             const { r, g, b, a } = color;
             const normals = faceNormals[i];
-            console.log(normals);
-
 
             const v = [corners[i0], corners[i1], corners[i2], corners[i3]];
 
