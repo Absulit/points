@@ -30,8 +30,8 @@ const base = {
         folder.add(options, 'scale', 0, 1, .0001).name('scale');
         folder.add(options, 'displace').name('displace');
 
-        points.setStorage('variables', 'Variables');
-        points.setStorage('colors', 'array<vec3f, 6>');
+        points.setStorage('variables', 'Variables', false, GPUShaderStage.FRAGMENT);
+        points.setStorage('colors', 'array<vec3f, 6>', false, GPUShaderStage.FRAGMENT);
 
         folder.open();
     },
