@@ -5,7 +5,6 @@ import frag from './cube_renderpass/frag.js';
 import compute from './cube_renderpass/compute.js';
 
 const options = {
-    val: 0,
 }
 
 // const WORKGROUP_X = 16;
@@ -88,9 +87,6 @@ const base = {
             'mat4x4<f32>'
         )
 
-        points.setUniform('val', options.val);
-        folder.add(options, 'val', 0, 2, .0001).name('Val');
-
         folder.open();
     },
     /**
@@ -108,8 +104,6 @@ const base = {
                 0, 0, (2 * far * near) * nf, 0
             ]
         )
-
-        points.setUniform('val', options.val);
     }
 }
 
