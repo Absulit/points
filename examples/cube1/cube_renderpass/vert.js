@@ -34,19 +34,39 @@ fn main(
     @builtin(vertex_index) vertexIndex: u32,
     @builtin(instance_index) instanceIndex: u32
 ) -> Fragment {
-    var pt = rotateZ(position.xyz, params.time * .9854);
-    pt = rotateY(pt, params.time * .94222);
-    pt = rotateX(pt, params.time * .865);
+    let angleZ = params.time * 0.9854;
+    let angleY = params.time * 0.94222;
+    let angleX = params.time * 0.865;
 
-    pt.z = pt.z;
+    let rotZ = mat4x4<f32>(
+        cos(angleZ), -sin(angleZ), 0.0, 0.0,
+        sin(angleZ),  cos(angleZ), 0.0, 0.0,
+        0.0,          0.0,         1.0, 0.0,
+        0.0,          0.0,         0.0, 1.0
+    );
 
-    let world = pt;
+    let rotY = mat4x4<f32>(
+        cos(angleY), 0.0, sin(angleY), 0.0,
+        0.0,         1.0, 0.0,         0.0,
+    -sin(angleY), 0.0, cos(angleY), 0.0,
+        0.0,         0.0, 0.0,         1.0
+    );
+
+    let rotX = mat4x4<f32>(
+        1.0, 0.0,          0.0,         0.0,
+        0.0, cos(angleX), -sin(angleX), 0.0,
+        0.0, sin(angleX),  cos(angleX), 0.0,
+        0.0, 0.0,          0.0,         1.0
+    );
+
+    let model = rotZ * rotY * rotX;
+
+    let world = (model * vec4f(position.xyz, 1.0)).xyz;
     let clip = params.projection * params.view * vec4f(world, 1.0);
 
-    // Project to clip space (assuming orthographic projection)
-    // let clip = vec4f(pt, 1.0);
+    let newNormal = normalize((model * vec4f(normal, 0.0)).xyz);
 
-    return defaultVertexBody(clip, color, uv, normal);
+    return defaultVertexBody(clip, color, uv, newNormal);
 }
 `;
 

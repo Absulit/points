@@ -22,9 +22,17 @@ fn main(
     let c = fnusin(uvr.x * uvr.y * 10.);
     let d = distance(a,b);
     let f = d * uvr.x * uvr.y;
-    let finalColor:vec4f = vec4(a*d,f*c*a,f, 1.);
+    let baseColor = vec4(a*d,f*c*a,f, 1.);
 
-    return finalColor;
+
+    let lightDirection = vec3f(-.5,-1,-1);
+    let N = normalize(normal);
+    let L = normalize(-lightDirection);
+    let diffuse = max(dot(N, L), 0.0); // Lambertian term
+
+    let finalColor = baseColor.rgb * diffuse; // how much of the color is diffused
+
+    return vec4f(finalColor, baseColor.a);
 }
 `;
 
