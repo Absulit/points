@@ -24,6 +24,7 @@ fn main(
     let f = d * uvr.x * uvr.y;
     let finalColor:vec4f = vec4(a*d,f*c*a,f, 1.);
 
+    return finalColor;
 }
 `;
 
