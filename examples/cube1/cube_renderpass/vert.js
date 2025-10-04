@@ -61,10 +61,10 @@ fn main(
 
     let model = rotZ * rotY * rotX;
 
-    let world = (model * vec4f(position.xyz, 1.0)).xyz;
-    let clip = params.projection * params.view * vec4f(world, 1.0);
+    let world = (model * vec4f(position.xyz, 1.)).xyz;
+    let clip = params.projection * params.view * vec4f(world, 1.);
 
-    let newNormal = normalize((model * vec4f(normal, 0.0)).xyz);
+    let newNormal = normalize((model * vec4f(normal, 0.)).xyz);
 
     return defaultVertexBody(clip, color, uv, newNormal);
 }
