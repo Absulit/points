@@ -15,7 +15,7 @@ fn main(
     var modifiedPosition = position;
     modifiedPosition.w = modifiedPosition.w + sin(f32(vertexIndex) * (params.time) * .01) * .1;
 
-    return defaultVertexBody(modifiedPosition, color, uv);
+    return defaultVertexBody(modifiedPosition, color, uv, normal);
 }
 `;
 
