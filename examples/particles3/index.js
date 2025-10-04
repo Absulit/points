@@ -22,6 +22,7 @@ console.log(NUMPARTICLES);
 
 const instancedParticlesRenderPass = new RenderPass(vert, frag1, compute0, WORKGROUP_X, WORKGROUP_Y, 1)
 instancedParticlesRenderPass.instanceCount = NUMPARTICLES;
+instancedParticlesRenderPass.depthWriteEnabled = false;
 
 const base = {
     renderPasses: [
@@ -31,7 +32,6 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
-        points.depthWriteEnabled = false;
         points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
         points.setConstant('THREADS_X', THREADS_X, 'u32');
         points.setConstant('THREADS_Y', THREADS_Y, 'u32');

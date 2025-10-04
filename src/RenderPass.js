@@ -84,6 +84,8 @@ class RenderPass {
     #vertexBuffer = null;
     #vertexBufferInfo = null;
 
+    #depthWriteEnabled = true;
+
     /**
      * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
      * This is useful for PostProcessing.
@@ -374,6 +376,20 @@ class RenderPass {
 
     set vertexBuffer(val) {
         this.#vertexBuffer = val;
+    }
+
+    get depthWriteEnabled() {
+        return this.#depthWriteEnabled;
+    }
+
+    /**
+     * Controls whether your fragment shader can write to the depth buffer.
+     * By default `true`.
+     * To allow transparency and a custom type of sort, set this as false;
+     * @param {Boolean} val
+     */
+    set depthWriteEnabled(val) {
+        this.#depthWriteEnabled = val;
     }
 
     /**
