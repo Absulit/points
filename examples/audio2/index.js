@@ -26,12 +26,12 @@ const base = {
             audio.play();
         }, 4);
 
-        points.setStorage('result', 'array<f32, 10>', 4);
+        points.setStorage('result', 'array<f32, 10>', false, GPUShaderStage.FRAGMENT);
         points.setSampler('imageSampler', null);
         points.setTexture2d('feedbackTexture', true);
 
 
-        points.setStorageMap('showMessage', 1, 'f32');
+        points.setStorageMap('showMessage', 1, 'f32', false, GPUShaderStage.FRAGMENT);
 
         const size = { x: 8, y: 22 };
         await points.setTextureString(
