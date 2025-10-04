@@ -38,21 +38,21 @@ fn main(
     let angleY = params.time * 0.94222;
     let angleX = params.time * 0.865;
 
-    let rotZ = mat4x4<f32>(
+    let rotZ = mat4x4f(
         cos(angleZ), -sin(angleZ), 0.0, 0.0,
         sin(angleZ),  cos(angleZ), 0.0, 0.0,
         0.0,          0.0,         1.0, 0.0,
         0.0,          0.0,         0.0, 1.0
     );
 
-    let rotY = mat4x4<f32>(
+    let rotY = mat4x4f(
         cos(angleY), 0.0, sin(angleY), 0.0,
         0.0,         1.0, 0.0,         0.0,
-    -sin(angleY), 0.0, cos(angleY), 0.0,
+       -sin(angleY), 0.0, cos(angleY), 0.0,
         0.0,         0.0, 0.0,         1.0
     );
 
-    let rotX = mat4x4<f32>(
+    let rotX = mat4x4f(
         1.0, 0.0,          0.0,         0.0,
         0.0, cos(angleX), -sin(angleX), 0.0,
         0.0, sin(angleX),  cos(angleX), 0.0,
