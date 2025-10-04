@@ -1271,8 +1271,6 @@ class Points {
         if (renderPass.vertexArray.length !== 0) {
             return;
         }
-        console.log(renderPass.name);
-
         const hasVertexAndFragmentShader = this.#renderPasses.some(renderPass => renderPass.hasVertexAndFragmentShader)
         if (hasVertexAndFragmentShader) {
             let colors = [
