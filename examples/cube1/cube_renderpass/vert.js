@@ -25,6 +25,34 @@ fn rotateZ(p:vec3<f32>, rads:f32 ) -> vec3<f32> {
     return vec3(xnew, ynew, p.z);
 }
 
+fn rotAxisZ(rads:f32) -> mat4x4f {
+    return mat4x4f(
+        cos(rads),   -sin(rads),   0.0, 0.0,
+        sin(rads),    cos(rads),   0.0, 0.0,
+        0.0,          0.0,         1.0, 0.0,
+        0.0,          0.0,         0.0, 1.0
+    );
+}
+
+fn rotAxisY(rads:f32) -> mat4x4f {
+    return mat4x4f(
+        cos(rads),   0.0, sin(rads),   0.0,
+        0.0,         1.0, 0.0,         0.0,
+       -sin(rads),   0.0, cos(rads),   0.0,
+        0.0,         0.0, 0.0,         1.0
+    );
+}
+
+fn rotAxisX(rads:f32) -> mat4x4f {
+    return mat4x4f(
+        1.0, 0.0,          0.0,         0.0,
+        0.0, cos(rads),   -sin(rads),   0.0,
+        0.0, sin(rads),    cos(rads),   0.0,
+        0.0, 0.0,          0.0,         1.0
+    );
+}
+
+
 @vertex
 fn main(
     @location(0) position: vec4f,
@@ -38,28 +66,11 @@ fn main(
     let angleY = params.time * 0.94222;
     let angleX = params.time * 0.865;
 
-    let rotZ = mat4x4f(
-        cos(angleZ), -sin(angleZ), 0.0, 0.0,
-        sin(angleZ),  cos(angleZ), 0.0, 0.0,
-        0.0,          0.0,         1.0, 0.0,
-        0.0,          0.0,         0.0, 1.0
-    );
+    let rotX = rotAxisZ(angleX);
+    let rotY = rotAxisY(angleY);
+    let rotZ = rotAxisZ(angleZ);
 
-    let rotY = mat4x4f(
-        cos(angleY), 0.0, sin(angleY), 0.0,
-        0.0,         1.0, 0.0,         0.0,
-       -sin(angleY), 0.0, cos(angleY), 0.0,
-        0.0,         0.0, 0.0,         1.0
-    );
-
-    let rotX = mat4x4f(
-        1.0, 0.0,          0.0,         0.0,
-        0.0, cos(angleX), -sin(angleX), 0.0,
-        0.0, sin(angleX),  cos(angleX), 0.0,
-        0.0, 0.0,          0.0,         1.0
-    );
-
-    let model = rotZ * rotY * rotX;
+    let model = rotX * rotY * rotZ;
 
     let world = (model * vec4f(position.xyz, 1.)).xyz;
     let clip = params.projection * params.view * vec4f(world, 1.);
