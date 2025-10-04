@@ -1,57 +1,10 @@
+import { rotXAxis, rotYAxis, rotZAxis } from 'points/math';
+
 const vert = /*wgsl*/`
 
-
-fn rotateX(p:vec3<f32>, rads:f32 ) -> vec3<f32> {
-    let s = sin(rads);
-    let c = cos(rads);
-    let znew = p.z * c - p.y * s;
-    let ynew = p.z * s + p.y * c;
-    return vec3(p.x, ynew, znew);
-}
-
-fn rotateY(p:vec3<f32>, rads:f32 ) -> vec3<f32> {
-    let s = sin(rads);
-    let c = cos(rads);
-    let xnew = p.x * c - p.z * s;
-    let znew = p.x * s + p.z * c;
-    return vec3(xnew, p.y, znew);
-}
-
-fn rotateZ(p:vec3<f32>, rads:f32 ) -> vec3<f32> {
-    let s = sin(rads);
-    let c = cos(rads);
-    let xnew = p.x * c - p.y * s;
-    let ynew = p.x * s + p.y * c;
-    return vec3(xnew, ynew, p.z);
-}
-
-fn rotZAxis(rads:f32) -> mat4x4f {
-    return mat4x4f(
-        cos(rads),   -sin(rads),   0.0, 0.0,
-        sin(rads),    cos(rads),   0.0, 0.0,
-        0.0,          0.0,         1.0, 0.0,
-        0.0,          0.0,         0.0, 1.0
-    );
-}
-
-fn rotYAxis(rads:f32) -> mat4x4f {
-    return mat4x4f(
-        cos(rads),   0.0, sin(rads),   0.0,
-        0.0,         1.0, 0.0,         0.0,
-       -sin(rads),   0.0, cos(rads),   0.0,
-        0.0,         0.0, 0.0,         1.0
-    );
-}
-
-fn rotXAxis(rads:f32) -> mat4x4f {
-    return mat4x4f(
-        1.0, 0.0,          0.0,         0.0,
-        0.0, cos(rads),   -sin(rads),   0.0,
-        0.0, sin(rads),    cos(rads),   0.0,
-        0.0, 0.0,          0.0,         1.0
-    );
-}
-
+${rotXAxis}
+${rotYAxis}
+${rotZAxis}
 
 @vertex
 fn main(
