@@ -125,6 +125,10 @@ fn angle(p1:vec2f, p2:vec2f) -> f32 {
 }
 `;
 
+/**
+ * Creates a Matrix rotated in the X axis by an angle in radians.
+ * @param {f32} rads angle
+ */
 export const rotXAxis = /*wgsl*/`
 fn rotXAxis(rads:f32) -> mat4x4f {
     return mat4x4f(
@@ -136,6 +140,10 @@ fn rotXAxis(rads:f32) -> mat4x4f {
 }
 `;
 
+/**
+ * Creates a Matrix rotated in the Y axis by an angle in radians.
+ * @param {f32} rads angle
+ */
 export const rotYAxis = /*wgsl*/`
 fn rotYAxis(rads:f32) -> mat4x4f {
     return mat4x4f(
@@ -147,6 +155,10 @@ fn rotYAxis(rads:f32) -> mat4x4f {
 }
 `;
 
+/**
+ * Creates a Matrix rotated in the Z axis by an angle in radians.
+ * @param {f32} rads angle
+ */
 export const rotZAxis = /*wgsl*/`
 fn rotZAxis(rads:f32) -> mat4x4f {
     return mat4x4f(
@@ -157,4 +169,3 @@ fn rotZAxis(rads:f32) -> mat4x4f {
     );
 }
 `;
-
