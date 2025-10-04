@@ -12,6 +12,7 @@ fn main(
     @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
     @location(3) uvr: vec2f,    // uv with aspect ratio corrected
     @location(4) mouse: vec2f,
+    @location(5) normal: vec3f,
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
 
@@ -23,7 +24,6 @@ fn main(
     let f = d * uvr.x * uvr.y;
     let finalColor:vec4f = vec4(a*d,f*c*a,f, 1.);
 
-    return finalColor;
 }
 `;
 
