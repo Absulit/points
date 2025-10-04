@@ -25,7 +25,7 @@ fn rotateZ(p:vec3<f32>, rads:f32 ) -> vec3<f32> {
     return vec3(xnew, ynew, p.z);
 }
 
-fn rotAxisZ(rads:f32) -> mat4x4f {
+fn rotZAxis(rads:f32) -> mat4x4f {
     return mat4x4f(
         cos(rads),   -sin(rads),   0.0, 0.0,
         sin(rads),    cos(rads),   0.0, 0.0,
@@ -34,7 +34,7 @@ fn rotAxisZ(rads:f32) -> mat4x4f {
     );
 }
 
-fn rotAxisY(rads:f32) -> mat4x4f {
+fn rotYAxis(rads:f32) -> mat4x4f {
     return mat4x4f(
         cos(rads),   0.0, sin(rads),   0.0,
         0.0,         1.0, 0.0,         0.0,
@@ -43,7 +43,7 @@ fn rotAxisY(rads:f32) -> mat4x4f {
     );
 }
 
-fn rotAxisX(rads:f32) -> mat4x4f {
+fn rotXAxis(rads:f32) -> mat4x4f {
     return mat4x4f(
         1.0, 0.0,          0.0,         0.0,
         0.0, cos(rads),   -sin(rads),   0.0,
@@ -66,9 +66,9 @@ fn main(
     let angleY = params.time * 0.94222;
     let angleX = params.time * 0.865;
 
-    let rotX = rotAxisZ(angleX);
-    let rotY = rotAxisY(angleY);
-    let rotZ = rotAxisZ(angleZ);
+    let rotX = rotXAxis(angleX);
+    let rotY = rotYAxis(angleY);
+    let rotZ = rotZAxis(angleZ);
 
     let model = rotX * rotY * rotZ;
 
