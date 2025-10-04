@@ -27,7 +27,7 @@ fn main(
     // Project to clip space (assuming orthographic projection)
     let clip = vec4f(world, 0.0, 1.0);
 
-    return defaultVertexBody(clip, particle.color, uv);
+    return defaultVertexBody(clip, particle.color, uv, normal);
 }
 `;
 
