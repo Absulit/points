@@ -17,6 +17,9 @@ const HEIGHT = 15i;
 const HWIDTH = WIDTH / 2;
 const HHEIGHT = HEIGHT / 2;
 
+const MAXHEIGHT = 2.5;
+const MAXDELAY = 5.;
+
 @compute @workgroup_size(THREADS_X, THREADS_Y, THREADS_Z)
 fn main(
     @builtin(global_invocation_id) GID: vec3u,
@@ -40,19 +43,16 @@ fn main(
 
 
 
-    let MAXHEIGHT = 2.5;
+
     if(particle.init == 0){
         rand_seed.x = .05656486 / indexF;
         rand();
 
-
-        let height = MAXHEIGHT  * rand_seed.y * mix(1.,0., f32(particle.init_height));
-
-        particle.position = vec3f(0, height,0);
-        particle.init_height = 1;
+        particle.position = vec3f(0, 0, 0);
         particle.color = vec4f(rand_seed, rand_seed.y, 1);
-        particle.scale = vec3f(.31);
+        particle.scale = vec3f();
         particle.rotation = vec3f(rand_seed, rand_seed.y);
+        particle.delay = params.time + rand_seed.y * MAXDELAY;
         particle.init = 1;
     }
 
@@ -62,21 +62,26 @@ fn main(
     rand_seed.y = indexF;
     rand();
     let dir = mix(-1, 1, step(.5, rand_seed.y));
+    let dir2 = mix(-1, 1, step(.5, rand_seed.x));
 
+    if(params.time >= particle.delay){
 
-    particle.rotation += vec3f(params.delta * n * dir, params.delta * n * dir, params.delta * dir);
+        particle.rotation += vec3f(params.delta * n * dir, params.delta * n * dir, params.delta * dir);
 
-    let scaleFactor = particle.position.y / MAXHEIGHT;
-    particle.scale = vec3f(mix(.5, .01, 1 - scaleFactor * (1-scaleFactor) * 2));
-    particle.position += vec3f(
-        rand_seed.x * .01 * dir,
-        params.delta * 1 + particle.color.x * .001,
-        rand_seed.y * .01 * dir
-    );
+        let scaleFactor = particle.position.y / MAXHEIGHT;
+        particle.scale = vec3f(mix(.5, .01, 1 - scaleFactor * (1-scaleFactor) * 2));
+        particle.position += vec3f(
+            dir * .001,
+            params.delta,
+            dir2 * .001
+        );
 
-    if(particle.position.y > MAXHEIGHT){
-        particle.init = 0;
+        if(particle.position.y > MAXHEIGHT){
+            particle.init = 0;
+        }
     }
+
+
 }
 `;
 

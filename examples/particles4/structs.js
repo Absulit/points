@@ -19,7 +19,8 @@ struct Particle {
     color: vec4f,
     noise: f32,
     init: u32,
-    init_height: u32,
+    delay: f32,
+    angle: f32,
 }
 
 `;
