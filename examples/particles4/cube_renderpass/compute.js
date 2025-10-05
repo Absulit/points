@@ -69,6 +69,7 @@ fn main(
         particle.rotation += vec3f(params.delta * n * dir, params.delta * n * dir, params.delta * dir);
 
         let scaleFactor = particle.position.y / MAXHEIGHT;
+        particle.factor = scaleFactor;
         particle.scale = vec3f(mix(.5, .01, 1 - scaleFactor * (1-scaleFactor) * 2));
         particle.position += vec3f(
             dir * .001,

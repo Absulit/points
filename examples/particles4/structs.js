@@ -21,6 +21,7 @@ struct Particle {
     init: u32,
     delay: f32,
     angle: f32,
+    factor: f32,
 }
 
 `;
