@@ -40,7 +40,7 @@ const nf = 1 / (near - far);
 const base = {
     renderPasses: [
         cube_renderpass,
-        // staticcube_renderpass,
+        staticcube_renderpass,
     ],
     /**
      * @param {Points} points

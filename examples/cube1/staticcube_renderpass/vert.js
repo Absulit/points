@@ -27,9 +27,10 @@ fn rotateZ(p:vec3<f32>, rads:f32 ) -> vec3<f32> {
 
 @vertex
 fn main(
-    @location(0) position: vec4<f32>,
-    @location(1) color: vec4<f32>,
-    @location(2) uv: vec2<f32>,
+    @location(0) position: vec4f,
+    @location(1) color: vec4f,
+    @location(2) uv: vec2f,
+    @location(3) normal: vec3f,
     @builtin(vertex_index) vertexIndex: u32,
     @builtin(instance_index) instanceIndex: u32
 ) -> Fragment {
@@ -47,7 +48,7 @@ fn main(
     // Project to clip space (assuming orthographic projection)
     // let clip = vec4f(pt, 1.0);
 
-    return defaultVertexBody(clip, color, uv);
+    return defaultVertexBody(clip, color, uv, normal);
 }
 `;
 
