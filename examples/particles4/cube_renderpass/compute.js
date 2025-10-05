@@ -19,6 +19,11 @@ const HHEIGHT = HEIGHT / 2;
 
 const MAXHEIGHT = 2.5;
 const MAXDELAY = 5.;
+const MAXSPEED = 4.;
+
+fn angleToVector(rads:f32) -> vec2f {
+    return vec2f(cos(rads), sin(rads));
+}
 
 @compute @workgroup_size(THREADS_X, THREADS_Y, THREADS_Z)
 fn main(
@@ -41,18 +46,22 @@ fn main(
 
     let particle = &particles[index];
 
-
-
-
     if(particle.init == 0){
-        rand_seed.x = .05656486 / indexF;
+        rand_seed.x = indexF;
         rand();
 
-        particle.position = vec3f(0, 0, 0);
+        let angle_intensity = .01;
+        // let n = snoise(particle.position.xy / 200 + params.time * .01);
+
+        particle.position = vec3f();
         particle.color = vec4f(rand_seed, rand_seed.y, 1);
         particle.scale = vec3f();
         particle.rotation = vec3f(rand_seed, rand_seed.y);
         particle.delay = params.time + rand_seed.y * MAXDELAY;
+        particle.speed = 1 + rand() * MAXSPEED;
+
+        rand();
+        particle.angle = angleToVector( rand_seed.y * TAU) * angle_intensity;
         particle.init = 1;
     }
 
@@ -66,16 +75,17 @@ fn main(
 
     if(params.time >= particle.delay){
 
-        particle.rotation += vec3f(params.delta * n * dir, params.delta * n * dir, params.delta * dir);
+        particle.rotation += vec3f(params.delta * dir2, params.delta * dir, params.delta * dir2);
 
         let scaleFactor = particle.position.y / MAXHEIGHT;
         particle.factor = scaleFactor;
-        particle.scale = vec3f(mix(.5, .01, 1 - scaleFactor * (1-scaleFactor) * 2));
+        particle.scale = vec3f(mix(.4, .01, 1 - scaleFactor * (1-scaleFactor) * 2));
+
         particle.position += vec3f(
-            dir * .001,
+            particle.angle.x * n,
             params.delta,
-            dir2 * .001
-        );
+            particle.angle.y * n
+        ) * particle.speed;
 
         if(particle.position.y > MAXHEIGHT){
             particle.init = 0;

@@ -17,11 +17,12 @@ struct Particle {
     rotation: vec3f,
     scale: vec3f,
     color: vec4f,
+    angle: vec2f,
     noise: f32,
-    init: u32,
     delay: f32,
-    angle: f32,
     factor: f32,
+    speed: f32,
+    init: u32,
 }
 
 `;

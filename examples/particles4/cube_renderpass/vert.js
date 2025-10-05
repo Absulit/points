@@ -7,30 +7,6 @@ ${structs}
 ${fusin}
 ${fnusin}
 
-fn rotateX(p:vec3<f32>, rads:f32 ) -> vec3<f32> {
-    let s = sin(rads);
-    let c = cos(rads);
-    let znew = p.z * c - p.y * s;
-    let ynew = p.z * s + p.y * c;
-    return vec3(p.x, ynew, znew);
-}
-
-fn rotateY(p:vec3<f32>, rads:f32 ) -> vec3<f32> {
-    let s = sin(rads);
-    let c = cos(rads);
-    let xnew = p.x * c - p.z * s;
-    let znew = p.x * s + p.z * c;
-    return vec3(xnew, p.y, znew);
-}
-
-fn rotateZ(p:vec3<f32>, rads:f32 ) -> vec3<f32> {
-    let s = sin(rads);
-    let c = cos(rads);
-    let xnew = p.x * c - p.y * s;
-    let ynew = p.x * s + p.y * c;
-    return vec3(xnew, ynew, p.z);
-}
-
 fn rotationMatrix(rotation: vec3f) -> mat3x3<f32> {
     let cx = cos(rotation.x);
     let sx = sin(rotation.x);
