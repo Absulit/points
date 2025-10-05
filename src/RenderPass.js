@@ -85,6 +85,7 @@ class RenderPass {
     #vertexBufferInfo = null;
 
     #depthWriteEnabled = true;
+    #loadOp = 'clear';
 
     /**
      * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
@@ -392,6 +393,19 @@ class RenderPass {
         this.#depthWriteEnabled = val;
     }
 
+    get loadOp() {
+        return this.#loadOp;
+    }
+
+    /**
+     * Controls if the last RenderPass data is preserved on screen or cleared.
+     * Default `clear`
+     * @param {'clear'|'load'} val
+     */
+    set loadOp(val) {
+        this.#loadOp = val;
+    }
+
     /**
      * - **currently for internal use**<br>
      * - **might be private in the future**<br>
@@ -415,7 +429,7 @@ class RenderPass {
         const { r: r1, g: g1, b: b1, a: a1 } = colors[1];
         const { r: r2, g: g2, b: b2, a: a2 } = colors[2];
         const { r: r3, g: g3, b: b3, a: a3 } = colors[3];
-        const normals = [ 0, 0, 1];
+        const normals = [0, 0, 1];
 
         this.#vertexArray.push(
             +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * .5, (+ny + 1) * .5, ...normals, // 0 top left
