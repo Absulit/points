@@ -59,10 +59,6 @@ const base = {
         points.setConstant('THREADS_Z', THREADS_Z, 'u32');
         points.setStorage('particles', `array<Particle, ${NUMPARTICLES}>`);
 
-        points.addEventListener('log', data => {
-            console.log('Array Max:', data[0] + 1);
-        }, 1)
-
         aspect = points.canvas.width / points.canvas.height;
         points.setUniform(
             'projection',
@@ -75,7 +71,7 @@ const base = {
             'mat4x4<f32>'
         )
 
-        // camera at [0, 0, 5], looking at origin
+        // camera at [0, -1.5, 5], looking above origin
         points.setUniform(
             'view',
             [
