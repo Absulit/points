@@ -35,7 +35,7 @@ const nf = 1 / (near - far);
 // ];
 
 
-// TODO: loadOp: 'clear', // load
+staticcube_renderpass.loadOp = 'load';
 
 const base = {
     renderPasses: [
