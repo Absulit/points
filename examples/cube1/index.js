@@ -4,7 +4,7 @@ import { cube_renderpass } from './cube_renderpass/index.js';
 import { staticcube_renderpass } from './staticcube_renderpass/index.js';
 
 const options = {
-
+    loadOp: false
 }
 
 
@@ -35,12 +35,12 @@ const nf = 1 / (near - far);
 // ];
 
 
-staticcube_renderpass.loadOp = 'load';
+cube_renderpass.loadOp = 'clear';
 
 const base = {
     renderPasses: [
-        cube_renderpass,
         staticcube_renderpass,
+        cube_renderpass,
     ],
     /**
      * @param {Points} points
@@ -86,6 +86,11 @@ const base = {
         // points.addRenderPass(RenderPasses.COLOR);
         // points.addRenderPass(RenderPasses.PIXELATE);
         // points.addRenderPass(RenderPasses.FILM_GRAIN);
+
+        folder.add(options, 'loadOp')
+            .name('loadOp: clear|load')
+            .onChange(value => cube_renderpass.loadOp = value ? 'load' : 'clear');
+        folder.open();
     },
     /**
      * @param {Points} points
