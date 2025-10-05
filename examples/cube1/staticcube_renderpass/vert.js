@@ -1,4 +1,10 @@
+import { rotXAxis, rotYAxis, rotZAxis } from "points/math";
+
 const vert = /*wgsl*/`
+
+${rotXAxis}
+${rotYAxis}
+${rotZAxis}
 
 @vertex
 fn main(
@@ -9,19 +15,15 @@ fn main(
     @builtin(vertex_index) vertexIndex: u32,
     @builtin(instance_index) instanceIndex: u32
 ) -> Fragment {
-    // var pt = rotateZ(position.xyz, params.time * .9854);
-    // pt = rotateY(pt, params.time * .94222);
-    // pt = rotateX(pt, params.time * .865);
 
-    // pt.z = pt.z;
+    let rotX = rotXAxis(params.time * -.6854);
+    let rotY = rotYAxis(params.time * .4222);
+    let rotZ = rotZAxis(params.time * .3865);
 
+    let model = rotX * rotY * rotZ;
 
-    // let world = pt;
-    let world = position.xyz;
+    let world = (model * vec4f(position.xyz, 1.)).xyz * 2;
     let clip = params.projection * params.view * vec4f(world, 1.0);
-
-    // Project to clip space (assuming orthographic projection)
-    // let clip = vec4f(pt, 1.0);
 
     return defaultVertexBody(clip, color, uv, normal);
 }
