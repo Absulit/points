@@ -20,7 +20,12 @@ fn main(
     let L = normalize(-lightDirection);
     let diffuse = max(dot(N, L), 0.0); // Lambertian term
 
-    let finalColor = baseColor.rgb * diffuse; // how much of the color is diffused
+    let lambert = baseColor.rgb * diffuse; // how much of the color is diffused
+
+    var finalColor = lambert;
+    if(params.lambert == 0){
+        finalColor = baseColor.rgb;
+    }
 
     return vec4f(finalColor, baseColor.a);
 

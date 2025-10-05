@@ -5,6 +5,7 @@ import frag from './cube_renderpass/frag.js';
 import compute from './cube_renderpass/compute.js';
 
 const options = {
+    lambert: false,
 }
 
 // const WORKGROUP_X = 16;
@@ -83,6 +84,9 @@ const base = {
             'mat4x4<f32>'
         )
 
+        points.setUniform('lambert', options.lambert);
+        folder.add(options, 'lambert').name('lambert');
+
         folder.open();
     },
     /**
@@ -100,6 +104,7 @@ const base = {
                 0, 0, (2 * far * near) * nf, 0
             ]
         )
+        points.setUniform('lambert', options.lambert);
     }
 }
 

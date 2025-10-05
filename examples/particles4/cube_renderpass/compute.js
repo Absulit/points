@@ -61,7 +61,7 @@ fn main(
         particle.speed = 1 + rand() * MAXSPEED;
 
         rand();
-        particle.angle = angleToVector( rand_seed.y * TAU) * angle_intensity;
+        particle.angle = angleToVector(rand_seed.y * TAU) * angle_intensity;
         particle.init = 1;
     }
 
