@@ -516,8 +516,8 @@ class RenderPass {
         }
     }
 
-    addSphere(center, radius, color, segments = 16, rings = 12) {
-        const { x, y, z } = center;
+    addSphere(coordinate, color, radius = 1, segments = 16, rings = 12) {
+        const { x, y, z } = coordinate;
         const { r, g, b, a } = color;
 
         const vertexGrid = [];
