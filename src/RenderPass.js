@@ -516,6 +516,60 @@ class RenderPass {
         }
     }
 
+    addSphere(center, radius, color, segments = 16, rings = 12) {
+        const { x, y, z } = center;
+        const { r, g, b, a } = color;
+
+        const vertexGrid = [];
+
+        // Generate vertices
+        for (let lat = 0; lat <= rings; lat++) {
+            const theta = (lat * Math.PI) / rings;
+            const sinTheta = Math.sin(theta);
+            const cosTheta = Math.cos(theta);
+
+            vertexGrid[lat] = [];
+
+            for (let lon = 0; lon <= segments; lon++) {
+                const phi = (lon * 2 * Math.PI) / segments;
+                const sinPhi = Math.sin(phi);
+                const cosPhi = Math.cos(phi);
+
+                const nx = cosPhi * sinTheta;
+                const ny = cosTheta;
+                const nz = sinPhi * sinTheta;
+
+                const vx = x + radius * nx;
+                const vy = y + radius * ny;
+                const vz = z + radius * nz;
+
+                const u = lon / segments;
+                const v = lat / rings;
+
+                vertexGrid[lat][lon] = [vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz];
+            }
+        }
+
+        // Generate triangles
+        for (let lat = 0; lat < rings; lat++) {
+            for (let lon = 0; lon < segments; lon++) {
+                const v1 = vertexGrid[lat][lon];
+                const v2 = vertexGrid[lat + 1][lon];
+                const v3 = vertexGrid[lat + 1][lon + 1];
+                const v4 = vertexGrid[lat][lon + 1];
+
+                // Triangle 1
+                this.#vertexArray.push(...v1, ...v2, ...v3);
+                // Triangle 2
+                this.#vertexArray.push(...v1, ...v3, ...v4);
+            }
+        }
+    }
+
+
+
+
+
 }
 
 export default RenderPass;
