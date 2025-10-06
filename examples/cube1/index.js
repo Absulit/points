@@ -59,12 +59,6 @@ const base = {
             { r: 1, g: 0, b: 0, a: 1 }
         );
 
-        cube_renderpass.addSphere(
-            {x:0,y:0,z:0},
-            1,
-            {r:1,g:0,b:0,a:1},
-        )
-
         aspect = points.canvas.width / points.canvas.height;
         points.setUniform(
             'projection',
