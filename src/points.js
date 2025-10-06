@@ -1656,6 +1656,12 @@ class Points {
                                         offset: renderPass.vertexBufferInfo.normalOffset,
                                         format: 'float32x3',
                                     },
+                                    {
+                                        // id
+                                        shaderLocation: 4,
+                                        offset: renderPass.vertexBufferInfo.idOffset,
+                                        format: 'float32',
+                                    },
                                 ],
                             },
                         ],
