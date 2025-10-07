@@ -586,8 +586,13 @@ class RenderPass {
         ++this.#meshCounter;
     }
 
-
-
+    /**
+     * For internal purposes
+     * ids and names of the meshes
+     */
+    get meshes() {
+        return this.#meshes;
+    }
 
 
 }

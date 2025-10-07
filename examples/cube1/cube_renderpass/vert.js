@@ -25,7 +25,7 @@ fn main(
     let rotZ = rotZAxis(angleZ);
 
     var model = rotX * rotY * rotZ;
-    if(id == 1){
+    if(id == params.cube1){
         model = rotX * rotY;
     }
 

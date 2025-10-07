@@ -1178,6 +1178,7 @@ class Points {
         }
 
         this.#renderPasses.forEach(r => r.init?.(this));
+        this.#renderPasses.forEach(r => r.meshes.forEach(mesh => this.setUniform(mesh.name, mesh.id)));
         this.#renderPasses.forEach(this.#compileRenderPass);
         this.#generateDataSize();
         //
