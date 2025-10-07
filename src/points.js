@@ -1118,6 +1118,7 @@ class Points {
         let dynamicGroupBindingsCompute = '';
         let dynamicGroupBindingsFragment = '';
         let dynamicStructParams = '';
+        let dynamicStructMesh = '';
         this.#uniforms.forEach(u => {
             u.type = u.type || 'f32';
             dynamicStructParams += /*wgsl*/`${u.name}:${u.type}, \n\t`;
@@ -1125,9 +1126,18 @@ class Points {
         if (this.#uniforms.length) {
             dynamicStructParams = /*wgsl*/`struct Params {\n\t${dynamicStructParams}\n}\n`;
         }
+        this.#meshUniforms.forEach(u => {
+            u.type = u.type || 'f32';
+            dynamicStructMesh += /*wgsl*/`${u.name}:${u.type}, \n\t`;
+        });
+        if (this.#meshUniforms.length) {
+            dynamicStructMesh = /*wgsl*/`struct Mesh {\n\t${dynamicStructMesh}\n}\n`;
+        }
         this.#constants.forEach(c => {
             dynamicStructParams += /*wgsl*/`const ${c.name}:${c.structName} = ${c.value};\n`;
         })
+        dynamicStructParams += dynamicStructMesh;
+
         renderPass.index = index;
         renderPass.hasVertexShader && (dynamicGroupBindingsVertex += dynamicStructParams);
         renderPass.hasComputeShader && (dynamicGroupBindingsCompute += dynamicStructParams);
@@ -1204,7 +1214,7 @@ class Points {
         }
 
         this.#renderPasses.forEach(r => r.init?.(this));
-        this.#renderPasses.forEach(r => r.meshes.forEach(mesh => this.setUniform(mesh.name, mesh.id, 'u32')));
+        this.#renderPasses.forEach(r => r.meshes.forEach(mesh => this.#setMeshUniform(mesh.name, mesh.id, 'u32')));
         this.#renderPasses.forEach(this.#compileRenderPass);
         this.#generateDataSize();
         //
