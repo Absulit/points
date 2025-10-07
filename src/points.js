@@ -988,6 +988,10 @@ class Points {
             dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <uniform> params: Params;\n`;
             bindingIndex += 1;
         }
+        if (this.#meshUniforms.length) {
+            dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <uniform> mesh: Mesh;\n`;
+            bindingIndex += 1;
+        }
         this.#storage.forEach(storageItem => {
             const isInternal = internal === storageItem.internal;
             if (isInternal && (!storageItem.shaderType || storageItem.shaderType & shaderType)) {
@@ -1376,11 +1380,17 @@ class Points {
         );
     }
 
-    #createUniformValues() {
-        const paramsDataSize = this.#dataSize.get('Params')
+    /**
+     *
+     * @param {Array} uniformsArray
+     * @param {String} structName
+     * @returns {{values:Float32Array, paramsDataSize:Object}}
+     */
+    #createUniformValues(uniformsArray, structName = 'Params') {
+        const paramsDataSize = this.#dataSize.get(structName)
         const paddings = paramsDataSize.paddings;
         // we check the paddings list and add 0's to just the ones that need it
-        const uniformsClone = structuredClone(this.#uniforms);
+        const uniformsClone = structuredClone(uniformsArray);
         let arrayValues = uniformsClone.map(v => {
             const padding = paddings[v.name];
             if (padding) {
@@ -1403,16 +1413,26 @@ class Points {
     }
 
     #createParametersUniforms() {
-        const { values, paramsDataSize } = this.#createUniformValues();
+        const { values, paramsDataSize } = this.#createUniformValues(this.#uniforms);
         this.#uniforms.buffer = this.#createAndMapBuffer(values, GPUBufferUsage.UNIFORM + GPUBufferUsage.COPY_DST, true, paramsDataSize.bytes);
+
+        if (this.#meshUniforms.length) {
+            const { values, paramsDataSize } = this.#createUniformValues(this.#meshUniforms);
+            this.#meshUniforms.buffer = this.#createAndMapBuffer(values, GPUBufferUsage.UNIFORM + GPUBufferUsage.COPY_DST, true, paramsDataSize.bytes);
+        }
     }
 
     /**
      * Updates all uniforms (for the update function)
      */
     #writeParametersUniforms() {
-        const { values } = this.#createUniformValues();
+        const { values } = this.#createUniformValues(this.#uniforms);
         this.#writeBuffer(this.#uniforms.buffer, values);
+
+        if (this.#meshUniforms.length) {
+            const { values } = this.#createUniformValues(this.#meshUniforms);
+            this.#writeBuffer(this.#meshUniforms.buffer, values);
+        }
     }
 
     /**
@@ -1757,6 +1777,21 @@ class Points {
                     resource: {
                         label: 'uniform',
                         buffer: this.#uniforms.buffer
+                    },
+                    buffer: {
+                        type: 'uniform'
+                    },
+                    // visibility
+                }
+            );
+        }
+        if (this.#meshUniforms.length) {
+            entries.push(
+                {
+                    binding: bindingIndex++,
+                    resource: {
+                        label: 'uniform',
+                        buffer: this.#meshUniforms.buffer
                     },
                     buffer: {
                         type: 'uniform'

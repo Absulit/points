@@ -20,7 +20,7 @@ fn main(
     var angleY = params.time * 0.94222;
     var angleX = params.time * 0.865;
 
-    if(id == params.cube1){
+    if(id == mesh.cube1){
         angleZ = params.time * 0.1854;
         angleY = params.time * 0.694222;
         angleX = params.time * 0.4865;

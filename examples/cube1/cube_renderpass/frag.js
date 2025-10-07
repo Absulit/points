@@ -31,7 +31,7 @@ fn main(
     let L = normalize(-lightDirection);
     let diffuse = max(dot(N, L), 0.0); // Lambertian term
 
-    if(id == params.cube1){
+    if(id == mesh.cube1){
         baseColor = vec4(a*f, d*c*f, f, 1);
     }
     let finalColor = baseColor.rgb * diffuse; // how much of the color is diffused
