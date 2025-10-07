@@ -88,6 +88,7 @@ class RenderPass {
     #loadOp = 'clear';
 
     #meshCounter = 0;
+    #meshes = [];
 
     /**
      * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
@@ -450,7 +451,7 @@ class RenderPass {
      * @param {{width:Number, height:Number, depth:Number}} dimensions
      * @param {{r:Number, g:Number, b:Number, a:Number}} color
      */
-    addCube(coordinate, dimensions, color) {
+    addCube(name, coordinate, dimensions, color) {
         const { x, y, z } = coordinate;
         const { width, height, depth } = dimensions;
         const hw = width / 2;
@@ -520,7 +521,7 @@ class RenderPass {
         ++this.#meshCounter;
     }
 
-    addSphere(coordinate, color, radius = 1, segments = 16, rings = 12) {
+    addSphere(name, coordinate, color, radius = 1, segments = 16, rings = 12) {
         const { x, y, z } = coordinate;
         const { r, g, b, a } = color;
 
