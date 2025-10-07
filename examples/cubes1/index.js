@@ -22,6 +22,16 @@ console.log('NUMPARTICLES: ', NUMPARTICLES);
 const cube_renderpass = new RenderPass(vert, frag, compute, WORKGROUP_X, WORKGROUP_Y, WORKGROUP_Z);
 cube_renderpass.instanceCount = NUMPARTICLES;
 
+// TODO: cubes need to be outside init() here, because the RenderPass is imported
+// and is already in memory the next time is loaded, so new cubes load
+// a solution would be to call a remove (like init, update) and delete the RenderPass
+
+cube_renderpass.addCube(
+    'base_cube',
+    { x: 0, y: 0, z: 0 },
+    { width: 1, height: 1, depth: 1 },
+    { r: 1, g: 0, b: 0, a: 1 }
+);
 
 const near = 0.1, far = 100;
 const f = 1.0 / Math.tan(Math.PI / 8); // ≈ 2.414
@@ -36,13 +46,6 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
-
-        cube_renderpass.addCube(
-            'base_cube',
-            { x: 0, y: 0, z: 0 },
-            { width: 1, height: 1, depth: 1 },
-            { r: 1, g: 0, b: 0, a: 1 }
-        );
 
         points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
         points.setConstant('WORKGROUP_X', WORKGROUP_X, 'u32');
