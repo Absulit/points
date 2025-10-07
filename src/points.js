@@ -52,6 +52,7 @@ class Points {
     #commandsFinished = [];
     #renderPassDescriptor = null;
     #uniforms = new UniformsArray();
+    #meshUniforms = new UniformsArray();
     #constants = [];
     #storage = [];
     #readStorage = [];
@@ -221,6 +222,31 @@ class Points {
         this.#uniforms.push(uniform);
         return uniform;
     }
+
+    #setMeshUniform(name, value, structName = null) {
+        const uniformToUpdate = this.#nameExists(this.#meshUniforms, name);
+        if (uniformToUpdate && structName) {
+            // if name exists is an update
+            console.warn(`#setMeshUniform(${name}, [${value}], ${structName}) can't set the structName of an already defined uniform.`);
+        }
+        if (uniformToUpdate) {
+            uniformToUpdate.value = value;
+            return uniformToUpdate;
+        }
+        if (structName && isArray(structName)) {
+            throw `${structName} is an array, which is currently not supported for Uniforms.`;
+        }
+        const uniform = {
+            name: name,
+            value: value,
+            type: structName,
+            size: null
+        }
+        Object.seal(uniform);
+        this.#meshUniforms.push(uniform);
+        return uniform;
+    }
+
     /**
      * Updates a list of uniforms
      * @param {Array<{name:String, value:Number}>} arr object array of the type: `{name, value}`
