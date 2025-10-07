@@ -8,10 +8,11 @@ ${rotZAxis}
 
 @vertex
 fn main(
-    @location(0) position: vec4f,
-    @location(1) color: vec4f,
-    @location(2) uv: vec2f,
-    @location(3) normal: vec3f,
+    @location(0) position:vec4f,
+    @location(1) color:vec4f,
+    @location(2) uv:vec2f,
+    @location(3) normal:vec3f,
+    @location(4) id:f32,
     @builtin(vertex_index) vertexIndex: u32,
     @builtin(instance_index) instanceIndex: u32
 ) -> Fragment {
@@ -23,7 +24,10 @@ fn main(
     let rotY = rotYAxis(angleY);
     let rotZ = rotZAxis(angleZ);
 
-    let model = rotX * rotY * rotZ;
+    var model = rotX * rotY * rotZ;
+    if(id == 1){
+        model = rotX * rotY;
+    }
 
     let world = (model * vec4f(position.xyz, 1.)).xyz;
     let clip = params.projection * params.view * vec4f(world, 1.);
