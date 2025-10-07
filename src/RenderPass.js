@@ -518,6 +518,13 @@ class RenderPass {
                 this.#vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normals, this.#meshCounter);
             }
         }
+
+        const mesh = {
+            name,
+            id: this.#meshCounter
+        }
+        this.#meshes.push(mesh);
+
         ++this.#meshCounter;
     }
 
@@ -569,6 +576,13 @@ class RenderPass {
                 this.#vertexArray.push(...v1, ...v3, ...v4);
             }
         }
+
+        const mesh = {
+            name,
+            id: this.#meshCounter
+        }
+        this.#meshes.push(mesh);
+
         ++this.#meshCounter;
     }
 
