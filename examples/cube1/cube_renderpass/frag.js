@@ -13,6 +13,7 @@ fn main(
     @location(3) uvr: vec2f,    // uv with aspect ratio corrected
     @location(4) mouse: vec2f,
     @location(5) normal: vec3f,
+    @interpolate(flat) @location(6) id: u32,
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
 
@@ -22,7 +23,7 @@ fn main(
     let c = fnusin(uvr.x * uvr.y * 10.);
     let d = distance(a,b);
     let f = d * uvr.x * uvr.y;
-    let baseColor = vec4(a*d,f*c*a,f, 1.);
+    var baseColor = vec4(a*d, f*c*a, f, 1.);
 
 
     let lightDirection = vec3f(-.5,-1,-1);
@@ -30,6 +31,9 @@ fn main(
     let L = normalize(-lightDirection);
     let diffuse = max(dot(N, L), 0.0); // Lambertian term
 
+    if(id == params.cube1){
+        baseColor = vec4(a*f, d*c*f, f, 1);
+    }
     let finalColor = baseColor.rgb * diffuse; // how much of the color is diffused
 
     return vec4f(finalColor, baseColor.a);

@@ -1178,7 +1178,7 @@ class Points {
         }
 
         this.#renderPasses.forEach(r => r.init?.(this));
-        this.#renderPasses.forEach(r => r.meshes.forEach(mesh => this.setUniform(mesh.name, mesh.id)));
+        this.#renderPasses.forEach(r => r.meshes.forEach(mesh => this.setUniform(mesh.name, mesh.id, 'u32')));
         this.#renderPasses.forEach(this.#compileRenderPass);
         this.#generateDataSize();
         //
@@ -1661,7 +1661,7 @@ class Points {
                                         // id
                                         shaderLocation: 4,
                                         offset: renderPass.vertexBufferInfo.idOffset,
-                                        format: 'float32',
+                                        format: 'uint32',
                                     },
                                 ],
                             },
