@@ -77,7 +77,7 @@ cube_renderpass.loadOp = 'clear';
 //   { r: 1, g: 0, b: 0, a: 1 }
 // );
 
-const url = 'glb1/cube.glb'; // or remote URL (CORS must allow)
+const url = 'glb1/monkey.glb'; // or remote URL (CORS must allow)
 try {
   const data = await loadAndExtract(url);
   const {positions, colors, uvs, normals, indices} = data[0]
