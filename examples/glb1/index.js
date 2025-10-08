@@ -4,6 +4,14 @@ import { cube_renderpass } from './cube_renderpass/index.js';
 
 import { WebIO } from 'https://unpkg.com/@gltf-transform/core@latest?module';
 
+function uint8ToBase64(uint8Array) {
+  let binary = '';
+  for (let i = 0; i < uint8Array.length; i++) {
+    binary += String.fromCharCode(uint8Array[i]);
+  }
+  return btoa(binary);
+}
+
 async function loadAndExtract(url) {
   const io = new WebIO();
 
@@ -32,11 +40,41 @@ async function loadAndExtract(url) {
       const uvs = getAttrArray('TEXCOORD_0');    // Float32Array | null
       const colors = getAttrArray('COLOR_0');       // Float32Array | null
       const indices = prim.getIndices() ? prim.getIndices().getArray() : null; // Uint16Array|Uint32Array|null
+      let texture = null;
 
       // const colorAccessor = prim.getAttribute('COLOR_0');
       // console.log(colorAccessor.getComponentType()); // Should be 5126 (FLOAT) or 5121 (UNSIGNED_BYTE)
       // console.log(colorAccessor.getNormalized());    // true or false
       const colorSize = prim.getAttribute('COLOR_0').getElementSize(); // 3 or 4
+
+      const material = prim.getMaterial();
+      if (!material) {
+        console.log('  No material assigned.');
+        continue;
+      }
+
+      const baseColorTexture = material.getBaseColorTexture();
+      if (baseColorTexture) {
+        console.log('  Base Color Texture:', baseColorTexture.getName());
+        console.log('  MIME Type:', baseColorTexture.getMimeType());// e.g. 'image/png'
+        console.log('  Image Size:', baseColorTexture.getImage()?.length);// Uint8Array
+        console.log('  Image Size:', baseColorTexture.getImage());// Uint8Array
+
+        const mimeType = baseColorTexture.getMimeType();
+        const imageData = baseColorTexture.getImage();
+
+
+        texture = `data:${mimeType};base64,${uint8ToBase64(imageData)}`;
+
+
+      } else {
+        console.log('  No base color texture.');
+      }
+
+      // You can also check other texture slots:
+      // material.getNormalTexture()
+      // material.getMetallicRoughnessTexture()
+      // material.getEmissiveTexture()
 
       results.push({
         meshName: mesh.getName() || null,
@@ -45,7 +83,8 @@ async function loadAndExtract(url) {
         uvs,
         colors,
         indices,
-        colorSize
+        colorSize,
+        texture
       });
     }
   }
@@ -84,10 +123,12 @@ cube_renderpass.loadOp = 'clear';
 // );
 
 const url = 'glb1/monkey.glb'; // or remote URL (CORS must allow)
+let textureOut = null;
 try {
   const data = await loadAndExtract(url);
-  const { positions, colors, uvs, normals, indices, colorSize } = data[0]
+  const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0]
   cube_renderpass.addMesh('test', positions, colors, colorSize, uvs, normals, indices)
+  textureOut = texture;
   console.log('Extracted primitives:', data);
   // upload data[i].positions etc to WebGPU buffers
 } catch (e) {
@@ -102,6 +143,9 @@ const base = {
    * @param {Points} points
    */
   init: async (points, folder) => {
+    await points.setTextureImage('albedo', textureOut);
+    points.setSampler('imageSampler', null)
+
     aspect = points.canvas.width / points.canvas.height;
     points.setUniform(
       'projection',
