@@ -587,7 +587,7 @@ class RenderPass {
     }
 
     /**
-     *
+     * Add a external mesh with the provided required data.
      * @param {String} name
      * @param {Array<{x:Number, y:Number, z:Number}>} vertices
      * @param {Array<{r:Number, g:Number, b:Number, a:Number}>} colors
@@ -595,30 +595,21 @@ class RenderPass {
      * @param {Array<Number>} normals
      */
     addMesh(name, vertices, colors, uvs, normals, indices) {
-
-        console.log(vertices.length);
-        console.log(colors?.length);
-        console.log(uvs.length);
-        console.log(normals.length);
-        console.log(indices);
-
         const itemAmount = indices.length;
 
         for (let i = 0; i < itemAmount; i++) {
             const index = indices[i];
-            const vertex = vertices.slice(index*3, index*3 + 3);
+            const vertex = vertices.slice(index * 3, index * 3 + 3);
 
-            const color = colors?.slice(index*4, index*4 + 4);
-            const uv = uvs.slice(index*2, index*2 + 2);
-            const normal = normals.slice(index*3, index*3 + 3);
-            // console.log(normal);
+            const color = colors?.slice(index * 4, index * 4 + 4);
+            const uv = uvs.slice(index * 2, index * 2 + 2);
+            const normal = normals.slice(index * 3, index * 3 + 3);
 
-            const [ x, y, z ] = vertex;
-            const [ r, g, b, a ] = color || [];
-            const [ u, v ] = uv;
+            const [x, y, z] = vertex;
+            const [r, g, b, a] = color || [1,0,1,1];
+            const [u, v] = uv;
             this.#vertexArray.push(+x, +y, +z, 1, r, g, b, a, u, v, ...normal, this.#meshCounter);
         }
-
 
         const mesh = {
             name,
