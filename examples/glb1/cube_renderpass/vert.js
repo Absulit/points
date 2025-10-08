@@ -16,9 +16,9 @@ fn main(
     @builtin(vertex_index) vertexIndex: u32,
     @builtin(instance_index) instanceIndex: u32
 ) -> Fragment {
-    var angleZ = params.time * 0.9854;
+    // var angleZ = params.time * 0.9854;
     var angleY = params.time * 0.94222;
-    var angleX = params.time * 0.865;
+    // var angleX = params.time * 0.865;
 
     // if(id == mesh.cube1){
     //     angleZ = params.time * 0.1854;
@@ -26,9 +26,9 @@ fn main(
     //     angleX = params.time * 0.4865;
     // }
 
-    let rotX = rotXAxis(angleX);
+    let rotX = rotXAxis(0);
     let rotY = rotYAxis(angleY);
-    let rotZ = rotZAxis(angleZ);
+    let rotZ = rotZAxis(0);
     let model = rotX * rotY * rotZ;
 
     let world = (model * vec4f(position.xyz, 1.)).xyz;

@@ -594,21 +594,21 @@ class RenderPass {
      * @param {Array<{u:Number, v:Number}>} uvs
      * @param {Array<Number>} normals
      */
-    addMesh(name, vertices, colors, uvs, normals, indices) {
+    addMesh(name, vertices, colors, colorSize, uvs, normals, indices) {
         const itemAmount = indices.length;
 
         for (let i = 0; i < itemAmount; i++) {
             const index = indices[i];
             const vertex = vertices.slice(index * 3, index * 3 + 3);
 
-            const color = colors?.slice(index * 4, index * 4 + 4);
+            const color = colors?.slice(index * colorSize, index * colorSize + colorSize);
             const uv = uvs.slice(index * 2, index * 2 + 2);
             const normal = normals.slice(index * 3, index * 3 + 3);
 
             const [x, y, z] = vertex;
-            const [r, g, b, a] = color || [1,0,1,1];
+            const [r, g, b] = color || [1, 0, 1];
             const [u, v] = uv;
-            this.#vertexArray.push(+x, +y, +z, 1, r, g, b, a, u, v, ...normal, this.#meshCounter);
+            this.#vertexArray.push(+x, +y, +z, 1, r, g, b, 1, u, v, ...normal, this.#meshCounter);
         }
 
         const mesh = {

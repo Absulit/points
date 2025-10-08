@@ -33,6 +33,11 @@ async function loadAndExtract(url) {
       const colors = getAttrArray('COLOR_0');       // Float32Array | null
       const indices = prim.getIndices() ? prim.getIndices().getArray() : null; // Uint16Array|Uint32Array|null
 
+      // const colorAccessor = prim.getAttribute('COLOR_0');
+      // console.log(colorAccessor.getComponentType()); // Should be 5126 (FLOAT) or 5121 (UNSIGNED_BYTE)
+      // console.log(colorAccessor.getNormalized());    // true or false
+      const colorSize = prim.getAttribute('COLOR_0').getElementSize(); // 3 or 4
+
       results.push({
         meshName: mesh.getName() || null,
         positions,
@@ -40,6 +45,7 @@ async function loadAndExtract(url) {
         uvs,
         colors,
         indices,
+        colorSize
       });
     }
   }
@@ -80,8 +86,8 @@ cube_renderpass.loadOp = 'clear';
 const url = 'glb1/monkey.glb'; // or remote URL (CORS must allow)
 try {
   const data = await loadAndExtract(url);
-  const {positions, colors, uvs, normals, indices} = data[0]
-  cube_renderpass.addMesh('test', positions, colors, uvs, normals, indices)
+  const { positions, colors, uvs, normals, indices, colorSize } = data[0]
+  cube_renderpass.addMesh('test', positions, colors, colorSize, uvs, normals, indices)
   console.log('Extracted primitives:', data);
   // upload data[i].positions etc to WebGPU buffers
 } catch (e) {
