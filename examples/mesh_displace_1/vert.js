@@ -94,7 +94,7 @@ fn pnoise3(P:vec3f, rep:vec3f) -> f32 {
     return 2.2 * n_xyz;
 }
 
-fn turbulence(p:f32) -> f32 {
+fn turbulence(p:vec3f) -> f32 {
     let w = 100.0;
     var t = -.5;
 
@@ -123,7 +123,13 @@ fn main(
     let rotZ = rotZAxis(angleZ);
     let model = rotX * rotY * rotZ;
 
-    let world = (model * vec4f(position.xyz, 1.)).xyz;
+    let noise = 10.0 * -.10 * turbulence(.5 * normal + params.time / 3.0);
+    let b = 5.0 * pnoise3(0.05 * position.xyz, vec3(100.));
+    let displacement = (-10. * noise + b) / 50.0;
+
+
+    let world = (model * vec4f(position.xyz  + normal * displacement * params.val * 100, 1.)).xyz;
+    // let world = position.xyz + normal * displacement * params.val * 10;
     let clip = params.projection * params.view * vec4f(world, 1.);
 
     let newNormal = normalize((model * vec4f(normal, 0.)).xyz);
@@ -136,16 +142,3 @@ fn main(
 `;
 
 export default vert;
-
-
-
-
-// void main() {
-//   float time = timeMsec / 1000.0; // Convert from A-Frame milliseconds to typical time in seconds.
-//   noise = 10.0 *  -.10 * turbulence( .5 * normal + time / 3.0 );
-//   float b = 5.0 * pnoise3( 0.05 * position, vec3( 100.0 ) );
-//   float displacement = (- 10. * noise + b) / 50.0;
-
-//   vec3 newPosition = position + normal * displacement + myOffset;
-//   gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
-// }

@@ -14,7 +14,7 @@ let aspect = null
 const nf = 1 / (near - far);
 
 const renderPass = new RenderPass(vert, frag, compute);
-renderPass.addSphere('sphere', { x: 0, y: 0, z: 0 }, { r: 1, g: 1, b: 0, a: 1 }, 1, 32, 32);
+renderPass.addSphere('sphere', { x: 0, y: 0, z: 0 }, { r: 1, g: 1, b: 0, a: 1 }, 1, 256, 256);
 
 const base = {
     renderPasses: [renderPass],
