@@ -1,8 +1,10 @@
 import { fnusin } from 'points/animation';
+import { texture } from 'points/image';
 
 const frag = /*wgsl*/`
 
 ${fnusin}
+${texture}
 
 
 @fragment
@@ -16,6 +18,9 @@ fn main(
     @interpolate(flat) @location(6) id: u32,
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
+
+    let flippedUV = vec2f(uv.x, 1. - uv.y);
+    let albedoColor = texture(albedo, imageSampler, flippedUV, false);
 
     let cellSize = 20. + 10. * fnusin(1.);
     let a = sin(uvr.x  * cellSize) * sin(uvr.y * cellSize);
@@ -34,9 +39,9 @@ fn main(
     // if(id == mesh.cube1){
     //     baseColor = vec4(a*f, d*c*f, f, 1);
     // }
-    let finalColor = baseColor.rgb * diffuse; // how much of the color is diffused
+    let finalColor = albedoColor.rgb * diffuse; // how much of the color is diffused
 
-    return vec4f(finalColor, baseColor.a);
+    return vec4f(finalColor, color.a);
 }
 `;
 

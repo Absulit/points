@@ -30,6 +30,8 @@ async function loadAndExtract(url) {
 
   for (const mesh of meshes) {
     for (const prim of mesh.listPrimitives()) {
+      console.log(prim);
+
       const getAttrArray = (name) => {
         const attr = prim.getAttribute(name);
         return attr ? attr.getArray() : null;
@@ -39,6 +41,7 @@ async function loadAndExtract(url) {
       const normals = getAttrArray('NORMAL');        // Float32Array | null
       const uvs = getAttrArray('TEXCOORD_0');    // Float32Array | null
       const colors = getAttrArray('COLOR_0');       // Float32Array | null
+
       const indices = prim.getIndices() ? prim.getIndices().getArray() : null; // Uint16Array|Uint32Array|null
       let texture = null;
 
@@ -58,7 +61,6 @@ async function loadAndExtract(url) {
         console.log('  Base Color Texture:', baseColorTexture.getName());
         console.log('  MIME Type:', baseColorTexture.getMimeType());// e.g. 'image/png'
         console.log('  Image Size:', baseColorTexture.getImage()?.length);// Uint8Array
-        console.log('  Image Size:', baseColorTexture.getImage());// Uint8Array
 
         const mimeType = baseColorTexture.getMimeType();
         const imageData = baseColorTexture.getImage();
@@ -94,7 +96,7 @@ async function loadAndExtract(url) {
 
 
 const options = {
-  loadOp: false
+  mode: 0
 }
 
 const near = 0.1, far = 100;
@@ -103,24 +105,6 @@ let aspect = null
 const nf = 1 / (near - far);
 
 
-// TODO: cubes need to be outside init() here, because the RenderPass is imported
-// and is already in memory the next time is loaded, so new cubes load
-// a solution would be to call a remove (like init, update) and delete the RenderPass
-
-
-cube_renderpass.loadOp = 'clear';
-// cube_renderpass.addCube(
-//   'cube0',
-//   { x: 0, y: 0, z: 0 },
-//   { width: 1, height: 1, depth: 1 },
-//   { r: 1, g: 0, b: 0, a: 1 }
-// );
-// cube_renderpass.addCube(
-//   'cube1',
-//   { x: 0, y: 1, z: 0 },
-//   { width: 1, height: 1, depth: 1 },
-//   { r: 1, g: 0, b: 0, a: 1 }
-// );
 
 const url = 'glb1/monkey.glb'; // or remote URL (CORS must allow)
 let textureOut = null;
@@ -174,9 +158,16 @@ const base = {
     // points.addRenderPass(RenderPasses.PIXELATE);
     // points.addRenderPass(RenderPasses.FILM_GRAIN);
 
-    folder.add(options, 'loadOp')
-      .name('loadOp: clear|load')
-      .onChange(value => cube_renderpass.loadOp = value ? 'load' : 'clear');
+    const dropdownItems = { 'Vertex': 0, 'Texture': 1, 'Shader': 2 };
+
+    points.setUniform('color_mode', options.mode);
+    folder.add(options, 'mode', dropdownItems).name('Colors').onChange(value => {
+      console.log(value);
+      points.setUniform('color_mode', value);
+    });
+
+
+
     folder.open();
   },
   /**
