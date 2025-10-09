@@ -94,6 +94,18 @@ fn pnoise3(P:vec3f, rep:vec3f) -> f32 {
     return 2.2 * n_xyz;
 }
 
+fn turbulence(p:f32) -> f32 {
+    let w = 100.0;
+    var t = -.5;
+
+    for (var f:f32 = 1; f <= 10; f+=1.){
+        let power = pow( 2.0, f );
+        t += abs(pnoise3(vec3(power * p), vec3(10., 10., 10.)) / power);
+    }
+
+    return t;
+}
+
 @vertex
 fn main(
     @location(0) position: vec4f,
@@ -126,19 +138,7 @@ fn main(
 export default vert;
 
 
-// float turbulence( vec3 p ) {
 
-//   float w = 100.0;
-//   float t = -.5;
-
-//   for (float f = 1.0 ; f <= 10.0 ; f++ ){
-//     float power = pow( 2.0, f );
-//     t += abs( pnoise3( vec3( power * p ), vec3( 10.0, 10.0, 10.0 ) ) / power );
-//   }
-
-//   return t;
-
-// }
 
 // void main() {
 //   float time = timeMsec / 1000.0; // Convert from A-Frame milliseconds to typical time in seconds.
