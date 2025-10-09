@@ -107,17 +107,11 @@ const nf = 1 / (near - far);
 
 
 const url = 'glb1/monkey.glb'; // or remote URL (CORS must allow)
-let textureOut = null;
-try {
-  const data = await loadAndExtract(url);
-  const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0]
-  cube_renderpass.addMesh('test', positions, colors, colorSize, uvs, normals, indices)
-  textureOut = texture;
-  console.log('Extracted primitives:', data);
-  // upload data[i].positions etc to WebGPU buffers
-} catch (e) {
-  console.error('Failed to load glTF:', e);
-}
+const data = await loadAndExtract(url);
+const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0]
+cube_renderpass.addMesh('test', positions, colors, colorSize, uvs, normals, indices)
+const textureOut = texture;
+
 
 const base = {
   renderPasses: [
