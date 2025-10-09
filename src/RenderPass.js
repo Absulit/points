@@ -528,6 +528,15 @@ class RenderPass {
         ++this.#meshCounter;
     }
 
+    /**
+     *
+     * @param {String} name
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     * @param {Number} radius
+     * @param {Number} segments
+     * @param {Number} rings
+     */
     addSphere(name, coordinate, color, radius = 1, segments = 16, rings = 12) {
         const { x, y, z } = coordinate;
         const { r, g, b, a } = color;
