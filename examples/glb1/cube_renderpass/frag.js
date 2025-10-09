@@ -36,10 +36,11 @@ fn main(
     let L = normalize(-lightDirection);
     let diffuse = max(dot(N, L), 0.0); // Lambertian term
 
-    // if(id == mesh.cube1){
-    //     baseColor = vec4(a*f, d*c*f, f, 1);
-    // }
-    let finalColor = albedoColor.rgb * diffuse; // how much of the color is diffused
+    baseColor = albedoColor;
+    if(params.color_mode == 2){
+        baseColor = vec4(a*f, d*c*f, f, 1);
+    }
+    let finalColor = baseColor.rgb * diffuse; // how much of the color is diffused
 
     return vec4f(finalColor, color.a);
 }

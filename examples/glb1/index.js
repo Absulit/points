@@ -96,7 +96,7 @@ async function loadAndExtract(url) {
 
 
 const options = {
-  mode: 0
+  mode: 1
 }
 
 const near = 0.1, far = 100;
@@ -152,7 +152,7 @@ const base = {
     // points.addRenderPass(RenderPasses.PIXELATE);
     // points.addRenderPass(RenderPasses.FILM_GRAIN);
 
-    const dropdownItems = { 'Vertex': 0, 'Texture': 1, 'Shader': 2 };
+    const dropdownItems = { /*'Vertex': 0,*/ 'Texture': 1, 'Shader': 2 };
 
     points.setUniform('color_mode', options.mode);
     folder.add(options, 'mode', dropdownItems).name('Colors').onChange(value => {
