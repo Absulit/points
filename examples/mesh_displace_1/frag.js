@@ -9,9 +9,6 @@ fn main(
     @location(4) mouse: vec2f,
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
-
-    let shadow = textureSampleCompare(depth, imageSampler, uvr, 1.);
-
     return color;
 }
 `;

@@ -24,10 +24,6 @@ const base = {
      */
     init: async (points, folder) => {
         // points.setStorage('noise', 'f32', false, GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT);
-
-        points.setTextureDepth2d('depth', GPUShaderStage.FRAGMENT);
-        points.setSampler('imageSampler', { compare: 'less' });
-
         aspect = points.canvas.width / points.canvas.height;
         points.setUniform(
             'projection',
