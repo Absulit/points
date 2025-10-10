@@ -58,6 +58,7 @@ class Points {
     #readStorage = [];
     #samplers = [];
     #textures2d = [];
+    #texturesDepth2d = [];
     #texturesToCopy = [];
     #textures2dArray = [];
     #texturesExternal = [];
@@ -157,8 +158,8 @@ class Points {
         this.#depthTexture = this.#device.createTexture({
             label: '_depthTexture',
             size: this.#presentationSize,
-            format: 'depth24plus',
-            usage: GPUTextureUsage.RENDER_ATTACHMENT,
+            format: 'depth32float',
+            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING,
         });
         // this is to solve an issue that requires the texture to be resized
         // if the screen dimensions change, this for a `setTexture2d` with
@@ -569,6 +570,23 @@ class Points {
         }
         this.#textures2d.push(texture2d);
         return texture2d;
+    }
+
+    setTextureDepth2d(name, shaderType, renderPassIndex) {
+        const exists = this.#nameExists(this.#texturesDepth2d, name);
+        if (exists) {
+            console.warn(`setTextureDepth2d: \`${name}\` already exists.`);
+            return exists;
+        }
+        const textureDepth2d = {
+            name,
+            shaderType,
+            texture: null,
+            renderPassIndex,
+            internal: false,
+        }
+        this.#texturesDepth2d.push(textureDepth2d);
+        return textureDepth2d;
     }
 
 
@@ -1019,7 +1037,8 @@ class Points {
         this.#samplers.forEach(sampler => {
             const isInternal = internal === sampler.internal;
             if (isInternal && (!sampler.shaderType || sampler.shaderType & shaderType)) {
-                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${sampler.name}: sampler;\n`;
+                const T = sampler.descriptor.compare ? 'sampler_comparison' : 'sampler';
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${sampler.name}: ${T};\n`;
                 bindingIndex += 1;
             }
         });
@@ -1034,6 +1053,13 @@ class Points {
             const isInternal = internal === texture.internal;
             if (isInternal && (!texture.shaderType || texture.shaderType & shaderType)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d<f32>;\n`;
+                bindingIndex += 1;
+            }
+        });
+        this.#texturesDepth2d.forEach(texture => {
+            const isInternal = internal === texture.internal;
+            if (isInternal && (!texture.shaderType || texture.shaderType & shaderType)) {
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_depth_2d;\n`;
                 bindingIndex += 1;
             }
         });
@@ -1514,9 +1540,8 @@ class Points {
         //--------------------------------------------
         this.#textures2d.forEach(texture2d => {
             if (texture2d.imageTexture) {
-                let cubeTexture;
                 const imageBitmap = texture2d.imageTexture.bitmap;
-                cubeTexture = this.#device.createTexture({
+                const cubeTexture = this.#device.createTexture({
                     label: texture2d.name,
                     size: [imageBitmap.width, imageBitmap.height, 1],
                     format: 'rgba8unorm',
@@ -1537,6 +1562,8 @@ class Points {
                 this.#createTextureBindingToCopy(texture2d);
             }
         });
+        //--------------------------------------------
+        this.#texturesDepth2d.forEach(texture2d => this.#createTextureDepth(texture2d));
         //--------------------------------------------
         this.#textures2dArray.forEach(texture2dArray => {
             if (texture2dArray.imageTextures) {
@@ -1585,6 +1612,15 @@ class Points {
             size: this.#presentationSize,
             format: this.#presentationFormat, // if 'depth24plus' throws error
             usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
+        });
+    }
+
+    #createTextureDepth(texture2d) {
+        texture2d.texture = this.#device.createTexture({
+            label: texture2d.name,
+            size: this.#presentationSize,
+            format: 'depth32float',
+            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING,
         });
     }
 
@@ -1678,7 +1714,7 @@ class Points {
                     depthStencil: {
                         depthWriteEnabled: renderPass.depthWriteEnabled,
                         depthCompare: 'less',
-                        format: 'depth24plus',
+                        format: 'depth32float',
                     },
                     vertex: {
                         module: this.#device.createShaderModule({
@@ -1847,7 +1883,7 @@ class Points {
                             binding: bindingIndex++,
                             resource: sampler.resource,
                             sampler: {
-                                type: 'filtering'
+                                type: sampler.descriptor.compare ? 'comparison' : 'filtering'
                             }
                         }
                     );
@@ -1882,6 +1918,25 @@ class Points {
                             resource: texture2d.texture.createView(),
                             texture: {
                                 type: 'float'
+                            }
+                        }
+                    );
+                }
+            });
+        }
+        if (this.#texturesDepth2d.length) {
+            this.#texturesDepth2d.forEach(texture2d => {
+                const isInternal = internal === texture2d.internal;
+                if (isInternal && (!texture2d.shaderType || texture2d.shaderType & shaderType)) {
+                    entries.push(
+                        {
+                            label: 'texture depth 2d',
+                            binding: bindingIndex++,
+                            resource: texture2d.texture.createView(),
+                            texture: {
+                                sampleType: 'depth',
+                                viewDimension: '2d',
+                                multisampled: false,
                             }
                         }
                     );
