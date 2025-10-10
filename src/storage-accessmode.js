@@ -66,5 +66,5 @@ export default function getStorageAccessMode(currentStage, storageShaderTypes) {
     return cache[storageShaderTypes][currentStage];
 }
 
-export const bindingModes = { ['r']: 'read', ['rw']: 'read_write' };
-export const entriesModes = { ['r']: 'read-only-storage', ['rw']: 'storage' };
+export const bindingModes = { 'r': 'read', 'rw': 'read_write' };
+export const entriesModes = { 'r': 'read-only-storage', 'rw': 'storage' };
