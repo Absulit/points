@@ -4,7 +4,7 @@ import frag from './frag.js';
 import Points, { RenderPass } from 'points';
 
 const options = {
-    val: 0,
+    val: -.108,
     bool: false,
 }
 
@@ -14,7 +14,7 @@ let aspect = null
 const nf = 1 / (near - far);
 
 const renderPass = new RenderPass(vert, frag, compute);
-renderPass.addSphere('sphere', { x: 0, y: 0, z: 0 }, { r: 1, g: 1, b: 0, a: 1 }, 1, 256, 256);
+renderPass.addSphere('sphere', { x: 0, y: 0, z: 0 }, { r: 1, g: 1, b: 0, a: 1 }, .5, 256, 256);
 
 const base = {
     renderPasses: [renderPass],
