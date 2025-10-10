@@ -86,6 +86,7 @@ class RenderPass {
 
     #depthWriteEnabled = true;
     #loadOp = 'clear';
+    #clearValue = { r: 0.0, g: 0.0, b: 0.0, a: 1.0 };
 
     #meshCounter = 0;
     #meshes = [];
@@ -407,6 +408,20 @@ class RenderPass {
      */
     set loadOp(val) {
         this.#loadOp = val;
+    }
+
+    get clearValue() {
+        return this.#clearValue;
+    }
+
+    /**
+     * Sets the color used to clear the RenderPass before drawing.
+     * (only if {@link RenderPass#loadOp | loadOp} is set to `clear`)
+     * default: black
+     * @param {{ r: Number, g: Number, b: Number, a: Number }} val
+     */
+    set clearValue(val) {
+        this.#clearValue = val;
     }
 
     /**

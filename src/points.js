@@ -2120,6 +2120,7 @@ class Points {
                 this.#passRenderBindGroup(renderPass);
                 this.#passVertexBindGroup(renderPass);
                 this.#renderPassDescriptor.colorAttachments[0].loadOp = renderPass.loadOp;
+                this.#renderPassDescriptor.colorAttachments[0].clearValue = renderPass.clearValue;
                 const passEncoder = commandEncoder.beginRenderPass(this.#renderPassDescriptor);
                 passEncoder.setPipeline(renderPass.renderPipeline);
 
