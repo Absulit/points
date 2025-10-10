@@ -23,41 +23,44 @@ read_write. Compute is always read_write.
 * @ignore
 */
 
+const R = 'r';
+const RW = 'rw';
+
 const cache = {
     [GPUShaderStage.COMPUTE | GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT]: {
-        [GPUShaderStage.COMPUTE]: 'rw',
-        [GPUShaderStage.VERTEX]: 'r',
-        [GPUShaderStage.FRAGMENT]: 'r'
+        [GPUShaderStage.COMPUTE]: RW,
+        [GPUShaderStage.VERTEX]: R,
+        [GPUShaderStage.FRAGMENT]: R
     },//
     [GPUShaderStage.COMPUTE]: {
-        [GPUShaderStage.COMPUTE]: 'rw',
+        [GPUShaderStage.COMPUTE]: RW,
         [GPUShaderStage.VERTEX]: null,
         [GPUShaderStage.FRAGMENT]: null
     },
     [GPUShaderStage.VERTEX]: {
         [GPUShaderStage.COMPUTE]: null,
-        [GPUShaderStage.VERTEX]: 'r',
+        [GPUShaderStage.VERTEX]: R,
         [GPUShaderStage.FRAGMENT]: null
     },
     [GPUShaderStage.FRAGMENT]: {
         [GPUShaderStage.COMPUTE]: null,
         [GPUShaderStage.VERTEX]: null,
-        [GPUShaderStage.FRAGMENT]: 'rw'
+        [GPUShaderStage.FRAGMENT]: RW
     },//
     [GPUShaderStage.COMPUTE | GPUShaderStage.VERTEX]: {
-        [GPUShaderStage.COMPUTE]: 'rw',
-        [GPUShaderStage.VERTEX]: 'r',
+        [GPUShaderStage.COMPUTE]: RW,
+        [GPUShaderStage.VERTEX]: R,
         [GPUShaderStage.FRAGMENT]: null
     },
     [GPUShaderStage.COMPUTE | GPUShaderStage.FRAGMENT]: {
-        [GPUShaderStage.COMPUTE]: 'rw',
+        [GPUShaderStage.COMPUTE]: RW,
         [GPUShaderStage.VERTEX]: null,
-        [GPUShaderStage.FRAGMENT]: 'rw'
+        [GPUShaderStage.FRAGMENT]: RW
     },//
     [GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT]: {
         [GPUShaderStage.COMPUTE]: null,
-        [GPUShaderStage.VERTEX]: 'r',
-        [GPUShaderStage.FRAGMENT]: 'r'
+        [GPUShaderStage.VERTEX]: R,
+        [GPUShaderStage.FRAGMENT]: R
     },
 }
 
@@ -66,5 +69,5 @@ export default function getStorageAccessMode(currentStage, storageShaderTypes) {
     return cache[storageShaderTypes][currentStage];
 }
 
-export const bindingModes = { 'r': 'read', 'rw': 'read_write' };
-export const entriesModes = { 'r': 'read-only-storage', 'rw': 'storage' };
+export const bindingModes = { [R]: 'read', [RW]: 'read_write' };
+export const entriesModes = { [R]: 'read-only-storage', [RW]: 'storage' };
