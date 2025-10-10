@@ -65,7 +65,6 @@ const cache = {
 }
 
 export default function getStorageAccessMode(currentStage, storageShaderTypes) {
-    // console.log(currentStage, storageShaderTypes);
     return cache[storageShaderTypes][currentStage];
 }
 
