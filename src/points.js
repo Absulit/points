@@ -1874,114 +1874,102 @@ class Points {
                 );
             }
         }
-        if (this.#samplers.length) {
-            this.#samplers.forEach(sampler => {
-                const isInternal = internal === sampler.internal;
-                if (isInternal && (!sampler.shaderType || sampler.shaderType & shaderType)) {
-                    entries.push(
-                        {
-                            binding: bindingIndex++,
-                            resource: sampler.resource,
-                            sampler: {
-                                type: sampler.descriptor.compare ? 'comparison' : 'filtering'
-                            }
+        this.#samplers.forEach(sampler => {
+            const isInternal = internal === sampler.internal;
+            if (isInternal && (!sampler.shaderType || sampler.shaderType & shaderType)) {
+                entries.push(
+                    {
+                        binding: bindingIndex++,
+                        resource: sampler.resource,
+                        sampler: {
+                            type: sampler.descriptor.compare ? 'comparison' : 'filtering'
                         }
-                    );
-                }
-            });
-        }
-        if (this.#texturesStorage2d.length) {
-            this.#texturesStorage2d.forEach(textureStorage2d => {
-                const isInternal = internal === textureStorage2d.internal;
-                if (isInternal && (!textureStorage2d.shaderType || textureStorage2d.shaderType & shaderType)) {
-                    entries.push(
-                        {
-                            label: 'texture storage 2d',
-                            binding: bindingIndex++,
-                            resource: textureStorage2d.texture.createView(),
-                            storageTexture: {
-                                type: 'write-only'
-                            }
+                    }
+                );
+            }
+        });
+        this.#texturesStorage2d.forEach(textureStorage2d => {
+            const isInternal = internal === textureStorage2d.internal;
+            if (isInternal && (!textureStorage2d.shaderType || textureStorage2d.shaderType & shaderType)) {
+                entries.push(
+                    {
+                        label: 'texture storage 2d',
+                        binding: bindingIndex++,
+                        resource: textureStorage2d.texture.createView(),
+                        storageTexture: {
+                            type: 'write-only'
                         }
-                    );
-                }
-            });
-        }
-        if (this.#textures2d.length) {
-            this.#textures2d.forEach(texture2d => {
-                const isInternal = internal === texture2d.internal;
-                if (isInternal && (!texture2d.shaderType || texture2d.shaderType & shaderType)) {
-                    entries.push(
-                        {
-                            label: 'texture 2d',
-                            binding: bindingIndex++,
-                            resource: texture2d.texture.createView(),
-                            texture: {
-                                type: 'float'
-                            }
+                    }
+                );
+            }
+        });
+        this.#textures2d.forEach(texture2d => {
+            const isInternal = internal === texture2d.internal;
+            if (isInternal && (!texture2d.shaderType || texture2d.shaderType & shaderType)) {
+                entries.push(
+                    {
+                        label: 'texture 2d',
+                        binding: bindingIndex++,
+                        resource: texture2d.texture.createView(),
+                        texture: {
+                            type: 'float'
                         }
-                    );
-                }
-            });
-        }
-        if (this.#texturesDepth2d.length) {
-            this.#texturesDepth2d.forEach(texture2d => {
-                const isInternal = internal === texture2d.internal;
-                if (isInternal && (!texture2d.shaderType || texture2d.shaderType & shaderType)) {
-                    entries.push(
-                        {
-                            label: 'texture depth 2d',
-                            binding: bindingIndex++,
-                            resource: texture2d.texture.createView(),
-                            texture: {
-                                sampleType: 'depth',
-                                viewDimension: '2d',
-                                multisampled: false,
-                            }
+                    }
+                );
+            }
+        });
+        this.#texturesDepth2d.forEach(texture2d => {
+            const isInternal = internal === texture2d.internal;
+            if (isInternal && (!texture2d.shaderType || texture2d.shaderType & shaderType)) {
+                entries.push(
+                    {
+                        label: 'texture depth 2d',
+                        binding: bindingIndex++,
+                        resource: texture2d.texture.createView(),
+                        texture: {
+                            sampleType: 'depth',
+                            viewDimension: '2d',
+                            multisampled: false,
                         }
-                    );
-                }
-            });
-        }
-        if (this.#textures2dArray.length) {
-            this.#textures2dArray.forEach(texture2dArray => {
-                const isInternal = internal === texture2dArray.internal;
-                if (isInternal && (!texture2dArray.shaderType || texture2dArray.shaderType & shaderType)) {
-                    entries.push(
-                        {
-                            label: 'texture 2d array',
-                            binding: bindingIndex++,
-                            resource: texture2dArray.texture.createView({
-                                dimension: '2d-array',
-                                baseArrayLayer: 0,
-                                arrayLayerCount: texture2dArray.imageTextures.bitmaps.length
-                            }),
-                            texture: {
-                                type: 'float',
-                                viewDimension: '2d-array'
-                            }
+                    }
+                );
+            }
+        });
+        this.#textures2dArray.forEach(texture2dArray => {
+            const isInternal = internal === texture2dArray.internal;
+            if (isInternal && (!texture2dArray.shaderType || texture2dArray.shaderType & shaderType)) {
+                entries.push(
+                    {
+                        label: 'texture 2d array',
+                        binding: bindingIndex++,
+                        resource: texture2dArray.texture.createView({
+                            dimension: '2d-array',
+                            baseArrayLayer: 0,
+                            arrayLayerCount: texture2dArray.imageTextures.bitmaps.length
+                        }),
+                        texture: {
+                            type: 'float',
+                            viewDimension: '2d-array'
                         }
-                    );
-                }
-            });
-        }
-        if (this.#texturesExternal.length) {
-            this.#texturesExternal.forEach(externalTexture => {
-                const isInternal = internal === externalTexture.internal;
-                if (isInternal && (!externalTexture.shaderType || externalTexture.shaderType & shaderType)) {
-                    entries.push(
-                        {
-                            label: 'external texture',
-                            binding: bindingIndex++,
-                            resource: externalTexture.texture,
-                            externalTexture: {
-                                // type: 'write-only'
-                            }
+                    }
+                );
+            }
+        });
+        this.#texturesExternal.forEach(externalTexture => {
+            const isInternal = internal === externalTexture.internal;
+            if (isInternal && (!externalTexture.shaderType || externalTexture.shaderType & shaderType)) {
+                entries.push(
+                    {
+                        label: 'external texture',
+                        binding: bindingIndex++,
+                        resource: externalTexture.texture,
+                        externalTexture: {
+                            // type: 'write-only'
                         }
-                    );
-                }
-            });
-        }
+                    }
+                );
+            }
+        });
         // TODO: repeated entry blocks
         this.#bindingTextures.forEach(bindingTexture => {
             const { usesRenderPass } = bindingTexture;
