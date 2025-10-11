@@ -108,6 +108,13 @@ class RenderPass {
         // }
     };
 
+    #depthStencilAttachment = {
+        //view: this.#depthTexture.createView(),
+        depthClearValue: 1.0,
+        depthLoadOp: 'clear',
+        depthStoreOp: 'store'
+    }
+
     /**
      * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
      * This is useful for PostProcessing.
@@ -413,12 +420,7 @@ class RenderPass {
     set depthWriteEnabled(val) {
 
         if (val) {
-            this.#descriptor.depthStencilAttachment = {
-                //view: this.#depthTexture.createView(),
-                depthClearValue: 1.0,
-                depthLoadOp: 'clear',
-                depthStoreOp: 'store'
-            }
+            this.#descriptor.depthStencilAttachment = this.#depthStencilAttachment;
         }
 
         this.#depthWriteEnabled = val;

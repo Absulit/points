@@ -37,6 +37,7 @@ const nf = 1 / (near - far);
 // and is already in memory the next time is loaded, so new cubes load
 // a solution would be to call a remove (like init, update) and delete the RenderPass
 
+staticcube_renderpass.depthWriteEnabled = true;
 staticcube_renderpass.addCube(
     'cube_behind',
     { x: 0, y: 0, z: 0 },
@@ -45,6 +46,7 @@ staticcube_renderpass.addCube(
 );
 
 cube_renderpass.loadOp = 'clear';
+cube_renderpass.depthWriteEnabled = true;
 cube_renderpass.addCube(
     'cube0',
     { x: 0, y: 0, z: 0 },
