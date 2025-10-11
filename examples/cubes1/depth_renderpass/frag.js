@@ -17,14 +17,14 @@ fn main(
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
 
-    let shadow = textureSampleCompare(depth, imageSampler, uvr, params.val);
+    let shadow = textureSampleCompare(depth, imageSampler, uv, params.val);
 
     let texSize = vec2f(textureDimensions(depth, 0));
-    let coords = vec2i(uv);
+    let coords = vec2i(uv * texSize);
     let d = textureLoad(depth, coords, 0);
-    let visual = pow(d, params.val);
+    let visual = pow(d, params.val * 1000);
 
-    return vec4f(vec3(shadow), 1);
+    return vec4f(vec3(visual), 1);
 }
 `;
 
