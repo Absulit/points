@@ -28,11 +28,11 @@ fn main(
     let shadow = textureSampleCompare(depth, imageSampler, uvr, params.val);
 
     let texSize = vec2f(textureDimensions(depth, 0));
-    let coords = vec2i(uvr);
+    let coords = vec2i(uv);
     let d = textureLoad(depth, coords, 0);
-    // let visual = pow(d, 0.5);
+    let visual = pow(d, params.val);
 
-    return vec4f(vec3(d * 10), 1);
+    return vec4f(vec3(shadow), 1);
 }
 `;
 

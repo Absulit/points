@@ -1058,8 +1058,10 @@ class Points {
         this.#texturesDepth2d.forEach(texture => {
             const isInternal = internal === texture.internal;
             if (isInternal && (!texture.shaderType || texture.shaderType & shaderType)) {
-                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_depth_2d;\n`;
-                bindingIndex += 1;
+                if(texture.renderPassIndex !== renderPassIndex){
+                    dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_depth_2d;\n`;
+                    bindingIndex += 1;
+                }
             }
         });
         this.#textures2dArray.forEach(texture => {
@@ -1546,7 +1548,8 @@ class Points {
             }
         });
         //--------------------------------------------
-        this.#texturesDepth2d.forEach(texture2d => this.#createTextureDepth(texture2d));
+        // this.#texturesDepth2d.forEach(texture2d => this.#createTextureDepth(texture2d));
+        this.#texturesDepth2d.forEach(texture2d => texture2d.texture = this.#depthTexture);
         //--------------------------------------------
         this.#textures2dArray.forEach(texture2dArray => {
             if (texture2dArray.imageTextures) {
@@ -1906,20 +1909,22 @@ class Points {
             }
         });
         this.#texturesDepth2d.forEach(texture2d => {
-            const isInternal = internal === texture2d.internal;
-            if (isInternal && (!texture2d.shaderType || texture2d.shaderType & shaderType)) {
-                entries.push(
-                    {
-                        label: 'texture depth 2d',
-                        binding: bindingIndex++,
-                        resource: texture2d.texture.createView(),
-                        texture: {
-                            sampleType: 'depth',
-                            viewDimension: '2d',
-                            multisampled: false,
+            if(texture2d.renderPassIndex !== renderPassIndex){
+                const isInternal = internal === texture2d.internal;
+                if (isInternal && (!texture2d.shaderType || texture2d.shaderType & shaderType)) {
+                    entries.push(
+                        {
+                            label: 'texture depth 2d',
+                            binding: bindingIndex++,
+                            resource: this.#depthTexture.createView(),
+                            texture: {
+                                sampleType: 'depth',
+                                viewDimension: '2d',
+                                multisampled: false,
+                            }
                         }
-                    }
-                );
+                    );
+                }
             }
         });
         this.#textures2dArray.forEach(texture2dArray => {
@@ -2151,6 +2156,7 @@ class Points {
                 renderPass.descriptor.colorAttachments[0].view = swapChainTexture.createView();
                 if(renderPass.depthWriteEnabled){
                     renderPass.descriptor.depthStencilAttachment.view = this.#depthTexture.createView();
+                    // renderPass.descriptor.depthStencilAttachment.view = this.#texturesDepth2d[0].texture.createView();
                 }
 
                 const passEncoder = commandEncoder.beginRenderPass(renderPass.descriptor);

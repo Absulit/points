@@ -24,9 +24,12 @@ console.log('NUMPARTICLES: ', NUMPARTICLES);
 
 const cube_renderpass = new RenderPass(vert, frag, compute, WORKGROUP_X, WORKGROUP_Y, WORKGROUP_Z);
 cube_renderpass.instanceCount = NUMPARTICLES;
+cube_renderpass.depthWriteEnabled = true;
+cube_renderpass.name = 'cube_renderpass';
 
 const depth_renderpass = new RenderPass(vertdepth, fragdepth);
 depth_renderpass.loadOp = 'load';
+depth_renderpass.name = 'depth_renderpass';
 
 // TODO: cubes need to be outside init() here, because the RenderPass is imported
 // and is already in memory the next time is loaded, so new cubes load
