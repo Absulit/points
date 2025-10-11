@@ -50,7 +50,6 @@ class Points {
     #numColumns = 1;
     #numRows = 1;
     #commandsFinished = [];
-    #renderPassDescriptor = null;
     #uniforms = new UniformsArray();
     #meshUniforms = new UniformsArray();
     #constants = [];
@@ -1268,22 +1267,7 @@ class Points {
                 this.#resizeCanvasToDefault();
             }
         }
-        this.#renderPassDescriptor = {
-            colorAttachments: [
-                {
-                    //view: textureView,
-                    clearValue: { r: 0.0, g: 0.0, b: 0.0, a: 1.0 },
-                    loadOp: 'clear',
-                    storeOp: 'store',
-                }
-            ],
-            depthStencilAttachment: {
-                //view: this.#depthTexture.createView(),
-                depthClearValue: 1.0,
-                depthLoadOp: 'clear',
-                depthStoreOp: 'store'
-            }
-        };
+
         // this.#createVertexBuffer(new Float32Array(this.#vertexArray));
         // TODO: this should be inside RenderPass, to not call vertexArray outside
         this.#renderPasses.forEach(renderPass => {
@@ -1294,7 +1278,6 @@ class Points {
 
         this.#createBuffers();
         this.#createPipeline();
-
 
         return true;
     }
@@ -2155,16 +2138,16 @@ class Points {
 
         // ---------------------
         const swapChainTexture = this.#context.getCurrentTexture();
-        this.#renderPassDescriptor.colorAttachments[0].view = swapChainTexture.createView();
-        this.#renderPassDescriptor.depthStencilAttachment.view = this.#depthTexture.createView();
 
         this.#renderPasses.forEach(renderPass => {
             if (renderPass.hasVertexAndFragmentShader) {
                 this.#passRenderBindGroup(renderPass);
                 this.#passVertexBindGroup(renderPass);
-                this.#renderPassDescriptor.colorAttachments[0].loadOp = renderPass.loadOp;
-                this.#renderPassDescriptor.colorAttachments[0].clearValue = renderPass.clearValue;
-                const passEncoder = commandEncoder.beginRenderPass(this.#renderPassDescriptor);
+
+                renderPass.descriptor.colorAttachments[0].view = swapChainTexture.createView();
+                renderPass.descriptor.depthStencilAttachment.view = this.#depthTexture.createView();
+
+                const passEncoder = commandEncoder.beginRenderPass(renderPass.descriptor);
                 passEncoder.setPipeline(renderPass.renderPipeline);
 
                 if (this.#uniforms.length) {

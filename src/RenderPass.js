@@ -91,6 +91,23 @@ class RenderPass {
     #meshCounter = 0;
     #meshes = [];
 
+    #descriptor = {
+        colorAttachments: [
+            {
+                //view: textureView,
+                clearValue: { r: 0.0, g: 0.0, b: 0.0, a: 1.0 },
+                loadOp: 'clear',
+                storeOp: 'store',
+            }
+        ],
+        depthStencilAttachment: {
+            //view: this.#depthTexture.createView(),
+            depthClearValue: 1.0,
+            depthLoadOp: 'clear',
+            depthStoreOp: 'store'
+        }
+    };
+
     /**
      * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
      * This is useful for PostProcessing.
@@ -408,6 +425,7 @@ class RenderPass {
      */
     set loadOp(val) {
         this.#loadOp = val;
+        this.#descriptor.colorAttachments[0].loadOp = this.#loadOp;
     }
 
     get clearValue() {
@@ -422,6 +440,14 @@ class RenderPass {
      */
     set clearValue(val) {
         this.#clearValue = val;
+        this.#descriptor.colorAttachments[0].clearValue = this.#clearValue;
+    }
+
+    /**
+     * @type {GPURenderPassDescriptor}
+     */
+    get descriptor() {
+        return this.#descriptor;
     }
 
     /**
