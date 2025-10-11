@@ -28,6 +28,7 @@ const NUMPARTICLES = WORKGROUP_X * WORKGROUP_Y * WORKGROUP_Z * THREADS_X * THREA
 console.log('NUMPARTICLES: ', NUMPARTICLES);
 
 const cube_renderpass = new RenderPass(vert, frag, compute, WORKGROUP_X, WORKGROUP_Y, WORKGROUP_Z);
+cube_renderpass.depthWriteEnabled = true;
 cube_renderpass.instanceCount = NUMPARTICLES;
 
 

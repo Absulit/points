@@ -1686,6 +1686,14 @@ class Points {
         // };
         this.#renderPasses.forEach(renderPass => {
             if (renderPass.hasVertexAndFragmentShader) {
+                let depthStencil = undefined;
+                if (renderPass.depthWriteEnabled) {
+                    depthStencil = {
+                        depthWriteEnabled: renderPass.depthWriteEnabled,
+                        depthCompare: 'less',
+                        format: 'depth32float',
+                    }
+                }
                 renderPass.renderPipeline = this.#device.createRenderPipeline({
                     label: `render pipeline: renderPass ${renderPass.index} (${renderPass.name})`,
                     // layout: 'auto',
@@ -1694,11 +1702,7 @@ class Points {
                     }),
                     //primitive: { topology: 'triangle-strip' },
                     primitive: { topology: 'triangle-list' },
-                    depthStencil: {
-                        depthWriteEnabled: renderPass.depthWriteEnabled,
-                        depthCompare: 'less',
-                        format: 'depth32float',
-                    },
+                    depthStencil,
                     vertex: {
                         module: this.#device.createShaderModule({
                             code: renderPass.compiledShaders.vertex,
@@ -2145,7 +2149,9 @@ class Points {
                 this.#passVertexBindGroup(renderPass);
 
                 renderPass.descriptor.colorAttachments[0].view = swapChainTexture.createView();
-                renderPass.descriptor.depthStencilAttachment.view = this.#depthTexture.createView();
+                if(renderPass.depthWriteEnabled){
+                    renderPass.descriptor.depthStencilAttachment.view = this.#depthTexture.createView();
+                }
 
                 const passEncoder = commandEncoder.beginRenderPass(renderPass.descriptor);
                 passEncoder.setPipeline(renderPass.renderPipeline);

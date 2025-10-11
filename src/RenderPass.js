@@ -84,7 +84,7 @@ class RenderPass {
     #vertexBuffer = null;
     #vertexBufferInfo = null;
 
-    #depthWriteEnabled = true;
+    #depthWriteEnabled = false;
     #loadOp = 'clear';
     #clearValue = { r: 0.0, g: 0.0, b: 0.0, a: 1.0 };
 
@@ -100,12 +100,12 @@ class RenderPass {
                 storeOp: 'store',
             }
         ],
-        depthStencilAttachment: {
-            //view: this.#depthTexture.createView(),
-            depthClearValue: 1.0,
-            depthLoadOp: 'clear',
-            depthStoreOp: 'store'
-        }
+        // depthStencilAttachment: {
+        //     //view: this.#depthTexture.createView(),
+        //     depthClearValue: 1.0,
+        //     depthLoadOp: 'clear',
+        //     depthStoreOp: 'store'
+        // }
     };
 
     /**
@@ -411,6 +411,16 @@ class RenderPass {
      * @param {Boolean} val
      */
     set depthWriteEnabled(val) {
+
+        if (val) {
+            this.#descriptor.depthStencilAttachment = {
+                //view: this.#depthTexture.createView(),
+                depthClearValue: 1.0,
+                depthLoadOp: 'clear',
+                depthStoreOp: 'store'
+            }
+        }
+
         this.#depthWriteEnabled = val;
     }
 
