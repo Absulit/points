@@ -8,7 +8,7 @@ import vertdepth from './depth_renderpass/vert.js';
 import fragdepth from './depth_renderpass/frag.js';
 
 const options = {
-    val: 0,
+    val: .98,
 }
 
 const WORKGROUP_X = 16;
@@ -97,7 +97,7 @@ const base = {
         )
 
         points.setUniform('val', options.val);
-        folder.add(options, 'val', 0, 2, .0001).name('Val');
+        folder.add(options, 'val', 0, 1, .0001).name('Val');
 
         folder.open();
     },
