@@ -57,7 +57,10 @@ const base = {
      */
     init: async (points, folder) => {
         points.setTextureDepth2d('depth', GPUShaderStage.FRAGMENT, 0);
-        points.setSampler('imageSampler', { compare: 'less' });
+        points.setSampler('imageSamplerCompare', { compare: 'less' });
+
+        points.setTexture2d('first_pass', true, null, 0);
+        points.setSampler('imageSampler', null);
 
         points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
         points.setConstant('WORKGROUP_X', WORKGROUP_X, 'u32');
