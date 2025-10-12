@@ -5,6 +5,9 @@ import vert from './glb_renderpass/vert.js';
 import frag from './glb_renderpass/frag.js';
 import compute from './glb_renderpass/compute.js';
 
+import vertdepth from './depth_renderpass/vert.js';
+import fragdepth from './depth_renderpass/frag.js';
+
 import { WebIO } from 'https://unpkg.com/@gltf-transform/core@latest?module';
 
 function uint8ToBase64(uint8Array) {
@@ -101,7 +104,8 @@ async function loadAndExtract(url) {
 
 
 const options = {
-    mode: 1
+    mode: 1,
+    dof: .62
 }
 
 const WORKGROUP_X = 4;
@@ -120,6 +124,10 @@ glb_renderpass.instanceCount = NUMPARTICLES;
 glb_renderpass.depthWriteEnabled = true;
 glb_renderpass.name = 'glb_renderpass';
 
+const depth_renderpass = new RenderPass(vertdepth, fragdepth);
+depth_renderpass.loadOp = 'load';
+depth_renderpass.name = 'depth_renderpass';
+
 const near = 0.1, far = 100;
 const f = 1.0 / Math.tan(Math.PI / 8); // ≈ 2.414
 let aspect = null
@@ -134,17 +142,25 @@ glb_renderpass.addMesh('test', positions, colors, colorSize, uvs, normals, indic
 glb_renderpass.depthWriteEnabled = true;
 const textureOut = texture;
 
-
 const base = {
     renderPasses: [
         glb_renderpass,
+        depth_renderpass
     ],
     /**
      * @param {Points} points
      */
     init: async (points, folder) => {
+        points.setTextureDepth2d('depth', GPUShaderStage.FRAGMENT, 0);
+        points.setSampler('imageSamplerCompare', { compare: 'less' });
+
+        points.setTexture2d('first_pass', true, null, 0);
+
         await points.setTextureImage('albedo', textureOut);
-        points.setSampler('imageSampler', null)
+        points.setSampler('imageSampler', null);
+
+        points.setUniform('dof', options.dof);
+        folder.add(options, 'dof', 0, 1, .0001).name('DOF');
 
 
         points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
@@ -199,6 +215,7 @@ const base = {
 
 
 
+
         folder.open();
     },
     /**
@@ -216,6 +233,8 @@ const base = {
                 0, 0, (2 * far * near) * nf, 0
             ]
         )
+
+        points.setUniform('dof', options.dof);
     }
 }
 
