@@ -16,6 +16,7 @@ const nf = 1 / (near - far);
 const renderPass = new RenderPass(vert, frag, compute);
 renderPass.clearValue = { r: 61 / 255, g: 37 / 255, b: 103 / 255, a: 1 }
 renderPass.addSphere('sphere', { x: 0, y: 0, z: 0 }, { r: 1, g: 1, b: 0, a: 1 }, 1.6, 256, 256);
+renderPass.depthWriteEnabled = true;
 
 const base = {
     renderPasses: [renderPass],
