@@ -1,6 +1,6 @@
 
 import Points, { RenderPass, RenderPasses } from 'points';
-import { cube_renderpass } from './cube_renderpass/index.js';
+import { glb_renderpass } from './glb_renderpass/index.js';
 
 import { WebIO } from 'https://unpkg.com/@gltf-transform/core@latest?module';
 
@@ -111,14 +111,14 @@ const nf = 1 / (near - far);
 const url = '../models/lucy.glb'; // or remote URL (CORS must allow)
 const data = await loadAndExtract(url);
 const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0];
-cube_renderpass.addMesh('test', positions, colors, colorSize, uvs, normals, indices);
-cube_renderpass.depthWriteEnabled = true;
+glb_renderpass.addMesh('test', positions, colors, colorSize, uvs, normals, indices);
+glb_renderpass.depthWriteEnabled = true;
 const textureOut = texture;
 
 
 const base = {
   renderPasses: [
-    cube_renderpass,
+    glb_renderpass,
   ],
   /**
    * @param {Points} points
