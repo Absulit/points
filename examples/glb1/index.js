@@ -106,10 +106,11 @@ const nf = 1 / (near - far);
 
 
 
-const url = 'glb1/monkey.glb'; // or remote URL (CORS must allow)
+const url = '../models/monkey.glb'; // or remote URL (CORS must allow)
 const data = await loadAndExtract(url);
 const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0]
 cube_renderpass.addMesh('test', positions, colors, colorSize, uvs, normals, indices)
+cube_renderpass.depthWriteEnabled = true;
 const textureOut = texture;
 
 
