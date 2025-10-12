@@ -18,8 +18,9 @@ fn main(
     @builtin(vertex_index) vertexIndex: u32,
     @builtin(instance_index) instanceIndex: u32
 ) -> Fragment {
+    let particle = particles[instanceIndex];
     // var angleZ = params.time * 0.9854;
-    var angleY = params.time * 0.94222;
+    var angleY = params.time * 0.094222;
     // var angleX = params.time * 0.865;
 
     // if(id == mesh.cube1){
@@ -33,7 +34,7 @@ fn main(
     let rotZ = rotZAxis(0);
     let model = rotX * rotY * rotZ;
 
-    let world = (model * vec4f(position.xyz - vec3f(0,1,0), 1.)).xyz;
+    let world = (model * vec4f(particle.position.xyz + position.xyz - vec3f(0,1,-10), 1.)).xyz;
     let clip = params.projection * params.view * vec4f(world, 1.);
 
     let newNormal = normalize((model * vec4f(normal, 0.)).xyz);

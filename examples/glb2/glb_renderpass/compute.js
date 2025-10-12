@@ -11,8 +11,8 @@ ${TAU}
 ${rand}
 ${snoise}
 
-const WIDTH = 15i;
-const HEIGHT = 15i;
+const WIDTH = 8i;
+const HEIGHT = 1i;
 
 const HWIDTH = WIDTH / 2;
 const HHEIGHT = HEIGHT / 2;
