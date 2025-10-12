@@ -4,9 +4,6 @@ import vert from './cube_renderpass/vert.js';
 import frag from './cube_renderpass/frag.js';
 import compute from './cube_renderpass/compute.js';
 
-import vertdepth from './depth_renderpass/vert.js';
-import fragdepth from './depth_renderpass/frag.js';
-
 const options = {
     val: .98,
 }
@@ -27,10 +24,6 @@ cube_renderpass.instanceCount = NUMPARTICLES;
 cube_renderpass.depthWriteEnabled = true;
 cube_renderpass.name = 'cube_renderpass';
 
-const depth_renderpass = new RenderPass(vertdepth, fragdepth);
-depth_renderpass.loadOp = 'load';
-depth_renderpass.name = 'depth_renderpass';
-
 // TODO: cubes need to be outside init() here, because the RenderPass is imported
 // and is already in memory the next time is loaded, so new cubes load
 // a solution would be to call a remove (like init, update) and delete the RenderPass
@@ -50,18 +43,11 @@ const nf = 1 / (near - far);
 const base = {
     renderPasses: [
         cube_renderpass,
-        depth_renderpass
     ],
     /**
      * @param {Points} points
      */
     init: async (points, folder) => {
-        points.setTextureDepth2d('depth', GPUShaderStage.FRAGMENT, 0);
-        points.setSampler('imageSamplerCompare', { compare: 'less' });
-
-        points.setTexture2d('first_pass', true, null, 0);
-        points.setSampler('imageSampler', null);
-
         points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
         points.setConstant('WORKGROUP_X', WORKGROUP_X, 'u32');
         points.setConstant('WORKGROUP_Y', WORKGROUP_Y, 'u32');
@@ -99,10 +85,6 @@ const base = {
             'mat4x4<f32>'
         )
 
-        points.setUniform('val', options.val);
-        folder.add(options, 'val', 0, 1, .0001).name('Val');
-
-        folder.open();
     },
     /**
      * @param {Points} points
@@ -119,8 +101,6 @@ const base = {
                 0, 0, (2 * far * near) * nf, 0
             ]
         )
-
-        points.setUniform('val', options.val);
     }
 }
 
