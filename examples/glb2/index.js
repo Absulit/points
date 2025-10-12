@@ -105,7 +105,7 @@ async function loadAndExtract(url) {
 
 const options = {
     mode: 1,
-    dof: .62
+    dof: .33
 }
 
 const WORKGROUP_X = 4;

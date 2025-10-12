@@ -39,8 +39,8 @@ fn main(
         imageSampler,
         vec2(),
         uvr,
-        vec2f(100), // resolution
-        rotateVector(vec2f(1.) * visual, 0) // direction
+        vec2f(512), // resolution
+        rotateVector(vec2f(2.,0) * visual, 0) // direction
     );
 
 
