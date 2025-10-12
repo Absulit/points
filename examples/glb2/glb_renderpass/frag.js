@@ -1,8 +1,10 @@
 import { fnusin } from 'points/animation';
 import { texture } from 'points/image';
+import { structs } from '../structs.js';
 
 const frag = /*wgsl*/`
 
+${structs}
 ${fnusin}
 ${texture}
 
