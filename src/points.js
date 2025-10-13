@@ -1058,7 +1058,7 @@ class Points {
         this.#texturesDepth2d.forEach(texture => {
             const isInternal = internal === texture.internal;
             if (isInternal && (!texture.shaderType || texture.shaderType & shaderType)) {
-                if(texture.renderPassIndex !== renderPassIndex){
+                if (texture.renderPassIndex !== renderPassIndex) {
                     dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_depth_2d;\n`;
                     bindingIndex += 1;
                 }
@@ -1909,7 +1909,7 @@ class Points {
             }
         });
         this.#texturesDepth2d.forEach(texture2d => {
-            if(texture2d.renderPassIndex !== renderPassIndex){
+            if (texture2d.renderPassIndex !== renderPassIndex) {
                 const isInternal = internal === texture2d.internal;
                 if (isInternal && (!texture2d.shaderType || texture2d.shaderType & shaderType)) {
                     entries.push(
@@ -2157,7 +2157,7 @@ class Points {
                 this.#passVertexBindGroup(renderPass);
 
                 renderPass.descriptor.colorAttachments[0].view = swapChainTexture.createView();
-                if(renderPass.depthWriteEnabled){
+                if (renderPass.depthWriteEnabled) {
                     renderPass.descriptor.depthStencilAttachment.view = this.#depthTexture.createView();
                     // renderPass.descriptor.depthStencilAttachment.view = this.#texturesDepth2d[0].texture.createView();
                 }
@@ -2177,7 +2177,24 @@ class Points {
                  * firstInstance?: number | undefined First instance to draw
                  */
                 //passEncoder.draw(3, 1, 0, 0);
-                passEncoder.draw(renderPass.vertexBufferInfo.vertexCount, renderPass.instanceCount);
+
+                // console.log(renderPass.meshes.find( mesh => mesh.instanceCount > 1));
+                // console.log(renderPass.meshes.some( mesh => mesh.instanceCount > 1));
+                // TODO: move this to renderPass because we can ask this just one time and have it as property
+                const isThereInstancing = renderPass.meshes.some(mesh => mesh.instanceCount > 1);
+                if (isThereInstancing) {
+                    let vertexOffset = 0;
+                    renderPass.meshes.forEach(mesh => {
+                        passEncoder.draw(mesh.verticesCount, mesh.instanceCount, vertexOffset, 0);
+                        // console.log(mesh.name, mesh.verticesCount, mesh.instanceCount, );
+                        vertexOffset = mesh.verticesCount;
+                    })
+                } else {
+                    // no instancing, regular draw with all the meshes
+                    passEncoder.draw(renderPass.vertexBufferInfo.vertexCount, renderPass.instanceCount);
+                }
+
+
                 passEncoder.end();
                 // Copy the rendering results from the swapchain into |texture2d.texture|.
                 this.#textures2d.forEach(texture2d => {

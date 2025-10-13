@@ -574,7 +574,9 @@ class RenderPass {
 
         const mesh = {
             name,
-            id: this.#meshCounter
+            id: this.#meshCounter,
+            instanceCount: 1,
+            verticesCount: 36
         }
         this.#meshes.push(mesh);
 
@@ -643,7 +645,9 @@ class RenderPass {
 
         const mesh = {
             name,
-            id: this.#meshCounter
+            id: this.#meshCounter,
+            instanceCount: 1,
+            verticesCount: rings * segments * 6
         }
         this.#meshes.push(mesh);
 
@@ -679,7 +683,8 @@ class RenderPass {
 
         const mesh = {
             name,
-            id: this.#meshCounter
+            id: this.#meshCounter,
+            instanceCount: 1
         }
         this.#meshes.push(mesh);
         ++this.#meshCounter;
