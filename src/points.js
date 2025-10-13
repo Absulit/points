@@ -2143,6 +2143,9 @@ class Points {
             }
         });
 
+        /**
+         * @type {GPUCommandEncoder}
+         */
         const commandEncoder = this.#device.createCommandEncoder();
 
         // ---------------------
