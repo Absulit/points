@@ -579,6 +579,8 @@ class RenderPass {
         this.#meshes.push(mesh);
 
         ++this.#meshCounter;
+
+        return mesh;
     }
 
     /**
@@ -646,6 +648,8 @@ class RenderPass {
         this.#meshes.push(mesh);
 
         ++this.#meshCounter;
+
+        return mesh;
     }
 
     /**
