@@ -46,16 +46,8 @@ const base = {
      */
     init: async (points, folder) => {
 
-        cube_renderpass.addCube(
-            'base_cube',
-            { x: 0, y: 0, z: 0 },
-            { width: 1, height: 1, depth: 1 },
-            { r: 1, g: 0, b: 0, a: 1 }
-        ).instanceCount = NUMPARTICLES;
-
-        cube_renderpass.addSphere(
-            'test',{x:0,y:0,z:0},{r:1,g:0,b:0,a:1}, 1.
-        ).instanceCount = 100;
+        cube_renderpass.addCube('base_cube').instanceCount = NUMPARTICLES;
+        cube_renderpass.addSphere('sphere').instanceCount = 100;
 
         points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
         points.setConstant('WORKGROUP_X', WORKGROUP_X, 'u32');
