@@ -38,27 +38,12 @@ const nf = 1 / (near - far);
 // a solution would be to call a remove (like init, update) and delete the RenderPass
 
 staticcube_renderpass.depthWriteEnabled = true;
-staticcube_renderpass.addCube(
-    'cube_behind',
-    { x: 0, y: 0, z: 0 },
-    { width: 1, height: 1, depth: 1 },
-    { r: 1, g: 0, b: 0, a: 1 }
-);
+staticcube_renderpass.addCube('cube_behind');
 
 cube_renderpass.loadOp = 'clear';
 cube_renderpass.depthWriteEnabled = true;
-cube_renderpass.addCube(
-    'cube0',
-    { x: 0, y: 0, z: 0 },
-    { width: 1, height: 1, depth: 1 },
-    { r: 1, g: 0, b: 0, a: 1 }
-);
-cube_renderpass.addCube(
-    'cube1',
-    { x: 0, y: 1, z: 0 },
-    { width: 1, height: 1, depth: 1 },
-    { r: 1, g: 0, b: 0, a: 1 }
-);
+cube_renderpass.addCube('cube0');
+cube_renderpass.addCube('cube1', { x: 0, y: 1, z: 0 });
 
 
 const base = {
@@ -70,12 +55,6 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
-
-
-
-
-
-
 
         aspect = points.canvas.width / points.canvas.height;
         points.setUniform(
