@@ -499,6 +499,89 @@ class RenderPass {
     }
 
     /**
+     * Adds a mesh quad
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {{width:Number, height:Number}} dimensions
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     */
+    addPlane(name, coordinate, dimensions, color){
+        const { x, y, z } = coordinate;
+        const { width, height, depth } = dimensions;
+        const hw = width / 2;
+        const hh = height / 2;
+        const hd = 0;
+
+        const corners = [
+            [x - hw, y - hh, z - hd], // 0: left-bottom-back
+            [x + hw, y - hh, z - hd], // 1: right-bottom-back
+            [x + hw, y + hh, z - hd], // 2: right-top-back
+            [x - hw, y + hh, z - hd], // 3: left-top-back
+        ];
+
+        const faceUVs = [
+            [[0, 0], [1, 0], [1, 1], [0, 1]], // back
+            // [[0, 0], [1, 0], [1, 1], [0, 1]], // front
+            // [[0, 0], [1, 0], [1, 1], [0, 1]], // left
+            // [[0, 0], [1, 0], [1, 1], [0, 1]], // right
+            // [[0, 0], [1, 0], [1, 1], [0, 1]], // top
+            // [[0, 0], [1, 0], [1, 1], [0, 1]], // bottom
+        ];
+
+        const faceNormals = [
+            [0, 0, -1],  // back
+            // [0, 0, 1],   // front
+            // [-1, 0, 0],  // left
+            // [1, 0, 0],   // right
+            // [0, 1, 0],   // top
+            // [0, -1, 0],  // bottom
+        ];
+
+        const faces = [
+            [0, 1, 2, 3], // back
+            // [5, 4, 7, 6], // front
+            // [4, 0, 3, 7], // left
+            // [1, 5, 6, 2], // right
+            // [3, 2, 6, 7], // top
+            // [4, 5, 1, 0], // bottom
+        ];
+
+        for (let i = 0; i < 1; i++) {
+            const [i0, i1, i2, i3] = faces[i];
+            // const color = faceColors[i];
+            const { r, g, b, a } = color;
+            const normals = faceNormals[i];
+
+            const v = [corners[i0], corners[i1], corners[i2], corners[i3]];
+
+            const uv = faceUVs[i];
+            const verts = [
+                [v[0], uv[0]],
+                [v[1], uv[1]],
+                [v[2], uv[2]],
+                [v[0], uv[0]],
+                [v[2], uv[2]],
+                [v[3], uv[3]],
+            ];
+
+            for (const [[vx, vy, vz], [u, v]] of verts) {
+                this.#vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normals, this.#meshCounter);
+            }
+        }
+
+        const mesh = {
+            name,
+            id: this.#meshCounter,
+            instanceCount: 1,
+            verticesCount: 6
+        }
+        this.#meshes.push(mesh);
+
+        ++this.#meshCounter;
+
+        return mesh;
+    }
+
+    /**
      * Adds a mesh cube
      * @param {{x:Number, y:Number, z:Number}} coordinate
      * @param {{width:Number, height:Number, depth:Number}} dimensions
