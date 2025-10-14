@@ -654,7 +654,7 @@ class RenderPass {
     }
 
     /**
-     *
+     * Adds a mesh sphere
      * @param {String} name
      * @param {{x:Number, y:Number, z:Number}} coordinate
      * @param {{r:Number, g:Number, b:Number, a:Number}} color
