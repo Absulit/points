@@ -28,12 +28,7 @@ cube_renderpass.name = 'cube_renderpass';
 // and is already in memory the next time is loaded, so new cubes load
 // a solution would be to call a remove (like init, update) and delete the RenderPass
 
-cube_renderpass.addCube(
-    'base_cube',
-    { x: 0, y: 0, z: 0 },
-    { width: 1, height: 1, depth: 1 },
-    { r: 1, g: 0, b: 0, a: 1 }
-);
+cube_renderpass.addCube('base_cube');
 
 const near = 0.1, far = 100;
 const f = 1.0 / Math.tan(Math.PI / 8); // ≈ 2.414
