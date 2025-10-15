@@ -1,12 +1,10 @@
 import { fnusin } from 'points/animation';
-import { texture } from 'points/image';
 import { structs } from '../structs.js';
 
 const frag = /*wgsl*/`
 
 ${structs}
 ${fnusin}
-${texture}
 
 
 @fragment
@@ -21,8 +19,7 @@ fn main(
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
 
-    let flippedUV = vec2f(uv.x, 1. - uv.y);
-    let albedoColor = texture(albedo, imageSampler, flippedUV, false);
+    let albedoColor = textureSample(albedo, imageSampler, uv);
 
     let cellSize = 20. + 10. * fnusin(1.);
     let a = sin(uvr.x  * cellSize) * sin(uvr.y * cellSize);
