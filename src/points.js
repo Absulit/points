@@ -1437,6 +1437,9 @@ class Points {
      * Updates all uniforms (for the update function)
      */
     #writeParametersUniforms() {
+        if (!this.#uniforms.buffer) {
+            console.error('An attempt to create uniforms has been made but no setUniform has been called. Maybe an update was called before a setUniform.')
+        }
         const { values } = this.#createUniformValues(this.#uniforms);
         this.#writeBuffer(this.#uniforms.buffer, values);
 
@@ -2341,6 +2344,12 @@ class Points {
         } else {
             this.#resizeCanvasToDefault();
         }
+    }
+
+    destroy(){
+
+        this.#uniforms = new UniformsArray();
+        this.#meshUniforms = new UniformsArray();
     }
 }
 
