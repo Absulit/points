@@ -111,6 +111,8 @@ const data = await loadAndExtract(url);
 const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0]
 cube_renderpass.addMesh('monkey', positions, colors, colorSize, uvs, normals, indices)
 cube_renderpass.depthWriteEnabled = true;
+cube_renderpass.clearValue = { r: 61 / 255, g: 37 / 255, b: 103 / 255, a: 1 }
+
 const textureOut = texture;
 
 
