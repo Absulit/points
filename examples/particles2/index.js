@@ -24,6 +24,28 @@ const instancedParticlesRenderPass = new RenderPass(vert, frag1, compute0, WORKG
 instancedParticlesRenderPass.depthWriteEnabled = false;
 instancedParticlesRenderPass.addPlane('plane', { x: 0, y: 0, z: 0 }, { width: 2, height: 2 }).instanceCount = NUMPARTICLES;
 
+// const aspect = canvas.width / canvas.height; // alternative to aspect in shader
+const left = -1;
+const right = 1;
+const bottom = -1;
+const top = 1;
+const near = -1;   // include z = 0
+const far = 1;
+
+const lr = 1 / (right - left);
+const bt = 1 / (top - bottom);
+const nf = 1 / (near - far);
+
+const orthoMatrix = [
+    2 * lr, 0,       0,        0,
+    0,      2 * bt,  0,        0,
+    0,      0,       2 * nf,   0,
+   -(right + left) * lr,
+   -(top + bottom) * bt,
+   (far + near) * nf,
+    1
+];
+
 const base = {
     renderPasses: [
         instancedParticlesRenderPass,
@@ -51,6 +73,7 @@ const base = {
         // await points.setTextureVideo('video', './../img/8056464-hd_1080_1920_30fps_800x800.mp4');
         // await points.setTextureVideo('video', './../img/pexels-shubh-haque-4746616-960x540-30fps.mp4');
 
+        points.setUniform('projection', orthoMatrix, 'mat4x4<f32>');
 
         points.setUniform('maxLife', options.maxLife);
         folder.add(options, 'maxLife', 1, 600, .0001).name('maxLife');
