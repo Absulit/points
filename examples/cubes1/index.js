@@ -20,7 +20,6 @@ const NUMPARTICLES = WORKGROUP_X * WORKGROUP_Y * WORKGROUP_Z * THREADS_X * THREA
 console.log('NUMPARTICLES: ', NUMPARTICLES);
 
 const cube_renderpass = new RenderPass(vert, frag, compute, WORKGROUP_X, WORKGROUP_Y, WORKGROUP_Z);
-cube_renderpass.instanceCount = NUMPARTICLES;
 cube_renderpass.depthWriteEnabled = true;
 cube_renderpass.name = 'cube_renderpass';
 
@@ -28,7 +27,7 @@ cube_renderpass.name = 'cube_renderpass';
 // and is already in memory the next time is loaded, so new cubes load
 // a solution would be to call a remove (like init, update) and delete the RenderPass
 
-cube_renderpass.addCube('base_cube');
+cube_renderpass.addCube('base_cube').instanceCount = NUMPARTICLES;
 
 const near = 0.1, far = 100;
 const f = 1.0 / Math.tan(Math.PI / 8); // ≈ 2.414
