@@ -24,8 +24,7 @@ const NUMPARTICLES = WORKGROUPS_X * WORKGROUPS_Y * WORKGROUPS_Z * THREADS_X * TH
 
 const renderPass0 = new RenderPass(vert, frag, compute, WORKGROUPS_X, WORKGROUPS_Y, WORKGROUPS_Z);
 renderPass0.name = 'Main Application';
-renderPass0.instanceCount = NUMPARTICLES;
-renderPass0.depthWriteEnabled = false;
+renderPass0.addPlane('plane', { x: 0, y: 0, z: 0 }, { width: 2, height: 2 }).instanceCount = NUMPARTICLES;
 
 const base = {
     renderPasses: [
