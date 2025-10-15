@@ -2186,12 +2186,11 @@ class Points {
                     let vertexOffset = 0;
                     renderPass.meshes.forEach(mesh => {
                         passEncoder.draw(mesh.verticesCount, mesh.instanceCount, vertexOffset, 0);
-                        // console.log(mesh.name, mesh.verticesCount, mesh.instanceCount, );
                         vertexOffset = mesh.verticesCount;
                     })
                 } else {
                     // no instancing, regular draw with all the meshes
-                    passEncoder.draw(renderPass.vertexBufferInfo.vertexCount, renderPass.instanceCount);
+                    passEncoder.draw(renderPass.vertexBufferInfo.vertexCount, 1);
                 }
 
 

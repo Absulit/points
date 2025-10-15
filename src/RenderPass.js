@@ -347,13 +347,11 @@ class RenderPass {
      * in this RenderPass. This means if you have a quad, it will create
      * `instanceCount` number of independent quads on the screen.
      * Useful for instanced particles driven by a Storage buffer.
-     * @param {Number} val
      */
-    set instanceCount(val) {
-        this.#instanceCount = val;
-    }
 
     get instanceCount() {
+        // TODO: lock the value with a flag
+        this.#instanceCount = this.#meshes.reduce((sum, mesh) => sum + mesh.instanceCount, 0);
         return this.#instanceCount;
     }
 
