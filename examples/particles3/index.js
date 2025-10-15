@@ -21,8 +21,8 @@ console.log(NUMPARTICLES);
 
 
 const instancedParticlesRenderPass = new RenderPass(vert, frag1, compute0, WORKGROUP_X, WORKGROUP_Y, 1)
-instancedParticlesRenderPass.instanceCount = NUMPARTICLES;
 instancedParticlesRenderPass.depthWriteEnabled = false;
+instancedParticlesRenderPass.addPlane('plane', { x: 0, y: 0 }, { width: 2, height: 2 }).instanceCount = NUMPARTICLES;
 
 const base = {
     renderPasses: [

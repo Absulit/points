@@ -29,8 +29,8 @@ console.log('NUMPARTICLES: ', NUMPARTICLES);
 
 const cube_renderpass = new RenderPass(vert, frag, compute, WORKGROUP_X, WORKGROUP_Y, WORKGROUP_Z);
 cube_renderpass.depthWriteEnabled = true;
-cube_renderpass.instanceCount = NUMPARTICLES;
-
+cube_renderpass.addCube('base_cube').instanceCount = NUMPARTICLES;
+cube_renderpass.addSphere('sphere').instanceCount = 100;
 
 const near = 0.1, far = 100;
 const f = 1.0 / Math.tan(Math.PI / 8); // ≈ 2.414
@@ -45,9 +45,6 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
-
-        cube_renderpass.addCube('base_cube').instanceCount = NUMPARTICLES;
-        cube_renderpass.addSphere('sphere').instanceCount = 100;
 
         points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
         points.setConstant('WORKGROUP_X', WORKGROUP_X, 'u32');
