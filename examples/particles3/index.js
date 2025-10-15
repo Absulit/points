@@ -24,6 +24,7 @@ const instancedParticlesRenderPass = new RenderPass(vert, frag1, compute0, WORKG
 instancedParticlesRenderPass.depthWriteEnabled = false;
 instancedParticlesRenderPass.addPlane('plane', { x: 0, y: 0 }, { width: 2, height: 2 }).instanceCount = NUMPARTICLES;
 
+// const aspect = canvas.width / canvas.height; // alternative to aspect in shader
 const left = -1;
 const right = 1;
 const bottom = -1;
