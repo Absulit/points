@@ -138,7 +138,7 @@ const url = '../models/lucy.glb'; // or remote URL (CORS must allow)
 const data = await loadAndExtract(url);
 const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0];
 glb_renderpass
-    .addMesh('test', positions, colors, colorSize, uvs, normals, indices)
+    .addMesh('lucy', positions, colors, colorSize, uvs, normals, indices)
     .instanceCount = NUMPARTICLES;
 glb_renderpass.depthWriteEnabled = true;
 const textureOut = texture;
@@ -163,6 +163,13 @@ const base = {
         points.setUniform('dof', options.dof);
         folder.add(options, 'dof', 0, 1, .0001).name('DOF');
 
+        const dropdownItems = { /*'Vertex': 0,*/ 'Texture': 1, 'Shader': 2 };
+
+        points.setUniform('color_mode', options.mode);
+        folder.add(options, 'mode', dropdownItems).name('Colors').onChange(value => {
+            console.log(value);
+            points.setUniform('color_mode', value);
+        });
 
         points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
         points.setConstant('WORKGROUP_X', WORKGROUP_X, 'u32');
@@ -205,17 +212,6 @@ const base = {
         // points.addRenderPass(RenderPasses.COLOR);
         // points.addRenderPass(RenderPasses.PIXELATE);
         // points.addRenderPass(RenderPasses.FILM_GRAIN);
-
-        const dropdownItems = { /*'Vertex': 0,*/ 'Texture': 1, 'Shader': 2 };
-
-        points.setUniform('color_mode', options.mode);
-        folder.add(options, 'mode', dropdownItems).name('Colors').onChange(value => {
-            console.log(value);
-            points.setUniform('color_mode', value);
-        });
-
-
-
 
         folder.open();
     },

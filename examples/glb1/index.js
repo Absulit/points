@@ -109,7 +109,7 @@ const nf = 1 / (near - far);
 const url = '../models/monkey.glb'; // or remote URL (CORS must allow)
 const data = await loadAndExtract(url);
 const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0]
-cube_renderpass.addMesh('test', positions, colors, colorSize, uvs, normals, indices)
+cube_renderpass.addMesh('monkey', positions, colors, colorSize, uvs, normals, indices)
 cube_renderpass.depthWriteEnabled = true;
 const textureOut = texture;
 
@@ -123,7 +123,15 @@ const base = {
    */
   init: async (points, folder) => {
     await points.setTextureImage('albedo', textureOut);
-    points.setSampler('imageSampler', null)
+    points.setSampler('imageSampler', null);
+
+    const dropdownItems = { /*'Vertex': 0,*/ 'Texture': 1, 'Shader': 2 };
+
+    points.setUniform('color_mode', options.mode);
+    folder.add(options, 'mode', dropdownItems).name('Colors').onChange(value => {
+      console.log(value);
+      points.setUniform('color_mode', value);
+    });
 
     aspect = points.canvas.width / points.canvas.height;
     points.setUniform(
@@ -152,16 +160,6 @@ const base = {
     // points.addRenderPass(RenderPasses.COLOR);
     // points.addRenderPass(RenderPasses.PIXELATE);
     // points.addRenderPass(RenderPasses.FILM_GRAIN);
-
-    const dropdownItems = { /*'Vertex': 0,*/ 'Texture': 1, 'Shader': 2 };
-
-    points.setUniform('color_mode', options.mode);
-    folder.add(options, 'mode', dropdownItems).name('Colors').onChange(value => {
-      console.log(value);
-      points.setUniform('color_mode', value);
-    });
-
-
 
     folder.open();
   },
