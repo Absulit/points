@@ -2170,13 +2170,6 @@ class Points {
                     passEncoder.setBindGroup(1, renderPass.renderBindGroup);
                 }
                 passEncoder.setVertexBuffer(0, renderPass.vertexBuffer);
-                /**
-                 * vertexCount: number The number of vertices to draw
-                 * instanceCount?: number | undefined The number of instances to draw
-                 * firstVertex?: number | undefined Offset into the vertex buffers, in vertices, to begin drawing from
-                 * firstInstance?: number | undefined First instance to draw
-                 */
-                //passEncoder.draw(3, 1, 0, 0);
 
                 // console.log(renderPass.meshes.find( mesh => mesh.instanceCount > 1));
                 // console.log(renderPass.meshes.some( mesh => mesh.instanceCount > 1));
@@ -2192,7 +2185,6 @@ class Points {
                     // no instancing, regular draw with all the meshes
                     passEncoder.draw(renderPass.vertexBufferInfo.vertexCount, 1);
                 }
-
 
                 passEncoder.end();
                 // Copy the rendering results from the swapchain into |texture2d.texture|.

@@ -731,9 +731,9 @@ class RenderPass {
      * @param {Array<Number>} normals
      */
     addMesh(name, vertices, colors, colorSize, uvs, normals, indices) {
-        const itemAmount = indices.length;
+        const verticesCount = indices.length;
 
-        for (let i = 0; i < itemAmount; i++) {
+        for (let i = 0; i < verticesCount; i++) {
             const index = indices[i];
             const vertex = vertices.slice(index * 3, index * 3 + 3);
 
@@ -750,7 +750,8 @@ class RenderPass {
         const mesh = {
             name,
             id: this.#meshCounter,
-            instanceCount: 1
+            instanceCount: 1,
+            verticesCount
         }
         this.#meshes.push(mesh);
         ++this.#meshCounter;
