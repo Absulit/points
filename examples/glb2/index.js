@@ -120,7 +120,6 @@ const NUMPARTICLES = WORKGROUP_X * WORKGROUP_Y * WORKGROUP_Z * THREADS_X * THREA
 console.log('NUMPARTICLES: ', NUMPARTICLES);
 
 const glb_renderpass = new RenderPass(vert, frag, compute, WORKGROUP_X, WORKGROUP_Y, WORKGROUP_Z);
-glb_renderpass.instanceCount = NUMPARTICLES;
 glb_renderpass.depthWriteEnabled = true;
 glb_renderpass.name = 'glb_renderpass';
 
@@ -138,7 +137,9 @@ const nf = 1 / (near - far);
 const url = '../models/lucy.glb'; // or remote URL (CORS must allow)
 const data = await loadAndExtract(url);
 const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0];
-glb_renderpass.addMesh('test', positions, colors, colorSize, uvs, normals, indices);
+glb_renderpass
+    .addMesh('test', positions, colors, colorSize, uvs, normals, indices)
+    .instanceCount = NUMPARTICLES;
 glb_renderpass.depthWriteEnabled = true;
 const textureOut = texture;
 
