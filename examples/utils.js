@@ -1,3 +1,5 @@
+import { WebIO } from 'https://unpkg.com/@gltf-transform/core@latest?module';
+
 // original from AFrame
 // https://github.com/aframevr/aframe/blob/aa792c9/src/utils/device.js#L52
 
@@ -24,3 +26,94 @@ export const isMobile = (function () {
     })(window.navigator.userAgent || window.navigator.vendor || window.opera);
     return function () { return _isMobile; };
 })();
+
+
+export function uint8ToBase64(uint8Array) {
+    let binary = '';
+    for (let i = 0; i < uint8Array.length; i++) {
+        binary += String.fromCharCode(uint8Array[i]);
+    }
+    return btoa(binary);
+}
+
+export async function loadAndExtract(url) {
+    const io = new WebIO();
+
+    // Option A: let WebIO fetch the resource (works for .glb or .gltf with resolvable relative resources)
+    // const doc = await io.read(url);
+
+    // Option B: fetch yourself then pass a Uint8Array to readBinary (works reliably for .glb or loaded .gltf/.bin combos)
+    const resp = await fetch(url);
+    const arrayBuffer = await resp.arrayBuffer();
+    const uint8 = new Uint8Array(arrayBuffer);
+    const doc = await io.readBinary(uint8);
+
+    const root = doc.getRoot();
+    const meshes = root.listMeshes();
+    const results = [];
+
+    for (const mesh of meshes) {
+        for (const prim of mesh.listPrimitives()) {
+            console.log(prim);
+
+            const getAttrArray = (name) => {
+                const attr = prim.getAttribute(name);
+                return attr ? attr.getArray() : null;
+            };
+
+            const positions = getAttrArray('POSITION');      // Float32Array | null
+            const normals = getAttrArray('NORMAL');        // Float32Array | null
+            const uvs = getAttrArray('TEXCOORD_0');    // Float32Array | null
+            const colors = getAttrArray('COLOR_0');       // Float32Array | null
+
+            const indices = prim.getIndices() ? prim.getIndices().getArray() : null; // Uint16Array|Uint32Array|null
+            let texture = null;
+
+            // const colorAccessor = prim.getAttribute('COLOR_0');
+            // console.log(colorAccessor.getComponentType()); // Should be 5126 (FLOAT) or 5121 (UNSIGNED_BYTE)
+            // console.log(colorAccessor.getNormalized());    // true or false
+            const colorSize = prim.getAttribute('COLOR_0').getElementSize(); // 3 or 4
+
+            const material = prim.getMaterial();
+            if (!material) {
+                console.log('  No material assigned.');
+                continue;
+            }
+
+            const baseColorTexture = material.getBaseColorTexture();
+            if (baseColorTexture) {
+                console.log('  Base Color Texture:', baseColorTexture.getName());
+                console.log('  MIME Type:', baseColorTexture.getMimeType());// e.g. 'image/png'
+                console.log('  Image Size:', baseColorTexture.getImage()?.length);// Uint8Array
+
+                const mimeType = baseColorTexture.getMimeType();
+                const imageData = baseColorTexture.getImage();
+
+
+                texture = `data:${mimeType};base64,${uint8ToBase64(imageData)}`;
+
+
+            } else {
+                console.log('  No base color texture.');
+            }
+
+            // You can also check other texture slots:
+            // material.getNormalTexture()
+            // material.getMetallicRoughnessTexture()
+            // material.getEmissiveTexture()
+
+            results.push({
+                meshName: mesh.getName() || null,
+                positions,
+                normals,
+                uvs,
+                colors,
+                indices,
+                colorSize,
+                texture
+            });
+        }
+    }
+
+    return results;
+}

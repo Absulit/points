@@ -2,7 +2,7 @@
 import * as dat from 'datgui';
 import Points, { RenderPass } from 'points';
 import { shaderProjects } from './index_files/shader_projects.js';
-import { isMobile } from './utils.js';
+import { isMobile } from 'utils';
 import CanvasRecorder from './../src/CanvasRecorder.js';
 
 
