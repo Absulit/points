@@ -119,6 +119,7 @@ Description of modules and functions here
             "points/math": "https://cdn.jsdelivr.net/npm/@absulit/points/build/core/math.min.js",
             "points/noise2d": "https://cdn.jsdelivr.net/npm/@absulit/points/build/core/noise2d.min.js",
             "points/classicnoise2d": "https://cdn.jsdelivr.net/npm/@absulit/points/build/core/classicnoise2d.min.js",
+            "points/classicnoise3d": "https://cdn.jsdelivr.net/npm/@absulit/points/build/core/classicnoise3d.min.js",
             "points/random": "https://cdn.jsdelivr.net/npm/@absulit/points/build/core/random.min.js",
             "points/sdf": "https://cdn.jsdelivr.net/npm/@absulit/points/build/core/sdf.min.js"
         }
@@ -168,6 +169,7 @@ npx jsr add @absulit/points # or jsr package
         "points/math": "@absulit/points/build/core/math.min.js",
         "points/noise2d": "@absulit/points/build/core/noise2d.min.js",
         "points/classicnoise2d": "@absulit/points/build/core/classicnoise2d.min.js",
+        "points/classicnoise3d": "@absulit/points/build/core/classicnoise3d.min.js",
         "points/random": "@absulit/points/build/core/random.min.js",
         "points/sdf": "@absulit/points/build/core/sdf.min.js"
     }
@@ -191,6 +193,7 @@ npx jsr add @absulit/points # or jsr package
         "points/math": ["node_modules/@absulit/points/build/core/math"],
         "points/noise2d": ["node_modules/@absulit/points/build/core/noise2d"],
         "points/classicnoise2d": ["node_modules/@absulit/points/build/core/classicnoise2d"],
+        "points/classicnoise3d": ["node_modules/@absulit/points/build/core/classicnoise3d"],
         "points/random": ["node_modules/@absulit/points/build/core/random"],
         "points/sdf": ["node_modules/@absulit/points/build/core/sdf"]
     }
@@ -265,6 +268,7 @@ bun x jsr add @absulit/points # jsr package
         "points/math": ["node_modules/@absulit/points/build/core/math"],
         "points/noise2d": ["node_modules/@absulit/points/build/core/noise2d"],
         "points/classicnoise2d": ["node_modules/@absulit/points/build/core/classicnoise2d"],
+        "points/classicnoise3d": ["node_modules/@absulit/points/build/core/classicnoise3d"],
         "points/random": ["node_modules/@absulit/points/build/core/random"],
         "points/sdf": ["node_modules/@absulit/points/build/core/sdf"]
     }
@@ -1062,6 +1066,7 @@ The Support Modules are not something that you entirely need but it offers a set
 | animation.js  | Functions that use sine and `params.time` to increase and decrease a value over time             |
 | cellular2d.js | Cellular noise based on work by Stefan Gustavson (link in file)             |
 | classicnoise2d.js | Classic Perlin noise based on work by Stefan Gustavson (link in file)             |
+| classicnoise3d.js | Classic Perlin noise based on work by Stefan Gustavson (link in file)             |
 | color.js | Color constants and functions that work with a color (vec4<f32>) input             |
 | debug.js | Functions that show a cross (useful for mouse position) and a frame (useful to show frame border)             |
 | defaultConstants.js | Currently it has nothing but it will have default constants for `POINTS` |

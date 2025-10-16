@@ -33,5 +33,6 @@ import { fnusin } from 'points/animation';
 {@link module:points/math|points/math}<br>
 {@link module:points/noise2d|points/noise2d}<br>
 {@link module:points/classicnoise2d|points/classicnoise2d}<br>
+{@link module:points/classicnoise3d|points/classicnoise3d}<br>
 {@link module:points/random|points/random}<br>
 {@link module:points/sdf|points/sdf}<br>

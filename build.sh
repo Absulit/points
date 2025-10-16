@@ -19,6 +19,7 @@ npx rollup -c
 ./node_modules/.bin/swc build/core/math.js --out-file build/core/math.min.js
 ./node_modules/.bin/swc build/core/noise2d.js --out-file build/core/noise2d.min.js
 ./node_modules/.bin/swc build/core/classicnoise2d.js --out-file build/core/classicnoise2d.min.js
+./node_modules/.bin/swc build/core/classicnoise3d.js --out-file build/core/classicnoise3d.min.js
 ./node_modules/.bin/swc build/core/random.js --out-file build/core/random.min.js
 ./node_modules/.bin/swc build/core/sdf.js --out-file build/core/sdf.min.js
 
@@ -29,7 +30,7 @@ npx rollup -c
 echo '/* @ts-self-types="./points.d.ts" */' | cat - build/points.min.js > temp && mv temp build/points.min.js
 
 
-list="animation audio color debug effects image math noise2d classicnoise2d random sdf"
+list="animation audio color debug effects image math noise2d classicnoise2d classicnoise3d random sdf"
 
 for item in $list; do
     echo '/* @ts-self-types="./'$item'.d.ts" */' | cat - build/core/$item.min.js > temp && mv temp build/core/$item.min.js

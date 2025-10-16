@@ -45,6 +45,7 @@ export default [
       audio: 'src/core/audio.js',
       cellular2d: 'src/core/cellular2d.js',
       classicnoise2d: 'src/core/classicnoise2d.js',
+      classicnoise3d: 'src/core/classicnoise3d.js',
       color: 'src/core/color.js',
       debug: 'src/core/debug.js',
       defaultConstants: 'src/core/defaultConstants.js',
