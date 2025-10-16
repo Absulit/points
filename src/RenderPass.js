@@ -734,6 +734,83 @@ class RenderPass {
     }
 
     /**
+     * Adds a Torus mesh
+     * @param {String} name
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {Number} radius
+     * @param {Number} tube
+     * @param {Number} radialSegments
+     * @param {Number} tubularSegments
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     * @returns {Object}
+     */
+    addTorus(name, coordinate = { x: 0, y: 0, z: 0 }, radius = 1, tube = 0.4, radialSegments = 32, tubularSegments = 24, color = { r: 1, g: 0, b: 1, a: 1 }) {
+        const { x, y, z } = coordinate;
+        const { r, g, b, a } = color;
+
+        const vertices = [];
+        const normals = [];
+        const uvs = [];
+        const indices = [];
+
+        for (let k = 0; k <= radialSegments; k++) {
+            const v = k / radialSegments * Math.PI * 2;
+            const cosV = Math.cos(v);
+            const sinV = Math.sin(v);
+
+            for (let i = 0; i <= tubularSegments; i++) {
+                const u = i / tubularSegments * Math.PI * 2;
+                const cosU = Math.cos(u);
+                const sinU = Math.sin(u);
+
+                const tx = (radius + tube * cosV) * cosU + x;
+                const ty = (radius + tube * cosV) * sinU + y;
+                const tz = tube * sinV + z;
+
+                const nx = cosV * cosU;
+                const ny = cosV * sinU;
+                const nz = sinV;
+
+                vertices.push([tx, ty, tz]);
+                normals.push([nx, ny, nz]);
+                uvs.push([i / tubularSegments, k / radialSegments]);
+            }
+        }
+
+        for (let k = 1; k <= radialSegments; k++) {
+            for (let i = 1; i <= tubularSegments; i++) {
+                const a = (tubularSegments + 1) * k + i - 1;
+                const b = (tubularSegments + 1) * (k - 1) + i - 1;
+                const c = (tubularSegments + 1) * (k - 1) + i;
+                const d = (tubularSegments + 1) * k + i;
+
+                indices.push([a, b, d]);
+                indices.push([b, c, d]);
+            }
+        }
+
+        for (const [i0, i1, i2] of indices) {
+            for (const i of [i0, i1, i2]) {
+                const [vx, vy, vz] = vertices[i];
+                const [nx, ny, nz] = normals[i];
+                const [u, v] = uvs[i];
+                this.#vertexArray.push(vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, this.#meshCounter);
+            }
+        }
+
+        const mesh = {
+            name,
+            id: this.#meshCounter,
+            instanceCount: 1,
+            verticesCount: indices.length * 3
+        };
+        this.#meshes.push(mesh);
+        ++this.#meshCounter;
+
+        return mesh;
+    }
+
+    /**
      * Add a external mesh with the provided required data.
      * @param {String} name
      * @param {Array<{x:Number, y:Number, z:Number}>} vertices
