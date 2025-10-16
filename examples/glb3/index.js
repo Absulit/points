@@ -106,7 +106,7 @@ const nf = 1 / (near - far);
 
 
 
-const url = '../models/monkey.glb'; // or remote URL (CORS must allow)
+const url = '../models/monkey_subdivide.glb'; // or remote URL (CORS must allow)
 const data = await loadAndExtract(url);
 const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0]
 cube_renderpass.addMesh('monkey', positions, colors, colorSize, uvs, normals, indices)
