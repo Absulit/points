@@ -72,7 +72,7 @@ export async function loadAndExtract(url) {
             // const colorAccessor = prim.getAttribute('COLOR_0');
             // console.log(colorAccessor.getComponentType()); // Should be 5126 (FLOAT) or 5121 (UNSIGNED_BYTE)
             // console.log(colorAccessor.getNormalized());    // true or false
-            const colorSize = prim.getAttribute('COLOR_0').getElementSize(); // 3 or 4
+            const colorSize = prim.getAttribute('COLOR_0')?.getElementSize(); // 3 or 4
 
             const material = prim.getMaterial();
             if (!material) {
