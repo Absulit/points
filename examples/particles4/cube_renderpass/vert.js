@@ -1,11 +1,8 @@
-import { fnusin, fusin } from 'points/animation';
 import { structs } from '../structs.js';
 
 const vert = /*wgsl*/`
 
 ${structs}
-${fusin}
-${fnusin}
 
 fn rotationMatrix(rotation: vec3f) -> mat3x3<f32> {
     let cx = cos(rotation.x);
@@ -67,7 +64,6 @@ fn main(
     let depth = vec4f(-particle.position.z / 253);
 
     return customVertexBody(clip, depth, uv, newNormal, particle);
-
 }
 `;
 

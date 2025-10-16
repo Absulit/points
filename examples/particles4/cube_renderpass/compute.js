@@ -1,7 +1,6 @@
 import { PI, TAU } from 'points/math';
 import { structs } from '../structs.js';
 import { rand } from 'points/random';
-import { snoise } from 'points/noise2d';
 
 const compute = /*wgsl*/`
 
@@ -9,7 +8,6 @@ ${structs}
 ${PI}
 ${TAU}
 ${rand}
-${snoise}
 
 const WIDTH = 15i;
 const HEIGHT = 15i;
@@ -50,8 +48,7 @@ fn main(
         rand_seed.x = indexF;
         rand();
 
-        let angle_intensity = .01;
-        // let n = snoise(particle.position.xy / 200 + params.time * .01);
+        let angle_intensity = .005;
 
         particle.position = vec3f();
         particle.color = vec4f(rand_seed, rand_seed.y, 1);
@@ -64,9 +61,6 @@ fn main(
         particle.angle = angleToVector(rand_seed.y * TAU) * angle_intensity;
         particle.init = 1;
     }
-
-    let n = snoise(particle.position.xy / 200 + params.time * .01);
-    particle.noise = n;
 
     rand_seed.y = indexF;
     rand();
@@ -82,17 +76,15 @@ fn main(
         particle.scale = vec3f(mix(.4, .01, 1 - scaleFactor * (1-scaleFactor) * 2));
 
         particle.position += vec3f(
-            particle.angle.x * n,
+            particle.angle.x,
             params.delta,
-            particle.angle.y * n
+            particle.angle.y
         ) * particle.speed;
 
         if(particle.position.y > MAXHEIGHT){
             particle.init = 0;
         }
     }
-
-
 }
 `;
 
