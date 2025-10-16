@@ -88,6 +88,27 @@ export const angle: string;
  */
 export const polar: string;
 /**
+ * Creates a Matrix rotated in the X axis by an angle in radians.
+ * @type {String}
+ * @param {f32} rads angle
+ * @returns {mat4x4f}
+ */
+export const rotXAxis: string;
+/**
+ * Creates a Matrix rotated in the Y axis by an angle in radians.
+ * @type {String}
+ * @param {f32} rads angle
+ * @returns {mat4x4f}
+ */
+export const rotYAxis: string;
+/**
+ * Creates a Matrix rotated in the Z axis by an angle in radians.
+ * @type {String}
+ * @param {f32} rads angle
+ * @returns {mat4x4f}
+ */
+export const rotZAxis: string;
+/**
  * Rotates a vector an amount of radians
  * @type {String}
  * @param {vec2f} p vector to rotate

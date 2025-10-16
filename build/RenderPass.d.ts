@@ -115,10 +115,8 @@ declare class RenderPass {
      * requires to run.
      * @param {Points} points instance of {@link Points} to call set* functions
      * like {@link Points#setUniform}  and others.
-     * @param {Object} params data that can be assigned to the RenderPass when
-     * the {@link Points#addRenderPass} method is called.
      */
-    init(points: Points, params: any): void;
+    init(points: Points): void;
     /**
      * List of buffer names that are required for this RenderPass so if it shows
      * them in the console.
@@ -133,12 +131,190 @@ declare class RenderPass {
      * in this RenderPass. This means if you have a quad, it will create
      * `instanceCount` number of independent quads on the screen.
      * Useful for instanced particles driven by a Storage buffer.
-     * @param {Number} val
      */
-    set instanceCount(val: number);
     get instanceCount(): number;
     set name(val: any);
     get name(): any;
     get internal(): boolean;
+    /**
+     * @param {Object} val data that can be assigned to the RenderPass when
+     * the {@link Points#addRenderPass} method is called.
+     */
+    set params(val: any);
+    /**
+     * Parameters specifically for Post RenderPass
+     */
+    get params(): any;
+    set vertexArray(val: Float32Array<ArrayBuffer>);
+    get vertexArray(): Float32Array<ArrayBuffer>;
+    set vertexBufferInfo(val: any);
+    get vertexBufferInfo(): any;
+    set vertexBuffer(val: any);
+    get vertexBuffer(): any;
+    /**
+     * Controls whether your fragment shader can write to the depth buffer.
+     * By default `true`.
+     * To allow transparency and a custom type of sort, set this as false;
+     * @param {Boolean} val
+     */
+    set depthWriteEnabled(val: boolean);
+    get depthWriteEnabled(): boolean;
+    /**
+     * Controls if the last RenderPass data is preserved on screen or cleared.
+     * Default `clear`
+     * @param {'clear'|'load'} val
+     */
+    set loadOp(val: "clear" | "load");
+    get loadOp(): "clear" | "load";
+    /**
+     * Sets the color used to clear the RenderPass before drawing.
+     * (only if {@link RenderPass#loadOp | loadOp} is set to `clear`)
+     * default: black
+     * @param {{ r: Number, g: Number, b: Number, a: Number }} val
+     */
+    set clearValue(val: {
+        r: number;
+        g: number;
+        b: number;
+        a: number;
+    });
+    get clearValue(): {
+        r: number;
+        g: number;
+        b: number;
+        a: number;
+    };
+    /**
+     * @type {GPURenderPassDescriptor}
+     */
+    get descriptor(): GPURenderPassDescriptor;
+    /**
+     * - **currently for internal use**<br>
+     * - **might be private in the future**<br>
+     * Adds two triangles as a quad called Point
+     * @param {Coordinate} coordinate `x` from 0 to canvas.width, `y` from 0 to canvas.height, `z` it goes from 0.0 to 1.0 and forward
+     * @param {Number} width point width
+     * @param {Number} height point height
+     * @param {Array<RGBAColor>} colors one color per corner
+     * @param {HTMLCanvasElement} canvas canvas element
+     * @param {Boolean} useTexture
+     * @ignore
+     */
+    addPoint(coordinate: Coordinate, width: number, height: number, colors: Array<RGBAColor>, canvas: HTMLCanvasElement, useTexture?: boolean): {
+        name: string;
+        id: number;
+        instanceCount: number;
+        verticesCount: number;
+    };
+    /**
+     * Adds a mesh quad
+     * @param {String} name
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {{width:Number, height:Number}} dimensions
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     * @param {{x:Number, y:Number }} segments mesh subdivisions
+     */
+    addPlane(name: string, coordinate?: {
+        x: number;
+        y: number;
+        z: number;
+    }, dimensions?: {
+        width: number;
+        height: number;
+    }, color?: {
+        r: number;
+        g: number;
+        b: number;
+        a: number;
+    }, segments?: {
+        x: number;
+        y: number;
+    }): {
+        name: string;
+        id: number;
+        instanceCount: number;
+        verticesCount: number;
+    };
+    /**
+     * Adds a mesh cube
+     * @param {String} name
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {{width:Number, height:Number, depth:Number}} dimensions
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     */
+    addCube(name: string, coordinate?: {
+        x: number;
+        y: number;
+        z: number;
+    }, dimensions?: {
+        width: number;
+        height: number;
+        depth: number;
+    }, color?: {
+        r: number;
+        g: number;
+        b: number;
+        a: number;
+    }): {
+        name: string;
+        id: number;
+        instanceCount: number;
+        verticesCount: number;
+    };
+    /**
+     * Adds a mesh sphere
+     * @param {String} name
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     * @param {Number} radius
+     * @param {Number} segments
+     * @param {Number} rings
+     */
+    addSphere(name: string, coordinate?: {
+        x: number;
+        y: number;
+        z: number;
+    }, color?: {
+        r: number;
+        g: number;
+        b: number;
+        a: number;
+    }, radius?: number, segments?: number, rings?: number): {
+        name: string;
+        id: number;
+        instanceCount: number;
+        verticesCount: number;
+    };
+    /**
+     * Add a external mesh with the provided required data.
+     * @param {String} name
+     * @param {Array<{x:Number, y:Number, z:Number}>} vertices
+     * @param {Array<{r:Number, g:Number, b:Number, a:Number}>} colors
+     * @param {Array<{u:Number, v:Number}>} uvs
+     * @param {Array<Number>} normals
+     */
+    addMesh(name: string, vertices: Array<{
+        x: number;
+        y: number;
+        z: number;
+    }>, colors: Array<{
+        r: number;
+        g: number;
+        b: number;
+        a: number;
+    }>, colorSize: any, uvs: Array<{
+        u: number;
+        v: number;
+    }>, normals: Array<number>, indices: any): {
+        name: string;
+        id: number;
+        instanceCount: number;
+        verticesCount: any;
+    };
+    /**
+     * For internal purposes
+     * ids and names of the meshes
+     */
+    get meshes(): any[];
     #private;
 }

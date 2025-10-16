@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en" data-color-scheme="auto">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Source: core/noise2d.js | Points</title>
+    <title>Module: points/classicnoise3d | Points</title>
     <meta name="description" content="A Generative Art library made in WebGPU"><meta name="keywords" content="javascript, webgl, crative-coding, shaders, generative-art, webgpu, genart, wgsl">
     <link rel="icon" title="dummy" href="data:image/x-icon;base64,AA">
     <script src="scripts/docolatte.min.js"></script>
@@ -23,7 +22,7 @@
         </div>
         <div class="topbar">
             <h1 class="page-title">
-                <a href="#">Source: core/noise2d.js</a>
+                <a href="#">Module: points/classicnoise3d</a>
             </h1>
             <a class="light-switch" title="Switch light/dark mode" href="#"><i class="label auto">
 <svg  class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -39,99 +38,131 @@
 
 
 
+
+<article class="doc">
+    <header>
+        
+            
+                
+            
+        
+    </header>
+
+    <div class="container-overview">
     
-<article class="src">
-    <pre class="prettyprint source linenums lang-js"><span class="_char">_</span><code>/**
- * original: Author : Ian McEwan, Ashima Arts.
- * https://github.com/ashima/webgl-noise/blob/master/src/noise2D.glsl
- *
- * These are wgsl functions, not js functions.
- * The function is enclosed in a js string constant,
- * to be appended into the code to reference it in the string shader.
- * @module points/noise2d
- */
+        
+            <div class="description"><p>original: Author :  Stefan Gustavson (stefan.gustavson@liu.se)<br>
+https://github.com/ashima/webgl-noise/blob/master/src/classicnoise3D.glsl<br>
+<br>
+These are wgsl functions, not js functions.
+The function is enclosed in a js string constant,
+to be appended into the code to reference it in the string shader.</p></div>
+        
 
-/**
- * Sinplex Noise function
- * @type {String}
- * @param {vec2f} v usually the uv
- * @returns {f32}
- *
- * @example
- * // js
- * import { snoise } from 'points/noise2d';
- *
- * // wgsl string
- * ${snoise}
- * let value = snoise(uv);
- */
+        
+            
 
-export const snoise = /*wgsl*/`
 
-fn mod289_v3(x: vec3f) -> vec3f {
-    return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
 
-fn mod289_v2(x: vec2f) -> vec2f {
-    return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
 
-fn permute(x: vec3f) -> vec3f {
-    return mod289_v3(((x*34.0)+10.0)*x);
-}
 
-fn snoise(v:vec2f) -> f32 {
-    let C = vec4(0.211324865405187,  // (3.0-sqrt(3.0))/6.0
-                        0.366025403784439,  // 0.5*(sqrt(3.0)-1.0)
-                       -0.577350269189626,  // -1.0 + 2.0 * C.x
-                        0.024390243902439); // 1.0 / 41.0
-    // First corner
-    var i  = floor(v + dot(v, C.yy) );
-    var x0 = v -   i + dot(i, C.xx);
 
-    // Other corners
-    var i1 = vec2(0.);
-    //i1.x = step( x0.y, x0.x ); // x0.x > x0.y ? 1.0 : 0.0
-    //i1.y = 1.0 - i1.x;
-    //i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
-    if(x0.x > x0.y){ i1 = vec2(1.0, 0.0); }else{ i1 = vec2(0.0, 1.0); }
-    //x0 = x0 - 0.0 + 0.0 * C.xx ;
-    // x1 = x0 - i1 + 1.0 * C.xx ;
-    // x2 = x0 - 1.0 + 2.0 * C.xx ;
-    var x12 = x0.xyxy + C.xxzz;
-    //x12.xy -= i1;
-    x12 = vec4(x12.xy - i1, x12.zw); // ?? fix
 
-    // Permutations
-    i = mod289_v2(i); // Avoid truncation effects in permutation
-    let p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 ))
-          + i.x + vec3(0.0, i1.x, 1.0 ));
 
-    var m = max(vec3(0.5) - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), vec3(0.0));
-    m = m*m ;
-    m = m*m ;
 
-    // Gradients: 41 points uniformly over a line, mapped onto a diamond.
-    // The ring size 17*17 = 289 is close to a multiple of 41 (41*7 = 287)
 
-    let x = 2.0 * fract(p * C.www) - 1.0;
-    let h = abs(x) - 0.5;
-    let ox = floor(x + 0.5);
-    let a0 = x - ox;
 
-    // Normalise gradients implicitly by scaling m
-    // Approximation of: m *= inversesqrt( a0*a0 + h*h );
-    m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
 
-    // Compute final noise value at P
-    var g = vec3(0.);
-    g.x  = a0.x  * x0.x  + h.x  * x0.y;
-    //g.yz = a0.yz * x12.xz + h.yz * x12.yw;
-    g = vec3(g.x,a0.yz * x12.xz + h.yz * x12.yw);
-    return 130.0 * dot(m, g);
-  }
-`;
-</code></pre>
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="core_classicnoise3d.js.html">core/classicnoise3d.js</a>, <a href="core_classicnoise3d.js.html#line1">line 1</a>
+</dd>
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id=".pnoise3"><span class="attributes"><span class="attribute">static</span><span class="attribute">constant</span></span>pnoise3<span class="type-signature"> <span class="type">String</span></span></h4>
+
+
+
+
+<div class="description">
+    <p>Classic Perlin noise, periodic variant</p>
+</div>
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="core_classicnoise3d.js.html">core/classicnoise3d.js</a>, <a href="core_classicnoise3d.js.html#line27">line 27</a>
+</dd>
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+
+    <pre class="prettyprint lang-js has-caption"><code>import { pnoise3 } from 'points/classicnoise3d';// wgsl string${pnoise3}let value = pnoise3(xyz);</code><div class="code-caption hljs">js</div></pre>
+
+
+
+
+        
+    
+
+    
+
+    
+
+    
 </article>
 
 
@@ -153,7 +184,7 @@ fn snoise(v:vec2f) -> f32 {
                     Documentation generated by <a rel="external" href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a><wbr>
                     using <a rel="external" href="https://github.com/amekusa/docolatte">Docolatte</a> theme
                     
-                    <wbr>on <time datetime="2025-10-16T19:58:52.774Z">Thu, 16 Oct 2025 19:58:52 GMT</time>
+                    <wbr>on <time datetime="2025-10-16T19:58:52.827Z">Thu, 16 Oct 2025 19:58:52 GMT</time>
                     
                 </p>
                 

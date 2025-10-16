@@ -124,7 +124,57 @@ fn angle(p1:vec2f, p2:vec2f) -> f32 {
     let distance = length(delta);
     return atan2(delta.y, delta.x);
 }
-
 `;
 
-export { E, PHI, PI, TAU, angle, polar, rotateVector };
+/**
+ * Creates a Matrix rotated in the X axis by an angle in radians.
+ * @type {String}
+ * @param {f32} rads angle
+ * @returns {mat4x4f}
+ */
+const rotXAxis = /*wgsl*/`
+fn rotXAxis(rads:f32) -> mat4x4f {
+    return mat4x4f(
+        1.0, 0.0,          0.0,         0.0,
+        0.0, cos(rads),   -sin(rads),   0.0,
+        0.0, sin(rads),    cos(rads),   0.0,
+        0.0, 0.0,          0.0,         1.0
+    );
+}
+`;
+
+/**
+ * Creates a Matrix rotated in the Y axis by an angle in radians.
+ * @type {String}
+ * @param {f32} rads angle
+ * @returns {mat4x4f}
+ */
+const rotYAxis = /*wgsl*/`
+fn rotYAxis(rads:f32) -> mat4x4f {
+    return mat4x4f(
+        cos(rads),   0.0, sin(rads),   0.0,
+        0.0,         1.0, 0.0,         0.0,
+       -sin(rads),   0.0, cos(rads),   0.0,
+        0.0,         0.0, 0.0,         1.0
+    );
+}
+`;
+
+/**
+ * Creates a Matrix rotated in the Z axis by an angle in radians.
+ * @type {String}
+ * @param {f32} rads angle
+ * @returns {mat4x4f}
+ */
+const rotZAxis = /*wgsl*/`
+fn rotZAxis(rads:f32) -> mat4x4f {
+    return mat4x4f(
+        cos(rads),   -sin(rads),   0.0, 0.0,
+        sin(rads),    cos(rads),   0.0, 0.0,
+        0.0,          0.0,         1.0, 0.0,
+        0.0,          0.0,         0.0, 1.0
+    );
+}
+`;
+
+export { E, PHI, PI, TAU, angle, polar, rotXAxis, rotYAxis, rotZAxis, rotateVector };
