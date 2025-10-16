@@ -37,8 +37,6 @@ fn main(
 
     let particle = &particles[index];
 
-    let flipTexture = vec3(1.,-1.,1);
-    let flipTextureCoordinates = vec3(-.5,.5,1);
     // if(f32(index)>log_data[0]){
     //     log_data[0] = f32(index);
     //     log.updated = 1;
@@ -51,8 +49,6 @@ fn main(
         let y = (index / WIDTH) % HEIGHT;
         let z = index / (WIDTH * HEIGHT);
         particle.position = vec3f(f32(x - HWIDTH), f32(y - HHEIGHT), -f32(z));
-
-        // particle.position = (particle.position * flipTexture + flipTextureCoordinates);
 
         particle.color = vec4f(rand_seed, rand_seed.y, 1);
         particle.scale = vec3f(.31);
@@ -67,7 +63,7 @@ fn main(
     let dir = mix(-1, 1, step(.5, rand_seed.y));
     particle.rotation += vec3f(params.delta, params.delta * n * dir, params.delta * dir);
 
-    // particle.position += vec3f(0, sin(n),0) * .001;
+    particle.position += vec3f(0, n,0) * .01;
 
 
 }
