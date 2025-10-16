@@ -62,10 +62,6 @@ fn main(
     rand();
     let dir = mix(-1, 1, step(.5, rand_seed.y));
     particle.rotation += vec3f(params.delta, params.delta * n * dir, params.delta * dir);
-
-    particle.position += vec3f(0, n,0) * .01;
-
-
 }
 `;
 

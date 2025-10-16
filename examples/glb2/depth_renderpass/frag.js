@@ -42,9 +42,6 @@ fn main(
         vec2f(512), // resolution
         rotateVector(vec2f(2.,0) * visual, 0) // direction
     );
-
-
-    // return vec4f(firstPassColor + visual);
 }
 `;
 
