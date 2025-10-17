@@ -22,23 +22,29 @@ fn main(
     var angleY = params.time * 0.94222;
     var angleX = params.time * 0.865;
 
-    // if(id == mesh.cube1){
+    // if(id == mesh.base_mesh){
     //     angleZ = params.time * 0.1854;
     //     angleY = params.time * 0.694222;
     //     angleX = params.time * 0.4865;
     // }
+
+    var p = vec4f();
+    if(instanceIndex >= 1){
+        p = vertex_data[instanceIndex];
+    }
 
     let rotX = rotXAxis(angleX);
     let rotY = rotYAxis(angleY);
     let rotZ = rotZAxis(angleZ);
     let model = rotX * rotY * rotZ;
 
-    let world = (model * vec4f(position.xyz, 1.)).xyz;
-    let clip = params.projection * params.view * vec4f(world, 1.);
+    let rotated = model * (position + p);
+    let scaled = rotated * .1;//scale;
+    let world = scaled;
 
-    let newNormal = normalize((model * vec4f(normal, 0.)).xyz);
+    let clip = params.projection * params.view * world;
 
-    var dvb = defaultVertexBody(clip, color, uv, newNormal);
+    var dvb = defaultVertexBody(clip, color, uv, normal);
     dvb.id = id;
 
     return dvb;
