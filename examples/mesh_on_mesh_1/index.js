@@ -9,12 +9,12 @@ const options = {
     bool: false,
 }
 
-const url = '../models/monkey.glb'; // or remote URL (CORS must allow)
+const url = '../models/monkey_subdivide.glb'; // or remote URL (CORS must allow)
 const data = await loadAndExtract(url);
 const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0]
 
 
-const WORKGROUP_X = 8;
+const WORKGROUP_X = 64;
 const WORKGROUP_Y = 1;
 const WORKGROUP_Z = 1;
 
@@ -28,8 +28,8 @@ console.log('NUMPARTICLES: ', NUMPARTICLES);
 const renderPass = new RenderPass(vert, frag, null);
 renderPass.depthWriteEnabled = true;
 // renderPass.addCube('base_mesh').instanceCount = 1;
-// renderPass.addMesh('base_mesh', positions, colors, colorSize, uvs, normals, indices)
-renderPass.addSphere('instance_mesh', { x: 0, y: 0, z: 0 }, { r: 0, g: 0, b: 0, a: 0 }, .04).instanceCount = NUMPARTICLES;
+renderPass.addMesh('base_mesh', positions, colors, colorSize, uvs, normals, indices)
+renderPass.addSphere('instance_mesh', { x: 0, y: 0, z: 0 }, { r: 0, g: 0, b: 0, a: 0 }, .02).instanceCount = NUMPARTICLES;
 
 const vertex_data = positions.reduce((acc, val, idx) => {
     if (idx % 3 === 0) acc.push([]);
@@ -41,7 +41,7 @@ const vertex_data = positions.reduce((acc, val, idx) => {
 
     return acc;
 }, []);
-console.log(vertex_data);
+// console.log(vertex_data);
 console.log(vertex_data.length);
 
 
