@@ -1,7 +1,7 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
-import Points from 'points';
+import Points, { RenderPass } from 'points';
 
 const options = {
     val: 0,
@@ -13,10 +13,14 @@ const options = {
     color5: { r: 115, g: 50.9, b: 20.3, a: .1 }, // r, g, b object
 }
 
+const renderPass = new RenderPass(vert, frag, compute);
+renderPass.addCube('base_mesh').instanceCount = 1;
+// renderPass.addSphere('instance_mesh').instanceCount = 1;
+
 const base = {
-    vert,
-    compute,
-    frag,
+    renderPasses: [
+        renderPass,
+    ],
     /**
      * @param {Points} points
      */
