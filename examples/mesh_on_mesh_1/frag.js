@@ -1,9 +1,10 @@
 import { fnusin } from 'points/animation';
+import { structs } from './structs.js';
 
 const frag = /*wgsl*/`
 
 ${fnusin}
-
+${structs}
 
 @fragment
 fn main(

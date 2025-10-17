@@ -37,6 +37,14 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+        points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
+        points.setConstant('WORKGROUP_X', WORKGROUP_X, 'u32');
+        points.setConstant('WORKGROUP_Y', WORKGROUP_Y, 'u32');
+        points.setConstant('WORKGROUP_Z', WORKGROUP_Z, 'u32');
+        points.setConstant('THREADS_X', THREADS_X, 'u32');
+        points.setConstant('THREADS_Y', THREADS_Y, 'u32');
+        points.setConstant('THREADS_Z', THREADS_Z, 'u32');
+        points.setStorage('particles', `array<Particle, ${NUMPARTICLES}>`);
 
         points.setUniform('val', options.val);
 
