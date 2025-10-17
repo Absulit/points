@@ -515,7 +515,13 @@ class RenderPass {
      * @param {{r:Number, g:Number, b:Number, a:Number}} color
      * @param {{x:Number, y:Number }} segments mesh subdivisions
      */
-    addPlane(name, coordinate = { x: 0, y: 0, z: 0 }, dimensions = { width: 1, height: 1 }, color = { r: 1, g: 0, b: 1, a: 0 }, segments = { x: 1, y: 1 }) {
+    addPlane(
+        name,
+        coordinate = { x: 0, y: 0, z: 0 },
+        dimensions = { width: 1, height: 1 },
+        color = { r: 1, g: 0, b: 1, a: 0 },
+        segments = { x: 1, y: 1 }
+    ) {
         const { x, y, z } = coordinate;
         const { width, height } = dimensions;
         const { x: sx, y: sy } = segments;
@@ -581,7 +587,12 @@ class RenderPass {
      * @param {{width:Number, height:Number, depth:Number}} dimensions
      * @param {{r:Number, g:Number, b:Number, a:Number}} color
      */
-    addCube(name, coordinate = { x: 0, y: 0, z: 0 }, dimensions = { width: 1, height: 1, depth: 1 }, color = { r: 1, g: 0, b: 1, a: 0 }) {
+    addCube(
+        name,
+        coordinate = { x: 0, y: 0, z: 0 },
+        dimensions = { width: 1, height: 1, depth: 1 },
+        color = { r: 1, g: 0, b: 1, a: 0 }
+    ) {
         const { x, y, z } = coordinate;
         const { width, height, depth } = dimensions;
         const hw = width / 2;
@@ -671,13 +682,20 @@ class RenderPass {
      * @param {Number} segments
      * @param {Number} rings
      */
-    addSphere(name, coordinate = { x: 0, y: 0, z: 0 }, color = { r: 1, g: 0, b: 1, a: 0 }, radius = 1, segments = 16, rings = 12) {
+    addSphere(
+        name,
+        coordinate = { x: 0, y: 0, z: 0 },
+        color = { r: 1, g: 0, b: 1, a: 0 },
+        radius = 1,
+        segments = 16,
+        rings = 12
+    ) {
         const { x, y, z } = coordinate;
         const { r, g, b, a } = color;
 
         const vertexGrid = [];
 
-        // Generate vertices
+        // generate vertices
         for (let lat = 0; lat <= rings; lat++) {
             const theta = (lat * Math.PI) / rings;
             const sinTheta = Math.sin(theta);
@@ -705,7 +723,7 @@ class RenderPass {
             }
         }
 
-        // Generate triangles
+        // generate triangles
         for (let lat = 0; lat < rings; lat++) {
             for (let lon = 0; lon < segments; lon++) {
                 const v1 = vertexGrid[lat][lon];
@@ -713,9 +731,9 @@ class RenderPass {
                 const v3 = vertexGrid[lat + 1][lon + 1];
                 const v4 = vertexGrid[lat][lon + 1];
 
-                // Triangle 1
+                // triangle 1
                 this.#vertexArray.push(...v1, ...v2, ...v3);
-                // Triangle 2
+                // triangle 2
                 this.#vertexArray.push(...v1, ...v3, ...v4);
             }
         }
@@ -744,7 +762,14 @@ class RenderPass {
      * @param {{r:Number, g:Number, b:Number, a:Number}} color
      * @returns {Object}
      */
-    addTorus(name, coordinate = { x: 0, y: 0, z: 0 }, radius = 1, tube = 0.4, radialSegments = 32, tubularSegments = 24, color = { r: 1, g: 0, b: 1, a: 1 }) {
+    addTorus(
+        name,
+        coordinate = { x: 0, y: 0, z: 0 },
+        radius = 1, tube = 0.4,
+        radialSegments = 32,
+        tubularSegments = 24,
+        color = { r: 1, g: 0, b: 1, a: 1 }
+    ) {
         const { x, y, z } = coordinate;
         const { r, g, b, a } = color;
 
@@ -805,6 +830,129 @@ class RenderPass {
             verticesCount: indices.length * 3
         };
         this.#meshes.push(mesh);
+
+        ++this.#meshCounter;
+
+        return mesh;
+    }
+
+    /**
+     *
+     * @param {String} name
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {Number} radius
+     * @param {Number} height
+     * @param Number} radialSegments
+     * @param {Boolean} cap
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     * @returns {Object}
+     */
+    addCylinder(
+        name,
+        coordinate = { x: 0, y: 0, z: 0 },
+        radius = 0.5,
+        height = 1,
+        radialSegments = 32,
+        cap = true,
+        color = { r: 1, g: 0, b: 1, a: 1 }
+    ) {
+        const { x: cx, y: cy, z: cz } = coordinate;
+        const { r, g, b, a } = color;
+        const halfHeight = height / 2;
+
+        const vertices = [];
+        const normals = [];
+        const uvs = [];
+        const indices = [];
+
+        // sides
+        for (let i = 0; i <= radialSegments; i++) {
+            const theta = (i / radialSegments) * Math.PI * 2;
+            const cosTheta = Math.cos(theta);
+            const sinTheta = Math.sin(theta);
+
+            const px = cx + radius * cosTheta;
+            const pz = cz + radius * sinTheta;
+
+            vertices.push([px, cy - halfHeight, pz]); // bottom
+            normals.push([cosTheta, 0, sinTheta]);
+            uvs.push([i / radialSegments, 0]);
+
+            vertices.push([px, cy + halfHeight, pz]); // top
+            normals.push([cosTheta, 0, sinTheta]);
+            uvs.push([i / radialSegments, 1]);
+        }
+
+        for (let i = 0; i < radialSegments; i++) {
+            const base = i * 2;
+            indices.push([base, base + 1, base + 3]);
+            indices.push([base, base + 3, base + 2]);
+        }
+
+        // caps
+        if (cap) {
+            const bottomCenterIndex = vertices.length;
+            vertices.push([cx, cy - halfHeight, cz]);
+            normals.push([0, -1, 0]);
+            uvs.push([0.5, 0.5]);
+
+            const topCenterIndex = vertices.length;
+            vertices.push([cx, cy + halfHeight, cz]);
+            normals.push([0, 1, 0]);
+            uvs.push([0.5, 0.5]);
+
+            for (let i = 0; i < radialSegments; i++) {
+                const theta = (i / radialSegments) * Math.PI * 2;
+                const nextTheta = ((i + 1) / radialSegments) * Math.PI * 2;
+
+                const x0 = cx + radius * Math.cos(theta);
+                const z0 = cz + radius * Math.sin(theta);
+                const x1 = cx + radius * Math.cos(nextTheta);
+                const z1 = cz + radius * Math.sin(nextTheta);
+
+                const bottomIdx0 = vertices.length;
+                vertices.push([x0, cy - halfHeight, z0]);
+                normals.push([0, -1, 0]);
+                uvs.push([0.5 + 0.5 * Math.cos(theta), 0.5 + 0.5 * Math.sin(theta)]);
+
+                const bottomIdx1 = vertices.length;
+                vertices.push([x1, cy - halfHeight, z1]);
+                normals.push([0, -1, 0]);
+                uvs.push([0.5 + 0.5 * Math.cos(nextTheta), 0.5 + 0.5 * Math.sin(nextTheta)]);
+
+                indices.push([bottomCenterIndex, bottomIdx0, bottomIdx1]);
+
+                const topIdx0 = vertices.length;
+                vertices.push([x0, cy + halfHeight, z0]);
+                normals.push([0, 1, 0]);
+                uvs.push([0.5 + 0.5 * Math.cos(theta), 0.5 + 0.5 * Math.sin(theta)]);
+
+                const topIdx1 = vertices.length;
+                vertices.push([x1, cy + halfHeight, z1]);
+                normals.push([0, 1, 0]);
+                uvs.push([0.5 + 0.5 * Math.cos(nextTheta), 0.5 + 0.5 * Math.sin(nextTheta)]);
+
+                indices.push([topCenterIndex, topIdx1, topIdx0]);
+            }
+        }
+
+        for (const [i0, i1, i2] of indices) {
+            for (const i of [i0, i1, i2]) {
+                const [vx, vy, vz] = vertices[i];
+                const [nx, ny, nz] = normals[i];
+                const [u, v] = uvs[i];
+                this.#vertexArray.push(vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, this.#meshCounter);
+            }
+        }
+
+        const mesh = {
+            name,
+            id: this.#meshCounter,
+            instanceCount: 1,
+            verticesCount: indices.length * 3
+        };
+        this.#meshes.push(mesh);
+
         ++this.#meshCounter;
 
         return mesh;
