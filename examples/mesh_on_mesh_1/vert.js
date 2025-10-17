@@ -7,6 +7,15 @@ ${rotXAxis}
 ${rotYAxis}
 ${rotZAxis}
 
+fn translationMatrix(offset: vec3f) -> mat4x4f {
+    return mat4x4f(
+        vec4f(1.0, 0.0, 0.0, 0.0),
+        vec4f(0.0, 1.0, 0.0, 0.0),
+        vec4f(0.0, 0.0, 1.0, 0.0),
+        vec4f(offset.x, offset.y, offset.z, 1.0)
+    );
+}
+
 @vertex
 fn main(
     @location(0) position:vec4f,
@@ -29,17 +38,21 @@ fn main(
     // }
 
     var p = vec4f();
-    if(instanceIndex >= 1){
+    if(instanceIndex >= 0){
         p = vertex_data[instanceIndex];
     }
 
     let rotX = rotXAxis(0);
     let rotY = rotYAxis(angleY);
     let rotZ = rotZAxis(0);
-    let model = rotX * rotY * rotZ;
+    var model = rotX * rotY * rotZ;
 
-    let rotated = model * (position + p);
-    let scaled = rotated * .1;//scale;
+    var rotated = model * (position);
+    if(mesh.instance_mesh == id){
+        model = rotX * rotY * rotZ * translationMatrix(p.xyz);
+        rotated = model * position;
+    }
+    let scaled = rotated * 1;//scale;
     let world = scaled;
 
     let clip = params.projection * params.view * world;

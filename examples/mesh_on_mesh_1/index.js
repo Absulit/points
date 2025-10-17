@@ -27,7 +27,6 @@ console.log('NUMPARTICLES: ', NUMPARTICLES);
 
 const renderPass = new RenderPass(vert, frag, null);
 renderPass.depthWriteEnabled = true;
-// renderPass.addCube('base_mesh').instanceCount = 1;
 renderPass.addMesh('base_mesh', positions, colors, colorSize, uvs, normals, indices)
 renderPass.addSphere('instance_mesh', { x: 0, y: 0, z: 0 }, { r: 0, g: 0, b: 0, a: 0 }, .02).instanceCount = NUMPARTICLES;
 
