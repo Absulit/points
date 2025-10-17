@@ -765,7 +765,8 @@ class RenderPass {
     addTorus(
         name,
         coordinate = { x: 0, y: 0, z: 0 },
-        radius = 1, tube = 0.4,
+        radius = 1,
+        tube = .4,
         radialSegments = 32,
         tubularSegments = 24,
         color = { r: 1, g: 0, b: 1, a: 1 }
