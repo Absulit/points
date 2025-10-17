@@ -29,7 +29,7 @@ const renderPass = new RenderPass(vert, frag, null);
 renderPass.depthWriteEnabled = true;
 // renderPass.addCube('base_mesh').instanceCount = 1;
 // renderPass.addMesh('base_mesh', positions, colors, colorSize, uvs, normals, indices)
-renderPass.addSphere('instance_mesh', { x: 0, y: 0, z: 0 }, { r: 0, g: 0, b: 0, a: 0 }, .01).instanceCount = NUMPARTICLES;
+renderPass.addSphere('instance_mesh', { x: 0, y: 0, z: 0 }, { r: 0, g: 0, b: 0, a: 0 }, .04).instanceCount = NUMPARTICLES;
 
 const vertex_data = positions.reduce((acc, val, idx) => {
     if (idx % 3 === 0) acc.push([]);
