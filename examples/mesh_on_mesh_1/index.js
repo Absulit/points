@@ -104,6 +104,17 @@ const base = {
      * @param {Points} points
      */
     update: points => {
+        aspect = points.canvas.width / points.canvas.height;
+        points.setUniform(
+            'projection',
+            [
+                f / aspect, 0, 0, 0,
+                0, f, 0, 0,
+                0, 0, (far + near) * nf, -1,
+                0, 0, (2 * far * near) * nf, 0
+            ]
+        )
+
         points.setUniform('val', options.val);
     }
 }
