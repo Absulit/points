@@ -837,12 +837,12 @@ class RenderPass {
     }
 
     /**
-     *
+     * Adds a Cylinder mesh
      * @param {String} name
      * @param {{x:Number, y:Number, z:Number}} coordinate
      * @param {Number} radius
      * @param {Number} height
-     * @param Number} radialSegments
+     * @param {Number} radialSegments
      * @param {Boolean} cap
      * @param {{r:Number, g:Number, b:Number, a:Number}} color
      * @returns {Object}
@@ -850,7 +850,7 @@ class RenderPass {
     addCylinder(
         name,
         coordinate = { x: 0, y: 0, z: 0 },
-        radius = 0.5,
+        radius = .5,
         height = 1,
         radialSegments = 32,
         cap = true,
@@ -894,12 +894,12 @@ class RenderPass {
             const bottomCenterIndex = vertices.length;
             vertices.push([cx, cy - halfHeight, cz]);
             normals.push([0, -1, 0]);
-            uvs.push([0.5, 0.5]);
+            uvs.push([.5, .5]);
 
             const topCenterIndex = vertices.length;
             vertices.push([cx, cy + halfHeight, cz]);
             normals.push([0, 1, 0]);
-            uvs.push([0.5, 0.5]);
+            uvs.push([.5, .5]);
 
             for (let i = 0; i < radialSegments; i++) {
                 const theta = (i / radialSegments) * Math.PI * 2;
@@ -913,24 +913,24 @@ class RenderPass {
                 const bottomIdx0 = vertices.length;
                 vertices.push([x0, cy - halfHeight, z0]);
                 normals.push([0, -1, 0]);
-                uvs.push([0.5 + 0.5 * Math.cos(theta), 0.5 + 0.5 * Math.sin(theta)]);
+                uvs.push([.5 + .5 * Math.cos(theta), .5 + .5 * Math.sin(theta)]);
 
                 const bottomIdx1 = vertices.length;
                 vertices.push([x1, cy - halfHeight, z1]);
                 normals.push([0, -1, 0]);
-                uvs.push([0.5 + 0.5 * Math.cos(nextTheta), 0.5 + 0.5 * Math.sin(nextTheta)]);
+                uvs.push([.5 + .5 * Math.cos(nextTheta), .5 + .5 * Math.sin(nextTheta)]);
 
                 indices.push([bottomCenterIndex, bottomIdx0, bottomIdx1]);
 
                 const topIdx0 = vertices.length;
                 vertices.push([x0, cy + halfHeight, z0]);
                 normals.push([0, 1, 0]);
-                uvs.push([0.5 + 0.5 * Math.cos(theta), 0.5 + 0.5 * Math.sin(theta)]);
+                uvs.push([.5 + .5 * Math.cos(theta), .5 + .5 * Math.sin(theta)]);
 
                 const topIdx1 = vertices.length;
                 vertices.push([x1, cy + halfHeight, z1]);
                 normals.push([0, 1, 0]);
-                uvs.push([0.5 + 0.5 * Math.cos(nextTheta), 0.5 + 0.5 * Math.sin(nextTheta)]);
+                uvs.push([.5 + .5 * Math.cos(nextTheta), .5 + .5 * Math.sin(nextTheta)]);
 
                 indices.push([topCenterIndex, topIdx1, topIdx0]);
             }
