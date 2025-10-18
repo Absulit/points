@@ -1,4 +1,3 @@
-import { fnusin } from 'points/animation';
 import { structs } from '../structs.js';
 import { blur9 } from 'points/effects';
 import { texture, texturePosition } from 'points/image';
@@ -6,13 +5,11 @@ import { rotateVector } from 'points/math';
 
 const frag = /*wgsl*/`
 
-${fnusin}
 ${structs}
 ${texturePosition}
 ${blur9}
 ${texture}
 ${rotateVector}
-
 
 @fragment
 fn main(

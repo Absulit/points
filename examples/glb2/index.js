@@ -38,8 +38,6 @@ const f = 1.0 / Math.tan(Math.PI / 8); // ≈ 2.414
 let aspect = null
 const nf = 1 / (near - far);
 
-
-
 const url = '../models/lucy.glb'; // or remote URL (CORS must allow)
 const data = await loadAndExtract(url);
 const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0];
@@ -47,7 +45,6 @@ glb_renderpass
     .addMesh('lucy', positions, colors, colorSize, uvs, normals, indices)
     .instanceCount = NUMPARTICLES;
 glb_renderpass.depthWriteEnabled = true;
-const textureOut = texture;
 
 const base = {
     renderPasses: [
@@ -63,7 +60,7 @@ const base = {
 
         points.setTexture2d('first_pass', true, null, 0);
 
-        await points.setTextureImage('albedo', textureOut);
+        await points.setTextureImage('albedo', texture);
         points.setSampler('imageSampler', null);
 
         points.setUniform('dof', options.dof);
@@ -89,7 +86,6 @@ const base = {
         points.addEventListener('logger', data => {
             console.log(data[0]);
         },4)
-
 
         aspect = points.canvas.width / points.canvas.height;
         points.setUniform(

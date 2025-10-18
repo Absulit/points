@@ -1,15 +1,10 @@
-import { PI, TAU } from 'points/math';
 import { structs } from '../structs.js';
 import { rand } from 'points/random';
-import { snoise } from 'points/noise2d';
 
 const compute = /*wgsl*/`
 
 ${structs}
-${PI}
-${TAU}
 ${rand}
-${snoise}
 
 const WIDTH = 8i;
 const HEIGHT = 1i;
@@ -49,19 +44,13 @@ fn main(
         let y = (index / WIDTH) % HEIGHT;
         let z = index / (WIDTH * HEIGHT);
         particle.position = vec3f(f32(x - HWIDTH), f32(y - HHEIGHT), -f32(z));
-
-        particle.color = vec4f(rand_seed, rand_seed.y, 1);
         particle.scale = vec3f(.31);
-        particle.rotation = vec3f(rand_seed, rand_seed.y);
 
         particle.init = 1;
     }
-    let n = snoise(particle.position.xy + params.time);
-    particle.noise = n;
     rand_seed.y = f32(index);
     rand();
     let dir = mix(-1, 1, step(.5, rand_seed.y));
-    particle.rotation += vec3f(params.delta, params.delta * n * dir, params.delta * dir);
 }
 `;
 
