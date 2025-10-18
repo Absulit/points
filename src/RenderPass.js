@@ -480,6 +480,8 @@ class RenderPass {
         return this.#topology;
     }
     /**
+     * To render as Triangles, lines or points.
+     * Use class {@link PrimitiveTopology}
      * @param {GPUPrimitiveTopology} val
      */
     set topology(val){
