@@ -10,15 +10,15 @@ function getWGSLCoordinate(value, side, invert = false) {
 
 export class PrimitiveTopology {
     /** @type {GPUPrimitiveTopology} */
-    POINT_LIST = 'point-list';
+    static POINT_LIST = 'point-list';
     /** @type {GPUPrimitiveTopology} */
-    LINE_LIST = 'line-list';
+    static LINE_LIST = 'line-list';
     /** @type {GPUPrimitiveTopology} */
-    LINE_STRIP = 'line-strip';
+    static LINE_STRIP = 'line-strip';
     /** @type {GPUPrimitiveTopology} */
-    TRIANGLE_LIST = 'triangle-list';
+    static TRIANGLE_LIST = 'triangle-list';
     /** @type {GPUPrimitiveTopology} */
-    TRIANGLE_STRIP = 'triangle-strip';
+    static TRIANGLE_STRIP = 'triangle-strip';
 };
 
 /**

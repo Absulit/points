@@ -1,6 +1,6 @@
 import UniformKeys from './UniformKeys.js';
 import VertexBufferInfo from './VertexBufferInfo.js';
-import RenderPass from './RenderPass.js';
+import RenderPass, { PrimitiveTopology } from './RenderPass.js';
 import RenderPasses from './RenderPasses.js';
 import Coordinate from './coordinate.js';
 import RGBAColor from './color.js';
@@ -2346,7 +2346,7 @@ class Points {
         }
     }
 
-    destroy(){
+    destroy() {
 
         this.#uniforms = new UniformsArray();
         this.#meshUniforms = new UniformsArray();
@@ -2354,4 +2354,4 @@ class Points {
 }
 
 export default Points;
-export { RenderPass, RenderPasses };
+export { RenderPass, RenderPasses, PrimitiveTopology };
