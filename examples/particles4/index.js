@@ -8,14 +8,6 @@ const options = {
     lambert: false,
 }
 
-// const WORKGROUP_X = 16;
-// const WORKGROUP_Y = 4;
-// const WORKGROUP_Z = 4;
-
-// const THREADS_X = 8;
-// const THREADS_Y = 8;
-// const THREADS_Z = 4;
-
 const WORKGROUP_X = 1;
 const WORKGROUP_Y = 1;
 const WORKGROUP_Z = 1;

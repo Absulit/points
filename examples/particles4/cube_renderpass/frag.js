@@ -1,11 +1,8 @@
-import { fnusin } from 'points/animation';
 import { structs } from '../structs.js';
 
 const frag = /*wgsl*/`
 
-${fnusin}
 ${structs}
-
 
 @fragment
 fn main(
@@ -18,7 +15,7 @@ fn main(
     let lightDirection = vec3f(-.5,-1,-1);
     let N = normalize(input.normal);
     let L = normalize(-lightDirection);
-    let diffuse = max(dot(N, L), 0.0); // Lambertian term
+    let diffuse = max(dot(N, L), 0.); // Lambertian term
 
     let lambert = baseColor.rgb * diffuse; // how much of the color is diffused
 
@@ -28,7 +25,6 @@ fn main(
     }
 
     return vec4f(finalColor, baseColor.a);
-
 }
 `;
 
