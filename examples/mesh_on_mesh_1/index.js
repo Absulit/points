@@ -5,7 +5,6 @@ import Points, { RenderPass } from 'points';
 import { loadAndExtract } from 'utils';
 
 const options = {
-    val: 0,
     visibility: true,
 }
 
@@ -28,7 +27,7 @@ console.log('NUMPARTICLES: ', NUMPARTICLES);
 const renderPass = new RenderPass(vert, frag, null);
 renderPass.depthWriteEnabled = true;
 renderPass.addMesh('base_mesh', positions, colors, colorSize, uvs, normals, indices)
-renderPass.addSphere('instance_mesh', { x: 0, y: 0, z: 0 }, { r: 0, g: 0, b: 0, a: 0 }, .02).instanceCount = NUMPARTICLES;
+renderPass.addSphere('instance_mesh', { x: 0, y: 0, z: 0 }, { r: 0, g: 0, b: 0, a: 0 }, .01).instanceCount = NUMPARTICLES;
 
 const vertex_data = positions.reduce((acc, val, idx) => {
     if (idx % 3 === 0) acc.push([]);
@@ -40,8 +39,6 @@ const vertex_data = positions.reduce((acc, val, idx) => {
 
     return acc;
 }, []);
-// console.log(vertex_data);
-console.log(vertex_data.length);
 
 
 const near = 0.1, far = 100;
@@ -68,10 +65,7 @@ const base = {
 
         points.setStorageMap('vertex_data', vertex_data.flat(), `array<vec4f, ${vertex_data.length}>`);
 
-        points.setUniform('val', options.val);
         points.setUniform('visibility', options.visibility);
-
-        folder.add(options, 'val', -1, 1, .0001).name('Val');
         folder.add(options, 'visibility').name('visibility');
 
         aspect = points.canvas.width / points.canvas.height;
@@ -115,7 +109,6 @@ const base = {
             ]
         )
 
-        points.setUniform('val', options.val);
         points.setUniform('visibility', options.visibility);
     }
 }
