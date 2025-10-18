@@ -7,6 +7,20 @@ function getWGSLCoordinate(value, side, invert = false) {
     return (p * 2 - 1) * direction;
 };
 
+
+export class PrimitiveTopology {
+    /** @type {GPUPrimitiveTopology} */
+    POINT_LIST = 'point-list';
+    /** @type {GPUPrimitiveTopology} */
+    LINE_LIST = 'line-list';
+    /** @type {GPUPrimitiveTopology} */
+    LINE_STRIP = 'line-strip';
+    /** @type {GPUPrimitiveTopology} */
+    TRIANGLE_LIST = 'triangle-list';
+    /** @type {GPUPrimitiveTopology} */
+    TRIANGLE_STRIP = 'triangle-strip';
+};
+
 /**
  * A RenderPass is a way to have a block of shaders to pass to your application pipeline and
  * these render passes will be executed in the order you pass them in the {@link Points#init} method.
