@@ -105,6 +105,8 @@ class RenderPass {
     #meshCounter = 0;
     #meshes = [];
 
+    #topology = PrimitiveTopology.TRIANGLE_LIST;
+
     #descriptor = {
         colorAttachments: [
             {
@@ -472,6 +474,16 @@ class RenderPass {
      */
     get descriptor() {
         return this.#descriptor;
+    }
+
+    get topology(){
+        return this.#topology;
+    }
+    /**
+     * @param {GPUPrimitiveTopology} val
+     */
+    set topology(val){
+        this.#topology = val;
     }
 
     /**

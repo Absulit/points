@@ -1707,7 +1707,7 @@ class Points {
                         bindGroupLayouts: [renderPass.bindGroupLayoutVertex, renderPass.bindGroupLayoutRender]
                     }),
                     //primitive: { topology: 'triangle-strip' },
-                    primitive: { topology: 'triangle-list' },
+                    primitive: { topology: renderPass.topology },
                     depthStencil,
                     vertex: {
                         module: this.#device.createShaderModule({
