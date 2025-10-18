@@ -27,6 +27,10 @@ fn main(
     @builtin(instance_index) instanceIndex: u32
 ) -> Fragment {
 
+    if(params.visibility == 0 && mesh.base_mesh == id){
+        return Fragment();
+    }
+
     var angleZ = params.time * 0.9854;
     var angleY = params.time * 0.94222;
     var angleX = params.time * 0.865;

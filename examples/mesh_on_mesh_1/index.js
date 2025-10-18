@@ -6,7 +6,7 @@ import { loadAndExtract } from 'utils';
 
 const options = {
     val: 0,
-    bool: false,
+    visibility: true,
 }
 
 const url = '../models/monkey_subdivide.glb'; // or remote URL (CORS must allow)
@@ -69,9 +69,10 @@ const base = {
         points.setStorageMap('vertex_data', vertex_data.flat(), `array<vec4f, ${vertex_data.length}>`);
 
         points.setUniform('val', options.val);
+        points.setUniform('visibility', options.visibility);
 
         folder.add(options, 'val', -1, 1, .0001).name('Val');
-        folder.add(options, 'bool').name('Bool');
+        folder.add(options, 'visibility').name('visibility');
 
         aspect = points.canvas.width / points.canvas.height;
         points.setUniform(
@@ -115,6 +116,7 @@ const base = {
         )
 
         points.setUniform('val', options.val);
+        points.setUniform('visibility', options.visibility);
     }
 }
 
