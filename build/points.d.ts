@@ -192,6 +192,13 @@ export class RenderPass {
      */
     get descriptor(): GPURenderPassDescriptor;
     /**
+     * To render as Triangles, lines or points.
+     * Use class {@link PrimitiveTopology}
+     * @param {GPUPrimitiveTopology} val
+     */
+    set topology(val: GPUPrimitiveTopology);
+    get topology(): GPUPrimitiveTopology;
+    /**
      * - **currently for internal use**<br>
      * - **might be private in the future**<br>
      * Adds two triangles as a quad called Point
@@ -288,6 +295,48 @@ export class RenderPass {
         instanceCount: number;
         verticesCount: number;
     };
+    /**
+     * Adds a Torus mesh
+     * @param {String} name
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {Number} radius
+     * @param {Number} tube
+     * @param {Number} radialSegments
+     * @param {Number} tubularSegments
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     * @returns {Object}
+     */
+    addTorus(name: string, coordinate?: {
+        x: number;
+        y: number;
+        z: number;
+    }, radius?: number, tube?: number, radialSegments?: number, tubularSegments?: number, color?: {
+        r: number;
+        g: number;
+        b: number;
+        a: number;
+    }): any;
+    /**
+     * Adds a Cylinder mesh
+     * @param {String} name
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {Number} radius
+     * @param {Number} height
+     * @param {Number} radialSegments
+     * @param {Boolean} cap
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     * @returns {Object}
+     */
+    addCylinder(name: string, coordinate?: {
+        x: number;
+        y: number;
+        z: number;
+    }, radius?: number, height?: number, radialSegments?: number, cap?: boolean, color?: {
+        r: number;
+        g: number;
+        b: number;
+        a: number;
+    }): any;
     /**
      * Add a external mesh with the provided required data.
      * @param {String} name

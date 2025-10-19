@@ -35,7 +35,7 @@ const PI = /*wgsl*/`const PI = 3.14159265;`;
  * ${TAU}
  * let value = TAU / 3.5;
  */
-const TAU = /*wgsl*/`const TAU = PI * 2;`;
+const TAU = /*wgsl*/`const TAU = 6.2831853;`;
 /**
  * PHI is the Golden Ratio
  *

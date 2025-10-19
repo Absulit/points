@@ -1,4 +1,22 @@
-export { RenderPass as default };
+/**
+ * To tell the {@link RenderPass} how to display the triangles.
+ * Default `TRIANGLE_LIST`
+ * @example
+ *
+ * renderPass.topology = PrimitiveTopology.POINT_LIST;
+ */
+export class PrimitiveTopology {
+    /** @type {GPUPrimitiveTopology} */
+    static POINT_LIST: GPUPrimitiveTopology;
+    /** @type {GPUPrimitiveTopology} */
+    static LINE_LIST: GPUPrimitiveTopology;
+    /** @type {GPUPrimitiveTopology} */
+    static LINE_STRIP: GPUPrimitiveTopology;
+    /** @type {GPUPrimitiveTopology} */
+    static TRIANGLE_LIST: GPUPrimitiveTopology;
+    /** @type {GPUPrimitiveTopology} */
+    static TRIANGLE_STRIP: GPUPrimitiveTopology;
+}
 /**
  * A RenderPass is a way to have a block of shaders to pass to your application pipeline and
  * these render passes will be executed in the order you pass them in the {@link Points#init} method.
@@ -189,6 +207,13 @@ declare class RenderPass {
      */
     get descriptor(): GPURenderPassDescriptor;
     /**
+     * To render as Triangles, lines or points.
+     * Use class {@link PrimitiveTopology}
+     * @param {GPUPrimitiveTopology} val
+     */
+    set topology(val: GPUPrimitiveTopology);
+    get topology(): GPUPrimitiveTopology;
+    /**
      * - **currently for internal use**<br>
      * - **might be private in the future**<br>
      * Adds two triangles as a quad called Point
@@ -286,6 +311,48 @@ declare class RenderPass {
         verticesCount: number;
     };
     /**
+     * Adds a Torus mesh
+     * @param {String} name
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {Number} radius
+     * @param {Number} tube
+     * @param {Number} radialSegments
+     * @param {Number} tubularSegments
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     * @returns {Object}
+     */
+    addTorus(name: string, coordinate?: {
+        x: number;
+        y: number;
+        z: number;
+    }, radius?: number, tube?: number, radialSegments?: number, tubularSegments?: number, color?: {
+        r: number;
+        g: number;
+        b: number;
+        a: number;
+    }): any;
+    /**
+     * Adds a Cylinder mesh
+     * @param {String} name
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {Number} radius
+     * @param {Number} height
+     * @param {Number} radialSegments
+     * @param {Boolean} cap
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     * @returns {Object}
+     */
+    addCylinder(name: string, coordinate?: {
+        x: number;
+        y: number;
+        z: number;
+    }, radius?: number, height?: number, radialSegments?: number, cap?: boolean, color?: {
+        r: number;
+        g: number;
+        b: number;
+        a: number;
+    }): any;
+    /**
      * Add a external mesh with the provided required data.
      * @param {String} name
      * @param {Array<{x:Number, y:Number, z:Number}>} vertices
@@ -318,3 +385,4 @@ declare class RenderPass {
     get meshes(): any[];
     #private;
 }
+export { RenderPass as default };
