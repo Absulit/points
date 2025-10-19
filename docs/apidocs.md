@@ -11,7 +11,7 @@ Looking for an explanation on how to use POINTS? follow this link:
 
 ## Main classes:<br>
 ```js
-import Points { RenderPass, RenderPasses } from 'points';
+import Points { RenderPass, RenderPasses, PrimitiveTopology } from 'points';
 ```
 
 {@link Points|Points}<br>
