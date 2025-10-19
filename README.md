@@ -21,30 +21,30 @@ https://github.com/Absulit/points/assets/233719/c7c164be-7b69-4277-a80c-ce458e75
 
 <div>
     <a href="https://absulit.github.io/points/examples/index.html#base">
-        <img src="./docs/base_demo.png" alt="base demo image" width="200"/>
+        <img src="./docs/assets/base_demo.png" alt="base demo image" width="200"/>
     </a>
     <a href="https://absulit.github.io/points/examples/index.html#bloom1">
-        <img src="./docs/bloom1.png" alt="image with bloom" width="200"/>
+        <img src="./docs/assets/bloom1.png" alt="image with bloom" width="200"/>
     </a>
     <a href="https://absulit.github.io/points/examples/index.html#imagetexture2">
-        <img src="./docs/imagetexture2.png" alt="image with effect" width="200"/>
+        <img src="./docs/assets/imagetexture2.png" alt="image with effect" width="200"/>
     </a>
     <a href="https://absulit.github.io/points/examples/index.html#imagetexture3">
-        <img src="./docs/imagetexture3.png" alt="image with distortion" width="200"/>
+        <img src="./docs/assets/imagetexture3.png" alt="image with distortion" width="200"/>
     </a>
 </div>
 <div>
     <a href="https://absulit.github.io/points/examples/index.html#dithering1">
-        <img src="./docs/dithering1.png" alt="image with dithering effect 1" width="200"/>
+        <img src="./docs/assets/dithering1.png" alt="image with dithering effect 1" width="200"/>
     </a>
     <a href="https://absulit.github.io/points/examples/index.html#dithering2">
-        <img src="./docs/dithering2.png" alt="image with dithering effect 2" width="200"/>
+        <img src="./docs/assets/dithering2.png" alt="image with dithering effect 2" width="200"/>
     </a>
     <a href="https://absulit.github.io/points/examples/index.html#dithering3_1">
-        <img src="./docs/dithering3.png" alt="image with dithering effect 3" width="200"/>
+        <img src="./docs/assets/dithering3.png" alt="image with dithering effect 3" width="200"/>
     </a>
     <a href="https://absulit.github.io/points/examples/index.html#noise1">
-        <img src="./docs/noise1.png" alt="image with noise layered" width="200"/>
+        <img src="./docs/assets/noise1.png" alt="image with noise layered" width="200"/>
     </a>
 </div>
 
