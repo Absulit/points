@@ -55,6 +55,8 @@ You can code freely without the use of any of the provided [support modules (mat
 # Documentation
 
 - [Requirements](docs/requirements.md)
+    - [A compatible WebGPU browser since it's currently in development](docs/requirements.md#a-compatible-webgpu-browser-since-its-currently-in-development)
+    - [Syntax highlight and IDE](docs/requirements.md#syntax-highlight-and-ide)
 - [Workflow](docs/workflow.md)
 - [API docs](https://absulit.github.io/points/apidocs/index.html)
 - [Installation](docs/installation.md)

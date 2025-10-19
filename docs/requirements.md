@@ -4,7 +4,7 @@
 
 Currently working on Chrome 113 (Windows and Mac tested)
 
-There's progress on Firefox Nightly but not all is working yet.
+Working on Firefox Nightly, only video texture is pending.
 
 WebGPU API reference (JavaScript):
 https://gpuweb.github.io/gpuweb/
