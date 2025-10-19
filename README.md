@@ -395,56 +395,7 @@ init();
 ```
 
 - [RenderPass](docs/renderpass.md)
-
-# Create your custom Shader project
-1. Copy the `/examples/base/` and place it where you want to store your project.
-2. Rename folder.
-3. Rename the project inside `base/index.js`, that's the name going to be used in the main.js import and then assigned to the shaders variable.
-
-```js
-import vert from './vert.js';
-import compute from './compute.js';
-import frag from './frag.js';
-const base = { // <--- change the name `base` to anything
-    vert,
-    compute,
-    frag,
-    init: async points => {
-        // ...
-    },
-    update: points => {
-        // ...
-    }
-}
-
-export default base; // <--- change the name `base` to anything
-```
-
-You can also do as in the renderpasses1 example, where you can define the full renderpass with the `RenderPass` class:
-
-```js
-const renderpasses1 = {
-    /**
-     * Render Passes expect to have an order
-     */
-    renderPasses: [
-        new RenderPass(vert, frag, compute),
-        // new RenderPass(vert2, frag2, compute2),
-        // ...
-    ],
-    init: async points => {
-        // ...
-    },
-    update: points => {
-        // ...
-    }
-}
-
-export default renderpasses1;
-```
-
-4. Change whatever you want inside `vert.js`, `compute.js`, `frag.js`.
-
+- [Create your custom Shader project](docs/create_your_custom_shader_project.md)
 - [Default data available to read](docs/default_data_to_read.md)
 - [Send data into the shaders](docs/send_data_into_the_shaders.md)
 - [Retrieve data from the shaders](docs/retrieve_data_from_the_shaders.md)
@@ -452,9 +403,6 @@ export default renderpasses1;
 - [Support Modules](docs/support_modules.md)
 - [RenderPasses for Post Processing](docs/render_passes_and_post_processing.md)
 - [Legacy folder (original project)](docs/legacy_folder.md)
-
-
-
 
 # Collaborators
 
