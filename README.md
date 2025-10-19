@@ -86,8 +86,11 @@ You can code freely without the use of any of the provided [support modules (mat
     - [Video - setTextureVideo](docs/send_data_into_the_shaders.md#video---settexturevideo)
     - [Webcam - setTextureWebcam](docs/send_data_into_the_shaders.md#webcam---settexturewebcam)
 - [Retrieve data from the shaders](docs/retrieve_data_from_the_shaders.md)
+    - [Read Storage - readStorage](docs/retrieve_data_from_the_shaders.md#read-storage---readstorage)
+    - [Events - addEventListener](docs/retrieve_data_from_the_shaders.md#events---addeventlistener)
 - [UV Coordinates and Textures Considerations](docs/uv_coordinates_and_textures_considerations.md)
 - [Support Modules](docs/support_modules.md)
+    - [How to use them](docs/support_modules.md#how-to-use-them)
 - [RenderPasses for Post Processing](docs/render_passes_and_post_processing.md)
 - [Legacy folder (original project)](docs/legacy_folder.md)
 

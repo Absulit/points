@@ -3,15 +3,15 @@
 You can already add render passes for postprocessing, you should add a new render pass as discussed in the [RenderPass](#renderpass) section, but you can also use a set of predefined renderpasses already included in the library to add a Post Processing effect by just adding a line of code. The RenderPasses2 demo has the 9 already included render passes running all at once with a few parameter:
 
 ```js
-RenderPasses.grayscale(points);
-RenderPasses.chromaticAberration(points, .02);
-RenderPasses.color(points, .5, 1, 0, 1, .5);
-RenderPasses.pixelate(points, 10, 10);
-RenderPasses.lensDistortion(points, .4, .01);
-RenderPasses.filmgrain(points);
-RenderPasses.bloom(points, .5);
-RenderPasses.blur(points, 100, 100, .4, 0, 0.0);
-RenderPasses.waves(points, .05, .03);
+points.addRenderPass(RenderPasses.GRAYSCALE);
+points.addRenderPass(RenderPasses.CHROMATIC_ABERRATION, { distance: .02 });
+points.addRenderPass(RenderPasses.COLOR, { color: [.5, 1, 0, 1], blendAmount: .5 });
+points.addRenderPass(RenderPasses.PIXELATE);
+points.addRenderPass(RenderPasses.LENS_DISTORTION);
+points.addRenderPass(RenderPasses.FILM_GRAIN);
+points.addRenderPass(RenderPasses.BLOOM);
+points.addRenderPass(RenderPasses.BLUR, { resolution: [100, 100], direction: [.4, 0], radians: 0 });
+points.addRenderPass(RenderPasses.WAVES, { scale: .045 });
 ```
 
 The render pass takes the output from your already defined shaders as a Texture and then applies a process to create an effect. It takes a few assumptions to work interchangeably between them or in a layered way, this by using the same name for the output texture and input texture.
