@@ -2,16 +2,6 @@
 
 `POINTS` is a library that uses WebGPU and allows you to create shaders without worrying too much about the setup.
 
-# Main Audience
-
-The library is for Generative Art, so in general for Creative Coders, for Programmers/Software people who like the arts, and Artists who like to code.
-
-People who just want to create nice live graphics and use mathematics to achieve this.
-
-There's also a strong case for people who wants to create an application that harness the power of a Compute Shader. So a Software Engineer or Mathematician who has to make heavy calculations can do it with this library.
-
-You can code freely without the use of any of the provided [support modules (math, color, image, effects, noise, sdf, etc)](#support-modules) or you can use them and have a little bit less of code in the shader. You can of course create your own modules and import them in the same way.
-
 # Gallery
 
 https://github.com/Absulit/points/assets/233719/c7c164be-7b69-4277-a80c-ce458e751966
@@ -49,6 +39,16 @@ https://github.com/Absulit/points/assets/233719/c7c164be-7b69-4277-a80c-ce458e75
 </div>
 
 All examples are live here: https://absulit.github.io/points/examples/
+
+# Main Audience
+
+The library is for Generative Art, so in general for Creative Coders, for Programmers/Software people who like the arts, and Artists who like to code.
+
+People who just want to create nice live graphics and use mathematics to achieve this.
+
+There's also a strong case for people who wants to create an application that harness the power of a Compute Shader. So a Software Engineer or Mathematician who has to make heavy calculations can do it with this library.
+
+You can code freely without the use of any of the provided [support modules (math, color, image, effects, noise, sdf, etc)](#support-modules) or you can use them and have a little bit less of code in the shader. You can of course create your own modules and import them in the same way.
 
 # Requirements
 
@@ -270,130 +270,11 @@ bun x jsr add @absulit/points # jsr package
 bun index.html
 ```
 
-# Code Setup
 
-Steps after installing. Here you will actually create the application and add the vertex, fragment and compute shaders.
+# temp
 
-[code: examples_tutorial/cdn/main.js](examples_tutorial/cdn/main.js)
-
-
-```js
-// this is your main.js file
-// import the `Points` class
-
-import Points, { RenderPass } from 'points';
-
-// reference the canvas in the constructor
-const points = new Points('canvas');
-
-// create your render pass with three shaders as follow
-const renderPasses = [
-    new RenderPass(
-        /*wgsl*/ `
-            // add @vertex string
-            @vertex
-            fn main(
-                @location(0) position: vec4f,
-                @location(1) color: vec4f,
-                @location(2) uv: vec2f,
-                @builtin(vertex_index) vertexIndex: u32
-            ) -> Fragment {
-                return defaultVertexBody(position, color, uv);
-            }
-        `,
-        /*wgsl*/`
-            // add @fragment string
-            @fragment
-            fn main(
-                @location(0) color: vec4f,
-                @location(1) uv: vec2f,
-                @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
-                @location(3) uvr: vec2f,    // uv with aspect ratio corrected
-                @location(4) mouse: vec2f,
-                @builtin(position) position: vec4f
-            ) -> @location(0) vec4f {
-                return color;
-            }
-        `,
-        /*wgsl*/`
-            // add @compute string (this can be null)
-        `
-    )
-];
-
-// call the `POINTS` init method and then the update method
-async function init(){
-    await points.init(renderPasses);
-    update();
-}
-init();
-
-// call `points.update()` methods to render a new frame
-function update() {
-    points.update();
-    requestAnimationFrame(update);
-}
-```
-
-If the shader is running properly you should see this: [Shader Example](https://absulit.github.io/points/examples/index.html#demo_6)
-
-# Repository Examples
-These are the examples from the live demo page here: https://absulit.github.io/points/examples/. It's recommended to download the repo for this. You can also click the source button (`<>`) in the live examples
-
-Source located at [examples/index.html](examples)
-
-You can take a look at `/examples/main.js` and `/examples/index.html`
-
-## index.html
-
-```html
-<canvas id="canvas" width="800" height="800">
-    Oops ... your browser doesn't support the HTML5 canvas element
-</canvas>
-```
-
-## main.js
-
-```js
-// import the `Points` class
-
-import Points from 'points';
-
-// import the base project
-import base from '../examples/base/index.js';
-
-// reference the canvas in the constructor
-const points = new Points('canvas');
-```
-
-```js
-async function init() {
-    // the base project in composed of the 3 shaders required
-    await base.init(points);
-    let renderPasses = base.renderPasses || [new RenderPass(base.vert, base.compute, base.frag)]
-
-    // we pass the array of renderPasses
-    await points.init(renderPasses);
-
-    // first call to update
-    update();
-}
-```
-
-```js
-// call the `base.update()`, and `points.update()` methods to render a new frame
-function update() {
-    base.update();
-    points.update();
-    requestAnimationFrame(update);
-}
-```
-
-```js
-// call init
-init();
-```
-
+- [Code Setup](docs/code_setup.md)
+- [Repository Examples](docs/repository_examples.md)
 - [RenderPass](docs/renderpass.md)
 - [Create your custom Shader project](docs/create_your_custom_shader_project.md)
 - [Default data available to read](docs/default_data_to_read.md)
