@@ -7,7 +7,13 @@ function getWGSLCoordinate(value, side, invert = false) {
     return (p * 2 - 1) * direction;
 };
 
-
+/**
+ * To tell the {@link RenderPass} how to display the triangles.
+ * Default `TRIANGLE_LIST`
+ * @example
+ *
+ * renderPass.topology = PrimitiveTopology.POINT_LIST;
+ */
 export class PrimitiveTopology {
     /** @type {GPUPrimitiveTopology} */
     static POINT_LIST = 'point-list';

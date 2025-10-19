@@ -17,6 +17,7 @@ import Points { RenderPass, RenderPasses } from 'points';
 {@link Points|Points}<br>
 {@link RenderPass|RenderPass}<br>
 {@link RenderPasses|RenderPasses}<br>
+{@link PrimitiveTopology|PrimitiveTopology}<br>
 
 ## Submodules with helper wgsl functions:
 
