@@ -55,6 +55,10 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+        // points.addRenderPass(RenderPasses.COLOR);
+        // points.addRenderPass(RenderPasses.PIXELATE);
+        // points.addRenderPass(RenderPasses.FILM_GRAIN);
+
         points.setTextureDepth2d('depth', GPUShaderStage.FRAGMENT, 0);
         points.setSampler('imageSamplerCompare', { compare: 'less' });
 
@@ -111,9 +115,6 @@ const base = {
             'mat4x4<f32>'
         )
 
-        // points.addRenderPass(RenderPasses.COLOR);
-        // points.addRenderPass(RenderPasses.PIXELATE);
-        // points.addRenderPass(RenderPasses.FILM_GRAIN);
 
         folder.open();
     },
