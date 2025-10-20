@@ -50,9 +50,9 @@ There's also a strong case for people who wants to create an application that ha
 
 You can code freely without the use of any of the provided [support modules (math, color, image, effects, noise, sdf, etc)](#support-modules) or you can use them and have a little bit less of code in the shader. You can of course create your own modules and import them in the same way.
 
-
-
 # Quick Setup
+<details>
+<summary>A simple one page boilerplate.</summary>
 
 ```html
 <html>
@@ -138,6 +138,9 @@ You can code freely without the use of any of the provided [support modules (mat
 </html>
 
 ```
+
+</details>
+
 
 # Documentation
 
