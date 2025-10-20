@@ -2,14 +2,18 @@
 
 Here you will actually create the application and add the vertex, fragment and compute shaders.
 
-You might need a few resources to learn about shaders or WebGPU in general. You can take a look at [WebGPU Fundamentals](https://webgpufundamentals.org/) but this is a low level guide and you might not need everything from there because POINTS wraps and simplifies a lot of these concepts, but I would recommend the following lessos:
+You might need a few resources to learn about shaders or WebGPU in general. You can take a look at [WebGPU Fundamentals](https://webgpufundamentals.org/) but this is a low level guide and you might not need everything from there because POINTS wraps and simplifies a lot of these concepts, but I would recommend the following lessons:
 
 - [WGSL](https://webgpufundamentals.org/webgpu/lessons/webgpu-wgsl.html) the programming language used in the shaders and very important in compute shaders.
 
-- [WebGPU from WebGL](https://webgpufundamentals.org/webgpu/lessons/webgpu-from-webgl.html) You already know WebGL.
+- [WebGPU from WebGL](https://webgpufundamentals.org/webgpu/lessons/webgpu-from-webgl.html) If you already know WebGL.
 
 
 [code: examples_tutorial/cdn/main.js](examples_tutorial/cdn/main.js)
+
+Bellow is basically the same code from the examples like cdn, npm and bun, but what I want you see here and understand is that this is where your main application lives. The vertex, fragment and compute shaders are strings, you can extract them and move them to separate files for convenience, this is what I do in the main examples folder where inside a vert.js, frag.js and compute.js there's a string exported const.
+
+Each string must have this same structure, a function named `main` (this currently can't be changed, but will be optional later) and the parameters it receives; several of the repo examples have a different size of @location parameters, but the order is the same. You can remove the compute shader entirely and send a `null`, but the application will fail if you ommit the other two.
 
 
 ```js
