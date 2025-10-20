@@ -1,6 +1,13 @@
-# Code Setup
+# Steps after installing
 
-Steps after installing. Here you will actually create the application and add the vertex, fragment and compute shaders.
+Here you will actually create the application and add the vertex, fragment and compute shaders.
+
+You might need a few resources to learn about shaders or WebGPU in general. You can take a look at [WebGPU Fundamentals](https://webgpufundamentals.org/) but this is a low level guide and you might not need everything from there because POINTS wraps and simplifies a lot of these concepts, but I would recommend the following lessos:
+
+- [WGSL](https://webgpufundamentals.org/webgpu/lessons/webgpu-wgsl.html) the programming language used in the shaders and very important in compute shaders.
+
+- [WebGPU from WebGL](https://webgpufundamentals.org/webgpu/lessons/webgpu-from-webgl.html) You already know WebGL.
+
 
 [code: examples_tutorial/cdn/main.js](examples_tutorial/cdn/main.js)
 

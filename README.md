@@ -153,7 +153,7 @@ You can code freely without the use of any of the provided [support modules (mat
     - [cdn (importmap)](docs/installation.md#cdn-importmap-code-examples_tutorialcdn)
     - [npm](docs/installation.md#npm-code-examples_tutorialnpm)
     - [bun](docs/installation.md#bun-code-examples_tutorialbun)
-- [Code Setup](docs/code_setup.md)
+- [Steps after installing](docs/steps_after_installing.md)
 - [Repository Examples](docs/repository_examples.md)
     - [index.html](docs/repository_examples.md#indexhtml)
     - [main.js](docs/repository_examples.md#mainjs)
