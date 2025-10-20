@@ -10,31 +10,31 @@ https://github.com/Absulit/points/assets/233719/c7c164be-7b69-4277-a80c-ce458e75
 # Examples
 
 <div>
-    <a href="https://absulit.github.io/points/examples/index.html#base">
-        <img src="./docs/assets/base_demo.png" alt="base demo image" width="200"/>
+    <a href="https://absulit.github.io/points/examples/index.html#bh1">
+        <img src="./docs/assets/image_1760920627510.png" alt="Kerr Black Hole simulation" width="200"/>
     </a>
-    <a href="https://absulit.github.io/points/examples/index.html#bloom1">
-        <img src="./docs/assets/bloom1.png" alt="image with bloom" width="200"/>
+    <a href="https://absulit.github.io/points/examples/index.html#mandelbrot1">
+        <img src="./docs/assets/image_1760921130678.png" alt="Mandelbrot fractal with zoom" width="200"/>
     </a>
-    <a href="https://absulit.github.io/points/examples/index.html#imagetexture2">
-        <img src="./docs/assets/imagetexture2.png" alt="image with effect" width="200"/>
+    <a href="https://absulit.github.io/points/examples/index.html#particles4">
+        <img src="./docs/assets/image_1760921075135.png" alt="Instanced particles" width="200"/>
     </a>
-    <a href="https://absulit.github.io/points/examples/index.html#imagetexture3">
-        <img src="./docs/assets/imagetexture3.png" alt="image with distortion" width="200"/>
+    <a href="https://absulit.github.io/points/examples/index.html#dithering_video_1">
+        <img src="./docs/assets/image_1760921752875.png" alt="Dithering effect on running on a video" width="200"/>
     </a>
 </div>
 <div>
-    <a href="https://absulit.github.io/points/examples/index.html#dithering1">
-        <img src="./docs/assets/dithering1.png" alt="image with dithering effect 1" width="200"/>
+    <a href="https://absulit.github.io/points/examples/index.html#droste_effect_1">
+        <img src="./docs/assets/image_1760921740999.png" alt="Droste effect on an SDF scene" width="200"/>
     </a>
-    <a href="https://absulit.github.io/points/examples/index.html#dithering2">
-        <img src="./docs/assets/dithering2.png" alt="image with dithering effect 2" width="200"/>
+    <a href="https://absulit.github.io/points/examples/index.html#mesh_on_mesh_1">
+        <img src="./docs/assets/image_1760921647471.png" alt="Instanced particles on top of a mesh vertices" width="200"/>
     </a>
-    <a href="https://absulit.github.io/points/examples/index.html#dithering3_1">
-        <img src="./docs/assets/dithering3.png" alt="image with dithering effect 3" width="200"/>
+    <a href="https://absulit.github.io/points/examples/index.html#particles3">
+        <img src="./docs/assets/image_1760921513803.png" alt="Instanced particles sampling a video" width="200"/>
     </a>
-    <a href="https://absulit.github.io/points/examples/index.html#noise1">
-        <img src="./docs/assets/noise1.png" alt="image with noise layered" width="200"/>
+    <a href="https://absulit.github.io/points/examples/index.html#glb2">
+        <img src="./docs/assets/image_1760922004657.png" alt="Instanced glb model of Lucy textured and with depth of field" width="200"/>
     </a>
 </div>
 

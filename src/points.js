@@ -149,7 +149,7 @@ class Points {
             //size: this.#presentationSize,
             width: this.#presentationSize[0],
             height: this.#presentationSize[1],
-            alphaMode: 'premultiplied',
+            alphaMode: 'opaque',
             // Specify we want both RENDER_ATTACHMENT and COPY_SRC since we
             // will copy out of the swapchain texture.
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
