@@ -1,4 +1,7 @@
-# Create your custom Shader project
+# Using the examples for a custom project
+
+You can also use the examples structure to create a custom project. This is the structure used in the [examples page](absulit.github.io/points/examples/).
+
 1. Copy the `/examples/base/` and place it where you want to store your project.
 2. Rename folder.
 3. Rename the project inside `base/index.js`, that's the name going to be used in the main.js import and then assigned to the shaders variable.

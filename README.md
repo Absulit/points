@@ -162,7 +162,7 @@ You can code freely without the use of any of the provided [support modules (mat
     - [Clear or preserve previous RenderPass output](docs/renderpass.md#clear-or-preserve-previous-renderpass-output)
     - [Lines, points, triangles (wireframe)](docs/renderpass.md#lines-points-triangles-wireframe)
     - [Instances](docs/renderpass.md#instances)
-- [Create your custom Shader project](docs/create_your_custom_shader_project.md)
+- [Using the examples for a custom project](docs/create_your_custom_shader_project.md)
 - [Default data available to read](docs/default_data_to_read.md)
     - [Params Uniform](docs/default_data_to_read.md#params-uniform)
     - [Parameters in vert.js that go to frag.js](docs/default_data_to_read.md#parameters-in-vertjs-that-go-to-fragjs)
