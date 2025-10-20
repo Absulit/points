@@ -1,6 +1,8 @@
 # Installation
 
-[examples_tutorial](examples_tutorial) has a directory per type of installation:
+Here is a list of several ways you can use POINTS, with a CDN which is plain html and js and the one I recommend the most, or you can use npm and also bun. There's also the [quick setup](../README.md#quick-setup) that is composed of all you need in a single html file, also available to [download in here](../examples_tutorial/index.html).
+
+The [examples_tutorial](examples_tutorial) folder has a directory per type of installation (cdn, npm, bun):
 
 ### cdn (importmap) [code: examples_tutorial/cdn/](examples_tutorial/cdn/)
 
