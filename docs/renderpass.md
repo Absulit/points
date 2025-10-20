@@ -38,7 +38,7 @@ new RenderPass(vert1, frag1, compute1, 8, 8, 1);
 
 A last parameter is also included called `init`, this is made for Post Processing purposes, and a lot of examples of use are at the [RenderPasses](../src/RenderPasses.js) class, in case you want to create and use one this way, but preferably, a `new RenderPass` is enough.
 
-## Important features of a RenderPass
+## Meshes
 
 A RenderPass takes charge by default of a quad mesh to display graphics, so you can just start coding in the Fragment Shader and see results, but if you need more, you can add a few 3d primitives or a custom mesh. Adding a custom primitive will remove the default quad in this RenderPass. Also to use 3d meshes and being drawn correctly, you must set `RenderPass#depthWriteEnabled` to `true`, by default is false since it's assumed a 2d workflow from the start. Depending on if you want to use the depth features, enabling or disabling this value is very useful.
 
@@ -48,6 +48,10 @@ renderpass.depthWriteEnabled = true;
 renderpass.addCube('cube0');
 renderpass.addCube('cube1', { x: 0, y: 1, z: 0 });
 ```
+
+Adding a custom mesh is a bit more complicated. Currently the POINTS library doesn't have a built it method to load any file format, this will go on your side. Currently I don't want to maintain something as huge as file format parsers, but you can use third parties as shown in the GLB demos in the examples page like the [GLB1](https://absulit.github.io/points/apidocs/RenderPass.html#glb1) which uses Don McCurdy [glTF-Transform](https://github.com/donmccurdy/glTF-Transform), which has a lot more that just parsing gltf/glb files. I use a `loadAndExtract` utilitarian method located in the `util.js` file in the repo, which is not included in the library, but can be used for the same purpose if required.
+
+The method RenderPass#addMesh has a lot of parameters (vertices, colors, uvs, normals) that just expect the data to be ready to load, so technically can be used with any parser, but I've only tested glTF-Transform since gltf is the pinnacle of 3d web formats.
 
 ## Clear or preserve previous RenderPass output
 
