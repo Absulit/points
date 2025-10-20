@@ -52,7 +52,7 @@ You can code freely without the use of any of the provided [support modules (mat
 
 # Quick Setup
 <details>
-<summary>A simple one page boilerplate.</summary>
+<summary>A simple one page boilerplate. ( 🔗 click to expand )</summary>
 
 ```html
 <html>
