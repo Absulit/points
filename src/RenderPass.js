@@ -543,11 +543,15 @@ class RenderPass {
 
     /**
      * Adds a mesh quad
-     * @param {String} name
+     * @param {String} name The name will show up in the `mesh` Uniform.
      * @param {{x:Number, y:Number, z:Number}} coordinate
      * @param {{width:Number, height:Number}} dimensions
      * @param {{r:Number, g:Number, b:Number, a:Number}} color
      * @param {{x:Number, y:Number }} segments mesh subdivisions
+     *
+     * @example
+     *
+     * renderPass.addPlane('plane', { x: 0, y: 0, z: 0 }, { width: 2, height: 2 }).instanceCount = NUMPARTICLES;
      */
     addPlane(
         name,
@@ -616,10 +620,14 @@ class RenderPass {
 
     /**
      * Adds a mesh cube
-     * @param {String} name
+     * @param {String} name The name will show up in the `mesh` Uniform.
      * @param {{x:Number, y:Number, z:Number}} coordinate
      * @param {{width:Number, height:Number, depth:Number}} dimensions
      * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     *
+     * @example
+     *
+     * renderPass.addCube('base_cube').instanceCount = NUMPARTICLES;
      */
     addCube(
         name,
@@ -709,12 +717,16 @@ class RenderPass {
 
     /**
      * Adds a mesh sphere
-     * @param {String} name
+     * @param {String} name The name will show up in the `mesh` Uniform.
      * @param {{x:Number, y:Number, z:Number}} coordinate
      * @param {{r:Number, g:Number, b:Number, a:Number}} color
      * @param {Number} radius
      * @param {Number} segments
      * @param {Number} rings
+     *
+     * @example
+     *
+     * renderPass.addSphere('sphere').instanceCount = 100;
      */
     addSphere(
         name,
@@ -787,7 +799,7 @@ class RenderPass {
 
     /**
      * Adds a Torus mesh
-     * @param {String} name
+     * @param {String} name The name will show up in the `mesh` Uniform.
      * @param {{x:Number, y:Number, z:Number}} coordinate
      * @param {Number} radius
      * @param {Number} tube
@@ -795,6 +807,10 @@ class RenderPass {
      * @param {Number} tubularSegments
      * @param {{r:Number, g:Number, b:Number, a:Number}} color
      * @returns {Object}
+     *
+     * @example
+     *
+     * renderPass.addTorus('myTorus');
      */
     addTorus(
         name,
@@ -873,7 +889,7 @@ class RenderPass {
 
     /**
      * Adds a Cylinder mesh
-     * @param {String} name
+     * @param {String} name The name will show up in the `mesh` Uniform.
      * @param {{x:Number, y:Number, z:Number}} coordinate
      * @param {Number} radius
      * @param {Number} height
@@ -881,6 +897,9 @@ class RenderPass {
      * @param {Boolean} cap
      * @param {{r:Number, g:Number, b:Number, a:Number}} color
      * @returns {Object}
+     *
+     * @example
+     * renderPass.addCylinder('myCylinder');
      */
     addCylinder(
         name,
@@ -995,7 +1014,7 @@ class RenderPass {
 
     /**
      * Add a external mesh with the provided required data.
-     * @param {String} name
+     * @param {String} name The name will show up in the `mesh` Uniform.
      * @param {Array<{x:Number, y:Number, z:Number}>} vertices
      * @param {Array<{r:Number, g:Number, b:Number, a:Number}>} colors
      * @param {Array<{u:Number, v:Number}>} uvs
