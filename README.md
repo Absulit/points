@@ -19,8 +19,8 @@ https://github.com/Absulit/points/assets/233719/c7c164be-7b69-4277-a80c-ce458e75
     <a href="https://absulit.github.io/points/examples/index.html#particles4">
         <img src="./docs/assets/image_1760921075135.png" alt="Instanced particles" width="200"/>
     </a>
-    <a href="https://absulit.github.io/points/examples/index.html#dithering_video_1">
-        <img src="./docs/assets/image_1760921752875.png" alt="Dithering effect on running on a video" width="200"/>
+    <a href="https://absulit.github.io/points/examples/index.html#mesh_displace_1">
+        <img src="./docs/assets/image_1760921860107.png" alt="Dithering effect on running on a video" width="200"/>
     </a>
 </div>
 <div>
