@@ -1,6 +1,6 @@
 import UniformKeys from './UniformKeys.js';
 import VertexBufferInfo from './VertexBufferInfo.js';
-import RenderPass from './RenderPass.js';
+import RenderPass, { PrimitiveTopology } from './RenderPass.js';
 import RenderPasses from './RenderPasses.js';
 import Coordinate from './coordinate.js';
 import RGBAColor from './color.js';
@@ -46,17 +46,18 @@ class Points {
     #buffer = null;
     #presentationSize = null;
     #depthTexture = null;
-    #vertexArray = [];
+    // #vertexArray = [];
     #numColumns = 1;
     #numRows = 1;
     #commandsFinished = [];
-    #renderPassDescriptor = null;
     #uniforms = new UniformsArray();
+    #meshUniforms = new UniformsArray();
     #constants = [];
     #storage = [];
     #readStorage = [];
     #samplers = [];
     #textures2d = [];
+    #texturesDepth2d = [];
     #texturesToCopy = [];
     #textures2dArray = [];
     #texturesExternal = [];
@@ -82,7 +83,6 @@ class Points {
     #events = new Map();
     #events_ids = 0;
     #dataSize = null;
-    #depthWriteEnabled = true;
 
     constructor(canvasId) {
         this.#canvasId = canvasId;
@@ -157,8 +157,8 @@ class Points {
         this.#depthTexture = this.#device.createTexture({
             label: '_depthTexture',
             size: this.#presentationSize,
-            format: 'depth24plus',
-            usage: GPUTextureUsage.RENDER_ATTACHMENT,
+            format: 'depth32float',
+            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING,
         });
         // this is to solve an issue that requires the texture to be resized
         // if the screen dimensions change, this for a `setTexture2d` with
@@ -203,7 +203,7 @@ class Points {
         const uniformToUpdate = this.#nameExists(this.#uniforms, name);
         if (uniformToUpdate && structName) {
             // if name exists is an update
-            throw '`setUniform()` can\'t set the structName of an already defined uniform.';
+            console.warn(`setUniform(${name}, [${value}], ${structName}) can't set the structName of an already defined uniform.`);
         }
         if (uniformToUpdate) {
             uniformToUpdate.value = value;
@@ -222,6 +222,31 @@ class Points {
         this.#uniforms.push(uniform);
         return uniform;
     }
+
+    #setMeshUniform(name, value, structName = null) {
+        const uniformToUpdate = this.#nameExists(this.#meshUniforms, name);
+        if (uniformToUpdate && structName) {
+            // if name exists is an update
+            console.warn(`#setMeshUniform(${name}, [${value}], ${structName}) can't set the structName of an already defined uniform.`);
+        }
+        if (uniformToUpdate) {
+            uniformToUpdate.value = value;
+            return uniformToUpdate;
+        }
+        if (structName && isArray(structName)) {
+            throw `${structName} is an array, which is currently not supported for Uniforms.`;
+        }
+        const uniform = {
+            name: name,
+            value: value,
+            type: structName,
+            size: null
+        }
+        Object.seal(uniform);
+        this.#meshUniforms.push(uniform);
+        return uniform;
+    }
+
     /**
      * Updates a list of uniforms
      * @param {Array<{name:String, value:Number}>} arr object array of the type: `{name, value}`
@@ -544,6 +569,23 @@ class Points {
         }
         this.#textures2d.push(texture2d);
         return texture2d;
+    }
+
+    setTextureDepth2d(name, shaderType, renderPassIndex) {
+        const exists = this.#nameExists(this.#texturesDepth2d, name);
+        if (exists) {
+            console.warn(`setTextureDepth2d: \`${name}\` already exists.`);
+            return exists;
+        }
+        const textureDepth2d = {
+            name,
+            shaderType,
+            texture: null,
+            renderPassIndex,
+            internal: false,
+        }
+        this.#texturesDepth2d.push(textureDepth2d);
+        return textureDepth2d;
     }
 
 
@@ -963,6 +1005,10 @@ class Points {
             dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <uniform> params: Params;\n`;
             bindingIndex += 1;
         }
+        if (this.#meshUniforms.length) {
+            dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <uniform> mesh: Mesh;\n`;
+            bindingIndex += 1;
+        }
         this.#storage.forEach(storageItem => {
             const isInternal = internal === storageItem.internal;
             if (isInternal && (!storageItem.shaderType || storageItem.shaderType & shaderType)) {
@@ -990,7 +1036,8 @@ class Points {
         this.#samplers.forEach(sampler => {
             const isInternal = internal === sampler.internal;
             if (isInternal && (!sampler.shaderType || sampler.shaderType & shaderType)) {
-                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${sampler.name}: sampler;\n`;
+                const T = sampler.descriptor.compare ? 'sampler_comparison' : 'sampler';
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${sampler.name}: ${T};\n`;
                 bindingIndex += 1;
             }
         });
@@ -1006,6 +1053,15 @@ class Points {
             if (isInternal && (!texture.shaderType || texture.shaderType & shaderType)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d<f32>;\n`;
                 bindingIndex += 1;
+            }
+        });
+        this.#texturesDepth2d.forEach(texture => {
+            const isInternal = internal === texture.internal;
+            if (isInternal && (!texture.shaderType || texture.shaderType & shaderType)) {
+                if (texture.renderPassIndex !== renderPassIndex) {
+                    dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_depth_2d;\n`;
+                    bindingIndex += 1;
+                }
             }
         });
         this.#textures2dArray.forEach(texture => {
@@ -1093,6 +1149,7 @@ class Points {
         let dynamicGroupBindingsCompute = '';
         let dynamicGroupBindingsFragment = '';
         let dynamicStructParams = '';
+        let dynamicStructMesh = '';
         this.#uniforms.forEach(u => {
             u.type = u.type || 'f32';
             dynamicStructParams += /*wgsl*/`${u.name}:${u.type}, \n\t`;
@@ -1100,9 +1157,18 @@ class Points {
         if (this.#uniforms.length) {
             dynamicStructParams = /*wgsl*/`struct Params {\n\t${dynamicStructParams}\n}\n`;
         }
+        this.#meshUniforms.forEach(u => {
+            u.type = u.type || 'f32';
+            dynamicStructMesh += /*wgsl*/`${u.name}:${u.type}, \n\t`;
+        });
+        if (this.#meshUniforms.length) {
+            dynamicStructMesh = /*wgsl*/`struct Mesh {\n\t${dynamicStructMesh}\n}\n`;
+        }
         this.#constants.forEach(c => {
             dynamicStructParams += /*wgsl*/`const ${c.name}:${c.structName} = ${c.value};\n`;
         })
+        dynamicStructParams += dynamicStructMesh;
+
         renderPass.index = index;
         renderPass.hasVertexShader && (dynamicGroupBindingsVertex += dynamicStructParams);
         renderPass.hasComputeShader && (dynamicGroupBindingsCompute += dynamicStructParams);
@@ -1179,6 +1245,7 @@ class Points {
         }
 
         this.#renderPasses.forEach(r => r.init?.(this));
+        this.#renderPasses.forEach(r => r.meshes.forEach(mesh => this.#setMeshUniform(mesh.name, mesh.id, 'u32')));
         this.#renderPasses.forEach(this.#compileRenderPass);
         this.#generateDataSize();
         //
@@ -1190,6 +1257,8 @@ class Points {
         }
         if (!adapter) { return false; }
         this.#device = await adapter.requestDevice();
+        console.log(this.#device.limits);
+
         this.#device.lost.then(info => console.log(info));
         if (this.#canvas !== null) this.#context = this.#canvas.getContext('webgpu');
         this.#presentationFormat = navigator.gpu.getPreferredCanvasFormat();
@@ -1200,23 +1269,18 @@ class Points {
                 this.#resizeCanvasToDefault();
             }
         }
-        this.#renderPassDescriptor = {
-            colorAttachments: [
-                {
-                    //view: textureView,
-                    clearValue: { r: 0.0, g: 0.0, b: 0.0, a: 1.0 },
-                    loadOp: 'clear',
-                    storeOp: 'store',
-                }
-            ],
-            depthStencilAttachment: {
-                //view: this.#depthTexture.createView(),
-                depthClearValue: 1.0,
-                depthLoadOp: 'clear',
-                depthStoreOp: 'store'
-            }
-        };
-        this.createScreen();
+
+        // this.#createVertexBuffer(new Float32Array(this.#vertexArray));
+        // TODO: this should be inside RenderPass, to not call vertexArray outside
+        this.#renderPasses.forEach(renderPass => {
+            this.createScreen(renderPass);
+            renderPass.vertexBufferInfo = new VertexBufferInfo(renderPass.vertexArray);
+            renderPass.vertexBuffer = this.#createAndMapBuffer(renderPass.vertexArray, GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST);
+        })
+
+        this.#createBuffers();
+        this.#createPipeline();
+
         return true;
     }
 
@@ -1230,17 +1294,17 @@ class Points {
             throw '`addPostRenderPass` should be called prior `Points.init()`';
         }
 
-        params ||= {};
+        renderPass.params = params || {};
 
-        const requiredNotFound = renderPass.required?.filter(i => !params[i] && !Number.isInteger(params[i]));
+        const requiredNotFound = renderPass.required?.filter(i => !renderPass.params[i] && !Number.isInteger(renderPass.params[i]));
 
         if (requiredNotFound?.length) {
             const paramsRequired = requiredNotFound.join(', ');
-            console.warn(`addRenderPass: parameters required: ${paramsRequired}`);
+            console.warn(`addRenderPass: (${renderPass.name}) parameters required: ${paramsRequired}`);
         }
 
         this.#postRenderPasses.push(renderPass);
-        renderPass.init(this, params);
+        renderPass.init(this);
     }
 
     /**
@@ -1254,7 +1318,10 @@ class Points {
      * Adds two triangles called points per number of columns and rows
      * @ignore
      */
-    createScreen() {
+    createScreen(renderPass) {
+        if (renderPass.vertexArray.length !== 0) {
+            return;
+        }
         const hasVertexAndFragmentShader = this.#renderPasses.some(renderPass => renderPass.hasVertexAndFragmentShader)
         if (hasVertexAndFragmentShader) {
             let colors = [
@@ -1266,13 +1333,10 @@ class Points {
             for (let xIndex = 0; xIndex < this.#numRows; xIndex++) {
                 for (let yIndex = 0; yIndex < this.#numColumns; yIndex++) {
                     const coordinate = new Coordinate(xIndex * this.#canvas.clientWidth / this.#numColumns, yIndex * this.#canvas.clientHeight / this.#numRows, .3);
-                    this.addPoint(coordinate, this.#canvas.clientWidth / this.#numColumns, this.#canvas.clientHeight / this.#numRows, colors);
+                    renderPass.addPoint(coordinate, this.#canvas.clientWidth / this.#numColumns, this.#canvas.clientHeight / this.#numRows, colors, this.#canvas);
                 }
             }
-            this.#createVertexBuffer(new Float32Array(this.#vertexArray));
         }
-        this.#createBuffers();
-        this.#createPipeline();
     }
     /**
      * @param {Float32Array} vertexArray
@@ -1327,11 +1391,17 @@ class Points {
         );
     }
 
-    #createUniformValues() {
-        const paramsDataSize = this.#dataSize.get('Params')
+    /**
+     *
+     * @param {Array} uniformsArray
+     * @param {String} structName
+     * @returns {{values:Float32Array, paramsDataSize:Object}}
+     */
+    #createUniformValues(uniformsArray, structName = 'Params') {
+        const paramsDataSize = this.#dataSize.get(structName)
         const paddings = paramsDataSize.paddings;
         // we check the paddings list and add 0's to just the ones that need it
-        const uniformsClone = structuredClone(this.#uniforms);
+        const uniformsClone = structuredClone(uniformsArray);
         let arrayValues = uniformsClone.map(v => {
             const padding = paddings[v.name];
             if (padding) {
@@ -1354,16 +1424,29 @@ class Points {
     }
 
     #createParametersUniforms() {
-        const { values, paramsDataSize } = this.#createUniformValues();
+        const { values, paramsDataSize } = this.#createUniformValues(this.#uniforms);
         this.#uniforms.buffer = this.#createAndMapBuffer(values, GPUBufferUsage.UNIFORM + GPUBufferUsage.COPY_DST, true, paramsDataSize.bytes);
+
+        if (this.#meshUniforms.length) {
+            const { values, paramsDataSize } = this.#createUniformValues(this.#meshUniforms);
+            this.#meshUniforms.buffer = this.#createAndMapBuffer(values, GPUBufferUsage.UNIFORM + GPUBufferUsage.COPY_DST, true, paramsDataSize.bytes);
+        }
     }
 
     /**
      * Updates all uniforms (for the update function)
      */
     #writeParametersUniforms() {
-        const { values } = this.#createUniformValues();
+        if (!this.#uniforms.buffer) {
+            console.error('An attempt to create uniforms has been made but no setUniform has been called. Maybe an update was called before a setUniform.')
+        }
+        const { values } = this.#createUniformValues(this.#uniforms);
         this.#writeBuffer(this.#uniforms.buffer, values);
+
+        if (this.#meshUniforms.length) {
+            const { values } = this.#createUniformValues(this.#meshUniforms);
+            this.#writeBuffer(this.#meshUniforms.buffer, values);
+        }
     }
 
     /**
@@ -1445,9 +1528,8 @@ class Points {
         //--------------------------------------------
         this.#textures2d.forEach(texture2d => {
             if (texture2d.imageTexture) {
-                let cubeTexture;
                 const imageBitmap = texture2d.imageTexture.bitmap;
-                cubeTexture = this.#device.createTexture({
+                const cubeTexture = this.#device.createTexture({
                     label: texture2d.name,
                     size: [imageBitmap.width, imageBitmap.height, 1],
                     format: 'rgba8unorm',
@@ -1468,6 +1550,9 @@ class Points {
                 this.#createTextureBindingToCopy(texture2d);
             }
         });
+        //--------------------------------------------
+        // this.#texturesDepth2d.forEach(texture2d => this.#createTextureDepth(texture2d));
+        this.#texturesDepth2d.forEach(texture2d => texture2d.texture = this.#depthTexture);
         //--------------------------------------------
         this.#textures2dArray.forEach(texture2dArray => {
             if (texture2dArray.imageTextures) {
@@ -1516,6 +1601,15 @@ class Points {
             size: this.#presentationSize,
             format: this.#presentationFormat, // if 'depth24plus' throws error
             usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
+        });
+    }
+
+    #createTextureDepth(texture2d) {
+        texture2d.texture = this.#device.createTexture({
+            label: texture2d.name,
+            size: this.#presentationSize,
+            format: 'depth32float',
+            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING,
         });
     }
 
@@ -1598,6 +1692,14 @@ class Points {
         // };
         this.#renderPasses.forEach(renderPass => {
             if (renderPass.hasVertexAndFragmentShader) {
+                let depthStencil = undefined;
+                if (renderPass.depthWriteEnabled) {
+                    depthStencil = {
+                        depthWriteEnabled: renderPass.depthWriteEnabled,
+                        depthCompare: 'less',
+                        format: 'depth32float',
+                    }
+                }
                 renderPass.renderPipeline = this.#device.createRenderPipeline({
                     label: `render pipeline: renderPass ${renderPass.index} (${renderPass.name})`,
                     // layout: 'auto',
@@ -1605,12 +1707,8 @@ class Points {
                         bindGroupLayouts: [renderPass.bindGroupLayoutVertex, renderPass.bindGroupLayoutRender]
                     }),
                     //primitive: { topology: 'triangle-strip' },
-                    primitive: { topology: 'triangle-list' },
-                    depthStencil: {
-                        depthWriteEnabled: this.#depthWriteEnabled,
-                        depthCompare: 'less',
-                        format: 'depth24plus',
-                    },
+                    primitive: { topology: renderPass.topology },
+                    depthStencil,
                     vertex: {
                         module: this.#device.createShaderModule({
                             code: renderPass.compiledShaders.vertex,
@@ -1618,25 +1716,37 @@ class Points {
                         entryPoint: 'main', // shader function name
                         buffers: [
                             {
-                                arrayStride: this.#vertexBufferInfo.vertexSize,
+                                arrayStride: renderPass.vertexBufferInfo.vertexSize,
                                 attributes: [
                                     {
                                         // position
                                         shaderLocation: 0,
-                                        offset: this.#vertexBufferInfo.vertexOffset,
+                                        offset: renderPass.vertexBufferInfo.vertexOffset,
                                         format: 'float32x4',
                                     },
                                     {
                                         // colors
                                         shaderLocation: 1,
-                                        offset: this.#vertexBufferInfo.colorOffset,
+                                        offset: renderPass.vertexBufferInfo.colorOffset,
                                         format: 'float32x4',
                                     },
                                     {
                                         // uv
                                         shaderLocation: 2,
-                                        offset: this.#vertexBufferInfo.uvOffset,
+                                        offset: renderPass.vertexBufferInfo.uvOffset,
                                         format: 'float32x2',
+                                    },
+                                    {
+                                        // normals
+                                        shaderLocation: 3,
+                                        offset: renderPass.vertexBufferInfo.normalOffset,
+                                        format: 'float32x3',
+                                    },
+                                    {
+                                        // id
+                                        shaderLocation: 4,
+                                        offset: renderPass.vertexBufferInfo.idOffset,
+                                        format: 'uint32',
                                     },
                                 ],
                             },
@@ -1704,6 +1814,21 @@ class Points {
                 }
             );
         }
+        if (this.#meshUniforms.length) {
+            entries.push(
+                {
+                    binding: bindingIndex++,
+                    resource: {
+                        label: 'uniform',
+                        buffer: this.#meshUniforms.buffer
+                    },
+                    buffer: {
+                        type: 'uniform'
+                    },
+                    // visibility
+                }
+            );
+        }
         this.#storage.forEach(storageItem => {
             const isInternal = internal === storageItem.internal;
             if (isInternal && (!storageItem.shaderType || storageItem.shaderType & shaderType)) {
@@ -1742,95 +1867,104 @@ class Points {
                 );
             }
         }
-        if (this.#samplers.length) {
-            this.#samplers.forEach(sampler => {
-                const isInternal = internal === sampler.internal;
-                if (isInternal && (!sampler.shaderType || sampler.shaderType & shaderType)) {
-                    entries.push(
-                        {
-                            binding: bindingIndex++,
-                            resource: sampler.resource,
-                            sampler: {
-                                type: 'filtering'
-                            }
+        this.#samplers.forEach(sampler => {
+            const isInternal = internal === sampler.internal;
+            if (isInternal && (!sampler.shaderType || sampler.shaderType & shaderType)) {
+                entries.push(
+                    {
+                        binding: bindingIndex++,
+                        resource: sampler.resource,
+                        sampler: {
+                            type: sampler.descriptor.compare ? 'comparison' : 'filtering'
                         }
-                    );
-                }
-            });
-        }
-        if (this.#texturesStorage2d.length) {
-            this.#texturesStorage2d.forEach(textureStorage2d => {
-                const isInternal = internal === textureStorage2d.internal;
-                if (isInternal && (!textureStorage2d.shaderType || textureStorage2d.shaderType & shaderType)) {
-                    entries.push(
-                        {
-                            label: 'texture storage 2d',
-                            binding: bindingIndex++,
-                            resource: textureStorage2d.texture.createView(),
-                            storageTexture: {
-                                type: 'write-only'
-                            }
+                    }
+                );
+            }
+        });
+        this.#texturesStorage2d.forEach(textureStorage2d => {
+            const isInternal = internal === textureStorage2d.internal;
+            if (isInternal && (!textureStorage2d.shaderType || textureStorage2d.shaderType & shaderType)) {
+                entries.push(
+                    {
+                        label: 'texture storage 2d',
+                        binding: bindingIndex++,
+                        resource: textureStorage2d.texture.createView(),
+                        storageTexture: {
+                            type: 'write-only'
                         }
-                    );
-                }
-            });
-        }
-        if (this.#textures2d.length) {
-            this.#textures2d.forEach(texture2d => {
+                    }
+                );
+            }
+        });
+        this.#textures2d.forEach(texture2d => {
+            const isInternal = internal === texture2d.internal;
+            if (isInternal && (!texture2d.shaderType || texture2d.shaderType & shaderType)) {
+                entries.push(
+                    {
+                        label: 'texture 2d',
+                        binding: bindingIndex++,
+                        resource: texture2d.texture.createView(),
+                        texture: {
+                            type: 'float'
+                        }
+                    }
+                );
+            }
+        });
+        this.#texturesDepth2d.forEach(texture2d => {
+            if (texture2d.renderPassIndex !== renderPassIndex) {
                 const isInternal = internal === texture2d.internal;
                 if (isInternal && (!texture2d.shaderType || texture2d.shaderType & shaderType)) {
                     entries.push(
                         {
-                            label: 'texture 2d',
+                            label: 'texture depth 2d',
                             binding: bindingIndex++,
-                            resource: texture2d.texture.createView(),
+                            resource: this.#depthTexture.createView(),
                             texture: {
-                                type: 'float'
+                                sampleType: 'depth',
+                                viewDimension: '2d',
+                                multisampled: false,
                             }
                         }
                     );
                 }
-            });
-        }
-        if (this.#textures2dArray.length) {
-            this.#textures2dArray.forEach(texture2dArray => {
-                const isInternal = internal === texture2dArray.internal;
-                if (isInternal && (!texture2dArray.shaderType || texture2dArray.shaderType & shaderType)) {
-                    entries.push(
-                        {
-                            label: 'texture 2d array',
-                            binding: bindingIndex++,
-                            resource: texture2dArray.texture.createView({
-                                dimension: '2d-array',
-                                baseArrayLayer: 0,
-                                arrayLayerCount: texture2dArray.imageTextures.bitmaps.length
-                            }),
-                            texture: {
-                                type: 'float',
-                                viewDimension: '2d-array'
-                            }
+            }
+        });
+        this.#textures2dArray.forEach(texture2dArray => {
+            const isInternal = internal === texture2dArray.internal;
+            if (isInternal && (!texture2dArray.shaderType || texture2dArray.shaderType & shaderType)) {
+                entries.push(
+                    {
+                        label: 'texture 2d array',
+                        binding: bindingIndex++,
+                        resource: texture2dArray.texture.createView({
+                            dimension: '2d-array',
+                            baseArrayLayer: 0,
+                            arrayLayerCount: texture2dArray.imageTextures.bitmaps.length
+                        }),
+                        texture: {
+                            type: 'float',
+                            viewDimension: '2d-array'
                         }
-                    );
-                }
-            });
-        }
-        if (this.#texturesExternal.length) {
-            this.#texturesExternal.forEach(externalTexture => {
-                const isInternal = internal === externalTexture.internal;
-                if (isInternal && (!externalTexture.shaderType || externalTexture.shaderType & shaderType)) {
-                    entries.push(
-                        {
-                            label: 'external texture',
-                            binding: bindingIndex++,
-                            resource: externalTexture.texture,
-                            externalTexture: {
-                                // type: 'write-only'
-                            }
+                    }
+                );
+            }
+        });
+        this.#texturesExternal.forEach(externalTexture => {
+            const isInternal = internal === externalTexture.internal;
+            if (isInternal && (!externalTexture.shaderType || externalTexture.shaderType & shaderType)) {
+                entries.push(
+                    {
+                        label: 'external texture',
+                        binding: bindingIndex++,
+                        resource: externalTexture.texture,
+                        externalTexture: {
+                            // type: 'write-only'
                         }
-                    );
-                }
-            });
-        }
+                    }
+                );
+            }
+        });
         // TODO: repeated entry blocks
         this.#bindingTextures.forEach(bindingTexture => {
             const { usesRenderPass } = bindingTexture;
@@ -2012,33 +2146,49 @@ class Points {
             }
         });
 
+        /**
+         * @type {GPUCommandEncoder}
+         */
         const commandEncoder = this.#device.createCommandEncoder();
 
         // ---------------------
         const swapChainTexture = this.#context.getCurrentTexture();
-        this.#renderPassDescriptor.colorAttachments[0].view = swapChainTexture.createView();
-        this.#renderPassDescriptor.depthStencilAttachment.view = this.#depthTexture.createView();
 
         this.#renderPasses.forEach(renderPass => {
             if (renderPass.hasVertexAndFragmentShader) {
                 this.#passRenderBindGroup(renderPass);
                 this.#passVertexBindGroup(renderPass);
-                const passEncoder = commandEncoder.beginRenderPass(this.#renderPassDescriptor);
+
+                renderPass.descriptor.colorAttachments[0].view = swapChainTexture.createView();
+                if (renderPass.depthWriteEnabled) {
+                    renderPass.descriptor.depthStencilAttachment.view = this.#depthTexture.createView();
+                    // renderPass.descriptor.depthStencilAttachment.view = this.#texturesDepth2d[0].texture.createView();
+                }
+
+                const passEncoder = commandEncoder.beginRenderPass(renderPass.descriptor);
                 passEncoder.setPipeline(renderPass.renderPipeline);
 
                 if (this.#uniforms.length) {
                     passEncoder.setBindGroup(0, renderPass.vertexBindGroup);
                     passEncoder.setBindGroup(1, renderPass.renderBindGroup);
                 }
-                passEncoder.setVertexBuffer(0, this.#buffer);
-                /**
-                 * vertexCount: number The number of vertices to draw
-                 * instanceCount?: number | undefined The number of instances to draw
-                 * firstVertex?: number | undefined Offset into the vertex buffers, in vertices, to begin drawing from
-                 * firstInstance?: number | undefined First instance to draw
-                 */
-                //passEncoder.draw(3, 1, 0, 0);
-                passEncoder.draw(this.#vertexBufferInfo.vertexCount, renderPass.instanceCount);
+                passEncoder.setVertexBuffer(0, renderPass.vertexBuffer);
+
+                // console.log(renderPass.meshes.find( mesh => mesh.instanceCount > 1));
+                // console.log(renderPass.meshes.some( mesh => mesh.instanceCount > 1));
+                // TODO: move this to renderPass because we can ask this just one time and have it as property
+                const isThereInstancing = renderPass.meshes.some(mesh => mesh.instanceCount > 1);
+                if (isThereInstancing) {
+                    let vertexOffset = 0;
+                    renderPass.meshes.forEach(mesh => {
+                        passEncoder.draw(mesh.verticesCount, mesh.instanceCount, vertexOffset, 0);
+                        vertexOffset = mesh.verticesCount;
+                    })
+                } else {
+                    // no instancing, regular draw with all the meshes
+                    passEncoder.draw(renderPass.vertexBufferInfo.vertexCount, 1);
+                }
+
                 passEncoder.end();
                 // Copy the rendering results from the swapchain into |texture2d.texture|.
                 this.#textures2d.forEach(texture2d => {
@@ -2127,42 +2277,6 @@ class Points {
         }
     }
 
-    #getWGSLCoordinate(value, side, invert = false) {
-        const direction = invert ? -1 : 1;
-        const p = value / side;
-        return (p * 2 - 1) * direction;
-    };
-    /**
-     * - **currently for internal use**<br>
-     * - **might be private in the future**<br>
-     * Adds two triangles as a quad called Point
-     * @param {Coordinate} coordinate `x` from 0 to canvas.width, `y` from 0 to canvas.height, `z` it goes from 0.0 to 1.0 and forward
-     * @param {Number} width point width
-     * @param {Number} height point height
-     * @param {Array<RGBAColor>} colors one color per corner
-     * @param {Boolean} useTexture
-     * @ignore
-     */
-    addPoint(coordinate, width, height, colors, useTexture = false) {
-        const { x, y, z } = coordinate;
-        const nx = this.#getWGSLCoordinate(x, this.#canvas.width);
-        const ny = this.#getWGSLCoordinate(y, this.#canvas.height, true);
-        const nz = z;
-        const nw = this.#getWGSLCoordinate(x + width, this.#canvas.width);
-        const nh = this.#getWGSLCoordinate(y + height, this.#canvas.height);
-        const { r: r0, g: g0, b: b0, a: a0 } = colors[0];
-        const { r: r1, g: g1, b: b1, a: a1 } = colors[1];
-        const { r: r2, g: g2, b: b2, a: a2 } = colors[2];
-        const { r: r3, g: g3, b: b3, a: a3 } = colors[3];
-        this.#vertexArray.push(
-            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * .5, (+ny + 1) * .5,// 0 top left
-            +nw, +ny, nz, 1, r1, g1, b1, a1, (+nw + 1) * .5, (+ny + 1) * .5,// 1 top right
-            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * .5, (-nh + 1) * .5,// 2 bottom right
-            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * .5, (+ny + 1) * .5,// 3 top left
-            +nx, -nh, nz, 1, r2, g2, b2, a2, (+nx + 1) * .5, (-nh + 1) * .5,// 4 bottom left
-            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * .5, (-nh + 1) * .5,// 5 bottom right
-        );
-    }
     /**
      * Reference to the canvas assigned in the constructor
      * @type {HTMLCanvasElement}
@@ -2232,15 +2346,12 @@ class Points {
         }
     }
 
-    /**
-     * Depth sort of elements is true by default.
-     * To allow transparency and a custom type of sort, set this as false;
-     * @param {Boolean} val
-     */
-    set depthWriteEnabled(val) {
-        this.#depthWriteEnabled = val;
+    destroy() {
+
+        this.#uniforms = new UniformsArray();
+        this.#meshUniforms = new UniformsArray();
     }
 }
 
 export default Points;
-export { RenderPass, RenderPasses };
+export { RenderPass, RenderPasses, PrimitiveTopology };

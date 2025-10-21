@@ -63,7 +63,7 @@ export const PI: "const PI = 3.14159265;";
  * ${TAU}
  * let value = TAU / 3.5;
  */
-export const TAU: "const TAU = PI * 2;";
+export const TAU: "const TAU = 6.2831853;";
 /**
  * Angle between two points.
  * @type {String}
@@ -87,6 +87,27 @@ export const angle: string;
  * let value = polar(distance, radians);
  */
 export const polar: string;
+/**
+ * Creates a Matrix rotated in the X axis by an angle in radians.
+ * @type {String}
+ * @param {f32} rads angle
+ * @returns {mat4x4f}
+ */
+export const rotXAxis: string;
+/**
+ * Creates a Matrix rotated in the Y axis by an angle in radians.
+ * @type {String}
+ * @param {f32} rads angle
+ * @returns {mat4x4f}
+ */
+export const rotYAxis: string;
+/**
+ * Creates a Matrix rotated in the Z axis by an angle in radians.
+ * @type {String}
+ * @param {f32} rads angle
+ * @returns {mat4x4f}
+ */
+export const rotZAxis: string;
 /**
  * Rotates a vector an amount of radians
  * @type {String}

@@ -1,11 +1,9 @@
-import { texture } from 'points/image';
 import { structs } from './structs.js';
 import { sdfCircle } from 'points/sdf';
 
 const frag = /*wgsl*/`
 
 ${structs}
-${texture}
 ${sdfCircle}
 
 @fragment

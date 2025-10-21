@@ -1,12 +1,11 @@
 import { structs } from './structs.js';
-import { PI, polar, TAU } from 'points/math';
+import { polar, TAU } from 'points/math';
 import { rand, random } from 'points/random';
 import { snoise } from 'points/noise2d';
 
 const compute = /*wgsl*/`
 
 ${structs}
-${PI}
 ${TAU}
 ${polar}
 ${rand}
@@ -27,7 +26,6 @@ fn particleInit(particles: ptr<storage, array<Particle,NUMPARTICLES>, read_write
     var start_position = rand_seed.xy;
     rand();
     let angle = TAU * rand_seed.y;
-
 
     var particleColor = vec4f();
     if(params.useVideo == 1){

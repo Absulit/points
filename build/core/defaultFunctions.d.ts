@@ -22,7 +22,7 @@
  * creation of a few variables that are commonly used.
  * @example
  * // Inside the main vertex function add this
- * return defaultVertexBody(position, color, uv);
+ * return defaultVertexBody(position, color, uv, normal);
  * @type {string}
  * @param {vec4f} position
  * @param {vec4f} color

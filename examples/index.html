@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title></title>
+        <title>WebGPU Points Library - Examples</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
         <link rel="stylesheet" type="text/css" href="style.css">
     </head>
@@ -61,6 +61,10 @@
                         <ul class="classicnoise2d"></ul>
                     </details>
                     <details>
+                        <summary>classicnoise3d</summary>
+                        <ul class="classicnoise3d"></ul>
+                    </details>
+                    <details>
                         <summary>random</summary>
                         <ul class="random"></ul>
                     </details>
@@ -69,19 +73,30 @@
                         <ul class="sdf"></ul>
                     </details>
 
+                    <hr>
                     <details>
-                        <summary>renderpasses</summary>
-                        <ul class="renderpasses"></ul>
+                        <summary>3d</summary>
+                        <ul class="threed"></ul>
                     </details>
-
+                    <details>
+                        <summary>compute</summary>
+                        <ul class="compute"></ul>
+                    </details>
+                    <details>
+                        <summary>glb - gltf</summary>
+                        <ul class="glb"></ul>
+                    </details>
+                    <details>
+                        <summary>mesh</summary>
+                        <ul class="mesh"></ul>
+                    </details>
                     <details>
                         <summary>raymarching</summary>
                         <ul class="raymarching"></ul>
                     </details>
-
                     <details>
-                        <summary>compute</summary>
-                        <ul class="compute"></ul>
+                        <summary>renderpasses</summary>
+                        <ul class="renderpasses"></ul>
                     </details>
                 </nav>
             </div>
@@ -128,10 +143,12 @@
                 "points/math": "../src/core/math.js",
                 "points/noise2d": "../src/core/noise2d.js",
                 "points/classicnoise2d": "../src/core/classicnoise2d.js",
+                "points/classicnoise3d": "../src/core/classicnoise3d.js",
                 "points/random": "../src/core/random.js",
                 "points/sdf": "../src/core/sdf.js",
 
-                "datgui": "https://cdn.jsdelivr.net/gh/dataarts/dat.gui@0.7.9/build/dat.gui.module.js"
+                "datgui": "https://cdn.jsdelivr.net/gh/dataarts/dat.gui@0.7.9/build/dat.gui.module.js",
+                "utils": "./utils.js"
               }
             }
         </script>

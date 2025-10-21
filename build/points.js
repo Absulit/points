@@ -1,6 +1,30 @@
 /* @ts-self-types="./points.d.ts" */
 import { RenderPass as RenderPass$1 } from 'points';
 
+function getWGSLCoordinate(value, side, invert = false) {
+    const direction = invert ? -1 : 1;
+    const p = value / side;
+    return (p * 2 - 1) * direction;
+}
+/**
+ * To tell the {@link RenderPass} how to display the triangles.
+ * Default `TRIANGLE_LIST`
+ * @example
+ *
+ * renderPass.topology = PrimitiveTopology.POINT_LIST;
+ */
+class PrimitiveTopology {
+    /** @type {GPUPrimitiveTopology} */
+    static POINT_LIST = 'point-list';
+    /** @type {GPUPrimitiveTopology} */
+    static LINE_LIST = 'line-list';
+    /** @type {GPUPrimitiveTopology} */
+    static LINE_STRIP = 'line-strip';
+    /** @type {GPUPrimitiveTopology} */
+    static TRIANGLE_LIST = 'triangle-list';
+    /** @type {GPUPrimitiveTopology} */
+    static TRIANGLE_STRIP = 'triangle-strip';
+}
 /**
  * A RenderPass is a way to have a block of shaders to pass to your application pipeline and
  * these render passes will be executed in the order you pass them in the {@link Points#init} method.
@@ -72,7 +96,44 @@ class RenderPass {
     #required = null;
     #instanceCount = 1;
     #internal = false;
-    #initCalled = false; // to avoid double init call
+    #params = null;
+
+    #vertexArray = [];
+    #vertexBuffer = null;
+    #vertexBufferInfo = null;
+
+    #depthWriteEnabled = false;
+    #loadOp = 'clear';
+    #clearValue = { r: 0.0, g: 0.0, b: 0.0, a: 1.0 };
+
+    #meshCounter = 0;
+    #meshes = [];
+
+    #topology = PrimitiveTopology.TRIANGLE_LIST;
+
+    #descriptor = {
+        colorAttachments: [
+            {
+                //view: textureView,
+                clearValue: { r: 0.0, g: 0.0, b: 0.0, a: 1.0 },
+                loadOp: 'clear',
+                storeOp: 'store',
+            }
+        ],
+        // depthStencilAttachment: {
+        //     //view: this.#depthTexture.createView(),
+        //     depthClearValue: 1.0,
+        //     depthLoadOp: 'clear',
+        //     depthStoreOp: 'store'
+        // }
+    };
+
+    #depthStencilAttachment = {
+        //view: this.#depthTexture.createView(),
+        depthClearValue: 1.0,
+        depthLoadOp: 'clear',
+        depthStoreOp: 'store'
+    }
 
     /**
      * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
@@ -281,15 +342,10 @@ class RenderPass {
      * requires to run.
      * @param {Points} points instance of {@link Points} to call set* functions
      * like {@link Points#setUniform}  and others.
-     * @param {Object} params data that can be assigned to the RenderPass when
-     * the {@link Points#addRenderPass} method is called.
      */
-    init(points, params) {
-        if (!this.#initCalled) {
-            this.#initCalled = true;
-            params ||= {};
-            this.#callback?.(points, params);
-        }
+    init(points) {
+        this.#params ||= {};
+        this.#callback?.(points, this.#params);
     }
 
     get required() {
@@ -311,13 +367,11 @@ class RenderPass {
      * in this RenderPass. This means if you have a quad, it will create
      * `instanceCount` number of independent quads on the screen.
      * Useful for instanced particles driven by a Storage buffer.
-     * @param {Number} val
      */
-    set instanceCount(val) {
-        this.#instanceCount = val;
-    }
 
     get instanceCount() {
+        // TODO: lock the value with a flag
+        this.#instanceCount = this.#meshes.reduce((sum, mesh) => sum + mesh.instanceCount, 0);
         return this.#instanceCount;
     }
 
@@ -332,6 +386,685 @@ class RenderPass {
     get internal() {
         return this.#internal;
     }
+
+    /**
+     * Parameters specifically for Post RenderPass
+     */
+    get params() {
+        return this.#params;
+    }
+    /**
+     * @param {Object} val data that can be assigned to the RenderPass when
+     * the {@link Points#addRenderPass} method is called.
+     */
+    set params(val) {
+        this.#params = val;
+    }
+
+    get vertexArray() {
+        return new Float32Array(this.#vertexArray);
+    }
+
+    set vertexArray(val) {
+        this.#vertexArray = val;
+    }
+
+    get vertexBufferInfo() {
+        return this.#vertexBufferInfo;
+    }
+
+    set vertexBufferInfo(val) {
+        this.#vertexBufferInfo = val;
+    }
+
+    get vertexBuffer() {
+        return this.#vertexBuffer;
+    }
+
+    set vertexBuffer(val) {
+        this.#vertexBuffer = val;
+    }
+
+    get depthWriteEnabled() {
+        return this.#depthWriteEnabled;
+    }
+
+    /**
+     * Controls whether your fragment shader can write to the depth buffer.
+     * By default `true`.
+     * To allow transparency and a custom type of sort, set this as false;
+     * @param {Boolean} val
+     */
+    set depthWriteEnabled(val) {
+
+        if (val) {
+            this.#descriptor.depthStencilAttachment = this.#depthStencilAttachment;
+        }
+
+        this.#depthWriteEnabled = val;
+    }
+
+    get loadOp() {
+        return this.#loadOp;
+    }
+
+    /**
+     * Controls if the last RenderPass data is preserved on screen or cleared.
+     * Default `clear`
+     * @param {'clear'|'load'} val
+     */
+    set loadOp(val) {
+        this.#loadOp = val;
+        this.#descriptor.colorAttachments[0].loadOp = this.#loadOp;
+    }
+
+    get clearValue() {
+        return this.#clearValue;
+    }
+
+    /**
+     * Sets the color used to clear the RenderPass before drawing.
+     * (only if {@link RenderPass#loadOp | loadOp} is set to `clear`)
+     * default: black
+     * @param {{ r: Number, g: Number, b: Number, a: Number }} val
+     */
+    set clearValue(val) {
+        this.#clearValue = val;
+        this.#descriptor.colorAttachments[0].clearValue = this.#clearValue;
+    }
+
+    /**
+     * @type {GPURenderPassDescriptor}
+     */
+    get descriptor() {
+        return this.#descriptor;
+    }
+
+    get topology(){
+        return this.#topology;
+    }
+    /**
+     * To render as Triangles, lines or points.
+     * Use class {@link PrimitiveTopology}
+     * @param {GPUPrimitiveTopology} val
+     */
+    set topology(val){
+        this.#topology = val;
+    }
+
+    /**
+     * - **currently for internal use**<br>
+     * - **might be private in the future**<br>
+     * Adds two triangles as a quad called Point
+     * @param {Coordinate} coordinate `x` from 0 to canvas.width, `y` from 0 to canvas.height, `z` it goes from 0.0 to 1.0 and forward
+     * @param {Number} width point width
+     * @param {Number} height point height
+     * @param {Array<RGBAColor>} colors one color per corner
+     * @param {HTMLCanvasElement} canvas canvas element
+     * @param {Boolean} useTexture
+     * @ignore
+     */
+    addPoint(coordinate, width, height, colors, canvas, useTexture = false) {
+        const { x, y, z } = coordinate;
+        const nx = getWGSLCoordinate(x, canvas.width);
+        const ny = getWGSLCoordinate(y, canvas.height, true);
+        const nz = z;
+        const nw = getWGSLCoordinate(x + width, canvas.width);
+        const nh = getWGSLCoordinate(y + height, canvas.height);
+        const { r: r0, g: g0, b: b0, a: a0 } = colors[0];
+        const { r: r1, g: g1, b: b1, a: a1 } = colors[1];
+        const { r: r2, g: g2, b: b2, a: a2 } = colors[2];
+        const { r: r3, g: g3, b: b3, a: a3 } = colors[3];
+        const normals = [0, 0, 1];
+
+        const id = this.#meshCounter;
+        this.#vertexArray.push(
+            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * .5, (+ny + 1) * .5, ...normals, id, // 0 top left
+            +nw, +ny, nz, 1, r1, g1, b1, a1, (+nw + 1) * .5, (+ny + 1) * .5, ...normals, id, // 1 top right
+            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * .5, (-nh + 1) * .5, ...normals, id, // 2 bottom right
+            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * .5, (+ny + 1) * .5, ...normals, id, // 3 top left
+            +nx, -nh, nz, 1, r2, g2, b2, a2, (+nx + 1) * .5, (-nh + 1) * .5, ...normals, id, // 4 bottom left
+            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * .5, (-nh + 1) * .5, ...normals, id, // 5 bottom right
+        );
+
+        const mesh = {
+            name: '_plane_',
+            id,
+            instanceCount: 1,
+            verticesCount: 6
+        };
+        this.#meshes.push(mesh);
+        ++this.#meshCounter;
+
+        return mesh;
+    }
+
+    /**
+     * Adds a mesh quad
+     * @param {String} name The name will show up in the `mesh` Uniform.
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {{width:Number, height:Number}} dimensions
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     * @param {{x:Number, y:Number }} segments mesh subdivisions
+     *
+     * @example
+     *
+     * renderPass.addPlane('plane', { x: 0, y: 0, z: 0 }, { width: 2, height: 2 }).instanceCount = NUMPARTICLES;
+     */
+    addPlane(
+        name,
+        coordinate = { x: 0, y: 0, z: 0 },
+        dimensions = { width: 1, height: 1 },
+        color = { r: 1, g: 0, b: 1, a: 0 },
+        segments = { x: 1, y: 1 }
+    ) {
+        const { x, y, z } = coordinate;
+        const { width, height } = dimensions;
+        const { x: sx, y: sy } = segments;
+        const hw = width / 2;
+        const hh = height / 2;
+
+        const { r, g, b, a } = color;
+        const normal = [0, 0, 1];
+
+        const id = this.#meshCounter;
+
+        const grid = [];
+        for (let iy = 0; iy <= sy; iy++) {
+            const v = iy / sy;
+            const posY = y - hh + v * height;
+
+            for (let ix = 0; ix <= sx; ix++) {
+                const u = ix / sx;
+                const posX = x - hw + u * width;
+
+                grid.push({
+                    position: [posX, posY, z],
+                    uv: [u, v]
+                });
+            }
+        }
+
+        for (let iy = 0; iy < sy; iy++) {
+            for (let ix = 0; ix < sx; ix++) {
+                const rowSize = sx + 1;
+                const i0 = iy * rowSize + ix;
+                const i1 = i0 + 1;
+                const i2 = i0 + rowSize;
+                const i3 = i2 + 1;
+
+                const quad = [
+                    grid[i0], grid[i1], grid[i3],
+                    grid[i0], grid[i3], grid[i2]
+                ];
+
+                for (const { position: [vx, vy, vz], uv: [u, v] } of quad) {
+                    this.#vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normal, id);
+                }
+            }
+        }
+
+        const mesh = {
+            name,
+            id,
+            instanceCount: 1,
+            verticesCount: sx * sy * 6
+        };
+        this.#meshes.push(mesh);
+        ++this.#meshCounter;
+
+        return mesh;
+    }
+
+    /**
+     * Adds a mesh cube
+     * @param {String} name The name will show up in the `mesh` Uniform.
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {{width:Number, height:Number, depth:Number}} dimensions
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     *
+     * @example
+     *
+     * renderPass.addCube('base_cube').instanceCount = NUMPARTICLES;
+     */
+    addCube(
+        name,
+        coordinate = { x: 0, y: 0, z: 0 },
+        dimensions = { width: 1, height: 1, depth: 1 },
+        color = { r: 1, g: 0, b: 1, a: 0 }
+    ) {
+        const { x, y, z } = coordinate;
+        const { width, height, depth } = dimensions;
+        const hw = width / 2;
+        const hh = height / 2;
+        const hd = depth / 2;
+
+        const corners = [
+            [x - hw, y - hh, z - hd], // 0: left-bottom-back
+            [x + hw, y - hh, z - hd], // 1: right-bottom-back
+            [x + hw, y + hh, z - hd], // 2: right-top-back
+            [x - hw, y + hh, z - hd], // 3: left-top-back
+            [x - hw, y - hh, z + hd], // 4: left-bottom-front
+            [x + hw, y - hh, z + hd], // 5: right-bottom-front
+            [x + hw, y + hh, z + hd], // 6: right-top-front
+            [x - hw, y + hh, z + hd], // 7: left-top-front
+        ];
+
+        const faceUVs = [
+            [[0, 0], [1, 0], [1, 1], [0, 1]], // back
+            [[0, 0], [1, 0], [1, 1], [0, 1]], // front
+            [[0, 0], [1, 0], [1, 1], [0, 1]], // left
+            [[0, 0], [1, 0], [1, 1], [0, 1]], // right
+            [[0, 0], [1, 0], [1, 1], [0, 1]], // top
+            [[0, 0], [1, 0], [1, 1], [0, 1]], // bottom
+        ];
+
+        const faceNormals = [
+            [0, 0, -1],  // back
+            [0, 0, 1],   // front
+            [-1, 0, 0],  // left
+            [1, 0, 0],   // right
+            [0, 1, 0],   // top
+            [0, -1, 0],  // bottom
+        ];
+
+        const faces = [
+            [0, 1, 2, 3], // back
+            [5, 4, 7, 6], // front
+            [4, 0, 3, 7], // left
+            [1, 5, 6, 2], // right
+            [3, 2, 6, 7], // top
+            [4, 5, 1, 0], // bottom
+        ];
+
+        for (let i = 0; i < 6; i++) {
+            const [i0, i1, i2, i3] = faces[i];
+            // const color = faceColors[i];
+            const { r, g, b, a } = color;
+            const normals = faceNormals[i];
+
+            const v = [corners[i0], corners[i1], corners[i2], corners[i3]];
+
+            const uv = faceUVs[i];
+            const verts = [
+                [v[0], uv[0]],
+                [v[1], uv[1]],
+                [v[2], uv[2]],
+                [v[0], uv[0]],
+                [v[2], uv[2]],
+                [v[3], uv[3]],
+            ];
+
+            for (const [[vx, vy, vz], [u, v]] of verts) {
+                this.#vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normals, this.#meshCounter);
+            }
+        }
+
+        const mesh = {
+            name,
+            id: this.#meshCounter,
+            instanceCount: 1,
+            verticesCount: 36
+        };
+        this.#meshes.push(mesh);
+
+        ++this.#meshCounter;
+
+        return mesh;
+    }
+
+    /**
+     * Adds a mesh sphere
+     * @param {String} name The name will show up in the `mesh` Uniform.
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     * @param {Number} radius
+     * @param {Number} segments
+     * @param {Number} rings
+     *
+     * @example
+     *
+     * renderPass.addSphere('sphere').instanceCount = 100;
+     */
+    addSphere(
+        name,
+        coordinate = { x: 0, y: 0, z: 0 },
+        color = { r: 1, g: 0, b: 1, a: 0 },
+        radius = 1,
+        segments = 16,
+        rings = 12
+    ) {
+        const { x, y, z } = coordinate;
+        const { r, g, b, a } = color;
+
+        const vertexGrid = [];
+
+        // generate vertices
+        for (let lat = 0; lat <= rings; lat++) {
+            const theta = (lat * Math.PI) / rings;
+            const sinTheta = Math.sin(theta);
+            const cosTheta = Math.cos(theta);
+
+            vertexGrid[lat] = [];
+
+            for (let lon = 0; lon <= segments; lon++) {
+                const phi = (lon * 2 * Math.PI) / segments;
+                const sinPhi = Math.sin(phi);
+                const cosPhi = Math.cos(phi);
+
+                const nx = cosPhi * sinTheta;
+                const ny = cosTheta;
+                const nz = sinPhi * sinTheta;
+
+                const vx = x + radius * nx;
+                const vy = y + radius * ny;
+                const vz = z + radius * nz;
+
+                const u = lon / segments;
+                const v = lat / rings;
+
+                vertexGrid[lat][lon] = [vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, this.#meshCounter];
+            }
+        }
+
+        // generate triangles
+        for (let lat = 0; lat < rings; lat++) {
+            for (let lon = 0; lon < segments; lon++) {
+                const v1 = vertexGrid[lat][lon];
+                const v2 = vertexGrid[lat + 1][lon];
+                const v3 = vertexGrid[lat + 1][lon + 1];
+                const v4 = vertexGrid[lat][lon + 1];
+
+                // triangle 1
+                this.#vertexArray.push(...v1, ...v2, ...v3);
+                // triangle 2
+                this.#vertexArray.push(...v1, ...v3, ...v4);
+            }
+        }
+
+        const mesh = {
+            name,
+            id: this.#meshCounter,
+            instanceCount: 1,
+            verticesCount: rings * segments * 6
+        };
+        this.#meshes.push(mesh);
+
+        ++this.#meshCounter;
+
+        return mesh;
+    }
+
+    /**
+     * Adds a Torus mesh
+     * @param {String} name The name will show up in the `mesh` Uniform.
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {Number} radius
+     * @param {Number} tube
+     * @param {Number} radialSegments
+     * @param {Number} tubularSegments
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     * @returns {Object}
+     *
+     * @example
+     *
+     * renderPass.addTorus('myTorus');
+     */
+    addTorus(
+        name,
+        coordinate = { x: 0, y: 0, z: 0 },
+        radius = 1,
+        tube = .4,
+        radialSegments = 32,
+        tubularSegments = 24,
+        color = { r: 1, g: 0, b: 1, a: 1 }
+    ) {
+        const { x, y, z } = coordinate;
+        const { r, g, b, a } = color;
+
+        const vertices = [];
+        const normals = [];
+        const uvs = [];
+        const indices = [];
+
+        for (let k = 0; k <= radialSegments; k++) {
+            const v = k / radialSegments * Math.PI * 2;
+            const cosV = Math.cos(v);
+            const sinV = Math.sin(v);
+
+            for (let i = 0; i <= tubularSegments; i++) {
+                const u = i / tubularSegments * Math.PI * 2;
+                const cosU = Math.cos(u);
+                const sinU = Math.sin(u);
+
+                const tx = (radius + tube * cosV) * cosU + x;
+                const ty = (radius + tube * cosV) * sinU + y;
+                const tz = tube * sinV + z;
+
+                const nx = cosV * cosU;
+                const ny = cosV * sinU;
+                const nz = sinV;
+
+                vertices.push([tx, ty, tz]);
+                normals.push([nx, ny, nz]);
+                uvs.push([i / tubularSegments, k / radialSegments]);
+            }
+        }
+
+        for (let k = 1; k <= radialSegments; k++) {
+            for (let i = 1; i <= tubularSegments; i++) {
+                const a = (tubularSegments + 1) * k + i - 1;
+                const b = (tubularSegments + 1) * (k - 1) + i - 1;
+                const c = (tubularSegments + 1) * (k - 1) + i;
+                const d = (tubularSegments + 1) * k + i;
+
+                indices.push([a, b, d]);
+                indices.push([b, c, d]);
+            }
+        }
+
+        for (const [i0, i1, i2] of indices) {
+            for (const i of [i0, i1, i2]) {
+                const [vx, vy, vz] = vertices[i];
+                const [nx, ny, nz] = normals[i];
+                const [u, v] = uvs[i];
+                this.#vertexArray.push(vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, this.#meshCounter);
+            }
+        }
+
+        const mesh = {
+            name,
+            id: this.#meshCounter,
+            instanceCount: 1,
+            verticesCount: indices.length * 3
+        };
+        this.#meshes.push(mesh);
+
+        ++this.#meshCounter;
+
+        return mesh;
+    }
+
+    /**
+     * Adds a Cylinder mesh
+     * @param {String} name The name will show up in the `mesh` Uniform.
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {Number} radius
+     * @param {Number} height
+     * @param {Number} radialSegments
+     * @param {Boolean} cap
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     * @returns {Object}
+     *
+     * @example
+     * renderPass.addCylinder('myCylinder');
+     */
+    addCylinder(
+        name,
+        coordinate = { x: 0, y: 0, z: 0 },
+        radius = .5,
+        height = 1,
+        radialSegments = 32,
+        cap = true,
+        color = { r: 1, g: 0, b: 1, a: 1 }
+    ) {
+        const { x: cx, y: cy, z: cz } = coordinate;
+        const { r, g, b, a } = color;
+        const halfHeight = height / 2;
+
+        const vertices = [];
+        const normals = [];
+        const uvs = [];
+        const indices = [];
+
+        // sides
+        for (let i = 0; i <= radialSegments; i++) {
+            const theta = (i / radialSegments) * Math.PI * 2;
+            const cosTheta = Math.cos(theta);
+            const sinTheta = Math.sin(theta);
+
+            const px = cx + radius * cosTheta;
+            const pz = cz + radius * sinTheta;
+
+            vertices.push([px, cy - halfHeight, pz]); // bottom
+            normals.push([cosTheta, 0, sinTheta]);
+            uvs.push([i / radialSegments, 0]);
+
+            vertices.push([px, cy + halfHeight, pz]); // top
+            normals.push([cosTheta, 0, sinTheta]);
+            uvs.push([i / radialSegments, 1]);
+        }
+
+        for (let i = 0; i < radialSegments; i++) {
+            const base = i * 2;
+            indices.push([base, base + 1, base + 3]);
+            indices.push([base, base + 3, base + 2]);
+        }
+
+        // caps
+        if (cap) {
+            const bottomCenterIndex = vertices.length;
+            vertices.push([cx, cy - halfHeight, cz]);
+            normals.push([0, -1, 0]);
+            uvs.push([.5, .5]);
+
+            const topCenterIndex = vertices.length;
+            vertices.push([cx, cy + halfHeight, cz]);
+            normals.push([0, 1, 0]);
+            uvs.push([.5, .5]);
+
+            for (let i = 0; i < radialSegments; i++) {
+                const theta = (i / radialSegments) * Math.PI * 2;
+                const nextTheta = ((i + 1) / radialSegments) * Math.PI * 2;
+
+                const x0 = cx + radius * Math.cos(theta);
+                const z0 = cz + radius * Math.sin(theta);
+                const x1 = cx + radius * Math.cos(nextTheta);
+                const z1 = cz + radius * Math.sin(nextTheta);
+
+                const bottomIdx0 = vertices.length;
+                vertices.push([x0, cy - halfHeight, z0]);
+                normals.push([0, -1, 0]);
+                uvs.push([.5 + .5 * Math.cos(theta), .5 + .5 * Math.sin(theta)]);
+
+                const bottomIdx1 = vertices.length;
+                vertices.push([x1, cy - halfHeight, z1]);
+                normals.push([0, -1, 0]);
+                uvs.push([.5 + .5 * Math.cos(nextTheta), .5 + .5 * Math.sin(nextTheta)]);
+
+                indices.push([bottomCenterIndex, bottomIdx0, bottomIdx1]);
+
+                const topIdx0 = vertices.length;
+                vertices.push([x0, cy + halfHeight, z0]);
+                normals.push([0, 1, 0]);
+                uvs.push([.5 + .5 * Math.cos(theta), .5 + .5 * Math.sin(theta)]);
+
+                const topIdx1 = vertices.length;
+                vertices.push([x1, cy + halfHeight, z1]);
+                normals.push([0, 1, 0]);
+                uvs.push([.5 + .5 * Math.cos(nextTheta), .5 + .5 * Math.sin(nextTheta)]);
+
+                indices.push([topCenterIndex, topIdx1, topIdx0]);
+            }
+        }
+
+        for (const [i0, i1, i2] of indices) {
+            for (const i of [i0, i1, i2]) {
+                const [vx, vy, vz] = vertices[i];
+                const [nx, ny, nz] = normals[i];
+                const [u, v] = uvs[i];
+                this.#vertexArray.push(vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, this.#meshCounter);
+            }
+        }
+
+        const mesh = {
+            name,
+            id: this.#meshCounter,
+            instanceCount: 1,
+            verticesCount: indices.length * 3
+        };
+        this.#meshes.push(mesh);
+
+        ++this.#meshCounter;
+
+        return mesh;
+    }
+
+    /**
+     * Add a external mesh with the provided required data.
+     * @param {String} name The name will show up in the `mesh` Uniform.
+     * @param {Array<{x:Number, y:Number, z:Number}>} vertices
+     * @param {Array<{r:Number, g:Number, b:Number, a:Number}>} colors
+     * @param {Array<{u:Number, v:Number}>} uvs
+     * @param {Array<Number>} normals
+     *
+     * @example
+     *
+     * const url = '../models/monkey.glb';
+     * const data = await loadAndExtract(url);
+     * const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0]
+     * renderPass.addMesh('monkey', positions, colors, colorSize, uvs, normals, indices)
+     * renderPass.depthWriteEnabled = true;
+     *
+     */
+    addMesh(name, vertices, colors, colorSize, uvs, normals, indices) {
+        const verticesCount = indices.length;
+
+        for (let i = 0; i < verticesCount; i++) {
+            const index = indices[i];
+            const vertex = vertices.slice(index * 3, index * 3 + 3);
+
+            const color = colors?.slice(index * colorSize, index * colorSize + colorSize);
+            const uv = uvs.slice(index * 2, index * 2 + 2);
+            const normal = normals.slice(index * 3, index * 3 + 3);
+
+            const [x, y, z] = vertex;
+            const [r, g, b] = color || [1, 0, 1];
+            const [u, v] = uv;
+            this.#vertexArray.push(+x, +y, +z, 1, r, g, b, 1, u, v, ...normal, this.#meshCounter);
+        }
+
+        const mesh = {
+            name,
+            id: this.#meshCounter,
+            instanceCount: 1,
+            verticesCount
+        };
+        this.#meshes.push(mesh);
+        ++this.#meshCounter;
+
+        return mesh;
+    }
+
+    /**
+     * For internal purposes
+     * ids and names of the meshes
+     */
+    get meshes() {
+        return this.#meshes;
+    }
+
+
 }
 
 const vert$8 = /*wgsl*/`
@@ -341,10 +1074,11 @@ fn main(
     @location(0) position: vec4f,
     @location(1) color: vec4f,
     @location(2) uv: vec2f,
+    @location(3) normal: vec3f,
     @builtin(vertex_index) vertexIndex: u32
 ) -> Fragment {
 
-    return defaultVertexBody(position, color, uv);
+    return defaultVertexBody(position, color, uv, normal);
 }
 `;
 
@@ -514,10 +1248,11 @@ fn main(
     @location(0) position: vec4f,
     @location(1) color: vec4f,
     @location(2) uv: vec2f,
+    @location(3) normal: vec3f,
     @builtin(vertex_index) vertexIndex: u32
 ) -> Fragment {
 
-    return defaultVertexBody(position, color, uv);
+    return defaultVertexBody(position, color, uv, normal);
 }
 `;
 
@@ -676,10 +1411,11 @@ fn main(
     @location(0) position: vec4f,
     @location(1) color: vec4f,
     @location(2) uv: vec2f,
+    @location(3) normal: vec3f,
     @builtin(vertex_index) vertexIndex: u32
 ) -> Fragment {
 
-    return defaultVertexBody(position, color, uv);
+    return defaultVertexBody(position, color, uv, normal);
 }
 `;
 
@@ -728,10 +1464,11 @@ fn main(
     @location(0) position: vec4f,
     @location(1) color: vec4f,
     @location(2) uv: vec2f,
+    @location(3) normal: vec3f,
     @builtin(vertex_index) vertexIndex: u32
 ) -> Fragment {
 
-    return defaultVertexBody(position, color, uv);
+    return defaultVertexBody(position, color, uv, normal);
 }
 `;
 
@@ -781,10 +1518,11 @@ fn main(
     @location(0) position: vec4f,
     @location(1) color: vec4f,
     @location(2) uv: vec2f,
+    @location(3) normal: vec3f,
     @builtin(vertex_index) vertexIndex: u32
 ) -> Fragment {
 
-    return defaultVertexBody(position, color, uv);
+    return defaultVertexBody(position, color, uv, normal);
 }
 `;
 
@@ -1045,10 +1783,11 @@ fn main(
     @location(0) position: vec4f,
     @location(1) color: vec4f,
     @location(2) uv: vec2f,
+    @location(3) normal: vec3f,
     @builtin(vertex_index) vertexIndex: u32
 ) -> Fragment {
 
-    return defaultVertexBody(position, color, uv);
+    return defaultVertexBody(position, color, uv, normal);
 }
 `;
 
@@ -1125,10 +1864,11 @@ fn main(
     @location(0) position: vec4f,
     @location(1) color: vec4f,
     @location(2) uv: vec2f,
+    @location(3) normal: vec3f,
     @builtin(vertex_index) vertexIndex: u32
 ) -> Fragment {
 
-    return defaultVertexBody(position, color, uv);
+    return defaultVertexBody(position, color, uv, normal);
 }
 `;
 
@@ -1178,10 +1918,11 @@ fn main(
     @location(0) position: vec4f,
     @location(1) color: vec4f,
     @location(2) uv: vec2f,
+    @location(3) normal: vec3f,
     @builtin(vertex_index) vertexIndex: u32
 ) -> Fragment {
 
-    return defaultVertexBody(position, color, uv);
+    return defaultVertexBody(position, color, uv, normal);
 }
 `;
 
@@ -1282,10 +2023,11 @@ fn main(
     @location(0) position: vec4f,
     @location(1) color: vec4f,
     @location(2) uv: vec2f,
+    @location(3) normal: vec3f,
     @builtin(vertex_index) vertexIndex: u32
 ) -> Fragment {
 
-    return defaultVertexBody(position, color, uv);
+    return defaultVertexBody(position, color, uv, normal);
 }
 `;
 
@@ -1492,6 +2234,8 @@ class VertexBufferInfo {
     #vertexOffset;
     #colorOffset;
     #uvOffset;
+    #normalOffset;
+    #idOffset;
     #vertexCount;
     /**
      * Along with the vertexArray it calculates some info like offsets required for the pipeline.
@@ -1501,11 +2245,13 @@ class VertexBufferInfo {
      * @param {Number} colorOffset index where the color data starts in a row of `triangleDataLength` items
      * @param {Number} uvOffset index where the uv data starts in a row of `triangleDataLength` items
      */
-    constructor(vertexArray, triangleDataLength = 10, vertexOffset = 0, colorOffset = 4, uvOffset = 8) {
+    constructor(vertexArray, triangleDataLength = 14, vertexOffset = 0, colorOffset = 4, uvOffset = 8, normalsOffset = 10, idOffset = 13) {
         this.#vertexSize = vertexArray.BYTES_PER_ELEMENT * triangleDataLength; // Byte size of ONE triangle data (vertex, color, uv). (one row)
         this.#vertexOffset = vertexArray.BYTES_PER_ELEMENT * vertexOffset;
         this.#colorOffset = vertexArray.BYTES_PER_ELEMENT * colorOffset; // Byte offset of triangle vertex color attribute.
         this.#uvOffset = vertexArray.BYTES_PER_ELEMENT * uvOffset;
+        this.#normalOffset = vertexArray.BYTES_PER_ELEMENT * normalsOffset;
+        this.#idOffset = vertexArray.BYTES_PER_ELEMENT * idOffset;
         this.#vertexCount = vertexArray.byteLength / this.#vertexSize;
     }
 
@@ -1523,6 +2269,14 @@ class VertexBufferInfo {
 
     get uvOffset() {
         return this.#uvOffset;
+    }
+
+    get normalOffset() {
+        return this.#normalOffset;
+    }
+
+    get idOffset() {
+        return this.#idOffset;
     }
 
     get vertexCount() {
@@ -1849,7 +2603,9 @@ struct Fragment {
     @location(1) uv: vec2f,
     @location(2) ratio: vec2f,
     @location(3) uvr: vec2f,
-    @location(4) mouse: vec2f
+    @location(4) mouse: vec2f,
+    @location(5) normal: vec3f,
+    @interpolate(flat) @location(6) id: u32
 }
 
 struct Sound {
@@ -1891,7 +2647,7 @@ struct Event {
  * creation of a few variables that are commonly used.
  * @example
  * // Inside the main vertex function add this
- * return defaultVertexBody(position, color, uv);
+ * return defaultVertexBody(position, color, uv, normal);
  * @type {string}
  * @param {vec4f} position
  * @param {vec4f} color
@@ -1899,18 +2655,19 @@ struct Event {
  * @return {Fragment}
  */
 const defaultVertexBody = /*wgsl*/`
-fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f) -> Fragment {
+fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) -> Fragment {
     var result: Fragment;
 
     let ratioX = params.screen.x / params.screen.y;
     let ratioY = 1. / ratioX / (params.screen.y / params.screen.x);
     result.ratio = vec2(ratioX, ratioY);
-    result.position = vec4f(position);
-    result.color = vec4f(color);
+    result.position = position;
+    result.color = color;
     result.uv = uv;
     result.uvr = vec2(uv.x * result.ratio.x, uv.y);
     result.mouse = vec2(params.mouse.x / params.screen.x, params.mouse.y / params.screen.y);
     result.mouse = result.mouse * vec2(1.,-1.) - vec2(0., -1.); // flip and move up
+    result.normal = normal;
 
     return result;
 }
@@ -2397,51 +3154,53 @@ read_write. Compute is always read_write.
 * @ignore
 */
 
+const R = 'r';
+const RW = 'rw';
+
 const cache = {
     [GPUShaderStage.COMPUTE | GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT]: {
-        [GPUShaderStage.COMPUTE]: 'rw',
-        [GPUShaderStage.VERTEX]: 'r',
-        [GPUShaderStage.FRAGMENT]: 'r'
+        [GPUShaderStage.COMPUTE]: RW,
+        [GPUShaderStage.VERTEX]: R,
+        [GPUShaderStage.FRAGMENT]: R
     },//
     [GPUShaderStage.COMPUTE]: {
-        [GPUShaderStage.COMPUTE]: 'rw',
+        [GPUShaderStage.COMPUTE]: RW,
         [GPUShaderStage.VERTEX]: null,
         [GPUShaderStage.FRAGMENT]: null
     },
     [GPUShaderStage.VERTEX]: {
         [GPUShaderStage.COMPUTE]: null,
-        [GPUShaderStage.VERTEX]: 'r',
+        [GPUShaderStage.VERTEX]: R,
         [GPUShaderStage.FRAGMENT]: null
     },
     [GPUShaderStage.FRAGMENT]: {
         [GPUShaderStage.COMPUTE]: null,
         [GPUShaderStage.VERTEX]: null,
-        [GPUShaderStage.FRAGMENT]: 'rw'
+        [GPUShaderStage.FRAGMENT]: RW
     },//
     [GPUShaderStage.COMPUTE | GPUShaderStage.VERTEX]: {
-        [GPUShaderStage.COMPUTE]: 'rw',
-        [GPUShaderStage.VERTEX]: 'r',
+        [GPUShaderStage.COMPUTE]: RW,
+        [GPUShaderStage.VERTEX]: R,
         [GPUShaderStage.FRAGMENT]: null
     },
     [GPUShaderStage.COMPUTE | GPUShaderStage.FRAGMENT]: {
-        [GPUShaderStage.COMPUTE]: 'rw',
+        [GPUShaderStage.COMPUTE]: RW,
         [GPUShaderStage.VERTEX]: null,
-        [GPUShaderStage.FRAGMENT]: 'rw'
+        [GPUShaderStage.FRAGMENT]: RW
     },//
     [GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT]: {
         [GPUShaderStage.COMPUTE]: null,
-        [GPUShaderStage.VERTEX]: 'r',
-        [GPUShaderStage.FRAGMENT]: 'r'
+        [GPUShaderStage.VERTEX]: R,
+        [GPUShaderStage.FRAGMENT]: R
     },
 };
 
 function getStorageAccessMode(currentStage, storageShaderTypes) {
-    // console.log(currentStage, storageShaderTypes);
     return cache[storageShaderTypes][currentStage];
 }
 
-const bindingModes = { ['r']: 'read', ['rw']: 'read_write' };
-const entriesModes = { ['r']: 'read-only-storage', ['rw']: 'storage' };
+const bindingModes = { [R]: 'read', [RW]: 'read_write' };
+const entriesModes = { [R]: 'read-only-storage', [RW]: 'storage' };
 
 /**
  * Main class Points, this is the entry point of an application with this library.
@@ -2476,17 +3235,18 @@ class Points {
     #buffer = null;
     #presentationSize = null;
     #depthTexture = null;
-    #vertexArray = [];
+    // #vertexArray = [];
     #numColumns = 1;
     #numRows = 1;
     #commandsFinished = [];
-    #renderPassDescriptor = null;
     #uniforms = new UniformsArray();
+    #meshUniforms = new UniformsArray();
     #constants = [];
     #storage = [];
     #readStorage = [];
     #samplers = [];
     #textures2d = [];
+    #texturesDepth2d = [];
     #texturesToCopy = [];
     #textures2dArray = [];
     #texturesExternal = [];
@@ -2512,7 +3272,6 @@ class Points {
     #events = new Map();
     #events_ids = 0;
     #dataSize = null;
-    #depthWriteEnabled = true;
 
     constructor(canvasId) {
         this.#canvasId = canvasId;
@@ -2587,8 +3346,8 @@ class Points {
         this.#depthTexture = this.#device.createTexture({
             label: '_depthTexture',
             size: this.#presentationSize,
-            format: 'depth24plus',
-            usage: GPUTextureUsage.RENDER_ATTACHMENT,
+            format: 'depth32float',
+            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING,
         });
         // this is to solve an issue that requires the texture to be resized
         // if the screen dimensions change, this for a `setTexture2d` with
@@ -2633,7 +3392,7 @@ class Points {
         const uniformToUpdate = this.#nameExists(this.#uniforms, name);
         if (uniformToUpdate && structName) {
             // if name exists is an update
-            throw '`setUniform()` can\'t set the structName of an already defined uniform.';
+            console.warn(`setUniform(${name}, [${value}], ${structName}) can't set the structName of an already defined uniform.`);
         }
         if (uniformToUpdate) {
             uniformToUpdate.value = value;
@@ -2652,6 +3411,31 @@ class Points {
         this.#uniforms.push(uniform);
         return uniform;
     }
+
+    #setMeshUniform(name, value, structName = null) {
+        const uniformToUpdate = this.#nameExists(this.#meshUniforms, name);
+        if (uniformToUpdate && structName) {
+            // if name exists is an update
+            console.warn(`#setMeshUniform(${name}, [${value}], ${structName}) can't set the structName of an already defined uniform.`);
+        }
+        if (uniformToUpdate) {
+            uniformToUpdate.value = value;
+            return uniformToUpdate;
+        }
+        if (structName && isArray(structName)) {
+            throw `${structName} is an array, which is currently not supported for Uniforms.`;
+        }
+        const uniform = {
+            name: name,
+            value: value,
+            type: structName,
+            size: null
+        };
+        Object.seal(uniform);
+        this.#meshUniforms.push(uniform);
+        return uniform;
+    }
+
     /**
      * Updates a list of uniforms
      * @param {Array<{name:String, value:Number}>} arr object array of the type: `{name, value}`
@@ -2974,6 +3758,23 @@ class Points {
         };
         this.#textures2d.push(texture2d);
         return texture2d;
+    }
+
+    setTextureDepth2d(name, shaderType, renderPassIndex) {
+        const exists = this.#nameExists(this.#texturesDepth2d, name);
+        if (exists) {
+            console.warn(`setTextureDepth2d: \`${name}\` already exists.`);
+            return exists;
+        }
+        const textureDepth2d = {
+            name,
+            shaderType,
+            texture: null,
+            renderPassIndex,
+            internal: false,
+        };
+        this.#texturesDepth2d.push(textureDepth2d);
+        return textureDepth2d;
     }
 
 
@@ -3393,6 +4194,10 @@ class Points {
             dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <uniform> params: Params;\n`;
             bindingIndex += 1;
         }
+        if (this.#meshUniforms.length) {
+            dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <uniform> mesh: Mesh;\n`;
+            bindingIndex += 1;
+        }
         this.#storage.forEach(storageItem => {
             const isInternal = internal === storageItem.internal;
             if (isInternal && (!storageItem.shaderType || storageItem.shaderType & shaderType)) {
@@ -3420,7 +4225,8 @@ class Points {
         this.#samplers.forEach(sampler => {
             const isInternal = internal === sampler.internal;
             if (isInternal && (!sampler.shaderType || sampler.shaderType & shaderType)) {
-                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${sampler.name}: sampler;\n`;
+                const T = sampler.descriptor.compare ? 'sampler_comparison' : 'sampler';
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${sampler.name}: ${T};\n`;
                 bindingIndex += 1;
             }
         });
@@ -3436,6 +4242,15 @@ class Points {
             if (isInternal && (!texture.shaderType || texture.shaderType & shaderType)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d<f32>;\n`;
                 bindingIndex += 1;
+            }
+        });
+        this.#texturesDepth2d.forEach(texture => {
+            const isInternal = internal === texture.internal;
+            if (isInternal && (!texture.shaderType || texture.shaderType & shaderType)) {
+                if (texture.renderPassIndex !== renderPassIndex) {
+                    dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_depth_2d;\n`;
+                    bindingIndex += 1;
+                }
             }
         });
         this.#textures2dArray.forEach(texture => {
@@ -3523,6 +4338,7 @@ class Points {
         let dynamicGroupBindingsCompute = '';
         let dynamicGroupBindingsFragment = '';
         let dynamicStructParams = '';
+        let dynamicStructMesh = '';
         this.#uniforms.forEach(u => {
             u.type = u.type || 'f32';
             dynamicStructParams += /*wgsl*/`${u.name}:${u.type}, \n\t`;
@@ -3530,9 +4346,18 @@ class Points {
         if (this.#uniforms.length) {
             dynamicStructParams = /*wgsl*/`struct Params {\n\t${dynamicStructParams}\n}\n`;
         }
+        this.#meshUniforms.forEach(u => {
+            u.type = u.type || 'f32';
+            dynamicStructMesh += /*wgsl*/`${u.name}:${u.type}, \n\t`;
+        });
+        if (this.#meshUniforms.length) {
+            dynamicStructMesh = /*wgsl*/`struct Mesh {\n\t${dynamicStructMesh}\n}\n`;
+        }
         this.#constants.forEach(c => {
             dynamicStructParams += /*wgsl*/`const ${c.name}:${c.structName} = ${c.value};\n`;
         });
+        dynamicStructParams += dynamicStructMesh;
+
         renderPass.index = index;
         renderPass.hasVertexShader && (dynamicGroupBindingsVertex += dynamicStructParams);
         renderPass.hasComputeShader && (dynamicGroupBindingsCompute += dynamicStructParams);
@@ -3608,6 +4433,7 @@ class Points {
         }
 
         this.#renderPasses.forEach(r => r.init?.(this));
+        this.#renderPasses.forEach(r => r.meshes.forEach(mesh => this.#setMeshUniform(mesh.name, mesh.id, 'u32')));
         this.#renderPasses.forEach(this.#compileRenderPass);
         this.#generateDataSize();
         //
@@ -3619,6 +4445,8 @@ class Points {
         }
         if (!adapter) { return false; }
         this.#device = await adapter.requestDevice();
+        console.log(this.#device.limits);
+
         this.#device.lost.then(info => console.log(info));
         if (this.#canvas !== null) this.#context = this.#canvas.getContext('webgpu');
         this.#presentationFormat = navigator.gpu.getPreferredCanvasFormat();
@@ -3629,23 +4457,18 @@ class Points {
                 this.#resizeCanvasToDefault();
             }
         }
-        this.#renderPassDescriptor = {
-            colorAttachments: [
-                {
-                    //view: textureView,
-                    clearValue: { r: 0.0, g: 0.0, b: 0.0, a: 1.0 },
-                    loadOp: 'clear',
-                    storeOp: 'store',
-                }
-            ],
-            depthStencilAttachment: {
-                //view: this.#depthTexture.createView(),
-                depthClearValue: 1.0,
-                depthLoadOp: 'clear',
-                depthStoreOp: 'store'
-            }
-        };
-        this.createScreen();
+
+        // this.#createVertexBuffer(new Float32Array(this.#vertexArray));
+        // TODO: this should be inside RenderPass, to not call vertexArray outside
+        this.#renderPasses.forEach(renderPass => {
+            this.createScreen(renderPass);
+            renderPass.vertexBufferInfo = new VertexBufferInfo(renderPass.vertexArray);
+            renderPass.vertexBuffer = this.#createAndMapBuffer(renderPass.vertexArray, GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST);
+        });
+
+        this.#createBuffers();
+        this.#createPipeline();
+
         return true;
     }
 
@@ -3659,17 +4482,17 @@ class Points {
             throw '`addPostRenderPass` should be called prior `Points.init()`';
         }
 
-        params ||= {};
+        renderPass.params = params || {};
 
-        const requiredNotFound = renderPass.required?.filter(i => !params[i] && !Number.isInteger(params[i]));
+        const requiredNotFound = renderPass.required?.filter(i => !renderPass.params[i] && !Number.isInteger(renderPass.params[i]));
 
         if (requiredNotFound?.length) {
             const paramsRequired = requiredNotFound.join(', ');
-            console.warn(`addRenderPass: parameters required: ${paramsRequired}`);
+            console.warn(`addRenderPass: (${renderPass.name}) parameters required: ${paramsRequired}`);
         }
 
         this.#postRenderPasses.push(renderPass);
-        renderPass.init(this, params);
+        renderPass.init(this);
     }
 
     /**
@@ -3683,7 +4506,10 @@ class Points {
      * Adds two triangles called points per number of columns and rows
      * @ignore
      */
-    createScreen() {
+    createScreen(renderPass) {
+        if (renderPass.vertexArray.length !== 0) {
+            return;
+        }
         const hasVertexAndFragmentShader = this.#renderPasses.some(renderPass => renderPass.hasVertexAndFragmentShader);
         if (hasVertexAndFragmentShader) {
             let colors = [
@@ -3695,13 +4521,10 @@ class Points {
             for (let xIndex = 0; xIndex < this.#numRows; xIndex++) {
                 for (let yIndex = 0; yIndex < this.#numColumns; yIndex++) {
                     const coordinate = new Coordinate(xIndex * this.#canvas.clientWidth / this.#numColumns, yIndex * this.#canvas.clientHeight / this.#numRows, .3);
-                    this.addPoint(coordinate, this.#canvas.clientWidth / this.#numColumns, this.#canvas.clientHeight / this.#numRows, colors);
+                    renderPass.addPoint(coordinate, this.#canvas.clientWidth / this.#numColumns, this.#canvas.clientHeight / this.#numRows, colors, this.#canvas);
                 }
             }
-            this.#createVertexBuffer(new Float32Array(this.#vertexArray));
         }
-        this.#createBuffers();
-        this.#createPipeline();
     }
     /**
      * @param {Float32Array} vertexArray
@@ -3756,11 +4579,17 @@ class Points {
         );
     }
 
-    #createUniformValues() {
-        const paramsDataSize = this.#dataSize.get('Params');
+    /**
+     *
+     * @param {Array} uniformsArray
+     * @param {String} structName
+     * @returns {{values:Float32Array, paramsDataSize:Object}}
+     */
+    #createUniformValues(uniformsArray, structName = 'Params') {
+        const paramsDataSize = this.#dataSize.get(structName);
         const paddings = paramsDataSize.paddings;
         // we check the paddings list and add 0's to just the ones that need it
-        const uniformsClone = structuredClone(this.#uniforms);
+        const uniformsClone = structuredClone(uniformsArray);
         let arrayValues = uniformsClone.map(v => {
             const padding = paddings[v.name];
             if (padding) {
@@ -3783,16 +4612,29 @@ class Points {
     }
 
     #createParametersUniforms() {
-        const { values, paramsDataSize } = this.#createUniformValues();
+        const { values, paramsDataSize } = this.#createUniformValues(this.#uniforms);
         this.#uniforms.buffer = this.#createAndMapBuffer(values, GPUBufferUsage.UNIFORM + GPUBufferUsage.COPY_DST, true, paramsDataSize.bytes);
+
+        if (this.#meshUniforms.length) {
+            const { values, paramsDataSize } = this.#createUniformValues(this.#meshUniforms);
+            this.#meshUniforms.buffer = this.#createAndMapBuffer(values, GPUBufferUsage.UNIFORM + GPUBufferUsage.COPY_DST, true, paramsDataSize.bytes);
+        }
     }
 
     /**
      * Updates all uniforms (for the update function)
      */
     #writeParametersUniforms() {
-        const { values } = this.#createUniformValues();
+        if (!this.#uniforms.buffer) {
+            console.error('An attempt to create uniforms has been made but no setUniform has been called. Maybe an update was called before a setUniform.');
+        }
+        const { values } = this.#createUniformValues(this.#uniforms);
         this.#writeBuffer(this.#uniforms.buffer, values);
+
+        if (this.#meshUniforms.length) {
+            const { values } = this.#createUniformValues(this.#meshUniforms);
+            this.#writeBuffer(this.#meshUniforms.buffer, values);
+        }
     }
 
     /**
@@ -3874,9 +4716,8 @@ class Points {
         //--------------------------------------------
         this.#textures2d.forEach(texture2d => {
             if (texture2d.imageTexture) {
-                let cubeTexture;
                 const imageBitmap = texture2d.imageTexture.bitmap;
-                cubeTexture = this.#device.createTexture({
+                const cubeTexture = this.#device.createTexture({
                     label: texture2d.name,
                     size: [imageBitmap.width, imageBitmap.height, 1],
                     format: 'rgba8unorm',
@@ -3897,6 +4738,9 @@ class Points {
                 this.#createTextureBindingToCopy(texture2d);
             }
         });
+        //--------------------------------------------
+        // this.#texturesDepth2d.forEach(texture2d => this.#createTextureDepth(texture2d));
+        this.#texturesDepth2d.forEach(texture2d => texture2d.texture = this.#depthTexture);
         //--------------------------------------------
         this.#textures2dArray.forEach(texture2dArray => {
             if (texture2dArray.imageTextures) {
@@ -3945,6 +4789,15 @@ class Points {
             size: this.#presentationSize,
             format: this.#presentationFormat, // if 'depth24plus' throws error
             usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
+        });
+    }
+
+    #createTextureDepth(texture2d) {
+        texture2d.texture = this.#device.createTexture({
+            label: texture2d.name,
+            size: this.#presentationSize,
+            format: 'depth32float',
+            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING,
         });
     }
 
@@ -4027,6 +4880,14 @@ class Points {
         // };
         this.#renderPasses.forEach(renderPass => {
             if (renderPass.hasVertexAndFragmentShader) {
+                let depthStencil = undefined;
+                if (renderPass.depthWriteEnabled) {
+                    depthStencil = {
+                        depthWriteEnabled: renderPass.depthWriteEnabled,
+                        depthCompare: 'less',
+                        format: 'depth32float',
+                    };
+                }
                 renderPass.renderPipeline = this.#device.createRenderPipeline({
                     label: `render pipeline: renderPass ${renderPass.index} (${renderPass.name})`,
                     // layout: 'auto',
@@ -4034,12 +4895,8 @@ class Points {
                         bindGroupLayouts: [renderPass.bindGroupLayoutVertex, renderPass.bindGroupLayoutRender]
                     }),
                     //primitive: { topology: 'triangle-strip' },
-                    primitive: { topology: 'triangle-list' },
-                    depthStencil: {
-                        depthWriteEnabled: this.#depthWriteEnabled,
-                        depthCompare: 'less',
-                        format: 'depth24plus',
-                    },
+                    primitive: { topology: renderPass.topology },
+                    depthStencil,
                     vertex: {
                         module: this.#device.createShaderModule({
                             code: renderPass.compiledShaders.vertex,
@@ -4047,25 +4904,37 @@ class Points {
                         entryPoint: 'main', // shader function name
                         buffers: [
                             {
-                                arrayStride: this.#vertexBufferInfo.vertexSize,
+                                arrayStride: renderPass.vertexBufferInfo.vertexSize,
                                 attributes: [
                                     {
                                         // position
                                         shaderLocation: 0,
-                                        offset: this.#vertexBufferInfo.vertexOffset,
+                                        offset: renderPass.vertexBufferInfo.vertexOffset,
                                         format: 'float32x4',
                                     },
                                     {
                                         // colors
                                         shaderLocation: 1,
-                                        offset: this.#vertexBufferInfo.colorOffset,
+                                        offset: renderPass.vertexBufferInfo.colorOffset,
                                         format: 'float32x4',
                                     },
                                     {
                                         // uv
                                         shaderLocation: 2,
-                                        offset: this.#vertexBufferInfo.uvOffset,
+                                        offset: renderPass.vertexBufferInfo.uvOffset,
                                         format: 'float32x2',
+                                    },
+                                    {
+                                        // normals
+                                        shaderLocation: 3,
+                                        offset: renderPass.vertexBufferInfo.normalOffset,
+                                        format: 'float32x3',
+                                    },
+                                    {
+                                        // id
+                                        shaderLocation: 4,
+                                        offset: renderPass.vertexBufferInfo.idOffset,
+                                        format: 'uint32',
                                     },
                                 ],
                             },
@@ -4133,6 +5002,21 @@ class Points {
                 }
             );
         }
+        if (this.#meshUniforms.length) {
+            entries.push(
+                {
+                    binding: bindingIndex++,
+                    resource: {
+                        label: 'uniform',
+                        buffer: this.#meshUniforms.buffer
+                    },
+                    buffer: {
+                        type: 'uniform'
+                    },
+                    // visibility
+                }
+            );
+        }
         this.#storage.forEach(storageItem => {
             const isInternal = internal === storageItem.internal;
             if (isInternal && (!storageItem.shaderType || storageItem.shaderType & shaderType)) {
@@ -4171,95 +5055,104 @@ class Points {
                 );
             }
         }
-        if (this.#samplers.length) {
-            this.#samplers.forEach(sampler => {
-                const isInternal = internal === sampler.internal;
-                if (isInternal && (!sampler.shaderType || sampler.shaderType & shaderType)) {
-                    entries.push(
-                        {
-                            binding: bindingIndex++,
-                            resource: sampler.resource,
-                            sampler: {
-                                type: 'filtering'
-                            }
+        this.#samplers.forEach(sampler => {
+            const isInternal = internal === sampler.internal;
+            if (isInternal && (!sampler.shaderType || sampler.shaderType & shaderType)) {
+                entries.push(
+                    {
+                        binding: bindingIndex++,
+                        resource: sampler.resource,
+                        sampler: {
+                            type: sampler.descriptor.compare ? 'comparison' : 'filtering'
                         }
-                    );
-                }
-            });
-        }
-        if (this.#texturesStorage2d.length) {
-            this.#texturesStorage2d.forEach(textureStorage2d => {
-                const isInternal = internal === textureStorage2d.internal;
-                if (isInternal && (!textureStorage2d.shaderType || textureStorage2d.shaderType & shaderType)) {
-                    entries.push(
-                        {
-                            label: 'texture storage 2d',
-                            binding: bindingIndex++,
-                            resource: textureStorage2d.texture.createView(),
-                            storageTexture: {
-                                type: 'write-only'
-                            }
+                    }
+                );
+            }
+        });
+        this.#texturesStorage2d.forEach(textureStorage2d => {
+            const isInternal = internal === textureStorage2d.internal;
+            if (isInternal && (!textureStorage2d.shaderType || textureStorage2d.shaderType & shaderType)) {
+                entries.push(
+                    {
+                        label: 'texture storage 2d',
+                        binding: bindingIndex++,
+                        resource: textureStorage2d.texture.createView(),
+                        storageTexture: {
+                            type: 'write-only'
                         }
-                    );
-                }
-            });
-        }
-        if (this.#textures2d.length) {
-            this.#textures2d.forEach(texture2d => {
+                    }
+                );
+            }
+        });
+        this.#textures2d.forEach(texture2d => {
+            const isInternal = internal === texture2d.internal;
+            if (isInternal && (!texture2d.shaderType || texture2d.shaderType & shaderType)) {
+                entries.push(
+                    {
+                        label: 'texture 2d',
+                        binding: bindingIndex++,
+                        resource: texture2d.texture.createView(),
+                        texture: {
+                            type: 'float'
+                        }
+                    }
+                );
+            }
+        });
+        this.#texturesDepth2d.forEach(texture2d => {
+            if (texture2d.renderPassIndex !== renderPassIndex) {
                 const isInternal = internal === texture2d.internal;
                 if (isInternal && (!texture2d.shaderType || texture2d.shaderType & shaderType)) {
                     entries.push(
                         {
-                            label: 'texture 2d',
+                            label: 'texture depth 2d',
                             binding: bindingIndex++,
-                            resource: texture2d.texture.createView(),
+                            resource: this.#depthTexture.createView(),
                             texture: {
-                                type: 'float'
+                                sampleType: 'depth',
+                                viewDimension: '2d',
+                                multisampled: false,
                             }
                         }
                     );
                 }
-            });
-        }
-        if (this.#textures2dArray.length) {
-            this.#textures2dArray.forEach(texture2dArray => {
-                const isInternal = internal === texture2dArray.internal;
-                if (isInternal && (!texture2dArray.shaderType || texture2dArray.shaderType & shaderType)) {
-                    entries.push(
-                        {
-                            label: 'texture 2d array',
-                            binding: bindingIndex++,
-                            resource: texture2dArray.texture.createView({
-                                dimension: '2d-array',
-                                baseArrayLayer: 0,
-                                arrayLayerCount: texture2dArray.imageTextures.bitmaps.length
-                            }),
-                            texture: {
-                                type: 'float',
-                                viewDimension: '2d-array'
-                            }
+            }
+        });
+        this.#textures2dArray.forEach(texture2dArray => {
+            const isInternal = internal === texture2dArray.internal;
+            if (isInternal && (!texture2dArray.shaderType || texture2dArray.shaderType & shaderType)) {
+                entries.push(
+                    {
+                        label: 'texture 2d array',
+                        binding: bindingIndex++,
+                        resource: texture2dArray.texture.createView({
+                            dimension: '2d-array',
+                            baseArrayLayer: 0,
+                            arrayLayerCount: texture2dArray.imageTextures.bitmaps.length
+                        }),
+                        texture: {
+                            type: 'float',
+                            viewDimension: '2d-array'
                         }
-                    );
-                }
-            });
-        }
-        if (this.#texturesExternal.length) {
-            this.#texturesExternal.forEach(externalTexture => {
-                const isInternal = internal === externalTexture.internal;
-                if (isInternal && (!externalTexture.shaderType || externalTexture.shaderType & shaderType)) {
-                    entries.push(
-                        {
-                            label: 'external texture',
-                            binding: bindingIndex++,
-                            resource: externalTexture.texture,
-                            externalTexture: {
-                                // type: 'write-only'
-                            }
+                    }
+                );
+            }
+        });
+        this.#texturesExternal.forEach(externalTexture => {
+            const isInternal = internal === externalTexture.internal;
+            if (isInternal && (!externalTexture.shaderType || externalTexture.shaderType & shaderType)) {
+                entries.push(
+                    {
+                        label: 'external texture',
+                        binding: bindingIndex++,
+                        resource: externalTexture.texture,
+                        externalTexture: {
+                            // type: 'write-only'
                         }
-                    );
-                }
-            });
-        }
+                    }
+                );
+            }
+        });
         // TODO: repeated entry blocks
         this.#bindingTextures.forEach(bindingTexture => {
             const { usesRenderPass } = bindingTexture;
@@ -4441,33 +5334,49 @@ class Points {
             }
         });
 
+        /**
+         * @type {GPUCommandEncoder}
+         */
         const commandEncoder = this.#device.createCommandEncoder();
 
         // ---------------------
         const swapChainTexture = this.#context.getCurrentTexture();
-        this.#renderPassDescriptor.colorAttachments[0].view = swapChainTexture.createView();
-        this.#renderPassDescriptor.depthStencilAttachment.view = this.#depthTexture.createView();
 
         this.#renderPasses.forEach(renderPass => {
             if (renderPass.hasVertexAndFragmentShader) {
                 this.#passRenderBindGroup(renderPass);
                 this.#passVertexBindGroup(renderPass);
-                const passEncoder = commandEncoder.beginRenderPass(this.#renderPassDescriptor);
+
+                renderPass.descriptor.colorAttachments[0].view = swapChainTexture.createView();
+                if (renderPass.depthWriteEnabled) {
+                    renderPass.descriptor.depthStencilAttachment.view = this.#depthTexture.createView();
+                    // renderPass.descriptor.depthStencilAttachment.view = this.#texturesDepth2d[0].texture.createView();
+                }
+
+                const passEncoder = commandEncoder.beginRenderPass(renderPass.descriptor);
                 passEncoder.setPipeline(renderPass.renderPipeline);
 
                 if (this.#uniforms.length) {
                     passEncoder.setBindGroup(0, renderPass.vertexBindGroup);
                     passEncoder.setBindGroup(1, renderPass.renderBindGroup);
                 }
-                passEncoder.setVertexBuffer(0, this.#buffer);
-                /**
-                 * vertexCount: number The number of vertices to draw
-                 * instanceCount?: number | undefined The number of instances to draw
-                 * firstVertex?: number | undefined Offset into the vertex buffers, in vertices, to begin drawing from
-                 * firstInstance?: number | undefined First instance to draw
-                 */
-                //passEncoder.draw(3, 1, 0, 0);
-                passEncoder.draw(this.#vertexBufferInfo.vertexCount, renderPass.instanceCount);
+                passEncoder.setVertexBuffer(0, renderPass.vertexBuffer);
+
+                // console.log(renderPass.meshes.find( mesh => mesh.instanceCount > 1));
+                // console.log(renderPass.meshes.some( mesh => mesh.instanceCount > 1));
+                // TODO: move this to renderPass because we can ask this just one time and have it as property
+                const isThereInstancing = renderPass.meshes.some(mesh => mesh.instanceCount > 1);
+                if (isThereInstancing) {
+                    let vertexOffset = 0;
+                    renderPass.meshes.forEach(mesh => {
+                        passEncoder.draw(mesh.verticesCount, mesh.instanceCount, vertexOffset, 0);
+                        vertexOffset = mesh.verticesCount;
+                    });
+                } else {
+                    // no instancing, regular draw with all the meshes
+                    passEncoder.draw(renderPass.vertexBufferInfo.vertexCount, 1);
+                }
+
                 passEncoder.end();
                 // Copy the rendering results from the swapchain into |texture2d.texture|.
                 this.#textures2d.forEach(texture2d => {
@@ -4556,42 +5465,6 @@ class Points {
         }
     }
 
-    #getWGSLCoordinate(value, side, invert = false) {
-        const direction = invert ? -1 : 1;
-        const p = value / side;
-        return (p * 2 - 1) * direction;
-    };
-    /**
-     * - **currently for internal use**<br>
-     * - **might be private in the future**<br>
-     * Adds two triangles as a quad called Point
-     * @param {Coordinate} coordinate `x` from 0 to canvas.width, `y` from 0 to canvas.height, `z` it goes from 0.0 to 1.0 and forward
-     * @param {Number} width point width
-     * @param {Number} height point height
-     * @param {Array<RGBAColor>} colors one color per corner
-     * @param {Boolean} useTexture
-     * @ignore
-     */
-    addPoint(coordinate, width, height, colors, useTexture = false) {
-        const { x, y, z } = coordinate;
-        const nx = this.#getWGSLCoordinate(x, this.#canvas.width);
-        const ny = this.#getWGSLCoordinate(y, this.#canvas.height, true);
-        const nz = z;
-        const nw = this.#getWGSLCoordinate(x + width, this.#canvas.width);
-        const nh = this.#getWGSLCoordinate(y + height, this.#canvas.height);
-        const { r: r0, g: g0, b: b0, a: a0 } = colors[0];
-        const { r: r1, g: g1, b: b1, a: a1 } = colors[1];
-        const { r: r2, g: g2, b: b2, a: a2 } = colors[2];
-        const { r: r3, g: g3, b: b3, a: a3 } = colors[3];
-        this.#vertexArray.push(
-            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * .5, (+ny + 1) * .5,// 0 top left
-            +nw, +ny, nz, 1, r1, g1, b1, a1, (+nw + 1) * .5, (+ny + 1) * .5,// 1 top right
-            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * .5, (-nh + 1) * .5,// 2 bottom right
-            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * .5, (+ny + 1) * .5,// 3 top left
-            +nx, -nh, nz, 1, r2, g2, b2, a2, (+nx + 1) * .5, (-nh + 1) * .5,// 4 bottom left
-            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * .5, (-nh + 1) * .5,// 5 bottom right
-        );
-    }
     /**
      * Reference to the canvas assigned in the constructor
      * @type {HTMLCanvasElement}
@@ -4661,13 +5534,10 @@ class Points {
         }
     }
 
-    /**
-     * Depth sort of elements is true by default.
-     * To allow transparency and a custom type of sort, set this as false;
-     * @param {Boolean} val
-     */
-    set depthWriteEnabled(val) {
-        this.#depthWriteEnabled = val;
+    destroy() {
+
+        this.#uniforms = new UniformsArray();
+        this.#meshUniforms = new UniformsArray();
     }
 }
 

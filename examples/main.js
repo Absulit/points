@@ -2,7 +2,7 @@
 import * as dat from 'datgui';
 import Points, { RenderPass } from 'points';
 import { shaderProjects } from './index_files/shader_projects.js';
-import { isMobile } from './utils.js';
+import { isMobile } from 'utils';
 import CanvasRecorder from './../src/CanvasRecorder.js';
 
 
@@ -44,7 +44,7 @@ stats.dom.style.display = 'inline-block';
 document.getElementsByClassName('right')[0].appendChild(stats.dom);
 
 const capturer = new CCapture({
-    format: 'webm',
+    format: 'jpg',
     //timeLimit: 10,
     verbose: true
 });
@@ -80,7 +80,7 @@ const shaderNames = {};
 const nav = document.getElementById('nav');
 
 const menuSectionNames = ['showcase', 'reference', 'animation', 'audio', 'color', 'debug', 'effects', 'image', 'math',
-    'noise2d', 'classicnoise2d', 'random', 'renderpasses', 'sdf', 'compute', 'raymarching'];
+    'noise2d', 'classicnoise2d', 'classicnoise3d', 'random', 'renderpasses', 'sdf', 'compute', 'raymarching', 'threed', 'mesh', 'glb'];
 
 const menuSections = [];
 
@@ -123,7 +123,7 @@ shaderProjects
         shaderNames[item.name] = index;
 
         menuSections.forEach(section => {
-            const {name, el} = section;
+            const { name, el } = section;
             if (item.tax.split(' ').find(t => t === name)) {
                 el.appendChild(createListItem(item, index));
             }
@@ -138,8 +138,14 @@ const descInfoEl = infoEl.querySelector('#info-desc');
 const authorInfoEl = infoEl.querySelector('#info-author');
 const authorLinkEl = infoEl.querySelector('#author-link');
 
+let animationFrameId = null;
+let requestToCancel = false;
+
 async function loadShaderByIndex(index) {
     console.clear();
+    if (animationFrameId) {
+        requestToCancel = true;
+    }
     if (index > shaderProjects.length) {
         index = 0;
     }
@@ -230,12 +236,12 @@ recordingOptions.forEach(recordingOption => {
 let points;
 
 let shaders;
-let animationFrameId = null;
+
 await loadShaderByURI();
 
 async function init() {
     if (animationFrameId) {
-        cancelAnimationFrame(animationFrameId);
+        requestToCancel = true;
     }
 
     canvas.width = 800;
@@ -249,6 +255,7 @@ async function init() {
     let renderPasses = shaders.renderPasses || [new RenderPass(shaders.vert, shaders.frag, shaders.compute)];
     // await points.addPostRenderPass(RenderPasses.GRAYSCALE);
     if (await points.init(renderPasses)) {
+        requestToCancel = false;
         points.fitWindow = isFitWindowData.isFitWindow;
         update();
     } else {
@@ -258,6 +265,10 @@ async function init() {
 }
 
 async function update() {
+    if (requestToCancel) {
+        cancelAnimationFrame(animationFrameId);
+        return
+    }
     stats.begin();
 
     // code here

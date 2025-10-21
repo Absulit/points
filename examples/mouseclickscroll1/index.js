@@ -5,7 +5,7 @@ const mouseclickscroll1 = {
     vert,
     frag,
     init: async points => {
-        points.setStorage('variables', 'Variable');
+        points.setStorage('variables', 'Variable', false, GPUShaderStage.FRAGMENT);
 
         const size = { x: 8, y: 22 };
         await points.setTextureString(

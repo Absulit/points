@@ -34,7 +34,7 @@ export const PI = /*wgsl*/`const PI = 3.14159265;`;
  * ${TAU}
  * let value = TAU / 3.5;
  */
-export const TAU = /*wgsl*/`const TAU = PI * 2;`;
+export const TAU = /*wgsl*/`const TAU = 6.2831853;`;
 /**
  * PHI is the Golden Ratio
  *
@@ -123,5 +123,55 @@ fn angle(p1:vec2f, p2:vec2f) -> f32 {
     let distance = length(delta);
     return atan2(delta.y, delta.x);
 }
+`;
 
+/**
+ * Creates a Matrix rotated in the X axis by an angle in radians.
+ * @type {String}
+ * @param {f32} rads angle
+ * @returns {mat4x4f}
+ */
+export const rotXAxis = /*wgsl*/`
+fn rotXAxis(rads:f32) -> mat4x4f {
+    return mat4x4f(
+        1.0, 0.0,          0.0,         0.0,
+        0.0, cos(rads),   -sin(rads),   0.0,
+        0.0, sin(rads),    cos(rads),   0.0,
+        0.0, 0.0,          0.0,         1.0
+    );
+}
+`;
+
+/**
+ * Creates a Matrix rotated in the Y axis by an angle in radians.
+ * @type {String}
+ * @param {f32} rads angle
+ * @returns {mat4x4f}
+ */
+export const rotYAxis = /*wgsl*/`
+fn rotYAxis(rads:f32) -> mat4x4f {
+    return mat4x4f(
+        cos(rads),   0.0, sin(rads),   0.0,
+        0.0,         1.0, 0.0,         0.0,
+       -sin(rads),   0.0, cos(rads),   0.0,
+        0.0,         0.0, 0.0,         1.0
+    );
+}
+`;
+
+/**
+ * Creates a Matrix rotated in the Z axis by an angle in radians.
+ * @type {String}
+ * @param {f32} rads angle
+ * @returns {mat4x4f}
+ */
+export const rotZAxis = /*wgsl*/`
+fn rotZAxis(rads:f32) -> mat4x4f {
+    return mat4x4f(
+        cos(rads),   -sin(rads),   0.0, 0.0,
+        sin(rads),    cos(rads),   0.0, 0.0,
+        0.0,          0.0,         1.0, 0.0,
+        0.0,          0.0,         0.0, 1.0
+    );
+}
 `;
