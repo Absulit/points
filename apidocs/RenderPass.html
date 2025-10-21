@@ -560,7 +560,7 @@ ids and names of the meshes</p>
 <dl class="details">
 <dt class="tag-source">Source:</dt>
 <dd class="tag-source">
-    <a href="RenderPass.js.html">RenderPass.js</a>, <a href="RenderPass.js.html#line1037">line 1037</a>
+    <a href="RenderPass.js.html">RenderPass.js</a>, <a href="RenderPass.js.html#line1065">line 1065</a>
 </dd>
 </dl>
 
@@ -922,7 +922,7 @@ Use class <a href="PrimitiveTopology.html">PrimitiveTopology</a></p>
 
             
 
-            <td class="description last"></td>
+            <td class="description last"><p>The name will show up in the <code>mesh</code> Uniform.</p></td>
         </tr>
 
     
@@ -1004,7 +1004,7 @@ Use class <a href="PrimitiveTopology.html">PrimitiveTopology</a></p>
 <dl class="details">
 <dt class="tag-source">Source:</dt>
 <dd class="tag-source">
-    <a href="RenderPass.js.html">RenderPass.js</a>, <a href="RenderPass.js.html#line624">line 624</a>
+    <a href="RenderPass.js.html">RenderPass.js</a>, <a href="RenderPass.js.html#line632">line 632</a>
 </dd>
 </dl>
 
@@ -1023,6 +1023,13 @@ Use class <a href="PrimitiveTopology.html">PrimitiveTopology</a></p>
 
 
 
+
+
+
+    <h5>Example</h5>
+    
+
+    <pre class="prettyprint lang-js"><code>renderPass.addCube('base_cube').instanceCount = NUMPARTICLES;</code></pre>
 
 
 
@@ -1097,7 +1104,7 @@ Use class <a href="PrimitiveTopology.html">PrimitiveTopology</a></p>
                 </td>
             
 
-            <td class="description last"></td>
+            <td class="description last"><p>The name will show up in the <code>mesh</code> Uniform.</p></td>
         </tr>
 
     
@@ -1277,7 +1284,7 @@ Use class <a href="PrimitiveTopology.html">PrimitiveTopology</a></p>
 <dl class="details">
 <dt class="tag-source">Source:</dt>
 <dd class="tag-source">
-    <a href="RenderPass.js.html">RenderPass.js</a>, <a href="RenderPass.js.html#line885">line 885</a>
+    <a href="RenderPass.js.html">RenderPass.js</a>, <a href="RenderPass.js.html#line904">line 904</a>
 </dd>
 </dl>
 
@@ -1313,6 +1320,13 @@ Use class <a href="PrimitiveTopology.html">PrimitiveTopology</a></p>
 
 
 
+
+
+
+    <h5>Example</h5>
+    
+
+    <pre class="prettyprint lang-js"><code>renderPass.addCylinder('myCylinder');</code></pre>
 
 
 
@@ -1381,7 +1395,7 @@ Use class <a href="PrimitiveTopology.html">PrimitiveTopology</a></p>
 
             
 
-            <td class="description last"></td>
+            <td class="description last"><p>The name will show up in the <code>mesh</code> Uniform.</p></td>
         </tr>
 
     
@@ -1485,7 +1499,7 @@ Use class <a href="PrimitiveTopology.html">PrimitiveTopology</a></p>
 <dl class="details">
 <dt class="tag-source">Source:</dt>
 <dd class="tag-source">
-    <a href="RenderPass.js.html">RenderPass.js</a>, <a href="RenderPass.js.html#line1004">line 1004</a>
+    <a href="RenderPass.js.html">RenderPass.js</a>, <a href="RenderPass.js.html#line1032">line 1032</a>
 </dd>
 </dl>
 
@@ -1504,6 +1518,13 @@ Use class <a href="PrimitiveTopology.html">PrimitiveTopology</a></p>
 
 
 
+
+
+
+    <h5>Example</h5>
+    
+
+    <pre class="prettyprint lang-js"><code>const url = '../models/monkey.glb';const data = await loadAndExtract(url);const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0]renderPass.addMesh('monkey', positions, colors, colorSize, uvs, normals, indices)renderPass.depthWriteEnabled = true;</code></pre>
 
 
 
@@ -1572,7 +1593,7 @@ Use class <a href="PrimitiveTopology.html">PrimitiveTopology</a></p>
 
             
 
-            <td class="description last"></td>
+            <td class="description last"><p>The name will show up in the <code>mesh</code> Uniform.</p></td>
         </tr>
 
     
@@ -1676,7 +1697,7 @@ Use class <a href="PrimitiveTopology.html">PrimitiveTopology</a></p>
 <dl class="details">
 <dt class="tag-source">Source:</dt>
 <dd class="tag-source">
-    <a href="RenderPass.js.html">RenderPass.js</a>, <a href="RenderPass.js.html#line552">line 552</a>
+    <a href="RenderPass.js.html">RenderPass.js</a>, <a href="RenderPass.js.html#line556">line 556</a>
 </dd>
 </dl>
 
@@ -1695,6 +1716,13 @@ Use class <a href="PrimitiveTopology.html">PrimitiveTopology</a></p>
 
 
 
+
+
+
+    <h5>Example</h5>
+    
+
+    <pre class="prettyprint lang-js"><code>renderPass.addPlane('plane', { x: 0, y: 0, z: 0 }, { width: 2, height: 2 }).instanceCount = NUMPARTICLES;</code></pre>
 
 
 
@@ -1769,7 +1797,7 @@ Use class <a href="PrimitiveTopology.html">PrimitiveTopology</a></p>
                 </td>
             
 
-            <td class="description last"></td>
+            <td class="description last"><p>The name will show up in the <code>mesh</code> Uniform.</p></td>
         </tr>
 
     
@@ -1921,7 +1949,7 @@ Use class <a href="PrimitiveTopology.html">PrimitiveTopology</a></p>
 <dl class="details">
 <dt class="tag-source">Source:</dt>
 <dd class="tag-source">
-    <a href="RenderPass.js.html">RenderPass.js</a>, <a href="RenderPass.js.html#line719">line 719</a>
+    <a href="RenderPass.js.html">RenderPass.js</a>, <a href="RenderPass.js.html#line731">line 731</a>
 </dd>
 </dl>
 
@@ -1940,6 +1968,13 @@ Use class <a href="PrimitiveTopology.html">PrimitiveTopology</a></p>
 
 
 
+
+
+
+    <h5>Example</h5>
+    
+
+    <pre class="prettyprint lang-js"><code>renderPass.addSphere('sphere').instanceCount = 100;</code></pre>
 
 
 
@@ -2014,7 +2049,7 @@ Use class <a href="PrimitiveTopology.html">PrimitiveTopology</a></p>
                 </td>
             
 
-            <td class="description last"></td>
+            <td class="description last"><p>The name will show up in the <code>mesh</code> Uniform.</p></td>
         </tr>
 
     
@@ -2194,7 +2229,7 @@ Use class <a href="PrimitiveTopology.html">PrimitiveTopology</a></p>
 <dl class="details">
 <dt class="tag-source">Source:</dt>
 <dd class="tag-source">
-    <a href="RenderPass.js.html">RenderPass.js</a>, <a href="RenderPass.js.html#line799">line 799</a>
+    <a href="RenderPass.js.html">RenderPass.js</a>, <a href="RenderPass.js.html#line815">line 815</a>
 </dd>
 </dl>
 
@@ -2230,6 +2265,13 @@ Use class <a href="PrimitiveTopology.html">PrimitiveTopology</a></p>
 
 
 
+
+
+
+    <h5>Example</h5>
+    
+
+    <pre class="prettyprint lang-js"><code>renderPass.addTorus('myTorus');</code></pre>
 
 
 
@@ -2367,7 +2409,7 @@ like <a href="Points.html#setUniform">Points#setUniform</a>  and others.</p></td
                     Documentation generated by <a rel="external" href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a><wbr>
                     using <a rel="external" href="https://github.com/amekusa/docolatte">Docolatte</a> theme
                     
-                    <wbr>on <time datetime="2025-10-19T20:55:47.721Z">Sun, 19 Oct 2025 20:55:47 GMT</time>
+                    <wbr>on <time datetime="2025-10-20T22:32:05.933Z">Mon, 20 Oct 2025 22:32:05 GMT</time>
                     
                 </p>
                 
