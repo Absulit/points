@@ -79,14 +79,14 @@ renderPass1.loadOp = 'load'; // to preserve first render pass output
 
 ## Lines, Points, Triangles (wireframe)
 
-To change the way the vertex primitives are displayed use the RenderPass#topology attribute along with the `PrimitiveTopology` class. You can display, triangles (by default), points and lines. Lines could be used to display a wireframe, but it depends on the vertices order.
+To change the way the vertex of any mesh are displayed use the RenderPass#topology attribute along with the `PrimitiveTopology` class. You can display, triangles (by default), points and lines. Lines could be used to display a wireframe, but it depends on the vertices order.
 
 ```js
 renderPass.topology = PrimitiveTopology.POINT_LIST;
 ```
 
 ## Instances
-If you plan to work with multiple items of the same mesh, you can use instances. By default, adding a new mesh sets its instances as `1`, and this is new draw call, so a good management of the instances is required for performance. Each method to add a mesh (plane, sphere, cube, torus, cylinder) and the same `addMesh` methods, return an object with a few properties but the most important is `instanceCount`, you can increase this value along with the amount of threads to be used in a Compute Shader (review the Particles examples) so each instance goes in par with the amount of threads available, this way a single process can run a mesh characteristics like rotation, position, color, etc.
+If you plan to work with multiple items of the same mesh, you can use instances. By default, adding a new mesh sets its instance amount as `1`, and this is new draw call, so a good management of the instances is required for performance. Each method to add a mesh (plane, sphere, cube, torus, cylinder) and the same `addMesh` methods, return an object with a few properties but the most important is `instanceCount`, you can increase this value along with the amount of threads to be used in a Compute Shader (review the Particles examples) so each instance goes in par with the amount of threads available, this way a single process can run a mesh characteristics like rotation, position, color, etc.
 
 ```js
 renderPass.addPlane(
