@@ -49,9 +49,19 @@ renderpass.addCube('cube0');
 renderpass.addCube('cube1', { x: 0, y: 1, z: 0 });
 ```
 
-Adding a custom mesh is a bit more complicated. Currently the POINTS library doesn't have a built it method to load any file format, this will go on your side. Currently I don't want to maintain something as huge as file format parsers, but you can use third parties as shown in the GLB demos in the examples page like the [GLB1](https://absulit.github.io/points/apidocs/RenderPass.html#glb1) which uses Don McCurdy [glTF-Transform](https://github.com/donmccurdy/glTF-Transform), which has a lot more that just parsing gltf/glb files. I use a `loadAndExtract` utilitarian method located in the `util.js` file in the repo, which is not included in the library, but can be used for the same purpose if required.
+Adding a custom mesh is a bit more complicated. Currently the POINTS library doesn't have a built in method to load any file formats, this will go on your side. Currently I don't want to maintain something as huge as file format parsers, but you can use third parties as shown in the GLB demos in the examples page like the [GLB1](https://absulit.github.io/points/apidocs/RenderPass.html#glb1) which uses Don McCurdy [glTF-Transform](https://github.com/donmccurdy/glTF-Transform), which has a lot more than just parsing gltf/glb files. I use a `loadAndExtract` utilitarian method located in the `util.js` file in the repo, which is not included in the library, but can be used for the same purpose if required.
 
 The method RenderPass#addMesh has a lot of parameters (vertices, colors, uvs, normals) that just expect the data to be ready to load, so technically can be used with any parser, but I've only tested glTF-Transform since gltf is the pinnacle of 3d web formats.
+
+
+```js
+// from examples/glb1/index.js
+const url = '../models/monkey.glb';
+const data = await loadAndExtract(url);
+const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0]
+renderPass.addMesh('monkey', positions, colors, colorSize, uvs, normals, indices)
+renderPass.depthWriteEnabled = true;
+```
 
 ## Clear or preserve previous RenderPass output
 
