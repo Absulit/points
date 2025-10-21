@@ -34,6 +34,26 @@ let time = params.time;
 
 ---
 
+## Mesh Uniform
+If you add a mesh to a RenderPass with one of the add* methods like `addCube`, `addSphere`, `addMesh`, the first parameter is a name, this name is an identifier inside the shaders with an id that can be compared with the id parameter in the vertex main function. This can be useful to add conditional behavior like rotating a specific mesh instance, or when the id value is passed from the vertex to the fragment shader, is useful to apply a different block of code and therefore paint the mesh differently.
+
+
+```rust
+// from examples/cube1/cube_renderpass/vert.js
+if(id == mesh.cube1){
+    angleZ = params.time * 0.1854;
+    angleY = params.time * 0.694222;
+    angleX = params.time * 0.4865;
+}
+
+// from examples/cube1/cube_renderpass/frag.js
+if(id == mesh.cube1){
+    baseColor = vec4(a*f, d*c*f, f, 1);
+}
+let finalColor = baseColor.rgb * diffuse;
+
+```
+
 ## Parameters in vert.js that go to frag.js
 
 ### vert.js
