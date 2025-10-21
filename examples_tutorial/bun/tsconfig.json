@@ -37,6 +37,7 @@
       "points/math": ["node_modules/@absulit/points/build/core/math"],
       "points/noise2d": ["node_modules/@absulit/points/build/core/noise2d"],
       "points/classicnoise2d": ["node_modules/@absulit/points/build/core/classicnoise2d"],
+      "points/classicnoise3d": ["node_modules/@absulit/points/build/core/classicnoise3d"],
       "points/random": ["node_modules/@absulit/points/build/core/random"],
       "points/sdf": ["node_modules/@absulit/points/build/core/sdf"]
     }

@@ -31,6 +31,7 @@
 
 x + (y * numColumns)
 index = x + (y * width) + (z * width * height) // for 3d
+index = x + (y * numColumns) + (z * numColumns * numRows)
 -----
 x = index % 3
 y = Math.floor(index / 3)

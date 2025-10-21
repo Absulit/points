@@ -25,6 +25,7 @@
         "build/core/audio.js",
         "build/core/cellular2d.js",
         "build/core/classicnoise2d.js",
+        "build/core/classicnoise3d.js",
         "build/core/color.js",
         "build/core/debug.js",
         "build/core/defaultConstants.js",

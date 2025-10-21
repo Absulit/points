@@ -11,12 +11,13 @@ Looking for an explanation on how to use POINTS? follow this link:
 
 ## Main classes:<br>
 ```js
-import Points { RenderPass, RenderPasses } from 'points';
+import Points { RenderPass, RenderPasses, PrimitiveTopology } from 'points';
 ```
 
 {@link Points|Points}<br>
 {@link RenderPass|RenderPass}<br>
 {@link RenderPasses|RenderPasses}<br>
+{@link PrimitiveTopology|PrimitiveTopology}<br>
 
 ## Submodules with helper wgsl functions:
 
@@ -33,5 +34,6 @@ import { fnusin } from 'points/animation';
 {@link module:points/math|points/math}<br>
 {@link module:points/noise2d|points/noise2d}<br>
 {@link module:points/classicnoise2d|points/classicnoise2d}<br>
+{@link module:points/classicnoise3d|points/classicnoise3d}<br>
 {@link module:points/random|points/random}<br>
 {@link module:points/sdf|points/sdf}<br>

@@ -14,6 +14,7 @@
       "points/math": ["./src/core/math.js"],
       "points/noise2d": ["./src/core/noise2d.js"],
       "points/classicnoise2d": ["./src/core/classicnoise2d.js"],
+      "points/classicnoise3d": ["./src/core/classicnoise3d.js"],
       "points/random": ["./src/core/random.js"],
       "points/renderpasses": ["./src/RenderPasses.js"],
       "points/sdf": ["./src/core/sdf.js"],
