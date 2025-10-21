@@ -4,8 +4,7 @@
 
 # Gallery
 
-https://github.com/Absulit/points/assets/233719/c7c164be-7b69-4277-a80c-ce458e751966
-
+https://github.com/user-attachments/assets/e61d8af1-a549-40bc-a790-221a3f8a41c7
 
 # Examples
 
