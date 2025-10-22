@@ -52,7 +52,7 @@ const base = {
 
         points.setSampler('imageSampler', null);
         await points.setTextureVideo('image', './../img/6982698-hd_1440_1080_25fps_800x800.mp4');
-        await points.setTextureImage('text', '../../img/inconsolata_regular_8x22.png');
+        await points.setTextureImage('text', './../../img/inconsolata_regular_8x22.png');
 
         points.setTexture2d('feedbackTexture', true);
         points.setTexture2d('feedbackTexture1', true, null, 1);
