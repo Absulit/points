@@ -1622,22 +1622,6 @@ class Points {
         });
     }
 
-    #createComputeBindGroup() {
-        this.#renderPasses.forEach((renderPass, index) => {
-            if (renderPass.hasComputeShader) {
-                const entries = this.#createEntries(GPUShaderStage.COMPUTE, renderPass);
-                if (entries.length) {
-                    renderPass.bindGroupLayoutCompute = this.#device.createBindGroupLayout({ entries });
-                    renderPass.computeBindGroup = this.#device.createBindGroup({
-                        label: `_createComputeBindGroup 0 - ${index}`,
-                        layout: renderPass.bindGroupLayoutCompute,
-                        entries: entries
-                    });
-                }
-            }
-        });
-    }
-
     /**
      * This is a slimmed down version of {@link #createComputeBindGroup}.
      * We don't create the bindingGroupLayout since it already exists.
@@ -2035,6 +2019,22 @@ class Points {
         // console.log(shaderType, entries);debugger
 
         return entries;
+    }
+
+    #createComputeBindGroup() {
+        this.#renderPasses.forEach((renderPass, index) => {
+            if (renderPass.hasComputeShader) {
+                const entries = this.#createEntries(GPUShaderStage.COMPUTE, renderPass);
+                if (entries.length) {
+                    renderPass.bindGroupLayoutCompute = this.#device.createBindGroupLayout({ entries });
+                    renderPass.computeBindGroup = this.#device.createBindGroup({
+                        label: `_createComputeBindGroup 0 - ${index}`,
+                        layout: renderPass.bindGroupLayoutCompute,
+                        entries: entries
+                    });
+                }
+            }
+        });
     }
 
     #createVertexBindGroup() {
