@@ -597,6 +597,7 @@ class Points {
         }
         const a = texture2d_A.texture;
         const cubeTexture = this.#device.createTexture({
+            label: '_cubeTexture',
             size: [a.width, a.height, 1],
             format: 'rgba8unorm',
             usage:
@@ -635,6 +636,7 @@ class Points {
             }
             texture2dToUpdate.imageTexture.bitmap = imageBitmap;
             const cubeTexture = this.#device.createTexture({
+                label: '_cubeTexture setTextureImage',
                 size: [imageBitmap.width, imageBitmap.height, 1],
                 format: 'rgba8unorm',
                 usage:
@@ -1520,6 +1522,7 @@ class Points {
         //--------------------------------------------
         this.#texturesStorage2d.forEach(textureStorage2d => {
             textureStorage2d.texture = this.#device.createTexture({
+                label: `_createBuffers, texturesStorage2d: ${textureStorage2d.name}`,
                 size: this.#presentationSize,
                 format: 'rgba8unorm',
                 usage: GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
@@ -1530,7 +1533,7 @@ class Points {
             if (texture2d.imageTexture) {
                 const imageBitmap = texture2d.imageTexture.bitmap;
                 const cubeTexture = this.#device.createTexture({
-                    label: texture2d.name,
+                    label: `_createBuffers, textures2d: ${texture2d.name}`,
                     size: [imageBitmap.width, imageBitmap.height, 1],
                     format: 'rgba8unorm',
                     usage:
@@ -1559,6 +1562,7 @@ class Points {
                 let cubeTexture;
                 const imageBitmaps = texture2dArray.imageTextures.bitmaps;
                 cubeTexture = this.#device.createTexture({
+                    label: `_createBuffers cubeTexture texture2dArray: ${texture2dArray.name}`,
                     size: [imageBitmaps[0].width, imageBitmaps[0].height, imageBitmaps.length],
                     format: 'rgba8unorm',
                     usage:
@@ -1582,12 +1586,14 @@ class Points {
         //--------------------------------------------
         this.#texturesExternal.forEach(externalTexture => {
             externalTexture.texture = this.#device.importExternalTexture({
+                label: `_createBuffers, externalTexture: ${externalTexture.name}`,
                 source: externalTexture.video
             });
         });
         //--------------------------------------------
         this.#bindingTextures.forEach(bindingTexture => {
             bindingTexture.texture = this.#device.createTexture({
+                label: `_createBuffers, bindingTexture: ${bindingTexture.name}`,
                 size: bindingTexture.size || this.#presentationSize,
                 format: 'rgba8unorm',
                 usage: GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
@@ -2112,6 +2118,7 @@ class Points {
         // END AUDIO
         this.#texturesExternal.forEach(externalTexture => {
             externalTexture.texture = this.#device.importExternalTexture({
+                label: `update, externalTexture: ${externalTexture.name}`,
                 source: externalTexture.video
             });
             if ('requestVideoFrameCallback' in externalTexture.video) {
