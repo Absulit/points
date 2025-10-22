@@ -2133,46 +2133,51 @@ class Points {
                 this.#passBindGroup(renderPass, GPUShaderStage.VERTEX);
 
 
-                const bundleEncoderDescriptor = {
-                    colorFormats: ['bgra8unorm'],
-                    sampleCount: 1
-                }
-
                 renderPass.descriptor.colorAttachments[0].view = swapChainTexture.createView();
                 if (renderPass.depthWriteEnabled) {
                     renderPass.descriptor.depthStencilAttachment.view = this.#depthTexture.createView();
-                    // renderPass.descriptor.depthStencilAttachment.view = this.#texturesDepth2d[0].texture.createView();
-                    bundleEncoderDescriptor.depthStencilFormat = 'depth32float'
                 }
 
-                const bundleEncoder = this.#device.createRenderBundleEncoder(bundleEncoderDescriptor);
+                if (!renderPass.bundle) {
+                    const bundleEncoderDescriptor = {
+                        colorFormats: ['bgra8unorm'],
+                        sampleCount: 1
+                    }
 
-                bundleEncoder.setPipeline(renderPass.renderPipeline);
 
-                if (this.#uniforms.length) {
-                    bundleEncoder.setBindGroup(0, renderPass.vertexBindGroup);
-                    bundleEncoder.setBindGroup(1, renderPass.renderBindGroup);
+                    if (renderPass.depthWriteEnabled) {
+                        bundleEncoderDescriptor.depthStencilFormat = 'depth32float'
+                    }
+
+                    const bundleEncoder = this.#device.createRenderBundleEncoder(bundleEncoderDescriptor);
+
+                    bundleEncoder.setPipeline(renderPass.renderPipeline);
+
+                    if (this.#uniforms.length) {
+                        bundleEncoder.setBindGroup(0, renderPass.vertexBindGroup);
+                        bundleEncoder.setBindGroup(1, renderPass.renderBindGroup);
+                    }
+                    bundleEncoder.setVertexBuffer(0, renderPass.vertexBuffer);
+
+                    // console.log(renderPass.meshes.find( mesh => mesh.instanceCount > 1));
+                    // console.log(renderPass.meshes.some( mesh => mesh.instanceCount > 1));
+                    // TODO: move this to renderPass because we can ask this just one time and have it as property
+                    const isThereInstancing = renderPass.meshes.some(mesh => mesh.instanceCount > 1);
+                    if (isThereInstancing) {
+                        let vertexOffset = 0;
+                        renderPass.meshes.forEach(mesh => {
+                            bundleEncoder.draw(mesh.verticesCount, mesh.instanceCount, vertexOffset, 0);
+                            vertexOffset = mesh.verticesCount;
+                        })
+                    } else {
+                        // no instancing, regular draw with all the meshes
+                        bundleEncoder.draw(renderPass.vertexBufferInfo.vertexCount, 1);
+                    }
+                    renderPass.bundle = bundleEncoder.finish();
                 }
-                bundleEncoder.setVertexBuffer(0, renderPass.vertexBuffer);
-
-                // console.log(renderPass.meshes.find( mesh => mesh.instanceCount > 1));
-                // console.log(renderPass.meshes.some( mesh => mesh.instanceCount > 1));
-                // TODO: move this to renderPass because we can ask this just one time and have it as property
-                const isThereInstancing = renderPass.meshes.some(mesh => mesh.instanceCount > 1);
-                if (isThereInstancing) {
-                    let vertexOffset = 0;
-                    renderPass.meshes.forEach(mesh => {
-                        bundleEncoder.draw(mesh.verticesCount, mesh.instanceCount, vertexOffset, 0);
-                        vertexOffset = mesh.verticesCount;
-                    })
-                } else {
-                    // no instancing, regular draw with all the meshes
-                    bundleEncoder.draw(renderPass.vertexBufferInfo.vertexCount, 1);
-                }
-                const bundle = bundleEncoder.finish();
 
                 const passEncoder = commandEncoder.beginRenderPass(renderPass.descriptor);
-                passEncoder.executeBundles([bundle]);
+                passEncoder.executeBundles([renderPass.bundle]);
                 passEncoder.end();
 
 
