@@ -16,7 +16,7 @@ const base = {
         let loop = true;
         audio = points.setAudio(
             'audio',
-            './../../audio/cognitive_dissonance.mp3',
+            './../audio/cognitive_dissonance.mp3',
             volume,
             loop,
             false
