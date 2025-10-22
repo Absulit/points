@@ -2228,6 +2228,38 @@ class Points {
             }
         });
 
+
+        // let descriptor0 = null;
+        // const group0 = this.#renderPasses.map(renderPass => {
+        //     if(renderPass.depthWriteEnabled){
+        //         descriptor0 = renderPass.descriptor
+        //         return renderPass.bundle
+        //     }
+        // })
+        // if(descriptor0){
+        //     const passEncoder0 = commandEncoder.beginRenderPass(descriptor0);
+        //     passEncoder0.executeBundles(group0);
+        //     passEncoder0.end();
+        // }
+
+
+        // let descriptor1 = null;
+        // const group1 = this.#renderPasses.map(renderPass => {
+        //     if(!renderPass.depthWriteEnabled){
+        //         descriptor1 = renderPass.descriptor
+        //         return renderPass.bundle
+        //     }
+        // })
+        // if(descriptor1){
+        //     const passEncoder1 = commandEncoder.beginRenderPass(descriptor1);
+        //     passEncoder1.executeBundles(group1);
+        //     passEncoder1.end();
+        // }
+
+
+
+
+
         this.#readStorage.forEach(readStorageItem => {
             let storageItem = this.#storage.find(storageItem => storageItem.name === readStorageItem.name);
             commandEncoder.copyBufferToBuffer(
