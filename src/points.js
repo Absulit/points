@@ -2132,20 +2132,28 @@ class Points {
                 this.#passBindGroup(renderPass, GPUShaderStage.FRAGMENT);
                 this.#passBindGroup(renderPass, GPUShaderStage.VERTEX);
 
+
+                const bundleEncoderDescriptor = {
+                    colorFormats: ['bgra8unorm'],
+                    sampleCount: 1
+                }
+
                 renderPass.descriptor.colorAttachments[0].view = swapChainTexture.createView();
                 if (renderPass.depthWriteEnabled) {
                     renderPass.descriptor.depthStencilAttachment.view = this.#depthTexture.createView();
                     // renderPass.descriptor.depthStencilAttachment.view = this.#texturesDepth2d[0].texture.createView();
+                    bundleEncoderDescriptor.depthStencilFormat = 'depth32float'
                 }
 
-                const passEncoder = commandEncoder.beginRenderPass(renderPass.descriptor);
-                passEncoder.setPipeline(renderPass.renderPipeline);
+                const bundleEncoder = this.#device.createRenderBundleEncoder(bundleEncoderDescriptor);
+
+                bundleEncoder.setPipeline(renderPass.renderPipeline);
 
                 if (this.#uniforms.length) {
-                    passEncoder.setBindGroup(0, renderPass.vertexBindGroup);
-                    passEncoder.setBindGroup(1, renderPass.renderBindGroup);
+                    bundleEncoder.setBindGroup(0, renderPass.vertexBindGroup);
+                    bundleEncoder.setBindGroup(1, renderPass.renderBindGroup);
                 }
-                passEncoder.setVertexBuffer(0, renderPass.vertexBuffer);
+                bundleEncoder.setVertexBuffer(0, renderPass.vertexBuffer);
 
                 // console.log(renderPass.meshes.find( mesh => mesh.instanceCount > 1));
                 // console.log(renderPass.meshes.some( mesh => mesh.instanceCount > 1));
@@ -2154,15 +2162,20 @@ class Points {
                 if (isThereInstancing) {
                     let vertexOffset = 0;
                     renderPass.meshes.forEach(mesh => {
-                        passEncoder.draw(mesh.verticesCount, mesh.instanceCount, vertexOffset, 0);
+                        bundleEncoder.draw(mesh.verticesCount, mesh.instanceCount, vertexOffset, 0);
                         vertexOffset = mesh.verticesCount;
                     })
                 } else {
                     // no instancing, regular draw with all the meshes
-                    passEncoder.draw(renderPass.vertexBufferInfo.vertexCount, 1);
+                    bundleEncoder.draw(renderPass.vertexBufferInfo.vertexCount, 1);
                 }
+                const bundle = bundleEncoder.finish();
 
+                const passEncoder = commandEncoder.beginRenderPass(renderPass.descriptor);
+                passEncoder.executeBundles([bundle]);
                 passEncoder.end();
+
+
                 // Copy the rendering results from the swapchain into |texture2d.texture|.
                 this.#textures2d.forEach(texture2d => {
                     if (texture2d.renderPassIndex === renderPass.index || !texture2d.renderPassIndex) {
@@ -2257,6 +2270,10 @@ class Points {
     get canvas() {
         return this.#canvas;
     }
+
+    /**
+     * @type {GPUDevice}
+     */
     get device() {
         return this.#device;
     }
