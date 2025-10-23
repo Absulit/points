@@ -1,6 +1,7 @@
 import { PI, TAU } from 'points/math';
 import { structs } from '../structs.js';
 import { rand } from 'points/random';
+import { pnoise3 } from 'points/classicnoise3d';
 
 const compute = /*wgsl*/`
 
@@ -8,6 +9,7 @@ ${structs}
 ${PI}
 ${TAU}
 ${rand}
+${pnoise3}
 
 const WIDTH = 15i;
 const HEIGHT = 15i;
@@ -21,6 +23,18 @@ const MAXSPEED = 4.;
 
 fn angleToVector(rads:f32) -> vec2f {
     return vec2f(cos(rads), sin(rads));
+}
+
+fn turbulence(p:vec3f) -> f32 {
+    let w = 100.0;
+    var t = -.5;
+
+    for (var f:f32 = 1; f <= 10; f+=1.){
+        let power = pow( 2.0, f );
+        t += abs(pnoise3(vec3(power * p), vec3(10., 10., 10.)) / power);
+    }
+
+    return t;
 }
 
 @compute @workgroup_size(THREADS_X, THREADS_Y, THREADS_Z)
@@ -50,7 +64,7 @@ fn main(
 
         let angle_intensity = .005;
 
-        particle.position = vec3f();
+        particle.position = vec3f(0,-.5,0);
         particle.color = vec4f(rand_seed, rand_seed.y, 1);
         particle.scale = vec3f();
         particle.rotation = vec3f(rand_seed, rand_seed.y);
@@ -75,11 +89,15 @@ fn main(
         particle.factor = scaleFactor;
         particle.scale = vec3f(mix(.4, .01, 1 - scaleFactor * (1-scaleFactor) * 2));
 
+        let b = 5.0 * pnoise3(0.5 * particle.position.xyz, vec3(100.));
+        let noise = turbulence(.5 * particle.position.xyz + params.time / 3.0) * -1;
         particle.position += vec3f(
-            particle.angle.x,
-            params.delta,
-            particle.angle.y
+            particle.angle.x * b,
+            params.delta * noise,
+            particle.angle.y * b
         ) * particle.speed;
+
+
 
         if(particle.position.y > MAXHEIGHT){
             particle.init = 0;

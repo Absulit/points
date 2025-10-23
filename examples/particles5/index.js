@@ -8,7 +8,7 @@ const options = {
     lambert: false,
 }
 
-const WORKGROUP_X = 2; // 1024
+const WORKGROUP_X = 1024; // 1024
 const WORKGROUP_Y = 2;
 const WORKGROUP_Z = 2;
 
@@ -24,7 +24,7 @@ cube_renderpass.depthWriteEnabled = true;
 cube_renderpass.addPlane(
     'base_cube',
     { x: 0, y: 0, z: 0 },
-    { width: .1, height: .1 }
+    { width: .1, height: .1, depth: .1 }
 ).instanceCount = NUMPARTICLES;
 
 
