@@ -1645,7 +1645,7 @@ class Points {
     }
 
     #createPipeline() {
-        this.#createComputeBindGroup();
+        this.#createBindGroup(GPUShaderStage.COMPUTE);
         this.#renderPasses.forEach((renderPass, index) => {
             if (renderPass.hasComputeShader) {
                 renderPass.computePipeline = this.#device.createComputePipeline({
@@ -1664,16 +1664,9 @@ class Points {
         });
 
         //--------------------------------------
-        this.#createVertexBindGroup();
-        this.#createRenderBindGroup();
-        //this.createVertexBuffer(new Float32Array(this.#vertexArray));
-        // enum GPUPrimitiveTopology {
-        //     'point-list',
-        //     'line-list',
-        //     'line-strip',
-        //     'triangle-list',
-        //     'triangle-strip',
-        // };
+        this.#createBindGroup(GPUShaderStage.VERTEX);
+        this.#createBindGroup(GPUShaderStage.FRAGMENT);
+
         this.#renderPasses.forEach(renderPass => {
             if (renderPass.hasVertexAndFragmentShader) {
                 let depthStencil = undefined;
@@ -2061,6 +2054,38 @@ class Points {
                     layout: renderPass.bindGroupLayoutRender,
                     entries
                 });
+            }
+        });
+    }
+
+    #createBindGroup(shaderType) {
+        this.#renderPasses.forEach((renderPass, index) => {
+            const hasComputeShader = (shaderType === GPUShaderStage.COMPUTE) && renderPass.hasComputeShader;
+            const hasVertexShader = (shaderType === GPUShaderStage.VERTEX) && renderPass.hasVertexShader;
+            const hasFragmentShader = (shaderType === GPUShaderStage.FRAGMENT) && renderPass.hasFragmentShader;
+
+            const entries = this.#createEntries(shaderType, renderPass);
+
+            if (entries.length) {
+                const bindGroupLayout = this.#device.createBindGroupLayout({ entries });
+                const bindGroup = this.#device.createBindGroup({
+                    label: `_createBindGroup ${shaderType} - ${index}`,
+                    layout: bindGroupLayout,
+                    entries: entries
+                });
+
+                if (hasComputeShader) {
+                    renderPass.bindGroupLayoutCompute = bindGroupLayout;
+                    renderPass.computeBindGroup = bindGroup
+                }
+                if (hasVertexShader) {
+                    renderPass.bindGroupLayoutVertex = bindGroupLayout;
+                    renderPass.vertexBindGroup = bindGroup
+                }
+                if (hasFragmentShader) {
+                    renderPass.bindGroupLayoutRender = bindGroupLayout;
+                    renderPass.renderBindGroup = bindGroup
+                }
             }
         });
     }
