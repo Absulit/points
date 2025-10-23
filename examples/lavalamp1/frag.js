@@ -102,7 +102,7 @@ fn main(
     var i = 0;
     var rayValue = 0.;
     var d = RayInfo();
-    for (; i < 80; i++) {
+    // for (; i < 80; i++) {
     for (; i < 32; i++) {
         let p = ro + rd * t; // position along the ray
         d = map(p, f32(i)); // current distance to the scene
