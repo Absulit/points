@@ -85,21 +85,25 @@ fn main(
 
         particle.rotation += vec3f(params.delta * dir2, params.delta * dir, params.delta * dir2);
 
-        let scaleFactor = particle.position.y / MAXHEIGHT;
+        let b = 5.0 * pnoise3(0.5 * particle.position.xyz, vec3(100.));
+        let noise = turbulence(.5 * particle.position.xyz + params.time / 3.0) * -1;
+
+        let localMaxHeight = MAXHEIGHT + noise * 10;
+
+        let scaleFactor = particle.position.y / localMaxHeight;
         particle.factor = scaleFactor;
         particle.scale = vec3f(mix(.4, .01, 1 - scaleFactor * (1-scaleFactor) * 2));
 
-        let b = 5.0 * pnoise3(0.5 * particle.position.xyz, vec3(100.));
-        let noise = turbulence(.5 * particle.position.xyz + params.time / 3.0) * -1;
+
         particle.position += vec3f(
-            particle.angle.x * b,
+            particle.angle.x + b * .01,
             params.delta * noise,
-            particle.angle.y * b
-        ) * particle.speed;
+            particle.angle.y + b * .01
+        ) * particle.speed * params.speed;
 
 
 
-        if(particle.position.y > MAXHEIGHT){
+        if(particle.position.y > localMaxHeight){
             particle.init = 0;
         }
     }

@@ -6,6 +6,7 @@ import compute from './cube_renderpass/compute.js';
 
 const options = {
     lambert: false,
+    speed: 1,
 }
 
 const WORKGROUP_X = 1024; // 1024
@@ -80,6 +81,9 @@ const base = {
         points.setUniform('lambert', options.lambert);
         folder.add(options, 'lambert').name('lambert');
 
+        points.setUniform('speed', options.speed);
+        folder.add(options, 'speed',0,1,.0001).name('speed');
+
         folder.open();
     },
     /**
@@ -98,6 +102,7 @@ const base = {
             ]
         )
         points.setUniform('lambert', options.lambert);
+        points.setUniform('speed', options.speed);
     }
 }
 
