@@ -1623,8 +1623,8 @@ class Points {
     }
 
     #createPipeline() {
-        this.#createBindGroup(GPUShaderStage.COMPUTE);
         this.#renderPasses.forEach((renderPass, index) => {
+            this.#createBindGroup(renderPass, GPUShaderStage.COMPUTE);
             if (renderPass.hasComputeShader) {
                 renderPass.computePipeline = this.#device.createComputePipeline({
                     layout: this.#device.createPipelineLayout({
@@ -1642,10 +1642,11 @@ class Points {
         });
 
         //--------------------------------------
-        this.#createBindGroup(GPUShaderStage.VERTEX);
-        this.#createBindGroup(GPUShaderStage.FRAGMENT);
 
         this.#renderPasses.forEach(renderPass => {
+            this.#createBindGroup(renderPass, GPUShaderStage.VERTEX);
+            this.#createBindGroup(renderPass, GPUShaderStage.FRAGMENT);
+
             if (renderPass.hasVertexAndFragmentShader) {
                 let depthStencil = undefined;
                 if (renderPass.depthWriteEnabled) {
@@ -2041,38 +2042,37 @@ class Points {
      * This might seem a bit more complicated but I wanted to have everything
      * in a single method to avoid duplication and possible bifurcations without
      * me knowing.
+     * @param {RenderPass} renderPass
      * @param {GPUShaderStage} shaderType
      */
-    #createBindGroup(shaderType) {
-        this.#renderPasses.forEach((renderPass, index) => {
-            const hasComputeShader = (shaderType === GPUShaderStage.COMPUTE) && renderPass.hasComputeShader;
-            const hasVertexShader = (shaderType === GPUShaderStage.VERTEX) && renderPass.hasVertexShader;
-            const hasFragmentShader = (shaderType === GPUShaderStage.FRAGMENT) && renderPass.hasFragmentShader;
+    #createBindGroup(renderPass, shaderType) {
+        const hasComputeShader = (shaderType === GPUShaderStage.COMPUTE) && renderPass.hasComputeShader;
+        const hasVertexShader = (shaderType === GPUShaderStage.VERTEX) && renderPass.hasVertexShader;
+        const hasFragmentShader = (shaderType === GPUShaderStage.FRAGMENT) && renderPass.hasFragmentShader;
 
-            const entries = this.#createEntries(shaderType, renderPass);
+        const entries = this.#createEntries(shaderType, renderPass);
 
-            if (entries.length) {
-                const bindGroupLayout = this.#device.createBindGroupLayout({ entries });
-                const bindGroup = this.#device.createBindGroup({
-                    label: `_createBindGroup ${shaderType} - ${index}`,
-                    layout: bindGroupLayout,
-                    entries: entries
-                });
+        if (entries.length) {
+            const bindGroupLayout = this.#device.createBindGroupLayout({ entries });
+            const bindGroup = this.#device.createBindGroup({
+                label: `_createBindGroup ${shaderType} - ${renderPass.name}`,
+                layout: bindGroupLayout,
+                entries: entries
+            });
 
-                if (hasComputeShader) {
-                    renderPass.bindGroupLayoutCompute = bindGroupLayout;
-                    renderPass.computeBindGroup = bindGroup
-                }
-                if (hasVertexShader) {
-                    renderPass.bindGroupLayoutVertex = bindGroupLayout;
-                    renderPass.vertexBindGroup = bindGroup
-                }
-                if (hasFragmentShader) {
-                    renderPass.bindGroupLayoutRender = bindGroupLayout;
-                    renderPass.renderBindGroup = bindGroup
-                }
+            if (hasComputeShader) {
+                renderPass.bindGroupLayoutCompute = bindGroupLayout;
+                renderPass.computeBindGroup = bindGroup
             }
-        });
+            if (hasVertexShader) {
+                renderPass.bindGroupLayoutVertex = bindGroupLayout;
+                renderPass.vertexBindGroup = bindGroup
+            }
+            if (hasFragmentShader) {
+                renderPass.bindGroupLayoutRender = bindGroupLayout;
+                renderPass.renderBindGroup = bindGroup
+            }
+        }
     }
 
     /**
@@ -2303,7 +2303,7 @@ class Points {
                 this.#texturesToCopy = [];
             }
             if (renderPass.hasComputeShader) {
-                this.#passBindGroup(renderPass, GPUShaderStage.COMPUTE)
+                this.#passBindGroup(renderPass, GPUShaderStage.COMPUTE);
 
                 const passEncoder = commandEncoder.beginComputePass();
                 passEncoder.setPipeline(renderPass.computePipeline);
