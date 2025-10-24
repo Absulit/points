@@ -92,7 +92,7 @@ fn main(
 
         let scaleFactor = particle.position.y / localMaxHeight;
         particle.factor = scaleFactor;
-        particle.scale = vec3f(mix(.4, .01, 1 - scaleFactor * (1-scaleFactor) * 2));
+        particle.scale = vec3f(mix(.4, .01, 1 - scaleFactor * (1-scaleFactor) * 2)) * params.scale;
 
 
         particle.position += vec3f(

@@ -10,6 +10,10 @@ ${sdfCircle}
 fn main(
     input: CustomFragment
 ) -> @location(0) vec4f {
+    let c = sdfCircle(vec2f(.5), .5, .0, input.uv);
+    if (c < 0.5) {
+        discard;
+    }
 
     let depth = clamp(input.depth.r * 8, 0, 1);
     let baseColor = vec4f(input.color.rgb * (1-depth), 1);
@@ -26,9 +30,8 @@ fn main(
         finalColor = baseColor.rgb;
     }
 
-    let c = sdfCircle(vec2f(.5), .5, .0, input.uv);
+    let circleColor = vec4f(finalColor * c, c);
 
-    let circleColor = vec4f(finalColor * c, baseColor.a * c);
 
     return circleColor;
 }

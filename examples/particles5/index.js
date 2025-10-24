@@ -7,6 +7,7 @@ import compute from './cube_renderpass/compute.js';
 const options = {
     lambert: false,
     speed: 1,
+    scale: .1,
 }
 
 const WORKGROUP_X = 1024; // 1024
@@ -21,11 +22,13 @@ const NUMPARTICLES = WORKGROUP_X * WORKGROUP_Y * WORKGROUP_Z * THREADS_X * THREA
 console.log('NUMPARTICLES: ', NUMPARTICLES);
 
 const cube_renderpass = new RenderPass(vert, frag, compute, WORKGROUP_X, WORKGROUP_Y, WORKGROUP_Z);
+cube_renderpass.clearValue = {r:0,g:0,b:0,a:0};
+cube_renderpass.loadOp = 'load';
 cube_renderpass.depthWriteEnabled = true;
 cube_renderpass.addPlane(
     'base_cube',
     { x: 0, y: 0, z: 0 },
-    { width: .1, height: .1, depth: .1 }
+    { width: 1., height: 1., depth: 1. }
 ).instanceCount = NUMPARTICLES;
 
 
@@ -84,6 +87,9 @@ const base = {
         points.setUniform('speed', options.speed);
         folder.add(options, 'speed',0,1,.0001).name('speed');
 
+        points.setUniform('scale', options.scale);
+        folder.add(options, 'scale',0,1,.0001).name('scale');
+
         folder.open();
     },
     /**
@@ -103,6 +109,7 @@ const base = {
         )
         points.setUniform('lambert', options.lambert);
         points.setUniform('speed', options.speed);
+        points.setUniform('scale', options.scale);
     }
 }
 
