@@ -2085,6 +2085,56 @@ class Points {
      * is not being updated at all. I have to make the createBindGroup call
      * only if the texture is updated.
      * @param {RenderPass} renderPass
+     * @param {GPUShaderStage} shaderType
+     */
+    #passBindGroup(renderPass, shaderType) {
+        const hasComputeShader = (shaderType === GPUShaderStage.COMPUTE) && renderPass.hasComputeShader;
+        const hasVertexShader = (shaderType === GPUShaderStage.VERTEX) && renderPass.hasVertexShader;
+        const hasFragmentShader = (shaderType === GPUShaderStage.FRAGMENT) && renderPass.hasFragmentShader;
+
+        const entries = this.#createEntries(shaderType, renderPass);
+
+        if (entries.length) {
+            let bindGroupLayout = null;
+
+            if (hasComputeShader) {
+                bindGroupLayout = renderPass.bindGroupLayoutCompute;
+            }
+            if (hasVertexShader) {
+                bindGroupLayout = renderPass.bindGroupLayoutVertex;
+            }
+            if (hasFragmentShader) {
+                bindGroupLayout = renderPass.bindGroupLayoutRender;
+            }
+
+            const bindGroup = this.#device.createBindGroup({
+                label: `_passComputeBindingGroup 0`,
+                layout: bindGroupLayout,
+                entries
+            });
+
+            if (hasComputeShader) {
+                renderPass.computeBindGroup = bindGroup
+            }
+            if (hasVertexShader) {
+                renderPass.vertexBindGroup = bindGroup
+            }
+            if (hasFragmentShader) {
+                renderPass.renderBindGroup = bindGroup
+            }
+        }
+    }
+
+    /**
+     * This is a slimmed down version of {@link #createComputeBindGroup}.
+     * We don't create the bindingGroupLayout since it already exists.
+     * We do update the entries. We have to update them because of
+     * changing textures like videos.
+     * TODO: this can be optimized even further by setting a flag to
+     * NOT CALL the createBindGroup if the texture (video/other)
+     * is not being updated at all. I have to make the createBindGroup call
+     * only if the texture is updated.
+     * @param {RenderPass} renderPass
      */
     #passComputeBindingGroup(renderPass) {
         const entries = this.#createEntries(GPUShaderStage.COMPUTE, renderPass);
