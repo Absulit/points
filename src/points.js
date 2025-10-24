@@ -1981,58 +1981,12 @@ class Points {
                     }
                 );
             }
-
-
         });
 
         entries.forEach(entry => entry.visibility = shaderType);
         // console.log(shaderType, entries);debugger
 
         return entries;
-    }
-
-    #createComputeBindGroup() {
-        this.#renderPasses.forEach((renderPass, index) => {
-            if (renderPass.hasComputeShader) {
-                const entries = this.#createEntries(GPUShaderStage.COMPUTE, renderPass);
-                if (entries.length) {
-                    renderPass.bindGroupLayoutCompute = this.#device.createBindGroupLayout({ entries });
-                    renderPass.computeBindGroup = this.#device.createBindGroup({
-                        label: `_createComputeBindGroup 0 - ${index}`,
-                        layout: renderPass.bindGroupLayoutCompute,
-                        entries: entries
-                    });
-                }
-            }
-        });
-    }
-
-    #createVertexBindGroup() {
-        this.#renderPasses.forEach(renderPass => {
-            const entries = this.#createEntries(GPUShaderStage.VERTEX, renderPass);
-            if (entries.length) {
-                renderPass.bindGroupLayoutVertex = this.#device.createBindGroupLayout({ entries });
-                renderPass.vertexBindGroup = this.#device.createBindGroup({
-                    label: '_createVertexBindGroup() 0',
-                    layout: renderPass.bindGroupLayoutVertex,
-                    entries
-                });
-            }
-        });
-    }
-
-    #createRenderBindGroup() {
-        this.#renderPasses.forEach(renderPass => {
-            const entries = this.#createEntries(GPUShaderStage.FRAGMENT, renderPass);
-            if (entries.length) {
-                renderPass.bindGroupLayoutRender = this.#device.createBindGroupLayout({ entries });
-                renderPass.renderBindGroup = this.#device.createBindGroup({
-                    label: '_createRenderBindGroup() 0',
-                    layout: renderPass.bindGroupLayoutRender,
-                    entries
-                });
-            }
-        });
     }
 
     /**
@@ -2122,66 +2076,6 @@ class Points {
             }
         }
     }
-
-    /**
-     * This is a slimmed down version of {@link #createComputeBindGroup}.
-     * We don't create the bindingGroupLayout since it already exists.
-     * We do update the entries. We have to update them because of
-     * changing textures like videos.
-     * TODO: this can be optimized even further by setting a flag to
-     * NOT CALL the createBindGroup if the texture (video/other)
-     * is not being updated at all. I have to make the createBindGroup call
-     * only if the texture is updated.
-     * @param {RenderPass} renderPass
-     */
-    #passComputeBindingGroup(renderPass) {
-        const entries = this.#createEntries(GPUShaderStage.COMPUTE, renderPass);
-        if (entries.length) {
-            renderPass.computeBindGroup = this.#device.createBindGroup({
-                label: `_passComputeBindingGroup 0`,
-                layout: renderPass.bindGroupLayoutCompute,
-                entries
-            });
-        }
-    }
-
-    /**
-     * This is a slimmed down version of {@link #createRenderBindGroup}.
-     * We don't create the bindingGroupLayout since it already exists.
-     * We do update the entries. We have to update them because of
-     * changing textures like videos.
-     * TODO: this can be optimized even further by setting a flag to
-     * NOT CALL the createBindGroup if the texture (video/other)
-     * is not being updated at all. I have to make the createBindGroup call
-     * only if the texture is updated.
-     * @param {RenderPass} renderPass
-     */
-    #passRenderBindGroup(renderPass) {
-        const entries = this.#createEntries(GPUShaderStage.FRAGMENT, renderPass);
-        if (entries.length) {
-            renderPass.renderBindGroup = this.#device.createBindGroup({
-                label: '_passRenderBindGroup() 0',
-                layout: renderPass.bindGroupLayoutRender,
-                entries
-            });
-        }
-    }
-
-    /**
-     *
-     * @param {RenderPass} renderPass
-     */
-    #passVertexBindGroup(renderPass) {
-        const entries = this.#createEntries(GPUShaderStage.VERTEX, renderPass);
-        if (entries.length) {
-            renderPass.vertexBindGroup = this.#device.createBindGroup({
-                label: '_passVertexBindGroup() 0',
-                layout: renderPass.bindGroupLayoutVertex,
-                entries
-            });
-        }
-    }
-
 
     /**
      * Method executed on each {@link https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame | requestAnimationFrame}.
