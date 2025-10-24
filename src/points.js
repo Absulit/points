@@ -1635,15 +1635,13 @@ class Points {
                         module: this.#device.createShaderModule({
                             code: renderPass.compiledShaders.compute
                         }),
-                        entryPoint: "main"
+                        entryPoint: 'main'
                     }
                 });
             }
-        });
 
-        //--------------------------------------
+            //--------------------------------------
 
-        this.#renderPasses.forEach(renderPass => {
             this.#createBindGroup(renderPass, GPUShaderStage.VERTEX);
             this.#createBindGroup(renderPass, GPUShaderStage.FRAGMENT);
 
