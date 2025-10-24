@@ -1,8 +1,10 @@
+import { sdfCircle } from 'points/sdf';
 import { structs } from '../structs.js';
 
 const frag = /*wgsl*/`
 
 ${structs}
+${sdfCircle}
 
 @fragment
 fn main(
@@ -24,7 +26,11 @@ fn main(
         finalColor = baseColor.rgb;
     }
 
-    return vec4f(finalColor, baseColor.a);
+    let c = sdfCircle(vec2f(.5), .5, .0, input.uv);
+
+    let circleColor = vec4f(finalColor * c, baseColor.a * c);
+
+    return circleColor;
 }
 `;
 
