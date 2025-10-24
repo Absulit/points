@@ -2076,8 +2076,8 @@ class Points {
     }
 
     /**
-     * This is a slimmed down version of {@link #createComputeBindGroup}.
-     * We don't create the bindingGroupLayout since it already exists.
+     * This is a slimmed down version of {@link #createBindGroup}.
+     * We don't create the bindGroupLayout since it already exists.
      * We do update the entries. We have to update them because of
      * changing textures like videos.
      * TODO: this can be optimized even further by setting a flag to
@@ -2238,8 +2238,8 @@ class Points {
 
         this.#renderPasses.forEach(renderPass => {
             if (renderPass.hasVertexAndFragmentShader) {
-                this.#passRenderBindGroup(renderPass);
-                this.#passVertexBindGroup(renderPass);
+                this.#passBindGroup(renderPass, GPUShaderStage.FRAGMENT);
+                this.#passBindGroup(renderPass, GPUShaderStage.VERTEX);
 
                 renderPass.descriptor.colorAttachments[0].view = swapChainTexture.createView();
                 if (renderPass.depthWriteEnabled) {
@@ -2303,7 +2303,7 @@ class Points {
                 this.#texturesToCopy = [];
             }
             if (renderPass.hasComputeShader) {
-                this.#passComputeBindingGroup(renderPass);
+                this.#passBindGroup(renderPass, GPUShaderStage.COMPUTE)
 
                 const passEncoder = commandEncoder.beginComputePass();
                 passEncoder.setPipeline(renderPass.computePipeline);
