@@ -77,7 +77,7 @@ class RenderPass {
     /**
      * @type {GPUBindGroupLayout}
      */
-    #bindGroupLayoutRender = null;
+    #bindGroupLayoutFragment = null;
     /**
      * @type {GPUBindGroupLayout}
      */
@@ -254,12 +254,12 @@ class RenderPass {
         return this.#vertexBindGroup;
     }
 
-    set bindGroupLayoutRender(value) {
-        this.#bindGroupLayoutRender = value;
+    set bindGroupLayoutFragment(value) {
+        this.#bindGroupLayoutFragment = value;
     }
 
-    get bindGroupLayoutRender() {
-        return this.#bindGroupLayoutRender;
+    get bindGroupLayoutFragment() {
+        return this.#bindGroupLayoutFragment;
     }
 
     set bindGroupLayoutVertex(value) {

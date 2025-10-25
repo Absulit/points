@@ -1663,7 +1663,7 @@ class Points {
                     label: `render pipeline: renderPass ${renderPass.index} (${renderPass.name})`,
                     // layout: 'auto',
                     layout: this.#device.createPipelineLayout({
-                        bindGroupLayouts: [renderPass.bindGroupLayoutVertex, renderPass.bindGroupLayoutRender]
+                        bindGroupLayouts: [renderPass.bindGroupLayoutVertex, renderPass.bindGroupLayoutFragment]
                     }),
                     //primitive: { topology: 'triangle-strip' },
                     primitive: { topology: renderPass.topology },
@@ -2026,7 +2026,7 @@ class Points {
                 renderPass.vertexBindGroup = bindGroup
             }
             if (hasFragmentShader) {
-                renderPass.bindGroupLayoutRender = bindGroupLayout;
+                renderPass.bindGroupLayoutFragment = bindGroupLayout;
                 renderPass.fragmentBindGroup = bindGroup
             }
         }
@@ -2061,7 +2061,7 @@ class Points {
                 bindGroupLayout = renderPass.bindGroupLayoutVertex;
             }
             if (hasFragmentShader) {
-                bindGroupLayout = renderPass.bindGroupLayoutRender;
+                bindGroupLayout = renderPass.bindGroupLayoutFragment;
             }
 
             const bindGroup = this.#device.createBindGroup({
