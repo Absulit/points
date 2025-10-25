@@ -2145,7 +2145,9 @@ class Points {
                     renderPass.descriptor.depthStencilAttachment.view = this.#depthTexture.createView();
                 }
 
-                if (!renderPass.bundle) {
+                // texturesExternal means there's a video
+                // if there's a video it needs to be updated no matter what
+                if (!renderPass.bundle || this.#texturesExternal.length) {
                     /** @type {GPURenderBundleEncoderDescriptor} */
                     const bundleEncoderDescriptor = {
                         colorFormats: ['bgra8unorm'],
