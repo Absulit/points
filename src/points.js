@@ -1624,8 +1624,8 @@ class Points {
 
     #createPipeline() {
         this.#renderPasses.forEach((renderPass, index) => {
-            this.#createBindGroup(renderPass, GPUShaderStage.COMPUTE);
             if (renderPass.hasComputeShader) {
+                this.#createBindGroup(renderPass, GPUShaderStage.COMPUTE);
                 renderPass.computePipeline = this.#device.createComputePipeline({
                     layout: this.#device.createPipelineLayout({
                         bindGroupLayouts: [renderPass.bindGroupLayoutCompute]
@@ -1642,10 +1642,9 @@ class Points {
 
             //--------------------------------------
 
-            this.#createBindGroup(renderPass, GPUShaderStage.VERTEX);
-            this.#createBindGroup(renderPass, GPUShaderStage.FRAGMENT);
-
             if (renderPass.hasVertexAndFragmentShader) {
+                this.#createBindGroup(renderPass, GPUShaderStage.VERTEX);
+                this.#createBindGroup(renderPass, GPUShaderStage.FRAGMENT);
                 let depthStencil = undefined;
                 if (renderPass.depthWriteEnabled) {
                     depthStencil = {
