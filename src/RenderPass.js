@@ -137,6 +137,8 @@ class RenderPass {
         depthStoreOp: 'store'
     }
 
+    #bundle = null;
+
     /**
      * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
      * This is useful for PostProcessing.
@@ -482,7 +484,7 @@ class RenderPass {
         return this.#descriptor;
     }
 
-    get topology(){
+    get topology() {
         return this.#topology;
     }
     /**
@@ -490,8 +492,19 @@ class RenderPass {
      * Use class {@link PrimitiveTopology}
      * @param {GPUPrimitiveTopology} val
      */
-    set topology(val){
+    set topology(val) {
         this.#topology = val;
+    }
+
+    get bundle() {
+        return this.#bundle;
+    }
+    /**
+     * Render Bundle for performance
+     * @param {GPURenderBundle} val
+     */
+    set bundle(val) {
+        this.#bundle = val;
     }
 
     /**

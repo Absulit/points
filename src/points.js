@@ -2146,16 +2146,17 @@ class Points {
                 }
 
                 if (!renderPass.bundle) {
+                    /** @type {GPURenderBundleEncoderDescriptor} */
                     const bundleEncoderDescriptor = {
                         colorFormats: ['bgra8unorm'],
                         sampleCount: 1
                     }
 
-
                     if (renderPass.depthWriteEnabled) {
                         bundleEncoderDescriptor.depthStencilFormat = 'depth32float'
                     }
 
+                    /** @type {GPURenderBundleEncoder} */
                     const bundleEncoder = this.#device.createRenderBundleEncoder(bundleEncoderDescriptor);
 
                     bundleEncoder.setPipeline(renderPass.renderPipeline);
@@ -2166,8 +2167,6 @@ class Points {
                     }
                     bundleEncoder.setVertexBuffer(0, renderPass.vertexBuffer);
 
-                    // console.log(renderPass.meshes.find( mesh => mesh.instanceCount > 1));
-                    // console.log(renderPass.meshes.some( mesh => mesh.instanceCount > 1));
                     // TODO: move this to renderPass because we can ask this just one time and have it as property
                     const isThereInstancing = renderPass.meshes.some(mesh => mesh.instanceCount > 1);
                     if (isThereInstancing) {
