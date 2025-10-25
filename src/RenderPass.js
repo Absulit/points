@@ -69,7 +69,7 @@ class RenderPass {
     /**
      * @type {GPUBindGroup}
      */
-    #renderBindGroup = null;
+    #fragmentBindGroup = null;
     /**
      * @type {GPUBindGroup}
      */
@@ -238,12 +238,12 @@ class RenderPass {
         return this.#computeBindGroup;
     }
 
-    set renderBindGroup(value) {
-        this.#renderBindGroup = value;
+    set fragmentBindGroup(value) {
+        this.#fragmentBindGroup = value;
     }
 
-    get renderBindGroup() {
-        return this.#renderBindGroup;
+    get fragmentBindGroup() {
+        return this.#fragmentBindGroup;
     }
 
     set vertexBindGroup(value) {

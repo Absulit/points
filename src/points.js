@@ -2027,7 +2027,7 @@ class Points {
             }
             if (hasFragmentShader) {
                 renderPass.bindGroupLayoutRender = bindGroupLayout;
-                renderPass.renderBindGroup = bindGroup
+                renderPass.fragmentBindGroup = bindGroup
             }
         }
     }
@@ -2077,7 +2077,7 @@ class Points {
                 renderPass.vertexBindGroup = bindGroup
             }
             if (hasFragmentShader) {
-                renderPass.renderBindGroup = bindGroup
+                renderPass.fragmentBindGroup = bindGroup
             }
         }
     }
@@ -2163,7 +2163,7 @@ class Points {
 
                     if (this.#uniforms.length) {
                         bundleEncoder.setBindGroup(0, renderPass.vertexBindGroup);
-                        bundleEncoder.setBindGroup(1, renderPass.renderBindGroup);
+                        bundleEncoder.setBindGroup(1, renderPass.fragmentBindGroup);
                     }
                     bundleEncoder.setVertexBuffer(0, renderPass.vertexBuffer);
 
