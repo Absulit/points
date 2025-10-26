@@ -36,6 +36,9 @@ import getStorageAccessMode, { bindingModes, entriesModes } from './storage-acce
 class Points {
     #canvasId = null;
     #canvas = null;
+    /** @type {GPUAdapter} */
+    #adapter = null;
+    /** @type {GPUDevice} */
     #device = null;
     #context = null;
     #presentationFormat = null;
@@ -1251,14 +1254,21 @@ class Points {
         this.#renderPasses.forEach(this.#compileRenderPass);
         this.#generateDataSize();
         //
-        let adapter = null;
-        try {
-            adapter = await navigator.gpu.requestAdapter();
-        } catch (err) {
-            console.log(err);
+        // let adapter = null;
+        if (!this.#adapter) {
+            try {
+                this.#adapter = await navigator.gpu.requestAdapter();
+            } catch (err) {
+                console.log(err);
+            }
         }
-        if (!adapter) { return false; }
-        this.#device = await adapter.requestDevice();
+        if (!this.#adapter) { return false; }
+        if (!this.#device) {
+            this.#device = await this.#adapter.requestDevice();
+            this.#device.label = (new Date()).getMilliseconds();
+        }
+        console.log(this.#device.label);
+
         console.log(this.#device.limits);
 
         this.#device.lost.then(info => console.log(info));
@@ -2145,9 +2155,11 @@ class Points {
                     renderPass.descriptor.depthStencilAttachment.view = this.#depthTexture.createView();
                 }
 
+                const isSameDevice = this.#device === renderPass.device;
+
                 // texturesExternal means there's a video
                 // if there's a video it needs to be updated no matter what
-                if (!renderPass.bundle || this.#texturesExternal.length) {
+                if (!isSameDevice || !renderPass.bundle || this.#texturesExternal.length) {
                     /** @type {GPURenderBundleEncoderDescriptor} */
                     const bundleEncoderDescriptor = {
                         colorFormats: ['bgra8unorm'],
@@ -2182,6 +2194,7 @@ class Points {
                         bundleEncoder.draw(renderPass.vertexBufferInfo.vertexCount, 1);
                     }
                     renderPass.bundle = bundleEncoder.finish();
+                    renderPass.device = this.#device;
                 }
 
                 const passEncoder = commandEncoder.beginRenderPass(renderPass.descriptor);

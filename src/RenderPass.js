@@ -138,6 +138,7 @@ class RenderPass {
     }
 
     #bundle = null;
+    #device = null;
 
     /**
      * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
@@ -505,6 +506,17 @@ class RenderPass {
      */
     set bundle(val) {
         this.#bundle = val;
+    }
+
+    get device() {
+        return this.#device;
+    }
+    /**
+     * Device reference to check if RenderBundle needs to be rebuilt
+     * @param {GPUDevice} val
+     */
+    set device(val) {
+        this.#device = val;
     }
 
     /**
