@@ -1113,6 +1113,27 @@ class Points {
         });
         return dynamicGroupBindings;
     }
+
+    #createDynamicGroupBindingsUpdate(shaderType, { index: renderPassIndex, internal }, groupId = 0) {
+        if (!shaderType) {
+            throw '`GPUShaderStage` is required';
+        }
+        // const groupId = 0;
+        let dynamicGroupBindings = '';
+        let bindingIndex = 0;
+
+        this.#texturesExternal.forEach(externalTexture => {
+            const isInternal = internal === externalTexture.internal;
+            if (isInternal && (!externalTexture.shaderType || externalTexture.shaderType & shaderType)) {
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${externalTexture.name}: texture_external;\n`;
+                bindingIndex += 1;
+            }
+        });
+
+        return dynamicGroupBindings;
+
+    }
+
     /**
      * Establishes the density of the base mesh, by default 1x1, meaning two triangles.
      * The final number of triangles is `numColumns` * `numRows` * `2` ( 2 being the triangles )
@@ -1178,9 +1199,16 @@ class Points {
         renderPass.hasVertexShader && (dynamicGroupBindingsVertex += dynamicStructParams);
         renderPass.hasComputeShader && (dynamicGroupBindingsCompute += dynamicStructParams);
         renderPass.hasFragmentShader && (dynamicGroupBindingsFragment += dynamicStructParams);
+
         renderPass.hasVertexShader && (dynamicGroupBindingsVertex += this.#createDynamicGroupBindings(GPUShaderStage.VERTEX, renderPass));
         renderPass.hasComputeShader && (dynamicGroupBindingsCompute += this.#createDynamicGroupBindings(GPUShaderStage.COMPUTE, renderPass));
         dynamicGroupBindingsFragment += this.#createDynamicGroupBindings(GPUShaderStage.FRAGMENT, renderPass, 1);
+
+        // renderPass.hasVertexShader && (dynamicGroupBindingsVertex += this.#createDynamicGroupBindingsUpdate(GPUShaderStage.VERTEX, renderPass, 2));
+        // renderPass.hasComputeShader && (dynamicGroupBindingsCompute += this.#createDynamicGroupBindingsUpdate(GPUShaderStage.COMPUTE, renderPass, 2));
+        // dynamicGroupBindingsFragment += this.#createDynamicGroupBindingsUpdate(GPUShaderStage.FRAGMENT, renderPass, 2);
+
+
         renderPass.hasVertexShader && (colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + defaultVertexBody + colorsVertWGSL);
         renderPass.hasComputeShader && (colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + colorsComputeWGSL);
         renderPass.hasFragmentShader && (colorsFragWGSL = dynamicGroupBindingsFragment + defaultStructs + colorsFragWGSL);
@@ -1999,7 +2027,29 @@ class Points {
         });
 
         entries.forEach(entry => entry.visibility = shaderType);
-        // console.log(shaderType, entries);debugger
+
+        return entries;
+    }
+
+    #createEntriesUpdate(shaderType, { index: renderPassIndex, internal }) {
+        let entries = [];
+        let bindingIndex = 0;
+        this.#texturesExternal.forEach(externalTexture => {
+            const isInternal = internal === externalTexture.internal;
+            if (isInternal && (!externalTexture.shaderType || externalTexture.shaderType & shaderType)) {
+                entries.push(
+                    {
+                        label: 'external texture',
+                        binding: bindingIndex++,
+                        resource: externalTexture.texture,
+                        externalTexture: {
+                            // type: 'write-only'
+                        }
+                    }
+                );
+            }
+        });
+        entries.forEach(entry => entry.visibility = shaderType);
 
         return entries;
     }
@@ -2022,9 +2072,9 @@ class Points {
         if (entries.length) {
             const bindGroupLayout = this.#device.createBindGroupLayout({ entries });
             const bindGroup = this.#device.createBindGroup({
-                label: `_createBindGroup ${shaderType} - ${renderPass.name}`,
+                label: `_createBindGroup a ${shaderType} - ${renderPass.name}`,
                 layout: bindGroupLayout,
-                entries: entries
+                entries
             });
 
             if (hasComputeShader) {
@@ -2039,7 +2089,16 @@ class Points {
                 renderPass.bindGroupLayoutFragment = bindGroupLayout;
                 renderPass.fragmentBindGroup = bindGroup
             }
+
+            // const entriesUpdate = this.#createEntriesUpdate(shaderType, renderPass);
+            // const bindGroup2 = this.#device.createBindGroup({
+            //     label: `_createBindGroup b ${shaderType} - ${renderPass.name}`,
+            //     layout: bindGroupLayout,
+            //     entries: entriesUpdate
+            // });
+            // renderPass.updateBindgroup = bindGroup2
         }
+
     }
 
     /**
@@ -2075,7 +2134,7 @@ class Points {
             }
 
             const bindGroup = this.#device.createBindGroup({
-                label: `_passComputeBindingGroup 0`,
+                label: `_passBindGroup 0`,
                 layout: bindGroupLayout,
                 entries
             });
@@ -2089,6 +2148,19 @@ class Points {
             if (hasFragmentShader) {
                 renderPass.fragmentBindGroup = bindGroup
             }
+
+
+            // const entriesUpdate = this.#createEntriesUpdate(shaderType, renderPass);
+            // if (entriesUpdate.length) {
+            //     const bindGroup = this.#device.createBindGroup({
+            //         label: `passBindGroup ${shaderType} - ${renderPass.name}`,
+            //         layout: bindGroupLayout,
+            //         entries: entriesUpdate
+            //     });
+            //     renderPass.updateBindgroup = bindGroup
+            // }
+
+
         }
     }
 
@@ -2160,6 +2232,7 @@ class Points {
                 // texturesExternal means there's a video
                 // if there's a video it needs to be updated no matter what
                 if (!isSameDevice || !renderPass.bundle || this.#texturesExternal.length) {
+                // if (!isSameDevice || !renderPass.bundle) {
                     /** @type {GPURenderBundleEncoderDescriptor} */
                     const bundleEncoderDescriptor = {
                         colorFormats: ['bgra8unorm'],
@@ -2198,6 +2271,7 @@ class Points {
                 }
 
                 const passEncoder = commandEncoder.beginRenderPass(renderPass.descriptor);
+                // passEncoder.setBindGroup(1, renderPass.updateBindgroup);
                 passEncoder.executeBundles([renderPass.bundle]);
                 passEncoder.end();
 
