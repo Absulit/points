@@ -132,6 +132,7 @@ class Points {
     }
 
     #resizeCanvasToDefault = () => {
+        this.#screenResized = true;
         this.#canvas.width = this.#originalCanvasWidth;
         this.#canvas.height = this.#originalCanvasHeigth;
         this.#setScreenSize();
@@ -2220,10 +2221,6 @@ class Points {
 
         this.#renderPasses.forEach(renderPass => {
             if (renderPass.hasVertexAndFragmentShader) {
-                this.#passBindGroup(renderPass, GPUShaderStage.FRAGMENT);
-                this.#passBindGroup(renderPass, GPUShaderStage.VERTEX);
-
-
                 renderPass.descriptor.colorAttachments[0].view = swapChainTexture.createView();
                 if (renderPass.depthWriteEnabled) {
                     renderPass.descriptor.depthStencilAttachment.view = this.#depthTexture.createView();
@@ -2232,8 +2229,11 @@ class Points {
                 const isSameDevice = this.#device === renderPass.device;
 
                 // texturesExternal means there's a video
-                // if there's a video it needs to be updated no matter what
+                // if there's a video it needs to be updated no matter what.
+                // Also, it needs to be updated if the screen size changes
                 if (!isSameDevice || !renderPass.bundle || this.#texturesExternal.length || this.#screenResized) {
+                    this.#passBindGroup(renderPass, GPUShaderStage.FRAGMENT);
+                    this.#passBindGroup(renderPass, GPUShaderStage.VERTEX);
                     /** @type {GPURenderBundleEncoderDescriptor} */
                     const bundleEncoderDescriptor = {
                         colorFormats: ['bgra8unorm'],
@@ -2308,7 +2308,9 @@ class Points {
                 this.#texturesToCopy = [];
             }
             if (renderPass.hasComputeShader) {
-                this.#passBindGroup(renderPass, GPUShaderStage.COMPUTE);
+                if (this.#texturesExternal.length || !renderPass.computeBindGroup) {
+                    this.#passBindGroup(renderPass, GPUShaderStage.COMPUTE);
+                }
 
                 const passEncoder = commandEncoder.beginComputePass();
                 passEncoder.setPipeline(renderPass.computePipeline);
