@@ -86,6 +86,7 @@ class Points {
     #events = new Map();
     #events_ids = 0;
     #dataSize = null;
+    #screenResized = false;
 
     constructor(canvasId) {
         this.#canvasId = canvasId;
@@ -121,6 +122,7 @@ class Points {
     }
 
     #resizeCanvasToFitWindow = () => {
+        this.#screenResized = true;
         if (this.#fitWindow) {
             const { offsetWidth, offsetHeight } = this.#canvas.parentNode;
             this.#canvas.width = offsetWidth;
@@ -2231,8 +2233,7 @@ class Points {
 
                 // texturesExternal means there's a video
                 // if there's a video it needs to be updated no matter what
-                if (!isSameDevice || !renderPass.bundle || this.#texturesExternal.length) {
-                // if (!isSameDevice || !renderPass.bundle) {
+                if (!isSameDevice || !renderPass.bundle || this.#texturesExternal.length || this.#screenResized) {
                     /** @type {GPURenderBundleEncoderDescriptor} */
                     const bundleEncoderDescriptor = {
                         colorFormats: ['bgra8unorm'],
@@ -2322,6 +2323,7 @@ class Points {
                 passEncoder.end();
             }
         });
+        this.#screenResized = false;
 
 
         // let descriptor0 = null;
