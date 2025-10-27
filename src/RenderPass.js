@@ -69,7 +69,7 @@ class RenderPass {
     /**
      * @type {GPUBindGroup}
      */
-    #renderBindGroup = null;
+    #fragmentBindGroup = null;
     /**
      * @type {GPUBindGroup}
      */
@@ -77,7 +77,7 @@ class RenderPass {
     /**
      * @type {GPUBindGroupLayout}
      */
-    #bindGroupLayoutRender = null;
+    #bindGroupLayoutFragment = null;
     /**
      * @type {GPUBindGroupLayout}
      */
@@ -136,6 +136,9 @@ class RenderPass {
         depthLoadOp: 'clear',
         depthStoreOp: 'store'
     }
+
+    #bundle = null;
+    #device = null;
 
     /**
      * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
@@ -236,12 +239,12 @@ class RenderPass {
         return this.#computeBindGroup;
     }
 
-    set renderBindGroup(value) {
-        this.#renderBindGroup = value;
+    set fragmentBindGroup(value) {
+        this.#fragmentBindGroup = value;
     }
 
-    get renderBindGroup() {
-        return this.#renderBindGroup;
+    get fragmentBindGroup() {
+        return this.#fragmentBindGroup;
     }
 
     set vertexBindGroup(value) {
@@ -252,12 +255,12 @@ class RenderPass {
         return this.#vertexBindGroup;
     }
 
-    set bindGroupLayoutRender(value) {
-        this.#bindGroupLayoutRender = value;
+    set bindGroupLayoutFragment(value) {
+        this.#bindGroupLayoutFragment = value;
     }
 
-    get bindGroupLayoutRender() {
-        return this.#bindGroupLayoutRender;
+    get bindGroupLayoutFragment() {
+        return this.#bindGroupLayoutFragment;
     }
 
     set bindGroupLayoutVertex(value) {
@@ -482,7 +485,7 @@ class RenderPass {
         return this.#descriptor;
     }
 
-    get topology(){
+    get topology() {
         return this.#topology;
     }
     /**
@@ -490,8 +493,30 @@ class RenderPass {
      * Use class {@link PrimitiveTopology}
      * @param {GPUPrimitiveTopology} val
      */
-    set topology(val){
+    set topology(val) {
         this.#topology = val;
+    }
+
+    get bundle() {
+        return this.#bundle;
+    }
+    /**
+     * Render Bundle for performance
+     * @param {GPURenderBundle} val
+     */
+    set bundle(val) {
+        this.#bundle = val;
+    }
+
+    get device() {
+        return this.#device;
+    }
+    /**
+     * Device reference to check if RenderBundle needs to be rebuilt
+     * @param {GPUDevice} val
+     */
+    set device(val) {
+        this.#device = val;
     }
 
     /**
