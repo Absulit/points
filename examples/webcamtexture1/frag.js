@@ -14,7 +14,19 @@ fn main(
         @builtin(position) position: vec4f
     ) -> @location(0) vec4f {
 
-    return textureExternal(webcam, imageSampler, uvr / params.scale, true);
+    var flip = vec2f(1, 1);
+    var displace = vec2f();
+    if(params.flip == 1){
+        flip = vec2f(-1, 1);
+        displace = vec2f(1, 0);
+    }
+
+    var ratioScale = 1.;
+    if(params.isMobile == 1){
+        ratioScale = ratio.x;
+    }
+
+    return textureExternal(webcam, imageSampler, uvr / ratioScale * flip + displace, true);
 }
 `;
 
