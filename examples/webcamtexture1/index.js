@@ -7,7 +7,7 @@ import { isMobile } from 'utils';
 const options = {
     scale: 1,
     isMobile: false,
-    flip: false,
+    flip: true,
 }
 
 const imagetexture1 = {
@@ -22,15 +22,12 @@ const imagetexture1 = {
 
         const size = { width: 1080, height: 1080 }
         if (options.isMobile) {
-            size.width = 100;
-            size.height = 100;
+            size.width = 1280;
+            size.height = 720;
         }
 
         points.setSampler('imageSampler', null);
-        await points.setTextureWebcam('webcam');
-
-        points.setUniform('scale', options.scale);
-        folder.add(options, 'scale', 0, 1, .0001).name('Scale');
+        await points.setTextureWebcam('webcam', size);
 
         points.setUniform('flip', options.flip);
         folder.add(options, 'flip').name('flip');
@@ -38,7 +35,6 @@ const imagetexture1 = {
         folder.open();
     },
     update: points => {
-        points.setUniform('scale', options.scale);
         points.setUniform('flip', options.flip);
         points.setUniform('isMobile', options.isMobile);
     }
