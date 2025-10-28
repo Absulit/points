@@ -783,9 +783,10 @@ class Points {
      * Loads webcam as `texture_external`and then
      * it will be available to read data from in the shaders.
      * @param {String} name id of the wgsl variable in the shader
+     * @param {{width:Number, height:Number}} size to crop the video. WebGPU might throw an error if size does not match.
      * @param {GPUShaderStage} shaderType
      * @returns {Object}
-     *
+     * @throws a WGSL error if the size doesn't match possible crop size
      * @example
      * // js
      * await points.setTextureWebcam('video');
@@ -793,33 +794,30 @@ class Points {
      * // wgsl string
      * et rgba = textureExternalPosition(video, imageSampler, position, uvr, true);
      */
-    async setTextureWebcam(name, shaderType) {
+    async setTextureWebcam(name, size = { width: 1080, height: 1080 }, shaderType) {
         if (this.#nameExists(this.#texturesExternal, name)) {
             throw `setTextureWebcam: ${name} already exists.`;
         }
         const video = document.createElement('video');
-        //video.loop = true;
-        //video.autoplay = true;
         video.muted = true;
-        //document.body.appendChild(video);
         if (navigator.mediaDevices.getUserMedia) {
-            await navigator.mediaDevices.getUserMedia({ video: true })
-                .then(async function (stream) {
+            await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: size.width }, height: { ideal: size.height } } })
+                .then(async stream => {
                     video.srcObject = stream;
                     await video.play();
                 })
-                .catch(function (err) {
-                    console.log(err);
-                });
+                .catch(err => { throw err });
         }
         const textureExternal = {
-            name: name,
-            shaderType: shaderType,
-            video: video,
+            name,
+            shaderType,
+            video,
+            size,
             internal: false
         };
         this.#texturesExternal.push(textureExternal);
-        return textureExternal;
+
+        return await new Promise(resolve => resolve(textureExternal));
     }
 
     /**
