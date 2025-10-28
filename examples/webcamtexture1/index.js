@@ -10,6 +10,8 @@ const options = {
     flip: true,
 }
 
+let webcam = null;
+
 const imagetexture1 = {
     vert,
     frag,
@@ -27,7 +29,12 @@ const imagetexture1 = {
         }
 
         points.setSampler('imageSampler', null);
-        await points.setTextureWebcam('webcam', size);
+        webcam = await points.setTextureWebcam('webcam', size)
+            .catch(err => {
+                console.log('---- display no webcam message');
+                throw err;
+            });
+
 
         points.setUniform('flip', options.flip);
         folder.add(options, 'flip').name('flip');
@@ -37,6 +44,12 @@ const imagetexture1 = {
     update: points => {
         points.setUniform('flip', options.flip);
         points.setUniform('isMobile', options.isMobile);
+    },
+    remove: _ => {
+        if (webcam?.video.srcObject) {
+            const stream = webcam.video.srcObject;
+            stream.getTracks().forEach(track => track.stop());
+        }
     }
 }
 
