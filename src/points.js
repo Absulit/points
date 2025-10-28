@@ -2234,7 +2234,7 @@ class Points {
                     this.#passBindGroup(renderPass, GPUShaderStage.VERTEX);
                     /** @type {GPURenderBundleEncoderDescriptor} */
                     const bundleEncoderDescriptor = {
-                        colorFormats: ['bgra8unorm'],
+                        colorFormats: [this.#presentationFormat],
                         sampleCount: 1
                     }
 
