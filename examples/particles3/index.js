@@ -29,6 +29,8 @@ if(options.isMobile){
     THREADS_X = 4;
     THREADS_Y = 4;
     THREADS_Z = 2;
+
+    options.particleSize = 6.5492;
 }
 
 const NUMPARTICLES = WORKGROUP_X * WORKGROUP_Y * WORKGROUP_Z * THREADS_X * THREADS_Y * THREADS_Z;
