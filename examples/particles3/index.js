@@ -2,6 +2,7 @@ import vert from './vert.js';
 import compute0 from './compute.js';
 import frag1 from './frag.js';
 import Points, { RenderPass } from 'points';
+import { isMobile } from 'utils';
 
 const options = {
     maxLife: 100,
@@ -10,7 +11,9 @@ const options = {
     particleSize: 2,
 }
 
-const WORKGROUP_X = 256;
+options.isMobile = isMobile();
+
+const WORKGROUP_X = options.isMobile? 8: 256;
 const WORKGROUP_Y = 1;
 
 const THREADS_X = 256;
@@ -54,6 +57,14 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+        const size = { width: 1080, height: 1080 }
+        if (options.isMobile) {
+            size.width = 1280;
+            size.height = 720;
+        }
+        await points.setTextureWebcam('webcam', size);
+
+
         points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
         points.setConstant('THREADS_X', THREADS_X, 'u32');
         points.setConstant('THREADS_Y', THREADS_Y, 'u32');
@@ -65,12 +76,8 @@ const base = {
         );
 
         points.setSampler('imageSampler', null);
-        // await points.setTextureImage('image', './../img/webgpu_800x800.png');
         await points.setTextureImage('image', './../img/absulit_800x800.jpg');
-        // await points.setTextureVideo('video', './../img/6982698-hd_1440_1080_25fps_800x800.mp4');
-        // await points.setTextureVideo('video', './../img/3641672-hd_1920_1080_24fps_800x800.mp4');
         await points.setTextureVideo('video', './../img/8056464-hd_1080_1920_30fps_800x800.mp4');
-        // await points.setTextureVideo('video', './../img/pexels-shubh-haque-4746616-960x540-30fps.mp4');
 
         points.setUniform('projection', orthoMatrix, 'mat4x4<f32>');
 
@@ -86,6 +93,16 @@ const base = {
         points.setUniform('particleSize', options.particleSize);
         folder.add(options, 'particleSize', 1, 10, .0001).name('particleSize');
 
+
+        const dropdownItems = { 'Video': 0, 'Webcam': 1, 'Image': 2 };
+        points.setUniform('texture_mode', options.mode);
+        folder.add(options, 'mode', dropdownItems).name('Textures').onChange(async value => {
+            console.log(value);
+            points.setUniform('texture_mode', value);
+        });
+
+
+
         folder.open();
     },
     /**
@@ -96,6 +113,7 @@ const base = {
         points.setUniform('maxLife', options.maxLife);
         points.setUniform('turbulenceScale', options.turbulenceScale);
         points.setUniform('particleSize', options.particleSize);
+        points.setUniform('texture_mode', options.mode);
     }
 }
 
