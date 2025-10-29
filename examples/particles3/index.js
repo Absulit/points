@@ -7,23 +7,35 @@ import { isMobile } from 'utils';
 const options = {
     maxLife: 100,
     turbulenceScale: 100,
-    useVideo: true,
     particleSize: 2,
+    mode: 0
 }
 
 options.isMobile = isMobile();
 
-const WORKGROUP_X = options.isMobile? 8: 256;
-const WORKGROUP_Y = 1;
+let WORKGROUP_X = 256;
+let WORKGROUP_Y = 2;
+let WORKGROUP_Z = 2;
 
-const THREADS_X = 256;
-const THREADS_Y = 1;
+let THREADS_X = 8;
+let THREADS_Y = 8;
+let THREADS_Z = 4;
 
-const NUMPARTICLES = WORKGROUP_X * WORKGROUP_Y * THREADS_X * THREADS_Y;
+if(options.isMobile){
+    WORKGROUP_X = 8;
+    WORKGROUP_Y = 4;
+    WORKGROUP_Z = 2;
+
+    THREADS_X = 4;
+    THREADS_Y = 4;
+    THREADS_Z = 2;
+}
+
+const NUMPARTICLES = WORKGROUP_X * WORKGROUP_Y * WORKGROUP_Z * THREADS_X * THREADS_Y * THREADS_Z;
 console.log(NUMPARTICLES);
 
 
-const instancedParticlesRenderPass = new RenderPass(vert, frag1, compute0, WORKGROUP_X, WORKGROUP_Y, 1)
+const instancedParticlesRenderPass = new RenderPass(vert, frag1, compute0, WORKGROUP_X, WORKGROUP_Y, WORKGROUP_Z)
 instancedParticlesRenderPass.depthWriteEnabled = false;
 instancedParticlesRenderPass.addPlane('plane', { x: 0, y: 0 }, { width: 2, height: 2 }).instanceCount = NUMPARTICLES;
 
@@ -64,10 +76,13 @@ const base = {
         }
         await points.setTextureWebcam('webcam', size);
 
-
         points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
+        points.setConstant('WORKGROUP_X', WORKGROUP_X, 'u32');
+        points.setConstant('WORKGROUP_Y', WORKGROUP_Y, 'u32');
+        points.setConstant('WORKGROUP_Z', WORKGROUP_Z, 'u32');
         points.setConstant('THREADS_X', THREADS_X, 'u32');
         points.setConstant('THREADS_Y', THREADS_Y, 'u32');
+        points.setConstant('THREADS_Z', THREADS_Z, 'u32');
         points.setStorage(
             'particles',
             `array<Particle, ${NUMPARTICLES}>`,
@@ -86,9 +101,6 @@ const base = {
 
         points.setUniform('turbulenceScale', options.turbulenceScale);
         folder.add(options, 'turbulenceScale', 10, 1024, .0001).name('turbulenceScale');
-
-        points.setUniform('useVideo', false);
-        folder.add(options, 'useVideo').name('useVideo');
 
         points.setUniform('particleSize', options.particleSize);
         folder.add(options, 'particleSize', 1, 10, .0001).name('particleSize');
@@ -109,7 +121,6 @@ const base = {
      * @param {Points} points
      */
     update: points => {
-        points.setUniform('useVideo', options.useVideo);
         points.setUniform('maxLife', options.maxLife);
         points.setUniform('turbulenceScale', options.turbulenceScale);
         points.setUniform('particleSize', options.particleSize);
