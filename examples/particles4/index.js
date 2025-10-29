@@ -3,18 +3,27 @@ import Points, { RenderPass } from 'points';
 import vert from './cube_renderpass/vert.js';
 import frag from './cube_renderpass/frag.js';
 import compute from './cube_renderpass/compute.js';
+import { isMobile } from 'utils';
 
 const options = {
     lambert: false,
 }
 
-const WORKGROUP_X = 1;
-const WORKGROUP_Y = 1;
-const WORKGROUP_Z = 1;
+options.isMobile = isMobile();
 
-const THREADS_X = 8;
-const THREADS_Y = 8;
-const THREADS_Z = 4;
+let WORKGROUP_X = 1;
+let WORKGROUP_Y = 1;
+let WORKGROUP_Z = 1;
+
+let THREADS_X = 8;
+let THREADS_Y = 8;
+let THREADS_Z = 4;
+
+if(options.isMobile){
+    THREADS_X = 4;
+    THREADS_Y = 4;
+    THREADS_Z = 2;
+}
 
 const NUMPARTICLES = WORKGROUP_X * WORKGROUP_Y * WORKGROUP_Z * THREADS_X * THREADS_Y * THREADS_Z;
 console.log('NUMPARTICLES: ', NUMPARTICLES);
@@ -22,7 +31,9 @@ console.log('NUMPARTICLES: ', NUMPARTICLES);
 const cube_renderpass = new RenderPass(vert, frag, compute, WORKGROUP_X, WORKGROUP_Y, WORKGROUP_Z);
 cube_renderpass.depthWriteEnabled = true;
 cube_renderpass.addCube('base_cube').instanceCount = NUMPARTICLES;
-cube_renderpass.addSphere('sphere').instanceCount = 100;
+if(!options.isMobile){
+    cube_renderpass.addSphere('sphere').instanceCount = 100;
+}
 
 const near = 0.1, far = 100;
 const f = 1.0 / Math.tan(Math.PI / 8); // ≈ 2.414
