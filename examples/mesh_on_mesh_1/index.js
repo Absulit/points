@@ -2,24 +2,40 @@ import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
 import Points, { RenderPass } from 'points';
-import { loadAndExtract } from 'utils';
+import { loadAndExtract, isMobile } from 'utils';
 
 const options = {
     visibility: true,
 }
 
-const url = '../models/monkey_subdivide.glb'; // or remote URL (CORS must allow)
+options.isMobile = isMobile();
+
+let url = '../models/monkey_subdivide.glb'; // or remote URL (CORS must allow)
+
+
+
+let WORKGROUP_X = 64;
+let WORKGROUP_Y = 1;
+let WORKGROUP_Z = 1;
+
+let THREADS_X = 256;
+let THREADS_Y = 1;
+let THREADS_Z = 1;
+
+if (options.isMobile) {
+    WORKGROUP_X = 8;
+    WORKGROUP_Y = 4;
+    WORKGROUP_Z = 2;
+
+    THREADS_X = 4;
+    THREADS_Y = 4;
+    THREADS_Z = 2;
+
+    url = '../models/monkey.glb';
+}
+
 const data = await loadAndExtract(url);
 const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0]
-
-
-const WORKGROUP_X = 64;
-const WORKGROUP_Y = 1;
-const WORKGROUP_Z = 1;
-
-const THREADS_X = 256;
-const THREADS_Y = 1;
-const THREADS_Z = 1;
 
 const NUMPARTICLES = WORKGROUP_X * WORKGROUP_Y * WORKGROUP_Z * THREADS_X * THREADS_Y * THREADS_Z;
 console.log('NUMPARTICLES: ', NUMPARTICLES);

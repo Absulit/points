@@ -18,7 +18,7 @@ fn main(
     let ratioX = params.screen.x / params.screen.y;
     let ratioY = 1. / ratioX / (params.screen.y / params.screen.x);
     let ratio = vec2(ratioX, ratioY);
-    let scaled = position.xy * particle.scale; // .01;
+    let scaled = position.xy / ratio * particle.scale; // .01;
 
     let world = scaled + particle.position / ratio;
 

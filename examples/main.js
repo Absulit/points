@@ -162,6 +162,7 @@ async function loadShaderByIndex(index) {
 
     changeUri(shaderProject.uri);
     shaders?.remove?.();
+    points?.destroy();
     shaders = (await import(shaderProject.path)).default;
     await init();
 

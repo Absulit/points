@@ -6,9 +6,6 @@ const compute = /*wgsl*/`
 ${structs}
 ${rand}
 
-const WIDTH = 8i;
-const HEIGHT = 1i;
-
 const HWIDTH = WIDTH / 2;
 const HHEIGHT = HEIGHT / 2;
 

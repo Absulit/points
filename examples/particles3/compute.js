@@ -18,7 +18,7 @@ const speed = 1.1; // .0001
 const SCREENSCALE = 2;
 const PARTICLE_SCALE = .01;
 
-fn particleInit(particles: ptr<storage, array<Particle,NUMPARTICLES>, read_write>, index:u32, wgid:vec3u) {
+fn particleInit(particles: ptr<storage, array<Particle,NUMPARTICLES>, read_write>, index:i32, wgid:vec3u) {
     let particle = &particles[index];
     rand_seed.x = f32(index) + .8945 + fract(params.time) / f32(wgid.x);
     rand();
@@ -29,9 +29,17 @@ fn particleInit(particles: ptr<storage, array<Particle,NUMPARTICLES>, read_write
     let angle = rand_seed.x * TAU;
 
     var particleColor = vec4f();
-    if(params.useVideo == 1){
+
+    let flip = vec2f(-1, 1);
+    let displace = vec2f(1, 0);
+
+    if(params.texture_mode == 0){ // video
         particleColor = textureLoad(video, vec2i(start_position * SIZE)); // video
-    }else{
+    }
+    if(params.texture_mode == 1){ // webcam
+        particleColor = textureLoad(webcam, vec2i((start_position * flip + displace) * SIZE)); // video
+    }
+    if(params.texture_mode == 2){ // image
         particleColor = textureLoad(image, vec2i(start_position * SIZE), 0); // image
     }
 
@@ -54,22 +62,30 @@ fn particleInit(particles: ptr<storage, array<Particle,NUMPARTICLES>, read_write
     // particle.noise = rand_seed.x * TAU;
 }
 
-@compute @workgroup_size(THREADS_X, THREADS_Y,1)
+@compute @workgroup_size(THREADS_X, THREADS_Y, THREADS_Z)
 fn main(
-    @builtin(global_invocation_id) GlobalId: vec3u,
-    @builtin(workgroup_id) WorkGroupID: vec3u,
-    @builtin(local_invocation_id) LocalInvocationID: vec3u
+    @builtin(global_invocation_id) GID: vec3u,
+    @builtin(workgroup_id) WID: vec3u,
+    @builtin(local_invocation_id) LID: vec3u
 ) {
-    let index = GlobalId.x + (GlobalId.y * THREADS_Y);
+    // index = x + (y * numColumns) + (z * numColumns * numRows)
 
-    if (index >= NUMPARTICLES) {
-        return;
-    }
+    let x = WID.x * THREADS_X + LID.x;
+    let y = WID.y * THREADS_Y + LID.y;
+    let z = WID.z * THREADS_Z + LID.z;
+
+    let X = x;
+    let Y = y * (WORKGROUP_X * THREADS_X);
+    let Z = z * (WORKGROUP_X * THREADS_X) * (WORKGROUP_Y * THREADS_Y);
+
+    let index = i32(X + Y + Z);
+    let indexF = f32(index);
+
 
     let particle = &particles[index];
 
     if(particle.init == 0){
-        particleInit(&particles, index, WorkGroupID);
+        particleInit(&particles, index, WID);
         particle.init = 1;
     }
 
@@ -84,7 +100,7 @@ fn main(
     particle.color = vec4f(particle.color.rgb, (1. - life_percent) * life_percent * 2);
 
     if(particle.life >= particle.life_limit || any(particle_position > vec2f(SCREENSCALE)) || any(particle_position < vec2f(-SCREENSCALE)) || particle.color.a == 0.){
-        particleInit(&particles, index, WorkGroupID);
+        particleInit(&particles, index, WID);
     }
 }
 `;
