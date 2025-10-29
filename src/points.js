@@ -1296,7 +1296,6 @@ class Points {
             this.#device = await this.#adapter.requestDevice();
             this.#device.label = (new Date()).getMilliseconds();
         }
-        console.log(this.#device.label);
 
         console.log(this.#device.limits);
 

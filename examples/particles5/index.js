@@ -3,6 +3,7 @@ import Points, { RenderPass } from 'points';
 import vert from './cube_renderpass/vert.js';
 import frag from './cube_renderpass/frag.js';
 import compute from './cube_renderpass/compute.js';
+import { isMobile } from 'utils';
 
 const options = {
     lambert: false,
@@ -10,13 +11,27 @@ const options = {
     scale: .1,
 }
 
-const WORKGROUP_X = 1024; // 1024
-const WORKGROUP_Y = 2;
-const WORKGROUP_Z = 2;
+options.isMobile = isMobile();
 
-const THREADS_X = 8;
-const THREADS_Y = 8;
-const THREADS_Z = 4;
+let WORKGROUP_X = 1024; // 1024
+let WORKGROUP_Y = 2;
+let WORKGROUP_Z = 2;
+
+let THREADS_X = 8;
+let THREADS_Y = 8;
+let THREADS_Z = 4;
+
+if(options.isMobile){
+    WORKGROUP_X = 8;
+    WORKGROUP_Y = 4;
+    WORKGROUP_Z = 2;
+
+    THREADS_X = 4;
+    THREADS_Y = 4;
+    THREADS_Z = 2;
+
+    options.scale = .616;
+}
 
 const NUMPARTICLES = WORKGROUP_X * WORKGROUP_Y * WORKGROUP_Z * THREADS_X * THREADS_Y * THREADS_Z;
 console.log('NUMPARTICLES: ', NUMPARTICLES);
