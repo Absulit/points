@@ -14,12 +14,12 @@ const options = {
 options.isMobile = isMobile();
 
 let WORKGROUP_X = 256;
-let WORKGROUP_Y = 2;
-let WORKGROUP_Z = 2;
+let WORKGROUP_Y = 1;
+let WORKGROUP_Z = 1;
 
-let THREADS_X = 8;
-let THREADS_Y = 8;
-let THREADS_Z = 4;
+let THREADS_X = 256;
+let THREADS_Y = 1;
+let THREADS_Z = 1;
 
 if(options.isMobile){
     WORKGROUP_X = 8;
@@ -69,12 +69,7 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
-        const size = { width: 1080, height: 1080 }
-        if (options.isMobile) {
-            size.width = 1280;
-            size.height = 720;
-        }
-        await points.setTextureWebcam('webcam', size);
+        await points.setTextureWebcam('webcam');
 
         points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
         points.setConstant('WORKGROUP_X', WORKGROUP_X, 'u32');

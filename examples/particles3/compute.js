@@ -30,11 +30,14 @@ fn particleInit(particles: ptr<storage, array<Particle,NUMPARTICLES>, read_write
 
     var particleColor = vec4f();
 
+    let flip = vec2f(-1, 1);
+    let displace = vec2f(1, 0);
+
     if(params.texture_mode == 0){ // video
         particleColor = textureLoad(video, vec2i(start_position * SIZE)); // video
     }
     if(params.texture_mode == 1){ // webcam
-        particleColor = textureLoad(webcam, vec2i(start_position * SIZE)); // video
+        particleColor = textureLoad(webcam, vec2i((start_position * flip + displace) * SIZE)); // video
     }
     if(params.texture_mode == 2){ // image
         particleColor = textureLoad(image, vec2i(start_position * SIZE), 0); // image
