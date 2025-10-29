@@ -44,12 +44,6 @@ const imagetexture1 = {
     update: points => {
         points.setUniform('flip', options.flip);
         points.setUniform('isMobile', options.isMobile);
-    },
-    remove: _ => {
-        if (webcam?.video.srcObject) {
-            const stream = webcam.video.srcObject;
-            stream.getTracks().forEach(track => track.stop());
-        }
     }
 }
 

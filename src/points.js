@@ -2474,6 +2474,11 @@ class Points {
 
         this.#uniforms = new UniformsArray();
         this.#meshUniforms = new UniformsArray();
+
+        this.#texturesExternal.forEach(textureExternal => {
+                const stream = textureExternal?.video.srcObject;
+                stream?.getTracks().forEach(track => track.stop());
+        })
     }
 }
 
