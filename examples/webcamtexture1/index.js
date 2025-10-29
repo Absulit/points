@@ -12,7 +12,7 @@ const options = {
 
 let webcam = null;
 
-const imagetexture1 = {
+const base = {
     vert,
     frag,
     /**
@@ -31,7 +31,7 @@ const imagetexture1 = {
         points.setSampler('imageSampler', null);
         webcam = await points.setTextureWebcam('webcam', size)
             .catch(err => {
-                console.log('---- display no webcam message');
+                alert('The webcam is not enabled.')
                 throw err;
             });
 
@@ -47,4 +47,4 @@ const imagetexture1 = {
     }
 }
 
-export default imagetexture1;
+export default base;
