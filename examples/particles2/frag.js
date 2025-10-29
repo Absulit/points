@@ -16,7 +16,7 @@ fn main(
     @builtin(position) position: vec4f
 ) -> @location(0) vec4f {
 
-    let c = sdfCircle(vec2f(.5), .5, .0, uvr);
+    let c = sdfCircle(vec2f(.5), .5, .0, uv);
 
     let finalColor = vec4f(color.rgb * c, color.a * c);
 
