@@ -43,6 +43,36 @@ export class LoadOp {
 }
 
 /**
+ * To tell the {@link RenderPass} what polygons are Front Facing
+ * Default `CCW`
+ * @example
+ *
+ * renderPass.frontFace = FrontFace.CCW;
+ */
+export class FrontFace {
+    /** @type {GPUFrontFace} */
+    static CCW = 'ccw';
+    /** @type {GPUFrontFace} */
+    static CC = 'cc';
+}
+
+/**
+ * To tell the {@link RenderPass} what polygons should be discarded
+ * Default `BACK`
+ * @example
+ *
+ * renderPass.cullMode = CullMode.BACK;
+ */
+export class CullMode {
+    /** @type {GPUCullMode} */
+    static NONE = 'none';
+    /** @type {GPUCullMode} */
+    static FRONT = 'front';
+    /** @type {GPUCullMode} */
+    static BACK = 'back';
+}
+
+/**
  * A RenderPass is a way to have a block of shaders to pass to your application pipeline and
  * these render passes will be executed in the order you pass them in the {@link Points#init} method.
  *
@@ -127,6 +157,8 @@ class RenderPass {
     #meshes = [];
 
     #topology = PrimitiveTopology.TRIANGLE_LIST;
+    #cullMode = CullMode.BACK;
+    #frontFace = FrontFace.CCW;
 
     #descriptor = {
         colorAttachments: [
@@ -503,6 +535,7 @@ class RenderPass {
     get topology() {
         return this.#topology;
     }
+
     /**
      * To render as Triangles, lines or points.
      * Use class {@link PrimitiveTopology}
@@ -512,9 +545,39 @@ class RenderPass {
         this.#topology = val;
     }
 
+    get cullMode() {
+        return this.#cullMode;
+    }
+
+    /**
+     * Triangles to discard.
+     * Default `BACK`.
+     * Use class {@link CullMode}
+     * @param {CullMode | GPUCullMode} val
+     */
+    set cullMode(val) {
+        this.#cullMode = val;
+    }
+
+    get frontFace() {
+        return this.#frontFace;
+    }
+
+    /**
+     * Direction of the triangles.
+     * Counter Clockwise (CCW) or Clockwise (CW)
+     * Default `CCW`.
+     * Use class {@link frontFace}
+     * @param {FrontFace | GPUFrontFace} val
+     */
+    set frontFace(val) {
+        this.#frontFace = val;
+    }
+
     get bundle() {
         return this.#bundle;
     }
+
     /**
      * Render Bundle for performance
      * @param {GPURenderBundle} val
@@ -548,25 +611,31 @@ class RenderPass {
      */
     addPoint(coordinate, width, height, colors, canvas, useTexture = false) {
         const { x, y, z } = coordinate;
-        const nx = getWGSLCoordinate(x, canvas.width);
-        const ny = getWGSLCoordinate(y, canvas.height, true);
-        const nz = z;
-        const nw = getWGSLCoordinate(x + width, canvas.width);
-        const nh = getWGSLCoordinate(y + height, canvas.height);
-        const { r: r0, g: g0, b: b0, a: a0 } = colors[0];
-        const { r: r1, g: g1, b: b1, a: a1 } = colors[1];
-        const { r: r2, g: g2, b: b2, a: a2 } = colors[2];
-        const { r: r3, g: g3, b: b3, a: a3 } = colors[3];
-        const normals = [0, 0, 1];
 
+        const nx = getWGSLCoordinate(x, canvas.width);                  // left
+        const ny = getWGSLCoordinate(y, canvas.height, true);           // top
+        const nw = getWGSLCoordinate(x + width, canvas.width);          // right
+        const nh = getWGSLCoordinate(y + height, canvas.height);        // bottom
+
+        const nz = z;
+        const normals = [0, 0, 1];
         const id = this.#meshCounter;
+
+        const { r: r0, g: g0, b: b0, a: a0 } = colors[0]; // top-left
+        const { r: r1, g: g1, b: b1, a: a1 } = colors[1]; // bottom-left
+        const { r: r2, g: g2, b: b2, a: a2 } = colors[2]; // top-right
+        const { r: r3, g: g3, b: b3, a: a3 } = colors[3]; // bottom-right
+
         this.#vertexArray.push(
-            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * .5, (+ny + 1) * .5, ...normals, id, // 0 top left
-            +nw, +ny, nz, 1, r1, g1, b1, a1, (+nw + 1) * .5, (+ny + 1) * .5, ...normals, id, // 1 top right
-            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * .5, (-nh + 1) * .5, ...normals, id, // 2 bottom right
-            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * .5, (+ny + 1) * .5, ...normals, id, // 3 top left
-            +nx, -nh, nz, 1, r2, g2, b2, a2, (+nx + 1) * .5, (-nh + 1) * .5, ...normals, id, // 4 bottom left
-            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * .5, (-nh + 1) * .5, ...normals, id, // 5 bottom right
+            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * 0.5, (+ny + 1) * 0.5, ...normals, id, // top-left
+            +nx, -nh, nz, 1, r1, g1, b1, a1, (+nx + 1) * 0.5, (-nh + 1) * 0.5, ...normals, id, // bottom-left
+            +nw, +ny, nz, 1, r2, g2, b2, a2, (+nw + 1) * 0.5, (+ny + 1) * 0.5, ...normals, id, // top-right
+        );
+
+        this.#vertexArray.push(
+            +nx, -nh, nz, 1, r1, g1, b1, a1, (+nx + 1) * 0.5, (-nh + 1) * 0.5, ...normals, id, // bottom-left
+            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * 0.5, (-nh + 1) * 0.5, ...normals, id, // bottom-right
+            +nw, +ny, nz, 1, r2, g2, b2, a2, (+nw + 1) * 0.5, (+ny + 1) * 0.5, ...normals, id, // top-right
         );
 
         const mesh = {
@@ -711,12 +780,12 @@ class RenderPass {
         ];
 
         const faces = [
-            [0, 1, 2, 3], // back
-            [5, 4, 7, 6], // front
-            [4, 0, 3, 7], // left
-            [1, 5, 6, 2], // right
-            [3, 2, 6, 7], // top
-            [4, 5, 1, 0], // bottom
+            [0, 3, 2, 1], // back
+            [4, 5, 6, 7], // front
+            [0, 4, 7, 3], // left
+            [5, 1, 2, 6], // right
+            [3, 7, 6, 2], // top
+            [0, 1, 5, 4], // bottom
         ];
 
         for (let i = 0; i < 6; i++) {
@@ -818,9 +887,9 @@ class RenderPass {
                 const v4 = vertexGrid[lat][lon + 1];
 
                 // triangle 1
-                this.#vertexArray.push(...v1, ...v2, ...v3);
+                this.#vertexArray.push(...v1, ...v3, ...v2);
                 // triangle 2
-                this.#vertexArray.push(...v1, ...v3, ...v4);
+                this.#vertexArray.push(...v1, ...v4, ...v3);
             }
         }
 
