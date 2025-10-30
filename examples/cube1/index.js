@@ -1,5 +1,5 @@
 
-import Points, { RenderPass, RenderPasses } from 'points';
+import Points, { LoadOp, RenderPass, RenderPasses } from 'points';
 import { cube_renderpass } from './cube_renderpass/index.js';
 import { staticcube_renderpass } from './staticcube_renderpass/index.js';
 
@@ -19,7 +19,7 @@ const nf = 1 / (near - far);
 staticcube_renderpass.depthWriteEnabled = true;
 staticcube_renderpass.addCube('cube_behind');
 
-cube_renderpass.loadOp = 'clear';
+cube_renderpass.loadOp = LoadOp.CLEAR;
 cube_renderpass.depthWriteEnabled = true;
 cube_renderpass.addCube('cube0');
 cube_renderpass.addCube('cube1', { x: 0, y: 1, z: 0 });
@@ -65,7 +65,7 @@ const base = {
 
         folder.add(options, 'loadOp')
             .name('loadOp: clear|load')
-            .onChange(value => cube_renderpass.loadOp = value ? 'load' : 'clear');
+            .onChange(value => cube_renderpass.loadOp = value ? LoadOp.LOAD : LoadOp.CLEAR);
         folder.open();
     },
     /**

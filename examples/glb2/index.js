@@ -1,5 +1,5 @@
 
-import Points, { RenderPass, RenderPasses } from 'points';
+import Points, { LoadOp, RenderPass, RenderPasses } from 'points';
 
 import vert from './glb_renderpass/vert.js';
 import frag from './glb_renderpass/frag.js';
@@ -48,7 +48,7 @@ glb_renderpass.depthWriteEnabled = true;
 glb_renderpass.name = 'glb_renderpass';
 
 const depth_renderpass = new RenderPass(vertdepth, fragdepth);
-depth_renderpass.loadOp = 'load';
+depth_renderpass.loadOp = LoadOp.LOAD;
 depth_renderpass.name = 'depth_renderpass';
 
 const near = 0.1, far = 100;
