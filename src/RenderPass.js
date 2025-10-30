@@ -548,25 +548,31 @@ class RenderPass {
      */
     addPoint(coordinate, width, height, colors, canvas, useTexture = false) {
         const { x, y, z } = coordinate;
-        const nx = getWGSLCoordinate(x, canvas.width);
-        const ny = getWGSLCoordinate(y, canvas.height, true);
-        const nz = z;
-        const nw = getWGSLCoordinate(x + width, canvas.width);
-        const nh = getWGSLCoordinate(y + height, canvas.height);
-        const { r: r0, g: g0, b: b0, a: a0 } = colors[0];
-        const { r: r1, g: g1, b: b1, a: a1 } = colors[1];
-        const { r: r2, g: g2, b: b2, a: a2 } = colors[2];
-        const { r: r3, g: g3, b: b3, a: a3 } = colors[3];
-        const normals = [0, 0, 1];
 
+        const nx = getWGSLCoordinate(x, canvas.width);                  // left
+        const ny = getWGSLCoordinate(y, canvas.height, true);           // top
+        const nw = getWGSLCoordinate(x + width, canvas.width);          // right
+        const nh = getWGSLCoordinate(y + height, canvas.height);        // bottom
+
+        const nz = z;
+        const normals = [0, 0, 1];
         const id = this.#meshCounter;
+
+        const { r: r0, g: g0, b: b0, a: a0 } = colors[0]; // top-left
+        const { r: r1, g: g1, b: b1, a: a1 } = colors[1]; // bottom-left
+        const { r: r2, g: g2, b: b2, a: a2 } = colors[2]; // top-right
+        const { r: r3, g: g3, b: b3, a: a3 } = colors[3]; // bottom-right
+
         this.#vertexArray.push(
-            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * .5, (+ny + 1) * .5, ...normals, id, // 0 top left
-            +nw, +ny, nz, 1, r1, g1, b1, a1, (+nw + 1) * .5, (+ny + 1) * .5, ...normals, id, // 1 top right
-            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * .5, (-nh + 1) * .5, ...normals, id, // 2 bottom right
-            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * .5, (+ny + 1) * .5, ...normals, id, // 3 top left
-            +nx, -nh, nz, 1, r2, g2, b2, a2, (+nx + 1) * .5, (-nh + 1) * .5, ...normals, id, // 4 bottom left
-            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * .5, (-nh + 1) * .5, ...normals, id, // 5 bottom right
+            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * 0.5, (+ny + 1) * 0.5, ...normals, id, // top-left
+            +nx, -nh, nz, 1, r1, g1, b1, a1, (+nx + 1) * 0.5, (-nh + 1) * 0.5, ...normals, id, // bottom-left
+            +nw, +ny, nz, 1, r2, g2, b2, a2, (+nw + 1) * 0.5, (+ny + 1) * 0.5, ...normals, id, // top-right
+        );
+
+        this.#vertexArray.push(
+            +nx, -nh, nz, 1, r1, g1, b1, a1, (+nx + 1) * 0.5, (-nh + 1) * 0.5, ...normals, id, // bottom-left
+            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * 0.5, (-nh + 1) * 0.5, ...normals, id, // bottom-right
+            +nw, +ny, nz, 1, r2, g2, b2, a2, (+nw + 1) * 0.5, (+ny + 1) * 0.5, ...normals, id, // top-right
         );
 
         const mesh = {
