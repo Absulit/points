@@ -157,6 +157,8 @@ class RenderPass {
     #meshes = [];
 
     #topology = PrimitiveTopology.TRIANGLE_LIST;
+    #cullMode = CullMode.BACK;
+    #frontFace = FrontFace.CCW;
 
     #descriptor = {
         colorAttachments: [
@@ -533,6 +535,7 @@ class RenderPass {
     get topology() {
         return this.#topology;
     }
+
     /**
      * To render as Triangles, lines or points.
      * Use class {@link PrimitiveTopology}
@@ -542,9 +545,39 @@ class RenderPass {
         this.#topology = val;
     }
 
+    get cullMode() {
+        return this.#cullMode;
+    }
+
+    /**
+     * Triangles to discard.
+     * Default `BACK`.
+     * Use class {@link CullMode}
+     * @param {CullMode | GPUCullMode} val
+     */
+    set cullMode(val) {
+        this.#cullMode = val;
+    }
+
+    get frontFace() {
+        return this.#frontFace;
+    }
+
+    /**
+     * Direction of the triangles.
+     * Counter Clockwise (CCW) or Clockwise (CW)
+     * Default `CCW`.
+     * Use class {@link frontFace}
+     * @param {FrontFace | GPUFrontFace} val
+     */
+    set frontFace(val) {
+        this.#frontFace = val;
+    }
+
     get bundle() {
         return this.#bundle;
     }
+
     /**
      * Render Bundle for performance
      * @param {GPURenderBundle} val
