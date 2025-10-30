@@ -28,6 +28,21 @@ export class PrimitiveTopology {
 };
 
 /**
+ * To tell the {@link RenderPass} how the data from the previous RenderPass
+ * is preserved on screen or cleared.
+ * Default `CLEAR`
+ * @example
+ *
+ * renderPass.loadOp = LoadOp.LOAD;
+ */
+export class LoadOp {
+    /** @type {GPULoadOp} */
+    static CLEAR = 'clear';
+    /** @type {GPULoadOp} */
+    static LOAD = 'load';
+}
+
+/**
  * A RenderPass is a way to have a block of shaders to pass to your application pipeline and
  * these render passes will be executed in the order you pass them in the {@link Points#init} method.
  *
@@ -456,7 +471,7 @@ class RenderPass {
     /**
      * Controls if the last RenderPass data is preserved on screen or cleared.
      * Default `clear`
-     * @param {'clear'|'load'} val
+     * @param {LoadOp | GPULoadOp} val
      */
     set loadOp(val) {
         this.#loadOp = val;
