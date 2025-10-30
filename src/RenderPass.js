@@ -120,7 +120,7 @@ class RenderPass {
     #vertexBufferInfo = null;
 
     #depthWriteEnabled = false;
-    #loadOp = 'clear';
+    #loadOp = LoadOp.CLEAR;
     #clearValue = { r: 0.0, g: 0.0, b: 0.0, a: 1.0 };
 
     #meshCounter = 0;

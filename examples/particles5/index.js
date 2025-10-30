@@ -1,5 +1,5 @@
 
-import Points, { RenderPass } from 'points';
+import Points, { LoadOp, RenderPass } from 'points';
 import vert from './cube_renderpass/vert.js';
 import frag from './cube_renderpass/frag.js';
 import compute from './cube_renderpass/compute.js';
@@ -38,7 +38,7 @@ console.log('NUMPARTICLES: ', NUMPARTICLES);
 
 const cube_renderpass = new RenderPass(vert, frag, compute, WORKGROUP_X, WORKGROUP_Y, WORKGROUP_Z);
 cube_renderpass.clearValue = {r:0,g:0,b:0,a:0};
-cube_renderpass.loadOp = 'load';
+cube_renderpass.loadOp = LoadOp.CLEAR;
 cube_renderpass.depthWriteEnabled = true;
 cube_renderpass.addPlane(
     'base_cube',
