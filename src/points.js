@@ -2219,7 +2219,7 @@ class Points {
         this.#renderPasses.forEach(renderPass => {
             if (renderPass.hasVertexAndFragmentShader) {
                 renderPass.descriptor.colorAttachments[0].view = swapChainTexture.createView();
-                if (renderPass.depthWriteEnabled && !renderPass.descriptor.depthStencilAttachment.view) {
+                if (renderPass.depthWriteEnabled && (!renderPass.descriptor.depthStencilAttachment.view || this.#screenResized)) {
                     renderPass.descriptor.depthStencilAttachment.view = this.#depthTexture.createView();
                 }
 
