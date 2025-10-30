@@ -43,6 +43,36 @@ export class LoadOp {
 }
 
 /**
+ * To tell the {@link RenderPass} what polygons are Front Facing
+ * Default `CCW`
+ * @example
+ *
+ * renderPass.frontFace = FrontFace.CCW;
+ */
+export class FrontFace {
+    /** @type {GPUFrontFace} */
+    static CCW = 'ccw';
+    /** @type {GPUFrontFace} */
+    static CC = 'cc';
+}
+
+/**
+ * To tell the {@link RenderPass} what polygons should be discarded
+ * Default `BACK`
+ * @example
+ *
+ * renderPass.cullMode = CullMode.BACK;
+ */
+export class CullMode {
+    /** @type {GPUCullMode} */
+    static NONE = 'none';
+    /** @type {GPUCullMode} */
+    static FRONT = 'front';
+    /** @type {GPUCullMode} */
+    static BACK = 'back';
+}
+
+/**
  * A RenderPass is a way to have a block of shaders to pass to your application pipeline and
  * these render passes will be executed in the order you pass them in the {@link Points#init} method.
  *
