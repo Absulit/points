@@ -824,9 +824,9 @@ class RenderPass {
                 const v4 = vertexGrid[lat][lon + 1];
 
                 // triangle 1
-                this.#vertexArray.push(...v1, ...v2, ...v3);
+                this.#vertexArray.push(...v1, ...v3, ...v2);
                 // triangle 2
-                this.#vertexArray.push(...v1, ...v3, ...v4);
+                this.#vertexArray.push(...v1, ...v4, ...v3);
             }
         }
 
