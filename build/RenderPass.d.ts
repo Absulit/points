@@ -1,4 +1,46 @@
 /**
+ * To tell the {@link RenderPass} what polygons should be discarded
+ * Default `BACK`
+ * @example
+ *
+ * renderPass.cullMode = CullMode.BACK;
+ */
+export class CullMode {
+    /** @type {GPUCullMode} */
+    static NONE: GPUCullMode;
+    /** @type {GPUCullMode} */
+    static FRONT: GPUCullMode;
+    /** @type {GPUCullMode} */
+    static BACK: GPUCullMode;
+}
+/**
+ * To tell the {@link RenderPass} what polygons are Front Facing
+ * Default `CCW`
+ * @example
+ *
+ * renderPass.frontFace = FrontFace.CCW;
+ */
+export class FrontFace {
+    /** @type {GPUFrontFace} */
+    static CCW: GPUFrontFace;
+    /** @type {GPUFrontFace} */
+    static CC: GPUFrontFace;
+}
+/**
+ * To tell the {@link RenderPass} how the data from the previous RenderPass
+ * is preserved on screen or cleared.
+ * Default `CLEAR`
+ * @example
+ *
+ * renderPass.loadOp = LoadOp.LOAD;
+ */
+export class LoadOp {
+    /** @type {GPULoadOp} */
+    static CLEAR: GPULoadOp;
+    /** @type {GPULoadOp} */
+    static LOAD: GPULoadOp;
+}
+/**
  * To tell the {@link RenderPass} how to display the triangles.
  * Default `TRIANGLE_LIST`
  * @example
@@ -84,12 +126,12 @@ declare class RenderPass {
     get renderPipeline(): any;
     set computeBindGroup(value: GPUBindGroup);
     get computeBindGroup(): GPUBindGroup;
-    set renderBindGroup(value: GPUBindGroup);
-    get renderBindGroup(): GPUBindGroup;
+    set fragmentBindGroup(value: GPUBindGroup);
+    get fragmentBindGroup(): GPUBindGroup;
     set vertexBindGroup(value: GPUBindGroup);
     get vertexBindGroup(): GPUBindGroup;
-    set bindGroupLayoutRender(value: GPUBindGroupLayout);
-    get bindGroupLayoutRender(): GPUBindGroupLayout;
+    set bindGroupLayoutFragment(value: GPUBindGroupLayout);
+    get bindGroupLayoutFragment(): GPUBindGroupLayout;
     set bindGroupLayoutVertex(value: GPUBindGroupLayout);
     get bindGroupLayoutVertex(): GPUBindGroupLayout;
     set bindGroupLayoutCompute(value: GPUBindGroupLayout);
@@ -179,11 +221,11 @@ declare class RenderPass {
     get depthWriteEnabled(): boolean;
     /**
      * Controls if the last RenderPass data is preserved on screen or cleared.
-     * Default `clear`
-     * @param {'clear'|'load'} val
+     * Default {@link LoadOp#CLEAR}
+     * @param {LoadOp | GPULoadOp} val
      */
-    set loadOp(val: "clear" | "load");
-    get loadOp(): "clear" | "load";
+    set loadOp(val: LoadOp | GPULoadOp);
+    get loadOp(): LoadOp | GPULoadOp;
     /**
      * Sets the color used to clear the RenderPass before drawing.
      * (only if {@link RenderPass#loadOp | loadOp} is set to `clear`)
@@ -213,6 +255,35 @@ declare class RenderPass {
      */
     set topology(val: GPUPrimitiveTopology);
     get topology(): GPUPrimitiveTopology;
+    /**
+     * Triangles to discard.
+     * Default `BACK`.
+     * Use class {@link CullMode}
+     * @param {CullMode | GPUCullMode} val
+     */
+    set cullMode(val: CullMode | GPUCullMode);
+    get cullMode(): CullMode | GPUCullMode;
+    /**
+     * Direction of the triangles.
+     * Counter Clockwise (CCW) or Clockwise (CW)
+     * Default `CCW`.
+     * Use class {@link frontFace}
+     * @param {FrontFace | GPUFrontFace} val
+     */
+    set frontFace(val: FrontFace | GPUFrontFace);
+    get frontFace(): FrontFace | GPUFrontFace;
+    /**
+     * Render Bundle for performance
+     * @param {GPURenderBundle} val
+     */
+    set bundle(val: GPURenderBundle);
+    get bundle(): GPURenderBundle;
+    /**
+     * Device reference to check if RenderBundle needs to be rebuilt
+     * @param {GPUDevice} val
+     */
+    set device(val: GPUDevice);
+    get device(): GPUDevice;
     /**
      * - **currently for internal use**<br>
      * - **might be private in the future**<br>
