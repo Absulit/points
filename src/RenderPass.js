@@ -717,12 +717,12 @@ class RenderPass {
         ];
 
         const faces = [
-            [0, 1, 2, 3], // back
-            [5, 4, 7, 6], // front
-            [4, 0, 3, 7], // left
-            [1, 5, 6, 2], // right
-            [3, 2, 6, 7], // top
-            [4, 5, 1, 0], // bottom
+            [0, 3, 2, 1], // back
+            [4, 5, 6, 7], // front
+            [0, 4, 7, 3], // left
+            [5, 1, 2, 6], // right
+            [3, 7, 6, 2], // top
+            [0, 1, 5, 4], // bottom
         ];
 
         for (let i = 0; i < 6; i++) {
