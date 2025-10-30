@@ -470,7 +470,7 @@ class RenderPass {
 
     /**
      * Controls if the last RenderPass data is preserved on screen or cleared.
-     * Default `clear`
+     * Default {@link LoadOp#CLEAR}
      * @param {LoadOp | GPULoadOp} val
      */
     set loadOp(val) {
