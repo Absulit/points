@@ -9,6 +9,7 @@ struct CustomFragment {
     @location(4) mouse: vec2f,
     @location(5) depth: vec4f,
     @location(6) noise: f32,
+
 }
 
 struct Particle {

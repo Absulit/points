@@ -26,6 +26,51 @@ class PrimitiveTopology {
     static TRIANGLE_STRIP = 'triangle-strip';
 }
 /**
+ * To tell the {@link RenderPass} how the data from the previous RenderPass
+ * is preserved on screen or cleared.
+ * Default `CLEAR`
+ * @example
+ *
+ * renderPass.loadOp = LoadOp.LOAD;
+ */
+class LoadOp {
+    /** @type {GPULoadOp} */
+    static CLEAR = 'clear';
+    /** @type {GPULoadOp} */
+    static LOAD = 'load';
+}
+
+/**
+ * To tell the {@link RenderPass} what polygons are Front Facing
+ * Default `CCW`
+ * @example
+ *
+ * renderPass.frontFace = FrontFace.CCW;
+ */
+class FrontFace {
+    /** @type {GPUFrontFace} */
+    static CCW = 'ccw';
+    /** @type {GPUFrontFace} */
+    static CC = 'cc';
+}
+
+/**
+ * To tell the {@link RenderPass} what polygons should be discarded
+ * Default `BACK`
+ * @example
+ *
+ * renderPass.cullMode = CullMode.BACK;
+ */
+class CullMode {
+    /** @type {GPUCullMode} */
+    static NONE = 'none';
+    /** @type {GPUCullMode} */
+    static FRONT = 'front';
+    /** @type {GPUCullMode} */
+    static BACK = 'back';
+}
+
+/**
  * A RenderPass is a way to have a block of shaders to pass to your application pipeline and
  * these render passes will be executed in the order you pass them in the {@link Points#init} method.
  *
@@ -67,7 +112,7 @@ class RenderPass {
     /**
      * @type {GPUBindGroup}
      */
-    #renderBindGroup = null;
+    #fragmentBindGroup = null;
     /**
      * @type {GPUBindGroup}
      */
@@ -75,7 +120,7 @@ class RenderPass {
     /**
      * @type {GPUBindGroupLayout}
      */
-    #bindGroupLayoutRender = null;
+    #bindGroupLayoutFragment = null;
     /**
      * @type {GPUBindGroupLayout}
      */
@@ -103,13 +148,15 @@ class RenderPass {
     #vertexBufferInfo = null;
 
     #depthWriteEnabled = false;
-    #loadOp = 'clear';
+    #loadOp = LoadOp.CLEAR;
     #clearValue = { r: 0.0, g: 0.0, b: 0.0, a: 1.0 };
 
     #meshCounter = 0;
     #meshes = [];
 
     #topology = PrimitiveTopology.TRIANGLE_LIST;
+    #cullMode = CullMode.BACK;
+    #frontFace = FrontFace.CCW;
 
     #descriptor = {
         colorAttachments: [
@@ -134,6 +181,9 @@ class RenderPass {
         depthLoadOp: 'clear',
         depthStoreOp: 'store'
     }
+
+    #bundle = null;
+    #device = null;
 
     /**
      * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
@@ -234,12 +284,12 @@ class RenderPass {
         return this.#computeBindGroup;
     }
 
-    set renderBindGroup(value) {
-        this.#renderBindGroup = value;
+    set fragmentBindGroup(value) {
+        this.#fragmentBindGroup = value;
     }
 
-    get renderBindGroup() {
-        return this.#renderBindGroup;
+    get fragmentBindGroup() {
+        return this.#fragmentBindGroup;
     }
 
     set vertexBindGroup(value) {
@@ -250,12 +300,12 @@ class RenderPass {
         return this.#vertexBindGroup;
     }
 
-    set bindGroupLayoutRender(value) {
-        this.#bindGroupLayoutRender = value;
+    set bindGroupLayoutFragment(value) {
+        this.#bindGroupLayoutFragment = value;
     }
 
-    get bindGroupLayoutRender() {
-        return this.#bindGroupLayoutRender;
+    get bindGroupLayoutFragment() {
+        return this.#bindGroupLayoutFragment;
     }
 
     set bindGroupLayoutVertex(value) {
@@ -450,8 +500,8 @@ class RenderPass {
 
     /**
      * Controls if the last RenderPass data is preserved on screen or cleared.
-     * Default `clear`
-     * @param {'clear'|'load'} val
+     * Default {@link LoadOp#CLEAR}
+     * @param {LoadOp | GPULoadOp} val
      */
     set loadOp(val) {
         this.#loadOp = val;
@@ -480,16 +530,69 @@ class RenderPass {
         return this.#descriptor;
     }
 
-    get topology(){
+    get topology() {
         return this.#topology;
     }
+
     /**
      * To render as Triangles, lines or points.
      * Use class {@link PrimitiveTopology}
      * @param {GPUPrimitiveTopology} val
      */
-    set topology(val){
+    set topology(val) {
         this.#topology = val;
+    }
+
+    get cullMode() {
+        return this.#cullMode;
+    }
+
+    /**
+     * Triangles to discard.
+     * Default `BACK`.
+     * Use class {@link CullMode}
+     * @param {CullMode | GPUCullMode} val
+     */
+    set cullMode(val) {
+        this.#cullMode = val;
+    }
+
+    get frontFace() {
+        return this.#frontFace;
+    }
+
+    /**
+     * Direction of the triangles.
+     * Counter Clockwise (CCW) or Clockwise (CW)
+     * Default `CCW`.
+     * Use class {@link frontFace}
+     * @param {FrontFace | GPUFrontFace} val
+     */
+    set frontFace(val) {
+        this.#frontFace = val;
+    }
+
+    get bundle() {
+        return this.#bundle;
+    }
+
+    /**
+     * Render Bundle for performance
+     * @param {GPURenderBundle} val
+     */
+    set bundle(val) {
+        this.#bundle = val;
+    }
+
+    get device() {
+        return this.#device;
+    }
+    /**
+     * Device reference to check if RenderBundle needs to be rebuilt
+     * @param {GPUDevice} val
+     */
+    set device(val) {
+        this.#device = val;
     }
 
     /**
@@ -506,25 +609,31 @@ class RenderPass {
      */
     addPoint(coordinate, width, height, colors, canvas, useTexture = false) {
         const { x, y, z } = coordinate;
-        const nx = getWGSLCoordinate(x, canvas.width);
-        const ny = getWGSLCoordinate(y, canvas.height, true);
-        const nz = z;
-        const nw = getWGSLCoordinate(x + width, canvas.width);
-        const nh = getWGSLCoordinate(y + height, canvas.height);
-        const { r: r0, g: g0, b: b0, a: a0 } = colors[0];
-        const { r: r1, g: g1, b: b1, a: a1 } = colors[1];
-        const { r: r2, g: g2, b: b2, a: a2 } = colors[2];
-        const { r: r3, g: g3, b: b3, a: a3 } = colors[3];
-        const normals = [0, 0, 1];
 
+        const nx = getWGSLCoordinate(x, canvas.width);                  // left
+        const ny = getWGSLCoordinate(y, canvas.height, true);           // top
+        const nw = getWGSLCoordinate(x + width, canvas.width);          // right
+        const nh = getWGSLCoordinate(y + height, canvas.height);        // bottom
+
+        const nz = z;
+        const normals = [0, 0, 1];
         const id = this.#meshCounter;
+
+        const { r: r0, g: g0, b: b0, a: a0 } = colors[0]; // top-left
+        const { r: r1, g: g1, b: b1, a: a1 } = colors[1]; // bottom-left
+        const { r: r2, g: g2, b: b2, a: a2 } = colors[2]; // top-right
+        const { r: r3, g: g3, b: b3, a: a3 } = colors[3]; // bottom-right
+
         this.#vertexArray.push(
-            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * .5, (+ny + 1) * .5, ...normals, id, // 0 top left
-            +nw, +ny, nz, 1, r1, g1, b1, a1, (+nw + 1) * .5, (+ny + 1) * .5, ...normals, id, // 1 top right
-            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * .5, (-nh + 1) * .5, ...normals, id, // 2 bottom right
-            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * .5, (+ny + 1) * .5, ...normals, id, // 3 top left
-            +nx, -nh, nz, 1, r2, g2, b2, a2, (+nx + 1) * .5, (-nh + 1) * .5, ...normals, id, // 4 bottom left
-            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * .5, (-nh + 1) * .5, ...normals, id, // 5 bottom right
+            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * 0.5, (+ny + 1) * 0.5, ...normals, id, // top-left
+            +nx, -nh, nz, 1, r1, g1, b1, a1, (+nx + 1) * 0.5, (-nh + 1) * 0.5, ...normals, id, // bottom-left
+            +nw, +ny, nz, 1, r2, g2, b2, a2, (+nw + 1) * 0.5, (+ny + 1) * 0.5, ...normals, id, // top-right
+        );
+
+        this.#vertexArray.push(
+            +nx, -nh, nz, 1, r1, g1, b1, a1, (+nx + 1) * 0.5, (-nh + 1) * 0.5, ...normals, id, // bottom-left
+            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * 0.5, (-nh + 1) * 0.5, ...normals, id, // bottom-right
+            +nw, +ny, nz, 1, r2, g2, b2, a2, (+nw + 1) * 0.5, (+ny + 1) * 0.5, ...normals, id, // top-right
         );
 
         const mesh = {
@@ -669,12 +778,12 @@ class RenderPass {
         ];
 
         const faces = [
-            [0, 1, 2, 3], // back
-            [5, 4, 7, 6], // front
-            [4, 0, 3, 7], // left
-            [1, 5, 6, 2], // right
-            [3, 2, 6, 7], // top
-            [4, 5, 1, 0], // bottom
+            [0, 3, 2, 1], // back
+            [4, 5, 6, 7], // front
+            [0, 4, 7, 3], // left
+            [5, 1, 2, 6], // right
+            [3, 7, 6, 2], // top
+            [0, 1, 5, 4], // bottom
         ];
 
         for (let i = 0; i < 6; i++) {
@@ -776,9 +885,9 @@ class RenderPass {
                 const v4 = vertexGrid[lat][lon + 1];
 
                 // triangle 1
-                this.#vertexArray.push(...v1, ...v2, ...v3);
+                this.#vertexArray.push(...v1, ...v3, ...v2);
                 // triangle 2
-                this.#vertexArray.push(...v1, ...v3, ...v4);
+                this.#vertexArray.push(...v1, ...v4, ...v3);
             }
         }
 
@@ -3225,6 +3334,9 @@ const entriesModes = { [R]: 'read-only-storage', [RW]: 'storage' };
 class Points {
     #canvasId = null;
     #canvas = null;
+    /** @type {GPUAdapter} */
+    #adapter = null;
+    /** @type {GPUDevice} */
     #device = null;
     #context = null;
     #presentationFormat = null;
@@ -3272,6 +3384,7 @@ class Points {
     #events = new Map();
     #events_ids = 0;
     #dataSize = null;
+    #screenResized = false;
 
     constructor(canvasId) {
         this.#canvasId = canvasId;
@@ -3307,6 +3420,7 @@ class Points {
     }
 
     #resizeCanvasToFitWindow = () => {
+        this.#screenResized = true;
         if (this.#fitWindow) {
             const { offsetWidth, offsetHeight } = this.#canvas.parentNode;
             this.#canvas.width = offsetWidth;
@@ -3316,6 +3430,7 @@ class Points {
     }
 
     #resizeCanvasToDefault = () => {
+        this.#screenResized = true;
         this.#canvas.width = this.#originalCanvasWidth;
         this.#canvas.height = this.#originalCanvasHeigth;
         this.#setScreenSize();
@@ -3786,6 +3901,7 @@ class Points {
         }
         const a = texture2d_A.texture;
         const cubeTexture = this.#device.createTexture({
+            label: '_cubeTexture',
             size: [a.width, a.height, 1],
             format: 'rgba8unorm',
             usage:
@@ -3824,6 +3940,7 @@ class Points {
             }
             texture2dToUpdate.imageTexture.bitmap = imageBitmap;
             const cubeTexture = this.#device.createTexture({
+                label: '_cubeTexture setTextureImage',
                 size: [imageBitmap.width, imageBitmap.height, 1],
                 format: 'rgba8unorm',
                 usage:
@@ -3964,9 +4081,10 @@ class Points {
      * Loads webcam as `texture_external`and then
      * it will be available to read data from in the shaders.
      * @param {String} name id of the wgsl variable in the shader
+     * @param {{width:Number, height:Number}} size to crop the video. WebGPU might throw an error if size does not match.
      * @param {GPUShaderStage} shaderType
      * @returns {Object}
-     *
+     * @throws a WGSL error if the size doesn't match possible crop size
      * @example
      * // js
      * await points.setTextureWebcam('video');
@@ -3974,33 +4092,30 @@ class Points {
      * // wgsl string
      * et rgba = textureExternalPosition(video, imageSampler, position, uvr, true);
      */
-    async setTextureWebcam(name, shaderType) {
+    async setTextureWebcam(name, size = { width: 1080, height: 1080 }, shaderType) {
         if (this.#nameExists(this.#texturesExternal, name)) {
             throw `setTextureWebcam: ${name} already exists.`;
         }
         const video = document.createElement('video');
-        //video.loop = true;
-        //video.autoplay = true;
         video.muted = true;
-        //document.body.appendChild(video);
         if (navigator.mediaDevices.getUserMedia) {
-            await navigator.mediaDevices.getUserMedia({ video: true })
-                .then(async function (stream) {
+            await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: size.width }, height: { ideal: size.height } } })
+                .then(async stream => {
                     video.srcObject = stream;
                     await video.play();
                 })
-                .catch(function (err) {
-                    console.log(err);
-                });
+                .catch(err => { throw err });
         }
         const textureExternal = {
-            name: name,
-            shaderType: shaderType,
-            video: video,
+            name,
+            shaderType,
+            video,
+            size,
             internal: false
         };
         this.#texturesExternal.push(textureExternal);
-        return textureExternal;
+
+        return await new Promise(resolve => resolve(textureExternal));
     }
 
     /**
@@ -4297,6 +4412,27 @@ class Points {
         });
         return dynamicGroupBindings;
     }
+
+    #createDynamicGroupBindingsUpdate(shaderType, { index: renderPassIndex, internal }, groupId = 0) {
+        if (!shaderType) {
+            throw '`GPUShaderStage` is required';
+        }
+        // const groupId = 0;
+        let dynamicGroupBindings = '';
+        let bindingIndex = 0;
+
+        this.#texturesExternal.forEach(externalTexture => {
+            const isInternal = internal === externalTexture.internal;
+            if (isInternal && (!externalTexture.shaderType || externalTexture.shaderType & shaderType)) {
+                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${externalTexture.name}: texture_external;\n`;
+                bindingIndex += 1;
+            }
+        });
+
+        return dynamicGroupBindings;
+
+    }
+
     /**
      * Establishes the density of the base mesh, by default 1x1, meaning two triangles.
      * The final number of triangles is `numColumns` * `numRows` * `2` ( 2 being the triangles )
@@ -4362,9 +4498,16 @@ class Points {
         renderPass.hasVertexShader && (dynamicGroupBindingsVertex += dynamicStructParams);
         renderPass.hasComputeShader && (dynamicGroupBindingsCompute += dynamicStructParams);
         renderPass.hasFragmentShader && (dynamicGroupBindingsFragment += dynamicStructParams);
+
         renderPass.hasVertexShader && (dynamicGroupBindingsVertex += this.#createDynamicGroupBindings(GPUShaderStage.VERTEX, renderPass));
         renderPass.hasComputeShader && (dynamicGroupBindingsCompute += this.#createDynamicGroupBindings(GPUShaderStage.COMPUTE, renderPass));
         dynamicGroupBindingsFragment += this.#createDynamicGroupBindings(GPUShaderStage.FRAGMENT, renderPass, 1);
+
+        // renderPass.hasVertexShader && (dynamicGroupBindingsVertex += this.#createDynamicGroupBindingsUpdate(GPUShaderStage.VERTEX, renderPass, 2));
+        // renderPass.hasComputeShader && (dynamicGroupBindingsCompute += this.#createDynamicGroupBindingsUpdate(GPUShaderStage.COMPUTE, renderPass, 2));
+        // dynamicGroupBindingsFragment += this.#createDynamicGroupBindingsUpdate(GPUShaderStage.FRAGMENT, renderPass, 2);
+
+
         renderPass.hasVertexShader && (colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + defaultVertexBody + colorsVertWGSL);
         renderPass.hasComputeShader && (colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + colorsComputeWGSL);
         renderPass.hasFragmentShader && (colorsFragWGSL = dynamicGroupBindingsFragment + defaultStructs + colorsFragWGSL);
@@ -4437,14 +4580,20 @@ class Points {
         this.#renderPasses.forEach(this.#compileRenderPass);
         this.#generateDataSize();
         //
-        let adapter = null;
-        try {
-            adapter = await navigator.gpu.requestAdapter();
-        } catch (err) {
-            console.log(err);
+        // let adapter = null;
+        if (!this.#adapter) {
+            try {
+                this.#adapter = await navigator.gpu.requestAdapter();
+            } catch (err) {
+                console.log(err);
+            }
         }
-        if (!adapter) { return false; }
-        this.#device = await adapter.requestDevice();
+        if (!this.#adapter) { return false; }
+        if (!this.#device) {
+            this.#device = await this.#adapter.requestDevice();
+            this.#device.label = (new Date()).getMilliseconds();
+        }
+
         console.log(this.#device.limits);
 
         this.#device.lost.then(info => console.log(info));
@@ -4708,6 +4857,7 @@ class Points {
         //--------------------------------------------
         this.#texturesStorage2d.forEach(textureStorage2d => {
             textureStorage2d.texture = this.#device.createTexture({
+                label: `_createBuffers, texturesStorage2d: ${textureStorage2d.name}`,
                 size: this.#presentationSize,
                 format: 'rgba8unorm',
                 usage: GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
@@ -4718,7 +4868,7 @@ class Points {
             if (texture2d.imageTexture) {
                 const imageBitmap = texture2d.imageTexture.bitmap;
                 const cubeTexture = this.#device.createTexture({
-                    label: texture2d.name,
+                    label: `_createBuffers, textures2d: ${texture2d.name}`,
                     size: [imageBitmap.width, imageBitmap.height, 1],
                     format: 'rgba8unorm',
                     usage:
@@ -4747,6 +4897,7 @@ class Points {
                 let cubeTexture;
                 const imageBitmaps = texture2dArray.imageTextures.bitmaps;
                 cubeTexture = this.#device.createTexture({
+                    label: `_createBuffers cubeTexture texture2dArray: ${texture2dArray.name}`,
                     size: [imageBitmaps[0].width, imageBitmaps[0].height, imageBitmaps.length],
                     format: 'rgba8unorm',
                     usage:
@@ -4770,12 +4921,14 @@ class Points {
         //--------------------------------------------
         this.#texturesExternal.forEach(externalTexture => {
             externalTexture.texture = this.#device.importExternalTexture({
+                label: `_createBuffers, externalTexture: ${externalTexture.name}`,
                 source: externalTexture.video
             });
         });
         //--------------------------------------------
         this.#bindingTextures.forEach(bindingTexture => {
             bindingTexture.texture = this.#device.createTexture({
+                label: `_createBuffers, bindingTexture: ${bindingTexture.name}`,
                 size: bindingTexture.size || this.#presentationSize,
                 format: 'rgba8unorm',
                 usage: GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
@@ -4810,48 +4963,10 @@ class Points {
         });
     }
 
-    #createComputeBindGroup() {
-        this.#renderPasses.forEach((renderPass, index) => {
-            if (renderPass.hasComputeShader) {
-                const entries = this.#createEntries(GPUShaderStage.COMPUTE, renderPass);
-                if (entries.length) {
-                    renderPass.bindGroupLayoutCompute = this.#device.createBindGroupLayout({ entries });
-                    renderPass.computeBindGroup = this.#device.createBindGroup({
-                        label: `_createComputeBindGroup 0 - ${index}`,
-                        layout: renderPass.bindGroupLayoutCompute,
-                        entries: entries
-                    });
-                }
-            }
-        });
-    }
-
-    /**
-     * This is a slimmed down version of {@link #createComputeBindGroup}.
-     * We don't create the bindingGroupLayout since it already exists.
-     * We do update the entries. We have to update them because of
-     * changing textures like videos.
-     * TODO: this can be optimized even further by setting a flag to
-     * NOT CALL the createBindGroup if the texture (video/other)
-     * is not being updated at all. I have to make the createBindGroup call
-     * only if the texture is updated.
-     * @param {RenderPass} renderPass
-     */
-    #passComputeBindingGroup(renderPass) {
-        const entries = this.#createEntries(GPUShaderStage.COMPUTE, renderPass);
-        if (entries.length) {
-            renderPass.computeBindGroup = this.#device.createBindGroup({
-                label: `_passComputeBindingGroup 0`,
-                layout: renderPass.bindGroupLayoutCompute,
-                entries
-            });
-        }
-    }
-
     #createPipeline() {
-        this.#createComputeBindGroup();
         this.#renderPasses.forEach((renderPass, index) => {
             if (renderPass.hasComputeShader) {
+                this.#createBindGroup(renderPass, GPUShaderStage.COMPUTE);
                 renderPass.computePipeline = this.#device.createComputePipeline({
                     layout: this.#device.createPipelineLayout({
                         bindGroupLayouts: [renderPass.bindGroupLayoutCompute]
@@ -4861,25 +4976,16 @@ class Points {
                         module: this.#device.createShaderModule({
                             code: renderPass.compiledShaders.compute
                         }),
-                        entryPoint: "main"
+                        entryPoint: 'main'
                     }
                 });
             }
-        });
 
-        //--------------------------------------
-        this.#createVertexBindGroup();
-        this.#createRenderBindGroup();
-        //this.createVertexBuffer(new Float32Array(this.#vertexArray));
-        // enum GPUPrimitiveTopology {
-        //     'point-list',
-        //     'line-list',
-        //     'line-strip',
-        //     'triangle-list',
-        //     'triangle-strip',
-        // };
-        this.#renderPasses.forEach(renderPass => {
+            //--------------------------------------
+
             if (renderPass.hasVertexAndFragmentShader) {
+                this.#createBindGroup(renderPass, GPUShaderStage.VERTEX);
+                this.#createBindGroup(renderPass, GPUShaderStage.FRAGMENT);
                 let depthStencil = undefined;
                 if (renderPass.depthWriteEnabled) {
                     depthStencil = {
@@ -4892,10 +4998,10 @@ class Points {
                     label: `render pipeline: renderPass ${renderPass.index} (${renderPass.name})`,
                     // layout: 'auto',
                     layout: this.#device.createPipelineLayout({
-                        bindGroupLayouts: [renderPass.bindGroupLayoutVertex, renderPass.bindGroupLayoutRender]
+                        bindGroupLayouts: [renderPass.bindGroupLayoutVertex, renderPass.bindGroupLayoutFragment]
                     }),
                     //primitive: { topology: 'triangle-strip' },
-                    primitive: { topology: renderPass.topology },
+                    primitive: { topology: renderPass.topology, cullMode: renderPass.cullMode, frontFace: renderPass.frontFace },
                     depthStencil,
                     vertex: {
                         module: this.#device.createShaderModule({
@@ -5215,47 +5321,86 @@ class Points {
                     }
                 );
             }
-
-
         });
 
         entries.forEach(entry => entry.visibility = shaderType);
-        // console.log(shaderType, entries);debugger
 
         return entries;
     }
 
-    #createVertexBindGroup() {
-        this.#renderPasses.forEach(renderPass => {
-            const entries = this.#createEntries(GPUShaderStage.VERTEX, renderPass);
-            if (entries.length) {
-                renderPass.bindGroupLayoutVertex = this.#device.createBindGroupLayout({ entries });
-                renderPass.vertexBindGroup = this.#device.createBindGroup({
-                    label: '_createVertexBindGroup() 0',
-                    layout: renderPass.bindGroupLayoutVertex,
-                    entries
-                });
+    #createEntriesUpdate(shaderType, { index: renderPassIndex, internal }) {
+        let entries = [];
+        let bindingIndex = 0;
+        this.#texturesExternal.forEach(externalTexture => {
+            const isInternal = internal === externalTexture.internal;
+            if (isInternal && (!externalTexture.shaderType || externalTexture.shaderType & shaderType)) {
+                entries.push(
+                    {
+                        label: 'external texture',
+                        binding: bindingIndex++,
+                        resource: externalTexture.texture,
+                        externalTexture: {
+                            // type: 'write-only'
+                        }
+                    }
+                );
             }
         });
-    }
+        entries.forEach(entry => entry.visibility = shaderType);
 
-    #createRenderBindGroup() {
-        this.#renderPasses.forEach(renderPass => {
-            const entries = this.#createEntries(GPUShaderStage.FRAGMENT, renderPass);
-            if (entries.length) {
-                renderPass.bindGroupLayoutRender = this.#device.createBindGroupLayout({ entries });
-                renderPass.renderBindGroup = this.#device.createBindGroup({
-                    label: '_createRenderBindGroup() 0',
-                    layout: renderPass.bindGroupLayoutRender,
-                    entries
-                });
-            }
-        });
+        return entries;
     }
 
     /**
-     * This is a slimmed down version of {@link #createRenderBindGroup}.
-     * We don't create the bindingGroupLayout since it already exists.
+     * This was originally 3 methods, one per GPUShaderStage.
+     * This might seem a bit more complicated but I wanted to have everything
+     * in a single method to avoid duplication and possible bifurcations without
+     * me knowing.
+     * @param {RenderPass} renderPass
+     * @param {GPUShaderStage} shaderType
+     */
+    #createBindGroup(renderPass, shaderType) {
+        const hasComputeShader = (shaderType === GPUShaderStage.COMPUTE) && renderPass.hasComputeShader;
+        const hasVertexShader = (shaderType === GPUShaderStage.VERTEX) && renderPass.hasVertexShader;
+        const hasFragmentShader = (shaderType === GPUShaderStage.FRAGMENT) && renderPass.hasFragmentShader;
+
+        const entries = this.#createEntries(shaderType, renderPass);
+
+        if (entries.length) {
+            const bindGroupLayout = this.#device.createBindGroupLayout({ entries });
+            const bindGroup = this.#device.createBindGroup({
+                label: `_createBindGroup a ${shaderType} - ${renderPass.name}`,
+                layout: bindGroupLayout,
+                entries
+            });
+
+            if (hasComputeShader) {
+                renderPass.bindGroupLayoutCompute = bindGroupLayout;
+                renderPass.computeBindGroup = bindGroup;
+            }
+            if (hasVertexShader) {
+                renderPass.bindGroupLayoutVertex = bindGroupLayout;
+                renderPass.vertexBindGroup = bindGroup;
+            }
+            if (hasFragmentShader) {
+                renderPass.bindGroupLayoutFragment = bindGroupLayout;
+                renderPass.fragmentBindGroup = bindGroup;
+            }
+
+            // const entriesUpdate = this.#createEntriesUpdate(shaderType, renderPass);
+            // const bindGroup2 = this.#device.createBindGroup({
+            //     label: `_createBindGroup b ${shaderType} - ${renderPass.name}`,
+            //     layout: bindGroupLayout,
+            //     entries: entriesUpdate
+            // });
+            // renderPass.updateBindgroup = bindGroup2
+        }
+
+    }
+
+    /**
+     * This is a slimmed down version of {@link #createBindGroup}.
+     * We don't create the bindGroupLayout since it already exists.
      * We do update the entries. We have to update them because of
      * changing textures like videos.
      * TODO: this can be optimized even further by setting a flag to
@@ -5263,33 +5408,58 @@ class Points {
      * is not being updated at all. I have to make the createBindGroup call
      * only if the texture is updated.
      * @param {RenderPass} renderPass
+     * @param {GPUShaderStage} shaderType
      */
-    #passRenderBindGroup(renderPass) {
-        const entries = this.#createEntries(GPUShaderStage.FRAGMENT, renderPass);
+    #passBindGroup(renderPass, shaderType) {
+        const hasComputeShader = (shaderType === GPUShaderStage.COMPUTE) && renderPass.hasComputeShader;
+        const hasVertexShader = (shaderType === GPUShaderStage.VERTEX) && renderPass.hasVertexShader;
+        const hasFragmentShader = (shaderType === GPUShaderStage.FRAGMENT) && renderPass.hasFragmentShader;
+
+        const entries = this.#createEntries(shaderType, renderPass);
+
         if (entries.length) {
-            renderPass.renderBindGroup = this.#device.createBindGroup({
-                label: '_passRenderBindGroup() 0',
-                layout: renderPass.bindGroupLayoutRender,
+            let bindGroupLayout = null;
+
+            if (hasComputeShader) {
+                bindGroupLayout = renderPass.bindGroupLayoutCompute;
+            }
+            if (hasVertexShader) {
+                bindGroupLayout = renderPass.bindGroupLayoutVertex;
+            }
+            if (hasFragmentShader) {
+                bindGroupLayout = renderPass.bindGroupLayoutFragment;
+            }
+
+            const bindGroup = this.#device.createBindGroup({
+                label: `_passBindGroup 0`,
+                layout: bindGroupLayout,
                 entries
             });
+
+            if (hasComputeShader) {
+                renderPass.computeBindGroup = bindGroup;
+            }
+            if (hasVertexShader) {
+                renderPass.vertexBindGroup = bindGroup;
+            }
+            if (hasFragmentShader) {
+                renderPass.fragmentBindGroup = bindGroup;
+            }
+
+
+            // const entriesUpdate = this.#createEntriesUpdate(shaderType, renderPass);
+            // if (entriesUpdate.length) {
+            //     const bindGroup = this.#device.createBindGroup({
+            //         label: `passBindGroup ${shaderType} - ${renderPass.name}`,
+            //         layout: bindGroupLayout,
+            //         entries: entriesUpdate
+            //     });
+            //     renderPass.updateBindgroup = bindGroup
+            // }
+
+
         }
     }
-
-    /**
-     *
-     * @param {RenderPass} renderPass
-     */
-    #passVertexBindGroup(renderPass) {
-        const entries = this.#createEntries(GPUShaderStage.VERTEX, renderPass);
-        if (entries.length) {
-            renderPass.vertexBindGroup = this.#device.createBindGroup({
-                label: '_passVertexBindGroup() 0',
-                layout: renderPass.bindGroupLayoutVertex,
-                entries
-            });
-        }
-    }
-
 
     /**
      * Method executed on each {@link https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame | requestAnimationFrame}.
@@ -5327,6 +5497,7 @@ class Points {
         // END AUDIO
         this.#texturesExternal.forEach(externalTexture => {
             externalTexture.texture = this.#device.importExternalTexture({
+                label: `update, externalTexture: ${externalTexture.name}`,
                 source: externalTexture.video
             });
             if ('requestVideoFrameCallback' in externalTexture.video) {
@@ -5344,40 +5515,62 @@ class Points {
 
         this.#renderPasses.forEach(renderPass => {
             if (renderPass.hasVertexAndFragmentShader) {
-                this.#passRenderBindGroup(renderPass);
-                this.#passVertexBindGroup(renderPass);
-
                 renderPass.descriptor.colorAttachments[0].view = swapChainTexture.createView();
-                if (renderPass.depthWriteEnabled) {
+                if (renderPass.depthWriteEnabled && (!renderPass.descriptor.depthStencilAttachment.view || this.#screenResized)) {
                     renderPass.descriptor.depthStencilAttachment.view = this.#depthTexture.createView();
-                    // renderPass.descriptor.depthStencilAttachment.view = this.#texturesDepth2d[0].texture.createView();
+                }
+
+                const isSameDevice = this.#device === renderPass.device;
+
+                // texturesExternal means there's a video
+                // if there's a video it needs to be updated no matter what.
+                // Also, it needs to be updated if the screen size changes
+                if (!isSameDevice || !renderPass.bundle || this.#texturesExternal.length || this.#screenResized) {
+                    this.#passBindGroup(renderPass, GPUShaderStage.FRAGMENT);
+                    this.#passBindGroup(renderPass, GPUShaderStage.VERTEX);
+                    /** @type {GPURenderBundleEncoderDescriptor} */
+                    const bundleEncoderDescriptor = {
+                        colorFormats: [this.#presentationFormat],
+                        sampleCount: 1
+                    };
+
+                    if (renderPass.depthWriteEnabled) {
+                        bundleEncoderDescriptor.depthStencilFormat = 'depth32float';
+                    }
+
+                    /** @type {GPURenderBundleEncoder} */
+                    const bundleEncoder = this.#device.createRenderBundleEncoder(bundleEncoderDescriptor);
+
+                    bundleEncoder.setPipeline(renderPass.renderPipeline);
+
+                    if (this.#uniforms.length) {
+                        bundleEncoder.setBindGroup(0, renderPass.vertexBindGroup);
+                        bundleEncoder.setBindGroup(1, renderPass.fragmentBindGroup);
+                    }
+                    bundleEncoder.setVertexBuffer(0, renderPass.vertexBuffer);
+
+                    // TODO: move this to renderPass because we can ask this just one time and have it as property
+                    const isThereInstancing = renderPass.meshes.some(mesh => mesh.instanceCount > 1);
+                    if (isThereInstancing) {
+                        let vertexOffset = 0;
+                        renderPass.meshes.forEach(mesh => {
+                            bundleEncoder.draw(mesh.verticesCount, mesh.instanceCount, vertexOffset, 0);
+                            vertexOffset = mesh.verticesCount;
+                        });
+                    } else {
+                        // no instancing, regular draw with all the meshes
+                        bundleEncoder.draw(renderPass.vertexBufferInfo.vertexCount, 1);
+                    }
+                    renderPass.bundle = bundleEncoder.finish();
+                    renderPass.device = this.#device;
                 }
 
                 const passEncoder = commandEncoder.beginRenderPass(renderPass.descriptor);
-                passEncoder.setPipeline(renderPass.renderPipeline);
-
-                if (this.#uniforms.length) {
-                    passEncoder.setBindGroup(0, renderPass.vertexBindGroup);
-                    passEncoder.setBindGroup(1, renderPass.renderBindGroup);
-                }
-                passEncoder.setVertexBuffer(0, renderPass.vertexBuffer);
-
-                // console.log(renderPass.meshes.find( mesh => mesh.instanceCount > 1));
-                // console.log(renderPass.meshes.some( mesh => mesh.instanceCount > 1));
-                // TODO: move this to renderPass because we can ask this just one time and have it as property
-                const isThereInstancing = renderPass.meshes.some(mesh => mesh.instanceCount > 1);
-                if (isThereInstancing) {
-                    let vertexOffset = 0;
-                    renderPass.meshes.forEach(mesh => {
-                        passEncoder.draw(mesh.verticesCount, mesh.instanceCount, vertexOffset, 0);
-                        vertexOffset = mesh.verticesCount;
-                    });
-                } else {
-                    // no instancing, regular draw with all the meshes
-                    passEncoder.draw(renderPass.vertexBufferInfo.vertexCount, 1);
-                }
-
+                // passEncoder.setBindGroup(1, renderPass.updateBindgroup);
+                passEncoder.executeBundles([renderPass.bundle]);
                 passEncoder.end();
+
+
                 // Copy the rendering results from the swapchain into |texture2d.texture|.
                 this.#textures2d.forEach(texture2d => {
                     if (texture2d.renderPassIndex === renderPass.index || !texture2d.renderPassIndex) {
@@ -5409,7 +5602,9 @@ class Points {
                 this.#texturesToCopy = [];
             }
             if (renderPass.hasComputeShader) {
-                this.#passComputeBindingGroup(renderPass);
+                if (this.#texturesExternal.length || !renderPass.computeBindGroup) {
+                    this.#passBindGroup(renderPass, GPUShaderStage.COMPUTE);
+                }
 
                 const passEncoder = commandEncoder.beginComputePass();
                 passEncoder.setPipeline(renderPass.computePipeline);
@@ -5424,6 +5619,39 @@ class Points {
                 passEncoder.end();
             }
         });
+        this.#screenResized = false;
+
+
+        // let descriptor0 = null;
+        // const group0 = this.#renderPasses.map(renderPass => {
+        //     if(renderPass.depthWriteEnabled){
+        //         descriptor0 = renderPass.descriptor
+        //         return renderPass.bundle
+        //     }
+        // })
+        // if(descriptor0){
+        //     const passEncoder0 = commandEncoder.beginRenderPass(descriptor0);
+        //     passEncoder0.executeBundles(group0);
+        //     passEncoder0.end();
+        // }
+
+
+        // let descriptor1 = null;
+        // const group1 = this.#renderPasses.map(renderPass => {
+        //     if(!renderPass.depthWriteEnabled){
+        //         descriptor1 = renderPass.descriptor
+        //         return renderPass.bundle
+        //     }
+        // })
+        // if(descriptor1){
+        //     const passEncoder1 = commandEncoder.beginRenderPass(descriptor1);
+        //     passEncoder1.executeBundles(group1);
+        //     passEncoder1.end();
+        // }
+
+
+
+
 
         this.#readStorage.forEach(readStorageItem => {
             let storageItem = this.#storage.find(storageItem => storageItem.name === readStorageItem.name);
@@ -5472,6 +5700,10 @@ class Points {
     get canvas() {
         return this.#canvas;
     }
+
+    /**
+     * @type {GPUDevice}
+     */
     get device() {
         return this.#device;
     }
@@ -5538,6 +5770,11 @@ class Points {
 
         this.#uniforms = new UniformsArray();
         this.#meshUniforms = new UniformsArray();
+
+        this.#texturesExternal.forEach(textureExternal => {
+            const stream = textureExternal?.video.srcObject;
+            stream?.getTracks().forEach(track => track.stop());
+        });
     }
 }
 

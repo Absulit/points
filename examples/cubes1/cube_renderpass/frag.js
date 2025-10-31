@@ -9,7 +9,8 @@ ${structs}
 
 @fragment
 fn main(
-    input: CustomFragment
+    input: CustomFragment,
+    @builtin(front_facing) isFront: bool,
 ) -> @location(0) vec4f {
 
     let cellSize = 20. + 10. * fnusin(1.);

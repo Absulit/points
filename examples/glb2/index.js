@@ -1,5 +1,5 @@
 
-import Points, { RenderPass, RenderPasses } from 'points';
+import Points, { LoadOp, RenderPass, RenderPasses } from 'points';
 
 import vert from './glb_renderpass/vert.js';
 import frag from './glb_renderpass/frag.js';
@@ -7,20 +7,38 @@ import compute from './glb_renderpass/compute.js';
 
 import vertdepth from './depth_renderpass/vert.js';
 import fragdepth from './depth_renderpass/frag.js';
-import { loadAndExtract } from 'utils';
+import { loadAndExtract, isMobile } from 'utils';
 
 const options = {
     mode: 1,
     dof: .33
 }
 
-const WORKGROUP_X = 4;
-const WORKGROUP_Y = 4;
-const WORKGROUP_Z = 1;
+options.isMobile = isMobile();
 
-const THREADS_X = 2;
-const THREADS_Y = 2;
-const THREADS_Z = 2;
+let WORKGROUP_X = 4;
+let WORKGROUP_Y = 4;
+let WORKGROUP_Z = 1;
+
+let THREADS_X = 2;
+let THREADS_Y = 2;
+let THREADS_Z = 2;
+
+let WIDTH = 8;
+let HEIGHT = 1;
+
+if(options.isMobile){
+    WORKGROUP_X = 4;
+    WORKGROUP_Y = 2;
+    WORKGROUP_Z = 1;
+
+    THREADS_X = 2;
+    THREADS_Y = 2;
+    THREADS_Z = 2;
+
+    WIDTH = 4;
+    HEIGHT = 1;
+}
 
 const NUMPARTICLES = WORKGROUP_X * WORKGROUP_Y * WORKGROUP_Z * THREADS_X * THREADS_Y * THREADS_Z;
 console.log('NUMPARTICLES: ', NUMPARTICLES);
@@ -30,7 +48,7 @@ glb_renderpass.depthWriteEnabled = true;
 glb_renderpass.name = 'glb_renderpass';
 
 const depth_renderpass = new RenderPass(vertdepth, fragdepth);
-depth_renderpass.loadOp = 'load';
+depth_renderpass.loadOp = LoadOp.LOAD;
 depth_renderpass.name = 'depth_renderpass';
 
 const near = 0.1, far = 100;
@@ -85,6 +103,8 @@ const base = {
         points.setConstant('THREADS_X', THREADS_X, 'u32');
         points.setConstant('THREADS_Y', THREADS_Y, 'u32');
         points.setConstant('THREADS_Z', THREADS_Z, 'u32');
+        points.setConstant('WIDTH', WIDTH, 'i32');
+        points.setConstant('HEIGHT', HEIGHT, 'i32');
         points.setStorage('particles', `array<Particle, ${NUMPARTICLES}>`);
 
         points.addEventListener('logger', data => {

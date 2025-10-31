@@ -69,12 +69,12 @@ export class RenderPass {
     get renderPipeline(): any;
     set computeBindGroup(value: GPUBindGroup);
     get computeBindGroup(): GPUBindGroup;
-    set renderBindGroup(value: GPUBindGroup);
-    get renderBindGroup(): GPUBindGroup;
+    set fragmentBindGroup(value: GPUBindGroup);
+    get fragmentBindGroup(): GPUBindGroup;
     set vertexBindGroup(value: GPUBindGroup);
     get vertexBindGroup(): GPUBindGroup;
-    set bindGroupLayoutRender(value: GPUBindGroupLayout);
-    get bindGroupLayoutRender(): GPUBindGroupLayout;
+    set bindGroupLayoutFragment(value: GPUBindGroupLayout);
+    get bindGroupLayoutFragment(): GPUBindGroupLayout;
     set bindGroupLayoutVertex(value: GPUBindGroupLayout);
     get bindGroupLayoutVertex(): GPUBindGroupLayout;
     set bindGroupLayoutCompute(value: GPUBindGroupLayout);
@@ -164,11 +164,11 @@ export class RenderPass {
     get depthWriteEnabled(): boolean;
     /**
      * Controls if the last RenderPass data is preserved on screen or cleared.
-     * Default `clear`
-     * @param {'clear'|'load'} val
+     * Default {@link LoadOp#CLEAR}
+     * @param {LoadOp | GPULoadOp} val
      */
-    set loadOp(val: "clear" | "load");
-    get loadOp(): "clear" | "load";
+    set loadOp(val: LoadOp | GPULoadOp);
+    get loadOp(): LoadOp | GPULoadOp;
     /**
      * Sets the color used to clear the RenderPass before drawing.
      * (only if {@link RenderPass#loadOp | loadOp} is set to `clear`)
@@ -198,6 +198,35 @@ export class RenderPass {
      */
     set topology(val: GPUPrimitiveTopology);
     get topology(): GPUPrimitiveTopology;
+    /**
+     * Triangles to discard.
+     * Default `BACK`.
+     * Use class {@link CullMode}
+     * @param {CullMode | GPUCullMode} val
+     */
+    set cullMode(val: CullMode | GPUCullMode);
+    get cullMode(): CullMode | GPUCullMode;
+    /**
+     * Direction of the triangles.
+     * Counter Clockwise (CCW) or Clockwise (CW)
+     * Default `CCW`.
+     * Use class {@link frontFace}
+     * @param {FrontFace | GPUFrontFace} val
+     */
+    set frontFace(val: FrontFace | GPUFrontFace);
+    get frontFace(): FrontFace | GPUFrontFace;
+    /**
+     * Render Bundle for performance
+     * @param {GPURenderBundle} val
+     */
+    set bundle(val: GPURenderBundle);
+    get bundle(): GPURenderBundle;
+    /**
+     * Device reference to check if RenderBundle needs to be rebuilt
+     * @param {GPUDevice} val
+     */
+    set device(val: GPUDevice);
+    get device(): GPUDevice;
     /**
      * - **currently for internal use**<br>
      * - **might be private in the future**<br>
@@ -809,9 +838,10 @@ declare class Points {
      * Loads webcam as `texture_external`and then
      * it will be available to read data from in the shaders.
      * @param {String} name id of the wgsl variable in the shader
+     * @param {{width:Number, height:Number}} size to crop the video. WebGPU might throw an error if size does not match.
      * @param {GPUShaderStage} shaderType
      * @returns {Object}
-     *
+     * @throws a WGSL error if the size doesn't match possible crop size
      * @example
      * // js
      * await points.setTextureWebcam('video');
@@ -819,7 +849,10 @@ declare class Points {
      * // wgsl string
      * et rgba = textureExternalPosition(video, imageSampler, position, uvr, true);
      */
-    setTextureWebcam(name: string, shaderType: GPUShaderStage): any;
+    setTextureWebcam(name: string, size: {
+        width: number;
+        height: number;
+    }, shaderType: GPUShaderStage): any;
     /**
      * Assigns an audio FrequencyData to a StorageMap.<br>
      * Calling setAudio creates a Storage with `name` in the wgsl shaders.<br>
@@ -963,7 +996,10 @@ declare class Points {
      * @type {HTMLCanvasElement}
      */
     get canvas(): HTMLCanvasElement;
-    get device(): any;
+    /**
+     * @type {GPUDevice}
+     */
+    get device(): GPUDevice;
     get context(): any;
     get presentationFormat(): any;
     get buffer(): any;
@@ -978,6 +1014,48 @@ declare class Points {
     get fullscreen(): boolean;
     destroy(): void;
     #private;
+}
+/**
+ * To tell the {@link RenderPass} how the data from the previous RenderPass
+ * is preserved on screen or cleared.
+ * Default `CLEAR`
+ * @example
+ *
+ * renderPass.loadOp = LoadOp.LOAD;
+ */
+declare class LoadOp {
+    /** @type {GPULoadOp} */
+    static CLEAR: GPULoadOp;
+    /** @type {GPULoadOp} */
+    static LOAD: GPULoadOp;
+}
+/**
+ * To tell the {@link RenderPass} what polygons should be discarded
+ * Default `BACK`
+ * @example
+ *
+ * renderPass.cullMode = CullMode.BACK;
+ */
+declare class CullMode {
+    /** @type {GPUCullMode} */
+    static NONE: GPUCullMode;
+    /** @type {GPUCullMode} */
+    static FRONT: GPUCullMode;
+    /** @type {GPUCullMode} */
+    static BACK: GPUCullMode;
+}
+/**
+ * To tell the {@link RenderPass} what polygons are Front Facing
+ * Default `CCW`
+ * @example
+ *
+ * renderPass.frontFace = FrontFace.CCW;
+ */
+declare class FrontFace {
+    /** @type {GPUFrontFace} */
+    static CCW: GPUFrontFace;
+    /** @type {GPUFrontFace} */
+    static CC: GPUFrontFace;
 }
 declare class Coordinate {
     constructor(x?: number, y?: number, z?: number);
