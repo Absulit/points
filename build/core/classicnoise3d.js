@@ -14,6 +14,7 @@
  * Classic Perlin noise, periodic variant
  * @type {String}
  * @param {vec3f} P position
+ * @param {vec3f} rep period repetition
  * @returns {f32}
  *
  * @example
