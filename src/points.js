@@ -2231,7 +2231,6 @@ class Points {
                 // if there's a video it needs to be updated no matter what.
                 // Also, it needs to be updated if the screen size changes
                 if (!isSameDevice || !renderPass.bundle || this.#texturesExternal.length || this.#screenResized || this.#textureUpdated) {
-                    this.#textureUpdated = false;
                     this.#passBindGroup(renderPass, GPUShaderStage.FRAGMENT);
                     this.#passBindGroup(renderPass, GPUShaderStage.VERTEX);
                     /** @type {GPURenderBundleEncoderDescriptor} */
@@ -2326,6 +2325,7 @@ class Points {
             }
         });
         this.#screenResized = false;
+        this.#textureUpdated = false;
 
 
         // let descriptor0 = null;
