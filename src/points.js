@@ -87,6 +87,7 @@ class Points {
     #events_ids = 0;
     #dataSize = null;
     #screenResized = false;
+    #textureUpdated = false;
 
     constructor(canvasId) {
         this.#canvasId = canvasId;
@@ -640,6 +641,7 @@ class Points {
             if (shaderType) {
                 throw '`setTextureImage()` the param `shaderType` should not be updated after its creation.';
             }
+            this.#textureUpdated = true;
             texture2dToUpdate.imageTexture.bitmap = imageBitmap;
             const cubeTexture = this.#device.createTexture({
                 label: '_cubeTexture setTextureImage',
@@ -2228,7 +2230,7 @@ class Points {
                 // texturesExternal means there's a video
                 // if there's a video it needs to be updated no matter what.
                 // Also, it needs to be updated if the screen size changes
-                if (!isSameDevice || !renderPass.bundle || this.#texturesExternal.length || this.#screenResized) {
+                if (!isSameDevice || !renderPass.bundle || this.#texturesExternal.length || this.#screenResized || this.#textureUpdated) {
                     this.#passBindGroup(renderPass, GPUShaderStage.FRAGMENT);
                     this.#passBindGroup(renderPass, GPUShaderStage.VERTEX);
                     /** @type {GPURenderBundleEncoderDescriptor} */
@@ -2323,6 +2325,7 @@ class Points {
             }
         });
         this.#screenResized = false;
+        this.#textureUpdated = false;
 
 
         // let descriptor0 = null;
