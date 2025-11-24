@@ -7,6 +7,9 @@ import frag1 from './r1/frag.js';
 import vert2 from './r2/vert.js';
 import frag2 from './r2/frag.js';
 
+import vert3 from './r3/vert.js';
+import frag3 from './r3/frag.js';
+
 import Points, { RenderPass } from 'points';
 
 const options = { scale: 1, bloom: .133 }
@@ -14,12 +17,14 @@ const options = { scale: 1, bloom: .133 }
 const r0 = new RenderPass(vert0, frag0);
 const r1 = new RenderPass(vert1, frag1);
 const r2 = new RenderPass(vert2, frag2);
+const r3 = new RenderPass(vert3, frag3);
 
 const bloom1 = {
     renderPasses: [
         r0,
         r1,
-        r2
+        r2,
+        r3
     ],
     /**
      * @param {Points} points
@@ -36,6 +41,7 @@ const bloom1 = {
         // await points.setTextureImage('image', './../img/absulit_800x800.jpg');
         points.setTexture2d('feedbackTexture0', true, GPUShaderStage.FRAGMENT, 0);
         points.setTexture2d('feedbackTexture1', true, GPUShaderStage.FRAGMENT, 1);
+        points.setTexture2d('feedbackTexture2', true, GPUShaderStage.FRAGMENT, 2);
 
         points.setUniform('scale', options.scale);
         points.setUniform('bloom', options.bloom);
