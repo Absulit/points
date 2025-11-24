@@ -16,9 +16,7 @@ fn main(
         @builtin(position) position: vec4f
     ) -> @location(0) vec4f {
 
-    let c0 = sdfCircle(vec2f(.5)*ratio, .2, 0, uvr);
-
-
+    let c0 = sdfCircle(vec2f(.5)*ratio, .1, 0, uvr);
 
     return vec4(c0);
 }

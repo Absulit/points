@@ -23,22 +23,14 @@ fn main(
         @builtin(position) position: vec4f
     ) -> @location(0) vec4f {
 
-    let rgbaImage = texture(image, imageSampler, uvr / params.scale, false);
+    let rgbaImage = texture(feedbackTexture0, imageSampler, uvr / params.scale, false);
 
     let luma = brightness(rgbaImage);
 
-
-    // let bloomVal = bloom(input, i32(params.bloom_iterations), params.bloom_amount);
-    // let rgbaBloom = vec4(bloomVal);
-
-    // let finalColor:vec4f = rgbaImage + rgbaBloom;
-
-
-    // let luma = dot(color.rgb, vec3<f32>(0.2126, 0.7152, 0.0722));
     let threshold = .5;
     let intensity = 1.;
     let mask = select(0.0, 1.0, luma > threshold);
-    return vec4<f32>(rgbaImage.rgb * mask * intensity, 1.0);
+    return vec4f(rgbaImage.rgb * mask * intensity, 1.0);
 }
 `;
 
