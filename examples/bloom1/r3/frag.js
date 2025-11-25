@@ -54,7 +54,10 @@ fn main(
         }
 
         let blurred = sum / max(norm, 1e-6);
-        return vec4f(blurred, 1.0);
+
+        let ft0 = texture(feedbackTexture0, imageSampler, uvr, true);
+
+        return ft0 + vec4f(blurred, 1.0) * params.bloom;
 }
 
 `;
