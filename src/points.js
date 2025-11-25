@@ -578,6 +578,13 @@ class Points {
         return texture2d;
     }
 
+    /**
+     * Creates a depth map from the selected `renderPassIndex`
+     * @param {String} name
+     * @param {GPUShaderStage} shaderType
+     * @param {Number} renderPassIndex
+     * @returns
+     */
     setTextureDepth2d(name, shaderType, renderPassIndex) {
         const exists = this.#nameExists(this.#texturesDepth2d, name);
         if (exists) {
@@ -595,6 +602,31 @@ class Points {
         return textureDepth2d;
     }
 
+    /**
+     * Creates a texture_2d with a higher range of 16 bits.
+     * This texture will have the data output from the RenderPass, meaning
+     * this is a render target with larger values, not a texture to write to.
+     * @param {String} name
+     * @param {GPUShaderStage} shaderType
+     * @param {Number} renderPassIndex
+     * @returns
+     */
+    setTextureHDR2d(name, shaderType, renderPassIndex) {
+        const exists = this.#nameExists(this.#texturesHDR2d, name);
+        if (exists) {
+            console.warn(`setTextureHDR2d: \`${name}\` already exists.`);
+            return exists;
+        }
+        const textureHDR2d = {
+            name,
+            shaderType,
+            texture: null,
+            renderPassIndex,
+            internal: false,
+        }
+        this.#texturesHDR2d.push(textureHDR2d);
+        return textureHDR2d;
+    }
 
     copyTexture(nameTextureA, nameTextureB) {
         const texture2d_A = this.#nameExists(this.#textures2d, nameTextureA);
