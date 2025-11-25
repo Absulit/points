@@ -23,7 +23,7 @@ fn main(
         @builtin(position) position: vec4f
     ) -> @location(0) vec4f {
 
-    let rgbaImage = texture(feedbackTexture0, imageSampler, uvr / params.scale, false);
+    let rgbaImage = texture(feedbackTexture0, imageSampler, uvr, false);
 
     let luma = brightness(rgbaImage);
 

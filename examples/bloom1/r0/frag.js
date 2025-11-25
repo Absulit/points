@@ -1,7 +1,9 @@
+import { texture } from 'points/image';
 import { sdfCircle } from 'points/sdf';
 
 const frag = /*wgsl*/`
 
+${texture}
 ${sdfCircle}
 
 
@@ -16,9 +18,12 @@ fn main(
         @builtin(position) position: vec4f
     ) -> @location(0) vec4f {
 
-    let c0 = sdfCircle(vec2f(.5)*ratio, .1, 0, uvr);
+    // let c0 = sdfCircle(vec2f(.5)*ratio, .1, 0, uvr);
+    let rgba = texture(image, imageSampler, uvr, true);
 
-    return vec4(c0);
+    // return vec4(c0);
+    return rgba;
+
 }
 `;
 

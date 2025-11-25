@@ -33,15 +33,20 @@ const bloom1 = {
         const descriptor = {
             addressModeU: 'repeat',
             addressModeV: 'repeat',
+            magFilter: 'linear',
+            minFilter: 'linear',
+            mipmapFilter: 'linear',
+            //maxAnisotropy: 10,
         }
 
         points.setSampler('imageSampler', descriptor);
         // await points.setTextureImage('image', './../img/carmen_lyra_423x643.jpg');
         // await points.setTextureImage('image', './../img/old_king_600x600.jpg');
-        // await points.setTextureImage('image', './../img/absulit_800x800.jpg');
-        points.setTexture2d('feedbackTexture0', true, GPUShaderStage.FRAGMENT, 0);
-        points.setTexture2d('feedbackTexture1', true, GPUShaderStage.FRAGMENT, 1);
-        points.setTexture2d('feedbackTexture2', true, GPUShaderStage.FRAGMENT, 2);
+        points.setTexture2d('feedbackTexture0', true, null, 0);
+        points.setTexture2d('feedbackTexture1', true, null, 1);
+        points.setTexture2d('feedbackTexture2', true, null, 2);
+        await points.setTextureImage('image', './../img/absulit_800x800.jpg');
+
 
         points.setUniform('scale', options.scale);
         points.setUniform('bloom', options.bloom);
