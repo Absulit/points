@@ -27,8 +27,8 @@ fn main(
 
     let luma = brightness(rgbaImage);
 
-    let threshold = .5;
-    let intensity = 1.;
+    let threshold = params.threshold;
+    let intensity = params.intensity;
     let mask = select(0.0, 1.0, luma > threshold);
     return vec4f(rgbaImage.rgb * mask * intensity, 1.0);
 }

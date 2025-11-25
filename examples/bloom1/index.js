@@ -12,7 +12,10 @@ import frag3 from './r3/frag.js';
 
 import Points, { RenderPass } from 'points';
 
-const options = { scale: 1, bloom: .133 }
+const options = {
+    threshold: .5,
+    intensity: 1,
+    bloom: .133 }
 
 const r0 = new RenderPass(vert0, frag0);
 const r1 = new RenderPass(vert1, frag1);
@@ -42,20 +45,23 @@ const bloom1 = {
         points.setSampler('imageSampler', descriptor);
         // await points.setTextureImage('image', './../img/carmen_lyra_423x643.jpg');
         // await points.setTextureImage('image', './../img/old_king_600x600.jpg');
+        await points.setTextureImage('image', './../img/absulit_800x800.jpg');
         points.setTexture2d('feedbackTexture0', true, null, 0);
         points.setTexture2d('feedbackTexture1', true, null, 1);
         points.setTexture2d('feedbackTexture2', true, null, 2);
-        await points.setTextureImage('image', './../img/absulit_800x800.jpg');
 
 
-        points.setUniform('scale', options.scale);
+        points.setUniform('threshold', options.threshold);
+        points.setUniform('intensity', options.intensity);
         points.setUniform('bloom', options.bloom);
-        folder.add(options, 'scale', 0, 1, .0001).name('scale');
-        folder.add(options, 'bloom', -1, 1, .0001).name('bloom');
+        folder.add(options, 'threshold', 0, 4, .0001).name('threshold');
+        folder.add(options, 'intensity', 0, 2, .0001).name('intensity');
+        folder.add(options, 'bloom', 0, 1, .0001).name('bloom');
         folder.open();
     },
     update: points => {
-        points.setUniform('scale', options.scale);
+        points.setUniform('threshold', options.threshold);
+        points.setUniform('intensity', options.intensity);
         points.setUniform('bloom', options.bloom);
     }
 }
