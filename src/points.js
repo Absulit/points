@@ -666,6 +666,7 @@ class Points {
             copyCurrentTexture: false,
             shaderType: shaderType,
             texture: null,
+            renderPassIndex: null,
             imageTexture: {
                 bitmap: imageBitmap
             },
@@ -2278,7 +2279,7 @@ class Points {
 
                 // Copy the rendering results from the swapchain into |texture2d.texture|.
                 this.#textures2d.forEach(texture2d => {
-                    if (texture2d.renderPassIndex === renderPass.index || !texture2d.renderPassIndex) {
+                    if (texture2d.renderPassIndex === renderPass.index || (!texture2d.renderPassIndex && texture2d.renderPassIndex !== 0)) {
                         if (texture2d.copyCurrentTexture) {
                             commandEncoder.copyTextureToTexture(
                                 {
