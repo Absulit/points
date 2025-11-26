@@ -13,10 +13,10 @@ import frag3 from './r3/frag.js';
 import Points, { RenderPass } from 'points';
 
 const options = {
-    radius: 8, // 8 - 16
-    bloomTextureSize: 1.001,
-    threshold: .5,
-    intensity: 1,
+    radius: 16, // 8 - 16
+    bloomTextureSize: 1.004,
+    threshold: 0,
+    intensity: 2,
     bloom: .133,
 }
 
