@@ -25,11 +25,11 @@ fn main(
 
         // params for later
         // texelSize: vec2<f32>; // 1.0 / bloomTextureSize
-        // radius: i32;          // e.g., 8–16
+        // radius: i32;          // e.g., 8-16
         // sigma: f32;           // e.g., radius / 2.0
-        let texelSize = vec2f(1) / 1.001;
-        let radius = 8;
-        let sigma = f32(radius) / 2.;
+        let texelSize = vec2f(1) / params.bloomTextureSize;
+        let radius = i32(params.radius);
+        let sigma = params.radius / 2.;
 
         var sum = vec3f(0.0);
         var norm = 0.0;

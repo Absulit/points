@@ -13,6 +13,11 @@ fn gaussian_weight(x: f32, sigma: f32) -> f32 {
     return exp(-0.5 * (x * x) / (sigma * sigma));
 }
 
+fn reinhardToneMap(color : vec3f) -> vec3f {
+    // Reinhard operator: color / (1 + color)
+    return color / (vec3f(1.0) + color);
+}
+
 @fragment
 fn main(
         @location(0) color: vec4f,
@@ -24,12 +29,12 @@ fn main(
     ) -> @location(0) vec4f {
 
         // params for later
-        // texelSize: vec2<f32>; // 1.0 / bloomTextureSize
-        // radius: i32;          // e.g., 8–16
+        // texelSize: vec2f; // 1.0 / bloomTextureSize
+        // radius: i32;          // e.g., 8-16
         // sigma: f32;           // e.g., radius / 2.0
-        let texelSize = vec2f(1) / 1.001;
-        let radius = 8;
-        let sigma = f32(radius) / 2.;
+        let texelSize = vec2f(1) / params.bloomTextureSize;
+        let radius = i32(params.radius);
+        let sigma = params.radius / 2.;
 
         var sum = vec3f(0.0);
         var norm = 0.0;
@@ -57,7 +62,12 @@ fn main(
 
         let ft0 = texture(feedbackTexture0, imageSampler, uvr, true);
 
-        return ft0 + vec4f(blurred, 1.0) * params.bloom;
+        // return ft0 + vec4f(blurred, 1.0) * params.bloom;
+        let t = reinhardToneMap(ft0.rgb + blurred * params.bloom);
+        // let t = tanh(ft0.rgb + blurred * params.bloom);
+        // let t = tanh((ft0.rgb + blurred * params.bloom)/3e1);
+
+        return vec4f(t, 1);
 }
 
 `;
