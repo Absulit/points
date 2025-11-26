@@ -602,32 +602,6 @@ class Points {
         return textureDepth2d;
     }
 
-    /**
-     * Creates a texture_2d with a higher range of 16 bits.
-     * This texture will have the data output from the RenderPass, meaning
-     * this is a render target with larger values, not a texture to write to.
-     * @param {String} name
-     * @param {GPUShaderStage} shaderType
-     * @param {Number} renderPassIndex
-     * @returns
-     */
-    setTextureHDR2d(name, shaderType, renderPassIndex) {
-        const exists = this.#nameExists(this.#texturesHDR2d, name);
-        if (exists) {
-            console.warn(`setTextureHDR2d: \`${name}\` already exists.`);
-            return exists;
-        }
-        const textureHDR2d = {
-            name,
-            shaderType,
-            texture: null,
-            renderPassIndex,
-            internal: false,
-        }
-        this.#texturesHDR2d.push(textureHDR2d);
-        return textureHDR2d;
-    }
-
     copyTexture(nameTextureA, nameTextureB) {
         const texture2d_A = this.#nameExists(this.#textures2d, nameTextureA);
         const texture2d_B = this.#nameExists(this.#textures2d, nameTextureB);
@@ -1336,7 +1310,7 @@ class Points {
 
         this.#device.lost.then(info => console.log(info));
         if (this.#canvas !== null) this.#context = this.#canvas.getContext('webgpu');
-        this.#presentationFormat = navigator.gpu.getPreferredCanvasFormat();
+        this.#presentationFormat = 'rgba16float'; //navigator.gpu.getPreferredCanvasFormat(); TODO make optional, pick 8 or 16/32
         if (this.#canvasId) {
             if (this.#fitWindow) {
                 this.#resizeCanvasToFitWindow();
