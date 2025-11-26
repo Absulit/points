@@ -13,6 +13,13 @@ import LayersArray from './LayersArray.js';
 import UniformsArray from './UniformsArray.js';
 import getStorageAccessMode, { bindingModes, entriesModes } from './storage-accessmode.js';
 
+class PresentationFormat {
+    static BGRA8UNORM = 'bgra8unorm';
+    static RGBA8UNORM = 'rgba8unorm';
+    static RGBA16FLOAT = 'rgba16float';
+    static RGBA32FLOAT = 'rgba32float';
+}
+
 /**
  * Main class Points, this is the entry point of an application with this library.
  * @example
@@ -1310,7 +1317,7 @@ class Points {
 
         this.#device.lost.then(info => console.log(info));
         if (this.#canvas !== null) this.#context = this.#canvas.getContext('webgpu');
-        this.#presentationFormat = 'rgba16float'; //navigator.gpu.getPreferredCanvasFormat(); TODO make optional, pick 8 or 16/32
+        this.#presentationFormat ||= navigator.gpu.getPreferredCanvasFormat();
         if (this.#canvasId) {
             if (this.#fitWindow) {
                 this.#resizeCanvasToFitWindow();
@@ -2479,6 +2486,24 @@ class Points {
         }
     }
 
+    get presentationFormat() {
+        return this.#presentationFormat;
+    }
+
+    /**
+     * Set the maximum range the render textures can hold.
+     * If you need HDR values use `16` or `32` float formats.
+     * This value is used in the texture that is created when a fragment shader
+     * returns its data, so if you use a `vec4` that goes beyond the default
+     * capped of `0..1` like `vec4(16,0,1,1)`, then use `16` or `32`.
+     *
+     * By default it has the `navigator.gpu.getPreferredCanvasFormat();` value.
+     * @param {PresentationFormat|String|GPUTextureFormat} value
+     */
+    set presentationFormat(value) {
+        this.#presentationFormat = value;
+    }
+
     destroy() {
 
         this.#uniforms = new UniformsArray();
@@ -2492,4 +2517,4 @@ class Points {
 }
 
 export default Points;
-export { RenderPass, RenderPasses, PrimitiveTopology, LoadOp };
+export { RenderPass, RenderPasses, PrimitiveTopology, LoadOp, PresentationFormat };

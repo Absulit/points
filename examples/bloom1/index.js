@@ -10,7 +10,7 @@ import frag2 from './r2/frag.js';
 import vert3 from './r3/vert.js';
 import frag3 from './r3/frag.js';
 
-import Points, { RenderPass } from 'points';
+import Points, { PresentationFormat, RenderPass } from 'points';
 
 const options = {
     radius: 16, // 8 - 16
@@ -44,6 +44,8 @@ const bloom1 = {
             mipmapFilter: 'linear',
             //maxAnisotropy: 10,
         }
+
+        points.presentationFormat = PresentationFormat.RGBA16FLOAT;
 
         points.setSampler('imageSampler', descriptor);
         // await points.setTextureImage('image', './../img/carmen_lyra_423x643.jpg');
