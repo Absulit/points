@@ -1,6 +1,6 @@
 import UniformKeys from './UniformKeys.js';
 import VertexBufferInfo from './VertexBufferInfo.js';
-import RenderPass, { PrimitiveTopology, LoadOp } from './RenderPass.js';
+import RenderPass, { PrimitiveTopology, LoadOp, CullMode } from './RenderPass.js';
 import RenderPasses from './RenderPasses.js';
 import Coordinate from './coordinate.js';
 import RGBAColor from './color.js';
@@ -2515,4 +2515,4 @@ class Points {
 }
 
 export default Points;
-export { RenderPass, RenderPasses, PrimitiveTopology, LoadOp, PresentationFormat };
+export { RenderPass, RenderPasses, PrimitiveTopology, CullMode, LoadOp, PresentationFormat };

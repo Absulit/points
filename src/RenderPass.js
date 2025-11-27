@@ -7,6 +7,12 @@ function getWGSLCoordinate(value, side, invert = false) {
     return (p * 2 - 1) * direction;
 };
 
+const BARYCENTRICS = [
+    [1, 0, 0],
+    [0, 1, 0],
+    [0, 0, 1],
+]
+
 /**
  * To tell the {@link RenderPass} how to display the triangles.
  * Default `TRIANGLE_LIST`
@@ -627,15 +633,15 @@ class RenderPass {
         const { r: r3, g: g3, b: b3, a: a3 } = colors[3]; // bottom-right
 
         this.#vertexArray.push(
-            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * 0.5, (+ny + 1) * 0.5, ...normals, id, // top-left
-            +nx, -nh, nz, 1, r1, g1, b1, a1, (+nx + 1) * 0.5, (-nh + 1) * 0.5, ...normals, id, // bottom-left
-            +nw, +ny, nz, 1, r2, g2, b2, a2, (+nw + 1) * 0.5, (+ny + 1) * 0.5, ...normals, id, // top-right
+            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * 0.5, (+ny + 1) * 0.5, ...normals, id, ...BARYCENTRICS[0], // top-left
+            +nx, -nh, nz, 1, r1, g1, b1, a1, (+nx + 1) * 0.5, (-nh + 1) * 0.5, ...normals, id, ...BARYCENTRICS[1], // bottom-left
+            +nw, +ny, nz, 1, r2, g2, b2, a2, (+nw + 1) * 0.5, (+ny + 1) * 0.5, ...normals, id, ...BARYCENTRICS[2], // top-right
         );
 
         this.#vertexArray.push(
-            +nx, -nh, nz, 1, r1, g1, b1, a1, (+nx + 1) * 0.5, (-nh + 1) * 0.5, ...normals, id, // bottom-left
-            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * 0.5, (-nh + 1) * 0.5, ...normals, id, // bottom-right
-            +nw, +ny, nz, 1, r2, g2, b2, a2, (+nw + 1) * 0.5, (+ny + 1) * 0.5, ...normals, id, // top-right
+            +nx, -nh, nz, 1, r1, g1, b1, a1, (+nx + 1) * 0.5, (-nh + 1) * 0.5, ...normals, id, ...BARYCENTRICS[0], // bottom-left
+            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * 0.5, (-nh + 1) * 0.5, ...normals, id, ...BARYCENTRICS[1], // bottom-right
+            +nw, +ny, nz, 1, r2, g2, b2, a2, (+nw + 1) * 0.5, (+ny + 1) * 0.5, ...normals, id, ...BARYCENTRICS[2], // top-right
         );
 
         const mesh = {
@@ -710,7 +716,7 @@ class RenderPass {
                 ];
 
                 for (const { position: [vx, vy, vz], uv: [u, v] } of quad) {
-                    this.#vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normal, id);
+                    this.#vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normal, id, ...BARYCENTRICS[ix % 3]);
                 }
             }
         }
@@ -807,7 +813,8 @@ class RenderPass {
             ];
 
             for (const [[vx, vy, vz], [u, v]] of verts) {
-                this.#vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normals, this.#meshCounter);
+                // console.log(i % 3);
+                this.#vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normals, this.#meshCounter, ...BARYCENTRICS[i % 3]);
             }
         }
 
@@ -874,7 +881,7 @@ class RenderPass {
                 const u = lon / segments;
                 const v = lat / rings;
 
-                vertexGrid[lat][lon] = [vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, this.#meshCounter];
+                vertexGrid[lat][lon] = [vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, this.#meshCounter, ...BARYCENTRICS[lat % 3]];
             }
         }
 
@@ -979,7 +986,7 @@ class RenderPass {
                 const [vx, vy, vz] = vertices[i];
                 const [nx, ny, nz] = normals[i];
                 const [u, v] = uvs[i];
-                this.#vertexArray.push(vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, this.#meshCounter);
+                this.#vertexArray.push(vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, this.#meshCounter, ...BARYCENTRICS[i % 3]);
             }
         }
 
@@ -1104,7 +1111,7 @@ class RenderPass {
                 const [vx, vy, vz] = vertices[i];
                 const [nx, ny, nz] = normals[i];
                 const [u, v] = uvs[i];
-                this.#vertexArray.push(vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, this.#meshCounter);
+                this.#vertexArray.push(vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, this.#meshCounter, ...BARYCENTRICS[i % 3]);
             }
         }
 
@@ -1152,7 +1159,7 @@ class RenderPass {
             const [x, y, z] = vertex;
             const [r, g, b] = color || [1, 0, 1];
             const [u, v] = uv;
-            this.#vertexArray.push(+x, +y, +z, 1, r, g, b, 1, u, v, ...normal, this.#meshCounter);
+            this.#vertexArray.push(+x, +y, +z, 1, r, g, b, 1, u, v, ...normal, this.#meshCounter, ...BARYCENTRICS[i % 3]);
         }
 
         const mesh = {
