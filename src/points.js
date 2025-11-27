@@ -52,7 +52,6 @@ class Points {
     /** @type {Array<RenderPass>} */
     #renderPasses = null;
     #postRenderPasses = [];
-    #vertexBufferInfo = null;
     #buffer = null;
     #presentationSize = null;
     #depthTexture = null;
@@ -1394,14 +1393,7 @@ class Points {
             }
         }
     }
-    /**
-     * @param {Float32Array} vertexArray
-     * @returns buffer
-     */
-    #createVertexBuffer(vertexArray) {
-        this.#vertexBufferInfo = new VertexBufferInfo(vertexArray);
-        this.#buffer = this.#createAndMapBuffer(vertexArray, GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST);
-    }
+
     /**
      * @param {Float32Array} data
      * @param {GPUBufferUsageFlags} usage
