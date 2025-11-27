@@ -61,7 +61,7 @@ export const shaderProjects = [
     { name: 'UVs 1', path: './uvs1/index.js', uri: 'uvs1', desc: 'Move your mouse. Displays two uvs at the same time.', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, enabled: true, tax: 'reference' },
     { name: 'Video Texture 1', path: './videotexture1/index.js', uri: 'videotexture1', desc: 'Loads a video as a texture to read in WGSL and displays it.', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, enabled: true, tax: 'image compute' },
     { name: 'Webcam Texture 1', path: './webcamtexture1/index.js', uri: 'webcamtexture1', desc: 'Webcam as video texture', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, enabled: true, tax: 'image' },
-    { name: 'Wireframe 1', path: './wireframe1/index.js', uri: 'wireframe1', desc: 'Webcam as video texture', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, enabled: true, tax: 'showcase 3d' },
+    { name: 'Wireframe 1', path: './wireframe1/index.js', uri: 'wireframe1', desc: 'Wireframe via fragment shader.', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, enabled: true, tax: 'showcase 3d' },
     // { name: 'PARAMS TEST', path: './params_test/index.js', uri:'params_test', desc:'', author: 'absulit', authlink:'http://absulit.com', fitWindow: true, enabled: true, tax: 'reference' },
     // { name: 'WebGPU Particles 1', path: './webgpu_particles_1/index.js', uri:'webgpu_particles_1', desc:'', author: 'absulit', authlink:'http://absulit.com', fitWindow: true, enabled: true, tax: 'reference' },
 ]
