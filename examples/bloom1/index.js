@@ -14,7 +14,7 @@ import Points, { PresentationFormat, PrimitiveTopology, RenderPass } from 'point
 
 const options = {
     radius: 16, // 8 - 16
-    bloomTextureSize: 1.004,
+    bloomTextureSize: 1.0011,
     threshold: 0,
     intensity: 2,
     bloom: .133,
