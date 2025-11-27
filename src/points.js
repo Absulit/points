@@ -1748,10 +1748,16 @@ class Points {
                                         format: 'float32x3',
                                     },
                                     {
-                                        // id
+                                        // id -> meshCounter
                                         shaderLocation: 4,
                                         offset: renderPass.vertexBufferInfo.idOffset,
                                         format: 'uint32',
+                                    },
+                                    {
+                                        // barycentrics
+                                        shaderLocation: 5,
+                                        offset: renderPass.vertexBufferInfo.barycentricsOffset,
+                                        format: 'float32x3',
                                     },
                                 ],
                             },
