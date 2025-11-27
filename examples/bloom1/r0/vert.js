@@ -26,6 +26,11 @@ fn main(
         angleY = params.time * 0.694222;
         angleX = params.time * 0.4865;
     }
+    if(id == mesh.cube1){
+        angleZ = params.time * 0.2854;
+        angleY = params.time * 0.594222;
+        angleX = params.time * 0.1865;
+    }
 
     let rotX = rotXAxis(angleX);
     let rotY = rotYAxis(angleY);

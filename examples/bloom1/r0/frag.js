@@ -15,22 +15,25 @@ ${layer}
 
 @fragment
 fn main(
-        @location(0) color: vec4f,
-        @location(1) uv: vec2f,
-        @location(2) ratio: vec2f,
-        @location(3) uvr: vec2f,
-        @location(4) mouse: vec2f,
-        @builtin(position) position: vec4f
-    ) -> @location(0) vec4f {
+    @location(0) color: vec4f,
+    @location(1) uv: vec2f,
+    @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
+    @location(3) uvr: vec2f,    // uv with aspect ratio corrected
+    @location(4) mouse: vec2f,
+    @location(5) normal: vec3f,
+    @interpolate(flat) @location(6) id: u32,
+    @builtin(position) position: vec4f
+) -> @location(0) vec4f {
 
-    let c0 = sdfCircle(vec2f(.4)*ratio, .1, 0, uvr) * 2 * RED;
-    let c1 = sdfCircle(vec2f(.5)*ratio, .1, 0, uvr) * 3 * GREEN;
-    let c2 = sdfCircle(vec2f(.6)*ratio, .1, 0, uvr) * 4 * BLUE;
-    let rgba = texture(image, imageSampler, uvr, true);
 
-    return 3 * GREEN;
-    // return vec4(c0 + c1 + c2);
-    // return layer(rgba, layer(c0, layer(c1, c2)));
+    var finalColor = 4 * BLUE;
+    if(id == mesh.cube0){
+        finalColor = 5 * RED;
+    }else if(id == mesh.cube1){
+        finalColor = 3 * GREEN;
+    }
+
+    return finalColor;
 }
 `;
 
