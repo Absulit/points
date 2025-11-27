@@ -10,7 +10,7 @@ import frag2 from './r2/frag.js';
 import vert3 from './r3/vert.js';
 import frag3 from './r3/frag.js';
 
-import Points, { PresentationFormat, RenderPass } from 'points';
+import Points, { PresentationFormat, PrimitiveTopology, RenderPass } from 'points';
 
 const options = {
     radius: 16, // 8 - 16
@@ -20,11 +20,19 @@ const options = {
     bloom: .133,
 }
 
+const near = 0.1, far = 100;
+const f = 1.0 / Math.tan(Math.PI / 8); // ≈ 2.414
+let aspect = null
+const nf = 1 / (near - far);
+
 const r0 = new RenderPass(vert0, frag0);
 const r1 = new RenderPass(vert1, frag1);
 const r2 = new RenderPass(vert2, frag2);
 const r3 = new RenderPass(vert3, frag3);
 
+r0.addCube('cube0');
+r0.depthWriteEnabled = true;
+r0.topology = PrimitiveTopology.LINE_STRIP;
 const bloom1 = {
     renderPasses: [
         r0,
@@ -46,6 +54,32 @@ const bloom1 = {
         }
 
         points.presentationFormat = PresentationFormat.RGBA16FLOAT;
+
+        aspect = points.canvas.width / points.canvas.height;
+        points.setUniform(
+            'projection',
+            [
+                f / aspect, 0, 0, 0,
+                0, f, 0, 0,
+                0, 0, (far + near) * nf, -1,
+                0, 0, (2 * far * near) * nf, 0
+            ],
+            'mat4x4<f32>'
+        )
+
+        // camera at [0, 0, 5], looking at origin
+        points.setUniform(
+            'view',
+            [
+                1, 0, 0, 0,
+                0, 1, 0, 0,
+                0, 0, 1, 0,
+                0, 0, -5, 1
+            ],
+            'mat4x4<f32>'
+        )
+
+
 
         points.setSampler('imageSampler', descriptor);
         // await points.setTextureImage('image', './../img/carmen_lyra_423x643.jpg');
@@ -77,6 +111,17 @@ const bloom1 = {
         points.setUniform('threshold', options.threshold);
         points.setUniform('intensity', options.intensity);
         points.setUniform('bloom', options.bloom);
+
+        aspect = points.canvas.width / points.canvas.height;
+        points.setUniform(
+            'projection',
+            [
+                f / aspect, 0, 0, 0,
+                0, f, 0, 0,
+                0, 0, (far + near) * nf, -1,
+                0, 0, (2 * far * near) * nf, 0
+            ]
+        )
     }
 }
 

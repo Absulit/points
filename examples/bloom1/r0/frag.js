@@ -28,7 +28,8 @@ fn main(
     let c2 = sdfCircle(vec2f(.6)*ratio, .1, 0, uvr) * 4 * BLUE;
     let rgba = texture(image, imageSampler, uvr, true);
 
-    return vec4(c0 + c1 + c2);
+    return 3 * GREEN;
+    // return vec4(c0 + c1 + c2);
     // return layer(rgba, layer(c0, layer(c1, c2)));
 }
 `;
