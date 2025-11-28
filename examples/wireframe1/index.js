@@ -21,11 +21,11 @@ const nf = 1 / (near - far);
 
 const r0 = new RenderPass(vert0, frag0, compute0);
 r0.depthWriteEnabled = true;
-// r0.cullMode = CullMode.NONE
+r0.cullMode = CullMode.NONE
 // r0.topology = PrimitiveTopology.LINE_STRIP
 r0.addCube('cube0');
 r0.addCylinder('cylinder0');
-r0.addPlane('p0')
+r0.addPlane('plane0')
 r0.addSphere('sphere0')
 r0.addTorus('torus0')
 
