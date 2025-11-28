@@ -1,8 +1,9 @@
-import { RED } from 'points/color';
+import { RED, WHITE } from 'points/color';
 
 const frag = /*wgsl*/`
 
 ${RED}
+${WHITE}
 
 
 @fragment
@@ -16,15 +17,11 @@ fn main(
 
     // Threshold controls line thickness
     var finalColor = RED;
-    if (edgeDist < width * params.val) {
-        finalColor = vec4f(1,1,1,1); // wireframe line color
+    if (edgeDist < width * params.thickness) {
+        finalColor = WHITE; // wireframe line color
     }
 
     return finalColor;
-
-
-    // return vec4f(edgeDist);
-
 }
 `;
 

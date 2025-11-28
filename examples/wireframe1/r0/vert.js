@@ -24,7 +24,7 @@ fn main(
 
     let model = rotX * rotY * rotZ;
 
-    let world = (model * vec4f(position.xyz, 1.)).xyz * 2;
+    let world = (model * vec4f(position.xyz, 1.)).xyz;
     let clip = params.projection * params.view * vec4f(world, 1.0);
 
     var dvb = defaultVertexBody(clip, color, uv, normal);
