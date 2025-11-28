@@ -2,11 +2,11 @@ import vert0 from './r0/vert.js';
 import compute0 from './r0/compute.js';
 import frag0 from './r0/frag.js';
 
-import Points, { RenderPass } from 'points';
+import Points, { CullMode, PrimitiveTopology, RenderPass } from 'points';
+import { loadAndExtract } from 'utils';
 
 const options = {
-    val: 0,
-    bool: false,
+    thickness: 0.456,
     color1: '#FF0000', // CSS string
     color2: [0, 128, 255], // RGB array
     color3: [0, 128, 255, 0.3], // RGB with alpha
@@ -21,7 +21,18 @@ const nf = 1 / (near - far);
 
 const r0 = new RenderPass(vert0, frag0, compute0);
 r0.depthWriteEnabled = true;
+// r0.cullMode = CullMode.NONE
+// r0.topology = PrimitiveTopology.LINE_STRIP
 r0.addCube('cube0');
+r0.addCylinder('cyl0');
+r0.addPlane('p0')
+r0.addSphere('s0')
+r0.addTorus('t0')
+
+const url = '../models/monkey_subdivide.glb'; // or remote URL (CORS must allow)
+const data = await loadAndExtract(url);
+const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0]
+r0.addMesh('monkey', positions, colors, colorSize, uvs, normals, indices)
 
 const base = {
     renderPasses: [
@@ -56,15 +67,8 @@ const base = {
             'mat4x4<f32>'
         )
 
-
-
-        // Add elements to dat gui
-        // create an uniform and get value from options
-        points.setUniform('val', options.val);
-
-        // https://github.com/dataarts/dat.gui/blob/master/API.md#GUI+add
-        folder.add(options, 'val', -1, 1, .0001).name('Val');
-        folder.add(options, 'bool').name('Bool');
+        points.setUniform('thickness', options.thickness);
+        folder.add(options, 'thickness', 0, 5, .0001).name('thickness');
 
         // https://github.com/dataarts/dat.gui/blob/master/API.md#GUI+addColor
         folder.addColor(options, 'color1');
@@ -90,8 +94,7 @@ const base = {
             ]
         )
 
-
-        points.setUniform('val', options.val);
+        points.setUniform('thickness', options.thickness);
     }
 }
 
