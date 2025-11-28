@@ -12,6 +12,8 @@ fn main(
     @location(1) color: vec4f,
     @location(2) uv: vec2f,
     @location(3) normal: vec3f,
+    @location(4) id: u32,
+    @location(5) barycentrics: vec3f,
     @builtin(vertex_index) vertexIndex: u32,
     @builtin(instance_index) instanceIndex: u32
 ) -> Fragment {
@@ -25,7 +27,9 @@ fn main(
     let world = (model * vec4f(position.xyz, 1.)).xyz * 2;
     let clip = params.projection * params.view * vec4f(world, 1.0);
 
-    return defaultVertexBody(clip, color, uv, normal);
+    var dvb = defaultVertexBody(clip, color, uv, normal);
+    dvb.barycentrics = barycentrics;
+    return dvb;
 }
 `;
 

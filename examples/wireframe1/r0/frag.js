@@ -7,17 +7,24 @@ ${RED}
 
 @fragment
 fn main(
-    @location(0) color: vec4f,
-    @location(1) uv: vec2f,
-    @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
-    @location(3) uvr: vec2f,    // uv with aspect ratio corrected
-    @location(4) mouse: vec2f,
-    @builtin(position) position: vec4f
+    in: Fragment
 ) -> @location(0) vec4f {
 
-    let finalColor = RED;
+    // Distance to nearest edge
+    let edgeDist = min(min(in.barycentrics.x, in.barycentrics.y), in.barycentrics.z);
+    let width = fwidth(edgeDist); // approximate derivative per pixel
+
+    // Threshold controls line thickness
+    var finalColor = RED;
+    if (edgeDist < width * params.val) {
+        finalColor = vec4f(1,1,1,1); // wireframe line color
+    }
 
     return finalColor;
+
+
+    // return vec4f(edgeDist);
+
 }
 `;
 
