@@ -24,10 +24,10 @@ r0.depthWriteEnabled = true;
 // r0.cullMode = CullMode.NONE
 // r0.topology = PrimitiveTopology.LINE_STRIP
 r0.addCube('cube0');
-r0.addCylinder('cyl0');
+r0.addCylinder('cylinder0');
 r0.addPlane('p0')
-r0.addSphere('s0')
-r0.addTorus('t0')
+r0.addSphere('sphere0')
+r0.addTorus('torus0')
 
 const url = '../models/monkey_subdivide.glb'; // or remote URL (CORS must allow)
 const data = await loadAndExtract(url);
