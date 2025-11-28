@@ -715,7 +715,7 @@ class RenderPass {
                     grid[i0], grid[i3], grid[i2]
                 ];
 
-                quad.map(({ position: [vx, vy, vz], uv: [u, v] }, i) => {
+                quad.forEach(({ position: [vx, vy, vz], uv: [u, v] }, i) => {
                     this.#vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normal, id, ...BARYCENTRICS[i % 3]);
                 })
             }
@@ -812,7 +812,7 @@ class RenderPass {
                 [v[3], uv[3]],
             ];
 
-            verts.map(([[vx, vy, vz], [u, v]], i) => {
+            verts.forEach(([[vx, vy, vz], [u, v]], i) => {
                 this.#vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normals, this.#meshCounter, ...BARYCENTRICS[i % 3]);
             })
         }
