@@ -1,5 +1,4 @@
 import vert0 from './r0/vert.js';
-import compute0 from './r0/compute.js';
 import frag0 from './r0/frag.js';
 
 import Points, { CullMode, PrimitiveTopology, RenderPass } from 'points';
@@ -17,7 +16,7 @@ const f = 1.0 / Math.tan(Math.PI / 8); // ≈ 2.414
 let aspect = null
 const nf = 1 / (near - far);
 
-const r0 = new RenderPass(vert0, frag0, compute0);
+const r0 = new RenderPass(vert0, frag0);
 r0.depthWriteEnabled = true;
 r0.cullMode = CullMode.NONE
 // r0.topology = PrimitiveTopology.LINE_STRIP
