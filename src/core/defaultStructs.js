@@ -21,7 +21,7 @@ struct Fragment {
     @location(3) uvr: vec2f,    // uv with aspect ratio corrected
     @location(4) mouse: vec2f,
     @location(5) normal: vec3f,
-    @interpolate(flat) @location(6) id: u32,
+    @interpolate(flat) @location(6) id: u32, // mesh or instance id
     @location(7) barycentrics: vec3f,
 }
 
