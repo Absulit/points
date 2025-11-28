@@ -1109,13 +1109,13 @@ class RenderPass {
             }
         }
 
-        for (const [i0, i1, i2] of indices) {
-            for (const i of [i0, i1, i2]) {
+        for (const ii of indices) {
+            ii.forEach((i, k) => {
                 const [vx, vy, vz] = vertices[i];
                 const [nx, ny, nz] = normals[i];
                 const [u, v] = uvs[i];
-                this.#vertexArray.push(vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, this.#meshCounter, ...BARYCENTRICS[i % 3]);
-            }
+                this.#vertexArray.push(vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, this.#meshCounter, ...BARYCENTRICS[k % 3]);
+            })
         }
 
         const mesh = {
