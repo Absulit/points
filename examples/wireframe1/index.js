@@ -9,6 +9,7 @@ const options = {
     thickness: 0.456,
     wireframeColor: [255, 255, 255], // RGB array
     fillColor: [255, 0, 0], // RGB array
+    opaque: true,
 }
 
 const near = 0.1, far = 100;
@@ -73,6 +74,11 @@ const base = {
         points.setUniform('thickness', options.thickness);
         folder.add(options, 'thickness', 0, 5, .0001).name('thickness');
 
+        points.setUniform('opaque', options.opaque);
+        folder.add(options, 'opaque').name('opaque').onChange(val =>{
+            r0.depthWriteEnabled = val; // TODO: error in depth
+        });
+
 
         folder.open();
     },
@@ -94,7 +100,7 @@ const base = {
         points.setUniform('thickness', options.thickness);
         points.setUniform('wireframeColor', options.wireframeColor);
         points.setUniform('fillColor', options.fillColor);
-
+        points.setUniform('opaque', options.opaque);
     }
 }
 

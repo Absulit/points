@@ -1,10 +1,4 @@
-import { RED, WHITE } from 'points/color';
-
 const frag = /*wgsl*/`
-
-${RED}
-${WHITE}
-
 
 @fragment
 fn main(
@@ -27,7 +21,7 @@ fn main(
     let width = fwidth(edgeDist); // approximate derivative per pixel
 
     let wireframeColor = vec4f(params.wireframeColor / 255, 1);
-    let fillColor = vec4f(params.fillColor / 255, 1);
+    let fillColor = vec4f(params.fillColor / 255, params.opaque);
     let finalColor = mix(fillColor, wireframeColor, step(edgeDist, width * params.thickness));
 
     return finalColor;
