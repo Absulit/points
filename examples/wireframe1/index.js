@@ -7,11 +7,8 @@ import { loadAndExtract } from 'utils';
 
 const options = {
     thickness: 0.456,
-    color1: '#FF0000', // CSS string
-    color2: [0, 128, 255], // RGB array
-    color3: [0, 128, 255, 0.3], // RGB with alpha
-    color4: { h: 350, s: 0.9, v: 0.3 }, // Hue, saturation, value
-    color5: { r: 115, g: 50.9, b: 20.3, a: .1 }, // r, g, b object
+    wireframeColor: [255, 255, 255], // RGB array
+    fillColor: [255, 0, 0], // RGB array
 }
 
 const near = 0.1, far = 100;
@@ -67,15 +64,15 @@ const base = {
             'mat4x4<f32>'
         )
 
+        points.setUniform('wireframeColor', options.wireframeColor, 'vec3f');
+        folder.addColor(options, 'wireframeColor');
+
+        points.setUniform('fillColor', options.fillColor, 'vec3f');
+        folder.addColor(options, 'fillColor');
+
         points.setUniform('thickness', options.thickness);
         folder.add(options, 'thickness', 0, 5, .0001).name('thickness');
 
-        // https://github.com/dataarts/dat.gui/blob/master/API.md#GUI+addColor
-        folder.addColor(options, 'color1');
-        folder.addColor(options, 'color2');
-        folder.addColor(options, 'color3');
-        folder.addColor(options, 'color4');
-        folder.addColor(options, 'color5');
 
         folder.open();
     },
@@ -95,6 +92,9 @@ const base = {
         )
 
         points.setUniform('thickness', options.thickness);
+        points.setUniform('wireframeColor', options.wireframeColor);
+        points.setUniform('fillColor', options.fillColor);
+
     }
 }
 
