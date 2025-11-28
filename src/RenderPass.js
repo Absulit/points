@@ -857,6 +857,7 @@ class RenderPass {
         const vertexGrid = [];
 
         // generate vertices
+        let k = 0;
         for (let lat = 0; lat <= rings; lat++) {
             const theta = (lat * Math.PI) / rings;
             const sinTheta = Math.sin(theta);
@@ -880,10 +881,13 @@ class RenderPass {
                 const u = lon / segments;
                 const v = lat / rings;
 
-                vertexGrid[lat][lon] = [vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, this.#meshCounter, ...BARYCENTRICS[lat % 3]];
+                vertexGrid[lat][lon] = [vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, this.#meshCounter];
             }
         }
 
+        const b0 = BARYCENTRICS[0];
+        const b1 = BARYCENTRICS[1];
+        const b2 = BARYCENTRICS[2];
         // generate triangles
         for (let lat = 0; lat < rings; lat++) {
             for (let lon = 0; lon < segments; lon++) {
@@ -893,9 +897,9 @@ class RenderPass {
                 const v4 = vertexGrid[lat][lon + 1];
 
                 // triangle 1
-                this.#vertexArray.push(...v1, ...v3, ...v2);
+                this.#vertexArray.push(...v1, ...b0, ...v3, ...b1, ...v2, ...b2);
                 // triangle 2
-                this.#vertexArray.push(...v1, ...v4, ...v3);
+                this.#vertexArray.push(...v1, ...b0, ...v4, ...b1, ...v3, ...b2);
             }
         }
 
