@@ -812,10 +812,9 @@ class RenderPass {
                 [v[3], uv[3]],
             ];
 
-            for (const [[vx, vy, vz], [u, v]] of verts) {
-                // console.log(i % 3);
+            verts.map(([[vx, vy, vz], [u, v]], i) => {
                 this.#vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normals, this.#meshCounter, ...BARYCENTRICS[i % 3]);
-            }
+            })
         }
 
         const mesh = {
