@@ -64,7 +64,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     }
 
     if(params.mouseDown == 1 && variables.isClicked == 0){
-        variables.mouseStart = mouse * ratio;
+        variables.mouseStart = in.mouse * in.ratio;
         variables.isClicked = 1;
     }
 
@@ -84,14 +84,14 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     }
 
     if(params.mouseDown == 1){
-        variables.mouseEnd = mouse * ratio;
+        variables.mouseEnd = in.mouse * in.ratio;
         variables.finalPosition = variables.fragtalCenter + p;
     }
 
     let fp = variables.finalPosition;
 
-    let cross = showDebugCross(fp, RED, uvr);
-    let cross_center = showDebugCross(center, YELLOW, uvr);
+    let cross = showDebugCross(fp, RED, in.uvr);
+    let cross_center = showDebugCross(center, YELLOW, in.uvr);
 
     let c = (in.uvr - center) / new_scale - fp + center;
 
