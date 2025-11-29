@@ -31,17 +31,17 @@ fn main(in: VertexIn) -> FragmentIn {
     let rotZ = rotZAxis(angleZ);
     let model = rotX * rotY * rotZ;
 
-    let noise = 10.0 * -.10 * turbulence(.5 * normal + params.time / 3.0);
-    let b = 5.0 * pnoise3(0.05 * position.xyz, vec3(100.));
+    let noise = 10.0 * -.10 * turbulence(.5 * in.normal + params.time / 3.0);
+    let b = 5.0 * pnoise3(0.05 * in.position.xyz, vec3(100.));
     let displacement = (-10. * noise + b) / 50.0;
 
-    let displace = normal * displacement * params.val * 4;
+    let displace = in.normal * displacement * params.val * 4;
     let world = (model * vec4f(in.position.xyz + displace, 1.)).xyz;
     let clip = params.projection * params.view * vec4f(world, 1.);
 
     let newNormal = normalize((model * vec4f(in.normal, 0.)).xyz);
 
-    var dvb = defaultVertexBody(clip, vec4f(vec3f(noise), 1), uv, newNormal);
+    var dvb = defaultVertexBody(clip, vec4f(vec3f(noise), 1), in.uv, newNormal);
     // dvb.id = in.id;
 
     return dvb;
