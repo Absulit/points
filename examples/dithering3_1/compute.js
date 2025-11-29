@@ -13,7 +13,7 @@ const workgroupSize = 8;
 
 @compute @workgroup_size(workgroupSize,workgroupSize,1)
 fn main(in: ComputeIn) {
-    let  in.WID = in.WID;
+    let WID = in.WID;
     //--------------------------------------------------
     let dims = textureDimensions(image);
 

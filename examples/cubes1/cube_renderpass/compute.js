@@ -17,7 +17,7 @@ const HHEIGHT = HEIGHT / 2;
 @compute @workgroup_size(THREADS_X, THREADS_Y, THREADS_Z)
 fn main(in: ComputeIn) {
     // index = x + (y * numColumns) + (z * numColumns * numRows)
-    let  in.WID = in.WID;
+    let WID = in.WID;
     let LID = in.LID;
 
     let x = in.WID.x * THREADS_X + in.LID.x;

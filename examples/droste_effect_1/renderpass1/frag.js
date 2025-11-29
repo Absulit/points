@@ -22,13 +22,13 @@ fn sdfRing(position:vec2f, radius1:f32, uv:vec2f) -> f32 {
 }
 
 fn annulus(position:vec2f, radius1:f32, radius2:f32, uv:vec2f) -> f32 {
-    let ring1 = sdfRing(position, radius1, in.uv);
-    let ring0 = sdfRing(position, radius2, in.uv);
+    let ring1 = sdfRing(position, radius1, uv);
+    let ring0 = sdfRing(position, radius2, uv);
     const w = .004;
-    var vertical = sdfLine2(position + vec2(0, radius1), position + vec2(0, radius2), w, in.uv);
-    vertical += sdfLine2(position + vec2(0, -radius1), position + vec2(0, -radius2), w, in.uv);
-    var horizontal = sdfLine2(position + vec2(radius1, 0), position + vec2(radius2, 0), w, in.uv);
-    horizontal += sdfLine2(position + vec2(-radius1, 0), position + vec2(-radius2, 0), w, in.uv);
+    var vertical = sdfLine2(position + vec2(0, radius1), position + vec2(0, radius2), w, uv);
+    vertical += sdfLine2(position + vec2(0, -radius1), position + vec2(0, -radius2), w, uv);
+    var horizontal = sdfLine2(position + vec2(radius1, 0), position + vec2(radius2, 0), w, uv);
+    horizontal += sdfLine2(position + vec2(-radius1, 0), position + vec2(-radius2, 0), w, uv);
     return ring0 + ring1 + vertical + horizontal;
 }
 
