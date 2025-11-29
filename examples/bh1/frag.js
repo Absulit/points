@@ -62,10 +62,10 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     let sliderA = params.sliderA; // 1.;
     let scale = params.scale; // .1116;
     let uv2 = in.uvr * 4 - (vec2(2) * in.ratio); // clip space
-    // let m = mouse * ratio * 4 + (vec2(.5) * ratio);
-    // let m = vec2f(0, params.mouseY) * ratio * 4 - (vec2(2) * ratio);
+    // let m = mouse * ratio * 4 + (vec2(.5) * in.ratio);
+    // let m = vec2f(0, params.mouseY) * in.ratio * 4 - (vec2(2) * in.ratio);
     let m = vec2f(0, fusin(.3) * .05 ) * in.ratio * 4 - vec2(-3); // -.2
-    // let m = vec2f(.5, .5) * 4 - (vec2(2) * ratio);
+    // let m = vec2f(.5, .5) * 4 - (vec2(2) * in.ratio);
 
     // initialization
     var ro = vec3f(0, 0, fusin(.15) * 1 +  -4.3/*params.roDistance*/); // ray origin

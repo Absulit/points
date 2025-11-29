@@ -39,7 +39,7 @@ fn angle(p1:vec2f, p2:vec2f) -> f32 {
 
 @fragment
 fn main(in: FragmentIn) -> @location(0) vec4f {
-    let center = vec2(.5,.5) * ratio;
+    let center = vec2(.5,.5) * in.ratio;
 
     if(variables.init == 0){
         variables.fragtalCenter = center;

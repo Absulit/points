@@ -29,12 +29,12 @@ const sizeF32 = vec2f(size);
 @fragment
 fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    let center = vec2(.5) * ratio ;
+    let center = vec2(.5) * in.ratio ;
     // start in center if mouse is not moving yet
     let mouser = mix(mouse * ratio, center, select(0., 1., any(mouse == vec2f())));
     let startPosition = center * scaleDigits;
     let cellRatio =
-        vec2(sizeF32.x / params.screen.x, sizeF32.y / params.screen.y) * ratio;
+        vec2(sizeF32.x / params.screen.x, sizeF32.y / params.screen.y) * in.ratio;
 
     let displaceInX = vec2(cellRatio.x, 0);
     let start0char = 16u;
@@ -54,7 +54,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     // -----------------------------------------------
     numberToDecode = params.mouse.y;
     let startPosition2 =
-        startPosition - vec2(0, sizeF32.x / params.screen.y) * ratio;
+        startPosition - vec2(0, sizeF32.x / params.screen.y) * in.ratio;
     let digits2 = GREEN * decodeNumberSprite(
         numberToDecode,
         start0char,
@@ -87,7 +87,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     );
     // -----------------------------------------------
     scaleAnim = 10.;
-    positionAnim = (mouser + vec2(.1, 0) * ratio) / scaleAnim;
+    positionAnim = (mouser + vec2(.1, 0) * in.ratio) / scaleAnim;
     indexAnim = u32(51 * fract(params.time * .15));
     let animPenguin = sprite(
         penguin,

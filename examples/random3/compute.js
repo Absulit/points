@@ -12,11 +12,7 @@ ${fnusin}
 const workgroupSize = 1;
 
 @compute @workgroup_size(workgroupSize,workgroupSize,1)
-fn main(
-    @builtin(global_invocation_id) GlobalId: vec3u,
-    @builtin(workgroup_id) WorkGroupID: vec3u,
-    @builtin(local_invocation_id) LocalInvocationID: vec3u
-) {
+fn main(in: ComputeIn) {
 
     rand_seed.x += f32(WorkGroupID.x);
     rand_seed.y += f32(WorkGroupID.y);

@@ -46,7 +46,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     var stringColor = vec4f();
     for (var index = 0; index < NUMCHARS; index++) {
         let charIndex = chars[index];
-        let charPosition = charSizeF32 * vec2f(f32(index), 0) * ratio;
+        let charPosition = charSizeF32 * vec2f(f32(index), 0) * in.ratio;
         let space = 0.;
         stringColor += sprite(
             font,

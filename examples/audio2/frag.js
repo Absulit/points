@@ -40,7 +40,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
         result[index] = audioAverage / f32(subSegmentLength);
     }
 
-    let center = vec2(.5) * ratio;
+    let center = vec2(.5) * in.ratio;
     let size = .4 * ratio.x;
     let circle1 = sdfCircle(center, result[0] * size, .0, uvr) * WHITE;
     let circle2 = sdfCircle(center, result[1] * size, .0, uvr) * GREEN;

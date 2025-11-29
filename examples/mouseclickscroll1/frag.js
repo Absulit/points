@@ -28,7 +28,7 @@ fn main(
 
     if(variables.init == 0.){
         variables.circleRadius = .1;
-        variables.circlePosition = vec2(.5, .5) * ratio;
+        variables.circlePosition = vec2(.5, .5) * in.ratio;
 
         variables.init = 1.;
     }
@@ -61,7 +61,7 @@ fn main(
     }
 
     // click to play message
-    let center = vec2f(.5) * ratio;
+    let center = vec2f(.5) * in.ratio;
     let showMessage = select(0.,1, any(mouse * ratio <= vec2f()));
 
     let dims = vec2f(textureDimensions(cta, 0));

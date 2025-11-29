@@ -18,7 +18,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     }
 
     // click to play message
-    let center = vec2f(.5) * ratio;
+    let center = vec2f(.5) * in.ratio;
 
     let dims = vec2f(textureDimensions(cta, 0));
     // if you are using uvr you have to multiply by ratio

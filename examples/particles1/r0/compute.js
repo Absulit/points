@@ -40,11 +40,7 @@ fn particleInit(particles: ptr<storage, array<Particle,NUMPARTICLES>, read_write
 }
 
 @compute @workgroup_size(256,1,1)
-fn main(
-    @builtin(global_invocation_id) GlobalId: vec3u,
-    @builtin(workgroup_id) WorkGroupID: vec3u,
-    @builtin(local_invocation_id) LocalInvocationID: vec3u
-) {
+fn main(in: ComputeIn) {
     let index = GlobalId.x;
 
 

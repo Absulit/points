@@ -83,8 +83,8 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
         variables.init = 1;
     }
 
-    let uv2 = uvr * 4 - (vec2(2) * ratio); // clip space
-    let m = mouse * 4 - (vec2(2) * ratio);
+    let uv2 = uvr * 4 - (vec2(2) * in.ratio); // clip space
+    let m = mouse * 4 - (vec2(2) * in.ratio);
 
     // initialization
     var ro = vec3f(0, 0, -3); // ray origin

@@ -11,7 +11,7 @@ ${texture}
 fn main(in: FragmentIn) -> @location(0) vec4f {
 
     let n1 = snoise(uv / params.sliderA);
-    let center = vec2(.5) * ratio;
+    let center = vec2(.5) * in.ratio;
     let d = distance(center, uvr); // sqrt(dot(d, d));
 
     // vector from center to current fragment
@@ -27,12 +27,12 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
         bind = sqrtDotCenter;
     } else {
         // stick to borders
-        // if (ratio.x < 1.0) {bind = center.x;} else {bind = center.y;};
-        bind = mix(center.x, center.y, step(ratio.x, 1));
+        // if (in.ratio.x < 1.0) {bind = center.x;} else {bind = center.y;};
+        bind = mix(center.x, center.y, step(in.ratio.x, 1));
     }
 
     // Weird formulas
-    var nuv = uvr;
+    var nuv = in.uvr;
     if (power > 0.0){
         //fisheye
         nuv =

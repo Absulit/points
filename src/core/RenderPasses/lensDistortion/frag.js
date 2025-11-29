@@ -21,12 +21,12 @@ fn angle(p1:vec2f, p2:vec2f) -> f32 {
 @fragment
 fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    let imagePosition = vec2(0.0,0.0) * ratio;
-    let center = vec2(.5,.5) * ratio;
-    let d = distance(center, uvr); // sqrt(dot(d, d));
+    let imagePosition = vec2(0.0,0.0) * in.ratio;
+    let center = vec2(.5,.5) * in.ratio;
+    let d = distance(center, in.uvr); // sqrt(dot(d, d));
 
     //vector from center to current fragment
-    let vectorToCenter = uvr - center;
+    let vectorToCenter = in.uvr - center;
     let sqrtDotCenter = sqrt(dot(center, center));
 
     //amount of effect
@@ -38,7 +38,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
         bind = sqrtDotCenter;
     } else {
         //stick to borders
-        if (ratio.x < 1.0) {
+        if (in.ratio.x < 1.0) {
             bind = center.x;
         } else {
             bind = center.y;
@@ -46,13 +46,13 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     }
 
     //Weird formulas
-    var nuv = uvr;
+    var nuv = in.uvr;
     if (power > 0.0){//fisheye
         nuv = center + normalize(vectorToCenter) * tan(d * power) * bind / tan( bind * power);
     } else if (power < 0.0){//antifisheye
         nuv = center + normalize(vectorToCenter) * atan(d * -power * 10.0) * bind / atan(-power * bind * 10.0);
     } else {
-        nuv = uvr;
+        nuv = in.uvr;
     }
 
     // let imageColor = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, imagePosition, nuv, false);

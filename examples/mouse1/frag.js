@@ -26,7 +26,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     let finalColor = positionCross + frame;
 
     // click to play message
-    let center = vec2f(.5) * ratio;
+    let center = vec2f(.5) * in.ratio;
     let showMessage = select(0.,1, any(mouse * ratio <= vec2f()));
 
     let dims = vec2f(textureDimensions(cta, 0));

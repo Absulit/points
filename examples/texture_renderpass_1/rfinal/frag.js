@@ -57,7 +57,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     images = layer(images, feedbackTextureColor4);
 
     let scaleDigits = .25;
-    let startPosition = vec2(.3, 0) * ratio * scaleDigits;
+    let startPosition = vec2(.3, 0) * in.ratio * scaleDigits;
     let start0char = 16u;
     let size = vec2(8u,22u);
 

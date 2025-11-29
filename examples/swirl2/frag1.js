@@ -12,7 +12,7 @@ ${texture}
 @fragment
 fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    let center = vec2f(.5) * ratio;
+    let center = vec2f(.5) * in.ratio;
 
     let d = 1 - distance(in.uvr, center);
     let uvrRotated = rotateVector(

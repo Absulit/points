@@ -12,7 +12,7 @@ ${PI}
 fn main(in: FragmentIn) -> @location(0) vec4f {
 
 
-    let center = vec2f(.5) * ratio;
+    let center = vec2f(.5) * in.ratio;
     let uvr2 = (in.uvr - center); // to center
 
     let a = atan2(in.uvr2.y, uvr2.x);

@@ -9,11 +9,7 @@ struct Matrix {
 }
 
 @compute @workgroup_size(8,8,1)
-fn main(
-    @builtin(global_invocation_id) GlobalId: vec3u,
-    @builtin(workgroup_id) WorkGroupID: vec3u,
-    @builtin(local_invocation_id) LocalInvocationID: vec3u
-) {
+fn main(in: ComputeIn) {
     // Guard against out-of-bounds work group sizes
     if (GlobalId.x >= u32(firstMatrix.size.x) || GlobalId.y >= u32(secondMatrix.size.y)) {
         return;
