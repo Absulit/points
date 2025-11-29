@@ -31,7 +31,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
 
     let center = vec2(.5) * in.ratio ;
     // start in center if mouse is not moving yet
-    let mouser = mix(mouse * ratio, center, select(0., 1., any(mouse == vec2f())));
+    let mouser = mix(in.mouse * in.ratio, center, select(0., 1., any(in.mouse == vec2f())));
     let startPosition = center * scaleDigits;
     let cellRatio =
         vec2(sizeF32.x / params.screen.x, sizeF32.y / params.screen.y) * in.ratio;
@@ -48,7 +48,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
         imageSampler,
         startPosition,
         in.uvr * scaleDigits,
-        ratio,
+        in.ratio,
         size
     ).r;
     // -----------------------------------------------
@@ -62,7 +62,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
         imageSampler,
         startPosition2,
         in.uvr * scaleDigits,
-        ratio,
+        in.ratio,
         size
     ).r;
 

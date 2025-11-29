@@ -6,10 +6,10 @@ ${fnusin}
 @vertex
 fn main(in: VertexIn) -> FragmentIn {
 
-    var modifiedPosition = position;
-    modifiedPosition.w = modifiedPosition.w + sin(f32(vertexIndex) * (params.time) * .01) * .1;
+    var modifiedPosition = in.position;
+    modifiedPosition.w = modifiedPosition.w + sin(f32(in.vertexIndex) * (params.time) * .01) * .1;
 
-    return defaultVertexBody(modifiedPosition, color, in.uv, in.normal);
+    return defaultVertexBody(modifiedPosition, in.color, in.uv, in.normal);
 }
 `;
 

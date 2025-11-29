@@ -11,7 +11,7 @@ ${texture}
 @fragment
 fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    let lines = sin(uv.x * (uv.x + 3. * fnusin(1.))) ;
+    let lines = sin(in.uv.x * (in.uv.x + 3. * fnusin(1.))) ;
     let rgbaImage = texture(
         image,
         feedbackSampler,

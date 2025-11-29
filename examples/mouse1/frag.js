@@ -17,7 +17,7 @@ const SCALE = 2.;
 @fragment
 fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    let startPosition = mouse * in.ratio;
+    let startPosition = in.mouse * in.ratio;
 
     let positionCross = showDebugCross(startPosition, RED, in.uvr);
 
@@ -27,7 +27,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
 
     // click to play message
     let center = vec2f(.5) * in.ratio;
-    let showMessage = select(0.,1, any(mouse * ratio <= vec2f()));
+    let showMessage = select(0.,1, any(in.mouse * in.ratio <= vec2f()));
 
     let dims = vec2f(textureDimensions(cta, 0));
     // if you are using uvr you have to multiply by ratio

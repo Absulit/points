@@ -28,7 +28,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     let decayB =  texColor.b * .9 * texColor3.b;
     let decayA =  texColor.a * .9;
 
-    var finalColor:vec4f = vec4(uv.x * c, uv.y * c, c, 1);
+    var finalColor:vec4f = vec4(in.uv.x * c, in.uv.y * c, c, 1);
     finalColor += vec4(decayR, decayG, decayB, 1);
     finalColor += texColorCompute;
 

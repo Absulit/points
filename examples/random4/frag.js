@@ -24,7 +24,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
         penguin,
         imageSampler,
         vec2f(),
-        (in.uvr - params.randPosition * ratio) / scaleAnim,
+        (in.uvr - params.randPosition * in.ratio) / scaleAnim,
         indexAnim,
         vec2u(32)
     );

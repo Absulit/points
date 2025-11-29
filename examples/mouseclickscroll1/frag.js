@@ -17,14 +17,7 @@ ${texture}
 const SCALE = 2.;
 
 @fragment
-fn main(
-        @location(0) color: vec4f,
-        @location(1) uv: vec2f,
-        @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
-        @location(3) uvr: vec2f,    // uv with aspect ratio corrected
-        @location(4) mouse: vec2f,
-        @builtin(position) position: vec4f
-    ) -> @location(0) vec4f {
+fn main(in: FragmentIn) -> @location(0) vec4f {
 
     if(variables.init == 0.){
         variables.circleRadius = .1;
@@ -42,7 +35,7 @@ fn main(
     }
 
     if(params.mouseClick == 1.){
-        variables.circlePosition = mouse * in.ratio;
+        variables.circlePosition = in.mouse * in.ratio;
     }
 
     let circleValue = sdfCircle(
@@ -62,7 +55,7 @@ fn main(
 
     // click to play message
     let center = vec2f(.5) * in.ratio;
-    let showMessage = select(0.,1, any(mouse * ratio <= vec2f()));
+    let showMessage = select(0.,1, any(in.mouse * in.ratio <= vec2f()));
 
     let dims = vec2f(textureDimensions(cta, 0));
     // if you are using uvr you have to multiply by ratio
