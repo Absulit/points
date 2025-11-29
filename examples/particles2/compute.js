@@ -51,11 +51,7 @@ fn particleInit(particles: ptr<storage, array<Particle,NUMPARTICLES>, read_write
 }
 
 @compute @workgroup_size(THREADS_X, THREADS_Y, THREADS_Z)
-fn main(
-    @builtin(global_invocation_id) GID: vec3u,
-    @builtin(workgroup_id) WID: vec3u,
-    @builtin(local_invocation_id) LID: vec3u
-) {
+fn main(in: ComputeIn) {
     // index = x + (y * numColumns) + (z * numColumns * numRows)
 
     let x = WID.x * THREADS_X + LID.x;

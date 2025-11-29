@@ -66,17 +66,11 @@ fn customVertexBody(position:vec4f, color:vec4f, depth:vec4f, noise:f32, uv:vec2
 }
 
 @vertex
-fn main(
-    @location(0) position: vec4<f32>,
-    @location(1) color: vec4<f32>,
-    @location(2) uv: vec2<f32>,
-    @builtin(vertex_index) vertexIndex: u32,
-    @builtin(instance_index) instanceIndex: u32
-) -> CustomFragment {
-    let particle = particles[instanceIndex];
+fn main(in: VertexIn) -> CustomFragment {
+    let particle = particles[in.instanceIndex];
 
     let rotMatrix = rotationMatrix(particle.rotation);
-    let rotated = rotMatrix * position.xyz;
+    let rotated = rotMatrix * in.position.xyz;
 
     let scaled = rotated * particle.scale;
     let world = scaled + particle.position;
@@ -92,8 +86,7 @@ fn main(
 
     let depth = vec4f(-particle.position.z / 253);
 
-    return customVertexBody(clip, particle.color, depth, particle.noise, uv);;
-
+    return customVertexBody(clip, particle.color, depth, particle.noise, in.uv);;
 }
 `;
 
