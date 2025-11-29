@@ -51,7 +51,7 @@ fn main(in: VertexIn) -> CustomFragment {
 
     let clip = params.projection * params.view * vec4f(world, 1.0);
 
-    let transformedNormal = model * normal;
+    let transformedNormal = model * in.normal;
     let newNormal = normalize(transformedNormal);
 
     let depth = vec4f(-particle.position.z / 253);

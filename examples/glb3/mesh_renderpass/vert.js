@@ -20,7 +20,7 @@ fn customVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f, wor
     result.uvr = vec2(uv.x * result.ratio.x, uv.y);
     result.mouse = vec2(params.mouse.x / params.screen.x, params.mouse.y / params.screen.y);
     result.mouse = result.mouse * vec2(1.,-1.) - vec2(0., -1.); // flip and move up
-    result.normal = normal;
+    result.normal = in.normal;
     result.world = world;
 
     return result;
