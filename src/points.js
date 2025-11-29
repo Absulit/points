@@ -1,6 +1,6 @@
 import UniformKeys from './UniformKeys.js';
 import VertexBufferInfo from './VertexBufferInfo.js';
-import RenderPass, { PrimitiveTopology, LoadOp } from './RenderPass.js';
+import RenderPass, { PrimitiveTopology, LoadOp, CullMode } from './RenderPass.js';
 import RenderPasses from './RenderPasses.js';
 import Coordinate from './coordinate.js';
 import RGBAColor from './color.js';
@@ -52,7 +52,6 @@ class Points {
     /** @type {Array<RenderPass>} */
     #renderPasses = null;
     #postRenderPasses = [];
-    #vertexBufferInfo = null;
     #buffer = null;
     #presentationSize = null;
     #depthTexture = null;
@@ -1394,14 +1393,7 @@ class Points {
             }
         }
     }
-    /**
-     * @param {Float32Array} vertexArray
-     * @returns buffer
-     */
-    #createVertexBuffer(vertexArray) {
-        this.#vertexBufferInfo = new VertexBufferInfo(vertexArray);
-        this.#buffer = this.#createAndMapBuffer(vertexArray, GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST);
-    }
+
     /**
      * @param {Float32Array} data
      * @param {GPUBufferUsageFlags} usage
@@ -1756,10 +1748,16 @@ class Points {
                                         format: 'float32x3',
                                     },
                                     {
-                                        // id
+                                        // id -> meshCounter
                                         shaderLocation: 4,
                                         offset: renderPass.vertexBufferInfo.idOffset,
                                         format: 'uint32',
+                                    },
+                                    {
+                                        // barycentrics
+                                        shaderLocation: 5,
+                                        offset: renderPass.vertexBufferInfo.barycentricsOffset,
+                                        format: 'float32x3',
                                     },
                                 ],
                             },
@@ -2517,4 +2515,4 @@ class Points {
 }
 
 export default Points;
-export { RenderPass, RenderPasses, PrimitiveTopology, LoadOp, PresentationFormat };
+export { RenderPass, RenderPasses, PrimitiveTopology, CullMode, LoadOp, PresentationFormat };
