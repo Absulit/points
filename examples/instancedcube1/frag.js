@@ -21,7 +21,7 @@ const CENTER = vec2(.5);
 
 @fragment
 fn main(in: FragmentIn) -> @location(0) vec4f {
-    let c = sdfCircle(CENTER, .4, .1, in.in.uvr);
+    let c = sdfCircle(CENTER, .4, .1, in.uvr);
 
     return vec4(in.uv * c, c, c);
 }

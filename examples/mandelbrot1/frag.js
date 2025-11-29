@@ -90,8 +90,8 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
 
     let fp = variables.finalPosition;
 
-    let cross = showDebugCross(fp, RED, in.in.uvr);
-    let cross_center = showDebugCross(center, YELLOW, in.in.uvr);
+    let cross = showDebugCross(fp, RED, in.uvr);
+    let cross_center = showDebugCross(center, YELLOW, in.uvr);
 
     let c = (in.uvr - center) / new_scale - fp + center;
 
