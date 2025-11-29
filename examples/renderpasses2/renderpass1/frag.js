@@ -7,7 +7,7 @@ ${texture}
 @fragment
 fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    return texture(image, imageSampler, uvr, true);
+    return texture(image, imageSampler, in.uvr, true);
 }
 `;
 

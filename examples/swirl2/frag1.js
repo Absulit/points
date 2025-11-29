@@ -33,7 +33,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     let imageColor = texture(
         feedbackTexture,
         imageSampler,
-        uvr * vec2(n, n2),
+        in.uvr * vec2(n, n2),
         false
     );
 

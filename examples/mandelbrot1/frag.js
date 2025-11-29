@@ -90,8 +90,8 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
 
     let fp = variables.finalPosition;
 
-    let cross = showDebugCross(fp, RED, in.uvr);
-    let cross_center = showDebugCross(center, YELLOW, in.uvr);
+    let cross = showDebugCross(fp, RED, in.in.uvr);
+    let cross_center = showDebugCross(center, YELLOW, in.in.uvr);
 
     let c = (in.uvr - center) / new_scale - fp + center;
 
@@ -137,8 +137,8 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
 
 
     // to draw a couple of circles to debug the touch
-    // let startCircle = sdfCircle(variables.mouseStart, .01,.01, uvr) * GREEN;
-    // let endCircle = sdfCircle(variables.mouseEnd, .01,.01, uvr) * BLUE;
+    // let startCircle = sdfCircle(variables.mouseStart, .01,.01, in.uvr) * GREEN;
+    // let endCircle = sdfCircle(variables.mouseEnd, .01,.01, in.uvr) * BLUE;
     // return layer(layer(finalColor, startCircle), endCircle);
 
     return finalColor;

@@ -9,9 +9,9 @@ ${sdfCircle}
 @fragment
 fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    let c = sdfCircle(vec2f(.5), .5, .0, uv);
+    let c = sdfCircle(vec2f(.5), .5, .0, in.uv);
 
-    let finalColor = vec4f(color.rgb * c, color.a * c);
+    let finalColor = vec4f(in.color.rgb * c, in.color.a * c);
 
     return finalColor;
 }

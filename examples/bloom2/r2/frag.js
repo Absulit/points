@@ -42,7 +42,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
             let uvR = in.uv + vec2f( offset * texelSize.x, 0.0);
 
             sum += textureSample(feedbackTexture1, imageSampler, uvL).rgb * w;
-            sum += textureSample(feedbackTexture1, imageSampler, uvR).rgb * w;
+            sum += textureSample(feedbackTexture1, imageSampler, in.uvr).rgb * w;
             norm += 2.0 * w;
         }
 

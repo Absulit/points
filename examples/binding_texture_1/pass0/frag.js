@@ -10,7 +10,7 @@ ${texture}
 @fragment
 fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    let finalColor = texture(readTexture, imageSampler, uvr, true);
+    let finalColor = texture(readTexture, imageSampler, in.uvr, true);
 
     return finalColor;
 }

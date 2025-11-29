@@ -9,7 +9,7 @@ ${texture}
 @fragment
 fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    let texColorCompute = texture(computeTexture, computeTextureSampler, uvr, false);
+    let texColorCompute = texture(computeTexture, computeTextureSampler, in.uvr, false);
 
     return texColorCompute;
 }

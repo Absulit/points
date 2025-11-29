@@ -15,7 +15,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     let rgbaImage = texture(
         image,
         feedbackSampler,
-        uvr * lines / params.scale,
+        in.uvr * lines / params.scale,
         false
     );
 

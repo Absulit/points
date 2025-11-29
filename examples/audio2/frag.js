@@ -24,7 +24,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
         showMessage = 0.;
     }
 
-    let feedbackColor = texture(feedbackTexture, imageSampler, uvr * vec2f(1, 1.01), true);
+    let feedbackColor = texture(feedbackTexture, imageSampler, in.uvr * vec2f(1, 1.01), true);
 
 
     let subSegmentLength = i32(params.audioLength) / segmentNum;
@@ -42,10 +42,10 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
 
     let center = vec2(.5) * in.ratio;
     let size = .4 * ratio.x;
-    let circle1 = sdfCircle(center, result[0] * size, .0, uvr) * WHITE;
-    let circle2 = sdfCircle(center, result[1] * size, .0, uvr) * GREEN;
-    let circle3 = sdfCircle(center, result[2] * size, .0, uvr) * YELLOW;
-    let circle4 = sdfCircle(center, result[3] * size, .0, uvr) * RED;
+    let circle1 = sdfCircle(center, result[0] * size, .0, in.uvr) * WHITE;
+    let circle2 = sdfCircle(center, result[1] * size, .0, in.uvr) * GREEN;
+    let circle3 = sdfCircle(center, result[2] * size, .0, in.uvr) * YELLOW;
+    let circle4 = sdfCircle(center, result[3] * size, .0, in.uvr) * RED;
 
     // click to play message
     let dims = vec2f(textureDimensions(cta, 0));

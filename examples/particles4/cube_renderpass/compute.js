@@ -27,9 +27,9 @@ fn angleToVector(rads:f32) -> vec2f {
 fn main(in: ComputeIn) {
     // index = x + (y * numColumns) + (z * numColumns * numRows)
 
-    let x = WID.x * THREADS_X + LID.x;
-    let y = WID.y * THREADS_Y + LID.y;
-    let z = WID.z * THREADS_Z + LID.z;
+    let x = in.WID.x * THREADS_X + in.LID.x;
+    let y = in.WID.y * THREADS_Y + in.LID.y;
+    let z = in.WID.z * THREADS_Z + in.LID.z;
 
     let X = x;
     let Y = y * (WORKGROUP_X * THREADS_X);

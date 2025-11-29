@@ -10,7 +10,7 @@ const CHROMATIC_DISPLACEMENT = 0.003695;
 @fragment
 fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    let texColorCompute = texture(computeTexture, feedbackSampler, uvr, true).g;
+    let texColorCompute = texture(computeTexture, feedbackSampler, in.uvr, true).g;
 
     let texColorComputeR = texture(
         computeTexture,

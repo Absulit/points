@@ -14,11 +14,11 @@ ${texture}
 @fragment
 fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    let texColor = texture(feedbackTexture, feedbackSampler, uvr, false);
+    let texColor = texture(feedbackTexture, feedbackSampler, in.uvr, false);
     let texColor2 = texture(feedbackTexture, feedbackSampler, uvr + vec2(-.001,1), false);
     let texColor3 = texture(feedbackTexture, feedbackSampler, uvr + vec2(.001,1), false);
 
-    let texColorCompute = texture(computeTexture, feedbackSampler, uvr, false);
+    let texColorCompute = texture(computeTexture, feedbackSampler, in.uvr, false);
 
     let d = distance(in.uvr, vec2(.5 + .1 * fusin(2.), .5  + .1 * fusin(4.123)) * in.ratio);
     let c = step(d, .1); // if(d > .1){c = 0.;}

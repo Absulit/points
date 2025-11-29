@@ -6,11 +6,11 @@ ${texture}
 @fragment
 fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    let imageColor = texture(feedbackTexture, imageSampler, uvr, true);
+    let imageColor = texture(feedbackTexture, imageSampler, in.uvr, true);
 
     // --------- chromatic displacement vector
     let cdv = vec2(params.sliderB, 0.);
-    let d = distance(vec2(.5), uvr);
+    let d = distance(vec2(.5), in.uvr);
     let imageColorR = texture(
         feedbackTexture,
         imageSampler,
@@ -20,7 +20,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     let imageColorG = texture(
         feedbackTexture,
         imageSampler,
-        uvr,
+        in.uvr,
         true
     ).g;
     let imageColorB = texture(

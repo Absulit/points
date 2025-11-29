@@ -8,8 +8,8 @@ fn main(in: ComputeIn) {
     let numPoints = u32(params.numPoints);
 
     // list of points for the sine wave
-    let fk = f32(GlobalId.x);
-    let point = &points[GlobalId.x];
+    let fk = f32(in.GID.x);
+    let point = &points[in.GID.x];
     (*point).x = fk / params.numPoints;
     (*point).y = sin(  ((*point).x * 32) + time) * .1;
 

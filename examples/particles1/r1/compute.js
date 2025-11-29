@@ -6,7 +6,7 @@ ${structs}
 
 @compute @workgroup_size(16,16,1)
 fn main(in: ComputeIn) {
-    let index = GlobalId.xy;
+    let index = in.GID.xy;
 
     let particleColor = textureLoad(pass0Texture, index, 0); // image
 

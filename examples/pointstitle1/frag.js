@@ -66,7 +66,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     let circleColorB = sdfCircle(circlePosition, .4 * b, 0.1, subuv - cdv);
 
     let finalColor = vec4(circleColorR, circleColor, circleColorB, 1);
-    return finalColor + showDebugFrame(RED, uvr);
+    return finalColor + showDebugFrame(RED, in.uvr);
 }
 `;
 

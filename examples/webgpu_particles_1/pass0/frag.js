@@ -8,7 +8,7 @@ ${structs}
 fn main(in : VertexOutput) -> @location(0) vec4f {
   var color = in.color;
   // Apply a circular particle alpha mask
-  color.a = color.a * max(1.0 - length(in.quad_pos), 0.0);
+  in.color.a = in.color.a * max(1.0 - length(in.quad_pos), 0.0);
   return color;
 }
 `;

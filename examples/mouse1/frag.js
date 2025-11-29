@@ -19,9 +19,9 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
 
     let startPosition = mouse * ratio;
 
-    let positionCross = showDebugCross(startPosition, RED, uvr);
+    let positionCross = showDebugCross(startPosition, RED, in.uvr);
 
-    let frame = showDebugFrame(RED, uvr);
+    let frame = showDebugFrame(RED, in.uvr);
 
     let finalColor = positionCross + frame;
 

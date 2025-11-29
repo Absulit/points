@@ -41,7 +41,7 @@ fn particleInit(particles: ptr<storage, array<Particle,NUMPARTICLES>, read_write
 
 @compute @workgroup_size(256,1,1)
 fn main(in: ComputeIn) {
-    let index = GlobalId.x;
+    let index = in.GID.x;
 
 
     if (index >= NUMPARTICLES) {
@@ -51,7 +51,7 @@ fn main(in: ComputeIn) {
     let particle = &particles[index];
 
     if((*particle).init == 0){
-        particleInit(&particles, index, WorkGroupID);
+        particleInit(&particles, index, in.WID);
         (*particle).init = 1;
     }
 
@@ -65,7 +65,7 @@ fn main(in: ComputeIn) {
     rand();
     let life_limit = rand_seed.x * params.maxLife;
     if((*particle).life >= life_limit || any(particle_position > SIZE) || any(particle_position < vec2f()) || (*particle).color.a == 0.){
-        particleInit(&particles, index, WorkGroupID);
+        particleInit(&particles, index, in.WID);
     }
 
     let particle_position_i = vec2i((*particle).position);

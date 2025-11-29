@@ -9,9 +9,9 @@ ${fusin}
 @fragment
 fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    let imageColor = texture(image, imageSampler, uvr, true);
+    let imageColor = texture(image, imageSampler, in.uvr, true);
     // first render pass doesn't use the feedback texture, it's the second pass
-    // _ = texture(feedbackTexture, feedbackSampler, uvr, true);
+    // _ = texture(feedbackTexture, feedbackSampler, in.uvr, true);
 
     let d = distance(in.uvr, vec2(.5 + .1 * fusin(2.), .5  + .1 * fusin(4.123)));
     let c = step(d, .1); // if(d > .1){c = 0.;}

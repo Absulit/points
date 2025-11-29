@@ -14,15 +14,15 @@ fn main(in: ComputeIn) {
     var rgba = textureSampleLevel(
         feedbackTexture,
         feedbackSampler,
-        vec2f(GlobalId.xy),
+        vec2f(in.GID.xy),
         0.
     );
 
     // textureLoad here behaves differently
-    // var rgba = textureLoad(feedbackTexture, GlobalId.xy, 0);
+    // var rgba = textureLoad(feedbackTexture, in.GID.xy, 0);
 
     rgba = clearMix(rgba, 1.01) + vec4f(1.,0.,0., .5);
-    textureStore(outputTex, GlobalId.xy, rgba);
+    textureStore(outputTex, in.GID.xy, rgba);
 }
 `;
 

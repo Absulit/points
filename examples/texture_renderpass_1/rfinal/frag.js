@@ -25,7 +25,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     // let scale = params.sliderC;
     let scale = .2 * ratio;
 
-    let feedbackTextureColor = texture(feedbackTexture, imageSampler, uvr, true);
+    let feedbackTextureColor = texture(feedbackTexture, imageSampler, in.uvr, true);
 
     // let imageColor = texture(image, imageSampler, vec2(0,0), uvr / scale, true);
     let imageColor = textureExternal(image, imageSampler, uvr / scale, true);
@@ -67,14 +67,14 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
         text,
         imageSampler,
         startPosition,
-        uvr * scaleDigits,
+        in.uvr * scaleDigits,
         ratio, size
     ).r;
     digits += RED * decodeNumberSprite(
         params.sliderB * 100, start0char,
         text, imageSampler,
         startPosition + vec2(.05 * 3, 0),
-        uvr * scaleDigits,
+        in.uvr * scaleDigits,
         ratio,
         size
     ).r;
@@ -84,7 +84,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
         text,
         imageSampler,
         startPosition + vec2(.05 * 2,0),
-        uvr * scaleDigits,
+        in.uvr * scaleDigits,
         ratio,
         size
     ).r;

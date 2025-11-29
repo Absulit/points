@@ -47,7 +47,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
         image,
         imageSampler,
         startPosition,
-        uvr * scaleDigits,
+        in.uvr * scaleDigits,
         ratio,
         size
     ).r;
@@ -61,14 +61,14 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
         image,
         imageSampler,
         startPosition2,
-        uvr * scaleDigits,
+        in.uvr * scaleDigits,
         ratio,
         size
     ).r;
 
-    //let debugTop = showDebugCross(startPosition + cellRatio, YELLOW, uvr);
+    //let debugTop = showDebugCross(startPosition + cellRatio, YELLOW, in.uvr);
     let debugPosition = mouser;
-    let debugBottom = showDebugCross(debugPosition, RED, uvr);
+    let debugBottom = showDebugCross(debugPosition, RED, in.uvr);
 
     var finalColor = layer(layer(digits, digits2), debugBottom);
 

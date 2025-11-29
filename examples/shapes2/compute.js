@@ -74,10 +74,10 @@ fn main(in: ComputeIn) {
     var rgba = vec4(0.);
     var colorsAround = array<vec4f,4>();
 
-    let nx = f32(GlobalId.x) / numColumns;
-    let ny = f32(GlobalId.y) / numRows;
+    let nx = f32(in.GID.x) / numColumns;
+    let ny = f32(in.GID.y) / numRows;
     let uv = vec2(nx,ny);
-    let positionU = GlobalId.xy;
+    let positionU = in.GID.xy;
 
     let uIndex = getPointsIndex(positionU);
 
@@ -93,7 +93,7 @@ fn main(in: ComputeIn) {
     }
     (*rgbaP) = rgba;
 
-    let sdf = sdfCircle(vec2f(1.,1.) * fnusin(1), .01, .2, uv);
+    let sdf = sdfCircle(vec2f(1.,1.) * fnusin(1), .01, .2, in.uv);
     (*rgbaP) += sdf;
 
 

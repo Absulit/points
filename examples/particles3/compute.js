@@ -66,9 +66,9 @@ fn particleInit(particles: ptr<storage, array<Particle,NUMPARTICLES>, read_write
 fn main(in: ComputeIn) {
     // index = x + (y * numColumns) + (z * numColumns * numRows)
 
-    let x = WID.x * THREADS_X + LID.x;
-    let y = WID.y * THREADS_Y + LID.y;
-    let z = WID.z * THREADS_Z + LID.z;
+    let x = in.WID.x * THREADS_X + in.LID.x;
+    let y = in.WID.y * THREADS_Y + in.LID.y;
+    let z = in.WID.z * THREADS_Z + in.LID.z;
 
     let X = x;
     let Y = y * (WORKGROUP_X * THREADS_X);
@@ -81,7 +81,7 @@ fn main(in: ComputeIn) {
     let particle = &particles[index];
 
     if(particle.init == 0){
-        particleInit(&particles, index, WID);
+        particleInit(&particles, index,  in.WID);
         particle.init = 1;
     }
 
@@ -96,7 +96,7 @@ fn main(in: ComputeIn) {
     particle.color = vec4f(particle.color.rgb, (1. - life_percent) * life_percent * 2);
 
     if(particle.life >= particle.life_limit || any(particle_position > vec2f(SCREENSCALE)) || any(particle_position < vec2f(-SCREENSCALE)) || particle.color.a == 0.){
-        particleInit(&particles, index, WID);
+        particleInit(&particles, index,  in.WID);
     }
 }
 `;

@@ -19,9 +19,9 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
 
     let point = points[0];
 
-    let orangeBall = sdfCircle(vec2(.4, .5) * in.ratio, .1, 0., uvr) *
+    let orangeBall = sdfCircle(vec2(.4, .5) * in.ratio, .1, 0., in.uvr) *
         vec4(1, .5, 0, 1);
-    let redBall = sdfCircle(vec2(.6, .5) * in.ratio, .1, .1, uvr) * RED;
+    let redBall = sdfCircle(vec2(.6, .5) * in.ratio, .1, .1, in.uvr) * RED;
 
     var finalColor = mix(orangeBall, redBall, in.uvr.x);
 

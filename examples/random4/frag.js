@@ -15,7 +15,7 @@ const maxIndex = 52.;
 @fragment
 fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    let feedbackColor = texture(feedbackTexture, imageSampler, uvr, true);
+    let feedbackColor = texture(feedbackTexture, imageSampler, in.uvr, true);
 
     rand_seed.y = fract(params.time) + rand_seed.x;
     rand();

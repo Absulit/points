@@ -15,12 +15,12 @@ ${blur9}
 fn main(in: FragmentIn) -> @location(0) vec4f {
 
     // second pass doesn't use the image, that's the first pass
-    // _ = texturePosition(image, imageSampler, vec2(0,0), uvr, true);
+    // _ = texturePosition(image, imageSampler, vec2(0,0), in.uvr, true);
     let feedbackColor = blur9(
         feedbackTexture,
         feedbackSampler,
         vec2f(),
-        uvr,
+        in.uvr,
         vec2(100.),
         rotateVector(vec2(.4,.0), 2 * PI * params.rotation)
     );

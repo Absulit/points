@@ -41,11 +41,11 @@ fn customVertexBody(position:vec4f, depth:vec4f, uv:vec2f, normal:vec3f, particl
 
 @vertex
 fn main(in: VertexIn) -> CustomFragment {
-    let particle = particles[instanceIndex];
+    let particle = particles[in.instanceIndex];
 
     let model = rotationMatrix(particle.rotation);
 
-    let rotated = model * position.xyz;
+    let rotated = model * in.position.xyz;
     let scaled = rotated * particle.scale;
     let world = scaled + particle.position;
 
@@ -56,7 +56,7 @@ fn main(in: VertexIn) -> CustomFragment {
 
     let depth = vec4f(-particle.position.z / 253);
 
-    return customVertexBody(clip, depth, uv, newNormal, particle);
+    return customVertexBody(clip, depth, in.uv, newNormal, particle);
 }
 `;
 

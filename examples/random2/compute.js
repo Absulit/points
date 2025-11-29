@@ -8,10 +8,10 @@ fn main(in: ComputeIn) {
 
     //--------------------------------------------------
 
-    let pointIndex = i32(GlobalId.y + (GlobalId.x * dims.x));
+    let pointIndex = i32(in.GID.y + (in.GID.x * dims.x));
     let c = rands[pointIndex];
 
-    textureStore(outputTex, GlobalId.xy, vec4f(c));
+    textureStore(outputTex, in.GID.xy, vec4f(c));
     storageBarrier();
 }
 `;
