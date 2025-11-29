@@ -13,16 +13,17 @@ const workgroupSize = 1;
 
 @compute @workgroup_size(workgroupSize,workgroupSize,1)
 fn main(in: ComputeIn) {
+    let GID = in.GID;
     //--------------------------------------------------
     let dims = textureDimensions(image);
-    var pointIndex = GlobalId.y + (GlobalId.x * dims.x);
+    var pointIndex = GID.y + (GID.x * dims.x);
 
-    points[pointIndex] = textureLoad(image, GlobalId.yx, 0); // image
-    // points[pointIndex] = textureLoad(image, GlobalId.yx); // video
+    points[pointIndex] = textureLoad(image, GID.yx, 0); // image
+    // points[pointIndex] = textureLoad(image, GID.yx); // video
 
     //--------------------------------------------------
 
-    pointIndex = GlobalId.x + (GlobalId.y * dims.y);
+    pointIndex = GID.x + (GID.y * dims.y);
 
     let b = brightness(points[pointIndex]);
     let newBrightness = step(.5, b); // if(b > .5){newBrightness = 1.;}
@@ -31,12 +32,12 @@ fn main(in: ComputeIn) {
 
     points[pointIndex] = vec4(newBrightness);
 
-    let pointIndexC = GlobalId.x + (GlobalId.y + distance) * dims.y;
+    let pointIndexC = GID.x + (GID.y + distance) * dims.y;
     let rightPoint = points[pointIndexC];
     points[pointIndexC] = vec4(rightPoint + (.5 * quant_error * params.quantError * 2));
 
 
-    textureStore(outputTex, GlobalId.xy, points[pointIndex]);
+    textureStore(outputTex, GID.xy, points[pointIndex]);
 }
 `;
 
