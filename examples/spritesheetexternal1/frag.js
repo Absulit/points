@@ -13,7 +13,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
 
     let dims = vec2f(textureDimensions(textImg, 0));
     // if you are using uvr you have to multiply by ratio
-    let imageWidth = dims / params.screen * ratio;
+    let imageWidth = dims / params.screen * in.ratio;
     let halfImageWidth = imageWidth * .5 * SCALE;
 
     let textColors = texture(

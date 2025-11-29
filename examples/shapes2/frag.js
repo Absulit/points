@@ -21,7 +21,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     let texColorComputeB = texture(
         computeTexture,
         feedbackSampler,
-        uvr - vec2(CHROMATIC_DISPLACEMENT, 0.), true
+        in.uvr - vec2(CHROMATIC_DISPLACEMENT, 0.), true
     ).b;
 
     return (texColorCompute + vec4(texColorComputeR,0,0,1) + vec4(0,0,texColorComputeB,1));

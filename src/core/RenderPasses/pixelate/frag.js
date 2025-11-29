@@ -14,7 +14,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
         vec2(0.),
         params.pixelate_pixelDims.x,
         params.pixelate_pixelDims.y,
-        uvr
+        in.uvr
     );
 
     let finalColor:vec4f = pixelatedColor;

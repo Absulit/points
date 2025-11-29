@@ -16,7 +16,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
 
     var ratioScale = 1.;
     if(params.isMobile == 1){
-        ratioScale = ratio.x;
+        ratioScale = in.ratio.x;
     }
 
     return textureExternal(webcam, imageSampler, in.uvr / ratioScale * flip + displace, true);

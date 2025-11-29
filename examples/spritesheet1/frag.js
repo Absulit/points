@@ -103,7 +103,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
         .14,
         0.,
         0.,
-        uvr
+        in.uvr
     ) * .5;
 
     return finalColor + animColor + layer(vec4(square), animPenguin);

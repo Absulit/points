@@ -23,7 +23,7 @@ ${sdfSmooth}
 fn main(in: FragmentIn) -> @location(0) vec4f {
 
     // let scale = params.sliderC;
-    let scale = .2 * ratio;
+    let scale = .2 * in.ratio;
 
     let feedbackTextureColor = texture(feedbackTexture, imageSampler, in.uvr, true);
 

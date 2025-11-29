@@ -42,14 +42,14 @@ fn main(
     }
 
     if(params.mouseClick == 1.){
-        variables.circlePosition = mouse * ratio;
+        variables.circlePosition = mouse * in.ratio;
     }
 
     let circleValue = sdfCircle(
         variables.circlePosition,
         variables.circleRadius,
         0.,
-        uvr
+        in.uvr
     );
 
     var finalColor = vec4(circleValue);
@@ -66,7 +66,7 @@ fn main(
 
     let dims = vec2f(textureDimensions(cta, 0));
     // if you are using uvr you have to multiply by ratio
-    let imageWidth = dims / params.screen * ratio;
+    let imageWidth = dims / params.screen * in.ratio;
     let halfImageWidth = imageWidth * .5 * SCALE;
 
     let ctaColor = texture(

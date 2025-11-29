@@ -17,7 +17,7 @@ const SCALE = 2.;
 @fragment
 fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    let startPosition = mouse * ratio;
+    let startPosition = mouse * in.ratio;
 
     let positionCross = showDebugCross(startPosition, RED, in.uvr);
 
@@ -31,7 +31,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
 
     let dims = vec2f(textureDimensions(cta, 0));
     // if you are using uvr you have to multiply by ratio
-    let imageWidth = dims / params.screen * ratio;
+    let imageWidth = dims / params.screen * in.ratio;
     let halfImageWidth = imageWidth * .5 * SCALE;
 
     let ctaColor = texture(

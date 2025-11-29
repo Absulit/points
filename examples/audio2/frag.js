@@ -41,7 +41,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     }
 
     let center = vec2(.5) * in.ratio;
-    let size = .4 * ratio.x;
+    let size = .4 * in.ratio.x;
     let circle1 = sdfCircle(center, result[0] * size, .0, in.uvr) * WHITE;
     let circle2 = sdfCircle(center, result[1] * size, .0, in.uvr) * GREEN;
     let circle3 = sdfCircle(center, result[2] * size, .0, in.uvr) * YELLOW;
@@ -50,7 +50,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     // click to play message
     let dims = vec2f(textureDimensions(cta, 0));
     // if you are using uvr you have to multiply by ratio
-    let imageWidth = dims / params.screen * ratio;
+    let imageWidth = dims / params.screen * in.ratio;
     let halfImageWidth = imageWidth * .5 * SCALE;
 
     let ctaColor = texture(
