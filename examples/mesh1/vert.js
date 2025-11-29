@@ -10,7 +10,7 @@ fn main(
     @location(2) uv: vec2f,
     @location(3) normal: vec3f,
     @builtin(vertex_index) vertexIndex: u32
-) -> Fragment {
+) -> FragmentIn {
 
     var modifiedPosition = position;
     modifiedPosition.w = modifiedPosition.w + sin(f32(vertexIndex) * (params.time) * .01) * .1;

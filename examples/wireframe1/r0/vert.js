@@ -16,7 +16,7 @@ fn main(
     @location(5) barycentrics: vec3f,
     @builtin(vertex_index) vertexIndex: u32,
     @builtin(instance_index) instanceIndex: u32
-) -> Fragment {
+) -> FragmentIn {
 
 
     var angleZ = params.time * 0.9854;

@@ -17,7 +17,7 @@ fn main(
     @location(4) id:u32,
     @builtin(vertex_index) vertexIndex: u32,
     @builtin(instance_index) instanceIndex: u32
-) -> Fragment {
+) -> FragmentIn {
     let particle = particles[instanceIndex];
     // var angleZ = params.time * 0.9854;
     var angleY = params.time * 0.094222;

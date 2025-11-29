@@ -14,7 +14,7 @@ fn main(
     @location(3) normal: vec3f,
     @builtin(vertex_index) vertexIndex: u32,
     @builtin(instance_index) instanceIndex: u32
-) -> Fragment {
+) -> FragmentIn {
 
     let rotX = rotXAxis(params.time * -.6854);
     let rotY = rotYAxis(params.time * .4222);

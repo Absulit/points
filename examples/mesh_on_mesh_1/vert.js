@@ -25,7 +25,7 @@ fn main(
     @location(4) id:u32,
     @builtin(vertex_index) vertexIndex: u32,
     @builtin(instance_index) instanceIndex: u32
-) -> Fragment {
+) -> FragmentIn {
 
     if(params.visibility == 0 && mesh.base_mesh == id){
         return Fragment();

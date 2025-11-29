@@ -12,7 +12,7 @@ fn main(
     @location(3) normal: vec3f,
     @builtin(vertex_index) vertexIndex: u32,
     @builtin(instance_index) instanceIndex: u32
-) -> Fragment {
+) -> FragmentIn {
     let particle = particles[instanceIndex];
 
     let ratioX = params.screen.x / params.screen.y;
