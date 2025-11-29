@@ -17,15 +17,7 @@ fn translationMatrix(offset: vec3f) -> mat4x4f {
 }
 
 @vertex
-fn main(
-    @location(0) position:vec4f,
-    @location(1) color:vec4f,
-    @location(2) uv:vec2f,
-    @location(3) normal:vec3f,
-    @location(4) id:u32,
-    @builtin(vertex_index) vertexIndex: u32,
-    @builtin(instance_index) instanceIndex: u32
-) -> FragmentIn {
+fn main(in: VertexIn) -> FragmentIn {
 
     if(params.visibility == 0 && mesh.base_mesh == id){
         return Fragment();
