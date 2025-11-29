@@ -23,7 +23,7 @@ fn main(in: VertexIn) -> FragmentIn {
 
     let newNormal = normalize((model * vec4f(normal, 0.)).xyz);
 
-    var dvb = defaultVertexBody(clip, color, uv, newNormal);
+    var dvb = defaultVertexBody(clip, in.color, in.uv, newNormal);
     dvb.id = id;
 
     return dvb;
