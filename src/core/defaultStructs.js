@@ -13,7 +13,23 @@
 
 const defaultStructs = /*wgsl*/`
 
-struct Fragment {
+struct ComputeIn {
+    @builtin(global_invocation_id) GID: vec3u,
+    @builtin(workgroup_id) WID: vec3u,
+    @builtin(local_invocation_id) LID: vec3u
+}
+
+struct VertexIn {
+    @location(0) position:vec4f,
+    @location(1) color:vec4f,
+    @location(2) uv:vec2f,
+    @location(3) normal:vec3f,
+    @location(4) id:u32,       // mesh id
+    @builtin(vertex_index) vertexIndex: u32,
+    @builtin(instance_index) instanceIndex: u32
+}
+
+struct FragmentIn {
     @builtin(position) position: vec4f,
     @location(0) color: vec4f,
     @location(1) uv: vec2f,

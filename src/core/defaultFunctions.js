@@ -28,11 +28,11 @@
  * @param {vec4f} position
  * @param {vec4f} color
  * @param {vec2f} uv
- * @return {Fragment}
+ * @return {FragmentIn}
  */
 export const defaultVertexBody = /*wgsl*/`
-fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) -> Fragment {
-    var result: Fragment;
+fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) -> FragmentIn {
+    var result: FragmentIn;
 
     let ratioX = params.screen.x / params.screen.y;
     let ratioY = 1. / ratioX / (params.screen.y / params.screen.x);

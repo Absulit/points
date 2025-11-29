@@ -1,11 +1,12 @@
 const compute = /*wgsl*/`
 
+
+// ComputeIn
+// @builtin(global_invocation_id) GID: vec3u,
+// @builtin(workgroup_id) WID: vec3u,
+// @builtin(local_invocation_id) LID: vec3u
 @compute @workgroup_size(8,8,1)
-fn main(
-    @builtin(global_invocation_id) GlobalId: vec3u,
-    @builtin(workgroup_id) WorkGroupID: vec3u,
-    @builtin(local_invocation_id) LocalInvocationID: vec3u
-) {
+fn main(in: ComputeIn) {
     let time = params.time;
 }
 `;
