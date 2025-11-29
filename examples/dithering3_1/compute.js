@@ -12,11 +12,7 @@ const distance:u32 = 1;
 const workgroupSize = 8;
 
 @compute @workgroup_size(workgroupSize,workgroupSize,1)
-fn main(
-    @builtin(global_invocation_id) GlobalId: vec3<u32>,
-    @builtin(workgroup_id) WorkGroupID: vec3<u32>,
-    @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
-) {
+fn main(in: ComputeIn) {
     //--------------------------------------------------
     let dims = textureDimensions(image);
 

@@ -55,11 +55,7 @@ fn getColorsAround4Layer(position: vec2<u32>, distance: u32) -> array<  vec4f, 4
 const workgroupSize = 1;
 
 @compute @workgroup_size(workgroupSize,workgroupSize,1)
-fn main(
-    @builtin(global_invocation_id) GlobalId: vec3<u32>,
-    @builtin(workgroup_id) WorkGroupID: vec3<u32>,
-    @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
-) {
+fn main(in: ComputeIn) {
     let numColumns:f32 = params.screen.x;
     let numRows:f32 = params.screen.y;
 
