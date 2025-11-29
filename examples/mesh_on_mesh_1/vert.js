@@ -19,25 +19,25 @@ fn translationMatrix(offset: vec3f) -> mat4x4f {
 @vertex
 fn main(in: VertexIn) -> FragmentIn {
 
-    if(params.visibility == 0 && mesh.base_mesh == id){
-        return Fragment();
+    if(params.visibility == 0 && mesh.base_mesh == in.id){
+        return FragmentIn();
     }
 
     // let angleZ = params.time * 0.9854;
     let angleY = params.time * 0.94222;
     // let angleX = params.time * 0.865;
 
-    let p = vertex_data[instanceIndex];
+    let p = vertex_data[in.instanceIndex];
 
     let rotX = rotXAxis(0);
     let rotY = rotYAxis(angleY);
     let rotZ = rotZAxis(0);
     var model = rotX * rotY * rotZ;
 
-    var rotated = model * position;
-    if(mesh.instance_mesh == id){
+    var rotated = model * in.position;
+    if(mesh.instance_mesh == in.id){
         model = rotX * rotY * rotZ * translationMatrix(p.xyz);
-        rotated = model * position;
+        rotated = model * in.position;
     }
 
     let world = rotated;

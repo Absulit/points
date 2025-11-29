@@ -17,7 +17,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     var baseColor = vec4f(1);
 
     var alpha = 1.;
-    if(mesh.base_mesh == id){
+    if(mesh.base_mesh == in.id){
         alpha = 1.;
         baseColor = RED;
     }
