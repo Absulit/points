@@ -19,14 +19,7 @@ fn angle(p1:vec2f, p2:vec2f) -> f32 {
 }
 
 @fragment
-fn main(
-    @location(0) color: vec4f,
-    @location(1) uv: vec2f,
-    @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
-    @location(3) uvr: vec2f,    // uv with aspect ratio corrected
-    @location(4) mouse: vec2f,
-    @builtin(position) position: vec4f
-) -> @location(0) vec4f {
+fn main(in: FragmentIn) -> @location(0) vec4f {
 
     let imagePosition = vec2(0.0,0.0) * ratio;
     let center = vec2(.5,.5) * ratio;

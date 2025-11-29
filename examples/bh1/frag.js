@@ -58,20 +58,13 @@ fn map(p:vec3f, step:f32) -> f32 {
 }
 
 @fragment
-fn main(
-    @location(0) color: vec4f,
-    @location(1) uv: vec2f,
-    @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
-    @location(3) uvr: vec2f,    // uv with aspect ratio corrected
-    @location(4) mouse: vec2f,
-    @builtin(position) position: vec4f
-) -> @location(0) vec4f {
+fn main(in: FragmentIn) -> @location(0) vec4f {
     let sliderA = params.sliderA; // 1.;
     let scale = params.scale; // .1116;
-    let uv2 = uvr * 4 - (vec2(2) * ratio); // clip space
+    let uv2 = in.uvr * 4 - (vec2(2) * in.ratio); // clip space
     // let m = mouse * ratio * 4 + (vec2(.5) * ratio);
     // let m = vec2f(0, params.mouseY) * ratio * 4 - (vec2(2) * ratio);
-    let m = vec2f(0, fusin(.3) * .05 ) * ratio * 4 - vec2(-3); // -.2
+    let m = vec2f(0, fusin(.3) * .05 ) * in.ratio * 4 - vec2(-3); // -.2
     // let m = vec2f(.5, .5) * 4 - (vec2(2) * ratio);
 
     // initialization
