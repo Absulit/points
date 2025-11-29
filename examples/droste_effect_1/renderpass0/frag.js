@@ -66,9 +66,9 @@ fn map(p: vec3f, step:f32) -> f32 {
 fn main(in: FragmentIn) -> @location(0) vec4f {
     let sliderA = 1.;
     let sliderB = .1116;
-    let uv2 = uvr * 4 - (vec2(2) * ratio); // clip space
-    // let m = mouse * 4 - (vec2(2) * ratio);
-    let m = vec2f(.5, .5) * 4 - (vec2(2) * ratio);
+    let uv2 = in.uvr * 4 - (vec2(2) * in.ratio); // clip space
+    // let m = mouse * 4 - (vec2(2) * in.ratio);
+    let m = vec2f(.5, .5) * 4 - (vec2(2) * in.ratio);
 
     // initialization
     var ro = vec3f(0, 0, -3); // ray origin

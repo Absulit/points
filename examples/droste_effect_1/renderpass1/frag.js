@@ -62,7 +62,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     let r1 = 0.3;
     let r2 = 0.7;
     let pos = vec2f(0);
-    var z = (uvr * 2) - (vec2(1) * ratio);
+    var z = (in.uvr * 2) - (vec2(1) * in.ratio);
     z = z * sliderB * 10;
 
     // 4. Take the tiled strips back to ordinary space.
@@ -79,7 +79,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     z = complexExp(z) * r1;
 
     let c = RGBAFromHSV( atan2(z.y,z.x)/PI*2,1.,1.);
-    let imageColor = texturePosition(feedbackTexture, imageSampler, vec2(-.5) * ratio, z / sliderA / 10 , false);
+    let imageColor = texturePosition(feedbackTexture, imageSampler, vec2(-.5) * in.ratio, z / sliderA / 10 , false);
 
     var a = annulus(pos, r1, r2, z);
 
