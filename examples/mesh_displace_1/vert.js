@@ -36,13 +36,13 @@ fn main(in: VertexIn) -> FragmentIn {
     let displacement = (-10. * noise + b) / 50.0;
 
     let displace = normal * displacement * params.val * 4;
-    let world = (model * vec4f(position.xyz + displace, 1.)).xyz;
+    let world = (model * vec4f(in.position.xyz + displace, 1.)).xyz;
     let clip = params.projection * params.view * vec4f(world, 1.);
 
-    let newNormal = normalize((model * vec4f(normal, 0.)).xyz);
+    let newNormal = normalize((model * vec4f(in.normal, 0.)).xyz);
 
     var dvb = defaultVertexBody(clip, vec4f(vec3f(noise), 1), uv, newNormal);
-    // dvb.id = id;
+    // dvb.id = in.id;
 
     return dvb;
 }

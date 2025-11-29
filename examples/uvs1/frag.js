@@ -7,7 +7,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     let uvColor = vec4(fract(uv * 10), 0, 1);
 
     // always square dimensions
-    let uvrColor = vec4(fract(uvr * 20), 0, 1).rbga;
+    let uvrColor = vec4(fract(in.uvr * 20), 0, 1).rbga;
 
     // if(uv.x > mouse.x){factor = 1.;}
     let factor = step(uv.x, mouse.x);

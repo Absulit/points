@@ -72,7 +72,7 @@ fn main(
     let ctaColor = texture(
         cta,
         imageSampler,
-        (uvr / SCALE) - (center - halfImageWidth) / SCALE,
+        (in.uvr / SCALE) - (center - halfImageWidth) / SCALE,
         true
     );
 

@@ -56,7 +56,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     let ctaColor = texture(
         cta,
         imageSampler,
-        (uvr / SCALE) - (center - halfImageWidth) / SCALE,
+        (in.uvr / SCALE) - (center - halfImageWidth) / SCALE,
         true
     ) * showMessage;
 

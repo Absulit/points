@@ -9,7 +9,7 @@ const SCALE = 2.;
 @fragment
 fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    let audioX = audio.data[u32(uvr.x * params.audioLength)] / 256;
+    let audioX = audio.data[u32(in.uvr.x * params.audioLength)] / 256;
 
     if(params.mouseClick == 1.){
         click_event.updated = 1;
@@ -28,7 +28,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     let ctaColor = texture(
         cta,
         imageSampler,
-        (uvr / SCALE) - (center - halfImageWidth) / SCALE,
+        (in.uvr / SCALE) - (center - halfImageWidth) / SCALE,
         true
     );
 

@@ -19,7 +19,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     let textColors = texture(
         textImg,
         imageSampler,
-        (uvr / SCALE) - (center - halfImageWidth) / SCALE,
+        (in.uvr / SCALE) - (center - halfImageWidth) / SCALE,
         true
     );
 

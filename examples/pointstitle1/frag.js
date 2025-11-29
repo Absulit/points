@@ -27,18 +27,18 @@ const charAIndex = 33u; // A
 @fragment
 fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    let n1 = snoise(uvr * 100. * 0.0016 /*params.sliderA*/ + params.time * .1);
+    let n1 = snoise(in.uvr * 100. * 0.0016 /*params.sliderA*/ + params.time * .1);
 
     let numColumns = 400. * 0.2662 * n1; // params.sliderB;
     let numRows = 400. * 0.3765; // params.sliderC;
-    let subuv = fract(uvr * vec2(numColumns, numRows));
+    let subuv = fract(in.uvr * vec2(numColumns, numRows));
     let subuvColor = vec4(subuv, 0, 1);
 
     let pixelsWidth = params.screen.x / numColumns;
     let pixelsHeight = params.screen.y / numRows;
     let dx = pixelsWidth * (1. / params.screen.x);
     let dy = pixelsHeight * (1. / params.screen.y);
-    let pixeleduv = vec2(dx * floor(uvr.x / dx), dy * floor(uvr.y / dy));
+    let pixeleduv = vec2(dx * floor(in.uvr.x / dx), dy * floor(in.uvr.y / dy));
     let pixeleduvColor = vec4(pixeleduv, 0, 1);
 
     let charSizeF32 = charSizeF / params.screen;

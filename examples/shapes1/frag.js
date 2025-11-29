@@ -37,7 +37,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
             params.squareFeather,
             radians(360.) * fnusin(2.),
             uvr
-        ) * vec4(uvr.x, 1 - in.uvr.y, 0, fi / 10);
+        ) * vec4(in.uvr.x, 1 - in.uvr.y, 0, fi / 10);
     }
 
     //----

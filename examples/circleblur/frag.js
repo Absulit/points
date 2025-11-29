@@ -20,7 +20,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
 
     let texColorCompute = texture(computeTexture, feedbackSampler, uvr, false);
 
-    let d = distance(uvr, vec2(.5 + .1 * fusin(2.), .5  + .1 * fusin(4.123)) * ratio);
+    let d = distance(in.uvr, vec2(.5 + .1 * fusin(2.), .5  + .1 * fusin(4.123)) * ratio);
     let c = step(d, .1); // if(d > .1){c = 0.;}
 
     let decayR =  texColor.r * .9 * texColor2.r;

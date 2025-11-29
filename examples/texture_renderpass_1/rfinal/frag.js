@@ -31,22 +31,22 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     let imageColor = textureExternal(image, imageSampler, uvr / scale, true);
     let feedbackTextureColor1 = texture(feedbackTexture1,
         imageSampler,
-        (uvr / scale) - vec2(1, 0),
+        (in.uvr / scale) - vec2(1, 0),
         true
     );
     let feedbackTextureColor2 = texture(feedbackTexture2,
         imageSampler,
-        (uvr / scale) - vec2(2, 0),
+        (in.uvr / scale) - vec2(2, 0),
         true
     );
     let feedbackTextureColor3 = texture(feedbackTexture3,
         imageSampler,
-        (uvr / scale) - vec2(3, 0),
+        (in.uvr / scale) - vec2(3, 0),
         true
     );
     let feedbackTextureColor4 = texture(feedbackTexture4,
         imageSampler,
-        (uvr / scale) - vec2(4, 0),
+        (in.uvr / scale) - vec2(4, 0),
         true
     );
 

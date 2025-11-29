@@ -43,10 +43,10 @@ fn main(in: VertexIn) -> FragmentIn {
     let world = rotated;
     let clip = params.projection * params.view * world;
 
-    let newNormal = normalize((model * vec4f(normal, 0.)).xyz);
+    let newNormal = normalize((model * vec4f(in.normal, 0.)).xyz);
 
     var dvb = defaultVertexBody(clip, in.color, in.uv, newNormal);
-    dvb.id = id;
+    dvb.id = in.id;
 
     return dvb;
 }
