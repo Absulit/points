@@ -19,7 +19,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     var finalColor:vec4f = vec4();
 
     if(variables.init == 0.){
-        rand_seed = uvr + params.time;
+        rand_seed = in.uvr + params.time;
         rand();
         finalColor = vec4(rand_seed, 0, 1);
         variables.init = 1;

@@ -6,15 +6,15 @@ ${texturePosition}
 @fragment
 fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    let imageColor = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0., 0), uvr, true);
+    let imageColor = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0., 0), in.uvr, true);
 
 
     // --------- chromatic displacement vector
     let cdv = vec2(params.chromaticAberration_distance, 0.);
-    let d = distance(vec2(.5,.5), uvr);
-    let imageColorR = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * in.ratio, uvr + cdv * d, true).r;
-    let imageColorG = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * in.ratio, uvr, true).g;
-    let imageColorB = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * in.ratio, uvr - cdv * d, true).b;
+    let d = distance(vec2(.5,.5), in.uvr);
+    let imageColorR = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * in.ratio, in.uvr + cdv * d, true).r;
+    let imageColorG = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * in.ratio, in.uvr, true).g;
+    let imageColorB = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * in.ratio, in.uvr - cdv * d, true).b;
 
     let finalColor:vec4f = vec4(imageColorR, imageColorG, imageColorB, 1);
 

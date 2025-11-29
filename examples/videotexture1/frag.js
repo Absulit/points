@@ -7,7 +7,7 @@ ${textureExternal}
 @fragment
 fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    let rgba = textureExternal(video, feedbackSampler, uvr / params.scale, true);
+    let rgba = textureExternal(video, feedbackSampler, in.uvr / params.scale, true);
 
     return rgba;
 }

@@ -11,7 +11,7 @@ ${WHITE}
 @fragment
 fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    let imageColor = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0., 0), uvr, true);
+    let imageColor = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0., 0), in.uvr, true);
     let finalColor:vec4f = brightness(imageColor) * WHITE;
 
     return finalColor;

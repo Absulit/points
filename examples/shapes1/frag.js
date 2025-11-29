@@ -25,7 +25,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
 
     var finalColor = mix(orangeBall, redBall, in.uvr.x);
 
-    finalColor += sdfLine2( vec2(.5) * in.ratio, vec2(.6), .001, uvr / ratio);
+    finalColor += sdfLine2( vec2(.5) * in.ratio, vec2(.6), .001, in.uvr / in.ratio);
 
 
     for(var i:u32; i<10;i++){
@@ -36,7 +36,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
             params.squareSize,
             params.squareFeather,
             radians(360.) * fnusin(2.),
-            uvr
+            in.uvr
         ) * vec4(in.uvr.x, 1 - in.uvr.y, 0, fi / 10);
     }
 
@@ -55,7 +55,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
             pointPosition,
             pointPosition2,
             .001 + .1 * params.lineWidth,
-            uvr / ratio
+            in.uvr / in.ratio
         );
     }
 

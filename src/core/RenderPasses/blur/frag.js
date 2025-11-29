@@ -15,7 +15,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
         renderpass_feedbackTexture,
         renderpass_feedbackSampler,
         vec2(),
-        uvr,
+        in.uvr,
         params.blur_resolution, // resolution
         rotateVector(params.blur_direction, params.blur_radians) // direction
     );

@@ -19,7 +19,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
         ratioScale = ratio.x;
     }
 
-    return textureExternal(webcam, imageSampler, uvr / ratioScale * flip + displace, true);
+    return textureExternal(webcam, imageSampler, in.uvr / ratioScale * flip + displace, true);
 }
 `;
 

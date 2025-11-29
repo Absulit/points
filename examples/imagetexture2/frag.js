@@ -14,7 +14,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     let color0 = vec4(params.color0 / 255, 1.);
     let color1 = vec4(params.color1 / 255, 1.);
 
-    let rgbaImage = texture(image, feedbackSampler, uvr / params.scale, false);
+    let rgbaImage = texture(image, feedbackSampler, in.uvr / params.scale, false);
 
     let b = brightness(rgbaImage);
     let d = distance(uv, rgbaImage.xy);

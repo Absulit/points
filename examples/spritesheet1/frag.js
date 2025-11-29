@@ -81,7 +81,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
         bobbles,
         imageSampler,
         positionAnim,
-        uvr / scaleAnim,
+        in.uvr / scaleAnim,
         indexAnim,
         vec2u(24,24)
     );
@@ -93,7 +93,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
         penguin,
         imageSampler,
         positionAnim,
-        uvr / scaleAnim,
+        in.uvr / scaleAnim,
         indexAnim,
         vec2u(32)
     );

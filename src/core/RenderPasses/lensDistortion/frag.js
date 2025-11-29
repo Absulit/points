@@ -61,7 +61,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     // Chromatic Aberration --
     // --------- chromatic displacement vector
     let cdv = vec2(params.lensDistortion_distance, 0.);
-    // let dis = distance(vec2(.5,.5), uvr);
+    // let dis = distance(vec2(.5,.5), in.uvr);
     let imageColorR = texture(renderpass_feedbackTexture, renderpass_feedbackSampler, nuv + cdv * params.lensDistortion_amount , true).r;
     let imageColorG = texture(renderpass_feedbackTexture, renderpass_feedbackSampler, nuv, true).g;
     let imageColorB = texture(renderpass_feedbackTexture, renderpass_feedbackSampler, nuv - cdv * params.lensDistortion_amount , true).b;

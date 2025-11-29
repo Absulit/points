@@ -27,8 +27,8 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
 
     let feedbackTextureColor = texture(feedbackTexture, imageSampler, in.uvr, true);
 
-    // let imageColor = texture(image, imageSampler, vec2(0,0), uvr / scale, true);
-    let imageColor = textureExternal(image, imageSampler, uvr / scale, true);
+    // let imageColor = texture(image, imageSampler, vec2(0,0), in.uvr / scale, true);
+    let imageColor = textureExternal(image, imageSampler, in.uvr / scale, true);
     let feedbackTextureColor1 = texture(feedbackTexture1,
         imageSampler,
         (in.uvr / scale) - vec2(1, 0),

@@ -15,7 +15,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
         false
     );
 
-    rand_seed = uvr + params.time;
+    rand_seed = in.uvr + params.time;
 
     let noise = rand() * .5 + .5;
     let finalColor = (feedbackTextureColor + feedbackTextureColor * noise) * .5;

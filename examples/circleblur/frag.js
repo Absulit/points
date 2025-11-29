@@ -15,8 +15,8 @@ ${texture}
 fn main(in: FragmentIn) -> @location(0) vec4f {
 
     let texColor = texture(feedbackTexture, feedbackSampler, in.uvr, false);
-    let texColor2 = texture(feedbackTexture, feedbackSampler, uvr + vec2(-.001,1), false);
-    let texColor3 = texture(feedbackTexture, feedbackSampler, uvr + vec2(.001,1), false);
+    let texColor2 = texture(feedbackTexture, feedbackSampler, in.uvr + vec2(-.001,1), false);
+    let texColor3 = texture(feedbackTexture, feedbackSampler, in.uvr + vec2(.001,1), false);
 
     let texColorCompute = texture(computeTexture, feedbackSampler, in.uvr, false);
 

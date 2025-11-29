@@ -12,7 +12,7 @@ ${PI}
 @fragment
 fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    let rgbaImage = texture(image, imageSampler, uvr / params.scale, false);
+    let rgbaImage = texture(image, imageSampler, in.uvr / params.scale, false);
 
     let input = rgbaImage.r;
     let bloomVal = bloom(input, 2, params.bloom);
