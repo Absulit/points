@@ -10,12 +10,12 @@ ${texture}
 @fragment
 fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    let n1 = snoise(uv / params.sliderA);
+    let n1 = snoise(in.uv / params.sliderA);
     let center = vec2(.5) * in.ratio;
     let d = distance(center, in.uvr); // sqrt(dot(d, d));
 
     // vector from center to current fragment
-    let vectorToCenter = uvr - center;
+    let vectorToCenter = in.uvr - center;
     let sqrtDotCenter = sqrt(dot(center, center));
 
     // amount of effect

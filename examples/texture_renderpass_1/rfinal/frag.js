@@ -68,14 +68,14 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
         imageSampler,
         startPosition,
         in.uvr * scaleDigits,
-        ratio, size
+        in.ratio, size
     ).r;
     digits += RED * decodeNumberSprite(
         params.sliderB * 100, start0char,
         text, imageSampler,
         startPosition + vec2(.05 * 3, 0),
         in.uvr * scaleDigits,
-        ratio,
+        in.ratio,
         size
     ).r;
     digits += RED * decodeNumberSprite(
@@ -85,7 +85,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
         imageSampler,
         startPosition + vec2(.05 * 2,0),
         in.uvr * scaleDigits,
-        ratio,
+        in.ratio,
         size
     ).r;
     digits = sdfSmooth(digits);
