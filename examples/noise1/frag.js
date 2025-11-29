@@ -17,7 +17,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     let n3 = snoise(uvr * 200. * params.scale2 + 10. * fnusin(.03));
     let n4 = fract(n1 * n2 + n3);
 
-    //let finalColor = vec4(n4, uvr.x - n4, 0, 1);
+    //let finalColor = vec4(n4, in.uvr.x - n4, 0, 1);
     let finalColor = mix(RED, YELLOW, n4 );
 
     return finalColor;

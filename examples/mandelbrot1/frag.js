@@ -113,15 +113,15 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     if(iteration < numIterations){
         finalColor = vec4(
             percentageIteration,
-            percentageIteration * uvr.x * fusin(1),
-            percentageIteration * uvr.y,
+            percentageIteration * in.uvr.x * fusin(1),
+            percentageIteration * in.uvr.y,
             1
         );
     }else{
         finalColor = vec4(
             percentageIteration,
-            percentageIteration * uvr.x,
-            1 - percentageIteration * uvr.y,
+            percentageIteration * in.uvr.x,
+            1 - percentageIteration * in.uvr.y,
             1
         );
     }

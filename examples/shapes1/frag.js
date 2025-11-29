@@ -23,7 +23,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
         vec4(1, .5, 0, 1);
     let redBall = sdfCircle(vec2(.6, .5) * ratio, .1, .1, uvr) * RED;
 
-    var finalColor = mix(orangeBall, redBall, uvr.x);
+    var finalColor = mix(orangeBall, redBall, in.uvr.x);
 
     finalColor += sdfLine2( vec2(.5) * ratio, vec2(.6), .001, uvr / ratio);
 
@@ -37,7 +37,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
             params.squareFeather,
             radians(360.) * fnusin(2.),
             uvr
-        ) * vec4(uvr.x, 1 - uvr.y, 0, fi / 10);
+        ) * vec4(uvr.x, 1 - in.uvr.y, 0, fi / 10);
     }
 
     //----

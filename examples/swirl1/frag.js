@@ -57,7 +57,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     let n = snoise(displaceValue + uvrTwisted ) * .5 + .5;
 
     let finalColor = vec4(
-        paletteLerp(colors, fract(n + params.time * .01 + uvr.x)),
+        paletteLerp(colors, fract(n + params.time * .01 + in.uvr.x)),
         1
     );
 
