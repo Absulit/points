@@ -13,6 +13,7 @@ const workgroupSize = 8;
 
 @compute @workgroup_size(workgroupSize,workgroupSize,1)
 fn main(in: ComputeIn) {
+    let WID = in.WID;
     //--------------------------------------------------
     let dims = textureDimensions(image);
 
@@ -26,11 +27,11 @@ fn main(in: ComputeIn) {
     if(variables.init == 0){
 
         for (var indexColumns:u32 = 0; indexColumns < numColumnsPiece; indexColumns++) {
-            let x = WorkGroupID.x * numColumnsPiece + indexColumns;
+            let x = WID.x * numColumnsPiece + indexColumns;
             let nx = x / numColumns;
             for (var indexRows:u32 = 0; indexRows < numRowsPiece; indexRows++) {
 
-                let y = WorkGroupID.y * numRowsPiece + indexRows;
+                let y = WID.y * numRowsPiece + indexRows;
                 let ny = y / numRows;
                 let uv = vec2(nx,ny);
 
@@ -55,10 +56,10 @@ fn main(in: ComputeIn) {
     //--------------------------------------------------
 
     for (var indexColumns:u32 = 0; indexColumns < numColumnsPiece; indexColumns++) {
-        let x = WorkGroupID.x * numColumnsPiece + indexColumns;
+        let x = WID.x * numColumnsPiece + indexColumns;
         for (var indexRows:u32 = 0; indexRows < numRowsPiece; indexRows++) {
 
-            let y = WorkGroupID.y * numRowsPiece + indexRows;
+            let y = WID.y * numRowsPiece + indexRows;
 
             let pointIndex = i32(y + (x * numColumns));
 
