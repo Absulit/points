@@ -39,7 +39,7 @@ const base = {
 
         points.setBindingTexture('writeTexture', 'readTexture');
 
-        points.setTexture2d('pass0Texture', true, null, 0);
+        points.setTexture2d('pass0Texture', true, null, 1);
 
         points.addEventListener('log', data => {
             const [a, b, c, d] = data;
