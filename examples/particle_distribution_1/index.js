@@ -1,5 +1,6 @@
 import vert0 from './r0/vert.js';
 import frag0 from './r0/frag.js';
+import compute0 from './r0/compute.js';
 
 import Points, { CullMode, PrimitiveTopology, RenderPass } from 'points';
 import { loadAndExtract } from 'utils';
@@ -16,20 +17,55 @@ const f = 1.0 / Math.tan(Math.PI / 8); // ≈ 2.414
 let aspect = null
 const nf = 1 / (near - far);
 
-const r0 = new RenderPass(vert0, frag0);
+const r0 = new RenderPass(vert0, frag0, compute0);
 r0.depthWriteEnabled = true;
 r0.cullMode = CullMode.NONE
 // r0.topology = PrimitiveTopology.LINE_STRIP
-r0.addCube('cube0');
-r0.addCylinder('cylinder0');
-r0.addPlane('plane0')
-r0.addSphere('sphere0')
-r0.addTorus('torus0')
+// r0.addCube('cube0');
+// r0.addCylinder('cylinder0');
+// r0.addPlane('plane0')
+// r0.addSphere('sphere0')
+// r0.addTorus('torus0')
 
-const url = '../models/monkey_subdivide.glb'; // or remote URL (CORS must allow)
+let url = '../models/monkey_subdivide.glb'; // or remote URL (CORS must allow)
+
+let WORKGROUP_X = 64;
+let WORKGROUP_Y = 1;
+let WORKGROUP_Z = 1;
+
+let THREADS_X = 256;
+let THREADS_Y = 1;
+let THREADS_Z = 1;
+
+if (options.isMobile) {
+    WORKGROUP_X = 8;
+    WORKGROUP_Y = 4;
+    WORKGROUP_Z = 2;
+
+    THREADS_X = 4;
+    THREADS_Y = 4;
+    THREADS_Z = 2;
+
+    url = '../models/monkey.glb';
+}
+
+const NUMPARTICLES = WORKGROUP_X * WORKGROUP_Y * WORKGROUP_Z * THREADS_X * THREADS_Y * THREADS_Z;
+console.log('NUMPARTICLES: ', NUMPARTICLES);
+
 const data = await loadAndExtract(url);
 const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0]
 r0.addMesh('monkey', positions, colors, colorSize, uvs, normals, indices)
+
+const vertex_data = positions.reduce((acc, val, idx) => {
+    if (idx % 3 === 0) acc.push([]);
+    acc[acc.length - 1].push(val);
+
+    if (acc[acc.length - 1].length === 3) {
+        acc[acc.length - 1].push(1);
+    }
+
+    return acc;
+}, []);
 
 const base = {
     renderPasses: [
@@ -39,6 +75,16 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+        points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
+        points.setConstant('WORKGROUP_X', WORKGROUP_X, 'u32');
+        points.setConstant('WORKGROUP_Y', WORKGROUP_Y, 'u32');
+        points.setConstant('WORKGROUP_Z', WORKGROUP_Z, 'u32');
+        points.setConstant('THREADS_X', THREADS_X, 'u32');
+        points.setConstant('THREADS_Y', THREADS_Y, 'u32');
+        points.setConstant('THREADS_Z', THREADS_Z, 'u32');
+        points.setStorage('particles', `array<Particle, ${NUMPARTICLES}>`, false, GPUShaderStage.COMPUTE | GPUShaderStage.VERTEX);
+
+        points.setStorageMap('vertex_data', vertex_data.flat(), `array<vec4f, ${vertex_data.length}>`);
 
         aspect = points.canvas.width / points.canvas.height;
         points.setUniform(

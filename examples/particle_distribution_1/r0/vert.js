@@ -1,7 +1,9 @@
 import { rotXAxis, rotYAxis, rotZAxis } from "points/math";
+import { structs } from "../structs.js";
 
 const vert = /*wgsl*/`
 
+${structs}
 ${rotXAxis}
 ${rotYAxis}
 ${rotZAxis}
@@ -15,43 +17,43 @@ fn main(in:VertexIn) -> FragmentIn {
     var offset = vec4f(0,0,0,1);
     var scale = 1.;
 
-    if(in.id == mesh.cube0){
-        angleZ = params.time * 0.1854;
-        angleY = params.time * -0.694222;
-        angleX = params.time * 0.4865;
+    // if(in.id == mesh.cube0){
+    //     angleZ = params.time * 0.1854;
+    //     angleY = params.time * -0.694222;
+    //     angleX = params.time * 0.4865;
 
-        offset = vec4f(-1,0,0,1);
-    }
-    if(in.id == mesh.cylinder0){
-        angleZ = params.time * -0.2854;
-        angleY = params.time * 0.594222;
-        angleX = params.time * 0.1865;
+    //     offset = vec4f(-1,0,0,1);
+    // }
+    // if(in.id == mesh.cylinder0){
+    //     angleZ = params.time * -0.2854;
+    //     angleY = params.time * 0.594222;
+    //     angleX = params.time * 0.1865;
 
-        offset = vec4f(1,0,0,1);
-    }
-    if(in.id == mesh.sphere0){
-        angleZ = params.time * 0.6894;
-        angleY = params.time * 0.44994;
-        angleX = params.time * 0.58657;
+    //     offset = vec4f(1,0,0,1);
+    // }
+    // if(in.id == mesh.sphere0){
+    //     angleZ = params.time * 0.6894;
+    //     angleY = params.time * 0.44994;
+    //     angleX = params.time * 0.58657;
 
-        offset = vec4f(0,1.6,0,1);
-        scale = .5;
-    }
-    if(in.id == mesh.torus0){
-        offset = vec4f(0,-1.6,0,1);
-        scale = .5;
-    }
-    if(in.id == mesh.plane0){
-        offset = vec4f(0,0,-2,1);
-        scale = 8.;
-    }
+    //     offset = vec4f(0,1.6,0,1);
+    //     scale = .5;
+    // }
+    // if(in.id == mesh.torus0){
+    //     offset = vec4f(0,-1.6,0,1);
+    //     scale = .5;
+    // }
+    // if(in.id == mesh.plane0){
+    //     offset = vec4f(0,0,-2,1);
+    //     scale = 8.;
+    // }
     if(in.id == mesh.monkey){
         angleZ = params.time * 0.0;
         angleY = params.time * 0.44994;
         angleX = params.time * 0.0;
 
         // offset = vec4f(0,-1,0,1);
-        scale = .5;
+        scale = 1;
     }
 
 
