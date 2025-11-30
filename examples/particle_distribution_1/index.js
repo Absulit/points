@@ -53,8 +53,16 @@ const NUMPARTICLES = WORKGROUP_X * WORKGROUP_Y * WORKGROUP_Z * THREADS_X * THREA
 console.log('NUMPARTICLES: ', NUMPARTICLES);
 
 const data = await loadAndExtract(url);
-const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0]
-r0.addMesh('monkey', positions, colors, colorSize, uvs, normals, indices)
+const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0];
+r0.addMesh('monkey', positions, colors, colorSize, uvs, normals, indices);
+
+r0.addSphere(
+    'instance_mesh',
+    { x: 0, y: 0, z: 0 },
+    { r: 0, g: 0, b: 0, a: 0 },
+    .01
+).instanceCount = NUMPARTICLES;
+
 
 const vertex_data = positions.reduce((acc, val, idx) => {
     if (idx % 3 === 0) acc.push([]);
@@ -120,7 +128,7 @@ const base = {
         folder.add(options, 'thickness', 0, 5, .0001).name('thickness');
 
         points.setUniform('opaque', options.opaque);
-        folder.add(options, 'opaque').name('opaque').onChange(val =>{
+        folder.add(options, 'opaque').name('opaque').onChange(val => {
             r0.depthWriteEnabled = val; // TODO: error in depth
         });
 

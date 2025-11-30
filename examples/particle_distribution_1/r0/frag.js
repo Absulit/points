@@ -1,4 +1,8 @@
+import { YELLOW } from "points/color";
+
 const frag = /*wgsl*/`
+
+${YELLOW}
 
 @fragment
 fn main(
@@ -20,9 +24,13 @@ fn main(
     let edgeDist = min(min(in.barycentrics.x, in.barycentrics.y), in.barycentrics.z);
     let width = fwidth(edgeDist); // approximate derivative per pixel
 
-    let wireframeColor = vec4f(params.wireframeColor / 255, 1);
-    let fillColor = vec4f(params.fillColor / 255, params.opaque);
-    let finalColor = mix(fillColor, wireframeColor, step(edgeDist, width * params.thickness));
+    var finalColor = YELLOW;
+    if(mesh.monkey == in.id){
+        let wireframeColor = vec4f(params.wireframeColor / 255, 1);
+        let fillColor = vec4f(params.fillColor / 255, params.opaque);
+        finalColor = mix(fillColor, wireframeColor, step(edgeDist, width * params.thickness));
+    }
+
 
     return finalColor;
 }
