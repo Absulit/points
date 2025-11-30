@@ -19,21 +19,14 @@ fn angle(p1:vec2f, p2:vec2f) -> f32 {
 }
 
 @fragment
-fn main(
-    @location(0) color: vec4f,
-    @location(1) uv: vec2f,
-    @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
-    @location(3) uvr: vec2f,    // uv with aspect ratio corrected
-    @location(4) mouse: vec2f,
-    @builtin(position) position: vec4f
-) -> @location(0) vec4f {
+fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    let imagePosition = vec2(0.0,0.0) * ratio;
-    let center = vec2(.5,.5) * ratio;
-    let d = distance(center, uvr); // sqrt(dot(d, d));
+    let imagePosition = vec2(0.0,0.0) * in.ratio;
+    let center = vec2(.5,.5) * in.ratio;
+    let d = distance(center, in.uvr); // sqrt(dot(d, d));
 
     //vector from center to current fragment
-    let vectorToCenter = uvr - center;
+    let vectorToCenter = in.uvr - center;
     let sqrtDotCenter = sqrt(dot(center, center));
 
     //amount of effect
@@ -45,7 +38,7 @@ fn main(
         bind = sqrtDotCenter;
     } else {
         //stick to borders
-        if (ratio.x < 1.0) {
+        if (in.ratio.x < 1.0) {
             bind = center.x;
         } else {
             bind = center.y;
@@ -53,13 +46,13 @@ fn main(
     }
 
     //Weird formulas
-    var nuv = uvr;
+    var nuv = in.uvr;
     if (power > 0.0){//fisheye
         nuv = center + normalize(vectorToCenter) * tan(d * power) * bind / tan( bind * power);
     } else if (power < 0.0){//antifisheye
         nuv = center + normalize(vectorToCenter) * atan(d * -power * 10.0) * bind / atan(-power * bind * 10.0);
     } else {
-        nuv = uvr;
+        nuv = in.uvr;
     }
 
     // let imageColor = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, imagePosition, nuv, false);
@@ -68,7 +61,7 @@ fn main(
     // Chromatic Aberration --
     // --------- chromatic displacement vector
     let cdv = vec2(params.lensDistortion_distance, 0.);
-    // let dis = distance(vec2(.5,.5), uvr);
+    // let dis = distance(vec2(.5,.5), in.uvr);
     let imageColorR = texture(renderpass_feedbackTexture, renderpass_feedbackSampler, nuv + cdv * params.lensDistortion_amount , true).r;
     let imageColorG = texture(renderpass_feedbackTexture, renderpass_feedbackSampler, nuv, true).g;
     let imageColorB = texture(renderpass_feedbackTexture, renderpass_feedbackSampler, nuv - cdv * params.lensDistortion_amount , true).b;

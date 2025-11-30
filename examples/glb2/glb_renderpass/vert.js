@@ -9,16 +9,8 @@ ${rotYAxis}
 ${rotZAxis}
 
 @vertex
-fn main(
-    @location(0) position:vec4f,
-    @location(1) color:vec4f,
-    @location(2) uv:vec2f,
-    @location(3) normal:vec3f,
-    @location(4) id:u32,
-    @builtin(vertex_index) vertexIndex: u32,
-    @builtin(instance_index) instanceIndex: u32
-) -> Fragment {
-    let particle = particles[instanceIndex];
+fn main(in: VertexIn) -> FragmentIn {
+    let particle = particles[in.instanceIndex];
     // var angleZ = params.time * 0.9854;
     var angleY = params.time * 0.094222;
     // var angleX = params.time * 0.865;
@@ -30,13 +22,13 @@ fn main(
 
     let offset = vec3f(0,1,-10);
 
-    let world = (model * vec4f(particle.position.xyz + position.xyz - offset, 1.)).xyz;
+    let world = (model * vec4f(particle.position.xyz + in.position.xyz - offset, 1.)).xyz;
     let clip = params.projection * params.view * vec4f(world, 1.);
 
-    let newNormal = normalize((model * vec4f(normal, 0.)).xyz);
+    let newNormal = normalize((model * vec4f(in.normal, 0.)).xyz);
 
-    var dvb = defaultVertexBody(clip, color, uv, newNormal);
-    dvb.id = id;
+    var dvb = defaultVertexBody(clip, in.color, in.uv, newNormal);
+    dvb.id = in.id;
 
     return dvb;
 }

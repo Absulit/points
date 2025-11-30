@@ -7,18 +7,7 @@ ${rotYAxis}
 ${rotZAxis}
 
 @vertex
-fn main(
-    @location(0) position: vec4f,
-    @location(1) color: vec4f,
-    @location(2) uv: vec2f,
-    @location(3) normal: vec3f,
-    @location(4) id: u32,
-    @location(5) barycentrics: vec3f,
-    @builtin(vertex_index) vertexIndex: u32,
-    @builtin(instance_index) instanceIndex: u32
-) -> Fragment {
-
-
+fn main(in:VertexIn) -> FragmentIn {
     var angleZ = params.time * 0.9854;
     var angleY = params.time * 0.94222;
     var angleX = params.time * -0.865;
@@ -26,21 +15,21 @@ fn main(
     var offset = vec4f(0,0,0,1);
     var scale = 1.;
 
-    if(id == mesh.cube0){
+    if(in.id == mesh.cube0){
         angleZ = params.time * 0.1854;
         angleY = params.time * -0.694222;
         angleX = params.time * 0.4865;
 
         offset = vec4f(-1,0,0,1);
     }
-    if(id == mesh.cylinder0){
+    if(in.id == mesh.cylinder0){
         angleZ = params.time * -0.2854;
         angleY = params.time * 0.594222;
         angleX = params.time * 0.1865;
 
         offset = vec4f(1,0,0,1);
     }
-    if(id == mesh.sphere0){
+    if(in.id == mesh.sphere0){
         angleZ = params.time * 0.6894;
         angleY = params.time * 0.44994;
         angleX = params.time * 0.58657;
@@ -48,15 +37,15 @@ fn main(
         offset = vec4f(0,1.6,0,1);
         scale = .5;
     }
-    if(id == mesh.torus0){
+    if(in.id == mesh.torus0){
         offset = vec4f(0,-1.6,0,1);
         scale = .5;
     }
-    if(id == mesh.plane0){
+    if(in.id == mesh.plane0){
         offset = vec4f(0,0,-2,1);
         scale = 8.;
     }
-    if(id == mesh.monkey){
+    if(in.id == mesh.monkey){
         angleZ = params.time * 0.0;
         angleY = params.time * 0.44994;
         angleX = params.time * 0.0;
@@ -73,14 +62,14 @@ fn main(
 
 
 
-    let world = (offset + model * vec4f(position.xyz, 1.)).xyz * scale;
+    let world = (offset + model * vec4f(in.position.xyz, 1.)).xyz * scale;
     let clip = params.projection * params.view * vec4f(world, 1.);
 
-    let newNormal = normalize((model * vec4f(normal, 0.)).xyz);
+    let newNormal = normalize((model * vec4f(in.normal, 0.)).xyz);
 
-    var dvb = defaultVertexBody(clip, color, uv, newNormal);
-    dvb.barycentrics = barycentrics;
-    dvb.id = id;
+    var dvb = defaultVertexBody(clip, in.color, in.uv, newNormal);
+    dvb.barycentrics = in.barycentrics;
+    dvb.id = in.id;
 
     return dvb;
 }

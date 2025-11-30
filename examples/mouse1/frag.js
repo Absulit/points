@@ -15,36 +15,29 @@ ${texture}
 const SCALE = 2.;
 
 @fragment
-fn main(
-        @location(0) color: vec4f,
-        @location(1) uv: vec2f,
-        @location(2) ratio: vec2f,
-        @location(3) uvr: vec2f,
-        @location(4) mouse: vec2f,
-        @builtin(position) position: vec4f
-    ) -> @location(0) vec4f {
+fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    let startPosition = mouse * ratio;
+    let startPosition = in.mouse * in.ratio;
 
-    let positionCross = showDebugCross(startPosition, RED, uvr);
+    let positionCross = showDebugCross(startPosition, RED, in.uvr);
 
-    let frame = showDebugFrame(RED, uvr);
+    let frame = showDebugFrame(RED, in.uvr);
 
     let finalColor = positionCross + frame;
 
     // click to play message
-    let center = vec2f(.5) * ratio;
-    let showMessage = select(0.,1, any(mouse * ratio <= vec2f()));
+    let center = vec2f(.5) * in.ratio;
+    let showMessage = select(0.,1, any(in.mouse * in.ratio <= vec2f()));
 
     let dims = vec2f(textureDimensions(cta, 0));
     // if you are using uvr you have to multiply by ratio
-    let imageWidth = dims / params.screen * ratio;
+    let imageWidth = dims / params.screen * in.ratio;
     let halfImageWidth = imageWidth * .5 * SCALE;
 
     let ctaColor = texture(
         cta,
         imageSampler,
-        (uvr / SCALE) - (center - halfImageWidth) / SCALE,
+        (in.uvr / SCALE) - (center - halfImageWidth) / SCALE,
         true
     );
 

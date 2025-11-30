@@ -14,14 +14,7 @@ fn gaussian_weight(x: f32, sigma: f32) -> f32 {
 }
 
 @fragment
-fn main(
-        @location(0) color: vec4f,
-        @location(1) uv: vec2f,
-        @location(2) ratio: vec2f,
-        @location(3) uvr: vec2f,
-        @location(4) mouse: vec2f,
-        @builtin(position) position: vec4f
-    ) -> @location(0) vec4f {
+fn main(in: FragmentIn) -> @location(0) vec4f {
 
         // params for later
         // texelSize: vec2<f32>; // 1.0 / bloomTextureSize
@@ -36,7 +29,7 @@ fn main(
 
         // center tap
         let w0 = gaussian_weight(0.0, sigma);
-        let c = textureSample(feedbackTexture1, imageSampler, uv).rgb;
+        let c = textureSample(feedbackTexture1, imageSampler, in.uv).rgb;
         sum += c * w0;
         norm += w0;
 
@@ -45,8 +38,8 @@ fn main(
             let offset = f32(i);
             let w = gaussian_weight(offset, sigma);
 
-            let uvL = uv + vec2f(-offset * texelSize.x, 0.0);
-            let uvR = uv + vec2f( offset * texelSize.x, 0.0);
+            let uvL = in.uv + vec2f(-offset * texelSize.x, 0.0);
+            let uvR = in.uv + vec2f( offset * texelSize.x, 0.0);
 
             sum += textureSample(feedbackTexture1, imageSampler, uvL).rgb * w;
             sum += textureSample(feedbackTexture1, imageSampler, uvR).rgb * w;

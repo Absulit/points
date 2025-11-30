@@ -55,21 +55,14 @@ fn complexDiv(a:vec2f, b:vec2f) -> vec2f {
 }
 
 @fragment
-fn main(
-    @location(0) color: vec4f,
-    @location(1) uv: vec2f,
-    @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
-    @location(3) uvr: vec2f,    // uv with aspect ratio corrected
-    @location(4) mouse: vec2f,
-    @builtin(position) position: vec4f
-) -> @location(0) vec4f {
+fn main(in: FragmentIn) -> @location(0) vec4f {
 
     let sliderA = .192;
     let sliderB = 1 + 40 * fnusin(1);
     let r1 = 0.3;
     let r2 = 0.7;
     let pos = vec2f(0);
-    var z = (uvr * 2) - (vec2(1) * ratio);
+    var z = (in.uvr * 2) - (vec2(1) * in.ratio);
     z = z * sliderB * 10;
 
     // 4. Take the tiled strips back to ordinary space.
@@ -86,7 +79,7 @@ fn main(
     z = complexExp(z) * r1;
 
     let c = RGBAFromHSV( atan2(z.y,z.x)/PI*2,1.,1.);
-    let imageColor = texturePosition(feedbackTexture, imageSampler, vec2(-.5) * ratio, z / sliderA / 10 , false);
+    let imageColor = texturePosition(feedbackTexture, imageSampler, vec2(-.5) * in.ratio, z / sliderA / 10 , false);
 
     var a = annulus(pos, r1, r2, z);
 

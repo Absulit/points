@@ -1,15 +1,18 @@
 const vert = /*wgsl*/`
 
+/**
+ * VertexIn
+ * position: vec4f,
+ * color: vec4f,
+ * uv: vec2f,
+ * normal: vec3f,
+ * id: u32,       // mesh id
+ * vertexIndex: u32,
+ * instanceIndex: u32,
+ */
 @vertex
-fn main(
-    @location(0) position: vec4f,
-    @location(1) color: vec4f,
-    @location(2) uv: vec2f,
-    @location(3) normal: vec3f,
-    @builtin(vertex_index) vertexIndex: u32
-) -> Fragment {
-
-    return defaultVertexBody(position, color, uv, normal);
+fn main(in: VertexIn) -> FragmentIn {
+    return defaultVertexBody(in.position, in.color, in.uv, in.normal);
 }
 `;
 

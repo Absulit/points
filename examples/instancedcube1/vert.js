@@ -29,15 +29,8 @@ fn rotateZ(p:vec3<f32>, rads:f32 ) -> vec3<f32> {
 }
 
 @vertex
-fn main(
-    @location(0) position: vec4f,
-    @location(1) color: vec4f,
-    @location(2) uv: vec2f,
-    @location(3) normal: vec3f,
-    @builtin(vertex_index) vertexIndex: u32,
-    @builtin(instance_index) instanceIndex: u32
-) -> Fragment {
-    let particle = particles[instanceIndex];
+fn main(in: VertexIn) -> FragmentIn {
+    let particle = particles[in.instanceIndex];
 
     var pt = rotateZ(particle.position, params.time * .9854);
     pt = rotateY(pt, params.time * .94222);
@@ -46,7 +39,7 @@ fn main(
     pt.z = pt.z + (400 * UNIT * .008);
 
     // scale local quad position
-    let scaled = position.xyz * .03; // particle.scale;
+    let scaled = in.position.xyz * .03; // particle.scale;
 
     // Translate to world position
     let world = scaled + pt;
@@ -54,7 +47,7 @@ fn main(
     // Project to clip space (assuming orthographic projection)
     let clip = vec4f(world, 1.0);
 
-    return defaultVertexBody(clip, particle.color, uv, normal);
+    return defaultVertexBody(clip, particle.color, in.uv, in.normal);
 }
 `;
 

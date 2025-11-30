@@ -13,7 +13,7 @@ fn main(
      * id: u32,       // mesh or instance id
      * barycentrics: vec3f,
      */
-    in: Fragment
+    in: FragmentIn
 ) -> @location(0) vec4f {
 
     // Distance to nearest edge

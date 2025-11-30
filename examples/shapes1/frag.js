@@ -15,24 +15,17 @@ ${sdfLine2}
 ${RED}
 
 @fragment
-fn main(
-        @location(0) color: vec4f,
-        @location(1) uv: vec2f,
-        @location(2) ratio: vec2f,
-        @location(3) uvr: vec2f,
-        @location(4) mouse: vec2f,
-        @builtin(position) position: vec4f
-    ) -> @location(0) vec4f {
+fn main(in: FragmentIn) -> @location(0) vec4f {
 
     let point = points[0];
 
-    let orangeBall = sdfCircle(vec2(.4, .5) * ratio, .1, 0., uvr) *
+    let orangeBall = sdfCircle(vec2(.4, .5) * in.ratio, .1, 0., in.uvr) *
         vec4(1, .5, 0, 1);
-    let redBall = sdfCircle(vec2(.6, .5) * ratio, .1, .1, uvr) * RED;
+    let redBall = sdfCircle(vec2(.6, .5) * in.ratio, .1, .1, in.uvr) * RED;
 
-    var finalColor = mix(orangeBall, redBall, uvr.x);
+    var finalColor = mix(orangeBall, redBall, in.uvr.x);
 
-    finalColor += sdfLine2( vec2(.5) * ratio, vec2(.6), .001, uvr / ratio);
+    finalColor += sdfLine2( vec2(.5) * in.ratio, vec2(.6), .001, in.uvr / in.ratio);
 
 
     for(var i:u32; i<10;i++){
@@ -43,8 +36,8 @@ fn main(
             params.squareSize,
             params.squareFeather,
             radians(360.) * fnusin(2.),
-            uvr
-        ) * vec4(uvr.x, 1 - uvr.y, 0, fi / 10);
+            in.uvr
+        ) * vec4(in.uvr.x, 1 - in.uvr.y, 0, fi / 10);
     }
 
     //----
@@ -62,7 +55,7 @@ fn main(
             pointPosition,
             pointPosition2,
             .001 + .1 * params.lineWidth,
-            uvr / ratio
+            in.uvr / in.ratio
         );
     }
 

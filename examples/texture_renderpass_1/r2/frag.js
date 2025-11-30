@@ -8,21 +8,14 @@ ${snoise}
 ${texture}
 
 @fragment
-fn main(
-    @location(0) color: vec4f,
-    @location(1) uv: vec2f,
-    @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
-    @location(3) uvr: vec2f,    // uv with aspect ratio corrected
-    @location(4) mouse: vec2f,
-    @builtin(position) position: vec4f
-) -> @location(0) vec4f {
+fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    let n1 = snoise(uv / params.sliderA);
-    let center = vec2(.5) * ratio;
-    let d = distance(center, uvr); // sqrt(dot(d, d));
+    let n1 = snoise(in.uv / params.sliderA);
+    let center = vec2(.5) * in.ratio;
+    let d = distance(center, in.uvr); // sqrt(dot(d, d));
 
     // vector from center to current fragment
-    let vectorToCenter = uvr - center;
+    let vectorToCenter = in.uvr - center;
     let sqrtDotCenter = sqrt(dot(center, center));
 
     // amount of effect
@@ -34,12 +27,12 @@ fn main(
         bind = sqrtDotCenter;
     } else {
         // stick to borders
-        // if (ratio.x < 1.0) {bind = center.x;} else {bind = center.y;};
-        bind = mix(center.x, center.y, step(ratio.x, 1));
+        // if (in.ratio.x < 1.0) {bind = center.x;} else {bind = center.y;};
+        bind = mix(center.x, center.y, step(in.ratio.x, 1));
     }
 
     // Weird formulas
-    var nuv = uvr;
+    var nuv = in.uvr;
     if (power > 0.0){
         //fisheye
         nuv =

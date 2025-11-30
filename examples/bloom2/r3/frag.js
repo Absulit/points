@@ -19,14 +19,7 @@ fn reinhardToneMap(color : vec3f) -> vec3f {
 }
 
 @fragment
-fn main(
-        @location(0) color: vec4f,
-        @location(1) uv: vec2f,
-        @location(2) ratio: vec2f,
-        @location(3) uvr: vec2f,
-        @location(4) mouse: vec2f,
-        @builtin(position) position: vec4f
-    ) -> @location(0) vec4f {
+fn main(in: FragmentIn) -> @location(0) vec4f {
 
         // params for later
         // texelSize: vec2f; // 1.0 / bloomTextureSize
@@ -41,7 +34,7 @@ fn main(
 
         // center tap
         let w0 = gaussian_weight(0.0, sigma);
-        let c = textureSample(feedbackTexture2, imageSampler, uv).rgb;
+        let c = textureSample(feedbackTexture2, imageSampler, in.uv).rgb;
         sum += c * w0;
         norm += w0;
 
@@ -50,8 +43,8 @@ fn main(
             let offset = f32(i);
             let w = gaussian_weight(offset, sigma);
 
-            let uvD = uv + vec2f(0.0, -offset * texelSize.y);
-            let uvU = uv + vec2f(0.0,  offset * texelSize.y);
+            let uvD = in.uv + vec2f(0.0, -offset * texelSize.y);
+            let uvU = in.uv + vec2f(0.0,  offset * texelSize.y);
 
             sum += textureSample(feedbackTexture2, imageSampler, uvD).rgb * w;
             sum += textureSample(feedbackTexture2, imageSampler, uvU).rgb * w;
@@ -60,7 +53,7 @@ fn main(
 
         let blurred = sum / max(norm, 1e-6);
 
-        let ft0 = texture(feedbackTexture0, imageSampler, uvr, true);
+        let ft0 = texture(feedbackTexture0, imageSampler, in.uvr, true);
 
         // return ft0 + vec4f(blurred, 1.0) * params.bloom;
         let t = reinhardToneMap(ft0.rgb + blurred * params.bloom);
