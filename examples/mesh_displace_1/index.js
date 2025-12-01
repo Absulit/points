@@ -15,11 +15,6 @@ if(options.isMobile){
     options.val = 1;
 }
 
-const near = 0.1, far = 100;
-const f = 1.0 / Math.tan(Math.PI / 8); // ≈ 2.414
-let aspect = null
-const nf = 1 / (near - far);
-
 const renderPass = new RenderPass(vert, frag);
 renderPass.clearValue = { r: 61 / 255, g: 37 / 255, b: 103 / 255, a: 1 }
 renderPass.addSphere('sphere', { x: 0, y: 0, z: 0 }, { r: 1, g: 1, b: 0, a: 1 }, 1.6, segments, segments);
