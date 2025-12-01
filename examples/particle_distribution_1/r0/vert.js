@@ -21,7 +21,7 @@ fn translationMatrix(offset: vec3f) -> mat4x4f {
 @vertex
 fn main(in:VertexIn) -> FragmentIn {
 
-    let p = vertex_data[in.instanceIndex];
+    let p = rand_positions[in.instanceIndex];
 
     var angleZ = params.time * 0.0;
     var angleY = params.time * 0.44994;
@@ -60,11 +60,12 @@ fn main(in:VertexIn) -> FragmentIn {
     //     offset = vec4f(0,0,-2,1);
     //     scale = 8.;
     // }
+    scale = 2;
     if(in.id == mesh.monkey){
 
 
         // offset = vec4f(0,-1,0,1);
-        scale = 1;
+
     }
 
 

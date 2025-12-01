@@ -7,7 +7,7 @@ import { loadAndExtract } from 'utils';
 
 const options = {
     thickness: 0.456,
-    wireframeColor: [255, 255, 255], // RGB array
+    wireframeColor: [0, 0, 0], // RGB array
     fillColor: [255, 0, 0], // RGB array
     opaque: true,
 }
@@ -29,12 +29,12 @@ r0.cullMode = CullMode.NONE
 
 let url = '../models/monkey_subdivide.glb'; // or remote URL (CORS must allow)
 
-let WORKGROUP_X = 64;
-let WORKGROUP_Y = 1;
+let WORKGROUP_X = 16;
+let WORKGROUP_Y = 4;
 let WORKGROUP_Z = 1;
 
-let THREADS_X = 256;
-let THREADS_Y = 1;
+let THREADS_X = 8;
+let THREADS_Y = 8;
 let THREADS_Z = 1;
 
 if (options.isMobile) {
@@ -60,7 +60,7 @@ r0.addSphere(
     'instance_mesh',
     { x: 0, y: 0, z: 0 },
     { r: 0, g: 0, b: 0, a: 0 },
-    .01
+    .005
 ).instanceCount = NUMPARTICLES;
 
 
@@ -75,6 +75,12 @@ const vertex_data = positions.reduce((acc, val, idx) => {
     return acc;
 }, []);
 
+const NUMTRIANGLES = Math.floor(vertex_data.length / 3);
+
+console.log('---- vertex_data.length', vertex_data.length);
+console.log('---- NUMTRIANGLES', NUMTRIANGLES);
+
+
 const base = {
     renderPasses: [
         r0,
@@ -84,6 +90,7 @@ const base = {
      */
     init: async (points, folder) => {
         points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
+        points.setConstant('NUMTRIANGLES', NUMTRIANGLES, 'u32');
         points.setConstant('WORKGROUP_X', WORKGROUP_X, 'u32');
         points.setConstant('WORKGROUP_Y', WORKGROUP_Y, 'u32');
         points.setConstant('WORKGROUP_Z', WORKGROUP_Z, 'u32');
@@ -93,6 +100,7 @@ const base = {
         points.setStorage('particles', `array<Particle, ${NUMPARTICLES}>`, false, GPUShaderStage.COMPUTE | GPUShaderStage.VERTEX);
 
         points.setStorageMap('vertex_data', vertex_data.flat(), `array<vec4f, ${vertex_data.length}>`);
+        points.setStorage('rand_positions', `array<vec4f, ${vertex_data.length}>`, false, GPUShaderStage.COMPUTE | GPUShaderStage.VERTEX);
 
         aspect = points.canvas.width / points.canvas.height;
         points.setUniform(

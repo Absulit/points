@@ -1,8 +1,10 @@
+import { rand } from "points/random";
 import { structs } from "../structs.js";
 
 const compute = /*wgsl*/`
 
 ${structs}
+${rand}
 
 // ComputeIn
 // @builtin(global_invocation_id) GID: vec3u,
@@ -22,8 +24,36 @@ fn main(in: ComputeIn) {
     let index = i32(X + Y + Z);
     let indexF = f32(index);
 
-    let particle = &particles[index];
+    if(index > i32(NUMTRIANGLES)){
+        return;
+    }
 
+    let i = index * 3;
+
+    let v0 = &vertex_data[i];
+    let v1 = &vertex_data[i+1];
+    let v2 = &vertex_data[i+2];
+    let position = &rand_positions[index];
+
+    rand_seed.y = indexF;
+    rand();
+    var r1 = rand_seed.x;
+    var r2 = rand_seed.y;
+
+    if (r1 + r2 > 1.) {
+        r1 = 1. - r1;
+        r2 = 1. - r2;
+    }
+
+    let u = r1;
+    let v = r2;
+    let w = 1.0 - r1 - r2;
+
+    let point = u*v0.xyz + v*v1.xyz + w*v2.xyz;
+
+    position.x = point.x;
+    position.y = point.y;
+    position.z = point.z;
 }
 `;
 
