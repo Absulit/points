@@ -12,6 +12,7 @@ import { loadImage, strToImage } from './texture-string.js';
 import LayersArray from './LayersArray.js';
 import UniformsArray from './UniformsArray.js';
 import getStorageAccessMode, { bindingModes, entriesModes } from './storage-accessmode.js';
+import { cross, dot, normalize, sub } from './matrix.js';
 
 class PresentationFormat {
     static BGRA8UNORM = 'bgra8unorm';
@@ -968,6 +969,8 @@ class Points {
     /**
      * Creates a Perspective camera with a given name to be used in the shaders.
      * The name is used as identifier in the shaders for the Projection and View matrices.
+     *
+     * The camera must be called on the update method so the aspect is updated by default
      * @param {String} name camera name in the shader for the projection and view
      * @param {vec3f} position
      * @param {Number} fov field of view angle
@@ -982,7 +985,7 @@ class Points {
      * // wgsl string
      * let clip = params.camera_projection * params.camera_view * vec4f(world, 1.);
      */
-    setCameraPerspective(name, position = [0, 0, -5], fov = 45, near = .1, far = 100, aspect = null) {
+    setCameraPerspective(name, position = [0, 0, -5], lookAt = [0, 0, 0], fov = 45, near = .1, far = 100, aspect = null) {
         const fov_radians = fov * (Math.PI / 180);
         const f = 1.0 / Math.tan(fov_radians / 2); // ≈ 2.414
         const nf = 1 / (near - far);
@@ -998,17 +1001,10 @@ class Points {
             'mat4x4<f32>'
         )
 
-        const [x, y, z] = position;
-        this.setUniform(
-            `${name}_view`,
-            [
-                1, 0, 0, 0,
-                0, 1, 0, 0,
-                0, 0, 1, 0,
-                x, y, z, 1
-            ],
-            'mat4x4<f32>'
-        )
+        const [x,y,z] = position;
+        const up = [0, 1, 0];
+        const ff = normalize(sub(lookAt, position));
+        const r = normalize(cross(ff, up));
     }
 
     /**
