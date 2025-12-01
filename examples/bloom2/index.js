@@ -20,11 +20,6 @@ const options = {
     bloom: .133,
 }
 
-const near = 0.1, far = 100;
-const f = 1.0 / Math.tan(Math.PI / 8); // ≈ 2.414
-let aspect = null
-const nf = 1 / (near - far);
-
 const r0 = new RenderPass(vert0, frag0);
 const r1 = new RenderPass(vert1, frag1);
 const r2 = new RenderPass(vert2, frag2);
@@ -58,30 +53,7 @@ const bloom1 = {
 
         points.presentationFormat = PresentationFormat.RGBA16FLOAT;
 
-        aspect = points.canvas.width / points.canvas.height;
-        points.setUniform(
-            'projection',
-            [
-                f / aspect, 0, 0, 0,
-                0, f, 0, 0,
-                0, 0, (far + near) * nf, -1,
-                0, 0, (2 * far * near) * nf, 0
-            ],
-            'mat4x4<f32>'
-        )
-
-        // camera at [0, 0, 5], looking at origin
-        points.setUniform(
-            'view',
-            [
-                1, 0, 0, 0,
-                0, 1, 0, 0,
-                0, 0, 1, 0,
-                0, 0, -5, 1
-            ],
-            'mat4x4<f32>'
-        )
-
+        points.setCameraPerspective('camera', [0, 0, -5]);
 
 
         points.setSampler('imageSampler', descriptor);
@@ -115,16 +87,7 @@ const bloom1 = {
         points.setUniform('intensity', options.intensity);
         points.setUniform('bloom', options.bloom);
 
-        aspect = points.canvas.width / points.canvas.height;
-        points.setUniform(
-            'projection',
-            [
-                f / aspect, 0, 0, 0,
-                0, f, 0, 0,
-                0, 0, (far + near) * nf, -1,
-                0, 0, (2 * far * near) * nf, 0
-            ]
-        )
+        points.setCameraPerspective('camera', [0, 0, -5]);
     }
 }
 
