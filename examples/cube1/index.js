@@ -30,7 +30,7 @@ const base = {
      */
     init: async (points, folder) => {
 
-        points.setCameraPerspective('camera', [0, 0, -5]);
+        points.setCameraPerspective('camera');
 
         // points.addRenderPass(RenderPasses.COLOR);
         // points.addRenderPass(RenderPasses.PIXELATE);
@@ -45,8 +45,7 @@ const base = {
      * @param {Points} points
      */
     update: points => {
-
-        points.setCameraPerspective('camera', [0, 0, -5]);
+        points.setCameraPerspective('camera', [0, 0, 5]);
     }
 }
 

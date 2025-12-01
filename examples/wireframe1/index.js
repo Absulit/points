@@ -35,7 +35,7 @@ const base = {
      */
     init: async (points, folder) => {
 
-        points.setCameraPerspective('camera', [0, 0, -5]);
+        points.setCameraPerspective('camera');
 
         points.setUniform('wireframeColor', options.wireframeColor, 'vec3f');
         folder.addColor(options, 'wireframeColor');
@@ -58,7 +58,7 @@ const base = {
      * @param {Points} points
      */
     update: points => {
-        points.setCameraPerspective('camera', [0, 0, -5]);
+        points.setCameraPerspective('camera', [0, 0, 5]);
         points.setUniform('thickness', options.thickness);
         points.setUniform('wireframeColor', options.wireframeColor);
         points.setUniform('fillColor', options.fillColor);

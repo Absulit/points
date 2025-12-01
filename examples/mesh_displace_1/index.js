@@ -10,7 +10,7 @@ const options = {
 options.isMobile = isMobile();
 
 let segments = 256;
-if(options.isMobile){
+if (options.isMobile) {
     segments = 64;
     options.val = 1;
 }
@@ -27,7 +27,7 @@ const base = {
      */
     init: async (points, folder) => {
         // points.setStorage('noise', 'f32', false, GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT);
-        points.setCameraPerspective('camera', [0, 0, -5]);
+        points.setCameraPerspective('camera');
 
 
         points.setUniform('val', options.val);
@@ -39,7 +39,7 @@ const base = {
      * @param {Points} points
      */
     update: points => {
-        points.setCameraPerspective('camera', [0, 0, -5]);
+        points.setCameraPerspective('camera', [0, 0, 5], [0, 0, -100]);
         points.setUniform('val', options.val);
     }
 }

@@ -78,7 +78,7 @@ const base = {
         points.setUniform('visibility', options.visibility);
         folder.add(options, 'visibility').name('visibility');
 
-        points.setCameraPerspective('camera', [0, 0, -5]);
+        points.setCameraPerspective('camera');
 
         folder.open();
     },
@@ -86,7 +86,7 @@ const base = {
      * @param {Points} points
      */
     update: points => {
-        points.setCameraPerspective('camera', [0, 0, -5]);
+        points.setCameraPerspective('camera', [0, 0, 5], [0, 0, -1000]);
 
         points.setUniform('visibility', options.visibility);
     }

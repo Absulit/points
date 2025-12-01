@@ -27,7 +27,7 @@ let THREADS_Z = 2;
 let WIDTH = 8;
 let HEIGHT = 1;
 
-if(options.isMobile){
+if (options.isMobile) {
     WORKGROUP_X = 4;
     WORKGROUP_Y = 2;
     WORKGROUP_Z = 1;
@@ -104,9 +104,9 @@ const base = {
 
         points.addEventListener('logger', data => {
             console.log(data[0]);
-        },4)
+        }, 4)
 
-        points.setCameraPerspective('camera', [0, 0, -5]);
+        points.setCameraPerspective('camera');
 
 
         folder.open();
@@ -116,7 +116,7 @@ const base = {
      */
     update: points => {
 
-        points.setCameraPerspective('camera', [0, 0, -5]);
+        points.setCameraPerspective('camera', [0, 0, 5], [0, 0, -1000]);
 
         points.setUniform('dof', options.dof);
     }

@@ -33,8 +33,8 @@ const base = {
             points.setUniform('color_mode', value);
         });
 
-        points.setCameraPerspective('camera', [0, 0, -5]);
-        points.setUniform('cameraPosition', [0, 0, -5], 'vec3f');
+        points.setCameraPerspective('camera');
+        points.setUniform('cameraPosition', [0, 0, 5], 'vec3f');
 
         // points.addRenderPass(RenderPasses.COLOR);
         // points.addRenderPass(RenderPasses.PIXELATE);
@@ -47,7 +47,7 @@ const base = {
      */
     update: points => {
 
-        points.setCameraPerspective('camera', [0, 0, -5]);
+        points.setCameraPerspective('camera', [0, 0, 5], [0, 0, -1000]);
     }
 }
 

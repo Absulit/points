@@ -53,7 +53,7 @@ const bloom1 = {
 
         points.presentationFormat = PresentationFormat.RGBA16FLOAT;
 
-        points.setCameraPerspective('camera', [0, 0, -5]);
+        points.setCameraPerspective('camera');
 
 
         points.setSampler('imageSampler', descriptor);
@@ -87,7 +87,7 @@ const bloom1 = {
         points.setUniform('intensity', options.intensity);
         points.setUniform('bloom', options.bloom);
 
-        points.setCameraPerspective('camera', [0, 0, -5]);
+        points.setCameraPerspective('camera', [0, 0, 5]);
     }
 }
 

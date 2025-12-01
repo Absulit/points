@@ -19,7 +19,7 @@ let THREADS_X = 8;
 let THREADS_Y = 8;
 let THREADS_Z = 4;
 
-if(options.isMobile){
+if (options.isMobile) {
     THREADS_X = 4;
     THREADS_Y = 4;
     THREADS_Z = 2;
@@ -31,7 +31,7 @@ console.log('NUMPARTICLES: ', NUMPARTICLES);
 const cube_renderpass = new RenderPass(vert, frag, compute, WORKGROUP_X, WORKGROUP_Y, WORKGROUP_Z);
 cube_renderpass.depthWriteEnabled = true;
 cube_renderpass.addCube('base_cube').instanceCount = NUMPARTICLES;
-if(!options.isMobile){
+if (!options.isMobile) {
     cube_renderpass.addSphere('sphere').instanceCount = 100;
 }
 
@@ -53,7 +53,7 @@ const base = {
         points.setConstant('THREADS_Z', THREADS_Z, 'u32');
         points.setStorage('particles', `array<Particle, ${NUMPARTICLES}>`);
 
-        points.setCameraPerspective('camera', [0, -1.5, -5]);
+        points.setCameraPerspective('camera');
 
         points.setUniform('lambert', options.lambert);
         folder.add(options, 'lambert').name('lambert');
@@ -65,7 +65,7 @@ const base = {
     */
     update: points => {
 
-        points.setCameraPerspective('camera', [0, -1.5, -5]);
+        points.setCameraPerspective('camera', [0, 1.5, 5], [0, 0, -1000]);
         points.setUniform('lambert', options.lambert);
     }
 }

@@ -22,7 +22,7 @@ let THREADS_Z = 4;
 let WIDTH = 15;
 let HEIGHT = 15;
 
-if(options.isMobile){
+if (options.isMobile) {
     WORKGROUP_X = 2;
     WORKGROUP_Y = 2;
     WORKGROUP_Z = 2;
@@ -71,14 +71,14 @@ const base = {
             console.log('Array Max:', data[0] + 1);
         }, 1)
 
-        points.setCameraPerspective('camera', [0, 0, -5]);
+        points.setCameraPerspective('camera');
 
     },
     /**
      * @param {Points} points
      */
     update: points => {
-        points.setCameraPerspective('camera', [0, 0, -5]);
+        points.setCameraPerspective('camera', [0, 0, 5], [0, 0, -1000]);
     }
 }
 
