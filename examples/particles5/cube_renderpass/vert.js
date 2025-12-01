@@ -49,7 +49,7 @@ fn main(in: VertexIn) -> CustomFragment {
     let scaled = rotated * particle.scale;
     let world = scaled + particle.position;
 
-    let clip = params.projection * params.view * vec4f(world, 1.0);
+    let clip = params.camera_projection * params.camera_view * vec4f(world, 1.0);
 
     let transformedNormal = model * in.normal;
     let newNormal = normalize(transformedNormal);
