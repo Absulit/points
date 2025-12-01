@@ -965,7 +965,7 @@ class Points {
         return bindingTexture;
     }
 
-    setCameraPerspective(name, position = [0,0,-5], fov = 60, near = .1, far = 100, aspect = null){
+    setCameraPerspective(name, position = [0, 0, -5], fov = 45, near = .1, far = 100, aspect = null) {
         const fov_radians = fov * (Math.PI / 180);
         const f = 1.0 / Math.tan(fov_radians / 2); // ≈ 2.414
         const nf = 1 / (near - far);
@@ -981,8 +981,7 @@ class Points {
             'mat4x4<f32>'
         )
 
-        // camera at [0, 0, 5], looking at origin
-        const [x,y,z] = position;
+        const [x, y, z] = position;
         this.setUniform(
             `${name}_view`,
             [
@@ -993,6 +992,26 @@ class Points {
             ],
             'mat4x4<f32>'
         )
+    }
+
+    setCameraOrthographic(name, left = -1, right = 1, top = 1, bottom = -1, near = -1, far = 1) {
+        // const aspect = canvas.width / canvas.height; // alternative to aspect in shader
+
+        const lr = 1 / (right - left);
+        const bt = 1 / (top - bottom);
+        const nf = 1 / (near - far);
+
+        const orthoMatrix = [
+            2 * lr, 0, 0, 0,
+            0, 2 * bt, 0, 0,
+            0, 0, 2 * nf, 0,
+            -(right + left) * lr,
+            -(top + bottom) * bt,
+            (far + near) * nf,
+            1
+        ];
+
+        this.setUniform(`${name}_projection`, orthoMatrix, 'mat4x4<f32>');
     }
 
     /**
