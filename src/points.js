@@ -965,6 +965,23 @@ class Points {
         return bindingTexture;
     }
 
+    /**
+     * Creates a Perspective camera with a given name to be used in the shaders.
+     * The name is used as identifier in the shaders for the Projection and View matrices.
+     * @param {String} name camera name in the shader for the projection and view
+     * @param {vec3f} position
+     * @param {Number} fov field of view angle
+     * @param {Number} near clipping near
+     * @param {Number} far clipping far
+     * @param {Number} aspect ratio of the camera, by default it choses the canvas aspect ratio
+     *
+     * @example
+     * // js
+     *  points.setCameraPerspective('camera', [0, 0, -5]);
+     *
+     * // wgsl string
+     * let clip = params.camera_projection * params.camera_view * vec4f(world, 1.);
+     */
     setCameraPerspective(name, position = [0, 0, -5], fov = 45, near = .1, far = 100, aspect = null) {
         const fov_radians = fov * (Math.PI / 180);
         const f = 1.0 / Math.tan(fov_radians / 2); // ≈ 2.414
@@ -994,6 +1011,25 @@ class Points {
         )
     }
 
+    /**
+     * Creates an Orthographic camera with a given name to be used in the shaders.
+     * The name is used as identifier in the shaders for the Projection matrix.
+     * @param {String} name
+     * @param {Number} left
+     * @param {Number} right
+     * @param {Number} top
+     * @param {Number} bottom
+     * @param {Number} near
+     * @param {Number} far
+     *
+     * @example
+     * // js
+     * points.setCameraOrthographic('camera');
+     *
+     * // wgsl string
+     * let clip = params.camera_projection * vec4f(world, 0.0, 1.0);
+     *
+     */
     setCameraOrthographic(name, left = -1, right = 1, top = 1, bottom = -1, near = -1, far = 1) {
         // const aspect = canvas.width / canvas.height; // alternative to aspect in shader
 
