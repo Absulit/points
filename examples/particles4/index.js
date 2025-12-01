@@ -35,11 +35,6 @@ if(!options.isMobile){
     cube_renderpass.addSphere('sphere').instanceCount = 100;
 }
 
-const near = 0.1, far = 100;
-const f = 1.0 / Math.tan(Math.PI / 8); // ≈ 2.414
-let aspect = null
-const nf = 1 / (near - far);
-
 const base = {
     renderPasses: [
         cube_renderpass,
@@ -58,29 +53,7 @@ const base = {
         points.setConstant('THREADS_Z', THREADS_Z, 'u32');
         points.setStorage('particles', `array<Particle, ${NUMPARTICLES}>`);
 
-        aspect = points.canvas.width / points.canvas.height;
-        points.setUniform(
-            'projection',
-            [
-                f / aspect, 0, 0, 0,
-                0, f, 0, 0,
-                0, 0, (far + near) * nf, -1,
-                0, 0, (2 * far * near) * nf, 0
-            ],
-            'mat4x4<f32>'
-        )
-
-        // camera at [0, -1.5, 5], looking above origin
-        points.setUniform(
-            'view',
-            [
-                1, 0, 0, 0,
-                0, 1, 0, 0,
-                0, 0, 1, 0,
-                0, -1.5, -5, 1
-            ],
-            'mat4x4<f32>'
-        )
+        points.setCameraPerspective('camera', [0, -1.5, -5]);
 
         points.setUniform('lambert', options.lambert);
         folder.add(options, 'lambert').name('lambert');
@@ -89,19 +62,10 @@ const base = {
     },
     /**
      * @param {Points} points
-     */
+    */
     update: points => {
 
-        aspect = points.canvas.width / points.canvas.height;
-        points.setUniform(
-            'projection',
-            [
-                f / aspect, 0, 0, 0,
-                0, f, 0, 0,
-                0, 0, (far + near) * nf, -1,
-                0, 0, (2 * far * near) * nf, 0
-            ]
-        )
+        points.setCameraPerspective('camera', [0, -1.5, -5]);
         points.setUniform('lambert', options.lambert);
     }
 }
