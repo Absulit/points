@@ -48,11 +48,6 @@ cube_renderpass.name = 'cube_renderpass';
 
 cube_renderpass.addCube('base_cube').instanceCount = NUMPARTICLES;
 
-const near = 0.1, far = 100;
-const f = 1.0 / Math.tan(Math.PI / 8); // ≈ 2.414
-let aspect = null
-const nf = 1 / (near - far);
-
 const base = {
     renderPasses: [
         cube_renderpass,
@@ -76,46 +71,14 @@ const base = {
             console.log('Array Max:', data[0] + 1);
         }, 1)
 
-        aspect = points.canvas.width / points.canvas.height;
-        points.setUniform(
-            'projection',
-            [
-                f / aspect, 0, 0, 0,
-                0, f, 0, 0,
-                0, 0, (far + near) * nf, -1,
-                0, 0, (2 * far * near) * nf, 0
-            ],
-            'mat4x4<f32>'
-        )
-
-        // camera at [0, 0, 5], looking at origin
-        points.setUniform(
-            'view',
-            [
-                1, 0, 0, 0,
-                0, 1, 0, 0,
-                0, 0, 1, 0,
-                0, 0, -5, 1
-            ],
-            'mat4x4<f32>'
-        )
+        points.setCameraPerspective('camera', [0, 0, -5]);
 
     },
     /**
      * @param {Points} points
      */
     update: points => {
-
-        aspect = points.canvas.width / points.canvas.height;
-        points.setUniform(
-            'projection',
-            [
-                f / aspect, 0, 0, 0,
-                0, f, 0, 0,
-                0, 0, (far + near) * nf, -1,
-                0, 0, (2 * far * near) * nf, 0
-            ]
-        )
+        points.setCameraPerspective('camera', [0, 0, -5]);
     }
 }
 
