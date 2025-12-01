@@ -965,6 +965,36 @@ class Points {
         return bindingTexture;
     }
 
+    setCameraPerspective(name, position = [0,0,-5], fov = 60, near = .1, far = 100, aspect = null){
+        const fov_radians = fov * (Math.PI / 180);
+        const f = 1.0 / Math.tan(fov_radians / 2); // ≈ 2.414
+        const nf = 1 / (near - far);
+        aspect ??= this.#canvas.width / this.#canvas.height;
+        this.setUniform(
+            `${name}_projection`,
+            [
+                f / aspect, 0, 0, 0,
+                0, f, 0, 0,
+                0, 0, (far + near) * nf, -1,
+                0, 0, (2 * far * near) * nf, 0
+            ],
+            'mat4x4<f32>'
+        )
+
+        // camera at [0, 0, 5], looking at origin
+        const [x,y,z] = position;
+        this.setUniform(
+            `${name}_view`,
+            [
+                1, 0, 0, 0,
+                0, 1, 0, 0,
+                0, 0, 1, 0,
+                x, y, z, 1
+            ],
+            'mat4x4<f32>'
+        )
+    }
+
     /**
      * Listens for an event dispatched from WGSL code
      * @param {String} name Number that represents an event Id
