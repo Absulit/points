@@ -971,6 +971,7 @@ class Points {
      * The name is used as identifier in the shaders for the Projection and View matrices.
      *
      * The camera must be called on the update method so the aspect is updated by default
+     * with the canvas width and height.
      * @param {String} name camera name in the shader for the projection and view
      * @param {vec3f} position
      * @param {Number} fov field of view angle
@@ -1005,6 +1006,16 @@ class Points {
         const up = [0, 1, 0];
         const ff = normalize(sub(lookAt, position));
         const r = normalize(cross(ff, up));
+        const u = cross(r, ff);
+
+        const perspectiveMatrix = [
+            r[0], u[0], -ff[0], 0,
+            r[1], u[1], -ff[1], 0,
+            r[2], u[2], -ff[2], 0,
+            -dot(r, position), -dot(u, position), dot(ff, position), 1
+        ]
+
+        this.setUniform(`${name}_view`, perspectiveMatrix, 'mat4x4<f32>');
     }
 
     /**
