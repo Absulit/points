@@ -86,7 +86,7 @@ fn main(in: VertexIn) -> CustomFragment {
 
     let depth = vec4f(-particle.position.z / 253);
 
-    return customVertexBody(clip, particle.color, depth, particle.noise, in.uv);;
+    return customVertexBody(clip, particle.color, depth, particle.noise, in.uv);
 }
 `;
 
