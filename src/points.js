@@ -1531,9 +1531,12 @@ class Points {
      * @returns {GPUBuffer} mapped buffer
      */
     #createAndMapBuffer(data, usage, mappedAtCreation = true, size = null) {
+         // TODO: review this, because then, size is not longer required
+
         const buffer = this.#device.createBuffer({
             mappedAtCreation: mappedAtCreation,
-            size: size || data.byteLength,
+            size: data.byteLength, // size || data.byteLength
+            // size: size || data.byteLength,
             usage: usage,
         });
         new Float32Array(buffer.getMappedRange()).set(data);
