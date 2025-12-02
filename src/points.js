@@ -62,6 +62,7 @@ class Points {
     #commandsFinished = [];
     #uniforms = new UniformsArray();
     #meshUniforms = new UniformsArray();
+    #cameraUniforms = new UniformsArray();
     #constants = [];
     #storage = [];
     #readStorage = [];
@@ -258,6 +259,30 @@ class Points {
         }
         Object.seal(uniform);
         this.#meshUniforms.push(uniform);
+        return uniform;
+    }
+
+    #setCameraUniform(name, value, structName = null) {
+        const uniformToUpdate = this.#nameExists(this.#cameraUniforms, name);
+        if (uniformToUpdate && structName) {
+            // if name exists is an update
+            // console.warn(`#setCameraUniform(${name}, [${value}], ${structName}) can't set the structName of an already defined uniform.`);
+        }
+        if (uniformToUpdate) {
+            uniformToUpdate.value = value;
+            return uniformToUpdate;
+        }
+        if (structName && isArray(structName)) {
+            throw `${structName} is an array, which is currently not supported for Uniforms.`;
+        }
+        const uniform = {
+            name: name,
+            value: value,
+            type: structName,
+            size: null
+        }
+        Object.seal(uniform);
+        this.#cameraUniforms.push(uniform);
         return uniform;
     }
 
@@ -991,7 +1016,7 @@ class Points {
         const f = 1.0 / Math.tan(fov_radians / 2); // ≈ 2.414
         const nf = 1 / (near - far);
         aspect ??= this.#canvas.width / this.#canvas.height;
-        this.setUniform(
+        this.#setCameraUniform(
             `${name}_projection`,
             [
                 f / aspect, 0, 0, 0,
@@ -1002,7 +1027,6 @@ class Points {
             'mat4x4<f32>'
         )
 
-        const [x,y,z] = position;
         const up = [0, 1, 0];
         const ff = normalize(sub(lookAt, position));
         const r = normalize(cross(ff, up));
@@ -1015,7 +1039,7 @@ class Points {
             -dot(r, position), -dot(u, position), dot(ff, position), 1
         ]
 
-        this.setUniform(`${name}_view`, perspectiveMatrix, 'mat4x4<f32>');
+        this.#setCameraUniform(`${name}_view`, perspectiveMatrix, 'mat4x4<f32>');
     }
 
     /**
@@ -1054,7 +1078,7 @@ class Points {
             1
         ];
 
-        this.setUniform(`${name}_projection`, orthoMatrix, 'mat4x4<f32>');
+        this.#setCameraUniform(`${name}_projection`, orthoMatrix, 'mat4x4<f32>');
     }
 
     /**
@@ -1120,6 +1144,10 @@ class Points {
         }
         if (this.#meshUniforms.length) {
             dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <uniform> mesh: Mesh;\n`;
+            bindingIndex += 1;
+        }
+        if (this.#cameraUniforms.length) {
+            dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <uniform> camera: Camera;\n`;
             bindingIndex += 1;
         }
         this.#storage.forEach(storageItem => {
@@ -1284,6 +1312,7 @@ class Points {
         let dynamicGroupBindingsFragment = '';
         let dynamicStructParams = '';
         let dynamicStructMesh = '';
+        let dynamicStructCamera = '';
         this.#uniforms.forEach(u => {
             u.type = u.type || 'f32';
             dynamicStructParams += /*wgsl*/`${u.name}:${u.type}, \n\t`;
@@ -1298,10 +1327,18 @@ class Points {
         if (this.#meshUniforms.length) {
             dynamicStructMesh = /*wgsl*/`struct Mesh {\n\t${dynamicStructMesh}\n}\n`;
         }
+        this.#cameraUniforms.forEach(u => {
+            u.type = u.type || 'f32';
+            dynamicStructCamera += /*wgsl*/`${u.name}:${u.type}, \n\t`;
+        });
+        if (this.#cameraUniforms.length) {
+            dynamicStructCamera = /*wgsl*/`struct Camera {\n\t${dynamicStructCamera}\n}\n`;
+        }
         this.#constants.forEach(c => {
             dynamicStructParams += /*wgsl*/`const ${c.name}:${c.structName} = ${c.value};\n`;
         })
         dynamicStructParams += dynamicStructMesh;
+        dynamicStructParams += dynamicStructCamera;
 
         renderPass.index = index;
         renderPass.hasVertexShader && (dynamicGroupBindingsVertex += dynamicStructParams);
@@ -1571,6 +1608,10 @@ class Points {
             const { values, paramsDataSize } = this.#createUniformValues(this.#meshUniforms);
             this.#meshUniforms.buffer = this.#createAndMapBuffer(values, GPUBufferUsage.UNIFORM + GPUBufferUsage.COPY_DST, true, paramsDataSize.bytes);
         }
+        if (this.#cameraUniforms.length) {
+            const { values, paramsDataSize } = this.#createUniformValues(this.#cameraUniforms);
+            this.#cameraUniforms.buffer = this.#createAndMapBuffer(values, GPUBufferUsage.UNIFORM + GPUBufferUsage.COPY_DST, true, paramsDataSize.bytes);
+        }
     }
 
     /**
@@ -1586,6 +1627,10 @@ class Points {
         if (this.#meshUniforms.length) {
             const { values } = this.#createUniformValues(this.#meshUniforms);
             this.#writeBuffer(this.#meshUniforms.buffer, values);
+        }
+        if (this.#cameraUniforms.length) {
+            const { values } = this.#createUniformValues(this.#cameraUniforms);
+            this.#writeBuffer(this.#cameraUniforms.buffer, values);
         }
     }
 
@@ -1924,6 +1969,21 @@ class Points {
                     resource: {
                         label: 'uniform',
                         buffer: this.#meshUniforms.buffer
+                    },
+                    buffer: {
+                        type: 'uniform'
+                    },
+                    // visibility
+                }
+            );
+        }
+        if (this.#cameraUniforms.length) {
+            entries.push(
+                {
+                    binding: bindingIndex++,
+                    resource: {
+                        label: 'uniform',
+                        buffer: this.#cameraUniforms.buffer
                     },
                     buffer: {
                         type: 'uniform'
@@ -2598,6 +2658,7 @@ class Points {
 
         this.#uniforms = new UniformsArray();
         this.#meshUniforms = new UniformsArray();
+        this.#cameraUniforms = new UniformsArray();
 
         this.#texturesExternal.forEach(textureExternal => {
             const stream = textureExternal?.video.srcObject;
