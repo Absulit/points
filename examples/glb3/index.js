@@ -27,14 +27,18 @@ const base = {
 
         const dropdownItems = { /*'Vertex': 0,*/ 'Texture': 1, 'Shader': 2 };
 
+        // TODO: move cameraPosition line of code after setCameraPerspective to
+        // test the error in #createAndMapBuffer
+        points.setUniform('cameraPosition', [0, 0, 5], 'vec3f');
         points.setUniform('color_mode', options.mode);
         folder.add(options, 'mode', dropdownItems).name('Colors').onChange(value => {
             console.log(value);
             points.setUniform('color_mode', value);
         });
 
+
         points.setCameraPerspective('camera');
-        points.setUniform('cameraPosition', [0, 0, 5], 'vec3f');
+
 
         // points.addRenderPass(RenderPasses.COLOR);
         // points.addRenderPass(RenderPasses.PIXELATE);

@@ -75,12 +75,12 @@ fn main(in: VertexIn) -> CustomFragment {
     let scaled = rotated * particle.scale;
     let world = scaled + particle.position;
 
-    var view = params.camera_view;
+    var view = camera.camera_view;
     view[3][0] = fnusin(.5); // x
     view[3][1] = fnusin(.869); // y
     view[3][2] = fusin(1.1) - 5; // z
 
-    let clip = params.camera_projection * view * vec4f(world, 1.0);
+    let clip = camera.camera_projection * view * vec4f(world, 1.0);
 
     // let uvColor = vec4f(uv, 0, 1);
 

@@ -37,7 +37,7 @@ fn main(in: VertexIn) -> FragmentIn {
 
     let displace = in.normal * displacement * params.val * 4;
     let world = (model * vec4f(in.position.xyz + displace, 1.)).xyz;
-    let clip = params.camera_projection * params.camera_view * vec4f(world, 1.);
+    let clip = camera.camera_projection * camera.camera_view * vec4f(world, 1.);
 
     let newNormal = normalize((model * vec4f(in.normal, 0.)).xyz);
 
