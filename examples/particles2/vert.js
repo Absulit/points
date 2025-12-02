@@ -15,7 +15,7 @@ fn main(in: VertexIn) -> FragmentIn {
 
     let world = scaled + particle.position / ratio;
 
-    let clip = params.camera_projection * vec4f(world, 0., 1.);
+    let clip = camera.camera_projection * vec4f(world, 0., 1.);
 
     return defaultVertexBody(clip, particle.color, in.uv, in.normal);
 }
