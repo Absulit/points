@@ -75,18 +75,18 @@ fn main(in: VertexIn) -> CustomFragment {
     let scaled = rotated * particle.scale;
     let world = scaled + particle.position;
 
-    var view = params.view;
+    var view = camera.camera_view;
     view[3][0] = fnusin(.5); // x
     view[3][1] = fnusin(.869); // y
     view[3][2] = fusin(1.1) - 5; // z
 
-    let clip = params.projection * view * vec4f(world, 1.0);
+    let clip = camera.camera_projection * view * vec4f(world, 1.0);
 
     // let uvColor = vec4f(uv, 0, 1);
 
     let depth = vec4f(-particle.position.z / 253);
 
-    return customVertexBody(clip, particle.color, depth, particle.noise, in.uv);;
+    return customVertexBody(clip, particle.color, depth, particle.noise, in.uv);
 }
 `;
 

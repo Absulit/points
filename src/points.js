@@ -12,6 +12,7 @@ import { loadImage, strToImage } from './texture-string.js';
 import LayersArray from './LayersArray.js';
 import UniformsArray from './UniformsArray.js';
 import getStorageAccessMode, { bindingModes, entriesModes } from './storage-accessmode.js';
+import { cross, dot, normalize, sub } from './matrix.js';
 
 class PresentationFormat {
     static BGRA8UNORM = 'bgra8unorm';
@@ -61,6 +62,7 @@ class Points {
     #commandsFinished = [];
     #uniforms = new UniformsArray();
     #meshUniforms = new UniformsArray();
+    #cameraUniforms = new UniformsArray();
     #constants = [];
     #storage = [];
     #readStorage = [];
@@ -257,6 +259,30 @@ class Points {
         }
         Object.seal(uniform);
         this.#meshUniforms.push(uniform);
+        return uniform;
+    }
+
+    #setCameraUniform(name, value, structName = null) {
+        const uniformToUpdate = this.#nameExists(this.#cameraUniforms, name);
+        if (uniformToUpdate && structName) {
+            // if name exists is an update
+            // console.warn(`#setCameraUniform(${name}, [${value}], ${structName}) can't set the structName of an already defined uniform.`);
+        }
+        if (uniformToUpdate) {
+            uniformToUpdate.value = value;
+            return uniformToUpdate;
+        }
+        if (structName && isArray(structName)) {
+            throw `${structName} is an array, which is currently not supported for Uniforms.`;
+        }
+        const uniform = {
+            name: name,
+            value: value,
+            type: structName,
+            size: null
+        }
+        Object.seal(uniform);
+        this.#cameraUniforms.push(uniform);
         return uniform;
     }
 
@@ -966,6 +992,110 @@ class Points {
     }
 
     /**
+     * Creates a Perspective camera with a given name to be used in the shaders.
+     * The name is used as identifier in the shaders for the Projection and View matrices.
+     *
+     * The name will be inside the `camera` uniform and composed with the
+     * projection and view identifiers: e.g.:
+     * name: mycamera
+     * uniform buffers:
+     *  camera.mycamera_projection;
+     *  camera.mycamera_view
+     *
+     * The camera must be called on the update method so the aspect is updated by default
+     * with the canvas width and height.
+     * @param {String} name camera name in the shader for the projection and view
+     * @param {vec3f} position
+     * @param {Number} fov field of view angle
+     * @param {Number} near clipping near
+     * @param {Number} far clipping far
+     * @param {Number} aspect ratio of the camera, by default it choses the canvas aspect ratio
+     *
+     * @example
+     * // js
+     *  points.setCameraPerspective('camera', [0, 0, -5]);
+     *
+     * // wgsl string
+     * let clip = camera.camera_projection * camera.camera_view * vec4f(world, 1.);
+     */
+    setCameraPerspective(name, position = [0, 0, -5], lookAt = [0, 0, 0], fov = 45, near = .1, far = 100, aspect = null) {
+        const fov_radians = fov * (Math.PI / 180);
+        const f = 1.0 / Math.tan(fov_radians / 2); // ≈ 2.414
+        const nf = 1 / (near - far);
+        aspect ??= this.#canvas.width / this.#canvas.height;
+        this.#setCameraUniform(
+            `${name}_projection`,
+            [
+                f / aspect, 0, 0, 0,
+                0, f, 0, 0,
+                0, 0, (far + near) * nf, -1,
+                0, 0, (2 * far * near) * nf, 0
+            ],
+            'mat4x4<f32>'
+        )
+
+        const up = [0, 1, 0];
+        const ff = normalize(sub(lookAt, position));
+        const r = normalize(cross(ff, up));
+        const u = cross(r, ff);
+
+        const perspectiveMatrix = [
+            r[0], u[0], -ff[0], 0,
+            r[1], u[1], -ff[1], 0,
+            r[2], u[2], -ff[2], 0,
+            -dot(r, position), -dot(u, position), dot(ff, position), 1
+        ]
+
+        this.#setCameraUniform(`${name}_view`, perspectiveMatrix, 'mat4x4<f32>');
+    }
+
+    /**
+     * Creates an Orthographic camera with a given name to be used in the shaders.
+     * The name is used as identifier in the shaders for the Projection matrix.
+     *
+     * The name will be inside the `camera` uniform and composed with the
+     * projection identifier: e.g.:
+     * name: mycamera
+     * uniform buffer:
+     *  camera.mycamera_projection;
+     *
+     * @param {String} name
+     * @param {Number} left
+     * @param {Number} right
+     * @param {Number} top
+     * @param {Number} bottom
+     * @param {Number} near
+     * @param {Number} far
+     *
+     * @example
+     * // js
+     * points.setCameraOrthographic('camera');
+     *
+     * // wgsl string
+     * let clip = camera.camera_projection * vec4f(world, 0.0, 1.0);
+     *
+     */
+    setCameraOrthographic(name, left = -1, right = 1, top = 1, bottom = -1, near = -1, far = 1) {
+        // const aspect = canvas.width / canvas.height; // alternative to aspect in shader
+
+        const lr = 1 / (right - left);
+        const bt = 1 / (top - bottom);
+        const nf = 1 / (near - far);
+
+        const orthoMatrix = [
+            2 * lr, 0, 0, 0,
+            0, 2 * bt, 0, 0,
+            0, 0, 2 * nf, 0,
+            -(right + left) * lr,
+            -(top + bottom) * bt,
+            (far + near) * nf,
+            1
+        ];
+
+        this.#setCameraUniform(`${name}_projection`, orthoMatrix, 'mat4x4<f32>');
+    }
+
+    /**
      * Listens for an event dispatched from WGSL code
      * @param {String} name Number that represents an event Id
      * @param {Function} callback function to be called when the event occurs
@@ -1028,6 +1158,10 @@ class Points {
         }
         if (this.#meshUniforms.length) {
             dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <uniform> mesh: Mesh;\n`;
+            bindingIndex += 1;
+        }
+        if (this.#cameraUniforms.length) {
+            dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <uniform> camera: Camera;\n`;
             bindingIndex += 1;
         }
         this.#storage.forEach(storageItem => {
@@ -1192,6 +1326,7 @@ class Points {
         let dynamicGroupBindingsFragment = '';
         let dynamicStructParams = '';
         let dynamicStructMesh = '';
+        let dynamicStructCamera = '';
         this.#uniforms.forEach(u => {
             u.type = u.type || 'f32';
             dynamicStructParams += /*wgsl*/`${u.name}:${u.type}, \n\t`;
@@ -1206,10 +1341,18 @@ class Points {
         if (this.#meshUniforms.length) {
             dynamicStructMesh = /*wgsl*/`struct Mesh {\n\t${dynamicStructMesh}\n}\n`;
         }
+        this.#cameraUniforms.forEach(u => {
+            u.type = u.type || 'f32';
+            dynamicStructCamera += /*wgsl*/`${u.name}:${u.type}, \n\t`;
+        });
+        if (this.#cameraUniforms.length) {
+            dynamicStructCamera = /*wgsl*/`struct Camera {\n\t${dynamicStructCamera}\n}\n`;
+        }
         this.#constants.forEach(c => {
             dynamicStructParams += /*wgsl*/`const ${c.name}:${c.structName} = ${c.value};\n`;
         })
         dynamicStructParams += dynamicStructMesh;
+        dynamicStructParams += dynamicStructCamera;
 
         renderPass.index = index;
         renderPass.hasVertexShader && (dynamicGroupBindingsVertex += dynamicStructParams);
@@ -1402,9 +1545,12 @@ class Points {
      * @returns {GPUBuffer} mapped buffer
      */
     #createAndMapBuffer(data, usage, mappedAtCreation = true, size = null) {
+         // TODO: review this, because then, size is not longer required
+
         const buffer = this.#device.createBuffer({
             mappedAtCreation: mappedAtCreation,
-            size: size || data.byteLength,
+            size: data.byteLength, // size || data.byteLength
+            // size: size || data.byteLength,
             usage: usage,
         });
         new Float32Array(buffer.getMappedRange()).set(data);
@@ -1479,6 +1625,10 @@ class Points {
             const { values, paramsDataSize } = this.#createUniformValues(this.#meshUniforms);
             this.#meshUniforms.buffer = this.#createAndMapBuffer(values, GPUBufferUsage.UNIFORM + GPUBufferUsage.COPY_DST, true, paramsDataSize.bytes);
         }
+        if (this.#cameraUniforms.length) {
+            const { values, paramsDataSize } = this.#createUniformValues(this.#cameraUniforms);
+            this.#cameraUniforms.buffer = this.#createAndMapBuffer(values, GPUBufferUsage.UNIFORM + GPUBufferUsage.COPY_DST, true, paramsDataSize.bytes);
+        }
     }
 
     /**
@@ -1494,6 +1644,10 @@ class Points {
         if (this.#meshUniforms.length) {
             const { values } = this.#createUniformValues(this.#meshUniforms);
             this.#writeBuffer(this.#meshUniforms.buffer, values);
+        }
+        if (this.#cameraUniforms.length) {
+            const { values } = this.#createUniformValues(this.#cameraUniforms);
+            this.#writeBuffer(this.#cameraUniforms.buffer, values);
         }
     }
 
@@ -1832,6 +1986,21 @@ class Points {
                     resource: {
                         label: 'uniform',
                         buffer: this.#meshUniforms.buffer
+                    },
+                    buffer: {
+                        type: 'uniform'
+                    },
+                    // visibility
+                }
+            );
+        }
+        if (this.#cameraUniforms.length) {
+            entries.push(
+                {
+                    binding: bindingIndex++,
+                    resource: {
+                        label: 'uniform',
+                        buffer: this.#cameraUniforms.buffer
                     },
                     buffer: {
                         type: 'uniform'
@@ -2506,6 +2675,7 @@ class Points {
 
         this.#uniforms = new UniformsArray();
         this.#meshUniforms = new UniformsArray();
+        this.#cameraUniforms = new UniformsArray();
 
         this.#texturesExternal.forEach(textureExternal => {
             const stream = textureExternal?.video.srcObject;

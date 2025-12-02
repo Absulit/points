@@ -27,7 +27,7 @@ let THREADS_Z = 2;
 let WIDTH = 8;
 let HEIGHT = 1;
 
-if(options.isMobile){
+if (options.isMobile) {
     WORKGROUP_X = 4;
     WORKGROUP_Y = 2;
     WORKGROUP_Z = 1;
@@ -50,11 +50,6 @@ glb_renderpass.name = 'glb_renderpass';
 const depth_renderpass = new RenderPass(vertdepth, fragdepth);
 depth_renderpass.loadOp = LoadOp.LOAD;
 depth_renderpass.name = 'depth_renderpass';
-
-const near = 0.1, far = 100;
-const f = 1.0 / Math.tan(Math.PI / 8); // ≈ 2.414
-let aspect = null
-const nf = 1 / (near - far);
 
 const url = '../models/lucy.glb'; // or remote URL (CORS must allow)
 const data = await loadAndExtract(url);
@@ -109,31 +104,9 @@ const base = {
 
         points.addEventListener('logger', data => {
             console.log(data[0]);
-        },4)
+        }, 4)
 
-        aspect = points.canvas.width / points.canvas.height;
-        points.setUniform(
-            'projection',
-            [
-                f / aspect, 0, 0, 0,
-                0, f, 0, 0,
-                0, 0, (far + near) * nf, -1,
-                0, 0, (2 * far * near) * nf, 0
-            ],
-            'mat4x4<f32>'
-        )
-
-        // camera at [0, 0, 5], looking at origin
-        points.setUniform(
-            'view',
-            [
-                1, 0, 0, 0,
-                0, 1, 0, 0,
-                0, 0, 1, 0,
-                0, 0, -5, 1
-            ],
-            'mat4x4<f32>'
-        )
+        points.setCameraPerspective('camera');
 
 
         folder.open();
@@ -143,16 +116,7 @@ const base = {
      */
     update: points => {
 
-        aspect = points.canvas.width / points.canvas.height;
-        points.setUniform(
-            'projection',
-            [
-                f / aspect, 0, 0, 0,
-                0, f, 0, 0,
-                0, 0, (far + near) * nf, -1,
-                0, 0, (2 * far * near) * nf, 0
-            ]
-        )
+        points.setCameraPerspective('camera', [0, 0, 5], [0, 0, -1000]);
 
         points.setUniform('dof', options.dof);
     }
