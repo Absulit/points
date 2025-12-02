@@ -995,6 +995,13 @@ class Points {
      * Creates a Perspective camera with a given name to be used in the shaders.
      * The name is used as identifier in the shaders for the Projection and View matrices.
      *
+     * The name will be inside the `camera` uniform and composed with the
+     * projection and view identifiers: e.g.:
+     * name: mycamera
+     * uniform buffers:
+     *  camera.mycamera_projection;
+     *  camera.mycamera_view
+     *
      * The camera must be called on the update method so the aspect is updated by default
      * with the canvas width and height.
      * @param {String} name camera name in the shader for the projection and view
@@ -1009,7 +1016,7 @@ class Points {
      *  points.setCameraPerspective('camera', [0, 0, -5]);
      *
      * // wgsl string
-     * let clip = params.camera_projection * params.camera_view * vec4f(world, 1.);
+     * let clip = camera.camera_projection * camera.camera_view * vec4f(world, 1.);
      */
     setCameraPerspective(name, position = [0, 0, -5], lookAt = [0, 0, 0], fov = 45, near = .1, far = 100, aspect = null) {
         const fov_radians = fov * (Math.PI / 180);
@@ -1045,6 +1052,13 @@ class Points {
     /**
      * Creates an Orthographic camera with a given name to be used in the shaders.
      * The name is used as identifier in the shaders for the Projection matrix.
+     *
+     * The name will be inside the `camera` uniform and composed with the
+     * projection identifier: e.g.:
+     * name: mycamera
+     * uniform buffer:
+     *  camera.mycamera_projection;
+     *
      * @param {String} name
      * @param {Number} left
      * @param {Number} right
@@ -1058,7 +1072,7 @@ class Points {
      * points.setCameraOrthographic('camera');
      *
      * // wgsl string
-     * let clip = params.camera_projection * vec4f(world, 0.0, 1.0);
+     * let clip = camera.camera_projection * vec4f(world, 0.0, 1.0);
      *
      */
     setCameraOrthographic(name, left = -1, right = 1, top = 1, bottom = -1, near = -1, far = 1) {
