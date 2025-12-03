@@ -364,3 +364,27 @@ export const dataSize = value => {
     }
     return structData;
 }
+
+export const newDataSize = value => {
+    const noCommentsValue = removeComments(value);
+    const structData = getStructDataByName(noCommentsValue);
+
+    let index = 0;
+    let bytes = 0
+
+    let rows = [];
+    let row = 0;
+
+    structData.forEach(sd => {
+        console.log(sd);
+        sd.names.forEach( (name, i) => {
+            const type = sd.types[i];
+            const typeSize = typeSizes[type];
+            console.log(name, type, typeSize);
+
+        })
+
+    })
+    console.log(structData);
+    return structData
+}
