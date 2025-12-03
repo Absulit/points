@@ -365,12 +365,26 @@ export const dataSize = value => {
     return structData;
 }
 
+/**
+ * Calculates if there's a space of bytes left in the row
+ * @param {Number} bytes current bytes size
+ * @param {Number} maxSize max size of row, in this case probably 16
+ * @returns remaining bytes if any
+ */
+function getRemainingBytes(bytes, maxSize) {
+    const remainder = bytes % maxSize
+    let remainingBytes = 0;
+    if (remainder) {
+        remainingBytes = maxSize - remainder;
+    }
+    return remainingBytes
+}
+
 export const newDataSize = value => {
     const noCommentsValue = removeComments(value);
     const structData = getStructDataByName(noCommentsValue);
 
-    let index = 0;
-    let bytes = 0
+    let bytes = 0;
 
     const MAX_ROW_SIZE = 16;
     structData.forEach(sd => {
@@ -388,23 +402,13 @@ export const newDataSize = value => {
 
             bytes += size;
 
-            const remainder = bytes % MAX_ROW_SIZE
-            remainingBytes = 0;
-            if (remainder) {
-                remainingBytes = MAX_ROW_SIZE - remainder;
-            }
-
-
+            remainingBytes = getRemainingBytes(bytes, MAX_ROW_SIZE);
         })
-        const remainder = bytes % MAX_ROW_SIZE
-        if (remainder) {
-            remainingBytes = MAX_ROW_SIZE - remainder;
-        }
+        remainingBytes = getRemainingBytes(bytes, MAX_ROW_SIZE);
         bytes += remainingBytes;
         console.log(bytes);
-
-
     })
+
     console.log(structData);
     return structData
 }
