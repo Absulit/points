@@ -11,10 +11,11 @@ const size_8_align_8 = { size: 8, align: 8 };
 const size_12_align_16 = { size: 12, align: 16 };
 const size_16_align_16 = { size: 16, align: 16 };
 const size_16_align_8 = { size: 16, align: 8 };
-const size_32_align_8 = { size: 32, align: 8 };
+const size_24_align_8 = { size: 24, align: 8 };
 const size_24_align_16 = { size: 24, align: 16 };
-const size_48_align_16 = { size: 48, align: 16 };
+const size_32_align_8 = { size: 32, align: 8 };
 const size_32_align_16 = { size: 32, align: 16 };
+const size_48_align_16 = { size: 48, align: 16 };
 const size_64_align_16 = { size: 64, align: 16 };
 
 export const typeSizes = {
@@ -49,28 +50,38 @@ export const typeSizes = {
     'vec4<f32>': size_16_align_16,
     'vec4<i32>': size_16_align_16,
     'vec4<u32>': size_16_align_16,
-    'mat2x2<f32>': size_16_align_8,
-    'mat2x3<f32>': size_32_align_8,
-    'mat2x4<f32>': size_32_align_8,
-    'mat3x2<f32>': size_24_align_16,
-    'mat3x3<f32>': size_48_align_16,
-    'mat3x4<f32>': size_48_align_16,
-    'mat4x2<f32>': size_32_align_16,
-    'mat4x3<f32>': size_64_align_16,
-    'mat4x4<f32>': size_64_align_16,
 
     // 'vec4<bool>': size_16_align_16,
     'vec4f': size_16_align_16,
     'vec4i': size_16_align_16,
     'vec4u': size_16_align_16,
+
+    'mat2x2<f32>': size_16_align_8,
+    'mat2x3<f32>': size_32_align_16,
+    'mat2x4<f32>': size_32_align_16,
+
     'mat2x2f': size_16_align_8,
-    'mat2x3f': size_32_align_8,
-    'mat2x4f': size_32_align_8,
-    'mat3x2f': size_24_align_16,
+    'mat2x3f': size_32_align_16,
+    'mat2x4f': size_32_align_16,
+
+
+    'mat3x2<f32>': size_24_align_8,
+    'mat3x2f': size_24_align_8,
+
+    'mat3x3<f32>': size_48_align_16,
     'mat3x3f': size_48_align_16,
+
+    'mat3x4<f32>': size_48_align_16,
     'mat3x4f': size_48_align_16,
-    'mat4x2f': size_32_align_16,
+
+
+    'mat4x2<f32>': size_32_align_8,
+    'mat4x2f': size_32_align_8,
+
+    'mat4x3<f32>': size_64_align_16,
     'mat4x3f': size_64_align_16,
+
+    'mat4x4<f32>': size_64_align_16,
     'mat4x4f': size_64_align_16,
 
     'atomic<u32>': size_4_align_4,
@@ -207,7 +218,7 @@ export function getArrayAlign(structName, structData) {
 
 export function getArrayTypeData(currentType, structData) {
     const [d] = getArrayTypeAndAmount(currentType);
-    if(!d){
+    if (!d) {
         throw `${currentType} seems to have an error, maybe a wrong amount?`;
     }
     if (d.amount == 0) {
