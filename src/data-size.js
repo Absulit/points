@@ -7,12 +7,15 @@
 
 const size_2_align_2 = { size: 2, align: 2 };
 const size_4_align_4 = { size: 4, align: 4 };
+const size_6_align_8 = { size: 6, align: 8 };
+const size_8_align_4 = { size: 6, align: 4 };
 const size_8_align_8 = { size: 8, align: 8 };
+const size_12_align_4 = { size: 12, align: 4 };
 const size_12_align_16 = { size: 12, align: 16 };
+const size_16_align_4 = { size: 16, align: 4 };
 const size_16_align_16 = { size: 16, align: 16 };
 const size_16_align_8 = { size: 16, align: 8 };
 const size_24_align_8 = { size: 24, align: 8 };
-const size_24_align_16 = { size: 24, align: 16 };
 const size_32_align_8 = { size: 32, align: 8 };
 const size_32_align_16 = { size: 32, align: 16 };
 const size_48_align_16 = { size: 48, align: 16 };
@@ -20,72 +23,92 @@ const size_64_align_16 = { size: 64, align: 16 };
 
 export const typeSizes = {
     'bool': size_4_align_4,
-    'f32': size_4_align_4,
     'i32': size_4_align_4,
     'u32': size_4_align_4,
+    'f32': size_4_align_4,
 
     'f16': size_2_align_2,
 
+    'atomic<u32>': size_4_align_4,
+    'atomic<i32>': size_4_align_4,
+
     'vec2<bool>': size_8_align_8,
-    'vec2<f32>': size_8_align_8,
     'vec2<i32>': size_8_align_8,
     'vec2<u32>': size_8_align_8,
-
+    'vec2<f32>': size_8_align_8,
     // 'vec2<bool>': size_8_align_8,
-    'vec2f': size_8_align_8,
     'vec2i': size_8_align_8,
     'vec2u': size_8_align_8,
+    'vec2f': size_8_align_8,
+
+    'vec2<f16>': size_4_align_4,
+    'vec2h': size_4_align_4,
 
     'vec3<bool>': size_12_align_16,
-    'vec3<f32>': size_12_align_16,
     'vec3<i32>': size_12_align_16,
     'vec3<u32>': size_12_align_16,
-
+    'vec3<f32>': size_12_align_16,
     // 'vec3<bool>': size_12_align_16,
-    'vec3f': size_12_align_16,
     'vec3i': size_12_align_16,
     'vec3u': size_12_align_16,
+    'vec3f': size_12_align_16,
+
+    'vec3<f16>': size_6_align_8,
+    'vec3h': size_6_align_8,
 
     'vec4<bool>': size_16_align_16,
-    'vec4<f32>': size_16_align_16,
     'vec4<i32>': size_16_align_16,
     'vec4<u32>': size_16_align_16,
-
+    'vec4<f32>': size_16_align_16,
     // 'vec4<bool>': size_16_align_16,
-    'vec4f': size_16_align_16,
     'vec4i': size_16_align_16,
     'vec4u': size_16_align_16,
+    'vec4f': size_16_align_16,
 
     'mat2x2<f32>': size_16_align_8,
-    'mat2x3<f32>': size_32_align_16,
-    'mat2x4<f32>': size_32_align_16,
-
     'mat2x2f': size_16_align_8,
-    'mat2x3f': size_32_align_16,
-    'mat2x4f': size_32_align_16,
-
+    'mat2x2<f16>': size_8_align_4,
+    'mat2x2h': size_8_align_4,
 
     'mat3x2<f32>': size_24_align_8,
     'mat3x2f': size_24_align_8,
-
-    'mat3x3<f32>': size_48_align_16,
-    'mat3x3f': size_48_align_16,
-
-    'mat3x4<f32>': size_48_align_16,
-    'mat3x4f': size_48_align_16,
-
+    'mat3x2<f16>': size_12_align_4,
+    'mat3x2h': size_12_align_4,
 
     'mat4x2<f32>': size_32_align_8,
     'mat4x2f': size_32_align_8,
+    'mat4x2<f16>': size_16_align_4,
+    'mat4x2h': size_16_align_4,
+
+    'mat2x3<f32>': size_32_align_16,
+    'mat2x3f': size_32_align_16,
+    'mat2x3<f16>': size_16_align_8,
+    'mat2x3h': size_16_align_8,
+
+    'mat3x3<f32>': size_48_align_16,
+    'mat3x3f': size_48_align_16,
+    'mat3x3<f16>': size_24_align_8,
+    'mat3x3h': size_24_align_8,
 
     'mat4x3<f32>': size_64_align_16,
     'mat4x3f': size_64_align_16,
+    'mat4x3<f16>': size_32_align_8,
+    'mat4x3h': size_32_align_8,
+
+    'mat2x4<f32>': size_32_align_16,
+    'mat2x4f': size_32_align_16,
+    'mat2x4<f16>': size_16_align_8,
+    'mat2x4h': size_16_align_8,
+
+    'mat3x4<f32>': size_48_align_16,
+    'mat3x4f': size_48_align_16,
+    'mat3x4<f16>': size_24_align_8,
+    'mat3x4h': size_24_align_8,
 
     'mat4x4<f32>': size_64_align_16,
     'mat4x4f': size_64_align_16,
-
-    'atomic<u32>': size_4_align_4,
-    'atomic<i32>': size_4_align_4,
+    'mat4x4<f16>': size_32_align_8,
+    'mat4x4h': size_32_align_8,
 }
 
 
