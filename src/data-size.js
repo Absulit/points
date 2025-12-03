@@ -65,6 +65,9 @@ export const typeSizes = {
     'vec4u': size_16_align_16,
     'vec4f': size_16_align_16,
 
+    'vec4<f16>': size_8_align_8,
+    'vec4h': size_8_align_8,
+
     'mat2x2<f32>': size_16_align_8,
     'mat2x2f': size_16_align_8,
     'mat2x2<f16>': size_8_align_4,
