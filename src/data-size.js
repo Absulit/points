@@ -372,17 +372,37 @@ export const newDataSize = value => {
     let index = 0;
     let bytes = 0
 
-    let rows = [];
-    let row = 0;
-
+    const MAX_ROW_SIZE = 16;
     structData.forEach(sd => {
         console.log(sd);
-        sd.names.forEach( (name, i) => {
+        let remainingBytes = 0;
+        sd.names.forEach((name, i) => {
             const type = sd.types[i];
             const typeSize = typeSizes[type];
-            console.log(name, type, typeSize);
+            const size = typeSize.size;
+
+            if (remainingBytes && size > remainingBytes) {
+                bytes += remainingBytes;
+                remainingBytes = 0;
+            }
+
+            bytes += size;
+
+            const remainder = bytes % MAX_ROW_SIZE
+            remainingBytes = 0;
+            if (remainder) {
+                remainingBytes = MAX_ROW_SIZE - remainder;
+            }
+
 
         })
+        const remainder = bytes % MAX_ROW_SIZE
+        if (remainder) {
+            remainingBytes = MAX_ROW_SIZE - remainder;
+        }
+        bytes += remainingBytes;
+        console.log(bytes);
+
 
     })
     console.log(structData);
