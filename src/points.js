@@ -7,7 +7,7 @@ import RGBAColor from './color.js';
 import Clock from './clock.js';
 import defaultStructs from './core/defaultStructs.js';
 import { defaultVertexBody } from './core/defaultFunctions.js';
-import { dataSize, getArrayTypeData, isArray, typeSizes } from './data-size.js';
+import { dataSize, getArrayTypeData, isArray, newDataSize, typeSizes } from './data-size.js';
 import { loadImage, strToImage } from './texture-string.js';
 import LayersArray from './LayersArray.js';
 import UniformsArray from './UniformsArray.js';
@@ -1393,7 +1393,7 @@ class Points {
             const { vertex, compute, fragment } = renderPass.compiledShaders;
             return vertex + compute + fragment;;
         }).join('\n');
-        this.#dataSize = dataSize(allShaders);
+        this.#dataSize = newDataSize(allShaders);
         // since uniforms are in a sigle struct
         // this is only required for storage
         this.#storage.forEach(s => {
@@ -1549,7 +1549,7 @@ class Points {
 
         const buffer = this.#device.createBuffer({
             mappedAtCreation: mappedAtCreation,
-            size: data.byteLength, // size || data.byteLength
+            size: Math.max(size, data.byteLength), // size || data.byteLength
             // size: size || data.byteLength,
             usage: usage,
         });
@@ -1593,7 +1593,7 @@ class Points {
         // we check the paddings list and add 0's to just the ones that need it
         const uniformsClone = structuredClone(uniformsArray);
         let arrayValues = uniformsClone.map(v => {
-            const padding = paddings[v.name];
+            const padding = paddings[v.name] / 4;
             if (padding) {
                 if (v.value.constructor !== Array) {
                     v.value = [v.value];
