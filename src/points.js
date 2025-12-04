@@ -7,7 +7,7 @@ import RGBAColor from './color.js';
 import Clock from './clock.js';
 import defaultStructs from './core/defaultStructs.js';
 import { defaultVertexBody } from './core/defaultFunctions.js';
-import { dataSize, getArrayTypeData, isArray, newDataSize, typeSizes } from './data-size.js';
+import { dataSize, getArrayTypeData, isArray, typeSizes } from './data-size.js';
 import { loadImage, strToImage } from './texture-string.js';
 import LayersArray from './LayersArray.js';
 import UniformsArray from './UniformsArray.js';
@@ -1393,7 +1393,7 @@ class Points {
             const { vertex, compute, fragment } = renderPass.compiledShaders;
             return vertex + compute + fragment;;
         }).join('\n');
-        this.#dataSize = newDataSize(allShaders);
+        this.#dataSize = dataSize(allShaders);
         // since uniforms are in a sigle struct
         // this is only required for storage
         this.#storage.forEach(s => {

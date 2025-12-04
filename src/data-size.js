@@ -210,16 +210,6 @@ function addBytesToAlign(bytes, aligment) {
     return result;
 }
 
-function getPadding(bytes, aligment, nextTypeDataSize) {
-    const nextMultiple = (bytes + aligment - 1) & ~(aligment - 1)
-    const needsPadding = (bytes + nextTypeDataSize) > nextMultiple;
-    let padAmount = 0
-    if (needsPadding) {
-        padAmount = nextMultiple - bytes;
-    }
-    return padAmount;
-}
-
 /**
  * Check if string has 'array' in it
  * @param {String} value
@@ -271,98 +261,6 @@ export function getArrayTypeData(currentType, structData) {
     return currentTypeData;
 }
 
-export const dataSize = value => {
-    const noCommentsValue = removeComments(value);
-    const structData = getStructDataByName(noCommentsValue);
-
-    for (const [structDatumKey, structDatum] of structData) {
-        // to obtain the higher max alignment, but this can be also calculated
-        // in the next step
-        structDatum.unique_types.forEach(ut => {
-            let maxAlign = structDatum.maxAlign || 0;
-            let align = 0;
-            // if it doesn't exists in typeSizes is an Array or a new Struct
-            if (!typeSizes[ut]) {
-                if (isArray(ut)) {
-                    align = getArrayAlign(ut, structData);
-                } else {
-                    const sd = structData.get(ut);
-                    align = sd.maxAlign;
-                }
-            } else {
-                align = typeSizes[ut].align;
-            }
-            maxAlign = align > maxAlign ? align : maxAlign;
-            structDatum.maxAlign = maxAlign;
-        });
-
-        let byteCounter = 0;
-        structDatum.types.forEach((t, i) => {
-            const name = structDatum.names[i];
-            const currentType = t;
-            const nextType = structDatum.types[i + 1];
-            let currentTypeData = typeSizes[currentType];
-            let nextTypeData = typeSizes[nextType];
-
-            structDatum.paddings = structDatum.paddings || {};
-
-            // if currentTypeData or nextTypeData have no data it means
-            // it's a struct or an array
-            // if it's a struct the data is already saved in structData
-            // because it was calculated previously
-            // assuming the struct was declared previously
-            if (!currentTypeData) {
-                if (currentType) {
-                    if (isArray(currentType)) {
-                        currentTypeData = getArrayTypeData(currentType, structData);
-                    } else {
-                        const sd = structData.get(currentType);
-                        if (sd) {
-                            currentTypeData = { size: sd.bytes, align: sd.maxAlign };
-                        }
-                    }
-                }
-            }
-            // read above
-            if (!nextTypeData) {
-                if (nextType) {
-                    if (isArray(nextType)) {
-                        nextTypeData = getArrayTypeData(nextType, structData);
-                    } else {
-                        const sd = structData.get(nextType)
-                        if (sd) {
-                            nextTypeData = { size: sd.bytes, align: sd.maxAlign };
-                        }
-                    }
-                }
-            }
-
-            if (!!currentTypeData) {
-                byteCounter += currentTypeData.size;
-                if ((currentTypeData.size === structDatum.maxAlign) || !nextType) {
-                    return;
-                }
-            }
-
-            if (!!nextTypeData) {
-                const padAmount = getPadding(byteCounter, structDatum.maxAlign, nextTypeData.size)
-                if (padAmount) {
-                    structDatum.paddings[name] = padAmount / 4;
-                    byteCounter += padAmount;
-                }
-            }
-        });
-
-        const padAmount = getPadding(byteCounter, structDatum.maxAlign, 16)
-        if (padAmount) {
-            structDatum.paddings[''] = padAmount / 4;
-            byteCounter += padAmount;
-        }
-
-        structDatum.bytes = byteCounter;
-    }
-    return structData;
-}
 
 /**
  * Calculates if there's a space of bytes left in the row
@@ -370,7 +268,7 @@ export const dataSize = value => {
  * @param {Number} maxSize max size of row, in this case probably 16
  * @returns remaining bytes if any
  */
-function getPadding2(bytes, maxSize) {
+function getPadding(bytes, maxSize) {
     const remainder = bytes % maxSize
     let remainingBytes = 0;
     if (remainder) {
@@ -379,7 +277,7 @@ function getPadding2(bytes, maxSize) {
     return remainingBytes
 }
 
-export const newDataSize = value => {
+export const dataSize = value => {
     const noCommentsValue = removeComments(value);
     const structData = getStructDataByName(noCommentsValue);
 
@@ -432,9 +330,9 @@ export const newDataSize = value => {
 
             bytes += size;
 
-            remainingBytes = getPadding2(bytes, MAX_ROW_SIZE);
+            remainingBytes = getPadding(bytes, MAX_ROW_SIZE);
         })
-        remainingBytes = getPadding2(bytes, MAX_ROW_SIZE);
+        remainingBytes = getPadding(bytes, MAX_ROW_SIZE);
         bytes += remainingBytes;
         console.log(bytes);
         sd.bytes = bytes;
