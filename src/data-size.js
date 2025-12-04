@@ -334,10 +334,8 @@ export const dataSize = value => {
         })
         remainingBytes = getPadding(bytes, MAX_ROW_SIZE);
         bytes += remainingBytes;
-        console.log(bytes);
         sd.bytes = bytes;
     })
 
-    console.log(structData);
     return structData
 }
