@@ -371,7 +371,7 @@ export const dataSize = value => {
  * @param {Number} maxSize max size of row, in this case probably 16
  * @returns remaining bytes if any
  */
-function getRemainingBytes(bytes, maxSize) {
+function getPadding2(bytes, maxSize) {
     const remainder = bytes % maxSize
     let remainingBytes = 0;
     if (remainder) {
@@ -410,9 +410,9 @@ export const newDataSize = value => {
 
             bytes += size;
 
-            remainingBytes = getRemainingBytes(bytes, MAX_ROW_SIZE);
+            remainingBytes = getPadding2(bytes, MAX_ROW_SIZE);
         })
-        remainingBytes = getRemainingBytes(bytes, MAX_ROW_SIZE);
+        remainingBytes = getPadding2(bytes, MAX_ROW_SIZE);
         bytes += remainingBytes;
         console.log(bytes);
     })
