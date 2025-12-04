@@ -391,21 +391,25 @@ export const newDataSize = value => {
         let bytes = 0;
         console.log(sd);
         let remainingBytes = 0;
+        sd.paddings = {};
         sd.names.forEach((name, i) => {
             const type = sd.types[i];
             const typeSize = typeSizes[type];
             const { size, align } = typeSize;
+            const prevName = sd.names[i - i];
 
             let aligned = bytes % align === 0;
             while (!aligned) {
                 remainingBytes -= 4
                 bytes += 4;
-                // remainingBytes = 0;
+                sd.paddings[prevName] ||= 0
+                sd.paddings[prevName] += 4
                 aligned = bytes % align === 0;
             }
 
             if (remainingBytes && size > remainingBytes) {
                 bytes += remainingBytes;
+                sd.paddings[prevName] = remainingBytes;
                 remainingBytes = 0;
             }
 
@@ -416,6 +420,7 @@ export const newDataSize = value => {
         remainingBytes = getPadding2(bytes, MAX_ROW_SIZE);
         bytes += remainingBytes;
         console.log(bytes);
+        sd.bytes = bytes;
     })
 
     console.log(structData);
