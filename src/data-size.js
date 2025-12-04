@@ -134,6 +134,7 @@ function removeComments(value) {
     const matches = value.matchAll(removeCommentsRE);
     for (const match of matches) {
         const captured = match[0];
+        value = value.replace(captured, '');
     }
     return value;
 }
@@ -392,16 +393,32 @@ export const newDataSize = value => {
         sd.paddings = {};
         sd.names.forEach((name, i) => {
             const type = sd.types[i];
-            const typeSize = typeSizes[type];
+            let typeSize = typeSizes[type];
+
+            // if no typeSize is an array or struct
+            if (!typeSize) {
+                if (type) {
+                    if (isArray(type)) {
+                        typeSize = getArrayTypeData(type, structData);
+                    } else {
+                        const sd = structData.get(type);
+                        if (sd) {
+                            typeSize = { size: sd.bytes, align: sd.maxAlign };
+                        }
+                    }
+                }
+            }
+
             const { size, align } = typeSize;
-            const prevName = sd.names[i - i];
+            const prevName = sd.names[i - 1];
 
             let aligned = bytes % align === 0;
             while (!aligned) {
                 remainingBytes -= 4
                 bytes += 4;
-                sd.paddings[prevName] ||= 0
-                sd.paddings[prevName] += 4
+                sd.paddings[prevName] ||= 0;
+                sd.paddings[prevName] += 4;
+                // console.log('---- prevName 1', prevName);
                 aligned = bytes % align === 0;
             }
 
