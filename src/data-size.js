@@ -393,7 +393,15 @@ export const newDataSize = value => {
         sd.names.forEach((name, i) => {
             const type = sd.types[i];
             const typeSize = typeSizes[type];
-            const size = typeSize.size;
+            const { size, align } = typeSize;
+
+            let aligned = bytes % align === 0;
+            while (!aligned) {
+                remainingBytes -= 4
+                bytes += 4;
+                // remainingBytes = 0;
+                aligned = bytes % align === 0;
+            }
 
             if (remainingBytes && size > remainingBytes) {
                 bytes += remainingBytes;
