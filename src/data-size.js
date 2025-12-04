@@ -116,7 +116,7 @@ export const typeSizes = {
 
 
 // ignore comments
-const removeCommentsRE = /^(?:(?!\/\/|\/*.*\/).|\n)+/gim
+const removeCommentsRE = /\/\*[\s\S]*?\*\/|\/\/.*/gim
 
 // struct name:
 const getStructNameRE = /struct\s+?(\w+)\s*{[^}]+}\n?/g
@@ -132,12 +132,10 @@ const arrayIntegrityRE = /\s*(array\s*<\s*\w+\s*(?:,\s*\d+)?\s*>)\s*,?/g
 
 function removeComments(value) {
     const matches = value.matchAll(removeCommentsRE);
-    let result = '';
     for (const match of matches) {
         const captured = match[0];
-        result += captured;
     }
-    return result;
+    return value;
 }
 
 function getInsideStruct(value) {
