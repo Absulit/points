@@ -1545,13 +1545,13 @@ class Points {
      * @returns {GPUBuffer} mapped buffer
      */
     #createAndMapBuffer(data, usage, mappedAtCreation = true, size = null) {
-        // TODO: review this, because then, size is not longer required
-
+        // the size comes from dataSize
+        // but in some cases size is null and we have to use byteLength
+        // sometimes both arrive and we have to use the bigger one
         const buffer = this.#device.createBuffer({
-            mappedAtCreation: mappedAtCreation,
-            size: Math.max(size, data.byteLength), // size || data.byteLength
-            // size: size || data.byteLength,
-            usage: usage,
+            mappedAtCreation,
+            size: Math.max(size, data.byteLength),
+            usage,
         });
         new Float32Array(buffer.getMappedRange()).set(data);
         buffer.unmap();
@@ -1604,12 +1604,7 @@ class Points {
             }
             return v.value;
         }).flat(1);
-        const finalPadding = paddings[''];
-        if (finalPadding) {
-            for (let i = 0; i < finalPadding; i++) {
-                arrayValues.push(0);
-            }
-        }
+
         return { values: new Float32Array(arrayValues), paramsDataSize };
     }
 
