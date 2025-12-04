@@ -384,10 +384,11 @@ export const newDataSize = value => {
     const noCommentsValue = removeComments(value);
     const structData = getStructDataByName(noCommentsValue);
 
-    let bytes = 0;
+
 
     const MAX_ROW_SIZE = 16;
     structData.forEach(sd => {
+        let bytes = 0;
         console.log(sd);
         let remainingBytes = 0;
         sd.names.forEach((name, i) => {
