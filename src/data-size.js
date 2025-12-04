@@ -399,10 +399,13 @@ export const newDataSize = value => {
                 if (type) {
                     if (isArray(type)) {
                         typeSize = getArrayTypeData(type, structData);
+                        if(!typeSize.align){
+                            typeSize.align = 16
+                        }
                     } else {
                         const sd = structData.get(type);
                         if (sd) {
-                            typeSize = { size: sd.bytes, align: sd.maxAlign };
+                            typeSize = { size: sd.bytes, align: MAX_ROW_SIZE };
                         }
                     }
                 }
