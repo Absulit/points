@@ -128,6 +128,17 @@ class Points {
                 }
             });
         }
+
+        // initializing internal uniforms
+        this.setUniform(UniformKeys.TIME, this.#time);
+        this.setUniform(UniformKeys.DELTA, this.#delta);
+        this.setUniform(UniformKeys.EPOCH, this.#epoch);
+        this.setUniform(UniformKeys.MOUSE_CLICK, this.#mouseClick);
+        this.setUniform(UniformKeys.MOUSE_DOWN, this.#mouseDown);
+        this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
+        this.setUniform(UniformKeys.SCREEN, [0, 0], 'vec2f');
+        this.setUniform(UniformKeys.MOUSE, [0, 0], 'vec2f');
+        this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta, 'vec2f');
     }
 
     #resizeCanvasToFitWindow = () => {
@@ -1421,16 +1432,6 @@ class Points {
      */
     async init(renderPasses) {
         this.#renderPasses = renderPasses.concat(this.#postRenderPasses);
-        // initializing internal uniforms
-        this.setUniform(UniformKeys.TIME, this.#time);
-        this.setUniform(UniformKeys.DELTA, this.#delta);
-        this.setUniform(UniformKeys.EPOCH, this.#epoch);
-        this.setUniform(UniformKeys.MOUSE_CLICK, this.#mouseClick);
-        this.setUniform(UniformKeys.MOUSE_DOWN, this.#mouseDown);
-        this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
-        this.setUniform(UniformKeys.SCREEN, [0, 0], 'vec2f');
-        this.setUniform(UniformKeys.MOUSE, [0, 0], 'vec2f');
-        this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta, 'vec2f');
         let hasComputeShaders = this.#renderPasses.some(renderPass => renderPass.hasComputeShader);
         if (!hasComputeShaders && this.#bindingTextures.length) {
             throw ' `setBindingTexture` requires at least one Compute Shader in a `RenderPass`'
@@ -2359,11 +2360,11 @@ class Points {
         this.setUniform(UniformKeys.TIME, this.#time);
         this.setUniform(UniformKeys.DELTA, this.#delta);
         this.setUniform(UniformKeys.EPOCH, this.#epoch);
-        this.setUniform(UniformKeys.SCREEN, [this.#canvas.width, this.#canvas.height]);
-        this.setUniform(UniformKeys.MOUSE, [this.#mouseX, this.#mouseY]);
         this.setUniform(UniformKeys.MOUSE_CLICK, this.#mouseClick);
         this.setUniform(UniformKeys.MOUSE_DOWN, this.#mouseDown);
         this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
+        this.setUniform(UniformKeys.SCREEN, [this.#canvas.width, this.#canvas.height]);
+        this.setUniform(UniformKeys.MOUSE, [this.#mouseX, this.#mouseY]);
         this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta);
         //--------------------------------------------
         this.#writeParametersUniforms();
