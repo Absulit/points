@@ -8,7 +8,7 @@
 const size_2_align_2 = { size: 2, align: 2 };
 const size_4_align_4 = { size: 4, align: 4 };
 const size_6_align_8 = { size: 6, align: 8 };
-const size_8_align_4 = { size: 6, align: 4 };
+const size_8_align_4 = { size: 8, align: 4 };
 const size_8_align_8 = { size: 8, align: 8 };
 const size_12_align_4 = { size: 12, align: 4 };
 const size_12_align_16 = { size: 12, align: 16 };
