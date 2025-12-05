@@ -239,24 +239,21 @@ export function getArrayTypeData(currentType, structData) {
     if (d.amount == 0) {
         throw new Error(`${currentType} has an amount of 0`);
     }
-    // if is an array with no amount then use these default values
-    let currentTypeData = { size: 16, align: 16 };
-    if (!!d.amount) {
+    let currentTypeData = typeSizes[d.type] || structData.get(d.type);
+    if (!currentTypeData) {
+        throw `Struct or type '${d.type}' in ${currentType} is not defined.`
+    }
+    if (d.amount) {
         const t = typeSizes[d.type];
         if (t) {
             // if array, the size is equal to the align
             currentTypeData = { size: t.align * d.amount, align: t.align };
-            // currentTypeData = { size: t.size * d.amount, align: t.align };
-            // currentTypeData = { size: 0, align: 0 };
         } else {
             const sd = structData.get(d.type);
             if (sd) {
                 currentTypeData = { size: sd.bytes * d.amount, align: sd.maxAlign };
             }
         }
-    } else {
-        const t = typeSizes[d.type] || structData.get(d.type);
-        currentTypeData = { size: t.size || t.bytes, align: t.maxAlign };
     }
     return currentTypeData;
 }
@@ -297,9 +294,6 @@ export const dataSize = value => {
                 if (type) {
                     if (isArray(type)) {
                         typeSize = getArrayTypeData(type, structData);
-                        if(!typeSize.align){
-                            typeSize.align = 16
-                        }
                     } else {
                         const sd = structData.get(type);
                         if (sd) {
@@ -313,12 +307,12 @@ export const dataSize = value => {
             const prevName = sd.names[i - 1];
 
             let aligned = bytes % align === 0;
+            const HALF = 2;
             while (!aligned) {
-                remainingBytes -= 4
-                bytes += 4;
+                remainingBytes -= HALF
+                bytes += HALF;
                 sd.paddings[prevName] ||= 0;
-                sd.paddings[prevName] += 4;
-                // console.log('---- prevName 1', prevName);
+                sd.paddings[prevName] += HALF;
                 aligned = bytes % align === 0;
             }
 
