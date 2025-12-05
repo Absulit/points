@@ -198,18 +198,6 @@ export function getArrayTypeAndAmount(value) {
     return result;
 }
 
-function addBytesToAlign(bytes, aligment) {
-    const remainder = bytes % aligment;
-    let result = 0;
-    if (remainder !== 0) {
-        // if not multiple we obtain the diff
-        // and add it to byteCounter to make it fit the alignment
-        const multipleDiff = aligment - remainder;
-        result = bytes = multipleDiff;
-    }
-    return result;
-}
-
 /**
  * Check if string has 'array' in it
  * @param {String} value
@@ -274,13 +262,12 @@ function getPadding(bytes, maxSize) {
     return remainingBytes
 }
 
+const MAX_ROW_SIZE = 16;
+const HALF = 2;
 export const dataSize = value => {
     const noCommentsValue = removeComments(value);
     const structData = getStructDataByName(noCommentsValue);
 
-
-
-    const MAX_ROW_SIZE = 16;
     structData.forEach(sd => {
         let bytes = 0;
         let remainingBytes = 0;
@@ -288,17 +275,23 @@ export const dataSize = value => {
         sd.names.forEach((name, i) => {
             const type = sd.types[i];
             let typeSize = typeSizes[type];
+            let repeat = 0;
 
             // if no typeSize is an array or struct
             if (!typeSize) {
                 if (type) {
                     if (isArray(type)) {
-                        typeSize = getArrayTypeData(type, structData);
+                        const [innerType] = getArrayTypeAndAmount(type);
+
+                        typeSize = typeSizes[innerType.type];
+                        repeat = innerType.amount; // check comment on top of do while
+                        innerType.align = MAX_ROW_SIZE;
                     } else {
                         const sd = structData.get(type);
-                        if (sd) {
-                            typeSize = { size: sd.bytes, align: MAX_ROW_SIZE };
+                        if(!sd){
+                            throw `Type or struct ${type} doesn't exist.`;
                         }
+                        typeSize = { size: sd.bytes, align: MAX_ROW_SIZE };
                     }
                 }
             }
@@ -306,23 +299,32 @@ export const dataSize = value => {
             const { size, align } = typeSize;
             const prevName = sd.names[i - 1];
 
-            let aligned = bytes % align === 0;
-            const HALF = 2;
-            while (!aligned) {
-                remainingBytes -= HALF
-                bytes += HALF;
-                sd.paddings[prevName] ||= 0;
-                sd.paddings[prevName] += HALF;
-                aligned = bytes % align === 0;
-            }
+            /**
+             * The idea with the repeat and the do while is that, if there's an
+             * array, the subtype will be added `type.amount` times with the
+             * same rules. That's it.
+             */
+            do {
+                let aligned = bytes % align === 0;
 
-            if (remainingBytes && size > remainingBytes) {
-                bytes += remainingBytes;
-                sd.paddings[prevName] = remainingBytes;
-                remainingBytes = 0;
-            }
+                while (!aligned) {
+                    remainingBytes -= HALF
+                    bytes += HALF;
+                    sd.paddings[prevName] ||= 0;
+                    sd.paddings[prevName] += HALF;
+                    aligned = bytes % align === 0;
+                }
 
-            bytes += size;
+                if (remainingBytes && size > remainingBytes) {
+                    bytes += remainingBytes;
+                    sd.paddings[prevName] = remainingBytes;
+                    remainingBytes = 0;
+                }
+
+                bytes += size;
+
+                repeat--;
+            } while (repeat > 0)
 
             remainingBytes = getPadding(bytes, MAX_ROW_SIZE);
         })
