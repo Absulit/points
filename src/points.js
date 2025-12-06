@@ -128,6 +128,17 @@ class Points {
                 }
             });
         }
+
+        // initializing internal uniforms
+        this.setUniform(UniformKeys.TIME, this.#time);
+        this.setUniform(UniformKeys.DELTA, this.#delta);
+        this.setUniform(UniformKeys.EPOCH, this.#epoch);
+        this.setUniform(UniformKeys.MOUSE_CLICK, this.#mouseClick);
+        this.setUniform(UniformKeys.MOUSE_DOWN, this.#mouseDown);
+        this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
+        this.setUniform(UniformKeys.SCREEN, [0, 0], 'vec2f');
+        this.setUniform(UniformKeys.MOUSE, [0, 0], 'vec2f');
+        this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta, 'vec2f');
     }
 
     #resizeCanvasToFitWindow = () => {
@@ -1421,16 +1432,6 @@ class Points {
      */
     async init(renderPasses) {
         this.#renderPasses = renderPasses.concat(this.#postRenderPasses);
-        // initializing internal uniforms
-        this.setUniform(UniformKeys.TIME, this.#time);
-        this.setUniform(UniformKeys.DELTA, this.#delta);
-        this.setUniform(UniformKeys.EPOCH, this.#epoch);
-        this.setUniform(UniformKeys.SCREEN, [0, 0], 'vec2f');
-        this.setUniform(UniformKeys.MOUSE, [0, 0], 'vec2f');
-        this.setUniform(UniformKeys.MOUSE_CLICK, this.#mouseClick);
-        this.setUniform(UniformKeys.MOUSE_DOWN, this.#mouseDown);
-        this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
-        this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta, 'vec2f');
         let hasComputeShaders = this.#renderPasses.some(renderPass => renderPass.hasComputeShader);
         if (!hasComputeShaders && this.#bindingTextures.length) {
             throw ' `setBindingTexture` requires at least one Compute Shader in a `RenderPass`'
@@ -1545,13 +1546,13 @@ class Points {
      * @returns {GPUBuffer} mapped buffer
      */
     #createAndMapBuffer(data, usage, mappedAtCreation = true, size = null) {
-         // TODO: review this, because then, size is not longer required
-
+        // the size comes from dataSize
+        // but in some cases size is null and we have to use byteLength
+        // sometimes both arrive and we have to use the bigger one
         const buffer = this.#device.createBuffer({
-            mappedAtCreation: mappedAtCreation,
-            size: data.byteLength, // size || data.byteLength
-            // size: size || data.byteLength,
-            usage: usage,
+            mappedAtCreation,
+            size: Math.max(size, data.byteLength),
+            usage,
         });
         new Float32Array(buffer.getMappedRange()).set(data);
         buffer.unmap();
@@ -1565,11 +1566,7 @@ class Points {
      * @returns {GPUBuffer} buffer
      */
     #createBuffer(size, usage) {
-        const buffer = this.#device.createBuffer({
-            size: size,
-            usage: usage,
-        });
-        return buffer
+        return this.#device.createBuffer({ size, usage });
     }
 
     /**
@@ -1597,7 +1594,7 @@ class Points {
         // we check the paddings list and add 0's to just the ones that need it
         const uniformsClone = structuredClone(uniformsArray);
         let arrayValues = uniformsClone.map(v => {
-            const padding = paddings[v.name];
+            const padding = paddings[v.name] / 4;
             if (padding) {
                 if (v.value.constructor !== Array) {
                     v.value = [v.value];
@@ -1608,12 +1605,7 @@ class Points {
             }
             return v.value;
         }).flat(1);
-        const finalPadding = paddings[''];
-        if (finalPadding) {
-            for (let i = 0; i < finalPadding; i++) {
-                arrayValues.push(0);
-            }
-        }
+
         return { values: new Float32Array(arrayValues), paramsDataSize };
     }
 
@@ -2368,11 +2360,11 @@ class Points {
         this.setUniform(UniformKeys.TIME, this.#time);
         this.setUniform(UniformKeys.DELTA, this.#delta);
         this.setUniform(UniformKeys.EPOCH, this.#epoch);
-        this.setUniform(UniformKeys.SCREEN, [this.#canvas.width, this.#canvas.height]);
-        this.setUniform(UniformKeys.MOUSE, [this.#mouseX, this.#mouseY]);
         this.setUniform(UniformKeys.MOUSE_CLICK, this.#mouseClick);
         this.setUniform(UniformKeys.MOUSE_DOWN, this.#mouseDown);
         this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
+        this.setUniform(UniformKeys.SCREEN, [this.#canvas.width, this.#canvas.height]);
+        this.setUniform(UniformKeys.MOUSE, [this.#mouseX, this.#mouseY]);
         this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta);
         //--------------------------------------------
         this.#writeParametersUniforms();

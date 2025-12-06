@@ -47,7 +47,7 @@ const base = {
         points.setStorageMap('test', [0, 0, 1, .5], 'vec4f');
 
 
-        points.setStorage('variables', 'Variable');
+        points.setStorage('variables', 'Variable', false, GPUShaderStage.FRAGMENT);
         points.setStorage('test2', 'TestStruct');
 
         points.setUniform('test3', [1, 0, 0, 1], 'vec4f');
