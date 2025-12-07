@@ -365,3 +365,29 @@ fn blur9(image: texture_2d<f32>, imageSampler:sampler, position:vec2f, uv:vec2f,
 
 // }
 // `;
+
+
+/**
+ * This function displays the wireframe of a mesh.
+ * You need the barycentrics data provided by the vertex shader, this is already
+ * provided in the `FragmentIn` struct in the fragment shader (`in` variable).
+ * @type {String}
+ * @param {vec4f} color color of the wireframe line
+ * @param {vec4f} fillColor color of the rest of the triangle
+ * @param {f32} thickness increase or decrease thickness of the wireframe line
+ * @param {vec3f} barycentrics barycentric coordiantes. Interpolated per triangle.
+ *
+ * @example
+ * // wgsl string
+ * // fragment shader
+ * return wireframe(wireframeColor, fillColor, params.thickness, in.barycentrics);
+ */
+export const wireframe = /*wgsl*/`
+fn wireframe(color:vec4f, fillColor:vec4f, thickness:f32, barycentrics:vec3f) -> vec4f {
+    // Distance to nearest edge
+    let edgeDist = min(min(barycentrics.x, barycentrics.y), barycentrics.z);
+    let width = fwidth(edgeDist); // approximate derivative per pixel
+
+    return mix(fillColor, color, step(edgeDist, width * thickness));
+}
+`;

@@ -1,4 +1,8 @@
+import { wireframe } from 'points/effects';
+
 const frag = /*wgsl*/`
+
+${wireframe}
 
 @fragment
 fn main(
@@ -16,15 +20,10 @@ fn main(
     in: FragmentIn
 ) -> @location(0) vec4f {
 
-    // Distance to nearest edge
-    let edgeDist = min(min(in.barycentrics.x, in.barycentrics.y), in.barycentrics.z);
-    let width = fwidth(edgeDist); // approximate derivative per pixel
-
     let wireframeColor = vec4f(params.wireframeColor / 255, 1);
     let fillColor = vec4f(params.fillColor / 255, params.opaque);
-    let finalColor = mix(fillColor, wireframeColor, step(edgeDist, width * params.thickness));
 
-    return finalColor;
+    return wireframe(wireframeColor, fillColor, params.thickness, in.barycentrics);
 }
 `;
 
