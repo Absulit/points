@@ -43,6 +43,7 @@ fn main(in: VertexIn) -> FragmentIn {
     let newNormal = normalize((model * vec4f(in.normal, 0.)).xyz);
 
     var dvb = defaultVertexBody(clip, in.color, in.uv, newNormal);
+    dvb.barycentrics = in.barycentrics;
     dvb.id = in.id;
 
     return dvb;

@@ -1,4 +1,4 @@
-import { BLUE, GREEN, layer, RED } from 'points/color';
+import { BLACK, BLUE, GREEN, layer, RED } from 'points/color';
 import { texture } from 'points/image';
 import { sdfCircle } from 'points/sdf';
 
@@ -9,17 +9,27 @@ ${sdfCircle}
 ${RED}
 ${GREEN}
 ${BLUE}
+${BLACK}
 ${layer}
+
+const THICKNESS = .8;
 
 @fragment
 fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    var finalColor = 4 * BLUE;
+    var wireframeColor = 4 * BLUE;
     if(in.id == mesh.cube0){
-        finalColor = 5 * RED;
+        wireframeColor = 5 * RED;
     }else if(in.id == mesh.cube1){
-        finalColor = 3 * GREEN;
+        wireframeColor = 3 * GREEN;
     }
+
+    // Distance to nearest edge
+    let edgeDist = min(min(in.barycentrics.x, in.barycentrics.y), in.barycentrics.z);
+    let width = fwidth(edgeDist); // approximate derivative per pixel
+
+    let fillColor = BLACK;
+    let finalColor = mix(fillColor, wireframeColor, step(edgeDist, width * THICKNESS));
 
     return finalColor;
 }
