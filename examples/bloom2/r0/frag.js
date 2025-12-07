@@ -15,12 +15,14 @@ const THICKNESS = .8;
 fn main(in: FragmentIn) -> @location(0) vec4f {
 
     var wireframeColor = 4 * BLUE;
+    // optional to avoid branching (remove the if else statements)
+    // wireframeColor = select(wireframeColor, 5 * RED, in.id == mesh.cube0);
+    // wireframeColor = select(wireframeColor, 3 * GREEN, in.id == mesh.cube1);
     if(in.id == mesh.cube0){
         wireframeColor = 5 * RED;
     }else if(in.id == mesh.cube1){
         wireframeColor = 3 * GREEN;
     }
-
 
     let fillColor = BLACK;
 
