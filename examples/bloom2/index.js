@@ -30,7 +30,7 @@ r0.addCube('cube1');
 r0.addCube('cube2');
 
 r0.depthWriteEnabled = true;
-r0.topology = PrimitiveTopology.LINE_STRIP;
+
 const bloom1 = {
     renderPasses: [
         r0,

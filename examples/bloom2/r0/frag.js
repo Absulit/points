@@ -1,27 +1,32 @@
-import { BLUE, GREEN, layer, RED } from 'points/color';
-import { texture } from 'points/image';
-import { sdfCircle } from 'points/sdf';
+import { BLACK, BLUE, GREEN, layer, RED } from 'points/color';
+import { wireframe } from 'points/effects';
 
 const frag = /*wgsl*/`
 
-${texture}
-${sdfCircle}
 ${RED}
 ${GREEN}
 ${BLUE}
-${layer}
+${BLACK}
+${wireframe}
+
+const THICKNESS = .8;
 
 @fragment
 fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    var finalColor = 4 * BLUE;
+    var wireframeColor = 4 * BLUE;
+    // optional to avoid branching (remove the if else statements)
+    // wireframeColor = select(wireframeColor, 5 * RED, in.id == mesh.cube0);
+    // wireframeColor = select(wireframeColor, 3 * GREEN, in.id == mesh.cube1);
     if(in.id == mesh.cube0){
-        finalColor = 5 * RED;
+        wireframeColor = 5 * RED;
     }else if(in.id == mesh.cube1){
-        finalColor = 3 * GREEN;
+        wireframeColor = 3 * GREEN;
     }
 
-    return finalColor;
+    let fillColor = BLACK;
+
+    return wireframe(wireframeColor, fillColor, THICKNESS, in.barycentrics);
 }
 `;
 

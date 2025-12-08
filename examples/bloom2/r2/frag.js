@@ -34,7 +34,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
         norm += w0;
 
         // paired taps left/right
-        for (var i: i32 = 1; i <= radius; i = i + 1) {
+        for (var i: i32 = 1; i <= radius; i++) {
             let offset = f32(i);
             let w = gaussian_weight(offset, sigma);
 
