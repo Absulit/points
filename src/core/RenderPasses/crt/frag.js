@@ -1,9 +1,6 @@
-import { texture } from '../../image.js';
-
 import { RED, GREEN, BLUE } from '../../color.js';
 import { texturePosition } from '../../image.js';
-import { showDebugFrame } from '../../debug.js';
-import { sdfLine, sdfSegment, sdfSquare } from '../../sdf.js';
+import { sdfSquare } from '../../sdf.js';
 import { rotateVector } from '../../math.js';
 import { fnusin } from '../../animation.js';
 
@@ -14,7 +11,6 @@ ${fnusin}
 ${sdfSquare}
 ${rotateVector}
 ${texturePosition}
-${showDebugFrame + sdfLine + sdfSegment}
 ${RED + GREEN + BLUE}
 
 fn sdfRect(startPoint:vec2<f32>, endPoint:vec2<f32>, uv:vec2<f32>) -> f32 {
@@ -76,9 +72,9 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
 
     // let rect = sdfRect(vec2(0.,0.1) * in.ratio, vec2(.33,.9) * in.ratio, uvr);
 
-    let finalColor:vec4<f32> = redSlot + greenSlot + blueSlot;
+    let finalColor:vec4f = redSlot + greenSlot + blueSlot;
 
-    return finalColor + showDebugFrame(RED, in.uvr);
+    return finalColor;
 }
 `;
 
