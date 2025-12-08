@@ -13,19 +13,16 @@ ${rotateVector}
 ${texturePosition}
 ${RED + GREEN + BLUE}
 
-fn sdfRect(startPoint:vec2<f32>, endPoint:vec2<f32>, uv:vec2<f32>) -> f32 {
-    var value = 0.;
-    if(
+fn sdfRect(startPoint:vec2f, endPoint:vec2f, uv:vec2f) -> f32 {
+    let value = select(
+        0.,
+        1.,
         (startPoint.x < uv.x) &&
         (startPoint.y < uv.y) &&
         (uv.x < endPoint.x) &&
         (uv.y < endPoint.y)
-        ){
-        value = 1.;
-    }
-    value = smoothstep(0, .5,  value);
-
-    return value;
+    );
+    return smoothstep(0, .5,  value);
 }
 @fragment
 fn main(in: FragmentIn) -> @location(0) vec4f {
@@ -72,7 +69,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
 
     // let rect = sdfRect(vec2(0.,0.1) * in.ratio, vec2(.33,.9) * in.ratio, uvr);
 
-    let finalColor:vec4f = redSlot + greenSlot + blueSlot;
+    let finalColor = redSlot + greenSlot + blueSlot;
 
     return finalColor;
 }
