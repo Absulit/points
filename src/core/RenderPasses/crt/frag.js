@@ -1,6 +1,6 @@
 import { RED, GREEN, BLUE } from '../../color.js';
-import { texturePosition } from '../../image.js';
-import { sdfSquare } from '../../sdf.js';
+import { texture } from '../../image.js';
+import { sdfRect } from '../../sdf.js';
 import { rotateVector } from '../../math.js';
 import { fnusin } from '../../animation.js';
 
@@ -8,22 +8,12 @@ import { fnusin } from '../../animation.js';
 const frag = /*wgsl*/`
 
 ${fnusin}
-${sdfSquare}
+${sdfRect}
 ${rotateVector}
-${texturePosition}
+${texture}
 ${RED + GREEN + BLUE}
 
-fn sdfRect(startPoint:vec2f, endPoint:vec2f, uv:vec2f) -> f32 {
-    let value = select(
-        0.,
-        1.,
-        (startPoint.x < uv.x) &&
-        (startPoint.y < uv.y) &&
-        (uv.x < endPoint.x) &&
-        (uv.y < endPoint.y)
-    );
-    return smoothstep(0, .5,  value);
-}
+
 @fragment
 fn main(in: FragmentIn) -> @location(0) vec4f {
 
@@ -47,15 +37,10 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     let subuvColor = vec4(subuv, 0, 1);
 
     // --------- chromatic displacement vector
-    // let cdv = vec2(.010, 0.);
-    // let cdv = vec2(-.006, 0.);
     let cdv = vec2(params.crt_displacement, 0.);
-    // let cdv = vec2(0., 0.);
-    let imageColorG = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * in.ratio, pixeleduv, true).g;
-    let imageColorR = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * in.ratio, pixeleduv + cdv, true).r;
-    let imageColorB = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * in.ratio, pixeleduv - cdv, true).b;
-
-
+    let imageColorG = texture(renderpass_feedbackTexture, renderpass_feedbackSampler, pixeleduv, true).g;
+    let imageColorR = texture(renderpass_feedbackTexture, renderpass_feedbackSampler, pixeleduv + cdv, true).r;
+    let imageColorB = texture(renderpass_feedbackTexture, renderpass_feedbackSampler, pixeleduv - cdv, true).b;
 
     let bottom_left = vec2(.0, .0);
     let top_right = bottom_left + vec2(.33, 1.);
@@ -67,7 +52,6 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     let greenSlot = GREEN * imageColorG * sdfRect(margin+margin_v+bottom_left + offset * 1, top_right - margin - margin_v + offset * 1, subuv);
     let blueSlot = BLUE * imageColorB * sdfRect(margin+margin_v+bottom_left + offset * 2, top_right - margin - margin_v + offset * 2, subuv);
 
-    // let rect = sdfRect(vec2(0.,0.1) * in.ratio, vec2(.33,.9) * in.ratio, uvr);
 
     let finalColor = redSlot + greenSlot + blueSlot;
 
