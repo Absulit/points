@@ -8,6 +8,7 @@ import filmgrain from './core/RenderPasses/filmgrain/index.js';
 import bloom from './core/RenderPasses/bloom/index.js';
 import blur from './core/RenderPasses/blur/index.js';
 import waves from './core/RenderPasses/waves/index.js';
+import crt from './core/RenderPasses/crt/index.js';
 import RenderPass from './RenderPass.js';
 
 /**
@@ -100,6 +101,12 @@ class RenderPasses {
      * points.addRenderPass(RenderPasses.WAVES, { scale: .05 });
      */
     static WAVES = waves;
+    /**
+     * Apply a CRT tv pixels effect {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.CRT, { scale: .05 });
+     */
+    static CRT = crt;
 }
 
 export default RenderPasses;
