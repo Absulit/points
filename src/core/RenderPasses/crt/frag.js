@@ -34,8 +34,8 @@ fn sdfRect(startPoint:vec2<f32>, endPoint:vec2<f32>, uv:vec2<f32>) -> f32 {
 @fragment
 fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    let numColumns = 200. *  params.crt_sliderB;
-    let numRows = 200. * params.crt_sliderB;
+    let numColumns = 200. *  params.crt_scale;
+    let numRows = 200. * params.crt_scale;
 
 
     let pixelsWidth = params.screen.x / numColumns;
@@ -56,11 +56,11 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     // --------- chromatic displacement vector
     // let cdv = vec2(.010, 0.);
     // let cdv = vec2(-.006, 0.);
-    let cdv = vec2(params.crt_sliderC, 0.);
+    let cdv = vec2(params.crt_displacement, 0.);
     // let cdv = vec2(0., 0.);
-    let imageColorG = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * in.ratio, pixeleduv / params.crt_sliderA / 20, true).g;
-    let imageColorR = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * in.ratio, pixeleduv / params.crt_sliderA / 20 + cdv, true).r;
-    let imageColorB = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * in.ratio, pixeleduv / params.crt_sliderA / 20 - cdv, true).b;
+    let imageColorG = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * in.ratio, pixeleduv, true).g;
+    let imageColorR = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * in.ratio, pixeleduv + cdv, true).r;
+    let imageColorB = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * in.ratio, pixeleduv - cdv, true).b;
 
 
 
