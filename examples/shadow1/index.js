@@ -1,7 +1,7 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
-import Points, { RenderPass } from 'points';
+import Points, { CullMode, RenderPass } from 'points';
 
 const options = {
     val: 0,
@@ -14,6 +14,10 @@ const options = {
 }
 
 const r0 = new RenderPass(vert, frag, compute);
+r0.depthWriteEnabled = true;
+r0.cullMode = CullMode.NONE;
+r0.addSphere('sphere');
+r0.addPlane('plane', { x: 0, y: 0, z: 0 }, { width: 2, height: 2 });
 
 const base = {
     renderPasses: [
@@ -23,6 +27,9 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+
+        points.setCameraPerspective('camera');
+
 
         // Add elements to dat gui
         // create an uniform and get value from options
@@ -45,6 +52,8 @@ const base = {
      * @param {Points} points
      */
     update: points => {
+        points.setCameraPerspective('camera', [0, 0, -5], [0, 0, 1000]);
+
         points.setUniform('val', options.val);
     }
 }

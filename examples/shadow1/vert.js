@@ -12,7 +12,13 @@ const vert = /*wgsl*/`
  */
 @vertex
 fn main(in: VertexIn) -> FragmentIn {
-    return defaultVertexBody(in.position, in.color, in.uv, in.normal);
+
+    let world = (/*model * */ vec4f(in.position.xyz, 1.)).xyz;
+    let clip = camera.camera_projection * camera.camera_view * vec4f(world, 1.);
+
+
+
+    return defaultVertexBody(clip, in.color, in.uv, in.normal);
 }
 `;
 
