@@ -23,10 +23,10 @@ ${RED}
  */
 @fragment
 fn main(in: FragmentCustom) -> @location(0) vec4f {
+
+
+
     let albedoColor = RED;
-
-
-
     let ambient = vec3f(.1, .1, .1); // ambient color
 
     let lightDirection = vec3f(fnusin(.6) -.5, fnusin(1) -5, fnusin(1.3) * -1);
@@ -45,7 +45,18 @@ fn main(in: FragmentCustom) -> @location(0) vec4f {
 
     let baseColor = albedoColor;
 
-    let finalColor = ambient + baseColor.rgb * diffuse + specularColor * specular;
+    var finalColor = ambient + baseColor.rgb * diffuse + specularColor * specular;
+
+    // let lightUV = in.uvr;
+    // let lightDepthValue = 1.;
+    // let shadowDarkness = 1.;
+
+    // let lightDepth = textureSampleCompare(depth, shadowSampler, lightUV.xy, lightDepthValue);
+    // // let lightDepth = textureSample(depth, shadowSampler, lightUV.xy);
+    // if (lightDepth < 0.5) { // result of compare: 1.0 = lit, 0.0 = shadow (API dependent)
+    //     finalColor *= shadowDarkness;
+    // }
+
 
     return vec4f(finalColor, 1);
 }

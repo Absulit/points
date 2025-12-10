@@ -27,10 +27,19 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
-
+        const descriptor = {
+            addressModeU: 'clamp-to-edge',
+            addressModeV: 'clamp-to-edge',
+            magFilter: 'nearest',
+            minFilter: 'nearest',
+            mipmapFilter: 'nearest',
+            //maxAnisotropy: 10,
+            compare: 'less',
+        }
         points.setCameraPerspective('camera');
         points.setUniform('cameraPosition', [0, 0, -5], 'vec3f');
         points.setTextureDepth2d('depth', GPUShaderStage.FRAGMENT, 0);
+        points.setSampler('shadowSampler', descriptor);
 
 
         // Add elements to dat gui
