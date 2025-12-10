@@ -4,7 +4,7 @@ import frag from './frag.js';
 import Points, { CullMode, RenderPass } from 'points';
 
 const options = {
-    val: 0,
+    val: 0.33,
     bool: false,
     color1: '#FF0000', // CSS string
     color2: [0, 128, 255], // RGB array
@@ -16,8 +16,8 @@ const options = {
 const r0 = new RenderPass(vert, frag, compute);
 r0.depthWriteEnabled = true;
 r0.cullMode = CullMode.NONE;
-r0.addSphere('sphere');
-r0.addPlane('plane', { x: 0, y: 0, z: 0 }, { width: 2, height: 2 });
+r0.addSphere('sphere',  { x: 0, y: 1, z: 0 });
+r0.addPlane('plane', { x: 0, y: 0, z: 0 }, { width: 4, height: 4 });
 
 const base = {
     renderPasses: [
