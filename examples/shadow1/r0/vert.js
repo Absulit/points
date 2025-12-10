@@ -1,5 +1,5 @@
 import { rotXAxis, rotYAxis, rotZAxis, TAU } from "points/math";
-import { structs } from "./structs.js";
+import { structs } from "./../structs.js";
 
 const vert = /*wgsl*/`
 

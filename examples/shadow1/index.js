@@ -1,6 +1,9 @@
-import vert from './vert.js';
-import compute from './compute.js';
-import frag from './frag.js';
+import vert from './r0/vert.js';
+import compute from './r0/compute.js';
+import frag from './r0/frag.js';
+
+import vert1 from './r1/vert.js';
+import frag1 from './r1/frag.js';
 import Points, { CullMode, RenderPass } from 'points';
 
 const options = {
@@ -19,9 +22,13 @@ r0.cullMode = CullMode.NONE;
 r0.addSphere('sphere', { x: 0, y: 1, z: 0 });
 r0.addPlane('plane', { x: 0, y: 0, z: 0 }, { width: 4, height: 4 });
 
+
+const r1 = new RenderPass(vert1, frag1);
+
 const base = {
     renderPasses: [
         r0,
+        r1
     ],
     /**
      * @param {Points} points
@@ -40,6 +47,8 @@ const base = {
         points.setUniform('cameraPosition', [0, 0, -5], 'vec3f');
         points.setTextureDepth2d('depth', GPUShaderStage.FRAGMENT, 0);
         points.setSampler('shadowSampler', descriptor);
+        points.setSampler('imageSampler', null);
+        points.setTexture2d('feedbackTexture', true, null, 0);
 
 
         // Add elements to dat gui
