@@ -16,7 +16,7 @@ const options = {
 const r0 = new RenderPass(vert, frag, compute);
 r0.depthWriteEnabled = true;
 r0.cullMode = CullMode.NONE;
-r0.addSphere('sphere',  { x: 0, y: 1, z: 0 });
+r0.addSphere('sphere', { x: 0, y: 1, z: 0 });
 r0.addPlane('plane', { x: 0, y: 0, z: 0 }, { width: 4, height: 4 });
 
 const base = {
@@ -29,6 +29,8 @@ const base = {
     init: async (points, folder) => {
 
         points.setCameraPerspective('camera');
+        points.setUniform('cameraPosition', [0, 0, -5], 'vec3f');
+        points.setTextureDepth2d('depth', GPUShaderStage.FRAGMENT, 0);
 
 
         // Add elements to dat gui

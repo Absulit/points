@@ -1,7 +1,9 @@
 import { rotXAxis, rotYAxis, rotZAxis, TAU } from "points/math";
+import { structs } from "./structs.js";
 
 const vert = /*wgsl*/`
 
+${structs}
 ${rotXAxis}
 ${rotYAxis}
 ${rotZAxis}
@@ -17,6 +19,24 @@ fn translateMatrix(pos:vec3f) -> mat4x4f {
     );
 }
 
+fn customVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f, world:vec3f) -> FragmentCustom {
+    var result: FragmentCustom;
+
+    let ratioX = params.screen.x / params.screen.y;
+    let ratioY = 1. / ratioX / (params.screen.y / params.screen.x);
+    result.ratio = vec2(ratioX, ratioY);
+    result.position = position;
+    result.color = color;
+    result.uv = uv;
+    result.uvr = vec2(uv.x * result.ratio.x, uv.y);
+    result.mouse = vec2(params.mouse.x / params.screen.x, params.mouse.y / params.screen.y);
+    result.mouse = result.mouse * vec2(1.,-1.) - vec2(0., -1.); // flip and move up
+    result.normal = normal;
+    result.world = world;
+
+    return result;
+}
+
 /**
  * VertexIn
  * position: vec4f,
@@ -28,7 +48,7 @@ fn translateMatrix(pos:vec3f) -> mat4x4f {
  * instanceIndex: u32,
  */
 @vertex
-fn main(in: VertexIn) -> FragmentIn {
+fn main(in: VertexIn) -> FragmentCustom {
 
     var rotX = rotXAxis(0);
     var rotY = rotYAxis(0);
@@ -45,7 +65,7 @@ fn main(in: VertexIn) -> FragmentIn {
 
 
 
-    return defaultVertexBody(clip, in.color, in.uv, in.normal);
+    return customVertexBody(clip, in.color, in.uv, in.normal, world.xyz);
 }
 `;
 
