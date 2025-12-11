@@ -55,8 +55,6 @@ class Points {
     #postRenderPasses = [];
     #buffer = null;
     #presentationSize = null;
-    #depthTexture = null;
-    // #vertexArray = [];
     #numColumns = 1;
     #numRows = 1;
     #commandsFinished = [];
@@ -180,12 +178,11 @@ class Points {
             // will copy out of the swapchain texture.
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
         });
-        this.#depthTexture = this.#device.createTexture({
-            label: '_depthTexture',
-            size: this.#presentationSize,
-            format: 'depth32float',
-            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING,
-        });
+
+        this.#renderPasses.forEach(renderPass => {
+            renderPass.textureDepth = this.#createTextureDepth('_depthTexture');
+        })
+
         // this is to solve an issue that requires the texture to be resized
         // if the screen dimensions change, this for a `setTexture2d` with
         // `copyCurrentTexture` parameter set to `true`.
@@ -634,6 +631,7 @@ class Points {
             console.warn(`setTextureDepth2d: \`${name}\` already exists.`);
             return exists;
         }
+        renderPassIndex ||= 0;
         const textureDepth2d = {
             name,
             shaderType,
@@ -1748,7 +1746,11 @@ class Points {
         });
         //--------------------------------------------
         // this.#texturesDepth2d.forEach(texture2d => this.#createTextureDepth(texture2d));
-        this.#texturesDepth2d.forEach(texture2d => texture2d.texture = this.#depthTexture);
+
+        this.#texturesDepth2d.forEach(texture2d => {
+            const renderPass = this.#renderPasses.find(renderPass => renderPass.index === texture2d.renderPassIndex)
+            texture2d.texture = renderPass.textureDepth;
+        });
         //--------------------------------------------
         this.#textures2dArray.forEach(texture2dArray => {
             if (texture2dArray.imageTextures) {
@@ -1803,9 +1805,9 @@ class Points {
         });
     }
 
-    #createTextureDepth(texture2d) {
-        texture2d.texture = this.#device.createTexture({
-            label: texture2d.name,
+    #createTextureDepth(name) {
+        return this.#device.createTexture({
+            label: name,
             size: this.#presentationSize,
             format: 'depth32float',
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING,
@@ -2088,11 +2090,13 @@ class Points {
             if (texture2d.renderPassIndex !== renderPassIndex) {
                 const isInternal = internal === texture2d.internal;
                 if (isInternal && (!texture2d.shaderType || texture2d.shaderType & shaderType)) {
+                    const renderPass = this.#renderPasses.find(renderPass => renderPass.index === texture2d.renderPassIndex)
+                    texture2d.texture = renderPass.textureDepth;
                     entries.push(
                         {
                             label: 'texture depth 2d',
                             binding: bindingIndex++,
-                            resource: this.#depthTexture.createView(),
+                            resource: texture2d.texture.createView(),
                             texture: {
                                 sampleType: 'depth',
                                 viewDimension: '2d',
@@ -2396,7 +2400,7 @@ class Points {
             if (renderPass.hasVertexAndFragmentShader) {
                 renderPass.descriptor.colorAttachments[0].view = swapChainTexture.createView();
                 if (renderPass.depthWriteEnabled && (!renderPass.descriptor.depthStencilAttachment.view || this.#screenResized)) {
-                    renderPass.descriptor.depthStencilAttachment.view = this.#depthTexture.createView();
+                    renderPass.descriptor.depthStencilAttachment.view = renderPass.textureDepth.createView();
                 }
 
                 const isSameDevice = this.#device === renderPass.device;
