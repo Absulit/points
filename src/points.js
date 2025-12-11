@@ -1824,14 +1824,14 @@ class Points {
     }
 
     #createPipeline() {
-        this.#renderPasses.forEach((renderPass, index) => {
+        this.#renderPasses.forEach(renderPass => {
             if (renderPass.hasComputeShader) {
                 this.#createBindGroup(renderPass, GPUShaderStage.COMPUTE);
                 renderPass.computePipeline = this.#device.createComputePipeline({
                     layout: this.#device.createPipelineLayout({
                         bindGroupLayouts: [renderPass.bindGroupLayoutCompute]
                     }),
-                    label: `_createPipeline() - ${index}`,
+                    label: `_createPipeline() - ${renderPass.index}`,
                     compute: {
                         module: this.#device.createShaderModule({
                             code: renderPass.compiledShaders.compute
