@@ -1437,10 +1437,6 @@ class Points {
             throw ' `setBindingTexture` requires at least one Compute Shader in a `RenderPass`'
         }
 
-        this.#renderPasses.forEach(r => r.init?.(this));
-        this.#renderPasses.forEach(r => r.meshes.forEach(mesh => this.#setMeshUniform(mesh.name, mesh.id, 'u32')));
-        this.#renderPasses.forEach(this.#compileRenderPass);
-        this.#generateDataSize();
         //
         // let adapter = null;
         if (!this.#adapter) {
@@ -1469,14 +1465,19 @@ class Points {
             }
         }
 
-        // this.#createVertexBuffer(new Float32Array(this.#vertexArray));
         // TODO: this should be inside RenderPass, to not call vertexArray outside
-        this.#renderPasses.forEach(renderPass => {
-            this.createScreen(renderPass);
-            renderPass.vertexBufferInfo = new VertexBufferInfo(renderPass.vertexArray);
-            renderPass.vertexBuffer = this.#createAndMapBuffer(renderPass.vertexArray, GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST);
-        })
+        this.#renderPasses.forEach((r, i) => {
+            r.init?.(this);
+            r.meshes.forEach(mesh => this.#setMeshUniform(mesh.name, mesh.id, 'u32'));
 
+            this.createScreen(r);
+            r.vertexBufferInfo = new VertexBufferInfo(r.vertexArray);
+            r.vertexBuffer = this.#createAndMapBuffer(r.vertexArray, GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST);
+
+            this.#compileRenderPass(r, i);
+        });
+
+        this.#generateDataSize();
         this.#createBuffers();
         this.#createPipeline();
 
@@ -1821,14 +1822,14 @@ class Points {
     }
 
     #createPipeline() {
-        this.#renderPasses.forEach((renderPass, index) => {
+        this.#renderPasses.forEach(renderPass => {
             if (renderPass.hasComputeShader) {
                 this.#createBindGroup(renderPass, GPUShaderStage.COMPUTE);
                 renderPass.computePipeline = this.#device.createComputePipeline({
                     layout: this.#device.createPipelineLayout({
                         bindGroupLayouts: [renderPass.bindGroupLayoutCompute]
                     }),
-                    label: `_createPipeline() - ${index}`,
+                    label: `_createPipeline() - ${renderPass.index}`,
                     compute: {
                         module: this.#device.createShaderModule({
                             code: renderPass.compiledShaders.compute
