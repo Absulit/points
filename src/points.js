@@ -1469,13 +1469,15 @@ class Points {
         this.#renderPasses.forEach(r => {
             r.init?.(this);
             r.meshes.forEach(mesh => this.#setMeshUniform(mesh.name, mesh.id, 'u32'));
+            // this is the same as this.#renderPasses.forEach(this.#compileRenderPass);
+            // but it doesn't work inside this loop, maybe for later
             // this.#compileRenderPass(r);
 
             this.createScreen(r);
             r.vertexBufferInfo = new VertexBufferInfo(r.vertexArray);
             r.vertexBuffer = this.#createAndMapBuffer(r.vertexArray, GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST);
         });
-        this.#renderPasses.forEach(this.#compileRenderPass);
+        this.#renderPasses.forEach(this.#compileRenderPass); // this.#compileRenderPass(r);
         this.#generateDataSize();
 
         this.#createBuffers();
