@@ -46,6 +46,7 @@ const base = {
             //maxAnisotropy: 10,
             compare: 'less',
         }
+        points.setCameraPerspective('light');
         points.setCameraPerspective('camera');
         points.setUniform('cameraPosition', [0, 0, -5], 'vec3f');
         points.setTextureDepth2d('depth', GPUShaderStage.FRAGMENT, 0);
@@ -77,6 +78,7 @@ const base = {
      * @param {Points} points
      */
     update: points => {
+        points.setCameraPerspective('light', [.5, 5, 1]);
         points.setCameraPerspective('camera', [0, 0, -5], [0, 0, 1000]);
 
         points.setUniform('val', options.val);

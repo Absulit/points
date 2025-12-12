@@ -61,7 +61,7 @@ fn main(in: VertexIn) -> FragmentCustom {
     let model = rotX * rotY * rotZ;
 
     let world = model * in.position;
-    let clip = camera.camera_projection * camera.camera_view * world;
+    let clip = camera.light_projection * camera.light_view * world;
 
 
 
