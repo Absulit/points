@@ -18,11 +18,15 @@ const options = {
 const r0 = new RenderPass(vert, frag);
 r0.depthWriteEnabled = true;
 r0.cullMode = CullMode.NONE;
-r0.addSphere('sphere', { x: 0, y: 1, z: 0 });
-r0.addPlane('plane', { x: 0, y: 0, z: 0 }, { width: 4, height: 4 });
+r0.addSphere('sphere0', { x: 0, y: 1, z: 0 });
+r0.addPlane('plane0', { x: 0, y: 0, z: 0 }, { width: 4, height: 4 });
 
 
 const r1 = new RenderPass(vert1, frag1);
+r1.depthWriteEnabled = true;
+r1.cullMode = CullMode.NONE;
+r1.addSphere('sphere1', { x: 0, y: 1, z: 0 });
+r1.addPlane('plane1', { x: 0, y: 0, z: 0 }, { width: 4, height: 4 });
 
 const base = {
     renderPasses: [
