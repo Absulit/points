@@ -9,21 +9,46 @@ ${structs}
 ${texture}
 ${rotateVector}
 
+fn translateMatrix(pos:vec3f) -> mat4x4f {
+    return mat4x4f(
+        vec4f(1.0, 0.0, 0.0, 0.0),
+        vec4f(0.0, 1.0, 0.0, 0.0),
+        vec4f(0.0, 0.0, 1.0, 0.0),
+        vec4f(pos.x, pos.y, pos.z, 1.0)
+    );
+}
+
 @fragment
 fn main(in: FragmentIn) -> @location(0) vec4f {
-    let lightUV = in.uvr;
-    let lightDepthValue = 1.;
-    let shadowDarkness = 1.;
+    // 1) sample stored depth (linear 0..1)
+    let flippedUV = vec2f(in.uv.x, 1. - in.uv.y);
+    let texSize = vec2f(textureDimensions(depth, 0));
+    let coords = vec2i(flippedUV * texSize);
+    let d = textureLoad(depth, coords, 0);
 
-    var finalColor = texture(feedbackTexture, imageSampler, in.uvr, true);
+    // 2) reconstruct NDC (x,y from uv -> [-1,1], z from depth -> [-1,1])
+    let ndc = vec4f(in.uv * 2.0 - vec2f(1.0, 1.0), d * 2.0 - 1.0, 1.0);
 
-    let lightDepth = textureSampleCompare(depth, shadowSampler, lightUV.xy, lightDepthValue);
-    // let lightDepth = textureSample(depth, shadowSampler, lightUV.xy);
-    if (lightDepth < 0.5) { // result of compare: 1.0 = lit, 0.0 = shadow (API dependent)
-        finalColor *= shadowDarkness;
-    }
+    // 3) reconstruct world position
+    let invViewProj = translateMatrix(-params.cameraPosition);
+    let worldPos4 = invViewProj * ndc;
+    let worldPos = (worldPos4.xyz / worldPos4.w);
 
-    return finalColor;
+    // 4) project into light space
+    let lightViewProj = translateMatrix(params.lightPosition);
+    let lightClip = lightViewProj * vec4f(worldPos, 1.0);
+    let lightNDC = lightClip.xyz / lightClip.w;
+    let lightUV = vec3f(lightNDC.xy * 0.5 + vec2f(0.5), lightNDC.z * 0.5 + 0.5);
+
+    // 5) shadow test (with bias)
+    let bias = 0.001;
+    let vis = textureSampleCompare(depth, shadowSampler, lightUV.xy, lightUV.z + bias);
+
+    // 6) combine with your color (sampled elsewhere)
+
+    let base = texture(feedbackTexture, imageSampler, in.uvr, true);
+    let shadowed = mix(base * (1.0 - 0.6), base, vis); // example darkness 0.6
+    return shadowed;
 }
 `;
 

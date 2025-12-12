@@ -50,6 +50,8 @@ const base = {
         points.setSampler('imageSampler', null);
         points.setTexture2d('feedbackTexture', true, null, 0);
 
+        points.setUniform('lightPosition', [-.5, -5, -1], 'vec3f');
+
 
         // Add elements to dat gui
         // create an uniform and get value from options

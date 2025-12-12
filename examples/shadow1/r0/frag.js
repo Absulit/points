@@ -29,7 +29,7 @@ fn main(in: FragmentCustom) -> @location(0) vec4f {
     let albedoColor = RED;
     let ambient = vec3f(.1, .1, .1); // ambient color
 
-    let lightDirection = vec3f(fnusin(.6) -.5, fnusin(1) -5, fnusin(1.3) * -1);
+    let lightDirection = vec3f(fnusin(.6), fnusin(1), fnusin(-1.3)) + params.lightPosition;
     let N = normalize(in.normal);
     let L = normalize(-lightDirection);
     let diffuse = max(dot(N, L), 0.0); // Lambertian term

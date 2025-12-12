@@ -55,7 +55,7 @@ fn main(in: VertexIn) -> FragmentCustom {
     var rotZ = rotZAxis(0);
 
     if(mesh.plane == in.id){
-        rotX = rotXAxis(TAU * params.val);
+        rotX = rotXAxis(TAU * .33);
     }
 
     let model = rotX * rotY * rotZ;
