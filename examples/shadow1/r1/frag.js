@@ -29,7 +29,7 @@ fn main(in: FragmentCustom) -> @location(0) vec4f {
     let albedoColor = RED;
     let ambient = vec3f(.1, .1, .1); // ambient color
 
-    let lightDirection = vec3f(fnusin(.6), fnusin(1), fnusin(-1.3)) + params.lightPosition;
+    let lightDirection = /*vec3f(fnusin(.6), fnusin(1), fnusin(-1.3)) +*/ params.lightPosition;
     let N = normalize(in.normal);
     let L = normalize(-lightDirection);
     let diffuse = max(dot(N, L), 0.0); // Lambertian term
@@ -47,18 +47,26 @@ fn main(in: FragmentCustom) -> @location(0) vec4f {
 
     var finalColor = ambient + baseColor.rgb * diffuse + specularColor * specular;
 
-    // let lightUV = in.uvr;
-    // let lightDepthValue = 1.;
-    // let shadowDarkness = 1.;
 
-    // let lightDepth = textureSampleCompare(depth, shadowSampler, lightUV.xy, lightDepthValue);
-    // // let lightDepth = textureSample(depth, shadowSampler, lightUV.xy);
-    // if (lightDepth < 0.5) { // result of compare: 1.0 = lit, 0.0 = shadow (API dependent)
-    //     finalColor *= shadowDarkness;
-    // }
+    // return vec4f(finalColor, 1);
+
+    // --- Shadow mapping ---
+    // Convert from clip space to normalized device coords
+    let proj = in.lightPos.xyz / in.lightPos.w;
+
+    // Convert from [-1,1] to [0,1]
+    let uv = proj.xy * .5 + vec2f(.5);
+    let depthVal = proj.z * .5 + .5;
+
+    let shadow = textureSampleCompare(depth, shadowSampler, uv, depthVal);
+
+    // shadow = 1 -> lit, shadow = 0 -> fully shadowed
+    let lighting = finalColor * shadow;
+
+    return vec4f(vec3f(lighting), 1.0);
 
 
-    return vec4f(finalColor, 1);
+
 }
 `;
 
