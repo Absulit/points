@@ -1,5 +1,4 @@
 import vert from './r0/vert.js';
-import compute from './r0/compute.js';
 import frag from './r0/frag.js';
 
 import vert1 from './r1/vert.js';
@@ -16,7 +15,7 @@ const options = {
     color5: { r: 115, g: 50.9, b: 20.3, a: .1 }, // r, g, b object
 }
 
-const r0 = new RenderPass(vert, frag, compute);
+const r0 = new RenderPass(vert, frag);
 r0.depthWriteEnabled = true;
 r0.cullMode = CullMode.NONE;
 r0.addSphere('sphere', { x: 0, y: 1, z: 0 });
