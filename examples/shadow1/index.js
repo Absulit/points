@@ -54,11 +54,10 @@ const base = {
             minFilter: 'nearest',
             mipmapFilter: 'nearest',
             //maxAnisotropy: 10,
-            compare: 'less',
+            compare: 'greater',
         }
 
-        points.setCameraOrthographic('light', -20, 20, 20, -20, .01, 100);
-        points.setCameraPerspective('light2');
+        points.setCameraOrthographic('light', -20, 20, 20, -20, .01, 100, invLightPosition, [0, 0, 0]);
 
 
         points.setCameraPerspective('camera');
@@ -96,7 +95,7 @@ const base = {
      */
     update: points => {
         // points.setCameraOrthographic('light',-20,20,20,-20,.01);
-        points.setCameraPerspective('light2', invLightPosition);
+        points.setCameraOrthographic('light', -20, 20, 20, -20, .01, 100, invLightPosition, [0, 0, 0]);
 
         points.setCameraPerspective('camera', [5, 0, -5], [0, 0, 0]);
 

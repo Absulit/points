@@ -64,7 +64,7 @@ fn main(in: VertexIn) -> FragmentCustom {
     let clip = camera.camera_projection * camera.camera_view * world;
 
     var cvb = customVertexBody(clip, in.color, in.uv, in.normal, world.xyz);
-    cvb.lightPos = (camera.light_projection * camera.light2_view) * world;
+    cvb.lightPos = (camera.light_projection * camera.light_view) * world;
 
     return cvb;
 }
