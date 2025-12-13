@@ -6,7 +6,7 @@ import frag1 from './r1/frag.js';
 import Points, { CullMode, RenderPass } from 'points';
 
 const options = {
-    val: -0.329,
+    val: 0.584,
     bool: false,
     color1: '#FF0000', // CSS string
     color2: [0, 128, 255], // RGB array
@@ -28,7 +28,7 @@ r1.cullMode = CullMode.NONE;
 r1.addSphere('sphere1', { x: 0, y: 1, z: 0 });
 r1.addPlane('plane1', { x: 0, y: 0, z: 0 }, { width: 4, height: 4 });
 
-const lightPosition = [-.5, -5, 4];
+const lightPosition = [10, -10, 10];
 const invLightPosition = lightPosition.map(v => v * -1);
 
 const base = {
@@ -47,10 +47,10 @@ const base = {
             minFilter: 'nearest',
             mipmapFilter: 'nearest',
             //maxAnisotropy: 10,
-            compare: 'greater',
+            compare: 'less',
         }
 
-        points.setCameraOrthographic('light',-10,10,10,-10, .1, 10);
+        points.setCameraOrthographic('light',-20,20,20,-20, .01, 100);
         points.setCameraPerspective('light2');
 
 
@@ -72,7 +72,7 @@ const base = {
         points.setUniform('val', options.val);
 
         // https://github.com/dataarts/dat.gui/blob/master/API.md#GUI+add
-        folder.add(options, 'val', -1, 1, .0001).name('Val');
+        folder.add(options, 'val', -4, 4, .0001).name('Val');
         folder.add(options, 'bool').name('Bool');
 
         // https://github.com/dataarts/dat.gui/blob/master/API.md#GUI+addColor
