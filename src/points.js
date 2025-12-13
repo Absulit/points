@@ -1089,15 +1089,15 @@ class Points {
 
         const lr = 1 / (right - left);
         const bt = 1 / (top - bottom);
-        const nf = 1 / (near - far);
+        const nf = 1 / (far - near);
 
         const orthoMatrix = [
             2 * lr, 0, 0, 0,
             0, 2 * bt, 0, 0,
-            0, 0, 2 * nf, 0,
+            0, 0, nf, 0,
             -(right + left) * lr,
             -(top + bottom) * bt,
-            (far + near) * nf,
+            -near * nf,
             1
         ];
 
