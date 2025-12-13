@@ -1032,30 +1032,33 @@ class Points {
         const f = 1.0 / Math.tan(fov_radians / 2); // ≈ 2.414
         const nf = 1 / (near - far);
         aspect ??= this.#canvas.width / this.#canvas.height;
+
+        const perspectiveMatrix = [
+            f / aspect, 0, 0, 0,
+            0, f, 0, 0,
+            0, 0, (far + near) * nf, -1,
+            0, 0, (2 * far * near) * nf, 0
+        ]
+
         this.#setCameraUniform(
             `${name}_projection`,
-            [
-                f / aspect, 0, 0, 0,
-                0, f, 0, 0,
-                0, 0, (far + near) * nf, -1,
-                0, 0, (2 * far * near) * nf, 0
-            ],
+            perspectiveMatrix,
             'mat4x4<f32>'
-        )
+        );
 
         const up = [0, 1, 0];
         const ff = normalize(sub(lookAt, position));
         const r = normalize(cross(ff, up));
         const u = cross(r, ff);
 
-        const perspectiveMatrix = [
+        const viewMatrix = [
             r[0], u[0], -ff[0], 0,
             r[1], u[1], -ff[1], 0,
             r[2], u[2], -ff[2], 0,
             -dot(r, position), -dot(u, position), dot(ff, position), 1
         ]
 
-        this.#setCameraUniform(`${name}_view`, perspectiveMatrix, 'mat4x4<f32>');
+        this.#setCameraUniform(`${name}_view`, viewMatrix, 'mat4x4<f32>');
     }
 
     /**
@@ -1084,7 +1087,7 @@ class Points {
      * let clip = camera.camera_projection * vec4f(world, 0.0, 1.0);
      *
      */
-    setCameraOrthographic(name, left = -1, right = 1, top = 1, bottom = -1, near = -1, far = 1) {
+    setCameraOrthographic(name, left = -1, right = 1, top = 1, bottom = -1, near = -1, far = 1, position = [0, 0, -5], lookAt = [0, 0, 0]) {
         // const aspect = canvas.width / canvas.height; // alternative to aspect in shader
 
         const lr = 1 / (right - left);
@@ -1102,6 +1105,21 @@ class Points {
         ];
 
         this.#setCameraUniform(`${name}_projection`, orthoMatrix, 'mat4x4<f32>');
+
+
+        const up = [0, 1, 0];
+        const ff = normalize(sub(lookAt, position));
+        const r = normalize(cross(ff, up));
+        const u = cross(r, ff);
+
+        const viewMatrix = [
+            r[0], u[0], -ff[0], 0,
+            r[1], u[1], -ff[1], 0,
+            r[2], u[2], -ff[2], 0,
+            -dot(r, position), -dot(u, position), dot(ff, position), 1
+        ]
+
+        this.#setCameraUniform(`${name}_view`, viewMatrix, 'mat4x4<f32>');
     }
 
     /**
