@@ -6,7 +6,7 @@ import frag1 from './r1/frag.js';
 import Points, { CullMode, RenderPass } from 'points';
 
 const options = {
-    val: 0.33,
+    val: -0.329,
     bool: false,
     color1: '#FF0000', // CSS string
     color2: [0, 128, 255], // RGB array
@@ -28,6 +28,9 @@ r1.cullMode = CullMode.NONE;
 r1.addSphere('sphere1', { x: 0, y: 1, z: 0 });
 r1.addPlane('plane1', { x: 0, y: 0, z: 0 }, { width: 4, height: 4 });
 
+const lightPosition = [-.5, -5, 4];
+const invLightPosition = lightPosition.map(v => v * -1);
+
 const base = {
     renderPasses: [
         r0,
@@ -44,9 +47,13 @@ const base = {
             minFilter: 'nearest',
             mipmapFilter: 'nearest',
             //maxAnisotropy: 10,
-            compare: 'less',
+            compare: 'greater',
         }
-        points.setCameraPerspective('light');
+
+        points.setCameraOrthographic('light',-10,10,10,-10, .1, 10);
+        points.setCameraPerspective('light2');
+
+
         points.setCameraPerspective('camera');
         points.setUniform('cameraPosition', [0, 0, -5], 'vec3f');
         points.setTextureDepth2d('depth', GPUShaderStage.FRAGMENT, 0);
@@ -54,7 +61,10 @@ const base = {
         points.setSampler('imageSampler', null);
         points.setTexture2d('feedbackTexture', true, null, 0);
 
-        points.setUniform('lightPosition', [-.5, -5, -1], 'vec3f');
+
+
+        points.setUniform('lightPosition', lightPosition, 'vec3f');
+
 
 
         // Add elements to dat gui
@@ -78,7 +88,9 @@ const base = {
      * @param {Points} points
      */
     update: points => {
-        points.setCameraPerspective('light', [.5, 5, 1]);
+        // points.setCameraOrthographic('light',-20,20,20,-20,.01);
+        points.setCameraPerspective('light2', invLightPosition);
+
         points.setCameraPerspective('camera', [0, 0, -5], [0, 0, 1000]);
 
         points.setUniform('val', options.val);

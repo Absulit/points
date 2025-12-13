@@ -45,25 +45,42 @@ fn main(in: FragmentCustom) -> @location(0) vec4f {
 
     let baseColor = albedoColor;
 
-    var finalColor = ambient + baseColor.rgb * diffuse + specularColor * specular;
-
-
-    // return vec4f(finalColor, 1);
+    let finalColor = ambient + baseColor.rgb * diffuse + specularColor * specular;
 
     // --- Shadow mapping ---
     // Convert from clip space to normalized device coords
-    let proj = in.lightPos.xyz / in.lightPos.w;
+    var proj = in.lightPos.xyz / in.lightPos.w;
 
     // Convert from [-1,1] to [0,1]
-    let uv = proj.xy * .5 + vec2f(.5);
+    var uv = proj.xy * .5 + vec2f(.5);
     let depthVal = proj.z * .5 + .5;
 
-    let shadow = textureSampleCompare(depth, shadowSampler, uv, depthVal);
+    let shadow = textureSampleCompare(depth, shadowSampler, uv, depthVal-params.val);
 
     // shadow = 1 -> lit, shadow = 0 -> fully shadowed
     let lighting = finalColor * shadow;
 
     return vec4f(vec3f(lighting), 1.0);
+
+
+    // proj = in.lightPos.xyz / in.lightPos.w;
+    // uv   = proj.xy * 0.5 + vec2f(0.5);
+    // let dFrag = proj.z * 0.5 + 0.5;
+
+
+    // let flippedUV = vec2f(in.uv.x, 1. - in.uv.y);
+    // let texSize = vec2f(textureDimensions(depth, 0));
+    // let coords = vec2i(flippedUV * texSize);
+    // let d = textureLoad(depth, coords, 0);
+    // let visual = pow(d, 1 * 100);
+
+    // // “Manual” compare (assuming compare = less-equal)
+    // let shadowManual = select(0.0, 1.0, dFrag <= d + params.val); // small bias
+
+    // // Visualize: red = frag depth, green = map depth, blue = shadow bool
+    // return vec4f(dFrag, d, shadowManual, 1.0);
+
+
 
 
 
