@@ -1,5 +1,6 @@
 export const shaderProjects = [
     { name: 'Base', path: './base/index.js', uri: 'base', desc: 'Empty project to start.', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, enabled: true, tax: 'reference showcase animation' },
+    { name: 'Base 3D', path: './base3d/index.js', uri: 'base3d', desc: 'Basic 3d project.', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, enabled: true, tax: 'reference showcase threed' },
     { name: 'Audio 1', path: './audio1/index.js', uri: 'audio1', desc: 'Audio visualization. Click to Start audio.', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, enabled: true, tax: 'audio image' },
     { name: 'Audio 2', path: './audio2/index.js', uri: 'audio2', desc: 'Audio visualization. Click to Start audio.', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, enabled: true, tax: 'audio sdf color image' },
     { name: 'Black Hole 1', path: './bh1/index.js', uri: 'bh1', desc: 'Simulation of a Kerr Black Hole with raymarching by bending the ray.<br>Accretion disk shows the bending of the light behind the Black Hole.', author: 'absulit', authlink: 'http://absulit.com', fitWindow: true, enabled: true, tax: 'showcase' },
