@@ -49,13 +49,23 @@ fn main(in: FragmentCustom) -> @location(0) vec4f {
     var proj = in.lightPos.xyz / in.lightPos.w;
 
     // Convert from [-1,1] to [0,1]
-    var uv = proj.xy * .5 + vec2f(.5);
+    var uv = proj.xy * .5 + .5;
     let dFrag = proj.z * .5 + .5;
+    let dMap = textureSampleCompare(depth, shadowSampler, uv, dFrag + params.val);
 
-    let dMap = textureSampleCompare(depth, shadowSampler, uv, dFrag * params.val);
+
+    // let flippedUV = vec2f(uv.x, 1. -uv.y);
+    // let texSize = vec2f(textureDimensions(depth, 0));
+    // let coords = vec2i(uv * texSize);
+    // let dMap = textureLoad(depth, coords, 0);
+    // let visual = pow(dMap, params.val * 100);
+
+
+
 
     // shadow = 1 -> lit, shadow = 0 -> fully shadowed
     let lighting = finalColor * dMap;
+    // let lighting = finalColor * visual;
 
     return vec4f(vec3f(lighting), 1.0);
 }

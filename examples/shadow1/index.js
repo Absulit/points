@@ -22,6 +22,19 @@ const planeDimensions = { width: 4, height: 4 };
 const planerColor = { r: 1, g: 0, b: 1, a: 0 };
 const planeSegments = { x: 10, y: 10 };
 
+const lightPosition = [0, 0, 5];
+const invLightPosition = lightPosition.map(v => v * -1);
+const orthoData = {
+    left: -20,
+    right: 20,
+    top: 20,
+    bottom: -20,
+    near: .1,
+    far: 100,
+    position: invLightPosition,
+    lookAt: [0, 0, 1000],
+}
+
 const r0 = new RenderPass(vert, frag);
 r0.depthWriteEnabled = true;
 r0.cullMode = CullMode.NONE;
@@ -35,8 +48,6 @@ r1.cullMode = CullMode.NONE;
 r1.addSphere('sphere1', spherePosition);
 r1.addPlane('plane1', planePosition, planeDimensions, planerColor, planeSegments);
 
-const lightPosition = [0, -0, 4];
-const invLightPosition = lightPosition.map(v => v * -1);
 
 const base = {
     renderPasses: [
@@ -57,7 +68,8 @@ const base = {
             compare: 'greater',
         }
 
-        points.setCameraOrthographic('light', -20, 20, 20, -20, .01, 100, invLightPosition, [0, 0, 0]);
+        const { left, right, top, bottom, near, far, position, lookAt } = orthoData;
+        points.setCameraOrthographic('light', left, right, top, bottom, near, far, position, lookAt);
 
 
         points.setCameraPerspective('camera');
@@ -94,9 +106,8 @@ const base = {
      * @param {Points} points
      */
     update: points => {
-        // points.setCameraOrthographic('light',-20,20,20,-20,.01);
-        points.setCameraOrthographic('light', -20, 20, 20, -20, .01, 100, invLightPosition, [0, 0, 0]);
-
+        const { left, right, top, bottom, near, far, position, lookAt } = orthoData;
+        points.setCameraOrthographic('light', left, right, top, bottom, near, far, position, lookAt);
         points.setCameraPerspective('camera', [5, 0, -5], [0, 0, 0]);
 
         points.setUniform('val', options.val);
