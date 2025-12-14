@@ -12,7 +12,11 @@ const vert = /*wgsl*/`
  */
 @vertex
 fn main(in: VertexIn) -> FragmentIn {
-    return defaultVertexBody(in.position, in.color, in.uv, in.normal);
+
+    let model = in.position;
+    let clip = camera.camera0_projection * camera.camera0_view * model;
+
+    return defaultVertexBody(clip, in.color, in.uv, in.normal);
 }
 `;
 
