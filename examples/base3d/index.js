@@ -11,11 +11,11 @@ const options = {
 const r0 = new RenderPass(vert, frag, compute);
 r0.depthWriteEnabled = true;
 // r0.cullMode = CullMode.NONE;
-r0.addCube('cube0');
-r0.addCube('cube1', { x: 0, y: 1.1, z: 0 });
-r0.addPlane('plane0', { x: 0, y: 0, z: 0 }, { width: 2, height: 2 })
+r0.addCube('cube0', { x: 0, y: 0, z: 0 }, { width: 1, height: 1, depth: 1 }, { r: .1, g: .5, b: 1 });
+r0.addSphere('sphere0', { x: 0, y: 1.1, z: 0 }, { r: 1, g: 1, b: 0 }, .5);
+r0.addPlane('plane0', { x: 0, y: 0, z: 0 }, { width: 2, height: 2 }, { r: 1, g: 0, b: 0 })
 
-let camera = {
+const camera = {
     position: [0, 0, 5],
     lookAt: [0, 0, 0]
 }
@@ -31,6 +31,7 @@ const base = {
      */
     init: async (points, folder) => {
 
+        points.setUniform('cameraPosition', camera.position);
         points.setCameraPerspective('camera0', camera.position, camera.lookAt);
 
         points.setUniform('val', options.val);
@@ -49,6 +50,7 @@ const base = {
 
         camera.position[1] = Math.sin(time * .01);
         camera.lookAt[1] = Math.sin(time * .00133);
+        points.setUniform('cameraPosition', camera.position);
         points.setCameraPerspective('camera0', camera.position, camera.lookAt);
         time++;
     }
