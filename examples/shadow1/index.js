@@ -48,6 +48,7 @@ r1.cullMode = CullMode.NONE;
 r1.addSphere('sphere1', spherePosition);
 r1.addPlane('plane1', planePosition, planeDimensions, planerColor, planeSegments);
 
+let t = 0;
 
 const base = {
     renderPasses: [
@@ -90,10 +91,14 @@ const base = {
      */
     update: points => {
         const { left, right, top, bottom, near, far, position, lookAt } = light;
+        const p = position;
+        p[0] = Math.sin(t * .01) * 1 + position[0]
         points.setCameraOrthographic('light', left, right, top, bottom, near, far, position, lookAt);
         points.setCameraPerspective('camera', camera.position, camera.lookAt);
 
         points.setUniform('val', options.val);
+
+        t++;
     }
 }
 
