@@ -50,15 +50,11 @@ fn customVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f, wor
 @vertex
 fn main(in: VertexIn) -> FragmentCustom {
 
-    var rotX = rotXAxis(0);
-    var rotY = rotYAxis(0);
-    var rotZ = rotZAxis(0);
-
     // if(mesh.plane1 == in.id){
         // rotX = rotXAxis(TAU * .33);
     // }
 
-    let model = rotX * rotY * rotZ;
+    let model = translateMatrix(vec3f());
 
     let world = model * in.position;
     let clip = camera.camera_projection * camera.camera_view * world;
