@@ -8,11 +8,6 @@ import Points, { CullMode, RenderPass } from 'points';
 const options = {
     val: 0.584,
     bool: false,
-    color1: '#FF0000', // CSS string
-    color2: [0, 128, 255], // RGB array
-    color3: [0, 128, 255, 0.3], // RGB with alpha
-    color4: { h: 350, s: 0.9, v: 0.3 }, // Hue, saturation, value
-    color5: { r: 115, g: 50.9, b: 20.3, a: .1 }, // r, g, b object
 }
 
 const spherePosition = { x: 0, y: 1, z: 0 };
@@ -23,15 +18,21 @@ const planerColor = { r: 1, g: 0, b: 1, a: 0 };
 const planeSegments = { x: 10, y: 10 };
 
 const lightPosition = [50, 100, -100];
-const orthoData = {
+const invLightPosition = lightPosition.map(v => -1 * v);
+const light = {
     left: -80,
     right: 80,
     top: 80,
     bottom: -80,
     near: -200,
     far: 300,
-    position: lightPosition,
+    position: invLightPosition,
     lookAt: [0, 0, 0],
+}
+
+const camera = {
+    position: [5, 0, -5],
+    lookAt: [0, 0, 0]
 }
 
 const r0 = new RenderPass(vert, frag);
@@ -64,40 +65,23 @@ const base = {
             minFilter: 'nearest',
             mipmapFilter: 'nearest',
             //maxAnisotropy: 10,
-            compare: 'greater',
+            compare: 'less',
         }
 
-        const { left, right, top, bottom, near, far, position, lookAt } = orthoData;
+        const { left, right, top, bottom, near, far, position, lookAt } = light;
         points.setCameraOrthographic('light', left, right, top, bottom, near, far, position, lookAt);
 
 
         points.setCameraPerspective('camera');
-        // points.setUniform('cameraPosition', [0, 0, -5], 'vec3f');
         points.setTextureDepth2d('depth', GPUShaderStage.FRAGMENT, 0);
         points.setSampler('shadowSampler', descriptor);
-        points.setSampler('imageSampler', null);
-        // points.setTexture2d('feedbackTexture', true, null, 0);
+        // points.setSampler('imageSampler', null);
+        points.setUniform('lightPos', position, 'vec3f');
 
-
-
-        points.setUniform('lightPos', lightPosition, 'vec3f');
-
-
-
-        // Add elements to dat gui
-        // create an uniform and get value from options
         points.setUniform('val', options.val);
-
-        // https://github.com/dataarts/dat.gui/blob/master/API.md#GUI+add
         folder.add(options, 'val', -4, 4, .0001).name('Val');
-        folder.add(options, 'bool').name('Bool');
 
-        // https://github.com/dataarts/dat.gui/blob/master/API.md#GUI+addColor
-        folder.addColor(options, 'color1');
-        folder.addColor(options, 'color2');
-        folder.addColor(options, 'color3');
-        folder.addColor(options, 'color4');
-        folder.addColor(options, 'color5');
+        folder.add(options, 'bool').name('Bool');
 
         folder.open();
     },
@@ -105,9 +89,9 @@ const base = {
      * @param {Points} points
      */
     update: points => {
-        const { left, right, top, bottom, near, far, position, lookAt } = orthoData;
+        const { left, right, top, bottom, near, far, position, lookAt } = light;
         points.setCameraOrthographic('light', left, right, top, bottom, near, far, position, lookAt);
-        points.setCameraPerspective('camera', [5, 0, -5], [0, 0, 0]);
+        points.setCameraPerspective('camera', camera.position, camera.lookAt);
 
         points.setUniform('val', options.val);
     }
