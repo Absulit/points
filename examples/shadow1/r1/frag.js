@@ -8,6 +8,9 @@ ${structs}
 ${fnusin}
 ${RED}
 
+const shadowDepthTextureSize = 1024.;
+const albedo = vec3f(.9);
+const ambientFactor = .2;
 
 /**
  * VertexIn
@@ -23,51 +26,26 @@ ${RED}
  */
 @fragment
 fn main(in: FragmentCustom) -> @location(0) vec4f {
-    let albedoColor = RED;
-    let ambient = vec3f(.1, .1, .1); // ambient color
+    // Percentage-closer filtering. Sample texels in the region
+    // to smooth the result.
+    var visibility = 0.0;
+    let oneOverShadowDepthTextureSize = 1.0 / shadowDepthTextureSize;
+    for (var y = -1; y <= 1; y++) {
+        for (var x = -1; x <= 1; x++) {
+            let offset = vec2f(vec2(x, y)) * oneOverShadowDepthTextureSize;
 
-    let lightDirection = /*vec3f(fnusin(.6), fnusin(1), fnusin(-1.3)) +*/ params.lightPosition;
-    let N = normalize(in.normal);
-    let L = normalize(-lightDirection);
-    let diffuse = max(dot(N, L), 0.0); // Lambertian term
+            visibility += textureSampleCompare(
+                depth, shadowSampler,
+                in.shadowPos.xy + offset, in.shadowPos.z - 0.007
+            );
+        }
+    }
+    visibility /= 9.0;
 
-    let viewDir = normalize(-params.cameraPosition + in.world); // direction to camera
-    let reflectDir = reflect(L, N); // reflected light direction
-    let specularStrength = .5;
-    let shininess = 32.0;
+    let lambertFactor = max(dot(normalize(params.lightPos - in.fragPos), normalize(in.normal)), 0.);
+    let lightingFactor = min(ambientFactor + visibility * lambertFactor, 1.);
 
-    let specular = pow(max(dot(viewDir, reflectDir), 0.0), shininess) * specularStrength;
-    let specularColor = vec3f(1., 1., 1.);
-
-
-    let baseColor = albedoColor;
-
-    let finalColor = ambient + baseColor.rgb * diffuse + specularColor * specular;
-
-    // --- Shadow mapping ---
-    // Convert from clip space to normalized device coords
-    var proj = in.lightPos.xyz / in.lightPos.w;
-
-    // Convert from [-1,1] to [0,1]
-    var uv = proj.xy * .5 + .5;
-    let dFrag = proj.z * .5 + .5;
-    let dMap = textureSampleCompare(depth, shadowSampler, uv, dFrag + params.val);
-
-
-    // let flippedUV = vec2f(uv.x, 1. -uv.y);
-    // let texSize = vec2f(textureDimensions(depth, 0));
-    // let coords = vec2i(uv * texSize);
-    // let dMap = textureLoad(depth, coords, 0);
-    // let visual = pow(dMap, params.val * 100);
-
-
-
-
-    // shadow = 1 -> lit, shadow = 0 -> fully shadowed
-    let lighting = finalColor * dMap;
-    // let lighting = finalColor * visual;
-
-    return vec4f(vec3f(lighting), 1.0);
+    return vec4(lightingFactor * albedo, 1.);
 }
 `;
 

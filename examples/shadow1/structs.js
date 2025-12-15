@@ -10,7 +10,8 @@ struct FragmentCustom {
     @location(5) normal: vec3f,
     @location(6) world: vec3f,
     @interpolate(flat) @location(7) id: u32,
-    @location(8) lightPos: vec4f, // position in light clip space
+    @location(8) shadowPos: vec3f,
+    @location(9) fragPos: vec3f,
 }
 
 `;

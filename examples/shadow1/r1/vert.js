@@ -64,7 +64,19 @@ fn main(in: VertexIn) -> FragmentCustom {
     let clip = camera.camera_projection * camera.camera_view * world;
 
     var cvb = customVertexBody(clip, in.color, in.uv, in.normal, world.xyz);
-    cvb.lightPos = (camera.light_projection * camera.light_view) * world;
+    // cvb.lightPos = (camera.light_projection * camera.light_view) * world;
+
+    cvb.fragPos = cvb.position.xyz;
+
+    // XY is in (-1, 1) space, Z is in (0, 1) space
+    let posFromLight = (camera.light_projection * camera.light_view) * world;
+
+    // Convert XY to (0, 1)
+    // Y is flipped because texture coords are Y-down.
+    cvb.shadowPos = vec3(
+        posFromLight.xy * vec2(0.5, -0.5) + vec2(0.5),
+        posFromLight.z
+    );
 
     return cvb;
 }

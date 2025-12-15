@@ -22,7 +22,7 @@ const planeDimensions = { width: 4, height: 4 };
 const planerColor = { r: 1, g: 0, b: 1, a: 0 };
 const planeSegments = { x: 10, y: 10 };
 
-const lightPosition = [0, 0, 5];
+const lightPosition = [50, 100, -100];
 const invLightPosition = lightPosition.map(v => v * -1);
 const orthoData = {
     left: -20,
@@ -32,7 +32,7 @@ const orthoData = {
     near: .1,
     far: 100,
     position: invLightPosition,
-    lookAt: [0, 0, 1000],
+    lookAt: [0, 0, 0],
 }
 
 const r0 = new RenderPass(vert, frag);
@@ -73,15 +73,15 @@ const base = {
 
 
         points.setCameraPerspective('camera');
-        points.setUniform('cameraPosition', [0, 0, -5], 'vec3f');
+        // points.setUniform('cameraPosition', [0, 0, -5], 'vec3f');
         points.setTextureDepth2d('depth', GPUShaderStage.FRAGMENT, 0);
         points.setSampler('shadowSampler', descriptor);
         points.setSampler('imageSampler', null);
-        points.setTexture2d('feedbackTexture', true, null, 0);
+        // points.setTexture2d('feedbackTexture', true, null, 0);
 
 
 
-        points.setUniform('lightPosition', lightPosition, 'vec3f');
+        points.setUniform('lightPos', lightPosition, 'vec3f');
 
 
 
