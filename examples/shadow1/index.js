@@ -23,15 +23,14 @@ const planerColor = { r: 1, g: 0, b: 1, a: 0 };
 const planeSegments = { x: 10, y: 10 };
 
 const lightPosition = [50, 100, -100];
-const invLightPosition = lightPosition.map(v => v * -1);
 const orthoData = {
-    left: -20,
-    right: 20,
-    top: 20,
-    bottom: -20,
-    near: .1,
-    far: 100,
-    position: invLightPosition,
+    left: -80,
+    right: 80,
+    top: 80,
+    bottom: -80,
+    near: -200,
+    far: 300,
+    position: lightPosition,
     lookAt: [0, 0, 0],
 }
 
