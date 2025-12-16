@@ -42,11 +42,11 @@ fn main(in: FragmentCustom) -> @location(0) vec4f {
     }
     visibility /= 9.0;
 
-    let lambertFactor = max(dot(normalize(params.lightPos - in.fragPos), normalize(in.normal)), 0.);
+    let lambertFactor = max(dot(normalize(params.lightPos - in.fragPos), normalize(in.normal)), 0.1);
     let lightingFactor = min(ambientFactor + visibility * lambertFactor, 1.);
 
-    // return vec4(vec3f(lightingFactor * albedo), 1.);
-    return vec4(vec3f(visibility), 1.);
+    return vec4(vec3f(lightingFactor * albedo), 1.);
+    // return vec4(vec3f(visibility), 1.);
 }
 `;
 
