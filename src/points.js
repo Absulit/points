@@ -55,8 +55,6 @@ class Points {
     #postRenderPasses = [];
     #buffer = null;
     #presentationSize = null;
-    #depthTexture = null;
-    // #vertexArray = [];
     #numColumns = 1;
     #numRows = 1;
     #commandsFinished = [];
@@ -180,12 +178,11 @@ class Points {
             // will copy out of the swapchain texture.
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
         });
-        this.#depthTexture = this.#device.createTexture({
-            label: '_depthTexture',
-            size: this.#presentationSize,
-            format: 'depth32float',
-            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING,
-        });
+
+        this.#renderPasses.forEach(renderPass => {
+            renderPass.textureDepth = this.#createTextureDepth('_depthTexture');
+        })
+
         // this is to solve an issue that requires the texture to be resized
         // if the screen dimensions change, this for a `setTexture2d` with
         // `copyCurrentTexture` parameter set to `true`.
@@ -634,6 +631,7 @@ class Points {
             console.warn(`setTextureDepth2d: \`${name}\` already exists.`);
             return exists;
         }
+        renderPassIndex ||= 0;
         const textureDepth2d = {
             name,
             shaderType,
@@ -1034,30 +1032,33 @@ class Points {
         const f = 1.0 / Math.tan(fov_radians / 2); // ≈ 2.414
         const nf = 1 / (near - far);
         aspect ??= this.#canvas.width / this.#canvas.height;
+
+        const perspectiveMatrix = [
+            f / aspect, 0, 0, 0,
+            0, f, 0, 0,
+            0, 0, (far + near) * nf, -1,
+            0, 0, (2 * far * near) * nf, 0
+        ]
+
         this.#setCameraUniform(
             `${name}_projection`,
-            [
-                f / aspect, 0, 0, 0,
-                0, f, 0, 0,
-                0, 0, (far + near) * nf, -1,
-                0, 0, (2 * far * near) * nf, 0
-            ],
+            perspectiveMatrix,
             'mat4x4<f32>'
-        )
+        );
 
         const up = [0, 1, 0];
         const ff = normalize(sub(lookAt, position));
         const r = normalize(cross(ff, up));
         const u = cross(r, ff);
 
-        const perspectiveMatrix = [
+        const viewMatrix = [
             r[0], u[0], -ff[0], 0,
             r[1], u[1], -ff[1], 0,
             r[2], u[2], -ff[2], 0,
             -dot(r, position), -dot(u, position), dot(ff, position), 1
         ]
 
-        this.#setCameraUniform(`${name}_view`, perspectiveMatrix, 'mat4x4<f32>');
+        this.#setCameraUniform(`${name}_view`, viewMatrix, 'mat4x4<f32>');
     }
 
     /**
@@ -1086,7 +1087,7 @@ class Points {
      * let clip = camera.camera_projection * vec4f(world, 0.0, 1.0);
      *
      */
-    setCameraOrthographic(name, left = -1, right = 1, top = 1, bottom = -1, near = -1, far = 1) {
+    setCameraOrthographic(name, left = -1, right = 1, top = 1, bottom = -1, near = -1, far = 1, position = [0, 0, -5], lookAt = [0, 0, 0]) {
         // const aspect = canvas.width / canvas.height; // alternative to aspect in shader
 
         const lr = 1 / (right - left);
@@ -1096,14 +1097,29 @@ class Points {
         const orthoMatrix = [
             2 * lr, 0, 0, 0,
             0, 2 * bt, 0, 0,
-            0, 0, 2 * nf, 0,
+            0, 0, nf, 0,
             -(right + left) * lr,
             -(top + bottom) * bt,
-            (far + near) * nf,
+            near * nf,
             1
         ];
 
         this.#setCameraUniform(`${name}_projection`, orthoMatrix, 'mat4x4<f32>');
+
+
+        const up = [0, 1, 0];
+        const ff = normalize(sub(lookAt, position));
+        const r = normalize(cross(ff, up));
+        const u = cross(r, ff);
+
+        const viewMatrix = [
+            r[0], u[0], -ff[0], 0,
+            r[1], u[1], -ff[1], 0,
+            r[2], u[2], -ff[2], 0,
+            -dot(r, position), -dot(u, position), dot(ff, position), 1
+        ]
+
+        this.#setCameraUniform(`${name}_view`, viewMatrix, 'mat4x4<f32>');
     }
 
     /**
@@ -1748,7 +1764,11 @@ class Points {
         });
         //--------------------------------------------
         // this.#texturesDepth2d.forEach(texture2d => this.#createTextureDepth(texture2d));
-        this.#texturesDepth2d.forEach(texture2d => texture2d.texture = this.#depthTexture);
+
+        this.#texturesDepth2d.forEach(texture2d => {
+            const renderPass = this.#renderPasses.find(renderPass => renderPass.index === texture2d.renderPassIndex)
+            texture2d.texture = renderPass.textureDepth;
+        });
         //--------------------------------------------
         this.#textures2dArray.forEach(texture2dArray => {
             if (texture2dArray.imageTextures) {
@@ -1803,9 +1823,9 @@ class Points {
         });
     }
 
-    #createTextureDepth(texture2d) {
-        texture2d.texture = this.#device.createTexture({
-            label: texture2d.name,
+    #createTextureDepth(name) {
+        return this.#device.createTexture({
+            label: name,
             size: this.#presentationSize,
             format: 'depth32float',
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING,
@@ -2088,11 +2108,13 @@ class Points {
             if (texture2d.renderPassIndex !== renderPassIndex) {
                 const isInternal = internal === texture2d.internal;
                 if (isInternal && (!texture2d.shaderType || texture2d.shaderType & shaderType)) {
+                    const renderPass = this.#renderPasses.find(renderPass => renderPass.index === texture2d.renderPassIndex)
+                    texture2d.texture = renderPass.textureDepth;
                     entries.push(
                         {
                             label: 'texture depth 2d',
                             binding: bindingIndex++,
-                            resource: this.#depthTexture.createView(),
+                            resource: texture2d.texture.createView(),
                             texture: {
                                 sampleType: 'depth',
                                 viewDimension: '2d',
@@ -2396,7 +2418,7 @@ class Points {
             if (renderPass.hasVertexAndFragmentShader) {
                 renderPass.descriptor.colorAttachments[0].view = swapChainTexture.createView();
                 if (renderPass.depthWriteEnabled && (!renderPass.descriptor.depthStencilAttachment.view || this.#screenResized)) {
-                    renderPass.descriptor.depthStencilAttachment.view = this.#depthTexture.createView();
+                    renderPass.descriptor.depthStencilAttachment.view = renderPass.textureDepth.createView();
                 }
 
                 const isSameDevice = this.#device === renderPass.device;

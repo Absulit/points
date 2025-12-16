@@ -40,6 +40,7 @@ struct FragmentIn {
     @location(5) normal: vec3f,
     @interpolate(flat) @location(6) id: u32, // mesh or instance id
     @location(7) barycentrics: vec3f,
+    @location(8) world: vec3f,
 }
 
 struct Sound {

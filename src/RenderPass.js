@@ -156,6 +156,7 @@ class RenderPass {
     #vertexBufferInfo = null;
 
     #depthWriteEnabled = false;
+    #textureDepth = null;
     #loadOp = LoadOp.CLEAR;
     #clearValue = { r: 0.0, g: 0.0, b: 0.0, a: 1.0 };
 
@@ -500,6 +501,18 @@ class RenderPass {
         }
 
         this.#depthWriteEnabled = val;
+    }
+
+    get textureDepth() {
+        return this.#textureDepth;
+    }
+
+    /**
+     * Holder for the depth map for this RenderPass only
+     * @param {GPUTexture} val
+     */
+    set textureDepth(val) {
+        this.#textureDepth = val;
     }
 
     get loadOp() {
