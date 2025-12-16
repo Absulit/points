@@ -43,7 +43,7 @@ const camera = {
 
 const r0 = new RenderPass(vert, frag);
 r0.depthWriteEnabled = true;
-r0.cullMode = CullMode.NONE;
+// r0.cullMode = CullMode.NONE;
 r0.addSphere('sphere0', spherePosition);
 r0.addPlane('plane0', planePosition, planeDimensions, planeColor, planeSegments);
 
