@@ -1,3 +1,8 @@
+/**
+ * Based on the Shadow Mapping demo in WebGPU Samples
+ * https://webgpu.github.io/webgpu-samples/?q=shad&sample=shadowMapping
+ */
+
 import vert from './r0/vert.js';
 import frag from './r0/frag.js';
 
