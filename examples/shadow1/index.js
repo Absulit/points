@@ -6,18 +6,20 @@ import frag1 from './r1/frag.js';
 import Points, { CullMode, RenderPass } from 'points';
 
 const options = {
-    val: 0.584,
-    bool: false,
+    ambientFactor: 0.2,
+    albedoFactor: 0.9,
+    lambertMax: 0.07,
 }
 
 const spherePosition = { x: 0, y: 1, z: 0 };
 
 const planePosition = { x: 0, y: 0, z: 2 };
 const planeDimensions = { width: 4, height: 4 };
-const planerColor = { r: 1, g: 0, b: 1, a: 0 };
+const planeColor = { r: 1, g: 0, b: 0, a: 1 };
 const planeSegments = { x: 10, y: 10 };
 
-const lightPosition = [25, 50, -50];
+const sphereColor = { r: .588, g: .454, b: 0, a: 1 };
+
 const light = {
     left: -10,
     right: 10,
@@ -25,7 +27,7 @@ const light = {
     bottom: -10,
     near: .1,
     far: 150,
-    position: lightPosition,
+    position: [25, 50, -50],
     lookAt: [0, 0, 0],
 }
 
@@ -38,14 +40,14 @@ const r0 = new RenderPass(vert, frag);
 r0.depthWriteEnabled = true;
 r0.cullMode = CullMode.NONE;
 r0.addSphere('sphere0', spherePosition);
-r0.addPlane('plane0', planePosition, planeDimensions, planerColor, planeSegments);
+r0.addPlane('plane0', planePosition, planeDimensions, planeColor, planeSegments);
 
 
 const r1 = new RenderPass(vert1, frag1);
 r1.depthWriteEnabled = true;
 r1.cullMode = CullMode.NONE;
-r1.addSphere('sphere1', spherePosition);
-r1.addPlane('plane1', planePosition, planeDimensions, planerColor, planeSegments);
+r1.addSphere('sphere1', spherePosition, sphereColor);
+r1.addPlane('plane1', planePosition, planeDimensions, planeColor, planeSegments);
 
 let t = 0;
 
@@ -78,10 +80,14 @@ const base = {
         // points.setSampler('imageSampler', null);
         points.setUniform('lightPos', position, 'vec3f');
 
-        points.setUniform('val', options.val);
-        folder.add(options, 'val', -4, 4, .0001).name('Val');
+        points.setUniform('ambientFactor', options.ambientFactor);
+        folder.add(options, 'ambientFactor', 0, 1, .0001).name('ambientFactor');
 
-        folder.add(options, 'bool').name('Bool');
+        points.setUniform('albedoFactor', options.albedoFactor);
+        folder.add(options, 'albedoFactor', 0, 1, .0001).name('albedoFactor');
+
+        points.setUniform('lambertMax', options.lambertMax);
+        folder.add(options, 'lambertMax', 0, 1, .0001).name('lambertMax');
 
         folder.open();
     },
@@ -95,7 +101,9 @@ const base = {
         points.setCameraOrthographic('light', left, right, top, bottom, near, far, position, lookAt);
         points.setCameraPerspective('camera', camera.position, camera.lookAt);
 
-        points.setUniform('val', options.val);
+        points.setUniform('ambientFactor', options.ambientFactor);
+        points.setUniform('albedoFactor', options.albedoFactor);
+        points.setUniform('lambertMax', options.lambertMax);
 
         t++;
     }

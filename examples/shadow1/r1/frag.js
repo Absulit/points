@@ -9,8 +9,7 @@ ${fnusin}
 ${RED}
 
 const shadowDepthTextureSize = 1024.;
-const albedo = vec3f(0.9); //RED.xyz * .9;
-const ambientFactor = .2;
+
 
 /**
  * VertexIn
@@ -26,6 +25,7 @@ const ambientFactor = .2;
  */
 @fragment
 fn main(in: FragmentCustom) -> @location(0) vec4f {
+    let albedo = in.color.rgb * params.albedoFactor;
     // Percentage-closer filtering. Sample texels in the region
     // to smooth the result.
     var visibility = 0.0;
@@ -42,8 +42,8 @@ fn main(in: FragmentCustom) -> @location(0) vec4f {
     }
     visibility /= 9.0;
 
-    let lambertFactor = max(dot(normalize(params.lightPos - in.fragPos), normalize(in.normal)), 0.1);
-    let lightingFactor = min(ambientFactor + visibility * lambertFactor, 1.);
+    let lambertFactor = max(dot(normalize(params.lightPos - in.fragPos), normalize(in.normal)), params.lambertMax);
+    let lightingFactor = min(params.ambientFactor + visibility * lambertFactor, 1.);
 
     return vec4(vec3f(lightingFactor * albedo), 1.);
     // return vec4(vec3f(visibility), 1.);
