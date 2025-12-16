@@ -9,7 +9,7 @@ ${fnusin}
 ${RED}
 
 const shadowDepthTextureSize = 1024.;
-const albedo = RED.xyz * .9;
+const albedo = vec3f(0.9); //RED.xyz * .9;
 const ambientFactor = .2;
 
 /**

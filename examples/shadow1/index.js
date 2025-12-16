@@ -17,16 +17,15 @@ const planeDimensions = { width: 4, height: 4 };
 const planerColor = { r: 1, g: 0, b: 1, a: 0 };
 const planeSegments = { x: 10, y: 10 };
 
-const lightPosition = [50, 100, -100];
-const invLightPosition = lightPosition.map(v => -1 * v);
+const lightPosition = [25, 50, -50];
 const light = {
-    left: -80,
-    right: 80,
-    top: 80,
-    bottom: -80,
-    near: -200,
-    far: 300,
-    position: invLightPosition,
+    left: -10,
+    right: 10,
+    top: 10,
+    bottom: -10,
+    near: .1,
+    far: 150,
+    position: lightPosition,
     lookAt: [0, 0, 0],
 }
 
@@ -92,7 +91,7 @@ const base = {
     update: points => {
         const { left, right, top, bottom, near, far, position, lookAt } = light;
         const p = position;
-        p[0] = Math.sin(t * .01) * 1 + position[0]
+        p[0] = -Math.sin(t * .01) * .5 + position[0]
         points.setCameraOrthographic('light', left, right, top, bottom, near, far, position, lookAt);
         points.setCameraPerspective('camera', camera.position, camera.lookAt);
 
