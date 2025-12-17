@@ -179,6 +179,8 @@ You can code freely without the use of any of the provided [support modules (mat
         - [Binding Texture - setBindingTexture](docs/send_data_into_the_shaders.md#bindingtexture---setbindingtexture)
         - [Video - setTextureVideo](docs/send_data_into_the_shaders.md#video---settexturevideo)
         - [Webcam - setTextureWebcam](docs/send_data_into_the_shaders.md#webcam---settexturewebcam)
+        - [DepthMap - setTextureDepth2d](docs/send_data_into_the_shaders.md#depthmap---settexturedepth2d)
+        - [Audio - setAudio](docs/send_data_into_the_shaders.md#audio---setaudio)
     - [Retrieve data from the shaders](docs/retrieve_data_from_the_shaders.md)
         - [Read Storage - readStorage](docs/retrieve_data_from_the_shaders.md#read-storage---readstorage)
         - [Events - addEventListener](docs/retrieve_data_from_the_shaders.md#events---addeventlistener)

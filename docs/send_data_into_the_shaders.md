@@ -359,6 +359,38 @@ async function init() {
 let rgbaWebcam = textureSampleBaseClampToEdge(webcam, feedbackSampler, fract(uv));
 ```
 
+## DepthMap - setTextureDepth2d
+
+Whenever a 3d is created you can request the creation of a Depth Map. This can be done per RenderPass and the RenderPass will hold the reference for that Depth Map.
+
+There can only be one Depth Map per RenderPass and you have to tell the index of the RenderPass you want the depth data from. You can not read the data in the same RenderPass, it has to be read in another. This because there's a restriction in WebGPU that you can only write or read to the same texture in the same pass, so any use of the depth texture is forced to at least two RenderPass. You also need a special type of sampler, one with a `compare` attribute and a value like `less` or `greater` among others.
+
+[🔗 see GPUCompareFunction](https://www.w3.org/TR/webgpu/#enumdef-gpucomparefunction)
+
+```js
+// index.js
+const descriptor = {
+    // … other options
+    compare: 'less', // https://www.w3.org/TR/webgpu/#enumdef-gpucomparefunction
+}
+points.setSampler('shadowSampler', descriptor);
+points.setTextureDepth2d('depth', GPUShaderStage.FRAGMENT, 0);
+```
+
+```rust
+// frag.js
+visibility += textureSampleCompare(
+    depth, shadowSampler,
+    in.shadowPos.xy + offset, in.shadowPos.z - 0.007
+);
+```
+Two great examples of the depth map use are here:
+
+[🔗 see GLB 2 Example](https://absulit.github.io/points/examples/index.html#glb2)
+
+[🔗 see Shadow 1 Example](https://absulit.github.io/points/examples/index.html#shadow1)
+
+
 ## Audio - setAudio
 
 You can load audio and use its data for visualization.
