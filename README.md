@@ -83,38 +83,45 @@ You can code freely without the use of any of the provided [support modules (mat
         // create your render pass with three shaders as follow
         const renderPass =
             new RenderPass(/*wgsl*/`
+                /**
+                 * VertexIn
+                 * position: vec4f,
+                 * color: vec4f,
+                 * uv: vec2f,
+                 * normal: vec3f,
+                 * id: u32,       // mesh id
+                 * vertexIndex: u32,
+                 * instanceIndex: u32,
+                 */
                 @vertex
-                fn main(
-                    @location(0) position:vec4f,
-                    @location(1) color:vec4f,
-                    @location(2) uv:vec2f,
-                    @builtin(vertex_index) vertexIndex:u32
-                ) -> Fragment {
-
-                    return defaultVertexBody(position, color, uv);
+                fn main(in:VertexIn) -> FragmentIn {
+                    return defaultVertexBody(in.position, in.color, in.uv, in.normal);
                 }`,
                 /*wgsl*/`
+                /**
+                 * VertexIn
+                 * position: vec4f,
+                 * color: vec4f,
+                 * uv: vec2f,
+                 * ratio: vec2f,  // relation between params.screen.x and params.screen.y
+                 * uvr: vec2f,    // uv with aspect ratio corrected
+                 * mouse: vec2f,
+                 * normal: vec3f,
+                 * id: u32,       // mesh or instance id
+                 * barycentrics: vec3f,
+                 */
                 @fragment
-                fn main(
-                    @location(0) color:vec4f,
-                    @location(1) uv:vec2f,
-                    @location(2) ratio:vec2f,  // relation between params.screen.x and params.screen.y
-                    @location(3) uvr:vec2f,    // uv with aspect ratio corrected
-                    @location(4) mouse:vec2f,
-                    @builtin(position) position:vec4f
-                ) -> @location(0) vec4f {
-
-                    return vec4f(uvr, 0, 1);
+                fn main(in:FragmentIn) -> @location(0) vec4f {
+                    return vec4f(in.uvr, 0, 1);
                 }
                 `,
                 /*wgsl*/`
-
+                // ComputeIn
+                // @builtin(global_invocation_id) GID: vec3u,
+                // @builtin(workgroup_id)  in.WID: vec3u,
+                // @builtin(local_invocation_id) LID: vec3u
                 @compute @workgroup_size(8,8,1)
-                fn main(
-                    @builtin(global_invocation_id) GlobalId:vec3u,
-                    @builtin(workgroup_id) WorkGroupID:vec3u,
-                    @builtin(local_invocation_id) LocalInvocationID:vec3u
-                ) {
+                fn main(in:ComputeIn) {
                     let time = params.time;
                 }
                 `,
