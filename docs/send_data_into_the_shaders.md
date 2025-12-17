@@ -403,7 +403,7 @@ let audio = points.setAudio('myAudio', './../../audio/cognitive_dissonance.mp3',
 
 With the `myAudio` name, a `Sound` type named `myAudio` is created. In the future it will have more information but now it only has the `data` property. `data` is an `array<f32, 2048>`, but it's not completely filled with data, it's only filled up to `params.myAudioLength`, (`myAudio` used as prefix for each different audio) and then each of these values has a max of 256, so if you want something like a percentage, you have to divide the value at a certain index between 256
 ```rust
-let audioX = audio.data[ u32(uvr.x * params.audioLength)] / 256;
+let audioX = audio.data[ u32(in.uvr.x * params.audioLength)] / 256;
 ```
 
 
