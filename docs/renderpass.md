@@ -81,6 +81,10 @@ renderPass1.loadOp = 'load'; // to preserve first render pass output
 
 To change the way the vertex of any mesh are displayed use the RenderPass#topology attribute along with the `PrimitiveTopology` class. You can display, triangles (by default), points and lines. Lines could be used to display a wireframe, but it depends on the vertices order.
 
+That being said, the PrimitiveTopology only works as expected or intended, if the mesh has a certain order in their vertices. Because of this a better way to display a wireframe is with a shader. A great example on how to build a shader based wireframe is as follows:
+
+[🔗 see Wireframe 1 Example](https://absulit.github.io/points/examples/index.html#wireframe)
+
 ```js
 renderPass.topology = PrimitiveTopology.POINT_LIST;
 ```
