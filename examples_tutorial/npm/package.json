@@ -27,6 +27,6 @@
     "points/sdf": "@absulit/points/build/core/sdf.min.js"
   },
   "dependencies": {
-    "@absulit/points": "^0.5.0"
+    "@absulit/points": "^0.6.0"
   }
 }
