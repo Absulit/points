@@ -220,6 +220,12 @@ declare class RenderPass {
     set depthWriteEnabled(val: boolean);
     get depthWriteEnabled(): boolean;
     /**
+     * Holder for the depth map for this RenderPass only
+     * @param {GPUTexture} val
+     */
+    set textureDepth(val: GPUTexture);
+    get textureDepth(): GPUTexture;
+    /**
      * Controls if the last RenderPass data is preserved on screen or cleared.
      * Default {@link LoadOp#CLEAR}
      * @param {LoadOp | GPULoadOp} val

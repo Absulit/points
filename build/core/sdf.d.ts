@@ -53,6 +53,20 @@ export const sdfLine: string;
  */
 export const sdfLine2: string;
 /**
+ * Create a rectangle with two coordinates.
+ * @type {String}
+ * @param {vec2f} startPoint first coordinate, one corner of the rectangle
+ * @param {vec2f} endPoint second coordinate, opposite corner of the rectangle
+ * @param {vec2f} uv
+ * @return {f32}
+ *
+ * @example
+ * // wgsl string
+ * sdfRect(vec2f(), vec2f(1), in.uvr);
+ *
+ */
+export const sdfRect: string;
+/**
  * A few signed distance functions.
  * <br>
  * <br>

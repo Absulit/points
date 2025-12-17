@@ -6,6 +6,12 @@ function getWGSLCoordinate(value, side, invert = false) {
     const p = value / side;
     return (p * 2 - 1) * direction;
 }
+const BARYCENTRICS = [
+    [1, 0, 0],
+    [0, 1, 0],
+    [0, 0, 1],
+];
+
 /**
  * To tell the {@link RenderPass} how to display the triangles.
  * Default `TRIANGLE_LIST`
@@ -148,6 +154,7 @@ class RenderPass {
     #vertexBufferInfo = null;
 
     #depthWriteEnabled = false;
+    #textureDepth = null;
     #loadOp = LoadOp.CLEAR;
     #clearValue = { r: 0.0, g: 0.0, b: 0.0, a: 1.0 };
 
@@ -494,6 +501,18 @@ class RenderPass {
         this.#depthWriteEnabled = val;
     }
 
+    get textureDepth() {
+        return this.#textureDepth;
+    }
+
+    /**
+     * Holder for the depth map for this RenderPass only
+     * @param {GPUTexture} val
+     */
+    set textureDepth(val) {
+        this.#textureDepth = val;
+    }
+
     get loadOp() {
         return this.#loadOp;
     }
@@ -625,15 +644,15 @@ class RenderPass {
         const { r: r3, g: g3, b: b3, a: a3 } = colors[3]; // bottom-right
 
         this.#vertexArray.push(
-            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * 0.5, (+ny + 1) * 0.5, ...normals, id, // top-left
-            +nx, -nh, nz, 1, r1, g1, b1, a1, (+nx + 1) * 0.5, (-nh + 1) * 0.5, ...normals, id, // bottom-left
-            +nw, +ny, nz, 1, r2, g2, b2, a2, (+nw + 1) * 0.5, (+ny + 1) * 0.5, ...normals, id, // top-right
+            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * 0.5, (+ny + 1) * 0.5, ...normals, id, ...BARYCENTRICS[0], // top-left
+            +nx, -nh, nz, 1, r1, g1, b1, a1, (+nx + 1) * 0.5, (-nh + 1) * 0.5, ...normals, id, ...BARYCENTRICS[1], // bottom-left
+            +nw, +ny, nz, 1, r2, g2, b2, a2, (+nw + 1) * 0.5, (+ny + 1) * 0.5, ...normals, id, ...BARYCENTRICS[2], // top-right
         );
 
         this.#vertexArray.push(
-            +nx, -nh, nz, 1, r1, g1, b1, a1, (+nx + 1) * 0.5, (-nh + 1) * 0.5, ...normals, id, // bottom-left
-            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * 0.5, (-nh + 1) * 0.5, ...normals, id, // bottom-right
-            +nw, +ny, nz, 1, r2, g2, b2, a2, (+nw + 1) * 0.5, (+ny + 1) * 0.5, ...normals, id, // top-right
+            +nx, -nh, nz, 1, r1, g1, b1, a1, (+nx + 1) * 0.5, (-nh + 1) * 0.5, ...normals, id, ...BARYCENTRICS[0], // bottom-left
+            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * 0.5, (-nh + 1) * 0.5, ...normals, id, ...BARYCENTRICS[1], // bottom-right
+            +nw, +ny, nz, 1, r2, g2, b2, a2, (+nw + 1) * 0.5, (+ny + 1) * 0.5, ...normals, id, ...BARYCENTRICS[2], // top-right
         );
 
         const mesh = {
@@ -707,9 +726,9 @@ class RenderPass {
                     grid[i0], grid[i3], grid[i2]
                 ];
 
-                for (const { position: [vx, vy, vz], uv: [u, v] } of quad) {
-                    this.#vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normal, id);
-                }
+                quad.forEach(({ position: [vx, vy, vz], uv: [u, v] }, i) => {
+                    this.#vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normal, id, ...BARYCENTRICS[i % 3]);
+                });
             }
         }
 
@@ -804,9 +823,9 @@ class RenderPass {
                 [v[3], uv[3]],
             ];
 
-            for (const [[vx, vy, vz], [u, v]] of verts) {
-                this.#vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normals, this.#meshCounter);
-            }
+            verts.forEach(([[vx, vy, vz], [u, v]], i) => {
+                this.#vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normals, this.#meshCounter, ...BARYCENTRICS[i % 3]);
+            });
         }
 
         const mesh = {
@@ -847,8 +866,6 @@ class RenderPass {
         const { r, g, b, a } = color;
 
         const vertexGrid = [];
-
-        // generate vertices
         for (let lat = 0; lat <= rings; lat++) {
             const theta = (lat * Math.PI) / rings;
             const sinTheta = Math.sin(theta);
@@ -876,6 +893,9 @@ class RenderPass {
             }
         }
 
+        const b0 = BARYCENTRICS[0];
+        const b1 = BARYCENTRICS[1];
+        const b2 = BARYCENTRICS[2];
         // generate triangles
         for (let lat = 0; lat < rings; lat++) {
             for (let lon = 0; lon < segments; lon++) {
@@ -885,9 +905,9 @@ class RenderPass {
                 const v4 = vertexGrid[lat][lon + 1];
 
                 // triangle 1
-                this.#vertexArray.push(...v1, ...v3, ...v2);
+                this.#vertexArray.push(...v1, ...b0, ...v3, ...b1, ...v2, ...b2);
                 // triangle 2
-                this.#vertexArray.push(...v1, ...v4, ...v3);
+                this.#vertexArray.push(...v1, ...b0, ...v4, ...b1, ...v3, ...b2);
             }
         }
 
@@ -977,7 +997,7 @@ class RenderPass {
                 const [vx, vy, vz] = vertices[i];
                 const [nx, ny, nz] = normals[i];
                 const [u, v] = uvs[i];
-                this.#vertexArray.push(vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, this.#meshCounter);
+                this.#vertexArray.push(vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, this.#meshCounter, ...BARYCENTRICS[i % 3]);
             }
         }
 
@@ -1097,13 +1117,13 @@ class RenderPass {
             }
         }
 
-        for (const [i0, i1, i2] of indices) {
-            for (const i of [i0, i1, i2]) {
+        for (const ii of indices) {
+            ii.forEach((i, k) => {
                 const [vx, vy, vz] = vertices[i];
                 const [nx, ny, nz] = normals[i];
                 const [u, v] = uvs[i];
-                this.#vertexArray.push(vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, this.#meshCounter);
-            }
+                this.#vertexArray.push(vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, this.#meshCounter, ...BARYCENTRICS[k % 3]);
+            });
         }
 
         const mesh = {
@@ -1150,7 +1170,7 @@ class RenderPass {
             const [x, y, z] = vertex;
             const [r, g, b] = color || [1, 0, 1];
             const [u, v] = uv;
-            this.#vertexArray.push(+x, +y, +z, 1, r, g, b, 1, u, v, ...normal, this.#meshCounter);
+            this.#vertexArray.push(+x, +y, +z, 1, r, g, b, 1, u, v, ...normal, this.#meshCounter, ...BARYCENTRICS[i % 3]);
         }
 
         const mesh = {
@@ -1176,18 +1196,12 @@ class RenderPass {
 
 }
 
-const vert$8 = /*wgsl*/`
+const vert$9 = /*wgsl*/`
 
 @vertex
-fn main(
-    @location(0) position: vec4f,
-    @location(1) color: vec4f,
-    @location(2) uv: vec2f,
-    @location(3) normal: vec3f,
-    @builtin(vertex_index) vertexIndex: u32
-) -> Fragment {
+fn main(in: VertexIn) -> FragmentIn {
 
-    return defaultVertexBody(position, color, uv, normal);
+    return defaultVertexBody(in.position, in.color, in.uv, in.normal);
 }
 `;
 
@@ -1320,48 +1334,35 @@ fn pixelateTexturePosition(texture:texture_2d<f32>, textureSampler:sampler, posi
 }
 `;
 
-const frag$8 = /*wgsl*/`
+const frag$9 = /*wgsl*/`
 
 ${texture}
 
 @fragment
-fn main(
-    @location(0) color: vec4f,
-    @location(1) uv: vec2f,
-    @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
-    @location(3) uvr: vec2f,    // uv with aspect ratio corrected
-    @location(4) mouse: vec2f,
-    @builtin(position) position: vec4f
-) -> @location(0) vec4f {
+fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    let imageColor = texture(renderpass_feedbackTexture, renderpass_feedbackSampler, uvr, true);
+    let imageColor = texture(renderpass_feedbackTexture, renderpass_feedbackSampler, in.uvr, true);
     let finalColor = (imageColor + params.color_color) * params.color_blendAmount;
 
     return finalColor;
 }
 `;
 
-const color = new RenderPass$1(vert$8, frag$8, null, 8, 8, 1, (points, params) => {
+const color$1 = new RenderPass$1(vert$9, frag$9, null, 8, 8, 1, (points, params) => {
     points.setSampler('renderpass_feedbackSampler', null).internal = true;
     points.setTexture2d('renderpass_feedbackTexture', true).internal = true;
     points.setUniform('color_blendAmount', params.blendAmount || .5);
     points.setUniform('color_color', params.color || [1, .75, .79, 1], 'vec4f');
 });
-color.required = ['color', 'blendAmount'];
-color.name = 'Color';
+color$1.required = ['color', 'blendAmount'];
+color$1.name = 'Color';
 
-const vert$7 = /*wgsl*/`
+const vert$8 = /*wgsl*/`
 
 @vertex
-fn main(
-    @location(0) position: vec4f,
-    @location(1) color: vec4f,
-    @location(2) uv: vec2f,
-    @location(3) normal: vec3f,
-    @builtin(vertex_index) vertexIndex: u32
-) -> Fragment {
+fn main(in: VertexIn) -> FragmentIn {
 
-    return defaultVertexBody(position, color, uv, normal);
+    return defaultVertexBody(in.position, in.color, in.uv, in.normal);
 }
 `;
 
@@ -1407,6 +1408,53 @@ fn fnusin(speed: f32) -> f32{
  * @module points/color
  */
 
+/**
+ * RED color;
+ * @type {vec4f}
+ *
+ * @example
+ * // js
+ * import { RED } from 'points/color';
+ *
+ * // wgsl string
+ * ${RED}
+ * let value = RED * vec4f(.5);
+ */
+const RED = /*wgsl*/`
+const RED = vec4(1.,0.,0.,1.);
+`;
+
+/**
+ * GREEN color;
+ * @type {vec4f}
+ *
+ * @example
+ * // js
+ * import { GREEN } from 'points/color';
+ *
+ * // wgsl string
+ * ${GREEN}
+ * let value = GREEN * vec4f(.5);
+ */
+const GREEN = /*wgsl*/`
+const GREEN = vec4(0.,1.,0.,1.);
+`;
+
+/**
+ * BLUE color;
+ * @type {vec4f}
+ *
+ * @example
+ * // js
+ * import { BLUE } from 'points/color';
+ *
+ * // wgsl string
+ * ${BLUE}
+ * let value = BLUE * vec4f(.5);
+ */
+const BLUE = /*wgsl*/`
+const BLUE = vec4(0.,0.,1.,1.);
+`;
 
 /**
  * WHITE color;
@@ -1483,7 +1531,7 @@ fn brightness(color:vec4f) -> f32 {
 }
 `;
 
-const frag$7 = /*wgsl*/`
+const frag$8 = /*wgsl*/`
 
 ${fnusin}
 ${texturePosition}
@@ -1491,66 +1539,46 @@ ${brightness}
 ${WHITE}
 
 @fragment
-fn main(
-    @location(0) color: vec4f,
-    @location(1) uv: vec2f,
-    @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
-    @location(3) uvr: vec2f,    // uv with aspect ratio corrected
-    @location(4) mouse: vec2f,
-    @builtin(position) position: vec4f
-) -> @location(0) vec4f {
+fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    let imageColor = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0., 0), uvr, true);
+    let imageColor = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0., 0), in.uvr, true);
     let finalColor:vec4f = brightness(imageColor) * WHITE;
 
     return finalColor;
 }
 `;
 
-const grayscale = new RenderPass$1(vert$7, frag$7, null, 8, 8, 1, (points, params) => {
+const grayscale = new RenderPass$1(vert$8, frag$8, null, 8, 8, 1, (points, params) => {
     points.setSampler('renderpass_feedbackSampler', null).internal = true;
     points.setTexture2d('renderpass_feedbackTexture', true).internal = true;
 });
 grayscale.name = 'Grayscale';
 
-const vert$6 = /*wgsl*/`
+const vert$7 = /*wgsl*/`
 
 @vertex
-fn main(
-    @location(0) position: vec4f,
-    @location(1) color: vec4f,
-    @location(2) uv: vec2f,
-    @location(3) normal: vec3f,
-    @builtin(vertex_index) vertexIndex: u32
-) -> Fragment {
+fn main(in: VertexIn) -> FragmentIn {
 
-    return defaultVertexBody(position, color, uv, normal);
+    return defaultVertexBody(in.position, in.color, in.uv, in.normal);
 }
 `;
 
-const frag$6 = /*wgsl*/`
+const frag$7 = /*wgsl*/`
 
 ${texturePosition}
 
 @fragment
-fn main(
-    @location(0) color: vec4f,
-    @location(1) uv: vec2f,
-    @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
-    @location(3) uvr: vec2f,    // uv with aspect ratio corrected
-    @location(4) mouse: vec2f,
-    @builtin(position) position: vec4f
-) -> @location(0) vec4f {
+fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    let imageColor = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0., 0), uvr, true);
+    let imageColor = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0., 0), in.uvr, true);
 
 
     // --------- chromatic displacement vector
     let cdv = vec2(params.chromaticAberration_distance, 0.);
-    let d = distance(vec2(.5,.5), uvr);
-    let imageColorR = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * ratio, uvr + cdv * d, true).r;
-    let imageColorG = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * ratio, uvr, true).g;
-    let imageColorB = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * ratio, uvr - cdv * d, true).b;
+    let d = distance(vec2(.5,.5), in.uvr);
+    let imageColorR = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * in.ratio, in.uvr + cdv * d, true).r;
+    let imageColorG = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * in.ratio, in.uvr, true).g;
+    let imageColorB = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0.) * in.ratio, in.uvr - cdv * d, true).b;
 
     let finalColor:vec4f = vec4(imageColorR, imageColorG, imageColorB, 1);
 
@@ -1558,7 +1586,7 @@ fn main(
 }
 `;
 
-const chromaticAberration = new RenderPass$1(vert$6, frag$6, null, 8, 8, 1, (points, params) => {
+const chromaticAberration = new RenderPass$1(vert$7, frag$7, null, 8, 8, 1, (points, params) => {
     points.setSampler('renderpass_feedbackSampler', null).internal = true;
     points.setTexture2d('renderpass_feedbackTexture', true).internal = true;
     points.setUniform('chromaticAberration_distance', params.distance || .02);
@@ -1566,35 +1594,22 @@ const chromaticAberration = new RenderPass$1(vert$6, frag$6, null, 8, 8, 1, (poi
 chromaticAberration.required = ['distance'];
 chromaticAberration.name = 'Chromatic Aberration';
 
-const vert$5 = /*wgsl*/`
+const vert$6 = /*wgsl*/`
 
 @vertex
-fn main(
-    @location(0) position: vec4f,
-    @location(1) color: vec4f,
-    @location(2) uv: vec2f,
-    @location(3) normal: vec3f,
-    @builtin(vertex_index) vertexIndex: u32
-) -> Fragment {
+fn main(in: VertexIn) -> FragmentIn {
 
-    return defaultVertexBody(position, color, uv, normal);
+    return defaultVertexBody(in.position, in.color, in.uv, in.normal);
 }
 `;
 
-const frag$5 = /*wgsl*/`
+const frag$6 = /*wgsl*/`
 
 ${texturePosition}
 ${pixelateTexturePosition}
 
 @fragment
-fn main(
-    @location(0) color: vec4f,
-    @location(1) uv: vec2f,
-    @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
-    @location(3) uvr: vec2f,    // uv with aspect ratio corrected
-    @location(4) mouse: vec2f,
-    @builtin(position) position: vec4f
-) -> @location(0) vec4f {
+fn main(in: FragmentIn) -> @location(0) vec4f {
 
 
     let pixelatedColor = pixelateTexturePosition(
@@ -1603,7 +1618,7 @@ fn main(
         vec2(0.),
         params.pixelate_pixelDims.x,
         params.pixelate_pixelDims.y,
-        uvr
+        in.uvr
     );
 
     let finalColor:vec4f = pixelatedColor;
@@ -1612,7 +1627,7 @@ fn main(
 }
 `;
 
-const pixelate = new RenderPass$1(vert$5, frag$5, null, 8, 8, 1, (points, params) => {
+const pixelate = new RenderPass$1(vert$6, frag$6, null, 8, 8, 1, (points, params) => {
     points.setSampler('renderpass_feedbackSampler', null).internal = true;
     points.setTexture2d('renderpass_feedbackTexture', true).internal = true;
     points.setUniform('pixelate_pixelDims', params.pixelDimensions || [10, 10], 'vec2f');
@@ -1620,18 +1635,12 @@ const pixelate = new RenderPass$1(vert$5, frag$5, null, 8, 8, 1, (points, params
 pixelate.required = ['pixelDimensions'];
 pixelate.name = 'Pixelate';
 
-const vert$4 = /*wgsl*/`
+const vert$5 = /*wgsl*/`
 
 @vertex
-fn main(
-    @location(0) position: vec4f,
-    @location(1) color: vec4f,
-    @location(2) uv: vec2f,
-    @location(3) normal: vec3f,
-    @builtin(vertex_index) vertexIndex: u32
-) -> Fragment {
+fn main(in: VertexIn) -> FragmentIn {
 
-    return defaultVertexBody(position, color, uv, normal);
+    return defaultVertexBody(in.position, in.color, in.uv, in.normal);
 }
 `;
 
@@ -1796,7 +1805,7 @@ fn snoise(v:vec2f) -> f32 {
 
 // https://www.geeks3d.com/20140213/glsl-shader-library-fish-eye-and-dome-and-barrel-distortion-post-processing-filters/
 
-const frag$4 = /*wgsl*/`
+const frag$5 = /*wgsl*/`
 
 ${texture}
 ${rotateVector}
@@ -1811,21 +1820,14 @@ fn angle(p1:vec2f, p2:vec2f) -> f32 {
 }
 
 @fragment
-fn main(
-    @location(0) color: vec4f,
-    @location(1) uv: vec2f,
-    @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
-    @location(3) uvr: vec2f,    // uv with aspect ratio corrected
-    @location(4) mouse: vec2f,
-    @builtin(position) position: vec4f
-) -> @location(0) vec4f {
+fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    let imagePosition = vec2(0.0,0.0) * ratio;
-    let center = vec2(.5,.5) * ratio;
-    let d = distance(center, uvr); // sqrt(dot(d, d));
+    let imagePosition = vec2(0.0,0.0) * in.ratio;
+    let center = vec2(.5,.5) * in.ratio;
+    let d = distance(center, in.uvr); // sqrt(dot(d, d));
 
     //vector from center to current fragment
-    let vectorToCenter = uvr - center;
+    let vectorToCenter = in.uvr - center;
     let sqrtDotCenter = sqrt(dot(center, center));
 
     //amount of effect
@@ -1837,7 +1839,7 @@ fn main(
         bind = sqrtDotCenter;
     } else {
         //stick to borders
-        if (ratio.x < 1.0) {
+        if (in.ratio.x < 1.0) {
             bind = center.x;
         } else {
             bind = center.y;
@@ -1845,13 +1847,13 @@ fn main(
     }
 
     //Weird formulas
-    var nuv = uvr;
+    var nuv = in.uvr;
     if (power > 0.0){//fisheye
         nuv = center + normalize(vectorToCenter) * tan(d * power) * bind / tan( bind * power);
     } else if (power < 0.0){//antifisheye
         nuv = center + normalize(vectorToCenter) * atan(d * -power * 10.0) * bind / atan(-power * bind * 10.0);
     } else {
-        nuv = uvr;
+        nuv = in.uvr;
     }
 
     // let imageColor = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, imagePosition, nuv, false);
@@ -1860,7 +1862,7 @@ fn main(
     // Chromatic Aberration --
     // --------- chromatic displacement vector
     let cdv = vec2(params.lensDistortion_distance, 0.);
-    // let dis = distance(vec2(.5,.5), uvr);
+    // let dis = distance(vec2(.5,.5), in.uvr);
     let imageColorR = texture(renderpass_feedbackTexture, renderpass_feedbackSampler, nuv + cdv * params.lensDistortion_amount , true).r;
     let imageColorG = texture(renderpass_feedbackTexture, renderpass_feedbackSampler, nuv, true).g;
     let imageColorB = texture(renderpass_feedbackTexture, renderpass_feedbackSampler, nuv - cdv * params.lensDistortion_amount , true).b;
@@ -1876,7 +1878,7 @@ fn main(
 }
 `;
 
-const lensDistortion = new RenderPass$1(vert$4, frag$4, null, 8, 8, 1, (points, params) => {
+const lensDistortion = new RenderPass$1(vert$5, frag$5, null, 8, 8, 1, (points, params) => {
     points.setSampler('renderpass_feedbackSampler', null).internal = true;
     points.setTexture2d('renderpass_feedbackTexture', true).internal = true;
     points.setUniform('lensDistortion_amount', params.amount || .4);
@@ -1885,18 +1887,12 @@ const lensDistortion = new RenderPass$1(vert$4, frag$4, null, 8, 8, 1, (points, 
 lensDistortion.required = ['amount', 'distance'];
 lensDistortion.name = 'Lens Distortion';
 
-const vert$3 = /*wgsl*/`
+const vert$4 = /*wgsl*/`
 
 @vertex
-fn main(
-    @location(0) position: vec4f,
-    @location(1) color: vec4f,
-    @location(2) uv: vec2f,
-    @location(3) normal: vec3f,
-    @builtin(vertex_index) vertexIndex: u32
-) -> Fragment {
+fn main(in: VertexIn) -> FragmentIn {
 
-    return defaultVertexBody(position, color, uv, normal);
+    return defaultVertexBody(in.position, in.color, in.uv, in.normal);
 }
 `;
 
@@ -1935,53 +1931,40 @@ fn rand() -> f32 {
 }
 `;
 
-const frag$3 = /*wgsl*/`
+const frag$4 = /*wgsl*/`
 
 ${texture}
 ${rand}
 ${snoise}
 
 @fragment
-fn main(
-    @location(0) color: vec4f,
-    @location(1) uv: vec2f,
-    @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
-    @location(3) uvr: vec2f,    // uv with aspect ratio corrected
-    @location(4) mouse: vec2f,
-    @builtin(position) position: vec4f
-) -> @location(0) vec4f {
+fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    let imageColor = texture(renderpass_feedbackTexture, renderpass_feedbackSampler, uvr, true);
+    let imageColor = texture(renderpass_feedbackTexture, renderpass_feedbackSampler, in.uvr, true);
 
-    rand_seed = uvr + params.time;
+    rand_seed = in.uvr + params.time;
 
     let noise = rand() * .5 + .5;
     return (imageColor + imageColor * noise)  * .5;
 }
 `;
 
-const filmgrain = new RenderPass$1(vert$3, frag$3, null, 8, 8, 1, (points, params) => {
+const filmgrain = new RenderPass$1(vert$4, frag$4, null, 8, 8, 1, (points, params) => {
     points.setSampler('renderpass_feedbackSampler', null).internal = true;
     points.setTexture2d('renderpass_feedbackTexture', true).internal = true;
 });
 filmgrain.name = 'Filmgrain';
 
-const vert$2 = /*wgsl*/`
+const vert$3 = /*wgsl*/`
 
 @vertex
-fn main(
-    @location(0) position: vec4f,
-    @location(1) color: vec4f,
-    @location(2) uv: vec2f,
-    @location(3) normal: vec3f,
-    @builtin(vertex_index) vertexIndex: u32
-) -> Fragment {
+fn main(in: VertexIn) -> FragmentIn {
 
-    return defaultVertexBody(position, color, uv, normal);
+    return defaultVertexBody(in.position, in.color, in.uv, in.normal);
 }
 `;
 
-const frag$2 = /*wgsl*/`
+const frag$3 = /*wgsl*/`
 
 ${texturePosition}
 ${bloom$1}
@@ -1989,17 +1972,10 @@ ${brightness}
 ${PI}
 
 @fragment
-fn main(
-    @location(0) color: vec4f,
-    @location(1) uv: vec2f,
-    @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
-    @location(3) uvr: vec2f,    // uv with aspect ratio corrected
-    @location(4) mouse: vec2f,
-    @builtin(position) position: vec4f
-) -> @location(0) vec4f {
+fn main(in: FragmentIn) -> @location(0) vec4f {
 
     let startPosition = vec2(0.,0.);
-    let rgbaImage = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, startPosition, uvr, false); //* .998046;
+    let rgbaImage = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, startPosition, in.uvr, false); //* .998046;
 
     let input = brightness(rgbaImage);
     let bloomVal = bloom(input, i32(params.bloom_iterations), params.bloom_amount);
@@ -2011,7 +1987,7 @@ fn main(
 }
 `;
 
-const bloom = new RenderPass$1(vert$2, frag$2, null, 8, 8, 1, (points, params) => {
+const bloom = new RenderPass$1(vert$3, frag$3, null, 8, 8, 1, (points, params) => {
     points.setSampler('renderpass_feedbackSampler', null).internal = true;
     points.setTexture2d('renderpass_feedbackTexture', true).internal = true;
     points.setUniform('bloom_amount', params.amount || .5);
@@ -2020,18 +1996,12 @@ const bloom = new RenderPass$1(vert$2, frag$2, null, 8, 8, 1, (points, params) =
 bloom.required = ['amount', 'iterations'];
 bloom.name = 'Bloom';
 
-const vert$1 = /*wgsl*/`
+const vert$2 = /*wgsl*/`
 
 @vertex
-fn main(
-    @location(0) position: vec4f,
-    @location(1) color: vec4f,
-    @location(2) uv: vec2f,
-    @location(3) normal: vec3f,
-    @builtin(vertex_index) vertexIndex: u32
-) -> Fragment {
+fn main(in: VertexIn) -> FragmentIn {
 
-    return defaultVertexBody(position, color, uv, normal);
+    return defaultVertexBody(in.position, in.color, in.uv, in.normal);
 }
 `;
 
@@ -2077,16 +2047,7 @@ fn blur9(image: texture_2d<f32>, imageSampler:sampler, position:vec2f, uv:vec2f,
 }
 `;
 
-/**
- * WIP
- */
-// export const blur8 = /*wgsl*/`
-// fn blur8(color:vec4f, colorsAround:array<vec4f, 8>, amount:f32) -> {
-
-// }
-// `;
-
-const frag$1 = /*wgsl*/`
+const frag$2 = /*wgsl*/`
 
 ${texturePosition}
 ${PI}
@@ -2094,20 +2055,13 @@ ${rotateVector}
 ${blur9}
 
 @fragment
-fn main(
-    @location(0) color: vec4f,
-    @location(1) uv: vec2f,
-    @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
-    @location(3) uvr: vec2f,    // uv with aspect ratio corrected
-    @location(4) mouse: vec2f,
-    @builtin(position) position: vec4f
-) -> @location(0) vec4f {
+fn main(in: FragmentIn) -> @location(0) vec4f {
 
     return blur9(
         renderpass_feedbackTexture,
         renderpass_feedbackSampler,
         vec2(),
-        uvr,
+        in.uvr,
         params.blur_resolution, // resolution
         rotateVector(params.blur_direction, params.blur_radians) // direction
     );
@@ -2115,7 +2069,7 @@ fn main(
 }
 `;
 
-const blur = new RenderPass$1(vert$1, frag$1, null, 8, 8, 1, (points, params) => {
+const blur = new RenderPass$1(vert$2, frag$2, null, 8, 8, 1, (points, params) => {
     points.setSampler('renderpass_feedbackSampler', null).internal = true;
     points.setTexture2d('renderpass_feedbackTexture', true).internal = true;
     points.setUniform('blur_resolution', params.resolution || [50, 50], 'vec2f');
@@ -2125,50 +2079,37 @@ const blur = new RenderPass$1(vert$1, frag$1, null, 8, 8, 1, (points, params) =>
 blur.required = ['resolution', 'direction', 'radians'];
 blur.name = 'Blur';
 
-const vert = /*wgsl*/`
+const vert$1 = /*wgsl*/`
 
 @vertex
-fn main(
-    @location(0) position: vec4f,
-    @location(1) color: vec4f,
-    @location(2) uv: vec2f,
-    @location(3) normal: vec3f,
-    @builtin(vertex_index) vertexIndex: u32
-) -> Fragment {
+fn main(in: VertexIn) -> FragmentIn {
 
-    return defaultVertexBody(position, color, uv, normal);
+    return defaultVertexBody(in.position, in.color, in.uv, in.normal);
 }
 `;
 
-const frag = /*wgsl*/`
+const frag$1 = /*wgsl*/`
 
 ${texturePosition}
 ${snoise}
 
 @fragment
-fn main(
-    @location(0) color: vec4f,
-    @location(1) uv: vec2f,
-    @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
-    @location(3) uvr: vec2f,    // uv with aspect ratio corrected
-    @location(4) mouse: vec2f,
-    @builtin(position) position: vec4f
-) -> @location(0) vec4f {
+fn main(in: FragmentIn) -> @location(0) vec4f {
 
     let scale = params.waves_scale;
     let intensity = params.waves_intensity;
-    let n1 = (snoise(uv / scale + vec2(.03, .4) * params.time) * .5 + .5) * intensity;
-    let n2 = (snoise(uv / scale + vec2(.3, .02) * params.time) * .5 + .5) * intensity;
+    let n1 = (snoise(in.uv / scale + vec2(.03, .4) * params.time) * .5 + .5) * intensity;
+    let n2 = (snoise(in.uv / scale + vec2(.3, .02) * params.time) * .5 + .5) * intensity;
     let n = n1 + n2;
 
-    let imageColor = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0., 0), uvr + n2, true);
+    let imageColor = texturePosition(renderpass_feedbackTexture, renderpass_feedbackSampler, vec2(0., 0), in.uvr + n2, true);
     let finalColor:vec4f = imageColor;
 
     return finalColor;
 }
 `;
 
-const waves = new RenderPass$1(vert, frag, null, 8, 8, 1, (points, params) => {
+const waves = new RenderPass$1(vert$1, frag$1, null, 8, 8, 1, (points, params) => {
     points.setSampler('renderpass_feedbackSampler', null).internal = true;
     points.setTexture2d('renderpass_feedbackTexture', true).internal = true;
     points.setUniform('waves_scale', params.scale || .45);
@@ -2176,6 +2117,116 @@ const waves = new RenderPass$1(vert, frag, null, 8, 8, 1, (points, params) => {
 });
 waves.required = ['scale', 'intensity'];
 waves.name = 'Waves';
+
+const vert = /*wgsl*/`
+
+@vertex
+fn main(in: VertexIn) -> FragmentIn {
+
+    return defaultVertexBody(in.position, in.color, in.uv, in.normal);
+}
+`;
+
+/**
+ * A few signed distance functions.
+ * <br>
+ * <br>
+ * These are wgsl functions, not js functions.
+ * The function is enclosed in a js string constant,
+ * to be appended into the code to reference it in the string shader.
+ * @module points/sdf
+ */
+
+
+/**
+ * Create a rectangle with two coordinates.
+ * @type {String}
+ * @param {vec2f} startPoint first coordinate, one corner of the rectangle
+ * @param {vec2f} endPoint second coordinate, opposite corner of the rectangle
+ * @param {vec2f} uv
+ * @return {f32}
+ *
+ * @example
+ * // wgsl string
+ * sdfRect(vec2f(), vec2f(1), in.uvr);
+ *
+ */
+const sdfRect = /*wgsl*/`
+
+fn sdfRect(startPoint:vec2f, endPoint:vec2f, uv:vec2f) -> f32 {
+    let value = select(
+        0.,
+        1.,
+        (startPoint.x < uv.x) &&
+        (startPoint.y < uv.y) &&
+        (uv.x < endPoint.x) &&
+        (uv.y < endPoint.y)
+    );
+    return smoothstep(0, .5,  value);
+}
+
+`;
+
+const frag = /*wgsl*/`
+
+${fnusin}
+${sdfRect}
+${rotateVector}
+${texture}
+${RED + GREEN + BLUE}
+
+const NUMCOLUMNS = 200.;
+
+@fragment
+fn main(in: FragmentIn) -> @location(0) vec4f {
+
+    let numColumns = NUMCOLUMNS *  params.crt_scale;
+    let numRows = NUMCOLUMNS * params.crt_scale;
+
+    let pixelsWidth = params.screen.x / numColumns;
+    let pixelsHeight = params.screen.y / numRows;
+    let dx = pixelsWidth * (1. / params.screen.x);
+    let dy = pixelsHeight * (1. / params.screen.y);
+
+    // if column is pair then displace by this amount
+    let x = select(0., .5, floor(in.uvr.x / dx) % 2 == 0.);
+
+    let pixeleduv = vec2(dx*floor( in.uvr.x / dx), dy * floor(in.uvr.y / dy + x));
+    let pixeleduvColor = vec4(pixeleduv, 0, 1);
+
+    let subuv = fract(in.uvr * vec2(numColumns, numRows) + vec2(0,x));
+    let subuvColor = vec4(subuv, 0, 1);
+
+    // --------- chromatic displacement vector
+    let cdv = vec2(params.crt_displacement, 0.);
+    let imageColorG = texture(renderpass_feedbackTexture, renderpass_feedbackSampler, pixeleduv, true).g;
+    let imageColorR = texture(renderpass_feedbackTexture, renderpass_feedbackSampler, pixeleduv + cdv, true).r;
+    let imageColorB = texture(renderpass_feedbackTexture, renderpass_feedbackSampler, pixeleduv - cdv, true).b;
+
+    let bottom_left = vec2(.0, .0);
+    let top_right = bottom_left + vec2(.33, 1.);
+
+    let margin = vec2(.01,0.) * 4;
+    let margin_v = vec2(.0, .01) * 8;
+    let offset = vec2(.33,0);
+    let redSlot = RED * imageColorR * sdfRect(margin+margin_v+bottom_left + offset * 0, top_right - margin - margin_v + offset * 0, subuv); // subuv
+    let greenSlot = GREEN * imageColorG * sdfRect(margin+margin_v+bottom_left + offset * 1, top_right - margin - margin_v + offset * 1, subuv);
+    let blueSlot = BLUE * imageColorB * sdfRect(margin+margin_v+bottom_left + offset * 2, top_right - margin - margin_v + offset * 2, subuv);
+
+    let finalColor = redSlot + greenSlot + blueSlot;
+
+    return finalColor;
+}
+`;
+
+const color = new RenderPass$1(vert, frag, null, 8, 8, 1, (points, params) => {
+    points.setSampler('renderpass_feedbackSampler', null).internal = true;
+    points.setTexture2d('renderpass_feedbackTexture', true).internal = true;
+    points.setUniform('crt_scale', params.scale || .390);
+    points.setUniform('crt_displacement', params.displacement || .013);
+});
+color.required = ['scale', 'displacement'];
+color.name = 'CRT';
 
 /**
  * List of predefined Render Passes for Post Processing.
@@ -2218,7 +2269,7 @@ class RenderPasses {
      * @example
      * points.addRenderPass(RenderPasses.COLOR, { color: [.5, 1, 0, 1], blendAmount: .5 });
      */
-    static COLOR = color;
+    static COLOR = color$1;
     /**
      * Apply a grayscale {@link RenderPass}
      * @example
@@ -2267,6 +2318,12 @@ class RenderPasses {
      * points.addRenderPass(RenderPasses.WAVES, { scale: .05 });
      */
     static WAVES = waves;
+    /**
+     * Apply a CRT tv pixels effect {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.CRT, { scale: .05 });
+     */
+    static CRT = color;
 }
 
 /**
@@ -2345,6 +2402,7 @@ class VertexBufferInfo {
     #uvOffset;
     #normalOffset;
     #idOffset;
+    #barycentricsOffset;
     #vertexCount;
     /**
      * Along with the vertexArray it calculates some info like offsets required for the pipeline.
@@ -2353,14 +2411,16 @@ class VertexBufferInfo {
      * @param {Number} vertexOffset index where the vertex data starts in a row of `triangleDataLength` items
      * @param {Number} colorOffset index where the color data starts in a row of `triangleDataLength` items
      * @param {Number} uvOffset index where the uv data starts in a row of `triangleDataLength` items
+     * @param {Number} barycentricsOffset index where the barycentrics data starts in a row of `triangleDataLength` items
      */
-    constructor(vertexArray, triangleDataLength = 14, vertexOffset = 0, colorOffset = 4, uvOffset = 8, normalsOffset = 10, idOffset = 13) {
+    constructor(vertexArray, triangleDataLength = 17, vertexOffset = 0, colorOffset = 4, uvOffset = 8, normalsOffset = 10, idOffset = 13, barycentricsOffset = 14) {
         this.#vertexSize = vertexArray.BYTES_PER_ELEMENT * triangleDataLength; // Byte size of ONE triangle data (vertex, color, uv). (one row)
         this.#vertexOffset = vertexArray.BYTES_PER_ELEMENT * vertexOffset;
         this.#colorOffset = vertexArray.BYTES_PER_ELEMENT * colorOffset; // Byte offset of triangle vertex color attribute.
         this.#uvOffset = vertexArray.BYTES_PER_ELEMENT * uvOffset;
         this.#normalOffset = vertexArray.BYTES_PER_ELEMENT * normalsOffset;
         this.#idOffset = vertexArray.BYTES_PER_ELEMENT * idOffset;
+        this.#barycentricsOffset = vertexArray.BYTES_PER_ELEMENT * barycentricsOffset;
         this.#vertexCount = vertexArray.byteLength / this.#vertexSize;
     }
 
@@ -2386,6 +2446,10 @@ class VertexBufferInfo {
 
     get idOffset() {
         return this.#idOffset;
+    }
+
+    get barycentricsOffset() {
+        return this.#barycentricsOffset;
     }
 
     get vertexCount() {
@@ -2706,15 +2770,34 @@ class Clock {
 
 const defaultStructs = /*wgsl*/`
 
-struct Fragment {
+struct ComputeIn {
+    @builtin(global_invocation_id) GID: vec3u,
+    @builtin(workgroup_id) WID: vec3u,
+    @builtin(local_invocation_id) LID: vec3u
+}
+
+struct VertexIn {
+    @location(0) position:vec4f,
+    @location(1) color:vec4f,
+    @location(2) uv:vec2f,
+    @location(3) normal:vec3f,
+    @location(4) id:u32,       // mesh id
+    @location(5) barycentrics: vec3f,
+    @builtin(vertex_index) vertexIndex: u32,
+    @builtin(instance_index) instanceIndex: u32
+}
+
+struct FragmentIn {
     @builtin(position) position: vec4f,
     @location(0) color: vec4f,
     @location(1) uv: vec2f,
-    @location(2) ratio: vec2f,
-    @location(3) uvr: vec2f,
+    @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
+    @location(3) uvr: vec2f,    // uv with aspect ratio corrected
     @location(4) mouse: vec2f,
     @location(5) normal: vec3f,
-    @interpolate(flat) @location(6) id: u32
+    @interpolate(flat) @location(6) id: u32, // mesh or instance id
+    @location(7) barycentrics: vec3f,
+    @location(8) world: vec3f,
 }
 
 struct Sound {
@@ -2756,16 +2839,16 @@ struct Event {
  * creation of a few variables that are commonly used.
  * @example
  * // Inside the main vertex function add this
- * return defaultVertexBody(position, color, uv, normal);
+ * return defaultVertexBody(in.position, in.color, in.uv, in.normal);
  * @type {string}
  * @param {vec4f} position
  * @param {vec4f} color
  * @param {vec2f} uv
- * @return {Fragment}
+ * @return {FragmentIn}
  */
 const defaultVertexBody = /*wgsl*/`
-fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) -> Fragment {
-    var result: Fragment;
+fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) -> FragmentIn {
+    var result: FragmentIn;
 
     let ratioX = params.screen.x / params.screen.y;
     let ratioY = 1. / ratioX / (params.screen.y / params.screen.x);
@@ -2791,79 +2874,116 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) ->
 
 const size_2_align_2 = { size: 2, align: 2 };
 const size_4_align_4 = { size: 4, align: 4 };
+const size_6_align_8 = { size: 6, align: 8 };
+const size_8_align_4 = { size: 8, align: 4 };
 const size_8_align_8 = { size: 8, align: 8 };
+const size_12_align_4 = { size: 12, align: 4 };
 const size_12_align_16 = { size: 12, align: 16 };
+const size_16_align_4 = { size: 16, align: 4 };
 const size_16_align_16 = { size: 16, align: 16 };
 const size_16_align_8 = { size: 16, align: 8 };
+const size_24_align_8 = { size: 24, align: 8 };
 const size_32_align_8 = { size: 32, align: 8 };
-const size_24_align_16 = { size: 24, align: 16 };
-const size_48_align_16 = { size: 48, align: 16 };
 const size_32_align_16 = { size: 32, align: 16 };
+const size_48_align_16 = { size: 48, align: 16 };
 const size_64_align_16 = { size: 64, align: 16 };
 
 const typeSizes = {
     'bool': size_4_align_4,
-    'f32': size_4_align_4,
     'i32': size_4_align_4,
     'u32': size_4_align_4,
+    'f32': size_4_align_4,
 
     'f16': size_2_align_2,
 
-    'vec2<bool>': size_8_align_8,
-    'vec2<f32>': size_8_align_8,
-    'vec2<i32>': size_8_align_8,
-    'vec2<u32>': size_8_align_8,
-
-    // 'vec2<bool>': size_8_align_8,
-    'vec2f': size_8_align_8,
-    'vec2i': size_8_align_8,
-    'vec2u': size_8_align_8,
-
-    'vec3<bool>': size_12_align_16,
-    'vec3<f32>': size_12_align_16,
-    'vec3<i32>': size_12_align_16,
-    'vec3<u32>': size_12_align_16,
-
-    // 'vec3<bool>': size_12_align_16,
-    'vec3f': size_12_align_16,
-    'vec3i': size_12_align_16,
-    'vec3u': size_12_align_16,
-
-    'vec4<bool>': size_16_align_16,
-    'vec4<f32>': size_16_align_16,
-    'vec4<i32>': size_16_align_16,
-    'vec4<u32>': size_16_align_16,
-    'mat2x2<f32>': size_16_align_8,
-    'mat2x3<f32>': size_32_align_8,
-    'mat2x4<f32>': size_32_align_8,
-    'mat3x2<f32>': size_24_align_16,
-    'mat3x3<f32>': size_48_align_16,
-    'mat3x4<f32>': size_48_align_16,
-    'mat4x2<f32>': size_32_align_16,
-    'mat4x3<f32>': size_64_align_16,
-    'mat4x4<f32>': size_64_align_16,
-
-    // 'vec4<bool>': size_16_align_16,
-    'vec4f': size_16_align_16,
-    'vec4i': size_16_align_16,
-    'vec4u': size_16_align_16,
-    'mat2x2f': size_16_align_8,
-    'mat2x3f': size_32_align_8,
-    'mat2x4f': size_32_align_8,
-    'mat3x2f': size_24_align_16,
-    'mat3x3f': size_48_align_16,
-    'mat3x4f': size_48_align_16,
-    'mat4x2f': size_32_align_16,
-    'mat4x3f': size_64_align_16,
-    'mat4x4f': size_64_align_16,
-
     'atomic<u32>': size_4_align_4,
     'atomic<i32>': size_4_align_4,
+
+    'vec2<bool>': size_8_align_8,
+    'vec2<i32>': size_8_align_8,
+    'vec2<u32>': size_8_align_8,
+    'vec2<f32>': size_8_align_8,
+    // 'vec2<bool>': size_8_align_8,
+    'vec2i': size_8_align_8,
+    'vec2u': size_8_align_8,
+    'vec2f': size_8_align_8,
+
+    'vec2<f16>': size_4_align_4,
+    'vec2h': size_4_align_4,
+
+    'vec3<bool>': size_12_align_16,
+    'vec3<i32>': size_12_align_16,
+    'vec3<u32>': size_12_align_16,
+    'vec3<f32>': size_12_align_16,
+    // 'vec3<bool>': size_12_align_16,
+    'vec3i': size_12_align_16,
+    'vec3u': size_12_align_16,
+    'vec3f': size_12_align_16,
+
+    'vec3<f16>': size_6_align_8,
+    'vec3h': size_6_align_8,
+
+    'vec4<bool>': size_16_align_16,
+    'vec4<i32>': size_16_align_16,
+    'vec4<u32>': size_16_align_16,
+    'vec4<f32>': size_16_align_16,
+    // 'vec4<bool>': size_16_align_16,
+    'vec4i': size_16_align_16,
+    'vec4u': size_16_align_16,
+    'vec4f': size_16_align_16,
+
+    'vec4<f16>': size_8_align_8,
+    'vec4h': size_8_align_8,
+
+    'mat2x2<f32>': size_16_align_8,
+    'mat2x2f': size_16_align_8,
+    'mat2x2<f16>': size_8_align_4,
+    'mat2x2h': size_8_align_4,
+
+    'mat3x2<f32>': size_24_align_8,
+    'mat3x2f': size_24_align_8,
+    'mat3x2<f16>': size_12_align_4,
+    'mat3x2h': size_12_align_4,
+
+    'mat4x2<f32>': size_32_align_8,
+    'mat4x2f': size_32_align_8,
+    'mat4x2<f16>': size_16_align_4,
+    'mat4x2h': size_16_align_4,
+
+    'mat2x3<f32>': size_32_align_16,
+    'mat2x3f': size_32_align_16,
+    'mat2x3<f16>': size_16_align_8,
+    'mat2x3h': size_16_align_8,
+
+    'mat3x3<f32>': size_48_align_16,
+    'mat3x3f': size_48_align_16,
+    'mat3x3<f16>': size_24_align_8,
+    'mat3x3h': size_24_align_8,
+
+    'mat4x3<f32>': size_64_align_16,
+    'mat4x3f': size_64_align_16,
+    'mat4x3<f16>': size_32_align_8,
+    'mat4x3h': size_32_align_8,
+
+    'mat2x4<f32>': size_32_align_16,
+    'mat2x4f': size_32_align_16,
+    'mat2x4<f16>': size_16_align_8,
+    'mat2x4h': size_16_align_8,
+
+    'mat3x4<f32>': size_48_align_16,
+    'mat3x4f': size_48_align_16,
+    'mat3x4<f16>': size_24_align_8,
+    'mat3x4h': size_24_align_8,
+
+    'mat4x4<f32>': size_64_align_16,
+    'mat4x4f': size_64_align_16,
+    'mat4x4<f16>': size_32_align_8,
+    'mat4x4h': size_32_align_8,
 };
 
 
 // ignore comments
-const removeCommentsRE = /^(?:(?!\/\/|\/*.*\/).|\n)+/gim;
+const removeCommentsRE = /\/\*[\s\S]*?\*\/|\/\/.*/gim;
 
 // struct name:
 const getStructNameRE = /struct\s+?(\w+)\s*{[^}]+}\n?/g;
@@ -2879,12 +2999,11 @@ const arrayIntegrityRE = /\s*(array\s*<\s*\w+\s*(?:,\s*\d+)?\s*>)\s*,?/g;
 
 function removeComments(value) {
     const matches = value.matchAll(removeCommentsRE);
-    let result = '';
     for (const match of matches) {
         const captured = match[0];
-        result += captured;
+        value = value.replace(captured, '');
     }
-    return result;
+    return value;
 }
 
 function getInsideStruct(value) {
@@ -2946,16 +3065,6 @@ function getArrayTypeAndAmount(value) {
     return result;
 }
 
-function getPadding(bytes, aligment, nextTypeDataSize) {
-    const nextMultiple = (bytes + aligment - 1) & ~(aligment - 1);
-    const needsPadding = (bytes + nextTypeDataSize) > nextMultiple;
-    let padAmount = 0;
-    if (needsPadding) {
-        padAmount = nextMultiple - bytes;
-    }
-    return padAmount;
-}
-
 /**
  * Check if string has 'array' in it
  * @param {String} value
@@ -2965,139 +3074,121 @@ function isArray(value) {
     return value.indexOf('array') != -1;
 }
 
-function getArrayAlign(structName, structData) {
-    const [d] = getArrayTypeAndAmount(structName);
-    const t = typeSizes[d.type] || structData.get(d.type);
-    if (!t) {
-        throw new Error(`${d.type} type has not been declared previously`)
-    }
-
-    // if it's not in typeSizes is a struct,
-    //therefore probably stored in structData
-    return t.align || t.maxAlign;
-}
-
 function getArrayTypeData(currentType, structData) {
     const [d] = getArrayTypeAndAmount(currentType);
-    if(!d){
+    if (!d) {
         throw `${currentType} seems to have an error, maybe a wrong amount?`;
     }
     if (d.amount == 0) {
         throw new Error(`${currentType} has an amount of 0`);
     }
-    // if is an array with no amount then use these default values
-    let currentTypeData = { size: 16, align: 16 };
-    if (!!d.amount) {
+    let currentTypeData = typeSizes[d.type] || structData.get(d.type);
+    if (!currentTypeData) {
+        throw `Struct or type '${d.type}' in ${currentType} is not defined.`
+    }
+    if (d.amount) {
         const t = typeSizes[d.type];
         if (t) {
             // if array, the size is equal to the align
             currentTypeData = { size: t.align * d.amount, align: t.align };
-            // currentTypeData = { size: t.size * d.amount, align: t.align };
-            // currentTypeData = { size: 0, align: 0 };
         } else {
             const sd = structData.get(d.type);
             if (sd) {
                 currentTypeData = { size: sd.bytes * d.amount, align: sd.maxAlign };
             }
         }
-    } else {
-        const t = typeSizes[d.type] || structData.get(d.type);
-        currentTypeData = { size: t.size || t.bytes, align: t.maxAlign };
     }
     return currentTypeData;
 }
 
+
+/**
+ * Calculates if there's a space of bytes left in the row
+ * @param {Number} bytes current bytes size
+ * @param {Number} maxSize max size of row, in this case probably 16
+ * @returns remaining bytes if any
+ */
+function getPadding(bytes, maxSize) {
+    const remainder = bytes % maxSize;
+    let remainingBytes = 0;
+    if (remainder) {
+        remainingBytes = maxSize - remainder;
+    }
+    return remainingBytes
+}
+
+const MAX_ROW_SIZE = 16;
+const HALF = 2;
 const dataSize = value => {
     const noCommentsValue = removeComments(value);
     const structData = getStructDataByName(noCommentsValue);
 
-    for (const [structDatumKey, structDatum] of structData) {
-        // to obtain the higher max alignment, but this can be also calculated
-        // in the next step
-        structDatum.unique_types.forEach(ut => {
-            let maxAlign = structDatum.maxAlign || 0;
-            let align = 0;
-            // if it doesn't exists in typeSizes is an Array or a new Struct
-            if (!typeSizes[ut]) {
-                if (isArray(ut)) {
-                    align = getArrayAlign(ut, structData);
-                } else {
-                    const sd = structData.get(ut);
-                    align = sd.maxAlign;
-                }
-            } else {
-                align = typeSizes[ut].align;
-            }
-            maxAlign = align > maxAlign ? align : maxAlign;
-            structDatum.maxAlign = maxAlign;
-        });
+    structData.forEach(sd => {
+        let bytes = 0;
+        let remainingBytes = 0;
+        sd.paddings = {};
+        sd.names.forEach((name, i) => {
+            const type = sd.types[i];
+            let typeSize = typeSizes[type];
+            let repeat = 0;
 
-        let byteCounter = 0;
-        structDatum.types.forEach((t, i) => {
-            const name = structDatum.names[i];
-            const currentType = t;
-            const nextType = structDatum.types[i + 1];
-            let currentTypeData = typeSizes[currentType];
-            let nextTypeData = typeSizes[nextType];
+            // if no typeSize is an array or struct
+            if (!typeSize) {
+                if (type) {
+                    if (isArray(type)) {
+                        const [innerType] = getArrayTypeAndAmount(type);
 
-            structDatum.paddings = structDatum.paddings || {};
-
-            // if currentTypeData or nextTypeData have no data it means
-            // it's a struct or an array
-            // if it's a struct the data is already saved in structData
-            // because it was calculated previously
-            // assuming the struct was declared previously
-            if (!currentTypeData) {
-                if (currentType) {
-                    if (isArray(currentType)) {
-                        currentTypeData = getArrayTypeData(currentType, structData);
+                        typeSize = typeSizes[innerType.type];
+                        repeat = innerType.amount; // check comment on top of do while
+                        innerType.align = MAX_ROW_SIZE;
                     } else {
-                        const sd = structData.get(currentType);
-                        if (sd) {
-                            currentTypeData = { size: sd.bytes, align: sd.maxAlign };
+                        const sd = structData.get(type);
+                        if(!sd){
+                            throw `Type or struct ${type} doesn't exist.`;
                         }
-                    }
-                }
-            }
-            // read above
-            if (!nextTypeData) {
-                if (nextType) {
-                    if (isArray(nextType)) {
-                        nextTypeData = getArrayTypeData(nextType, structData);
-                    } else {
-                        const sd = structData.get(nextType);
-                        if (sd) {
-                            nextTypeData = { size: sd.bytes, align: sd.maxAlign };
-                        }
+                        typeSize = { size: sd.bytes, align: MAX_ROW_SIZE };
                     }
                 }
             }
 
-            if (!!currentTypeData) {
-                byteCounter += currentTypeData.size;
-                if ((currentTypeData.size === structDatum.maxAlign) || !nextType) {
-                    return;
-                }
-            }
+            const { size, align } = typeSize;
+            const prevName = sd.names[i - 1];
 
-            if (!!nextTypeData) {
-                const padAmount = getPadding(byteCounter, structDatum.maxAlign, nextTypeData.size);
-                if (padAmount) {
-                    structDatum.paddings[name] = padAmount / 4;
-                    byteCounter += padAmount;
+            /**
+             * The idea with the repeat and the do while is that, if there's an
+             * array, the subtype will be added `type.amount` times with the
+             * same rules. That's it.
+             */
+            do {
+                let aligned = bytes % align === 0;
+
+                while (!aligned) {
+                    remainingBytes -= HALF;
+                    bytes += HALF;
+                    sd.paddings[prevName] ||= 0;
+                    sd.paddings[prevName] += HALF;
+                    aligned = bytes % align === 0;
                 }
-            }
+
+                if (remainingBytes && size > remainingBytes) {
+                    bytes += remainingBytes;
+                    sd.paddings[prevName] = remainingBytes;
+                    remainingBytes = 0;
+                }
+
+                bytes += size;
+
+                repeat--;
+            } while (repeat > 0)
+
+            remainingBytes = getPadding(bytes, MAX_ROW_SIZE);
         });
+        remainingBytes = getPadding(bytes, MAX_ROW_SIZE);
+        bytes += remainingBytes;
+        sd.bytes = bytes;
+    });
 
-        const padAmount = getPadding(byteCounter, structDatum.maxAlign, 16);
-        if (padAmount) {
-            structDatum.paddings[''] = padAmount / 4;
-            byteCounter += padAmount;
-        }
-
-        structDatum.bytes = byteCounter;
-    }
-    return structData;
+    return structData
 };
 
 /**
@@ -3312,6 +3403,87 @@ const bindingModes = { [R]: 'read', [RW]: 'read_write' };
 const entriesModes = { [R]: 'read-only-storage', [RW]: 'storage' };
 
 /**
+ * Just a few functions to be used with the cameras
+ *
+ * based on https://github.com/greggman/wgpu-matrix/
+ * @module data-size
+ * @ignore
+ */
+
+
+/**
+ * Divides a vector by its Euclidean length and returns the quotient.
+ *
+ * @param v - The vector.
+ * @returns The normalized vector.
+ */
+function normalize(v) {
+    const result = [0, 0, 0];
+
+    const v0 = v[0];
+    const v1 = v[1];
+    const v2 = v[2];
+    const len = Math.sqrt(v0 * v0 + v1 * v1 + v2 * v2);
+
+    if (len > 0.00001) {
+        result[0] = v0 / len;
+        result[1] = v1 / len;
+        result[2] = v2 / len;
+    }
+
+    return result;
+}
+
+/**
+ * Subtracts two vectors.
+ * @param a - Operand vector.
+ * @param b - Operand vector.
+ * @param dst - vector to hold result. If not passed in a new one is created.
+ * @returns A vector that is the difference of a and b.
+ */
+function sub(a, b) {
+    const result = [0, 0, 0];
+
+    result[0] = a[0] - b[0];
+    result[1] = a[1] - b[1];
+    result[2] = a[2] - b[2];
+
+    return result;
+}
+
+/**
+ * Computes the cross product of two vectors; assumes both vectors have
+ * three entries.
+ * @param a - Operand vector.
+ * @param b - Operand vector.
+ * @param dst - vector to hold result. If not passed in a new one is created.
+ * @returns The vector of a cross b.
+ */
+function cross(a, b) {
+    const result = [0, 0, 0];
+
+    const t1 = a[2] * b[0] - a[0] * b[2];
+    const t2 = a[0] * b[1] - a[1] * b[0];
+    result[0] = a[1] * b[2] - a[2] * b[1];
+    result[1] = t1;
+    result[2] = t2;
+
+    return result;
+}
+
+
+/**
+ * Computes the dot product of two vectors; assumes both vectors have
+ * three entries.
+ * @param a - Operand vector.
+ * @param b - Operand vector.
+ * @returns dot product
+ */
+function dot(a, b) {
+    return (a[0] * b[0]) + (a[1] * b[1]) + (a[2] * b[2]);
+}
+
+/**
  * Main class Points, this is the entry point of an application with this library.
  * @example
  * import Points from 'points';
@@ -3343,16 +3515,14 @@ class Points {
     /** @type {Array<RenderPass>} */
     #renderPasses = null;
     #postRenderPasses = [];
-    #vertexBufferInfo = null;
     #buffer = null;
     #presentationSize = null;
-    #depthTexture = null;
-    // #vertexArray = [];
     #numColumns = 1;
     #numRows = 1;
     #commandsFinished = [];
     #uniforms = new UniformsArray();
     #meshUniforms = new UniformsArray();
+    #cameraUniforms = new UniformsArray();
     #constants = [];
     #storage = [];
     #readStorage = [];
@@ -3418,6 +3588,17 @@ class Points {
                 }
             });
         }
+
+        // initializing internal uniforms
+        this.setUniform(UniformKeys.TIME, this.#time);
+        this.setUniform(UniformKeys.DELTA, this.#delta);
+        this.setUniform(UniformKeys.EPOCH, this.#epoch);
+        this.setUniform(UniformKeys.MOUSE_CLICK, this.#mouseClick);
+        this.setUniform(UniformKeys.MOUSE_DOWN, this.#mouseDown);
+        this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
+        this.setUniform(UniformKeys.SCREEN, [0, 0], 'vec2f');
+        this.setUniform(UniformKeys.MOUSE, [0, 0], 'vec2f');
+        this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta, 'vec2f');
     }
 
     #resizeCanvasToFitWindow = () => {
@@ -3459,12 +3640,11 @@ class Points {
             // will copy out of the swapchain texture.
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
         });
-        this.#depthTexture = this.#device.createTexture({
-            label: '_depthTexture',
-            size: this.#presentationSize,
-            format: 'depth32float',
-            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING,
+
+        this.#renderPasses.forEach(renderPass => {
+            renderPass.textureDepth = this.#createTextureDepth('_depthTexture');
         });
+
         // this is to solve an issue that requires the texture to be resized
         // if the screen dimensions change, this for a `setTexture2d` with
         // `copyCurrentTexture` parameter set to `true`.
@@ -3549,6 +3729,26 @@ class Points {
         };
         Object.seal(uniform);
         this.#meshUniforms.push(uniform);
+        return uniform;
+    }
+
+    #setCameraUniform(name, value, structName = null) {
+        const uniformToUpdate = this.#nameExists(this.#cameraUniforms, name);
+        if (uniformToUpdate) {
+            uniformToUpdate.value = value;
+            return uniformToUpdate;
+        }
+        if (structName && isArray(structName)) {
+            throw `${structName} is an array, which is currently not supported for Uniforms.`;
+        }
+        const uniform = {
+            name: name,
+            value: value,
+            type: structName,
+            size: null
+        };
+        Object.seal(uniform);
+        this.#cameraUniforms.push(uniform);
         return uniform;
     }
 
@@ -3876,12 +4076,20 @@ class Points {
         return texture2d;
     }
 
+    /**
+     * Creates a depth map from the selected `renderPassIndex`
+     * @param {String} name
+     * @param {GPUShaderStage} shaderType
+     * @param {Number} renderPassIndex
+     * @returns
+     */
     setTextureDepth2d(name, shaderType, renderPassIndex) {
         const exists = this.#nameExists(this.#texturesDepth2d, name);
         if (exists) {
             console.warn(`setTextureDepth2d: \`${name}\` already exists.`);
             return exists;
         }
+        renderPassIndex ||= 0;
         const textureDepth2d = {
             name,
             shaderType,
@@ -3892,7 +4100,6 @@ class Points {
         this.#texturesDepth2d.push(textureDepth2d);
         return textureDepth2d;
     }
-
 
     copyTexture(nameTextureA, nameTextureB) {
         const texture2d_A = this.#nameExists(this.#textures2d, nameTextureA);
@@ -3964,6 +4171,7 @@ class Points {
             copyCurrentTexture: false,
             shaderType: shaderType,
             texture: null,
+            renderPassIndex: null,
             imageTexture: {
                 bitmap: imageBitmap
             },
@@ -4251,6 +4459,128 @@ class Points {
     }
 
     /**
+     * Creates a Perspective camera with a given name to be used in the shaders.
+     * The name is used as identifier in the shaders for the Projection and View matrices.
+     *
+     * The name will be inside the `camera` uniform and composed with the
+     * projection and view identifiers: e.g.:
+     * name: mycamera
+     * uniform buffers:
+     *  camera.mycamera_projection;
+     *  camera.mycamera_view
+     *
+     * The camera must be called on the update method so the aspect is updated by default
+     * with the canvas width and height.
+     * @param {String} name camera name in the shader for the projection and view
+     * @param {vec3f} position
+     * @param {Number} fov field of view angle
+     * @param {Number} near clipping near
+     * @param {Number} far clipping far
+     * @param {Number} aspect ratio of the camera, by default it choses the canvas aspect ratio
+     *
+     * @example
+     * // js
+     *  points.setCameraPerspective('camera', [0, 0, -5]);
+     *
+     * // wgsl string
+     * let clip = camera.camera_projection * camera.camera_view * vec4f(world, 1.);
+     */
+    setCameraPerspective(name, position = [0, 0, -5], lookAt = [0, 0, 0], fov = 45, near = .1, far = 100, aspect = null) {
+        const fov_radians = fov * (Math.PI / 180);
+        const f = 1.0 / Math.tan(fov_radians / 2); // ≈ 2.414
+        const nf = 1 / (near - far);
+        aspect ??= this.#canvas.width / this.#canvas.height;
+
+        const perspectiveMatrix = [
+            f / aspect, 0, 0, 0,
+            0, f, 0, 0,
+            0, 0, (far + near) * nf, -1,
+            0, 0, (2 * far * near) * nf, 0
+        ];
+
+        this.#setCameraUniform(
+            `${name}_projection`,
+            perspectiveMatrix,
+            'mat4x4<f32>'
+        );
+
+        const up = [0, 1, 0];
+        const ff = normalize(sub(lookAt, position));
+        const r = normalize(cross(ff, up));
+        const u = cross(r, ff);
+
+        const viewMatrix = [
+            r[0], u[0], -ff[0], 0,
+            r[1], u[1], -ff[1], 0,
+            r[2], u[2], -ff[2], 0,
+            -dot(r, position), -dot(u, position), dot(ff, position), 1
+        ];
+
+        this.#setCameraUniform(`${name}_view`, viewMatrix, 'mat4x4<f32>');
+    }
+
+    /**
+     * Creates an Orthographic camera with a given name to be used in the shaders.
+     * The name is used as identifier in the shaders for the Projection matrix.
+     *
+     * The name will be inside the `camera` uniform and composed with the
+     * projection identifier: e.g.:
+     * name: mycamera
+     * uniform buffer:
+     *  camera.mycamera_projection;
+     *
+     * @param {String} name
+     * @param {Number} left
+     * @param {Number} right
+     * @param {Number} top
+     * @param {Number} bottom
+     * @param {Number} near
+     * @param {Number} far
+     *
+     * @example
+     * // js
+     * points.setCameraOrthographic('camera');
+     *
+     * // wgsl string
+     * let clip = camera.camera_projection * vec4f(world, 0.0, 1.0);
+     *
+     */
+    setCameraOrthographic(name, left = -1, right = 1, top = 1, bottom = -1, near = -1, far = 1, position = [0, 0, -5], lookAt = [0, 0, 0]) {
+        // const aspect = canvas.width / canvas.height; // alternative to aspect in shader
+
+        const lr = 1 / (right - left);
+        const bt = 1 / (top - bottom);
+        const nf = 1 / (near - far);
+
+        const orthoMatrix = [
+            2 * lr, 0, 0, 0,
+            0, 2 * bt, 0, 0,
+            0, 0, nf, 0,
+            -(right + left) * lr,
+            -(top + bottom) * bt,
+            near * nf,
+            1
+        ];
+
+        this.#setCameraUniform(`${name}_projection`, orthoMatrix, 'mat4x4<f32>');
+
+
+        const up = [0, 1, 0];
+        const ff = normalize(sub(lookAt, position));
+        const r = normalize(cross(ff, up));
+        const u = cross(r, ff);
+
+        const viewMatrix = [
+            r[0], u[0], -ff[0], 0,
+            r[1], u[1], -ff[1], 0,
+            r[2], u[2], -ff[2], 0,
+            -dot(r, position), -dot(u, position), dot(ff, position), 1
+        ];
+
+        this.#setCameraUniform(`${name}_view`, viewMatrix, 'mat4x4<f32>');
+    }
+
+    /**
      * Listens for an event dispatched from WGSL code
      * @param {String} name Number that represents an event Id
      * @param {Function} callback function to be called when the event occurs
@@ -4313,6 +4643,10 @@ class Points {
         }
         if (this.#meshUniforms.length) {
             dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <uniform> mesh: Mesh;\n`;
+            bindingIndex += 1;
+        }
+        if (this.#cameraUniforms.length) {
+            dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <uniform> camera: Camera;\n`;
             bindingIndex += 1;
         }
         this.#storage.forEach(storageItem => {
@@ -4477,6 +4811,7 @@ class Points {
         let dynamicGroupBindingsFragment = '';
         let dynamicStructParams = '';
         let dynamicStructMesh = '';
+        let dynamicStructCamera = '';
         this.#uniforms.forEach(u => {
             u.type = u.type || 'f32';
             dynamicStructParams += /*wgsl*/`${u.name}:${u.type}, \n\t`;
@@ -4491,10 +4826,18 @@ class Points {
         if (this.#meshUniforms.length) {
             dynamicStructMesh = /*wgsl*/`struct Mesh {\n\t${dynamicStructMesh}\n}\n`;
         }
+        this.#cameraUniforms.forEach(u => {
+            u.type = u.type || 'f32';
+            dynamicStructCamera += /*wgsl*/`${u.name}:${u.type}, \n\t`;
+        });
+        if (this.#cameraUniforms.length) {
+            dynamicStructCamera = /*wgsl*/`struct Camera {\n\t${dynamicStructCamera}\n}\n`;
+        }
         this.#constants.forEach(c => {
             dynamicStructParams += /*wgsl*/`const ${c.name}:${c.structName} = ${c.value};\n`;
         });
         dynamicStructParams += dynamicStructMesh;
+        dynamicStructParams += dynamicStructCamera;
 
         renderPass.index = index;
         renderPass.hasVertexShader && (dynamicGroupBindingsVertex += dynamicStructParams);
@@ -4562,25 +4905,11 @@ class Points {
      */
     async init(renderPasses) {
         this.#renderPasses = renderPasses.concat(this.#postRenderPasses);
-        // initializing internal uniforms
-        this.setUniform(UniformKeys.TIME, this.#time);
-        this.setUniform(UniformKeys.DELTA, this.#delta);
-        this.setUniform(UniformKeys.EPOCH, this.#epoch);
-        this.setUniform(UniformKeys.SCREEN, [0, 0], 'vec2f');
-        this.setUniform(UniformKeys.MOUSE, [0, 0], 'vec2f');
-        this.setUniform(UniformKeys.MOUSE_CLICK, this.#mouseClick);
-        this.setUniform(UniformKeys.MOUSE_DOWN, this.#mouseDown);
-        this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
-        this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta, 'vec2f');
         let hasComputeShaders = this.#renderPasses.some(renderPass => renderPass.hasComputeShader);
         if (!hasComputeShaders && this.#bindingTextures.length) {
             throw ' `setBindingTexture` requires at least one Compute Shader in a `RenderPass`'
         }
 
-        this.#renderPasses.forEach(r => r.init?.(this));
-        this.#renderPasses.forEach(r => r.meshes.forEach(mesh => this.#setMeshUniform(mesh.name, mesh.id, 'u32')));
-        this.#renderPasses.forEach(this.#compileRenderPass);
-        this.#generateDataSize();
         //
         // let adapter = null;
         if (!this.#adapter) {
@@ -4600,7 +4929,7 @@ class Points {
 
         this.#device.lost.then(info => console.log(info));
         if (this.#canvas !== null) this.#context = this.#canvas.getContext('webgpu');
-        this.#presentationFormat = navigator.gpu.getPreferredCanvasFormat();
+        this.#presentationFormat ||= navigator.gpu.getPreferredCanvasFormat();
         if (this.#canvasId) {
             if (this.#fitWindow) {
                 this.#resizeCanvasToFitWindow();
@@ -4609,14 +4938,19 @@ class Points {
             }
         }
 
-        // this.#createVertexBuffer(new Float32Array(this.#vertexArray));
         // TODO: this should be inside RenderPass, to not call vertexArray outside
-        this.#renderPasses.forEach(renderPass => {
-            this.createScreen(renderPass);
-            renderPass.vertexBufferInfo = new VertexBufferInfo(renderPass.vertexArray);
-            renderPass.vertexBuffer = this.#createAndMapBuffer(renderPass.vertexArray, GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST);
+        this.#renderPasses.forEach((r, i) => {
+            r.init?.(this);
+            r.meshes.forEach(mesh => this.#setMeshUniform(mesh.name, mesh.id, 'u32'));
+
+            this.createScreen(r);
+            r.vertexBufferInfo = new VertexBufferInfo(r.vertexArray);
+            r.vertexBuffer = this.#createAndMapBuffer(r.vertexArray, GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST);
+
+            this.#compileRenderPass(r, i);
         });
 
+        this.#generateDataSize();
         this.#createBuffers();
         this.#createPipeline();
 
@@ -4677,14 +5011,7 @@ class Points {
             }
         }
     }
-    /**
-     * @param {Float32Array} vertexArray
-     * @returns buffer
-     */
-    #createVertexBuffer(vertexArray) {
-        this.#vertexBufferInfo = new VertexBufferInfo(vertexArray);
-        this.#buffer = this.#createAndMapBuffer(vertexArray, GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST);
-    }
+
     /**
      * @param {Float32Array} data
      * @param {GPUBufferUsageFlags} usage
@@ -4693,10 +5020,13 @@ class Points {
      * @returns {GPUBuffer} mapped buffer
      */
     #createAndMapBuffer(data, usage, mappedAtCreation = true, size = null) {
+        // the size comes from dataSize
+        // but in some cases size is null and we have to use byteLength
+        // sometimes both arrive and we have to use the bigger one
         const buffer = this.#device.createBuffer({
-            mappedAtCreation: mappedAtCreation,
-            size: size || data.byteLength,
-            usage: usage,
+            mappedAtCreation,
+            size: Math.max(size, data.byteLength),
+            usage,
         });
         new Float32Array(buffer.getMappedRange()).set(data);
         buffer.unmap();
@@ -4710,11 +5040,7 @@ class Points {
      * @returns {GPUBuffer} buffer
      */
     #createBuffer(size, usage) {
-        const buffer = this.#device.createBuffer({
-            size: size,
-            usage: usage,
-        });
-        return buffer
+        return this.#device.createBuffer({ size, usage });
     }
 
     /**
@@ -4742,7 +5068,7 @@ class Points {
         // we check the paddings list and add 0's to just the ones that need it
         const uniformsClone = structuredClone(uniformsArray);
         let arrayValues = uniformsClone.map(v => {
-            const padding = paddings[v.name];
+            const padding = paddings[v.name] / 4;
             if (padding) {
                 if (v.value.constructor !== Array) {
                     v.value = [v.value];
@@ -4753,12 +5079,7 @@ class Points {
             }
             return v.value;
         }).flat(1);
-        const finalPadding = paddings[''];
-        if (finalPadding) {
-            for (let i = 0; i < finalPadding; i++) {
-                arrayValues.push(0);
-            }
-        }
+
         return { values: new Float32Array(arrayValues), paramsDataSize };
     }
 
@@ -4769,6 +5090,10 @@ class Points {
         if (this.#meshUniforms.length) {
             const { values, paramsDataSize } = this.#createUniformValues(this.#meshUniforms);
             this.#meshUniforms.buffer = this.#createAndMapBuffer(values, GPUBufferUsage.UNIFORM + GPUBufferUsage.COPY_DST, true, paramsDataSize.bytes);
+        }
+        if (this.#cameraUniforms.length) {
+            const { values, paramsDataSize } = this.#createUniformValues(this.#cameraUniforms);
+            this.#cameraUniforms.buffer = this.#createAndMapBuffer(values, GPUBufferUsage.UNIFORM + GPUBufferUsage.COPY_DST, true, paramsDataSize.bytes);
         }
     }
 
@@ -4785,6 +5110,10 @@ class Points {
         if (this.#meshUniforms.length) {
             const { values } = this.#createUniformValues(this.#meshUniforms);
             this.#writeBuffer(this.#meshUniforms.buffer, values);
+        }
+        if (this.#cameraUniforms.length) {
+            const { values } = this.#createUniformValues(this.#cameraUniforms);
+            this.#writeBuffer(this.#cameraUniforms.buffer, values);
         }
     }
 
@@ -4892,7 +5221,11 @@ class Points {
         });
         //--------------------------------------------
         // this.#texturesDepth2d.forEach(texture2d => this.#createTextureDepth(texture2d));
-        this.#texturesDepth2d.forEach(texture2d => texture2d.texture = this.#depthTexture);
+
+        this.#texturesDepth2d.forEach(texture2d => {
+            const renderPass = this.#renderPasses.find(renderPass => renderPass.index === texture2d.renderPassIndex);
+            texture2d.texture = renderPass.textureDepth;
+        });
         //--------------------------------------------
         this.#textures2dArray.forEach(texture2dArray => {
             if (texture2dArray.imageTextures) {
@@ -4947,9 +5280,9 @@ class Points {
         });
     }
 
-    #createTextureDepth(texture2d) {
-        texture2d.texture = this.#device.createTexture({
-            label: texture2d.name,
+    #createTextureDepth(name) {
+        return this.#device.createTexture({
+            label: name,
             size: this.#presentationSize,
             format: 'depth32float',
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING,
@@ -4966,14 +5299,14 @@ class Points {
     }
 
     #createPipeline() {
-        this.#renderPasses.forEach((renderPass, index) => {
+        this.#renderPasses.forEach(renderPass => {
             if (renderPass.hasComputeShader) {
                 this.#createBindGroup(renderPass, GPUShaderStage.COMPUTE);
                 renderPass.computePipeline = this.#device.createComputePipeline({
                     layout: this.#device.createPipelineLayout({
                         bindGroupLayouts: [renderPass.bindGroupLayoutCompute]
                     }),
-                    label: `_createPipeline() - ${index}`,
+                    label: `_createPipeline() - ${renderPass.index}`,
                     compute: {
                         module: this.#device.createShaderModule({
                             code: renderPass.compiledShaders.compute
@@ -5039,10 +5372,16 @@ class Points {
                                         format: 'float32x3',
                                     },
                                     {
-                                        // id
+                                        // id -> meshCounter
                                         shaderLocation: 4,
                                         offset: renderPass.vertexBufferInfo.idOffset,
                                         format: 'uint32',
+                                    },
+                                    {
+                                        // barycentrics
+                                        shaderLocation: 5,
+                                        offset: renderPass.vertexBufferInfo.barycentricsOffset,
+                                        format: 'float32x3',
                                     },
                                 ],
                             },
@@ -5117,6 +5456,21 @@ class Points {
                     resource: {
                         label: 'uniform',
                         buffer: this.#meshUniforms.buffer
+                    },
+                    buffer: {
+                        type: 'uniform'
+                    },
+                    // visibility
+                }
+            );
+        }
+        if (this.#cameraUniforms.length) {
+            entries.push(
+                {
+                    binding: bindingIndex++,
+                    resource: {
+                        label: 'uniform',
+                        buffer: this.#cameraUniforms.buffer
                     },
                     buffer: {
                         type: 'uniform'
@@ -5211,11 +5565,13 @@ class Points {
             if (texture2d.renderPassIndex !== renderPassIndex) {
                 const isInternal = internal === texture2d.internal;
                 if (isInternal && (!texture2d.shaderType || texture2d.shaderType & shaderType)) {
+                    const renderPass = this.#renderPasses.find(renderPass => renderPass.index === texture2d.renderPassIndex);
+                    texture2d.texture = renderPass.textureDepth;
                     entries.push(
                         {
                             label: 'texture depth 2d',
                             binding: bindingIndex++,
-                            resource: this.#depthTexture.createView(),
+                            resource: texture2d.texture.createView(),
                             texture: {
                                 sampleType: 'depth',
                                 viewDimension: '2d',
@@ -5484,11 +5840,11 @@ class Points {
         this.setUniform(UniformKeys.TIME, this.#time);
         this.setUniform(UniformKeys.DELTA, this.#delta);
         this.setUniform(UniformKeys.EPOCH, this.#epoch);
-        this.setUniform(UniformKeys.SCREEN, [this.#canvas.width, this.#canvas.height]);
-        this.setUniform(UniformKeys.MOUSE, [this.#mouseX, this.#mouseY]);
         this.setUniform(UniformKeys.MOUSE_CLICK, this.#mouseClick);
         this.setUniform(UniformKeys.MOUSE_DOWN, this.#mouseDown);
         this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
+        this.setUniform(UniformKeys.SCREEN, [this.#canvas.width, this.#canvas.height]);
+        this.setUniform(UniformKeys.MOUSE, [this.#mouseX, this.#mouseY]);
         this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta);
         //--------------------------------------------
         this.#writeParametersUniforms();
@@ -5519,7 +5875,7 @@ class Points {
             if (renderPass.hasVertexAndFragmentShader) {
                 renderPass.descriptor.colorAttachments[0].view = swapChainTexture.createView();
                 if (renderPass.depthWriteEnabled && (!renderPass.descriptor.depthStencilAttachment.view || this.#screenResized)) {
-                    renderPass.descriptor.depthStencilAttachment.view = this.#depthTexture.createView();
+                    renderPass.descriptor.depthStencilAttachment.view = renderPass.textureDepth.createView();
                 }
 
                 const isSameDevice = this.#device === renderPass.device;
@@ -5575,7 +5931,7 @@ class Points {
 
                 // Copy the rendering results from the swapchain into |texture2d.texture|.
                 this.#textures2d.forEach(texture2d => {
-                    if (texture2d.renderPassIndex === renderPass.index || !texture2d.renderPassIndex) {
+                    if (texture2d.renderPassIndex === renderPass.index || !Number.isInteger(texture2d.renderPassIndex)) {
                         if (texture2d.copyCurrentTexture) {
                             commandEncoder.copyTextureToTexture(
                                 {
@@ -5769,10 +6125,29 @@ class Points {
         }
     }
 
+    get presentationFormat() {
+        return this.#presentationFormat;
+    }
+
+    /**
+     * Set the maximum range the render textures can hold.
+     * If you need HDR values use `16` or `32` float formats.
+     * This value is used in the texture that is created when a fragment shader
+     * returns its data, so if you use a `vec4` that goes beyond the default
+     * capped of `0..1` like `vec4(16,0,1,1)`, then use `16` or `32`.
+     *
+     * By default it has the `navigator.gpu.getPreferredCanvasFormat();` value.
+     * @param {PresentationFormat|String|GPUTextureFormat} value
+     */
+    set presentationFormat(value) {
+        this.#presentationFormat = value;
+    }
+
     destroy() {
 
         this.#uniforms = new UniformsArray();
         this.#meshUniforms = new UniformsArray();
+        this.#cameraUniforms = new UniformsArray();
 
         this.#texturesExternal.forEach(textureExternal => {
             const stream = textureExternal?.video.srcObject;

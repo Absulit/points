@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en" data-color-scheme="auto">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Module: points/effects | Points</title>
+    <title>Source: matrix.js | Points</title>
     <meta name="description" content="A Generative Art library made in WebGPU"><meta name="keywords" content="javascript, webgl, crative-coding, shaders, generative-art, webgpu, genart, wgsl">
     <link rel="icon" title="dummy" href="data:image/x-icon;base64,AA">
     <script src="scripts/docolatte.min.js"></script>
@@ -22,7 +23,7 @@
         </div>
         <div class="topbar">
             <h1 class="page-title">
-                <a href="#">Module: points/effects</a>
+                <a href="#">Source: matrix.js</a>
             </h1>
             <a class="light-switch" title="Switch light/dark mode" href="#"><i class="label auto">
 <svg  class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -38,508 +39,89 @@
 
 
 
-
-<article class="doc">
-    <header>
-        
-            
-                
-            
-        
-    </header>
-
-    <div class="container-overview">
     
-        
-            <div class="description"><p>These are wgsl functions, not js functions.
-The function is enclosed in a js string constant,
-to be appended into the code to reference it in the string shader.</p></div>
-        
-
-        
-            
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-<dt class="tag-source">Source:</dt>
-<dd class="tag-source">
-    <a href="core_effects.js.html">core/effects.js</a>, <a href="core_effects.js.html#line1">line 1</a>
-</dd>
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-    
-    </div>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Members</h3>
-
-        
-            
-<h4 class="name" id=".blur9"><span class="attributes"><span class="attribute">static</span><span class="attribute">constant</span></span>blur9<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    <p>Applies a blur to an image
-<br>
-based on https://github.com/Jam3/glsl-fast-gaussian-blur/blob/master/9.glsl</p>
-</div>
-
-
-
-
-
-<dl class="details">
-<dt class="tag-source">Source:</dt>
-<dd class="tag-source">
-    <a href="core_effects.js.html">core/effects.js</a>, <a href="core_effects.js.html#line346">line 346</a>
-</dd>
-</dl>
-
-
-
-
-
-    <h5>Example</h5>
-    
-
-    <pre class="prettyprint lang-js has-caption"><code>import { blur9 } from 'points/effects';// wgsl string${blur9}let value = blur9(image, imageSampler, position, uv, resolution, direction);</code><div class="code-caption hljs">js</div></pre>
-
-
-
-
-        
-            
-<h4 class="name" id=".clearAlpha"><span class="attributes"><span class="attribute">static</span><span class="attribute">constant</span></span>clearAlpha<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    <p>Takes a color and reduces its value but applied to the alpha channel.</p>
-</div>
-
-
-
-
-
-<dl class="details">
-<dt class="tag-source">Source:</dt>
-<dd class="tag-source">
-    <a href="core_effects.js.html">core/effects.js</a>, <a href="core_effects.js.html#line189">line 189</a>
-</dd>
-</dl>
-
-
-
-
-
-    <h5>Example</h5>
-    
-
-    <pre class="prettyprint lang-js has-caption"><code>import { clearAlpha } from 'points/effects';// wgsl string${clearAlpha}let value = clearAlpha(color, 1.01);</code><div class="code-caption hljs">js</div></pre>
-
-
-
-
-        
-            
-<h4 class="name" id=".clearMix"><span class="attributes"><span class="attribute">static</span><span class="attribute">constant</span></span>clearMix<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    <p>Takes a color and reduces its values by a <code>level</code></p>
-</div>
-
-
-
-
-
-<dl class="details">
-<dt class="tag-source">Source:</dt>
-<dd class="tag-source">
-    <a href="core_effects.js.html">core/effects.js</a>, <a href="core_effects.js.html#line162">line 162</a>
-</dd>
-</dl>
-
-
-
-
-
-    <h5>Example</h5>
-    
-
-    <pre class="prettyprint lang-js has-caption"><code>import { clearMix } from 'points/effects';// wgsl string${clearMix}let value = clearMix(color, 1.01);</code><div class="code-caption hljs">js</div></pre>
-
-
-
-
-        
-            
-<h4 class="name" id=".euclideanDistance"><span class="attributes"><span class="attribute">static</span><span class="attribute">constant</span></span>euclideanDistance<span class="type-signature"> <span class="type">String</span></span></h4>
-
-
-
-
-<div class="description">
-    <p>Calculates the <a href="https://en.wikipedia.org/wiki/Euclidean_distance">Euclidean Distance</a>
-between colors.</p>
-</div>
-
-
-
-
-
-<dl class="details">
-<dt class="tag-source">Source:</dt>
-<dd class="tag-source">
-    <a href="core_effects.js.html">core/effects.js</a>, <a href="core_effects.js.html#line24">line 24</a>
-</dd>
-</dl>
-
-
-
-
-
-    <h5>Example</h5>
-    
-
-    <pre class="prettyprint lang-js has-caption"><code>import { euclideanDistance } from 'points/effects';// wgsl string${euclideanDistance}let currentDistance = euclideanDistance(color, paletteColor);</code><div class="code-caption hljs">js</div></pre>
-
-
-
-
-        
-            
-<h4 class="name" id=".getClosestColorInPalette"><span class="attributes"><span class="attribute">static</span><span class="attribute">constant</span></span>getClosestColorInPalette<span class="type-signature"> <span class="type">String</span></span></h4>
-
-
-
-
-<div class="description">
-    <p>This assumes you have declared a palette in a variable or constant called
-<code>getClosestColorInPalette_palette</code>
-<br>
-Gets the closest color based on the <code>distance</code> parameter.</p>
-</div>
-
-
-
-
-
-<dl class="details">
-<dt class="tag-source">Source:</dt>
-<dd class="tag-source">
-    <a href="core_effects.js.html">core/effects.js</a>, <a href="core_effects.js.html#line60">line 60</a>
-</dd>
-</dl>
-
-
-
-
-
-    <h5>Example</h5>
-    
-
-    <pre class="prettyprint lang-js has-caption"><code>import { getClosestColorInPalette } from 'points/effects';// wgsl string${getClosestColorInPalette}const numPaletteItems = 2;const getClosestColorInPalette_palette = array&lt;vec4f, numPaletteItems>( vec4(255./255., 69./255., 0., 1.), vec4(255./255., 168./255., 0, 1.),);let value = getClosestColorInPalette(rgba, numPaletteItems, distance);</code><div class="code-caption hljs">js</div></pre>
-
-
-
-
-        
-            
-<h4 class="name" id=".getColorsAround4Texture"><span class="attributes"><span class="attribute">static</span><span class="attribute">constant</span></span>getColorsAround4Texture<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    <p>From a given texture and its position, get top, botto, left and right color values</p>
-</div>
-
-
-
-
-
-<dl class="details">
-<dt class="tag-source">Source:</dt>
-<dd class="tag-source">
-    <a href="core_effects.js.html">core/effects.js</a>, <a href="core_effects.js.html#line243">line 243</a>
-</dd>
-</dl>
-
-
-
-
-
-    <h5>Example</h5>
-    
-
-    <pre class="prettyprint lang-js has-caption"><code>import { getColorsAround4Texture } from 'points/effects';// wgsl string${getColorsAround4Texture}let value = getColorsAround4Texture(texture, position, distance);</code><div class="code-caption hljs">js</div></pre>
-
-
-
-
-        
-            
-<h4 class="name" id=".getColorsAroundTexture"><span class="attributes"><span class="attribute">static</span><span class="attribute">constant</span></span>getColorsAroundTexture<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    <p>From a given texture and its position, get the 9 color values around.</p>
-</div>
-
-
-
-
-
-<dl class="details">
-<dt class="tag-source">Source:</dt>
-<dd class="tag-source">
-    <a href="core_effects.js.html">core/effects.js</a>, <a href="core_effects.js.html#line214">line 214</a>
-</dd>
-</dl>
-
-
-
-
-
-    <h5>Example</h5>
-    
-
-    <pre class="prettyprint lang-js has-caption"><code>import { getColorsAroundTexture } from 'points/effects';// wgsl string${getColorsAroundTexture}let value = getColorsAroundTexture(texture, position, distance);</code><div class="code-caption hljs">js</div></pre>
-
-
-
-
-        
-            
-<h4 class="name" id=".orderedDithering"><span class="attributes"><span class="attribute">static</span><span class="attribute">constant</span></span>orderedDithering<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    <p>Applies <a href="https://en.wikipedia.org/wiki/Ordered_dithering">Ordered Dithering</a> to a color.
-Best with the colors of an image texture.
-<br>
-This requires <code>orderedDithering_threshold_map</code> to be imported or
-create your own version of it.</p>
-</div>
-
-
-
-
-
-<dl class="details">
-<dt class="tag-source">Source:</dt>
-<dd class="tag-source">
-    <a href="core_effects.js.html">core/effects.js</a>, <a href="core_effects.js.html#line123">line 123</a>
-</dd>
-</dl>
-
-
-
-
-
-    <h5>Example</h5>
-    
-
-    <pre class="prettyprint lang-js has-caption"><code>import { orderedDithering, orderedDithering_threshold_map } from 'points/effects';// wgsl string${orderedDithering}${orderedDithering_threshold_map}let color = texturePosition(image, imageSampler, vec2(0.), uvr, false);let value = orderedDithering(color, depth, dims, uvr);</code><div class="code-caption hljs">js</div></pre>
-
-
-
-
-        
-            
-<h4 class="name" id=".orderedDithering_threshold_map"><span class="attributes"><span class="attribute">static</span><span class="attribute">constant</span></span>orderedDithering_threshold_map<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    <p>To be used with <code>orderedDithering</code>.<br>
-You can use this or create yours.</p>
-</div>
-
-
-
-
-
-<dl class="details">
-<dt class="tag-source">Source:</dt>
-<dd class="tag-source">
-    <a href="core_effects.js.html">core/effects.js</a>, <a href="core_effects.js.html#line92">line 92</a>
-</dd>
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id=".soften4"><span class="attributes"><span class="attribute">static</span><span class="attribute">constant</span></span>soften4<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    <p>Softens a color based on list of colors around it or any list of 4 colors.</p>
-</div>
-
-
-
-
-
-<dl class="details">
-<dt class="tag-source">Source:</dt>
-<dd class="tag-source">
-    <a href="core_effects.js.html">core/effects.js</a>, <a href="core_effects.js.html#line279">line 279</a>
-</dd>
-</dl>
-
-
-
-
-
-    <h5>Example</h5>
-    
-
-    <pre class="prettyprint lang-js has-caption"><code>import { soften4 } from 'points/effects';// wgsl string${soften4}let value = soften4(color, colorsAround,  colorPower);</code><div class="code-caption hljs">js</div></pre>
-
-
-
-
-        
-            
-<h4 class="name" id=".soften8"><span class="attributes"><span class="attribute">static</span><span class="attribute">constant</span></span>soften8<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    <p>Softens a color based on list of colors around it or any list of 8 colors.</p>
-</div>
-
-
-
-
-
-<dl class="details">
-<dt class="tag-source">Source:</dt>
-<dd class="tag-source">
-    <a href="core_effects.js.html">core/effects.js</a>, <a href="core_effects.js.html#line306">line 306</a>
-</dd>
-</dl>
-
-
-
-
-
-    <h5>Example</h5>
-    
-
-    <pre class="prettyprint lang-js has-caption"><code>import { soften8 } from 'points/effects';// wgsl string${soften8}let value = soften8(color, colorsA);</code><div class="code-caption hljs">js</div></pre>
-
-
-
-
-        
-            
-<h4 class="name" id=".wireframe"><span class="attributes"><span class="attribute">static</span><span class="attribute">constant</span></span>wireframe<span class="type-signature"> <span class="type">String</span></span></h4>
-
-
-
-
-<div class="description">
-    <p>This function displays the wireframe of a mesh.
-You need the barycentrics data provided by the vertex shader, this is already
-provided in the <code>FragmentIn</code> struct in the fragment shader (<code>in</code> variable).</p>
-</div>
-
-
-
-
-
-<dl class="details">
-<dt class="tag-source">Source:</dt>
-<dd class="tag-source">
-    <a href="core_effects.js.html">core/effects.js</a>, <a href="core_effects.js.html#line385">line 385</a>
-</dd>
-</dl>
-
-
-
-
-
-    <h5>Example</h5>
-    
-
-    <pre class="prettyprint lang-js has-caption"><code>// fragment shaderreturn wireframe(wireframeColor, fillColor, params.thickness, in.barycentrics);</code><div class="code-caption hljs">wgsl string</div></pre>
-
-
-
-
-        
-    
-
-    
-
-    
-
-    
+<article class="src">
+    <pre class="prettyprint source linenums lang-js"><span class="_char">_</span><code>/**
+ * Just a few functions to be used with the cameras
+ *
+ * based on https://github.com/greggman/wgpu-matrix/
+ * @module data-size
+ * @ignore
+ */
+
+
+/**
+ * Divides a vector by its Euclidean length and returns the quotient.
+ *
+ * @param v - The vector.
+ * @returns The normalized vector.
+ */
+export function normalize(v) {
+    const result = [0, 0, 0];
+
+    const v0 = v[0];
+    const v1 = v[1];
+    const v2 = v[2];
+    const len = Math.sqrt(v0 * v0 + v1 * v1 + v2 * v2);
+
+    if (len > 0.00001) {
+        result[0] = v0 / len;
+        result[1] = v1 / len;
+        result[2] = v2 / len;
+    }
+
+    return result;
+}
+
+/**
+ * Subtracts two vectors.
+ * @param a - Operand vector.
+ * @param b - Operand vector.
+ * @param dst - vector to hold result. If not passed in a new one is created.
+ * @returns A vector that is the difference of a and b.
+ */
+export function sub(a, b) {
+    const result = [0, 0, 0];
+
+    result[0] = a[0] - b[0];
+    result[1] = a[1] - b[1];
+    result[2] = a[2] - b[2];
+
+    return result;
+}
+
+/**
+ * Computes the cross product of two vectors; assumes both vectors have
+ * three entries.
+ * @param a - Operand vector.
+ * @param b - Operand vector.
+ * @param dst - vector to hold result. If not passed in a new one is created.
+ * @returns The vector of a cross b.
+ */
+export function cross(a, b) {
+    const result = [0, 0, 0];
+
+    const t1 = a[2] * b[0] - a[0] * b[2];
+    const t2 = a[0] * b[1] - a[1] * b[0];
+    result[0] = a[1] * b[2] - a[2] * b[1];
+    result[1] = t1;
+    result[2] = t2;
+
+    return result;
+}
+
+
+/**
+ * Computes the dot product of two vectors; assumes both vectors have
+ * three entries.
+ * @param a - Operand vector.
+ * @param b - Operand vector.
+ * @returns dot product
+ */
+export function dot(a, b) {
+    return (a[0] * b[0]) + (a[1] * b[1]) + (a[2] * b[2]);
+}
+</code></pre>
 </article>
 
 
@@ -561,7 +143,7 @@ provided in the <code>FragmentIn</code> struct in the fragment shader (<code>in<
                     Documentation generated by <a rel="external" href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a><wbr>
                     using <a rel="external" href="https://github.com/amekusa/docolatte">Docolatte</a> theme
                     
-                    <wbr>on <time datetime="2025-12-17T19:11:21.224Z">Wed, 17 Dec 2025 19:11:21 GMT</time>
+                    <wbr>on <time datetime="2025-12-17T19:11:21.091Z">Wed, 17 Dec 2025 19:11:21 GMT</time>
                     
                 </p>
                 
