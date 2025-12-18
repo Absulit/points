@@ -168,6 +168,8 @@ You can code freely without the use of any of the provided [support modules (mat
     - [Clear or preserve previous RenderPass output](docs/renderpass.md#clear-or-preserve-previous-renderpass-output)
     - [Lines, points, triangles (wireframe)](docs/renderpass.md#lines-points-triangles-wireframe)
     - [Instances](docs/renderpass.md#instances)
+    - [Discarding Triangles - CullMode](docs/renderpass.md#discarding-triangles---cullmode)
+    - [Face Direction - FrontFace](docs/renderpass.md#face-direction---frontface)
 - [Using the examples for a custom project](docs/create_your_custom_shader_project.md)
 - Data Input and Output
     - [Default data available to read](docs/default_data_to_read.md)

@@ -101,3 +101,30 @@ renderPass.addPlane(
 ).instanceCount = NUMPARTICLES;
 
 ```
+
+## Discarding Triangles - CullMode
+
+Triangles that are not visible by the camera can be a performance issue depending on how large the scene is. By default the `CullMode` is `CullMode.BACK`, this ignores the back of the triangles, the part not visible to the camera.
+
+Sometimes you will need both sides to be visible (looking inside an object), then you can use `CullMode.NONE`.
+
+To ignore the front face only you can use `CullMode.FRONT`.
+
+This property is modified per `RenderPass`
+
+```js
+// index.js
+const r1 = new RenderPass(vert1, frag1);
+r1.depthWriteEnabled = true;
+r1.cullMode = CullMode.NONE;
+```
+
+## Face Direction - FrontFace
+
+Along with CullMode, to decide what side is interpreted as "front", the property RenderPass.frontFace is used for this purpose. The order in the creation of the triangle tells WebGPU which face is the front. By default `FrontFace.CCW`.
+
+```js
+const r1 = new RenderPass(vert1, frag1);
+r1.frontFace = FrontFace.CW;
+
+```
