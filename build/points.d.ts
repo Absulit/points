@@ -731,7 +731,7 @@ declare class Points {
      * points.setSampler('imageSampler', descriptor);
      *
      * // wgsl string
-     * let value = texturePosition(image, imageSampler, position, uvr, true);
+     * let value = texturePosition(image, imageSampler, position, in.uvr, true);
      */
     setSampler(name: string, descriptor: GPUSamplerDescriptor, shaderType: any): any;
     /**
@@ -784,7 +784,7 @@ declare class Points {
      * await points.setTextureImage('image', './../myimage.jpg');
      *
      * // wgsl string
-     * let rgba = texturePosition(image, imageSampler, position, uvr, true);
+     * let rgba = texturePosition(image, imageSampler, position, in.uvr, true);
      */
     setTextureImage(name: string, path: string, shaderType?: GPUShaderStage): any;
     /**
@@ -813,7 +813,7 @@ declare class Points {
      * );
      *
      * // wgsl string
-     * let textColors = texturePosition(textImg, imageSampler, position, uvr, true);
+     * let textColors = texturePosition(textImg, imageSampler, position, in.uvr, true);
      *
      */
     setTextureString(name: string, text: string, path: string, size: {
@@ -850,7 +850,7 @@ declare class Points {
      * await points.setTextureVideo('video', './../myvideo.mp4');
      *
      * // wgsl string
-     * let rgba = textureExternalPosition(video, imageSampler, position, uvr, true);
+     * let rgba = textureExternalPosition(video, imageSampler, position, in.uvr, true);
      */
     setTextureVideo(name: string, path: string, shaderType: GPUShaderStage): any;
     /**
@@ -866,7 +866,7 @@ declare class Points {
      * await points.setTextureWebcam('video');
      *
      * // wgsl string
-     * et rgba = textureExternalPosition(video, imageSampler, position, uvr, true);
+     * et rgba = textureExternalPosition(video, imageSampler, position, in.uvr, true);
      */
     setTextureWebcam(name: string, size: {
         width: number;
@@ -888,7 +888,7 @@ declare class Points {
      * const audio = points.setAudio('audio', 'audiofile.ogg', volume, loop, autoplay);
      *
      * // wgsl
-     * let audioX = audio.data[ u32(uvr.x * params.audioLength)] / 256;
+     * let audioX = audio.data[ u32(in.uvr.x * params.audioLength)] / 256;
      */
     setAudio(name: string, path: string, volume: number, loop: boolean, autoplay: boolean): HTMLAudioElement;
     setTextureStorage2d(name: any, shaderType: any): {
