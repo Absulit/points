@@ -5,14 +5,11 @@ const compute = /*wgsl*/`
 ${structs}
 
 @compute @workgroup_size(THREADS_X, THREADS_Y, THREADS_Z)
-fn main(
-    @builtin(global_invocation_id) GlobalId: vec3u,
-    @builtin(workgroup_id) WorkGroupID: vec3u,
-    @builtin(local_invocation_id) LocalInvocationID: vec3u
-) {
+fn main(in: ComputeIn) {
+    let GlobalId = in.GID;
     let width = SIDE;
     let height = SIDE;
-    let index = GlobalId.x + (GlobalId.y * width) + (GlobalId.z * width * height);
+    let index = in.GID.x + (in.GID.y * width) + (in.GID.z * width * height);
     let particle = &particles[index];
 
     if(particle.init == 0){

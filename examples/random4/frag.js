@@ -13,16 +13,9 @@ const scaleAnim = 10.;
 const maxIndex = 52.;
 
 @fragment
-fn main(
-        @location(0) color: vec4f,
-        @location(1) uv: vec2f,
-        @location(2) ratio: vec2f,
-        @location(3) uvr: vec2f,
-        @location(4) mouse: vec2f,
-        @builtin(position) position: vec4f
-    ) -> @location(0) vec4f {
+fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    let feedbackColor = texture(feedbackTexture, imageSampler, uvr, true);
+    let feedbackColor = texture(feedbackTexture, imageSampler, in.uvr, true);
 
     rand_seed.y = fract(params.time) + rand_seed.x;
     rand();
@@ -31,7 +24,7 @@ fn main(
         penguin,
         imageSampler,
         vec2f(),
-        (uvr - params.randPosition * ratio) / scaleAnim,
+        (in.uvr - params.randPosition * in.ratio) / scaleAnim,
         indexAnim,
         vec2u(32)
     );

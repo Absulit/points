@@ -12,6 +12,6 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "@absulit/points": "^0.1.0-alpha.1"
+    "@absulit/points": "^0.6.0"
   }
 }

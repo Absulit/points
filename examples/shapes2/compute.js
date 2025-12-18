@@ -55,11 +55,7 @@ fn getColorsAround4Layer(position: vec2<u32>, distance: u32) -> array<  vec4f, 4
 const workgroupSize = 1;
 
 @compute @workgroup_size(workgroupSize,workgroupSize,1)
-fn main(
-    @builtin(global_invocation_id) GlobalId: vec3<u32>,
-    @builtin(workgroup_id) WorkGroupID: vec3<u32>,
-    @builtin(local_invocation_id) LocalInvocationID: vec3<u32>
-) {
+fn main(in: ComputeIn) {
     let numColumns:f32 = params.screen.x;
     let numRows:f32 = params.screen.y;
 
@@ -78,10 +74,10 @@ fn main(
     var rgba = vec4(0.);
     var colorsAround = array<vec4f,4>();
 
-    let nx = f32(GlobalId.x) / numColumns;
-    let ny = f32(GlobalId.y) / numRows;
+    let nx = f32(in.GID.x) / numColumns;
+    let ny = f32(in.GID.y) / numRows;
     let uv = vec2(nx,ny);
-    let positionU = GlobalId.xy;
+    let positionU = in.GID.xy;
 
     let uIndex = getPointsIndex(positionU);
 
@@ -97,7 +93,7 @@ fn main(
     }
     (*rgbaP) = rgba;
 
-    let sdf = sdfCircle(vec2f(1.,1.) * fnusin(1), .01, .2, uv);
+    let sdf = sdfCircle(vec2f(1.,1.) * fnusin(1), .01, .2, in.uv);
     (*rgbaP) += sdf;
 
 

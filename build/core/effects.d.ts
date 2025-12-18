@@ -186,3 +186,22 @@ export const soften4: "\nfn soften4(color:vec4f, colorsAround:array<vec4f, 4>, c
  * let value = soften8(color, colorsA);
  */
 export const soften8: "\nfn soften8(color:vec4f, colorsAround:array<vec4f, 8>, colorPower:f32) -> vec4f {\n    var newColor:vec4f = color;\n    for (var indexColors = 0u; indexColors < 8u; indexColors++) {\n        var colorAround = colorsAround[indexColors];\n        // colorAround.r = (color.r + colorAround.r * colorPower) / (colorPower + 1.);\n        // colorAround.g = (color.g + colorAround.g * colorPower) / (colorPower + 1.);\n        // colorAround.b = (color.b + colorAround.b * colorPower) / (colorPower + 1.);\n        // colorAround.a = (color.a + colorAround.a * colorPower) / (colorPower + 1.);\n\n        colorAround = (color + colorAround * colorPower) / (colorPower + 1.);\n\n\n\n        newColor += colorAround;\n    }\n    return newColor * .2;\n}\n";
+/**
+ * WIP
+ */
+/**
+ * This function displays the wireframe of a mesh.
+ * You need the barycentrics data provided by the vertex shader, this is already
+ * provided in the `FragmentIn` struct in the fragment shader (`in` variable).
+ * @type {String}
+ * @param {vec4f} color color of the wireframe line
+ * @param {vec4f} fillColor color of the rest of the triangle
+ * @param {f32} thickness increase or decrease thickness of the wireframe line
+ * @param {vec3f} barycentrics barycentric coordiantes. Interpolated per triangle.
+ *
+ * @example
+ * // wgsl string
+ * // fragment shader
+ * return wireframe(wireframeColor, fillColor, params.thickness, in.barycentrics);
+ */
+export const wireframe: string;

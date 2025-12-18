@@ -119,8 +119,34 @@ fn sdfSquare(position:vec2f, radius:f32, feather:f32, rotationRads: f32, uv:vec2
 }
 `;
 
-// export const sdfRectangle = /*wgsl*/`
-// `;
+/**
+ * Create a rectangle with two coordinates.
+ * @type {String}
+ * @param {vec2f} startPoint first coordinate, one corner of the rectangle
+ * @param {vec2f} endPoint second coordinate, opposite corner of the rectangle
+ * @param {vec2f} uv
+ * @return {f32}
+ *
+ * @example
+ * // wgsl string
+ * sdfRect(vec2f(), vec2f(1), in.uvr);
+ *
+ */
+export const sdfRect = /*wgsl*/`
+
+fn sdfRect(startPoint:vec2f, endPoint:vec2f, uv:vec2f) -> f32 {
+    let value = select(
+        0.,
+        1.,
+        (startPoint.x < uv.x) &&
+        (startPoint.y < uv.y) &&
+        (uv.x < endPoint.x) &&
+        (uv.y < endPoint.y)
+    );
+    return smoothstep(0, .5,  value);
+}
+
+`;
 
 
 /**

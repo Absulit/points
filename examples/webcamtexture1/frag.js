@@ -5,14 +5,7 @@ const frag = /*wgsl*/`
 ${textureExternal}
 
 @fragment
-fn main(
-        @location(0) color: vec4f,
-        @location(1) uv: vec2f,
-        @location(2) ratio: vec2f,
-        @location(3) uvr: vec2f,
-        @location(4) mouse: vec2f,
-        @builtin(position) position: vec4f
-    ) -> @location(0) vec4f {
+fn main(in: FragmentIn) -> @location(0) vec4f {
 
     var flip = vec2f(1, 1);
     var displace = vec2f();
@@ -23,10 +16,10 @@ fn main(
 
     var ratioScale = 1.;
     if(params.isMobile == 1){
-        ratioScale = ratio.x;
+        ratioScale = in.ratio.x;
     }
 
-    return textureExternal(webcam, imageSampler, uvr / ratioScale * flip + displace, true);
+    return textureExternal(webcam, imageSampler, in.uvr / ratioScale * flip + displace, true);
 }
 `;
 

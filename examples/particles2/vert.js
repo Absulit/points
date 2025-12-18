@@ -5,26 +5,19 @@ const vert = /*wgsl*/`
 ${structs}
 
 @vertex
-fn main(
-    @location(0) position: vec4f,
-    @location(1) color: vec4f,
-    @location(2) uv: vec2f,
-    @location(3) normal: vec3f,
-    @builtin(vertex_index) vertexIndex: u32,
-    @builtin(instance_index) instanceIndex: u32
-) -> Fragment {
-    let particle = particles[instanceIndex];
+fn main(in: VertexIn) -> FragmentIn {
+    let particle = particles[in.instanceIndex];
 
     let ratioX = params.screen.x / params.screen.y;
     let ratioY = 1. / ratioX / (params.screen.y / params.screen.x);
     let ratio = vec2(ratioX, ratioY);
-    let scaled = position.xy / ratio * particle.scale; // .01;
+    let scaled = in.position.xy / ratio * particle.scale; // .01;
 
     let world = scaled + particle.position / ratio;
 
-    let clip = params.projection * vec4f(world, 0., 1.);
+    let clip = camera.camera_projection * vec4f(world, 0., 1.);
 
-    return defaultVertexBody(clip, particle.color, uv, normal);
+    return defaultVertexBody(clip, particle.color, in.uv, in.normal);
 }
 `;
 

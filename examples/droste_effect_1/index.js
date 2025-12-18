@@ -14,7 +14,7 @@ import { RenderPass } from 'points';
  * https://github.com/ruby-processing/picrate-examples/blob/master/library/video/capture/data/droste.glsl
  */
 
-// TODO: does colors requires a 0 at the end? (padding)
+// TODO: do colors requires a 0 at the end? (padding)
 const colors = [
     248,208,146, 0,
     21, 144, 151, 0,

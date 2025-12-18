@@ -16,14 +16,7 @@ const SCALE = 2.;
 const segmentNum = 4;
 
 @fragment
-fn main(
-    @location(0) color: vec4f,
-    @location(1) uv: vec2f,
-    @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
-    @location(3) uvr: vec2f,    // uv with aspect ratio corrected
-    @location(4) mouse: vec2f,
-    @builtin(position) position: vec4f
-) -> @location(0) vec4f {
+fn main(in: FragmentIn) -> @location(0) vec4f {
 
     if(params.mouseClick == 1.){
         click_event.updated = 1;
@@ -31,7 +24,7 @@ fn main(
         showMessage = 0.;
     }
 
-    let feedbackColor = texture(feedbackTexture, imageSampler, uvr * vec2f(1, 1.01), true);
+    let feedbackColor = texture(feedbackTexture, imageSampler, in.uvr * vec2f(1, 1.01), true);
 
 
     let subSegmentLength = i32(params.audioLength) / segmentNum;
@@ -47,23 +40,23 @@ fn main(
         result[index] = audioAverage / f32(subSegmentLength);
     }
 
-    let center = vec2(.5) * ratio;
-    let size = .4 * ratio.x;
-    let circle1 = sdfCircle(center, result[0] * size, .0, uvr) * WHITE;
-    let circle2 = sdfCircle(center, result[1] * size, .0, uvr) * GREEN;
-    let circle3 = sdfCircle(center, result[2] * size, .0, uvr) * YELLOW;
-    let circle4 = sdfCircle(center, result[3] * size, .0, uvr) * RED;
+    let center = vec2(.5) * in.ratio;
+    let size = .4 * in.ratio.x;
+    let circle1 = sdfCircle(center, result[0] * size, .0, in.uvr) * WHITE;
+    let circle2 = sdfCircle(center, result[1] * size, .0, in.uvr) * GREEN;
+    let circle3 = sdfCircle(center, result[2] * size, .0, in.uvr) * YELLOW;
+    let circle4 = sdfCircle(center, result[3] * size, .0, in.uvr) * RED;
 
     // click to play message
     let dims = vec2f(textureDimensions(cta, 0));
     // if you are using uvr you have to multiply by ratio
-    let imageWidth = dims / params.screen * ratio;
+    let imageWidth = dims / params.screen * in.ratio;
     let halfImageWidth = imageWidth * .5 * SCALE;
 
     let ctaColor = texture(
         cta,
         imageSampler,
-        (uvr / SCALE) - (center - halfImageWidth) / SCALE,
+        (in.uvr / SCALE) - (center - halfImageWidth) / SCALE,
         true
     ) * showMessage;
 

@@ -85,6 +85,11 @@ To change the way the vertex of any mesh are displayed use the RenderPass#topolo
 renderPass.topology = PrimitiveTopology.POINT_LIST;
 ```
 
+That being said, the PrimitiveTopology only works as expected or intended, if the mesh has a certain order in their vertices. Because of this a better way to display a wireframe is with a shader. A great example on how to build a shader based wireframe is as follows:
+
+[🔗 see Wireframe 1 Example](https://absulit.github.io/points/examples/index.html#wireframe)
+
+
 ## Instances
 If you plan to work with multiple items of the same mesh, you can use instances. By default, adding a new mesh sets its instance amount as `1`, and this is new draw call, so a good management of the instances is required for performance. Each method to add a mesh (plane, sphere, cube, torus, cylinder) and the same `addMesh` methods, return an object with a few properties but the most important is `instanceCount`, you can increase this value along with the amount of threads to be used in a Compute Shader (review the Particles examples) so each instance goes in par with the amount of threads available, this way a single process can run a mesh characteristics like rotation, position, color, etc.
 
@@ -94,5 +99,32 @@ renderPass.addPlane(
     { x: 0, y: 0, z: 0 },
     { width: 2, height: 2 }
 ).instanceCount = NUMPARTICLES;
+
+```
+
+## Discarding Triangles - CullMode
+
+Triangles that are not visible by the camera can be a performance issue depending on how large the scene is. By default the `CullMode` is `CullMode.BACK`, this ignores the back of the triangles, the part not visible to the camera.
+
+Sometimes you will need both sides to be visible (looking inside an object), then you can use `CullMode.NONE`.
+
+To ignore the front face only you can use `CullMode.FRONT`.
+
+This property is modified per `RenderPass`
+
+```js
+// index.js
+const r1 = new RenderPass(vert1, frag1);
+r1.depthWriteEnabled = true;
+r1.cullMode = CullMode.NONE;
+```
+
+## Face Direction - FrontFace
+
+Along with CullMode, to decide what side is interpreted as "front", the property RenderPass.frontFace is used for this purpose. The order in the creation of the triangle tells WebGPU which face is the front. By default `FrontFace.CCW`.
+
+```js
+const r1 = new RenderPass(vert1, frag1);
+r1.frontFace = FrontFace.CW;
 
 ```

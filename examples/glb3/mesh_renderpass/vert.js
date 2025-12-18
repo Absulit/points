@@ -1,22 +1,12 @@
 import { rotXAxis, rotYAxis, rotZAxis } from 'points/math';
+import { structs } from '../structs.js';
 
 const vert = /*wgsl*/`
 
+${structs}
 ${rotXAxis}
 ${rotYAxis}
 ${rotZAxis}
-
-struct FragmentCustom {
-    @builtin(position) position: vec4f,
-    @location(0) color: vec4f,
-    @location(1) uv: vec2f,
-    @location(2) ratio: vec2f,
-    @location(3) uvr: vec2f,
-    @location(4) mouse: vec2f,
-    @location(5) normal: vec3f,
-    @location(6) world: vec3f,
-    @interpolate(flat) @location(7) id: u32
-}
 
 fn customVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f, world:vec3f) -> FragmentCustom {
     var result: FragmentCustom;
@@ -37,15 +27,7 @@ fn customVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f, wor
 }
 
 @vertex
-fn main(
-    @location(0) position:vec4f,
-    @location(1) color:vec4f,
-    @location(2) uv:vec2f,
-    @location(3) normal:vec3f,
-    @location(4) id:u32,
-    @builtin(vertex_index) vertexIndex: u32,
-    @builtin(instance_index) instanceIndex: u32
-) -> FragmentCustom {
+fn main(in: VertexIn) -> FragmentCustom {
     // var angleZ = params.time * 0.9854;
     var angleY = params.time * 0.94222;
     // var angleX = params.time * 0.865;
@@ -55,13 +37,13 @@ fn main(
     let rotZ = rotZAxis(0);
     let model = rotX * rotY * rotZ;
 
-    let world = (model * vec4f(position.xyz, 1.)).xyz;
-    let clip = params.projection * params.view * vec4f(world, 1.);
+    let world = (model * vec4f(in.position.xyz, 1.)).xyz;
+    let clip = camera.camera_projection * camera.camera_view * vec4f(world, 1.);
 
-    let newNormal = normalize((model * vec4f(normal, 0.)).xyz);
+    let newNormal = normalize((model * vec4f(in.normal, 0.)).xyz);
 
-    var dvb = customVertexBody(clip, color, uv, newNormal, world);
-    dvb.id = id;
+    var dvb = customVertexBody(clip, in.color, in.uv, newNormal, world);
+    dvb.id = in.id;
 
     return dvb;
 }

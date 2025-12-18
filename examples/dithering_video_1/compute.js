@@ -8,20 +8,16 @@ const distance = 1u;
 const workgroupSize = 1;
 
 @compute @workgroup_size(workgroupSize,workgroupSize,1)
-fn main(
-    @builtin(global_invocation_id) GlobalId: vec3u,
-    @builtin(workgroup_id) WorkGroupID: vec3u,
-    @builtin(local_invocation_id) LocalInvocationID: vec3u
-) {
+fn main(in: ComputeIn) {
     //--------------------------------------------------
     let dims = textureDimensions(image);
-    var pointIndex = GlobalId.y + (GlobalId.x * dims.x);
-    // points[pointIndex] = textureLoad(image, GlobalId.yx, 0); // image
-    points[pointIndex] = textureLoad(image, GlobalId.yx); // video
+    var pointIndex = in.GID.y + (in.GID.x * dims.x);
+    // points[pointIndex] = textureLoad(image, in.GID.yx, 0); // image
+    points[pointIndex] = textureLoad(image, in.GID.yx); // video
 
     //--------------------------------------------------
 
-    pointIndex = GlobalId.x + (GlobalId.y * dims.y);
+    pointIndex = in.GID.x + (in.GID.y * dims.y);
 
     let b = brightness(points[pointIndex]);
     let newBrightness = step(.5, b); // if(b > .5){newBrightness = 1.;}
@@ -30,11 +26,11 @@ fn main(
 
     points[pointIndex] = vec4(newBrightness);
 
-    let pointIndexC = GlobalId.x + (GlobalId.y + distance) * dims.y;
+    let pointIndexC = in.GID.x + (in.GID.y + distance) * dims.y;
     let rightPoint = points[pointIndexC];
     points[pointIndexC] = vec4(brightness(rightPoint) + (.5 * quant_error * params.quantError * 2));
 
-    textureStore(outputTex, GlobalId.xy, points[pointIndex]);
+    textureStore(outputTex, in.GID.xy, points[pointIndex]);
 }
 `;
 

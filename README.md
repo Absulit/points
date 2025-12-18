@@ -83,38 +83,45 @@ You can code freely without the use of any of the provided [support modules (mat
         // create your render pass with three shaders as follow
         const renderPass =
             new RenderPass(/*wgsl*/`
+                /**
+                 * VertexIn
+                 * position: vec4f,
+                 * color: vec4f,
+                 * uv: vec2f,
+                 * normal: vec3f,
+                 * id: u32,       // mesh id
+                 * vertexIndex: u32,
+                 * instanceIndex: u32,
+                 */
                 @vertex
-                fn main(
-                    @location(0) position:vec4f,
-                    @location(1) color:vec4f,
-                    @location(2) uv:vec2f,
-                    @builtin(vertex_index) vertexIndex:u32
-                ) -> Fragment {
-
-                    return defaultVertexBody(position, color, uv);
+                fn main(in:VertexIn) -> FragmentIn {
+                    return defaultVertexBody(in.position, in.color, in.uv, in.normal);
                 }`,
                 /*wgsl*/`
+                /**
+                 * VertexIn
+                 * position: vec4f,
+                 * color: vec4f,
+                 * uv: vec2f,
+                 * ratio: vec2f,  // relation between params.screen.x and params.screen.y
+                 * uvr: vec2f,    // uv with aspect ratio corrected
+                 * mouse: vec2f,
+                 * normal: vec3f,
+                 * id: u32,       // mesh or instance id
+                 * barycentrics: vec3f,
+                 */
                 @fragment
-                fn main(
-                    @location(0) color:vec4f,
-                    @location(1) uv:vec2f,
-                    @location(2) ratio:vec2f,  // relation between params.screen.x and params.screen.y
-                    @location(3) uvr:vec2f,    // uv with aspect ratio corrected
-                    @location(4) mouse:vec2f,
-                    @builtin(position) position:vec4f
-                ) -> @location(0) vec4f {
-
-                    return vec4f(uvr, 0, 1);
+                fn main(in:FragmentIn) -> @location(0) vec4f {
+                    return vec4f(in.uvr, 0, 1);
                 }
                 `,
                 /*wgsl*/`
-
+                // ComputeIn
+                // @builtin(global_invocation_id) GID: vec3u,
+                // @builtin(workgroup_id)  in.WID: vec3u,
+                // @builtin(local_invocation_id) LID: vec3u
                 @compute @workgroup_size(8,8,1)
-                fn main(
-                    @builtin(global_invocation_id) GlobalId:vec3u,
-                    @builtin(workgroup_id) WorkGroupID:vec3u,
-                    @builtin(local_invocation_id) LocalInvocationID:vec3u
-                ) {
+                fn main(in:ComputeIn) {
                     let time = params.time;
                 }
                 `,
@@ -161,6 +168,8 @@ You can code freely without the use of any of the provided [support modules (mat
     - [Clear or preserve previous RenderPass output](docs/renderpass.md#clear-or-preserve-previous-renderpass-output)
     - [Lines, points, triangles (wireframe)](docs/renderpass.md#lines-points-triangles-wireframe)
     - [Instances](docs/renderpass.md#instances)
+    - [Discarding Triangles - CullMode](docs/renderpass.md#discarding-triangles---cullmode)
+    - [Face Direction - FrontFace](docs/renderpass.md#face-direction---frontface)
 - [Using the examples for a custom project](docs/create_your_custom_shader_project.md)
 - Data Input and Output
     - [Default data available to read](docs/default_data_to_read.md)
@@ -179,6 +188,11 @@ You can code freely without the use of any of the provided [support modules (mat
         - [Binding Texture - setBindingTexture](docs/send_data_into_the_shaders.md#bindingtexture---setbindingtexture)
         - [Video - setTextureVideo](docs/send_data_into_the_shaders.md#video---settexturevideo)
         - [Webcam - setTextureWebcam](docs/send_data_into_the_shaders.md#webcam---settexturewebcam)
+        - [DepthMap - setTextureDepth2d](docs/send_data_into_the_shaders.md#depthmap---settexturedepth2d)
+        - [Audio - setAudio](docs/send_data_into_the_shaders.md#audio---setaudio)
+        - [Cameras](docs/send_data_into_the_shaders.md#cameras)
+            - [Perspective Camera - setCameraPerspective](docs/send_data_into_the_shaders.md#perspective-camera---setcameraperspective)
+            - [Orthographic Camera - setCameraOrthographic](docs/send_data_into_the_shaders.md#orthographic-camera---setcameraorthographic)
     - [Retrieve data from the shaders](docs/retrieve_data_from_the_shaders.md)
         - [Read Storage - readStorage](docs/retrieve_data_from_the_shaders.md#read-storage---readstorage)
         - [Events - addEventListener](docs/retrieve_data_from_the_shaders.md#events---addeventlistener)

@@ -12,16 +12,9 @@ ${texture}
 ${rotateVector}
 
 @fragment
-fn main(
-    @location(0) color: vec4f,
-    @location(1) uv: vec2f,
-    @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
-    @location(3) uvr: vec2f,    // uv with aspect ratio corrected
-    @location(4) mouse: vec2f,
-    @builtin(position) position: vec4f
-) -> @location(0) vec4f {
+fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    let flippedUV = vec2f(uv.x, 1. - uv.y);
+    let flippedUV = vec2f(in.uv.x, 1. - in.uv.y);
     let shadow = textureSampleCompare(depth, imageSamplerCompare, flippedUV, params.dof);
 
     let texSize = vec2f(textureDimensions(depth, 0));
@@ -29,13 +22,13 @@ fn main(
     let d = textureLoad(depth, coords, 0);
     let visual = pow(d, params.dof * 100);
 
-    let firstPassColor = texture(first_pass, imageSampler, uvr, true);
+    let firstPassColor = texture(first_pass, imageSampler, in.uvr, true);
 
     return blur9(
         first_pass,
         imageSampler,
         vec2(),
-        uvr,
+        in.uvr,
         vec2f(512), // resolution
         rotateVector(vec2f(2.,0) * visual, 0) // direction
     );

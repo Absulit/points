@@ -23,14 +23,7 @@ fn paletteLerp(a:array<vec3f,6>, value:f32) -> vec3f {
 }
 
 @fragment
-fn main(
-    @location(0) color: vec4f,
-    @location(1) uv: vec2f,
-    @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
-    @location(3) uvr: vec2f,    // uv with aspect ratio corrected
-    @location(4) mouse: vec2f,
-    @builtin(position) position: vec4f
-) -> @location(0) vec4f {
+fn main(in: FragmentIn) -> @location(0) vec4f {
 
 
     if(variables.init == 0){
@@ -46,11 +39,11 @@ fn main(
         variables.init = 1;
     }
 
-    let center = vec2f(.5) * ratio;
+    let center = vec2f(.5) * in.ratio;
 
-    let d = 1 - distance(uvr, center);
+    let d = 1 - distance(in.uvr, center);
     let uvrRotated = rotateVector(
-        (uvr - center) / params.scale,
+        (in.uvr - center) / params.scale,
         params.time * .1
     );
     let uvrTwisted = rotateVector(
@@ -64,7 +57,7 @@ fn main(
     let n = snoise(displaceValue + uvrTwisted ) * .5 + .5;
 
     let finalColor = vec4(
-        paletteLerp(colors, fract(n + params.time * .01 + uvr.x)),
+        paletteLerp(colors, fract(n + params.time * .01 + in.uvr.x)),
         1
     );
 

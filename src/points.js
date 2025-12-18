@@ -1,6 +1,6 @@
 import UniformKeys from './UniformKeys.js';
 import VertexBufferInfo from './VertexBufferInfo.js';
-import RenderPass, { PrimitiveTopology, LoadOp } from './RenderPass.js';
+import RenderPass, { PrimitiveTopology, LoadOp, CullMode, FrontFace } from './RenderPass.js';
 import RenderPasses from './RenderPasses.js';
 import Coordinate from './coordinate.js';
 import RGBAColor from './color.js';
@@ -12,6 +12,23 @@ import { loadImage, strToImage } from './texture-string.js';
 import LayersArray from './LayersArray.js';
 import UniformsArray from './UniformsArray.js';
 import getStorageAccessMode, { bindingModes, entriesModes } from './storage-accessmode.js';
+import { cross, dot, normalize, sub } from './matrix.js';
+
+/**
+ * Class to be used to decide if the output textures can hold more data beyond
+ * the range from 0..1, thing is useful for HDR images.
+ *
+ * @example
+ *
+ * points.presentationFormat = PresentationFormat.RGBA16FLOAT;
+ *
+ */
+class PresentationFormat {
+    static BGRA8UNORM = 'bgra8unorm';
+    static RGBA8UNORM = 'rgba8unorm';
+    static RGBA16FLOAT = 'rgba16float';
+    static RGBA32FLOAT = 'rgba32float';
+}
 
 /**
  * Main class Points, this is the entry point of an application with this library.
@@ -45,16 +62,14 @@ class Points {
     /** @type {Array<RenderPass>} */
     #renderPasses = null;
     #postRenderPasses = [];
-    #vertexBufferInfo = null;
     #buffer = null;
     #presentationSize = null;
-    #depthTexture = null;
-    // #vertexArray = [];
     #numColumns = 1;
     #numRows = 1;
     #commandsFinished = [];
     #uniforms = new UniformsArray();
     #meshUniforms = new UniformsArray();
+    #cameraUniforms = new UniformsArray();
     #constants = [];
     #storage = [];
     #readStorage = [];
@@ -120,6 +135,17 @@ class Points {
                 }
             });
         }
+
+        // initializing internal uniforms
+        this.setUniform(UniformKeys.TIME, this.#time);
+        this.setUniform(UniformKeys.DELTA, this.#delta);
+        this.setUniform(UniformKeys.EPOCH, this.#epoch);
+        this.setUniform(UniformKeys.MOUSE_CLICK, this.#mouseClick);
+        this.setUniform(UniformKeys.MOUSE_DOWN, this.#mouseDown);
+        this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
+        this.setUniform(UniformKeys.SCREEN, [0, 0], 'vec2f');
+        this.setUniform(UniformKeys.MOUSE, [0, 0], 'vec2f');
+        this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta, 'vec2f');
     }
 
     #resizeCanvasToFitWindow = () => {
@@ -161,12 +187,11 @@ class Points {
             // will copy out of the swapchain texture.
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
         });
-        this.#depthTexture = this.#device.createTexture({
-            label: '_depthTexture',
-            size: this.#presentationSize,
-            format: 'depth32float',
-            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING,
-        });
+
+        this.#renderPasses.forEach(renderPass => {
+            renderPass.textureDepth = this.#createTextureDepth('_depthTexture');
+        })
+
         // this is to solve an issue that requires the texture to be resized
         // if the screen dimensions change, this for a `setTexture2d` with
         // `copyCurrentTexture` parameter set to `true`.
@@ -251,6 +276,30 @@ class Points {
         }
         Object.seal(uniform);
         this.#meshUniforms.push(uniform);
+        return uniform;
+    }
+
+    #setCameraUniform(name, value, structName = null) {
+        const uniformToUpdate = this.#nameExists(this.#cameraUniforms, name);
+        if (uniformToUpdate && structName) {
+            // if name exists is an update
+            // console.warn(`#setCameraUniform(${name}, [${value}], ${structName}) can't set the structName of an already defined uniform.`);
+        }
+        if (uniformToUpdate) {
+            uniformToUpdate.value = value;
+            return uniformToUpdate;
+        }
+        if (structName && isArray(structName)) {
+            throw `${structName} is an array, which is currently not supported for Uniforms.`;
+        }
+        const uniform = {
+            name: name,
+            value: value,
+            type: structName,
+            size: null
+        }
+        Object.seal(uniform);
+        this.#cameraUniforms.push(uniform);
         return uniform;
     }
 
@@ -502,7 +551,7 @@ class Points {
      * points.setSampler('imageSampler', descriptor);
      *
      * // wgsl string
-     * let value = texturePosition(image, imageSampler, position, uvr, true);
+     * let value = texturePosition(image, imageSampler, position, in.uvr, true);
      */
 
     setSampler(name, descriptor, shaderType) {
@@ -578,12 +627,20 @@ class Points {
         return texture2d;
     }
 
+    /**
+     * Creates a depth map from the selected `renderPassIndex`
+     * @param {String} name
+     * @param {GPUShaderStage} shaderType
+     * @param {Number} renderPassIndex
+     * @returns
+     */
     setTextureDepth2d(name, shaderType, renderPassIndex) {
         const exists = this.#nameExists(this.#texturesDepth2d, name);
         if (exists) {
             console.warn(`setTextureDepth2d: \`${name}\` already exists.`);
             return exists;
         }
+        renderPassIndex ||= 0;
         const textureDepth2d = {
             name,
             shaderType,
@@ -594,7 +651,6 @@ class Points {
         this.#texturesDepth2d.push(textureDepth2d);
         return textureDepth2d;
     }
-
 
     copyTexture(nameTextureA, nameTextureB) {
         const texture2d_A = this.#nameExists(this.#textures2d, nameTextureA);
@@ -630,7 +686,7 @@ class Points {
      * await points.setTextureImage('image', './../myimage.jpg');
      *
      * // wgsl string
-     * let rgba = texturePosition(image, imageSampler, position, uvr, true);
+     * let rgba = texturePosition(image, imageSampler, position, in.uvr, true);
      */
     async setTextureImage(name, path, shaderType = null) {
         const texture2dToUpdate = this.#nameExists(this.#textures2d, name);
@@ -666,6 +722,7 @@ class Points {
             copyCurrentTexture: false,
             shaderType: shaderType,
             texture: null,
+            renderPassIndex: null,
             imageTexture: {
                 bitmap: imageBitmap
             },
@@ -701,7 +758,7 @@ class Points {
      * );
      *
      * // wgsl string
-     * let textColors = texturePosition(textImg, imageSampler, position, uvr, true);
+     * let textColors = texturePosition(textImg, imageSampler, position, in.uvr, true);
      *
      */
     async setTextureString(name, text, path, size, offset = 0, shaderType = null) {
@@ -759,7 +816,7 @@ class Points {
      * await points.setTextureVideo('video', './../myvideo.mp4');
      *
      * // wgsl string
-     * let rgba = textureExternalPosition(video, imageSampler, position, uvr, true);
+     * let rgba = textureExternalPosition(video, imageSampler, position, in.uvr, true);
      */
     async setTextureVideo(name, path, shaderType) {
         if (this.#nameExists(this.#texturesExternal, name)) {
@@ -794,7 +851,7 @@ class Points {
      * await points.setTextureWebcam('video');
      *
      * // wgsl string
-     * et rgba = textureExternalPosition(video, imageSampler, position, uvr, true);
+     * et rgba = textureExternalPosition(video, imageSampler, position, in.uvr, true);
      */
     async setTextureWebcam(name, size = { width: 1080, height: 1080 }, shaderType) {
         if (this.#nameExists(this.#texturesExternal, name)) {
@@ -838,7 +895,7 @@ class Points {
      * const audio = points.setAudio('audio', 'audiofile.ogg', volume, loop, autoplay);
      *
      * // wgsl
-     * let audioX = audio.data[ u32(uvr.x * params.audioLength)] / 256;
+     * let audioX = audio.data[ u32(in.uvr.x * params.audioLength)] / 256;
      */
     setAudio(name, path, volume, loop, autoplay) {
         const audio = new Audio(path);
@@ -953,6 +1010,128 @@ class Points {
     }
 
     /**
+     * Creates a Perspective camera with a given name to be used in the shaders.
+     * The name is used as identifier in the shaders for the Projection and View matrices.
+     *
+     * The name will be inside the `camera` uniform and composed with the
+     * projection and view identifiers: e.g.:
+     * name: mycamera
+     * uniform buffers:
+     *  camera.mycamera_projection;
+     *  camera.mycamera_view
+     *
+     * The camera must be called on the update method so the aspect is updated by default
+     * with the canvas width and height.
+     * @param {String} name camera name in the shader for the projection and view
+     * @param {vec3f} position
+     * @param {Number} fov field of view angle
+     * @param {Number} near clipping near
+     * @param {Number} far clipping far
+     * @param {Number} aspect ratio of the camera, by default it choses the canvas aspect ratio
+     *
+     * @example
+     * // js
+     *  points.setCameraPerspective('camera', [0, 0, -5]);
+     *
+     * // wgsl string
+     * let clip = camera.camera_projection * camera.camera_view * vec4f(world, 1.);
+     */
+    setCameraPerspective(name, position = [0, 0, -5], lookAt = [0, 0, 0], fov = 45, near = .1, far = 100, aspect = null) {
+        const fov_radians = fov * (Math.PI / 180);
+        const f = 1.0 / Math.tan(fov_radians / 2); // ≈ 2.414
+        const nf = 1 / (near - far);
+        aspect ??= this.#canvas.width / this.#canvas.height;
+
+        const perspectiveMatrix = [
+            f / aspect, 0, 0, 0,
+            0, f, 0, 0,
+            0, 0, (far + near) * nf, -1,
+            0, 0, (2 * far * near) * nf, 0
+        ]
+
+        this.#setCameraUniform(
+            `${name}_projection`,
+            perspectiveMatrix,
+            'mat4x4<f32>'
+        );
+
+        const up = [0, 1, 0];
+        const ff = normalize(sub(lookAt, position));
+        const r = normalize(cross(ff, up));
+        const u = cross(r, ff);
+
+        const viewMatrix = [
+            r[0], u[0], -ff[0], 0,
+            r[1], u[1], -ff[1], 0,
+            r[2], u[2], -ff[2], 0,
+            -dot(r, position), -dot(u, position), dot(ff, position), 1
+        ]
+
+        this.#setCameraUniform(`${name}_view`, viewMatrix, 'mat4x4<f32>');
+    }
+
+    /**
+     * Creates an Orthographic camera with a given name to be used in the shaders.
+     * The name is used as identifier in the shaders for the Projection matrix.
+     *
+     * The name will be inside the `camera` uniform and composed with the
+     * projection identifier: e.g.:
+     * name: mycamera
+     * uniform buffer:
+     *  camera.mycamera_projection;
+     *
+     * @param {String} name
+     * @param {Number} left
+     * @param {Number} right
+     * @param {Number} top
+     * @param {Number} bottom
+     * @param {Number} near
+     * @param {Number} far
+     *
+     * @example
+     * // js
+     * points.setCameraOrthographic('camera');
+     *
+     * // wgsl string
+     * let clip = camera.camera_projection * vec4f(world, 0.0, 1.0);
+     *
+     */
+    setCameraOrthographic(name, left = -1, right = 1, top = 1, bottom = -1, near = -1, far = 1, position = [0, 0, -5], lookAt = [0, 0, 0]) {
+        // const aspect = canvas.width / canvas.height; // alternative to aspect in shader
+
+        const lr = 1 / (right - left);
+        const bt = 1 / (top - bottom);
+        const nf = 1 / (near - far);
+
+        const orthoMatrix = [
+            2 * lr, 0, 0, 0,
+            0, 2 * bt, 0, 0,
+            0, 0, nf, 0,
+            -(right + left) * lr,
+            -(top + bottom) * bt,
+            near * nf,
+            1
+        ];
+
+        this.#setCameraUniform(`${name}_projection`, orthoMatrix, 'mat4x4<f32>');
+
+
+        const up = [0, 1, 0];
+        const ff = normalize(sub(lookAt, position));
+        const r = normalize(cross(ff, up));
+        const u = cross(r, ff);
+
+        const viewMatrix = [
+            r[0], u[0], -ff[0], 0,
+            r[1], u[1], -ff[1], 0,
+            r[2], u[2], -ff[2], 0,
+            -dot(r, position), -dot(u, position), dot(ff, position), 1
+        ]
+
+        this.#setCameraUniform(`${name}_view`, viewMatrix, 'mat4x4<f32>');
+    }
+
+    /**
      * Listens for an event dispatched from WGSL code
      * @param {String} name Number that represents an event Id
      * @param {Function} callback function to be called when the event occurs
@@ -1015,6 +1194,10 @@ class Points {
         }
         if (this.#meshUniforms.length) {
             dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <uniform> mesh: Mesh;\n`;
+            bindingIndex += 1;
+        }
+        if (this.#cameraUniforms.length) {
+            dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <uniform> camera: Camera;\n`;
             bindingIndex += 1;
         }
         this.#storage.forEach(storageItem => {
@@ -1179,6 +1362,7 @@ class Points {
         let dynamicGroupBindingsFragment = '';
         let dynamicStructParams = '';
         let dynamicStructMesh = '';
+        let dynamicStructCamera = '';
         this.#uniforms.forEach(u => {
             u.type = u.type || 'f32';
             dynamicStructParams += /*wgsl*/`${u.name}:${u.type}, \n\t`;
@@ -1193,10 +1377,18 @@ class Points {
         if (this.#meshUniforms.length) {
             dynamicStructMesh = /*wgsl*/`struct Mesh {\n\t${dynamicStructMesh}\n}\n`;
         }
+        this.#cameraUniforms.forEach(u => {
+            u.type = u.type || 'f32';
+            dynamicStructCamera += /*wgsl*/`${u.name}:${u.type}, \n\t`;
+        });
+        if (this.#cameraUniforms.length) {
+            dynamicStructCamera = /*wgsl*/`struct Camera {\n\t${dynamicStructCamera}\n}\n`;
+        }
         this.#constants.forEach(c => {
             dynamicStructParams += /*wgsl*/`const ${c.name}:${c.structName} = ${c.value};\n`;
         })
         dynamicStructParams += dynamicStructMesh;
+        dynamicStructParams += dynamicStructCamera;
 
         renderPass.index = index;
         renderPass.hasVertexShader && (dynamicGroupBindingsVertex += dynamicStructParams);
@@ -1265,25 +1457,11 @@ class Points {
      */
     async init(renderPasses) {
         this.#renderPasses = renderPasses.concat(this.#postRenderPasses);
-        // initializing internal uniforms
-        this.setUniform(UniformKeys.TIME, this.#time);
-        this.setUniform(UniformKeys.DELTA, this.#delta);
-        this.setUniform(UniformKeys.EPOCH, this.#epoch);
-        this.setUniform(UniformKeys.SCREEN, [0, 0], 'vec2f');
-        this.setUniform(UniformKeys.MOUSE, [0, 0], 'vec2f');
-        this.setUniform(UniformKeys.MOUSE_CLICK, this.#mouseClick);
-        this.setUniform(UniformKeys.MOUSE_DOWN, this.#mouseDown);
-        this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
-        this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta, 'vec2f');
         let hasComputeShaders = this.#renderPasses.some(renderPass => renderPass.hasComputeShader);
         if (!hasComputeShaders && this.#bindingTextures.length) {
             throw ' `setBindingTexture` requires at least one Compute Shader in a `RenderPass`'
         }
 
-        this.#renderPasses.forEach(r => r.init?.(this));
-        this.#renderPasses.forEach(r => r.meshes.forEach(mesh => this.#setMeshUniform(mesh.name, mesh.id, 'u32')));
-        this.#renderPasses.forEach(this.#compileRenderPass);
-        this.#generateDataSize();
         //
         // let adapter = null;
         if (!this.#adapter) {
@@ -1303,7 +1481,7 @@ class Points {
 
         this.#device.lost.then(info => console.log(info));
         if (this.#canvas !== null) this.#context = this.#canvas.getContext('webgpu');
-        this.#presentationFormat = navigator.gpu.getPreferredCanvasFormat();
+        this.#presentationFormat ||= navigator.gpu.getPreferredCanvasFormat();
         if (this.#canvasId) {
             if (this.#fitWindow) {
                 this.#resizeCanvasToFitWindow();
@@ -1312,14 +1490,19 @@ class Points {
             }
         }
 
-        // this.#createVertexBuffer(new Float32Array(this.#vertexArray));
         // TODO: this should be inside RenderPass, to not call vertexArray outside
-        this.#renderPasses.forEach(renderPass => {
-            this.createScreen(renderPass);
-            renderPass.vertexBufferInfo = new VertexBufferInfo(renderPass.vertexArray);
-            renderPass.vertexBuffer = this.#createAndMapBuffer(renderPass.vertexArray, GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST);
-        })
+        this.#renderPasses.forEach((r, i) => {
+            r.init?.(this);
+            r.meshes.forEach(mesh => this.#setMeshUniform(mesh.name, mesh.id, 'u32'));
 
+            this.createScreen(r);
+            r.vertexBufferInfo = new VertexBufferInfo(r.vertexArray);
+            r.vertexBuffer = this.#createAndMapBuffer(r.vertexArray, GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST);
+
+            this.#compileRenderPass(r, i);
+        });
+
+        this.#generateDataSize();
         this.#createBuffers();
         this.#createPipeline();
 
@@ -1380,14 +1563,7 @@ class Points {
             }
         }
     }
-    /**
-     * @param {Float32Array} vertexArray
-     * @returns buffer
-     */
-    #createVertexBuffer(vertexArray) {
-        this.#vertexBufferInfo = new VertexBufferInfo(vertexArray);
-        this.#buffer = this.#createAndMapBuffer(vertexArray, GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST);
-    }
+
     /**
      * @param {Float32Array} data
      * @param {GPUBufferUsageFlags} usage
@@ -1396,10 +1572,13 @@ class Points {
      * @returns {GPUBuffer} mapped buffer
      */
     #createAndMapBuffer(data, usage, mappedAtCreation = true, size = null) {
+        // the size comes from dataSize
+        // but in some cases size is null and we have to use byteLength
+        // sometimes both arrive and we have to use the bigger one
         const buffer = this.#device.createBuffer({
-            mappedAtCreation: mappedAtCreation,
-            size: size || data.byteLength,
-            usage: usage,
+            mappedAtCreation,
+            size: Math.max(size, data.byteLength),
+            usage,
         });
         new Float32Array(buffer.getMappedRange()).set(data);
         buffer.unmap();
@@ -1413,11 +1592,7 @@ class Points {
      * @returns {GPUBuffer} buffer
      */
     #createBuffer(size, usage) {
-        const buffer = this.#device.createBuffer({
-            size: size,
-            usage: usage,
-        });
-        return buffer
+        return this.#device.createBuffer({ size, usage });
     }
 
     /**
@@ -1445,7 +1620,7 @@ class Points {
         // we check the paddings list and add 0's to just the ones that need it
         const uniformsClone = structuredClone(uniformsArray);
         let arrayValues = uniformsClone.map(v => {
-            const padding = paddings[v.name];
+            const padding = paddings[v.name] / 4;
             if (padding) {
                 if (v.value.constructor !== Array) {
                     v.value = [v.value];
@@ -1456,12 +1631,7 @@ class Points {
             }
             return v.value;
         }).flat(1);
-        const finalPadding = paddings[''];
-        if (finalPadding) {
-            for (let i = 0; i < finalPadding; i++) {
-                arrayValues.push(0);
-            }
-        }
+
         return { values: new Float32Array(arrayValues), paramsDataSize };
     }
 
@@ -1472,6 +1642,10 @@ class Points {
         if (this.#meshUniforms.length) {
             const { values, paramsDataSize } = this.#createUniformValues(this.#meshUniforms);
             this.#meshUniforms.buffer = this.#createAndMapBuffer(values, GPUBufferUsage.UNIFORM + GPUBufferUsage.COPY_DST, true, paramsDataSize.bytes);
+        }
+        if (this.#cameraUniforms.length) {
+            const { values, paramsDataSize } = this.#createUniformValues(this.#cameraUniforms);
+            this.#cameraUniforms.buffer = this.#createAndMapBuffer(values, GPUBufferUsage.UNIFORM + GPUBufferUsage.COPY_DST, true, paramsDataSize.bytes);
         }
     }
 
@@ -1488,6 +1662,10 @@ class Points {
         if (this.#meshUniforms.length) {
             const { values } = this.#createUniformValues(this.#meshUniforms);
             this.#writeBuffer(this.#meshUniforms.buffer, values);
+        }
+        if (this.#cameraUniforms.length) {
+            const { values } = this.#createUniformValues(this.#cameraUniforms);
+            this.#writeBuffer(this.#cameraUniforms.buffer, values);
         }
     }
 
@@ -1595,7 +1773,11 @@ class Points {
         });
         //--------------------------------------------
         // this.#texturesDepth2d.forEach(texture2d => this.#createTextureDepth(texture2d));
-        this.#texturesDepth2d.forEach(texture2d => texture2d.texture = this.#depthTexture);
+
+        this.#texturesDepth2d.forEach(texture2d => {
+            const renderPass = this.#renderPasses.find(renderPass => renderPass.index === texture2d.renderPassIndex)
+            texture2d.texture = renderPass.textureDepth;
+        });
         //--------------------------------------------
         this.#textures2dArray.forEach(texture2dArray => {
             if (texture2dArray.imageTextures) {
@@ -1650,9 +1832,9 @@ class Points {
         });
     }
 
-    #createTextureDepth(texture2d) {
-        texture2d.texture = this.#device.createTexture({
-            label: texture2d.name,
+    #createTextureDepth(name) {
+        return this.#device.createTexture({
+            label: name,
             size: this.#presentationSize,
             format: 'depth32float',
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING,
@@ -1669,14 +1851,14 @@ class Points {
     }
 
     #createPipeline() {
-        this.#renderPasses.forEach((renderPass, index) => {
+        this.#renderPasses.forEach(renderPass => {
             if (renderPass.hasComputeShader) {
                 this.#createBindGroup(renderPass, GPUShaderStage.COMPUTE);
                 renderPass.computePipeline = this.#device.createComputePipeline({
                     layout: this.#device.createPipelineLayout({
                         bindGroupLayouts: [renderPass.bindGroupLayoutCompute]
                     }),
-                    label: `_createPipeline() - ${index}`,
+                    label: `_createPipeline() - ${renderPass.index}`,
                     compute: {
                         module: this.#device.createShaderModule({
                             code: renderPass.compiledShaders.compute
@@ -1742,10 +1924,16 @@ class Points {
                                         format: 'float32x3',
                                     },
                                     {
-                                        // id
+                                        // id -> meshCounter
                                         shaderLocation: 4,
                                         offset: renderPass.vertexBufferInfo.idOffset,
                                         format: 'uint32',
+                                    },
+                                    {
+                                        // barycentrics
+                                        shaderLocation: 5,
+                                        offset: renderPass.vertexBufferInfo.barycentricsOffset,
+                                        format: 'float32x3',
                                     },
                                 ],
                             },
@@ -1820,6 +2008,21 @@ class Points {
                     resource: {
                         label: 'uniform',
                         buffer: this.#meshUniforms.buffer
+                    },
+                    buffer: {
+                        type: 'uniform'
+                    },
+                    // visibility
+                }
+            );
+        }
+        if (this.#cameraUniforms.length) {
+            entries.push(
+                {
+                    binding: bindingIndex++,
+                    resource: {
+                        label: 'uniform',
+                        buffer: this.#cameraUniforms.buffer
                     },
                     buffer: {
                         type: 'uniform'
@@ -1914,11 +2117,13 @@ class Points {
             if (texture2d.renderPassIndex !== renderPassIndex) {
                 const isInternal = internal === texture2d.internal;
                 if (isInternal && (!texture2d.shaderType || texture2d.shaderType & shaderType)) {
+                    const renderPass = this.#renderPasses.find(renderPass => renderPass.index === texture2d.renderPassIndex)
+                    texture2d.texture = renderPass.textureDepth;
                     entries.push(
                         {
                             label: 'texture depth 2d',
                             binding: bindingIndex++,
-                            resource: this.#depthTexture.createView(),
+                            resource: texture2d.texture.createView(),
                             texture: {
                                 sampleType: 'depth',
                                 viewDimension: '2d',
@@ -2187,11 +2392,11 @@ class Points {
         this.setUniform(UniformKeys.TIME, this.#time);
         this.setUniform(UniformKeys.DELTA, this.#delta);
         this.setUniform(UniformKeys.EPOCH, this.#epoch);
-        this.setUniform(UniformKeys.SCREEN, [this.#canvas.width, this.#canvas.height]);
-        this.setUniform(UniformKeys.MOUSE, [this.#mouseX, this.#mouseY]);
         this.setUniform(UniformKeys.MOUSE_CLICK, this.#mouseClick);
         this.setUniform(UniformKeys.MOUSE_DOWN, this.#mouseDown);
         this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
+        this.setUniform(UniformKeys.SCREEN, [this.#canvas.width, this.#canvas.height]);
+        this.setUniform(UniformKeys.MOUSE, [this.#mouseX, this.#mouseY]);
         this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta);
         //--------------------------------------------
         this.#writeParametersUniforms();
@@ -2222,7 +2427,7 @@ class Points {
             if (renderPass.hasVertexAndFragmentShader) {
                 renderPass.descriptor.colorAttachments[0].view = swapChainTexture.createView();
                 if (renderPass.depthWriteEnabled && (!renderPass.descriptor.depthStencilAttachment.view || this.#screenResized)) {
-                    renderPass.descriptor.depthStencilAttachment.view = this.#depthTexture.createView();
+                    renderPass.descriptor.depthStencilAttachment.view = renderPass.textureDepth.createView();
                 }
 
                 const isSameDevice = this.#device === renderPass.device;
@@ -2278,7 +2483,7 @@ class Points {
 
                 // Copy the rendering results from the swapchain into |texture2d.texture|.
                 this.#textures2d.forEach(texture2d => {
-                    if (texture2d.renderPassIndex === renderPass.index || !texture2d.renderPassIndex) {
+                    if (texture2d.renderPassIndex === renderPass.index || !Number.isInteger(texture2d.renderPassIndex)) {
                         if (texture2d.copyCurrentTexture) {
                             commandEncoder.copyTextureToTexture(
                                 {
@@ -2416,9 +2621,6 @@ class Points {
     get context() {
         return this.#context;
     }
-    get presentationFormat() {
-        return this.#presentationFormat;
-    }
     get buffer() {
         return this.#buffer;
     }
@@ -2472,10 +2674,31 @@ class Points {
         }
     }
 
+    get presentationFormat() {
+        return this.#presentationFormat;
+    }
+
+    /**
+     * Set the maximum range the render textures can hold.
+     * If you need HDR values use `16` or `32` float formats.
+     * This value is used in the texture that is created when a fragment shader
+     * returns its data, so if you use a `vec4` that goes beyond the default
+     * capped of `0..1` like `vec4(16,0,1,1)`, then use `16` or `32`.
+     *
+     * {@link PresentationFormat}
+     *
+     * By default it has the `navigator.gpu.getPreferredCanvasFormat();` value.
+     * @param {PresentationFormat|String|GPUTextureFormat} value
+     */
+    set presentationFormat(value) {
+        this.#presentationFormat = value;
+    }
+
     destroy() {
 
         this.#uniforms = new UniformsArray();
         this.#meshUniforms = new UniformsArray();
+        this.#cameraUniforms = new UniformsArray();
 
         this.#texturesExternal.forEach(textureExternal => {
             const stream = textureExternal?.video.srcObject;
@@ -2485,4 +2708,4 @@ class Points {
 }
 
 export default Points;
-export { RenderPass, RenderPasses, PrimitiveTopology, LoadOp };
+export { RenderPass, RenderPasses, PrimitiveTopology, CullMode, LoadOp, PresentationFormat, FrontFace };
