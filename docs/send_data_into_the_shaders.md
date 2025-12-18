@@ -412,7 +412,62 @@ let audioX = audio.data[ u32(in.uvr.x * params.audioLength)] / 256;
 > **Note:** The `points.setAudio` method returns a `new Audio` reference, you are responsible to start and stop the audio from the JavaScript side, if you require to start and stop a sound by creating a call from the shaders, please check the `Events - addEventListener` section
 
 ---
+# Cameras
 
+For 3d scenes where you add meshes via the `RenderPass.add*` methods, you might want to add a camera. The camera will provide you with a couple of new uniform matrices you can call in the Vertex Shader to set the projection accordingly. This process is not automatic like in other libraries, you have to add it manually in your vertex shader. This might change later.
+
+When creating a camera a new `camera` is created to hold data for the cameras only. This data are the Projection and View matrices. The cameras are named after the name set by the user when the camera is created, followed by a postfix of the type of matrix data it has:
+
+```js
+// `myCameraName` will be the starting name in `camera` uniform on wgsl
+points.setCameraPerspective(`myCameraName`);
+```
+
+```rust
+camera.myCameraName_projection
+camera.myCameraName_view
+```
+
+
+## Perspective Camera - setCameraPerspective
+
+```js
+// index.js
+points.setCameraPerspective('camera0', [0, 0, -5], [0, 0, 0]);
+```
+
+```rust
+// vert.js
+let world = (model * vec4f(in.position.xyz, 1.)).xyz;
+let clip = camera.camera0_projection * camera.camera0_view * vec4f(world, 1.);
+
+let newNormal = normalize((model * vec4f(in.normal, 0.)).xyz);
+
+var dvb = defaultVertexBody(clip, in.color, in.uv, newNormal);
+dvb.world = world;
+```
+
+
+## Orthographic Camera - setCameraOrthographic
+
+```js
+// index.js
+points.setCameraOrthographic('camera1');
+
+```
+
+```rust
+// vert.js
+let clip = camera.camera1_projection * vec4f(world, 0., 1.);
+
+return defaultVertexBody(clip, particle.color, in.uv, in.normal);
+```
+
+---
+
+> **Note:** Currently, meshes do not have a Model matrix, this might change in the future. Also, object and camera rotations should be done via shaders. This also might change in the future.
+
+---
 
 ## Layers - setLayers
 
