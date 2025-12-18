@@ -40,30 +40,23 @@ fn customVertexBody(position:vec4f, depth:vec4f, uv:vec2f, normal:vec3f, particl
 }
 
 @vertex
-fn main(
-    @location(0) position: vec4f,
-    @location(1) color: vec4f,
-    @location(2) uv: vec2f,
-    @location(3) normal: vec3f,
-    @builtin(vertex_index) vertexIndex: u32,
-    @builtin(instance_index) instanceIndex: u32
-) -> CustomFragment {
-    let particle = particles[instanceIndex];
+fn main(in: VertexIn) -> CustomFragment {
+    let particle = particles[in.instanceIndex];
 
     let model = rotationMatrix(particle.rotation);
 
-    let rotated = model * position.xyz;
+    let rotated = model * in.position.xyz;
     let scaled = rotated * particle.scale;
     let world = scaled + particle.position;
 
-    let clip = params.projection * params.view * vec4f(world, 1.0);
+    let clip = camera.camera_projection * camera.camera_view * vec4f(world, 1.0);
 
-    let transformedNormal = model * normal;
+    let transformedNormal = model * in.normal;
     let newNormal = normalize(transformedNormal);
 
     let depth = vec4f(-particle.position.z / 253);
 
-    return customVertexBody(clip, depth, uv, newNormal, particle);
+    return customVertexBody(clip, depth, in.uv, newNormal, particle);
 }
 `;
 

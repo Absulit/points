@@ -91,7 +91,7 @@ const base = {
         await points.setTextureImage('image', './../img/absulit_800x800.jpg');
         await points.setTextureVideo('video', './../img/8056464-hd_1080_1920_30fps_800x800.mp4');
 
-        points.setUniform('projection', orthoMatrix, 'mat4x4<f32>');
+        points.setCameraOrthographic('camera');
 
         points.setUniform('maxLife', options.maxLife);
         folder.add(options, 'maxLife', 1, 600, .0001).name('maxLife');

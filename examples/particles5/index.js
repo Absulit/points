@@ -21,7 +21,7 @@ let THREADS_X = 8;
 let THREADS_Y = 8;
 let THREADS_Z = 4;
 
-if(options.isMobile){
+if (options.isMobile) {
     WORKGROUP_X = 8;
     WORKGROUP_Y = 4;
     WORKGROUP_Z = 2;
@@ -37,7 +37,7 @@ const NUMPARTICLES = WORKGROUP_X * WORKGROUP_Y * WORKGROUP_Z * THREADS_X * THREA
 console.log('NUMPARTICLES: ', NUMPARTICLES);
 
 const cube_renderpass = new RenderPass(vert, frag, compute, WORKGROUP_X, WORKGROUP_Y, WORKGROUP_Z);
-cube_renderpass.clearValue = {r:0,g:0,b:0,a:0};
+cube_renderpass.clearValue = { r: 0, g: 0, b: 0, a: 0 };
 cube_renderpass.loadOp = LoadOp.CLEAR;
 cube_renderpass.depthWriteEnabled = true;
 cube_renderpass.addPlane(
@@ -72,38 +72,16 @@ const base = {
         points.setConstant('THREADS_Z', THREADS_Z, 'u32');
         points.setStorage('particles', `array<Particle, ${NUMPARTICLES}>`);
 
-        aspect = points.canvas.width / points.canvas.height;
-        points.setUniform(
-            'projection',
-            [
-                f / aspect, 0, 0, 0,
-                0, f, 0, 0,
-                0, 0, (far + near) * nf, -1,
-                0, 0, (2 * far * near) * nf, 0
-            ],
-            'mat4x4<f32>'
-        )
-
-        // camera at [0, -1.5, 5], looking above origin
-        points.setUniform(
-            'view',
-            [
-                1, 0, 0, 0,
-                0, 1, 0, 0,
-                0, 0, 1, 0,
-                0, -1.5, -5, 1
-            ],
-            'mat4x4<f32>'
-        )
+        points.setCameraPerspective('camera');
 
         points.setUniform('lambert', options.lambert);
         folder.add(options, 'lambert').name('lambert');
 
         points.setUniform('speed', options.speed);
-        folder.add(options, 'speed',0,1,.0001).name('speed');
+        folder.add(options, 'speed', 0, 1, .0001).name('speed');
 
         points.setUniform('scale', options.scale);
-        folder.add(options, 'scale',0,1,.0001).name('scale');
+        folder.add(options, 'scale', 0, 1, .0001).name('scale');
 
         folder.open();
     },
@@ -111,17 +89,7 @@ const base = {
      * @param {Points} points
      */
     update: points => {
-
-        aspect = points.canvas.width / points.canvas.height;
-        points.setUniform(
-            'projection',
-            [
-                f / aspect, 0, 0, 0,
-                0, f, 0, 0,
-                0, 0, (far + near) * nf, -1,
-                0, 0, (2 * far * near) * nf, 0
-            ]
-        )
+        points.setCameraPerspective('camera', [0, 1.5, 5], [0, 0, -1000]);
         points.setUniform('lambert', options.lambert);
         points.setUniform('speed', options.speed);
         points.setUniform('scale', options.scale);

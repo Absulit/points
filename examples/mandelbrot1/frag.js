@@ -38,15 +38,8 @@ fn angle(p1:vec2f, p2:vec2f) -> f32 {
 }
 
 @fragment
-fn main(
-    @location(0) color: vec4f,
-    @location(1) uv: vec2f,
-    @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
-    @location(3) uvr: vec2f,    // uv with aspect ratio corrected
-    @location(4) mouse: vec2f,
-    @builtin(position) position: vec4f
-) -> @location(0) vec4f {
-    let center = vec2(.5,.5) * ratio;
+fn main(in: FragmentIn) -> @location(0) vec4f {
+    let center = vec2(.5,.5) * in.ratio;
 
     if(variables.init == 0){
         variables.fragtalCenter = center;
@@ -71,7 +64,7 @@ fn main(
     }
 
     if(params.mouseDown == 1 && variables.isClicked == 0){
-        variables.mouseStart = mouse * ratio;
+        variables.mouseStart = in.mouse * in.ratio;
         variables.isClicked = 1;
     }
 
@@ -91,16 +84,16 @@ fn main(
     }
 
     if(params.mouseDown == 1){
-        variables.mouseEnd = mouse * ratio;
+        variables.mouseEnd = in.mouse * in.ratio;
         variables.finalPosition = variables.fragtalCenter + p;
     }
 
     let fp = variables.finalPosition;
 
-    let cross = showDebugCross(fp, RED, uvr);
-    let cross_center = showDebugCross(center, YELLOW, uvr);
+    let cross = showDebugCross(fp, RED, in.uvr);
+    let cross_center = showDebugCross(center, YELLOW, in.uvr);
 
-    let c = (uvr - center) / new_scale - fp + center;
+    let c = (in.uvr - center) / new_scale - fp + center;
 
     var x = 0.;
     var y = 0.;
@@ -120,15 +113,15 @@ fn main(
     if(iteration < numIterations){
         finalColor = vec4(
             percentageIteration,
-            percentageIteration * uvr.x * fusin(1),
-            percentageIteration * uvr.y,
+            percentageIteration * in.uvr.x * fusin(1),
+            percentageIteration * in.uvr.y,
             1
         );
     }else{
         finalColor = vec4(
             percentageIteration,
-            percentageIteration * uvr.x,
-            1 - percentageIteration * uvr.y,
+            percentageIteration * in.uvr.x,
+            1 - percentageIteration * in.uvr.y,
             1
         );
     }
@@ -144,8 +137,8 @@ fn main(
 
 
     // to draw a couple of circles to debug the touch
-    // let startCircle = sdfCircle(variables.mouseStart, .01,.01, uvr) * GREEN;
-    // let endCircle = sdfCircle(variables.mouseEnd, .01,.01, uvr) * BLUE;
+    // let startCircle = sdfCircle(variables.mouseStart, .01,.01, in.uvr) * GREEN;
+    // let endCircle = sdfCircle(variables.mouseEnd, .01,.01, in.uvr) * BLUE;
     // return layer(layer(finalColor, startCircle), endCircle);
 
     return finalColor;

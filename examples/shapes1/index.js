@@ -4,7 +4,7 @@ import frag from './frag.js';
 import { RenderPass } from 'points';
 
 const options = {
-    squareSize: .423,
+    squareSize: .103,
     squareFeather: .009,
     lineWidth: .092,
 }

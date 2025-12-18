@@ -7,14 +7,7 @@ ${rotYAxis}
 ${rotZAxis}
 
 @vertex
-fn main(
-    @location(0) position: vec4f,
-    @location(1) color: vec4f,
-    @location(2) uv: vec2f,
-    @location(3) normal: vec3f,
-    @builtin(vertex_index) vertexIndex: u32,
-    @builtin(instance_index) instanceIndex: u32
-) -> Fragment {
+fn main(in: VertexIn) -> FragmentIn {
 
     let rotX = rotXAxis(params.time * -.6854);
     let rotY = rotYAxis(params.time * .4222);
@@ -22,10 +15,10 @@ fn main(
 
     let model = rotX * rotY * rotZ;
 
-    let world = (model * vec4f(position.xyz, 1.)).xyz * 2;
-    let clip = params.projection * params.view * vec4f(world, 1.0);
+    let world = (model * vec4f(in.position.xyz, 1.)).xyz * 2;
+    let clip = camera.camera_projection * camera.camera_view * vec4f(world, 1.0);
 
-    return defaultVertexBody(clip, color, uv, normal);
+    return defaultVertexBody(clip, in.color, in.uv, in.normal);
 }
 `;
 

@@ -359,6 +359,38 @@ async function init() {
 let rgbaWebcam = textureSampleBaseClampToEdge(webcam, feedbackSampler, fract(uv));
 ```
 
+## DepthMap - setTextureDepth2d
+
+Whenever a 3d is created you can request the creation of a Depth Map. This can be done per RenderPass and the RenderPass will hold the reference for that Depth Map.
+
+There can only be one Depth Map per RenderPass and you have to tell the index of the RenderPass you want the depth data from. You can not read the data in the same RenderPass, it has to be read in another. This because there's a restriction in WebGPU that you can only write or read to the same texture in the same pass, so any use of the depth texture is forced to at least two RenderPass. You also need a special type of sampler, one with a `compare` attribute and a value like `less` or `greater` among others.
+
+[🔗 see GPUCompareFunction](https://www.w3.org/TR/webgpu/#enumdef-gpucomparefunction)
+
+```js
+// index.js
+const descriptor = {
+    // … other options
+    compare: 'less', // https://www.w3.org/TR/webgpu/#enumdef-gpucomparefunction
+}
+points.setSampler('shadowSampler', descriptor);
+points.setTextureDepth2d('depth', GPUShaderStage.FRAGMENT, 0);
+```
+
+```rust
+// frag.js
+visibility += textureSampleCompare(
+    depth, shadowSampler,
+    in.shadowPos.xy + offset, in.shadowPos.z - 0.007
+);
+```
+Two great examples of the depth map use are here:
+
+[🔗 see GLB 2 Example](https://absulit.github.io/points/examples/index.html#glb2)
+
+[🔗 see Shadow 1 Example](https://absulit.github.io/points/examples/index.html#shadow1)
+
+
 ## Audio - setAudio
 
 You can load audio and use its data for visualization.
@@ -371,7 +403,7 @@ let audio = points.setAudio('myAudio', './../../audio/cognitive_dissonance.mp3',
 
 With the `myAudio` name, a `Sound` type named `myAudio` is created. In the future it will have more information but now it only has the `data` property. `data` is an `array<f32, 2048>`, but it's not completely filled with data, it's only filled up to `params.myAudioLength`, (`myAudio` used as prefix for each different audio) and then each of these values has a max of 256, so if you want something like a percentage, you have to divide the value at a certain index between 256
 ```rust
-let audioX = audio.data[ u32(uvr.x * params.audioLength)] / 256;
+let audioX = audio.data[ u32(in.uvr.x * params.audioLength)] / 256;
 ```
 
 
@@ -380,7 +412,62 @@ let audioX = audio.data[ u32(uvr.x * params.audioLength)] / 256;
 > **Note:** The `points.setAudio` method returns a `new Audio` reference, you are responsible to start and stop the audio from the JavaScript side, if you require to start and stop a sound by creating a call from the shaders, please check the `Events - addEventListener` section
 
 ---
+# Cameras
 
+For 3d scenes where you add meshes via the `RenderPass.add*` methods, you might want to add a camera. The camera will provide you with a couple of new uniform matrices you can call in the Vertex Shader to set the projection accordingly. This process is not automatic like in other libraries, you have to add it manually in your vertex shader. This might change later.
+
+When creating a camera a new `camera` is created to hold data for the cameras only. This data are the Projection and View matrices. The cameras are named after the name set by the user when the camera is created, followed by a postfix of the type of matrix data it has:
+
+```js
+// `myCameraName` will be the starting name in `camera` uniform on wgsl
+points.setCameraPerspective(`myCameraName`);
+```
+
+```rust
+camera.myCameraName_projection
+camera.myCameraName_view
+```
+
+
+## Perspective Camera - setCameraPerspective
+
+```js
+// index.js
+points.setCameraPerspective('camera0', [0, 0, -5], [0, 0, 0]);
+```
+
+```rust
+// vert.js
+let world = (model * vec4f(in.position.xyz, 1.)).xyz;
+let clip = camera.camera0_projection * camera.camera0_view * vec4f(world, 1.);
+
+let newNormal = normalize((model * vec4f(in.normal, 0.)).xyz);
+
+var dvb = defaultVertexBody(clip, in.color, in.uv, newNormal);
+dvb.world = world;
+```
+
+
+## Orthographic Camera - setCameraOrthographic
+
+```js
+// index.js
+points.setCameraOrthographic('camera1');
+
+```
+
+```rust
+// vert.js
+let clip = camera.camera1_projection * vec4f(world, 0., 1.);
+
+return defaultVertexBody(clip, particle.color, in.uv, in.normal);
+```
+
+---
+
+> **Note:** Currently, meshes do not have a Model matrix, this might change in the future. Also, object and camera rotations should be done via shaders. This also might change in the future.
+
+---
 
 ## Layers - setLayers
 

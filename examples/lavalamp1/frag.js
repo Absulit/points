@@ -62,14 +62,7 @@ fn map(p: vec3f, step:f32) -> RayInfo {
 }
 
 @fragment
-fn main(
-    @location(0) color: vec4f,
-    @location(1) uv: vec2f,
-    @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
-    @location(3) uvr: vec2f,    // uv with aspect ratio corrected
-    @location(4) mouse: vec2f,
-    @builtin(position) position: vec4f
-) -> @location(0) vec4f {
+fn main(in: FragmentIn) -> @location(0) vec4f {
 
     rand_seed.x = .01835255;
     if(variables.init == 0){
@@ -90,8 +83,8 @@ fn main(
         variables.init = 1;
     }
 
-    let uv2 = uvr * 4 - (vec2(2) * ratio); // clip space
-    let m = mouse * 4 - (vec2(2) * ratio);
+    let uv2 = in.uvr * 4 - (vec2(2) * in.ratio); // clip space
+    let m = in.mouse * 4 - (vec2(2) * in.ratio);
 
     // initialization
     var ro = vec3f(0, 0, -3); // ray origin

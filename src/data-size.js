@@ -7,79 +7,116 @@
 
 const size_2_align_2 = { size: 2, align: 2 };
 const size_4_align_4 = { size: 4, align: 4 };
+const size_6_align_8 = { size: 6, align: 8 };
+const size_8_align_4 = { size: 8, align: 4 };
 const size_8_align_8 = { size: 8, align: 8 };
+const size_12_align_4 = { size: 12, align: 4 };
 const size_12_align_16 = { size: 12, align: 16 };
+const size_16_align_4 = { size: 16, align: 4 };
 const size_16_align_16 = { size: 16, align: 16 };
 const size_16_align_8 = { size: 16, align: 8 };
+const size_24_align_8 = { size: 24, align: 8 };
 const size_32_align_8 = { size: 32, align: 8 };
-const size_24_align_16 = { size: 24, align: 16 };
-const size_48_align_16 = { size: 48, align: 16 };
 const size_32_align_16 = { size: 32, align: 16 };
+const size_48_align_16 = { size: 48, align: 16 };
 const size_64_align_16 = { size: 64, align: 16 };
 
 export const typeSizes = {
     'bool': size_4_align_4,
-    'f32': size_4_align_4,
     'i32': size_4_align_4,
     'u32': size_4_align_4,
+    'f32': size_4_align_4,
 
     'f16': size_2_align_2,
 
-    'vec2<bool>': size_8_align_8,
-    'vec2<f32>': size_8_align_8,
-    'vec2<i32>': size_8_align_8,
-    'vec2<u32>': size_8_align_8,
-
-    // 'vec2<bool>': size_8_align_8,
-    'vec2f': size_8_align_8,
-    'vec2i': size_8_align_8,
-    'vec2u': size_8_align_8,
-
-    'vec3<bool>': size_12_align_16,
-    'vec3<f32>': size_12_align_16,
-    'vec3<i32>': size_12_align_16,
-    'vec3<u32>': size_12_align_16,
-
-    // 'vec3<bool>': size_12_align_16,
-    'vec3f': size_12_align_16,
-    'vec3i': size_12_align_16,
-    'vec3u': size_12_align_16,
-
-    'vec4<bool>': size_16_align_16,
-    'vec4<f32>': size_16_align_16,
-    'vec4<i32>': size_16_align_16,
-    'vec4<u32>': size_16_align_16,
-    'mat2x2<f32>': size_16_align_8,
-    'mat2x3<f32>': size_32_align_8,
-    'mat2x4<f32>': size_32_align_8,
-    'mat3x2<f32>': size_24_align_16,
-    'mat3x3<f32>': size_48_align_16,
-    'mat3x4<f32>': size_48_align_16,
-    'mat4x2<f32>': size_32_align_16,
-    'mat4x3<f32>': size_64_align_16,
-    'mat4x4<f32>': size_64_align_16,
-
-    // 'vec4<bool>': size_16_align_16,
-    'vec4f': size_16_align_16,
-    'vec4i': size_16_align_16,
-    'vec4u': size_16_align_16,
-    'mat2x2f': size_16_align_8,
-    'mat2x3f': size_32_align_8,
-    'mat2x4f': size_32_align_8,
-    'mat3x2f': size_24_align_16,
-    'mat3x3f': size_48_align_16,
-    'mat3x4f': size_48_align_16,
-    'mat4x2f': size_32_align_16,
-    'mat4x3f': size_64_align_16,
-    'mat4x4f': size_64_align_16,
-
     'atomic<u32>': size_4_align_4,
     'atomic<i32>': size_4_align_4,
+
+    'vec2<bool>': size_8_align_8,
+    'vec2<i32>': size_8_align_8,
+    'vec2<u32>': size_8_align_8,
+    'vec2<f32>': size_8_align_8,
+    // 'vec2<bool>': size_8_align_8,
+    'vec2i': size_8_align_8,
+    'vec2u': size_8_align_8,
+    'vec2f': size_8_align_8,
+
+    'vec2<f16>': size_4_align_4,
+    'vec2h': size_4_align_4,
+
+    'vec3<bool>': size_12_align_16,
+    'vec3<i32>': size_12_align_16,
+    'vec3<u32>': size_12_align_16,
+    'vec3<f32>': size_12_align_16,
+    // 'vec3<bool>': size_12_align_16,
+    'vec3i': size_12_align_16,
+    'vec3u': size_12_align_16,
+    'vec3f': size_12_align_16,
+
+    'vec3<f16>': size_6_align_8,
+    'vec3h': size_6_align_8,
+
+    'vec4<bool>': size_16_align_16,
+    'vec4<i32>': size_16_align_16,
+    'vec4<u32>': size_16_align_16,
+    'vec4<f32>': size_16_align_16,
+    // 'vec4<bool>': size_16_align_16,
+    'vec4i': size_16_align_16,
+    'vec4u': size_16_align_16,
+    'vec4f': size_16_align_16,
+
+    'vec4<f16>': size_8_align_8,
+    'vec4h': size_8_align_8,
+
+    'mat2x2<f32>': size_16_align_8,
+    'mat2x2f': size_16_align_8,
+    'mat2x2<f16>': size_8_align_4,
+    'mat2x2h': size_8_align_4,
+
+    'mat3x2<f32>': size_24_align_8,
+    'mat3x2f': size_24_align_8,
+    'mat3x2<f16>': size_12_align_4,
+    'mat3x2h': size_12_align_4,
+
+    'mat4x2<f32>': size_32_align_8,
+    'mat4x2f': size_32_align_8,
+    'mat4x2<f16>': size_16_align_4,
+    'mat4x2h': size_16_align_4,
+
+    'mat2x3<f32>': size_32_align_16,
+    'mat2x3f': size_32_align_16,
+    'mat2x3<f16>': size_16_align_8,
+    'mat2x3h': size_16_align_8,
+
+    'mat3x3<f32>': size_48_align_16,
+    'mat3x3f': size_48_align_16,
+    'mat3x3<f16>': size_24_align_8,
+    'mat3x3h': size_24_align_8,
+
+    'mat4x3<f32>': size_64_align_16,
+    'mat4x3f': size_64_align_16,
+    'mat4x3<f16>': size_32_align_8,
+    'mat4x3h': size_32_align_8,
+
+    'mat2x4<f32>': size_32_align_16,
+    'mat2x4f': size_32_align_16,
+    'mat2x4<f16>': size_16_align_8,
+    'mat2x4h': size_16_align_8,
+
+    'mat3x4<f32>': size_48_align_16,
+    'mat3x4f': size_48_align_16,
+    'mat3x4<f16>': size_24_align_8,
+    'mat3x4h': size_24_align_8,
+
+    'mat4x4<f32>': size_64_align_16,
+    'mat4x4f': size_64_align_16,
+    'mat4x4<f16>': size_32_align_8,
+    'mat4x4h': size_32_align_8,
 }
 
 
 // ignore comments
-const removeCommentsRE = /^(?:(?!\/\/|\/*.*\/).|\n)+/gim
+const removeCommentsRE = /\/\*[\s\S]*?\*\/|\/\/.*/gim
 
 // struct name:
 const getStructNameRE = /struct\s+?(\w+)\s*{[^}]+}\n?/g
@@ -95,12 +132,11 @@ const arrayIntegrityRE = /\s*(array\s*<\s*\w+\s*(?:,\s*\d+)?\s*>)\s*,?/g
 
 function removeComments(value) {
     const matches = value.matchAll(removeCommentsRE);
-    let result = '';
     for (const match of matches) {
         const captured = match[0];
-        result += captured;
+        value = value.replace(captured, '');
     }
-    return result;
+    return value;
 }
 
 function getInsideStruct(value) {
@@ -162,28 +198,6 @@ export function getArrayTypeAndAmount(value) {
     return result;
 }
 
-function addBytesToAlign(bytes, aligment) {
-    const remainder = bytes % aligment;
-    let result = 0;
-    if (remainder !== 0) {
-        // if not multiple we obtain the diff
-        // and add it to byteCounter to make it fit the alignment
-        const multipleDiff = aligment - remainder;
-        result = bytes = multipleDiff;
-    }
-    return result;
-}
-
-function getPadding(bytes, aligment, nextTypeDataSize) {
-    const nextMultiple = (bytes + aligment - 1) & ~(aligment - 1)
-    const needsPadding = (bytes + nextTypeDataSize) > nextMultiple;
-    let padAmount = 0
-    if (needsPadding) {
-        padAmount = nextMultiple - bytes;
-    }
-    return padAmount;
-}
-
 /**
  * Check if string has 'array' in it
  * @param {String} value
@@ -207,123 +221,117 @@ export function getArrayAlign(structName, structData) {
 
 export function getArrayTypeData(currentType, structData) {
     const [d] = getArrayTypeAndAmount(currentType);
-    if(!d){
+    if (!d) {
         throw `${currentType} seems to have an error, maybe a wrong amount?`;
     }
     if (d.amount == 0) {
         throw new Error(`${currentType} has an amount of 0`);
     }
-    // if is an array with no amount then use these default values
-    let currentTypeData = { size: 16, align: 16 };
-    if (!!d.amount) {
+    let currentTypeData = typeSizes[d.type] || structData.get(d.type);
+    if (!currentTypeData) {
+        throw `Struct or type '${d.type}' in ${currentType} is not defined.`
+    }
+    if (d.amount) {
         const t = typeSizes[d.type];
         if (t) {
             // if array, the size is equal to the align
             currentTypeData = { size: t.align * d.amount, align: t.align };
-            // currentTypeData = { size: t.size * d.amount, align: t.align };
-            // currentTypeData = { size: 0, align: 0 };
         } else {
             const sd = structData.get(d.type);
             if (sd) {
                 currentTypeData = { size: sd.bytes * d.amount, align: sd.maxAlign };
             }
         }
-    } else {
-        const t = typeSizes[d.type] || structData.get(d.type);
-        currentTypeData = { size: t.size || t.bytes, align: t.maxAlign };
     }
     return currentTypeData;
 }
 
+
+/**
+ * Calculates if there's a space of bytes left in the row
+ * @param {Number} bytes current bytes size
+ * @param {Number} maxSize max size of row, in this case probably 16
+ * @returns remaining bytes if any
+ */
+function getPadding(bytes, maxSize) {
+    const remainder = bytes % maxSize
+    let remainingBytes = 0;
+    if (remainder) {
+        remainingBytes = maxSize - remainder;
+    }
+    return remainingBytes
+}
+
+const MAX_ROW_SIZE = 16;
+const HALF = 2;
 export const dataSize = value => {
     const noCommentsValue = removeComments(value);
     const structData = getStructDataByName(noCommentsValue);
 
-    for (const [structDatumKey, structDatum] of structData) {
-        // to obtain the higher max alignment, but this can be also calculated
-        // in the next step
-        structDatum.unique_types.forEach(ut => {
-            let maxAlign = structDatum.maxAlign || 0;
-            let align = 0;
-            // if it doesn't exists in typeSizes is an Array or a new Struct
-            if (!typeSizes[ut]) {
-                if (isArray(ut)) {
-                    align = getArrayAlign(ut, structData);
-                } else {
-                    const sd = structData.get(ut);
-                    align = sd.maxAlign;
-                }
-            } else {
-                align = typeSizes[ut].align;
-            }
-            maxAlign = align > maxAlign ? align : maxAlign;
-            structDatum.maxAlign = maxAlign;
-        });
+    structData.forEach(sd => {
+        let bytes = 0;
+        let remainingBytes = 0;
+        sd.paddings = {};
+        sd.names.forEach((name, i) => {
+            const type = sd.types[i];
+            let typeSize = typeSizes[type];
+            let repeat = 0;
 
-        let byteCounter = 0;
-        structDatum.types.forEach((t, i) => {
-            const name = structDatum.names[i];
-            const currentType = t;
-            const nextType = structDatum.types[i + 1];
-            let currentTypeData = typeSizes[currentType];
-            let nextTypeData = typeSizes[nextType];
+            // if no typeSize is an array or struct
+            if (!typeSize) {
+                if (type) {
+                    if (isArray(type)) {
+                        const [innerType] = getArrayTypeAndAmount(type);
 
-            structDatum.paddings = structDatum.paddings || {};
-
-            // if currentTypeData or nextTypeData have no data it means
-            // it's a struct or an array
-            // if it's a struct the data is already saved in structData
-            // because it was calculated previously
-            // assuming the struct was declared previously
-            if (!currentTypeData) {
-                if (currentType) {
-                    if (isArray(currentType)) {
-                        currentTypeData = getArrayTypeData(currentType, structData);
+                        typeSize = typeSizes[innerType.type];
+                        repeat = innerType.amount; // check comment on top of do while
+                        innerType.align = MAX_ROW_SIZE;
                     } else {
-                        const sd = structData.get(currentType);
-                        if (sd) {
-                            currentTypeData = { size: sd.bytes, align: sd.maxAlign };
+                        const sd = structData.get(type);
+                        if(!sd){
+                            throw `Type or struct ${type} doesn't exist.`;
                         }
-                    }
-                }
-            }
-            // read above
-            if (!nextTypeData) {
-                if (nextType) {
-                    if (isArray(nextType)) {
-                        nextTypeData = getArrayTypeData(nextType, structData);
-                    } else {
-                        const sd = structData.get(nextType)
-                        if (sd) {
-                            nextTypeData = { size: sd.bytes, align: sd.maxAlign };
-                        }
+                        typeSize = { size: sd.bytes, align: MAX_ROW_SIZE };
                     }
                 }
             }
 
-            if (!!currentTypeData) {
-                byteCounter += currentTypeData.size;
-                if ((currentTypeData.size === structDatum.maxAlign) || !nextType) {
-                    return;
+            const { size, align } = typeSize;
+            const prevName = sd.names[i - 1];
+
+            /**
+             * The idea with the repeat and the do while is that, if there's an
+             * array, the subtype will be added `type.amount` times with the
+             * same rules. That's it.
+             */
+            do {
+                let aligned = bytes % align === 0;
+
+                while (!aligned) {
+                    remainingBytes -= HALF
+                    bytes += HALF;
+                    sd.paddings[prevName] ||= 0;
+                    sd.paddings[prevName] += HALF;
+                    aligned = bytes % align === 0;
                 }
-            }
 
-            if (!!nextTypeData) {
-                const padAmount = getPadding(byteCounter, structDatum.maxAlign, nextTypeData.size)
-                if (padAmount) {
-                    structDatum.paddings[name] = padAmount / 4;
-                    byteCounter += padAmount;
+                if (remainingBytes && size > remainingBytes) {
+                    bytes += remainingBytes;
+                    sd.paddings[prevName] = remainingBytes;
+                    remainingBytes = 0;
                 }
-            }
-        });
 
-        const padAmount = getPadding(byteCounter, structDatum.maxAlign, 16)
-        if (padAmount) {
-            structDatum.paddings[''] = padAmount / 4;
-            byteCounter += padAmount;
-        }
+                bytes += size;
 
-        structDatum.bytes = byteCounter;
-    }
-    return structData;
+                repeat--;
+            } while (repeat > 0)
+
+            remainingBytes = getPadding(bytes, MAX_ROW_SIZE);
+        })
+        remainingBytes = getPadding(bytes, MAX_ROW_SIZE);
+        bytes += remainingBytes;
+        sd.bytes = bytes;
+    })
+
+    return structData
 }

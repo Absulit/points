@@ -27,21 +27,14 @@ const size = vec2(8u, 22u);
 const sizeF32 = vec2f(size);
 
 @fragment
-fn main(
-        @location(0) color: vec4f,
-        @location(1) uv: vec2f,
-        @location(2) ratio: vec2f,
-        @location(3) uvr: vec2f,
-        @location(4) mouse: vec2f,
-        @builtin(position) position: vec4f
-    ) -> @location(0) vec4f {
+fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    let center = vec2(.5) * ratio ;
+    let center = vec2(.5) * in.ratio ;
     // start in center if mouse is not moving yet
-    let mouser = mix(mouse * ratio, center, select(0., 1., any(mouse == vec2f())));
+    let mouser = mix(in.mouse * in.ratio, center, select(0., 1., any(in.mouse == vec2f())));
     let startPosition = center * scaleDigits;
     let cellRatio =
-        vec2(sizeF32.x / params.screen.x, sizeF32.y / params.screen.y) * ratio;
+        vec2(sizeF32.x / params.screen.x, sizeF32.y / params.screen.y) * in.ratio;
 
     let displaceInX = vec2(cellRatio.x, 0);
     let start0char = 16u;
@@ -54,28 +47,28 @@ fn main(
         image,
         imageSampler,
         startPosition,
-        uvr * scaleDigits,
-        ratio,
+        in.uvr * scaleDigits,
+        in.ratio,
         size
     ).r;
     // -----------------------------------------------
     numberToDecode = params.mouse.y;
     let startPosition2 =
-        startPosition - vec2(0, sizeF32.x / params.screen.y) * ratio;
+        startPosition - vec2(0, sizeF32.x / params.screen.y) * in.ratio;
     let digits2 = GREEN * decodeNumberSprite(
         numberToDecode,
         start0char,
         image,
         imageSampler,
         startPosition2,
-        uvr * scaleDigits,
-        ratio,
+        in.uvr * scaleDigits,
+        in.ratio,
         size
     ).r;
 
-    //let debugTop = showDebugCross(startPosition + cellRatio, YELLOW, uvr);
+    //let debugTop = showDebugCross(startPosition + cellRatio, YELLOW, in.uvr);
     let debugPosition = mouser;
-    let debugBottom = showDebugCross(debugPosition, RED, uvr);
+    let debugBottom = showDebugCross(debugPosition, RED, in.uvr);
 
     var finalColor = layer(layer(digits, digits2), debugBottom);
 
@@ -88,19 +81,19 @@ fn main(
         bobbles,
         imageSampler,
         positionAnim,
-        uvr / scaleAnim,
+        in.uvr / scaleAnim,
         indexAnim,
         vec2u(24,24)
     );
     // -----------------------------------------------
     scaleAnim = 10.;
-    positionAnim = (mouser + vec2(.1, 0) * ratio) / scaleAnim;
+    positionAnim = (mouser + vec2(.1, 0) * in.ratio) / scaleAnim;
     indexAnim = u32(51 * fract(params.time * .15));
     let animPenguin = sprite(
         penguin,
         imageSampler,
         positionAnim,
-        uvr / scaleAnim,
+        in.uvr / scaleAnim,
         indexAnim,
         vec2u(32)
     );
@@ -110,7 +103,7 @@ fn main(
         .14,
         0.,
         0.,
-        uvr
+        in.uvr
     ) * .5;
 
     return finalColor + animColor + layer(vec4(square), animPenguin);

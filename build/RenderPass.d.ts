@@ -24,7 +24,7 @@ export class FrontFace {
     /** @type {GPUFrontFace} */
     static CCW: GPUFrontFace;
     /** @type {GPUFrontFace} */
-    static CC: GPUFrontFace;
+    static CW: GPUFrontFace;
 }
 /**
  * To tell the {@link RenderPass} how the data from the previous RenderPass
@@ -219,6 +219,12 @@ declare class RenderPass {
      */
     set depthWriteEnabled(val: boolean);
     get depthWriteEnabled(): boolean;
+    /**
+     * Holder for the depth map for this RenderPass only
+     * @param {GPUTexture} val
+     */
+    set textureDepth(val: GPUTexture);
+    get textureDepth(): GPUTexture;
     /**
      * Controls if the last RenderPass data is preserved on screen or cleared.
      * Default {@link LoadOp#CLEAR}
