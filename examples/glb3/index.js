@@ -1,5 +1,5 @@
 
-import Points, { RenderPass, RenderPasses } from 'points';
+import Points, { FrontFace, RenderPass, RenderPasses } from 'points';
 import { mesh_renderpass } from './mesh_renderpass/index.js';
 import { loadAndExtract } from 'utils';
 
@@ -13,6 +13,7 @@ const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0]
 mesh_renderpass.addMesh('monkey', positions, colors, colorSize, uvs, normals, indices);
 mesh_renderpass.depthWriteEnabled = true;
 mesh_renderpass.clearValue = { r: 61 / 255, g: 37 / 255, b: 103 / 255, a: 1 }
+// mesh_renderpass.frontFace = FrontFace.CW
 
 const base = {
     renderPasses: [

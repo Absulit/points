@@ -59,7 +59,7 @@ export class FrontFace {
     /** @type {GPUFrontFace} */
     static CCW = 'ccw';
     /** @type {GPUFrontFace} */
-    static CC = 'cc';
+    static CW = 'cw';
 }
 
 /**
