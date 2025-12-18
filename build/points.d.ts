@@ -1075,18 +1075,6 @@ declare class Points {
      */
     get device(): GPUDevice;
     get context(): any;
-    /**
-     * Set the maximum range the render textures can hold.
-     * If you need HDR values use `16` or `32` float formats.
-     * This value is used in the texture that is created when a fragment shader
-     * returns its data, so if you use a `vec4` that goes beyond the default
-     * capped of `0..1` like `vec4(16,0,1,1)`, then use `16` or `32`.
-     *
-     * By default it has the `navigator.gpu.getPreferredCanvasFormat();` value.
-     * @param {PresentationFormat|String|GPUTextureFormat} value
-     */
-    set presentationFormat(value: PresentationFormat | string | GPUTextureFormat);
-    get presentationFormat(): PresentationFormat | string | GPUTextureFormat;
     get buffer(): any;
     /**
      * Triggers the app to run in full screen mode
@@ -1097,6 +1085,20 @@ declare class Points {
      */
     set fullscreen(value: boolean);
     get fullscreen(): boolean;
+    /**
+     * Set the maximum range the render textures can hold.
+     * If you need HDR values use `16` or `32` float formats.
+     * This value is used in the texture that is created when a fragment shader
+     * returns its data, so if you use a `vec4` that goes beyond the default
+     * capped of `0..1` like `vec4(16,0,1,1)`, then use `16` or `32`.
+     *
+     * {@link PresentationFormat}
+     *
+     * By default it has the `navigator.gpu.getPreferredCanvasFormat();` value.
+     * @param {PresentationFormat|String|GPUTextureFormat} value
+     */
+    set presentationFormat(value: PresentationFormat | string | GPUTextureFormat);
+    get presentationFormat(): PresentationFormat | string | GPUTextureFormat;
     destroy(): void;
     #private;
 }
@@ -1140,7 +1142,7 @@ declare class FrontFace {
     /** @type {GPUFrontFace} */
     static CCW: GPUFrontFace;
     /** @type {GPUFrontFace} */
-    static CC: GPUFrontFace;
+    static CW: GPUFrontFace;
 }
 declare class Coordinate {
     constructor(x?: number, y?: number, z?: number);

@@ -24,7 +24,7 @@ export class FrontFace {
     /** @type {GPUFrontFace} */
     static CCW: GPUFrontFace;
     /** @type {GPUFrontFace} */
-    static CC: GPUFrontFace;
+    static CW: GPUFrontFace;
 }
 /**
  * To tell the {@link RenderPass} how the data from the previous RenderPass
