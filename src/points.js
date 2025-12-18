@@ -1,6 +1,6 @@
 import UniformKeys from './UniformKeys.js';
 import VertexBufferInfo from './VertexBufferInfo.js';
-import RenderPass, { PrimitiveTopology, LoadOp, CullMode } from './RenderPass.js';
+import RenderPass, { PrimitiveTopology, LoadOp, CullMode, FrontFace } from './RenderPass.js';
 import RenderPasses from './RenderPasses.js';
 import Coordinate from './coordinate.js';
 import RGBAColor from './color.js';
@@ -14,6 +14,15 @@ import UniformsArray from './UniformsArray.js';
 import getStorageAccessMode, { bindingModes, entriesModes } from './storage-accessmode.js';
 import { cross, dot, normalize, sub } from './matrix.js';
 
+/**
+ * Class to be used to decide if the output textures can hold more data beyond
+ * the range from 0..1, thing is useful for HDR images.
+ *
+ * @example
+ *
+ * points.presentationFormat = PresentationFormat.RGBA16FLOAT;
+ *
+ */
 class PresentationFormat {
     static BGRA8UNORM = 'bgra8unorm';
     static RGBA8UNORM = 'rgba8unorm';
@@ -542,7 +551,7 @@ class Points {
      * points.setSampler('imageSampler', descriptor);
      *
      * // wgsl string
-     * let value = texturePosition(image, imageSampler, position, uvr, true);
+     * let value = texturePosition(image, imageSampler, position, in.uvr, true);
      */
 
     setSampler(name, descriptor, shaderType) {
@@ -677,7 +686,7 @@ class Points {
      * await points.setTextureImage('image', './../myimage.jpg');
      *
      * // wgsl string
-     * let rgba = texturePosition(image, imageSampler, position, uvr, true);
+     * let rgba = texturePosition(image, imageSampler, position, in.uvr, true);
      */
     async setTextureImage(name, path, shaderType = null) {
         const texture2dToUpdate = this.#nameExists(this.#textures2d, name);
@@ -749,7 +758,7 @@ class Points {
      * );
      *
      * // wgsl string
-     * let textColors = texturePosition(textImg, imageSampler, position, uvr, true);
+     * let textColors = texturePosition(textImg, imageSampler, position, in.uvr, true);
      *
      */
     async setTextureString(name, text, path, size, offset = 0, shaderType = null) {
@@ -807,7 +816,7 @@ class Points {
      * await points.setTextureVideo('video', './../myvideo.mp4');
      *
      * // wgsl string
-     * let rgba = textureExternalPosition(video, imageSampler, position, uvr, true);
+     * let rgba = textureExternalPosition(video, imageSampler, position, in.uvr, true);
      */
     async setTextureVideo(name, path, shaderType) {
         if (this.#nameExists(this.#texturesExternal, name)) {
@@ -842,7 +851,7 @@ class Points {
      * await points.setTextureWebcam('video');
      *
      * // wgsl string
-     * et rgba = textureExternalPosition(video, imageSampler, position, uvr, true);
+     * et rgba = textureExternalPosition(video, imageSampler, position, in.uvr, true);
      */
     async setTextureWebcam(name, size = { width: 1080, height: 1080 }, shaderType) {
         if (this.#nameExists(this.#texturesExternal, name)) {
@@ -886,7 +895,7 @@ class Points {
      * const audio = points.setAudio('audio', 'audiofile.ogg', volume, loop, autoplay);
      *
      * // wgsl
-     * let audioX = audio.data[ u32(uvr.x * params.audioLength)] / 256;
+     * let audioX = audio.data[ u32(in.uvr.x * params.audioLength)] / 256;
      */
     setAudio(name, path, volume, loop, autoplay) {
         const audio = new Audio(path);
@@ -2612,9 +2621,6 @@ class Points {
     get context() {
         return this.#context;
     }
-    get presentationFormat() {
-        return this.#presentationFormat;
-    }
     get buffer() {
         return this.#buffer;
     }
@@ -2679,6 +2685,8 @@ class Points {
      * returns its data, so if you use a `vec4` that goes beyond the default
      * capped of `0..1` like `vec4(16,0,1,1)`, then use `16` or `32`.
      *
+     * {@link PresentationFormat}
+     *
      * By default it has the `navigator.gpu.getPreferredCanvasFormat();` value.
      * @param {PresentationFormat|String|GPUTextureFormat} value
      */
@@ -2700,4 +2708,4 @@ class Points {
 }
 
 export default Points;
-export { RenderPass, RenderPasses, PrimitiveTopology, CullMode, LoadOp, PresentationFormat };
+export { RenderPass, RenderPasses, PrimitiveTopology, CullMode, LoadOp, PresentationFormat, FrontFace };

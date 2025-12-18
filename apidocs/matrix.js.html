@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Source: core/defaultFunctions.js | Points</title>
+    <title>Source: matrix.js | Points</title>
     <meta name="description" content="A Generative Art library made in WebGPU"><meta name="keywords" content="javascript, webgl, crative-coding, shaders, generative-art, webgpu, genart, wgsl">
     <link rel="icon" title="dummy" href="data:image/x-icon;base64,AA">
     <script src="scripts/docolatte.min.js"></script>
@@ -23,7 +23,7 @@
         </div>
         <div class="topbar">
             <h1 class="page-title">
-                <a href="#">Source: core/defaultFunctions.js</a>
+                <a href="#">Source: matrix.js</a>
             </h1>
             <a class="light-switch" title="Switch light/dark mode" href="#"><i class="label auto">
 <svg  class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -42,55 +42,85 @@
     
 <article class="src">
     <pre class="prettyprint source linenums lang-js"><span class="_char">_</span><code>/**
- * The defaultFunctions are functions already incorporated onto the shaders you create,
- * so you can call them without import.
- * &lt;br>
- * &lt;br>
- * These are wgsl functions, not js functions.
- * The function is enclosed in a js string constant,
- * to be appended into the code to reference it in the string shader.
+ * Just a few functions to be used with the cameras
  *
- * Use the base example as reference: examples/base/vert.js
- * @module defaultFunctions
+ * based on https://github.com/greggman/wgpu-matrix/
+ * @module data-size
+ * @ignore
  */
+
 
 /**
- * The defaultVertexBody is used as a drop-in replacement of the vertex shader content.
- * &lt;br>
- * This is not required, but useful if you plan to use the default parameters of the library.
- * &lt;br>
- * All the examples in the examples directory use this function in their vert.js file.
- * &lt;br>
- * &lt;br>
- * Default function for the Vertex shader that takes charge of automating the
- * creation of a few variables that are commonly used.
- * @example
- * // Inside the main vertex function add this
- * return defaultVertexBody(in.position, in.color, in.uv, in.normal);
- * @type {string}
- * @param {vec4f} position
- * @param {vec4f} color
- * @param {vec2f} uv
- * @return {FragmentIn}
+ * Divides a vector by its Euclidean length and returns the quotient.
+ *
+ * @param v - The vector.
+ * @returns The normalized vector.
  */
-export const defaultVertexBody = /*wgsl*/`
-fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) -> FragmentIn {
-    var result: FragmentIn;
+export function normalize(v) {
+    const result = [0, 0, 0];
 
-    let ratioX = params.screen.x / params.screen.y;
-    let ratioY = 1. / ratioX / (params.screen.y / params.screen.x);
-    result.ratio = vec2(ratioX, ratioY);
-    result.position = position;
-    result.color = color;
-    result.uv = uv;
-    result.uvr = vec2(uv.x * result.ratio.x, uv.y);
-    result.mouse = vec2(params.mouse.x / params.screen.x, params.mouse.y / params.screen.y);
-    result.mouse = result.mouse * vec2(1.,-1.) - vec2(0., -1.); // flip and move up
-    result.normal = normal;
+    const v0 = v[0];
+    const v1 = v[1];
+    const v2 = v[2];
+    const len = Math.sqrt(v0 * v0 + v1 * v1 + v2 * v2);
+
+    if (len > 0.00001) {
+        result[0] = v0 / len;
+        result[1] = v1 / len;
+        result[2] = v2 / len;
+    }
 
     return result;
 }
-`;
+
+/**
+ * Subtracts two vectors.
+ * @param a - Operand vector.
+ * @param b - Operand vector.
+ * @param dst - vector to hold result. If not passed in a new one is created.
+ * @returns A vector that is the difference of a and b.
+ */
+export function sub(a, b) {
+    const result = [0, 0, 0];
+
+    result[0] = a[0] - b[0];
+    result[1] = a[1] - b[1];
+    result[2] = a[2] - b[2];
+
+    return result;
+}
+
+/**
+ * Computes the cross product of two vectors; assumes both vectors have
+ * three entries.
+ * @param a - Operand vector.
+ * @param b - Operand vector.
+ * @param dst - vector to hold result. If not passed in a new one is created.
+ * @returns The vector of a cross b.
+ */
+export function cross(a, b) {
+    const result = [0, 0, 0];
+
+    const t1 = a[2] * b[0] - a[0] * b[2];
+    const t2 = a[0] * b[1] - a[1] * b[0];
+    result[0] = a[1] * b[2] - a[2] * b[1];
+    result[1] = t1;
+    result[2] = t2;
+
+    return result;
+}
+
+
+/**
+ * Computes the dot product of two vectors; assumes both vectors have
+ * three entries.
+ * @param a - Operand vector.
+ * @param b - Operand vector.
+ * @returns dot product
+ */
+export function dot(a, b) {
+    return (a[0] * b[0]) + (a[1] * b[1]) + (a[2] * b[2]);
+}
 </code></pre>
 </article>
 
@@ -113,7 +143,7 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) ->
                     Documentation generated by <a rel="external" href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a><wbr>
                     using <a rel="external" href="https://github.com/amekusa/docolatte">Docolatte</a> theme
                     
-                    <wbr>on <time datetime="2025-12-18T16:00:39.131Z">Thu, 18 Dec 2025 16:00:39 GMT</time>
+                    <wbr>on <time datetime="2025-12-18T16:00:39.128Z">Thu, 18 Dec 2025 16:00:39 GMT</time>
                     
                 </p>
                 

@@ -22,11 +22,11 @@
  * creation of a few variables that are commonly used.
  * @example
  * // Inside the main vertex function add this
- * return defaultVertexBody(position, color, uv, normal);
+ * return defaultVertexBody(in.position, in.color, in.uv, in.normal);
  * @type {string}
  * @param {vec4f} position
  * @param {vec4f} color
  * @param {vec2f} uv
- * @return {Fragment}
+ * @return {FragmentIn}
  */
 export const defaultVertexBody: string;

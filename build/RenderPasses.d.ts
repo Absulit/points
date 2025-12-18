@@ -89,4 +89,11 @@ declare class RenderPasses {
      * points.addRenderPass(RenderPasses.WAVES, { scale: .05 });
      */
     static WAVES: any;
+    /**
+     * Apply a CRT tv pixels effect {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.CRT, { scale: .05 });
+     */
+    static CRT: RenderPass;
 }
+import { RenderPass } from 'points';

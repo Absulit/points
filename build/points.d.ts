@@ -163,6 +163,12 @@ export class RenderPass {
     set depthWriteEnabled(val: boolean);
     get depthWriteEnabled(): boolean;
     /**
+     * Holder for the depth map for this RenderPass only
+     * @param {GPUTexture} val
+     */
+    set textureDepth(val: GPUTexture);
+    get textureDepth(): GPUTexture;
+    /**
      * Controls if the last RenderPass data is preserved on screen or cleared.
      * Default {@link LoadOp#CLEAR}
      * @param {LoadOp | GPULoadOp} val
@@ -517,6 +523,12 @@ export class RenderPasses {
      * points.addRenderPass(RenderPasses.WAVES, { scale: .05 });
      */
     static WAVES: RenderPass;
+    /**
+     * Apply a CRT tv pixels effect {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.CRT, { scale: .05 });
+     */
+    static CRT: RenderPass;
 }
 /**
  * Main class Points, this is the entry point of an application with this library.
@@ -719,7 +731,7 @@ declare class Points {
      * points.setSampler('imageSampler', descriptor);
      *
      * // wgsl string
-     * let value = texturePosition(image, imageSampler, position, uvr, true);
+     * let value = texturePosition(image, imageSampler, position, in.uvr, true);
      */
     setSampler(name: string, descriptor: GPUSamplerDescriptor, shaderType: any): any;
     /**
@@ -749,7 +761,14 @@ declare class Points {
      *
      */
     setTexture2d(name: string, copyCurrentTexture: boolean, shaderType: GPUShaderStage, renderPassIndex: number): any;
-    setTextureDepth2d(name: any, shaderType: any, renderPassIndex: any): any;
+    /**
+     * Creates a depth map from the selected `renderPassIndex`
+     * @param {String} name
+     * @param {GPUShaderStage} shaderType
+     * @param {Number} renderPassIndex
+     * @returns
+     */
+    setTextureDepth2d(name: string, shaderType: GPUShaderStage, renderPassIndex: number): any;
     copyTexture(nameTextureA: any, nameTextureB: any): void;
     /**
      * Loads an image as `texture_2d` and then it will be available to read
@@ -765,7 +784,7 @@ declare class Points {
      * await points.setTextureImage('image', './../myimage.jpg');
      *
      * // wgsl string
-     * let rgba = texturePosition(image, imageSampler, position, uvr, true);
+     * let rgba = texturePosition(image, imageSampler, position, in.uvr, true);
      */
     setTextureImage(name: string, path: string, shaderType?: GPUShaderStage): any;
     /**
@@ -794,7 +813,7 @@ declare class Points {
      * );
      *
      * // wgsl string
-     * let textColors = texturePosition(textImg, imageSampler, position, uvr, true);
+     * let textColors = texturePosition(textImg, imageSampler, position, in.uvr, true);
      *
      */
     setTextureString(name: string, text: string, path: string, size: {
@@ -831,7 +850,7 @@ declare class Points {
      * await points.setTextureVideo('video', './../myvideo.mp4');
      *
      * // wgsl string
-     * let rgba = textureExternalPosition(video, imageSampler, position, uvr, true);
+     * let rgba = textureExternalPosition(video, imageSampler, position, in.uvr, true);
      */
     setTextureVideo(name: string, path: string, shaderType: GPUShaderStage): any;
     /**
@@ -847,7 +866,7 @@ declare class Points {
      * await points.setTextureWebcam('video');
      *
      * // wgsl string
-     * et rgba = textureExternalPosition(video, imageSampler, position, uvr, true);
+     * et rgba = textureExternalPosition(video, imageSampler, position, in.uvr, true);
      */
     setTextureWebcam(name: string, size: {
         width: number;
@@ -869,7 +888,7 @@ declare class Points {
      * const audio = points.setAudio('audio', 'audiofile.ogg', volume, loop, autoplay);
      *
      * // wgsl
-     * let audioX = audio.data[ u32(uvr.x * params.audioLength)] / 256;
+     * let audioX = audio.data[ u32(in.uvr.x * params.audioLength)] / 256;
      */
     setAudio(name: string, path: string, volume: number, loop: boolean, autoplay: boolean): HTMLAudioElement;
     setTextureStorage2d(name: any, shaderType: any): {
@@ -905,6 +924,61 @@ declare class Points {
      * let value = texturePosition(computeTexture, imageSampler, position, uv, false);
      */
     setBindingTexture(writeName: string, readName: string, writeIndex: number, readIndex: number, size: Array<number, 2>): any;
+    /**
+     * Creates a Perspective camera with a given name to be used in the shaders.
+     * The name is used as identifier in the shaders for the Projection and View matrices.
+     *
+     * The name will be inside the `camera` uniform and composed with the
+     * projection and view identifiers: e.g.:
+     * name: mycamera
+     * uniform buffers:
+     *  camera.mycamera_projection;
+     *  camera.mycamera_view
+     *
+     * The camera must be called on the update method so the aspect is updated by default
+     * with the canvas width and height.
+     * @param {String} name camera name in the shader for the projection and view
+     * @param {vec3f} position
+     * @param {Number} fov field of view angle
+     * @param {Number} near clipping near
+     * @param {Number} far clipping far
+     * @param {Number} aspect ratio of the camera, by default it choses the canvas aspect ratio
+     *
+     * @example
+     * // js
+     *  points.setCameraPerspective('camera', [0, 0, -5]);
+     *
+     * // wgsl string
+     * let clip = camera.camera_projection * camera.camera_view * vec4f(world, 1.);
+     */
+    setCameraPerspective(name: string, position?: vec3f, lookAt?: number[], fov?: number, near?: number, far?: number, aspect?: number): void;
+    /**
+     * Creates an Orthographic camera with a given name to be used in the shaders.
+     * The name is used as identifier in the shaders for the Projection matrix.
+     *
+     * The name will be inside the `camera` uniform and composed with the
+     * projection identifier: e.g.:
+     * name: mycamera
+     * uniform buffer:
+     *  camera.mycamera_projection;
+     *
+     * @param {String} name
+     * @param {Number} left
+     * @param {Number} right
+     * @param {Number} top
+     * @param {Number} bottom
+     * @param {Number} near
+     * @param {Number} far
+     *
+     * @example
+     * // js
+     * points.setCameraOrthographic('camera');
+     *
+     * // wgsl string
+     * let clip = camera.camera_projection * vec4f(world, 0.0, 1.0);
+     *
+     */
+    setCameraOrthographic(name: string, left?: number, right?: number, top?: number, bottom?: number, near?: number, far?: number, position?: number[], lookAt?: number[]): void;
     /**
      * Listens for an event dispatched from WGSL code
      * @param {String} name Number that represents an event Id
@@ -1001,7 +1075,6 @@ declare class Points {
      */
     get device(): GPUDevice;
     get context(): any;
-    get presentationFormat(): any;
     get buffer(): any;
     /**
      * Triggers the app to run in full screen mode
@@ -1012,6 +1085,20 @@ declare class Points {
      */
     set fullscreen(value: boolean);
     get fullscreen(): boolean;
+    /**
+     * Set the maximum range the render textures can hold.
+     * If you need HDR values use `16` or `32` float formats.
+     * This value is used in the texture that is created when a fragment shader
+     * returns its data, so if you use a `vec4` that goes beyond the default
+     * capped of `0..1` like `vec4(16,0,1,1)`, then use `16` or `32`.
+     *
+     * {@link PresentationFormat}
+     *
+     * By default it has the `navigator.gpu.getPreferredCanvasFormat();` value.
+     * @param {PresentationFormat|String|GPUTextureFormat} value
+     */
+    set presentationFormat(value: PresentationFormat | string | GPUTextureFormat);
+    get presentationFormat(): PresentationFormat | string | GPUTextureFormat;
     destroy(): void;
     #private;
 }
@@ -1055,7 +1142,7 @@ declare class FrontFace {
     /** @type {GPUFrontFace} */
     static CCW: GPUFrontFace;
     /** @type {GPUFrontFace} */
-    static CC: GPUFrontFace;
+    static CW: GPUFrontFace;
 }
 declare class Coordinate {
     constructor(x?: number, y?: number, z?: number);
