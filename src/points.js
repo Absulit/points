@@ -14,6 +14,15 @@ import UniformsArray from './UniformsArray.js';
 import getStorageAccessMode, { bindingModes, entriesModes } from './storage-accessmode.js';
 import { cross, dot, normalize, sub } from './matrix.js';
 
+/**
+ * Class to be used to decide if the output textures can hold more data beyond
+ * the range from 0..1, thing is useful for HDR images.
+ *
+ * @example
+ *
+ * points.presentationFormat = PresentationFormat.RGBA16FLOAT;
+ *
+ */
 class PresentationFormat {
     static BGRA8UNORM = 'bgra8unorm';
     static RGBA8UNORM = 'rgba8unorm';
@@ -2612,9 +2621,6 @@ class Points {
     get context() {
         return this.#context;
     }
-    get presentationFormat() {
-        return this.#presentationFormat;
-    }
     get buffer() {
         return this.#buffer;
     }
@@ -2678,6 +2684,8 @@ class Points {
      * This value is used in the texture that is created when a fragment shader
      * returns its data, so if you use a `vec4` that goes beyond the default
      * capped of `0..1` like `vec4(16,0,1,1)`, then use `16` or `32`.
+     *
+     * {@link PresentationFormat}
      *
      * By default it has the `navigator.gpu.getPreferredCanvasFormat();` value.
      * @param {PresentationFormat|String|GPUTextureFormat} value
