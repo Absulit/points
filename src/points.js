@@ -2512,7 +2512,12 @@ class Points {
                 this.#texturesToCopy = [];
             }
             if (renderPass.hasComputeShader) {
-                if (this.#texturesExternal.length || !renderPass.computeBindGroup) {
+                const isSameDevice = this.#device === renderPass.device;
+
+                // texturesExternal means there's a video
+                // if there's a video it needs to be updated no matter what.
+                // Also, it needs to be updated if the screen size changes
+                if (!isSameDevice || !renderPass.bundle || this.#texturesExternal.length || this.#screenResized || this.#textureUpdated) {
                     this.#passBindGroup(renderPass, GPUShaderStage.COMPUTE);
                 }
 
