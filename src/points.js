@@ -2424,18 +2424,21 @@ class Points {
         const swapChainTexture = this.#context.getCurrentTexture();
 
         this.#renderPasses.forEach(renderPass => {
+
+            const isSameDevice = this.#device === renderPass.device;
+
+            // texturesExternal means there's a video
+            // if there's a video it needs to be updated no matter what.
+            // Also, it needs to be updated if the screen size changes
+            const updateBundle = !isSameDevice || !renderPass.bundle || this.#texturesExternal.length || this.#screenResized || this.#textureUpdated;
+
             if (renderPass.hasVertexAndFragmentShader) {
                 renderPass.descriptor.colorAttachments[0].view = swapChainTexture.createView();
                 if (renderPass.depthWriteEnabled && (!renderPass.descriptor.depthStencilAttachment.view || this.#screenResized)) {
                     renderPass.descriptor.depthStencilAttachment.view = renderPass.textureDepth.createView();
                 }
 
-                const isSameDevice = this.#device === renderPass.device;
-
-                // texturesExternal means there's a video
-                // if there's a video it needs to be updated no matter what.
-                // Also, it needs to be updated if the screen size changes
-                if (!isSameDevice || !renderPass.bundle || this.#texturesExternal.length || this.#screenResized || this.#textureUpdated) {
+                if (updateBundle) {
                     this.#passBindGroup(renderPass, GPUShaderStage.FRAGMENT);
                     this.#passBindGroup(renderPass, GPUShaderStage.VERTEX);
                     /** @type {GPURenderBundleEncoderDescriptor} */
@@ -2512,7 +2515,7 @@ class Points {
                 this.#texturesToCopy = [];
             }
             if (renderPass.hasComputeShader) {
-                if (this.#texturesExternal.length || !renderPass.computeBindGroup) {
+                if (updateBundle) {
                     this.#passBindGroup(renderPass, GPUShaderStage.COMPUTE);
                 }
 
