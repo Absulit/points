@@ -8,12 +8,29 @@ const demo6 = {
      * @param {Points} points
      */
     init: async points => {
+    // <div id="test-container">
+    //     <div id="test">
+    //         test
+    //     </div>
+    // </div>
 
-        const testEl = document.getElementById('test');
-        console.log(testEl);
+        const content = document.getElementsByClassName('content column right')[0]
+        console.log(content);
 
 
-        await points.setTextureElement('image', testEl);
+        const container = document.createElement('div');
+        container.id = 'test-container';
+
+        const pointsEl = document.createElement('div');
+        pointsEl.id = 'test';
+        pointsEl.textContent = 'POINTS';
+
+        container.appendChild(pointsEl);
+        content.appendChild(container)
+        console.log(pointsEl);
+
+
+        await points.setTextureElement('image', pointsEl);
         points.setSampler('imageSampler', null);
 
     },
