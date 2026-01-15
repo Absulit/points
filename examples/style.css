@@ -143,7 +143,10 @@ h2 {
   list-style: none;
 }
 
-summary { position: sticky; top: 0; }
+summary {
+  position: sticky;
+  top: 0;
+}
 
 summary::before {
   content: "+";
@@ -192,4 +195,29 @@ div.dg.ac {
   overflow-y: scroll;
   padding: 0 0 70px 0;
   scrollbar-width: thin;
+}
+
+#test-container {
+  position: absolute;
+  /* top: -100vh; */
+}
+
+#test {
+  color: white;
+  background: #833AB4;
+  background: linear-gradient(90deg, rgba(131, 58, 180, 1) 0%, rgba(253, 29, 29, 1) 50%, rgb(252 176 69 / 10%) 100%);
+  border-radius: 10px;
+  text-decoration: solid;
+  font-size: 50px;
+  font-weight: bold;
+  text-shadow: #030f06;
+  /* width: 100px;
+  height: 100px; */
+  font-family: monospace;
+  text-shadow:
+    3px 3px 0 #000,
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
 }

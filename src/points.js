@@ -13,6 +13,7 @@ import LayersArray from './LayersArray.js';
 import UniformsArray from './UniformsArray.js';
 import getStorageAccessMode, { bindingModes, entriesModes } from './storage-accessmode.js';
 import { cross, dot, normalize, sub } from './matrix.js';
+import { elToImage, getCSS } from './texture-element.js';
 
 /**
  * Class to be used to decide if the output textures can hold more data beyond
@@ -730,6 +731,23 @@ class Points {
         }
         this.#textures2d.push(texture2d);
         return texture2d;
+    }
+
+    /**
+     * Loads a `HTMLElement` as `texture_2d`. It will automatically interpret
+     * the CSS associated with the element to render it.
+     * Fonts need to be explicitly described in the element.
+     * This will only generate an image, so animations will not work.
+     * @param {String} name identifier it will have in the shaders
+     * @param {HTMLElement} element element loaded in the DOM or dynamically
+     * @param {GPUShaderStage} shaderType in what shader type it will exist only
+     * @returns {Object}
+     */
+    async setTextureElement(name, element, shaderType = null) {
+        const styles = getCSS(element);
+        const cssText = styles.map(style => style.cssText ).join('\n');
+        const path = await elToImage(element, cssText);
+        return await this.setTextureImage(name, path, shaderType);
     }
 
     /**

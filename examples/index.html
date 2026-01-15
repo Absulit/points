@@ -1,135 +1,148 @@
 <html>
-    <head>
-        <title>WebGPU Points Library - Examples</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-        <link rel="stylesheet" type="text/css" href="style.css">
-    </head>
-    <body>
 
-        <div class="main container">
-            <div class="nav column left hide scrollable">
-                <nav id="nav">
-                    <ul>
-                        <li class="menu-main"><a href="https://github.com/Absulit/points/">POINTS Github</a></li>
-                    </ul>
+<head>
+    <title>WebGPU Points Library - Examples</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
 
-                    <details open>
-                        <summary>showcase</summary>
-                        <ul class="showcase"></ul>
-                    </details>
+<body>
 
-                    <details open>
-                        <summary>reference</summary>
-                        <ul class="reference"></ul>
-                    </details>
-
-
-                    <details>
-                        <summary>animation</summary>
-                        <ul class="animation"></ul>
-                    </details>
-                    <details>
-                        <summary>audio</summary>
-                        <ul class="audio"></ul>
-                    </details>
-                    <details>
-                        <summary>color</summary>
-                        <ul class="color"></ul>
-                    </details>
-                    <details>
-                        <summary>debug</summary>
-                        <ul class="debug"></ul>
-                    </details>
-                    <details>
-                        <summary>effects</summary>
-                        <ul class="effects"></ul>
-                    </details>
-                    <details>
-                        <summary>image</summary>
-                        <ul class="image"></ul>
-                    </details>
-                    <details>
-                        <summary>math</summary>
-                        <ul class="math"></ul>
-                    </details>
-                    <details>
-                        <summary>noise2d</summary>
-                        <ul class="noise2d"></ul>
-                    </details>
-                    <details>
-                        <summary>classicnoise2d</summary>
-                        <ul class="classicnoise2d"></ul>
-                    </details>
-                    <details>
-                        <summary>classicnoise3d</summary>
-                        <ul class="classicnoise3d"></ul>
-                    </details>
-                    <details>
-                        <summary>random</summary>
-                        <ul class="random"></ul>
-                    </details>
-                    <details>
-                        <summary>sdf</summary>
-                        <ul class="sdf"></ul>
-                    </details>
-
-                    <hr>
-                    <details>
-                        <summary>3d</summary>
-                        <ul class="threed"></ul>
-                    </details>
-                    <details>
-                        <summary>compute</summary>
-                        <ul class="compute"></ul>
-                    </details>
-                    <details>
-                        <summary>glb - gltf</summary>
-                        <ul class="glb"></ul>
-                    </details>
-                    <details>
-                        <summary>mesh</summary>
-                        <ul class="mesh"></ul>
-                    </details>
-                    <details>
-                        <summary>raymarching</summary>
-                        <ul class="raymarching"></ul>
-                    </details>
-                    <details>
-                        <summary>renderpasses</summary>
-                        <ul class="renderpasses"></ul>
-                    </details>
-                </nav>
-            </div>
-            <div class="content column right">
-                <div id="info">
-                    <a href="https://github.com/Absulit/points" target="_blank" rel="noopener">POINTS</a> - <span id="info-title">A Name</span><br>
-                    <p id="info-desc">
-                        A small description.
-                    </p>
-                    Author: <a id="author-link" href="https://absulit.com/" target="_blank" rel="noopener"><span id="info-author">absulit</span></a>
-                </div>
-                <div id="nowebgpu">
-                    <div>
-                        WebGPU is only available on Chrome, <a target="_blank" rel="noopener" href="https://www.mozilla.org/en-US/firefox/nightly/notes/">Firefox Nightly</a>, and <a target="_blank" rel="noopener" href="https://developer.apple.com/safari/technology-preview/">Safary Technology Preview</a>.
-                    </div>
-                </div>
-                <canvas id="canvas" width="800" height="800">
-                    Oops ... your browser doesn't support the HTML5 canvas element
-                </canvas>
-
-                <a id="menu_btn" class="hide">
-                    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAKlBMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKE86IAAAADnRSTlMAX/HztP/vOg0n+YNyvawRDacAAABVSURBVHicY2AgBwjCAZCjbAwFJkCOaigUhAA5amlQkALklMMBAwPHTDgAchYpQYE2kLMUZkA0kLMKBlYDOWfgAM01HDAHGFujG4DCuQsDt8nyNAoAADjrOnV/R7wqAAAAAElFTkSuQmCC">
-                </a>
-                <a id="source_btn" target="_blank" href title="View source code" rel="noopener">
-                    <img src="./index_files/ic_code_black_24dp.svg">
-                </a>
-            </div>
+    <div id="test-container">
+        <div id="test">
+            test
         </div>
+    </div>
+    <div class="main container">
+        <div class="nav column left hide scrollable">
+            <nav id="nav">
+                <ul>
+                    <li class="menu-main"><a href="https://github.com/Absulit/points/">POINTS Github</a></li>
+                </ul>
 
-        <script src="../src/vendor/stats.js"></script>
-        <script src="../src/vendor/ccapture/CCapture.all.min.js"></script>
+                <details open>
+                    <summary>showcase</summary>
+                    <ul class="showcase"></ul>
+                </details>
 
-        <script type="importmap">
+                <details open>
+                    <summary>reference</summary>
+                    <ul class="reference"></ul>
+                </details>
+
+
+                <details>
+                    <summary>animation</summary>
+                    <ul class="animation"></ul>
+                </details>
+                <details>
+                    <summary>audio</summary>
+                    <ul class="audio"></ul>
+                </details>
+                <details>
+                    <summary>color</summary>
+                    <ul class="color"></ul>
+                </details>
+                <details>
+                    <summary>debug</summary>
+                    <ul class="debug"></ul>
+                </details>
+                <details>
+                    <summary>effects</summary>
+                    <ul class="effects"></ul>
+                </details>
+                <details>
+                    <summary>image</summary>
+                    <ul class="image"></ul>
+                </details>
+                <details>
+                    <summary>math</summary>
+                    <ul class="math"></ul>
+                </details>
+                <details>
+                    <summary>noise2d</summary>
+                    <ul class="noise2d"></ul>
+                </details>
+                <details>
+                    <summary>classicnoise2d</summary>
+                    <ul class="classicnoise2d"></ul>
+                </details>
+                <details>
+                    <summary>classicnoise3d</summary>
+                    <ul class="classicnoise3d"></ul>
+                </details>
+                <details>
+                    <summary>random</summary>
+                    <ul class="random"></ul>
+                </details>
+                <details>
+                    <summary>sdf</summary>
+                    <ul class="sdf"></ul>
+                </details>
+
+                <hr>
+                <details>
+                    <summary>3d</summary>
+                    <ul class="threed"></ul>
+                </details>
+                <details>
+                    <summary>compute</summary>
+                    <ul class="compute"></ul>
+                </details>
+                <details>
+                    <summary>glb - gltf</summary>
+                    <ul class="glb"></ul>
+                </details>
+                <details>
+                    <summary>mesh</summary>
+                    <ul class="mesh"></ul>
+                </details>
+                <details>
+                    <summary>raymarching</summary>
+                    <ul class="raymarching"></ul>
+                </details>
+                <details>
+                    <summary>renderpasses</summary>
+                    <ul class="renderpasses"></ul>
+                </details>
+            </nav>
+        </div>
+        <div class="content column right">
+            <div id="info">
+                <a href="https://github.com/Absulit/points" target="_blank" rel="noopener">POINTS</a> - <span
+                    id="info-title">A Name</span><br>
+                <p id="info-desc">
+                    A small description.
+                </p>
+                Author: <a id="author-link" href="https://absulit.com/" target="_blank" rel="noopener"><span
+                        id="info-author">absulit</span></a>
+            </div>
+            <div id="nowebgpu">
+                <div>
+                    WebGPU is only available on Chrome, <a target="_blank" rel="noopener"
+                        href="https://www.mozilla.org/en-US/firefox/nightly/notes/">Firefox Nightly</a>, and <a
+                        target="_blank" rel="noopener"
+                        href="https://developer.apple.com/safari/technology-preview/">Safary Technology Preview</a>.
+                </div>
+            </div>
+            <canvas id="canvas" width="800" height="800">
+                Oops ... your browser doesn't support the HTML5 canvas element
+            </canvas>
+
+            <a id="menu_btn" class="hide">
+                <img
+                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAKlBMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKE86IAAAADnRSTlMAX/HztP/vOg0n+YNyvawRDacAAABVSURBVHicY2AgBwjCAZCjbAwFJkCOaigUhAA5amlQkALklMMBAwPHTDgAchYpQYE2kLMUZkA0kLMKBlYDOWfgAM01HDAHGFujG4DCuQsDt8nyNAoAADjrOnV/R7wqAAAAAElFTkSuQmCC">
+            </a>
+            <a id="source_btn" target="_blank" href title="View source code" rel="noopener">
+                <img src="./index_files/ic_code_black_24dp.svg">
+            </a>
+        </div>
+    </div>
+
+    <script src="../src/vendor/stats.js"></script>
+    <script src="../src/vendor/ccapture/CCapture.all.min.js"></script>
+
+    <script type="importmap">
             {
               "imports": {
                 "points": "../src/points.js",
@@ -153,7 +166,8 @@
             }
         </script>
 
-        <script src="main.js" type="module"></script>
+    <script src="main.js" type="module"></script>
 
-    </body>
+</body>
+
 </html>
