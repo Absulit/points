@@ -4,6 +4,11 @@
  * @ignore
  */
 
+/**
+ * Get the CSS associated with a specific `HTMLElement`.
+ * @param {HTMLElement} el
+ * @returns {String} All the CSS associated to the `el` `HTMLElement`.
+ */
 export function getCSS(el) {
     const sheets = document.styleSheets;
     const matchedRules = [];
@@ -23,6 +28,12 @@ export function getCSS(el) {
     return matchedRules;
 }
 
+/**
+ * Renders a `HTMLElement` as image along with some CSS.
+ * @param {HTMLElement} element Element to render.
+ * @param {String} styles CSS styles to render the element with.
+ * @returns {Promise<Image>}
+ */
 export async function elToImage(element, styles) {
     const width = element.offsetWidth;
     const height = element.offsetHeight;
@@ -33,15 +44,15 @@ export async function elToImage(element, styles) {
     const htmlContent = new XMLSerializer().serializeToString(element);
 
     const svgData = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
-        <foreignObject width="100%" height="100%">
-        <div xmlns="http://www.w3.org/1999/xhtml">
-            <style>${styles}</style>
-            ${htmlContent}
-        </div>
-      </foreignObject>
-    </svg>
-  `;
+        <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
+            <foreignObject width="100%" height="100%">
+                <div xmlns="http://www.w3.org/1999/xhtml">
+                    <style>${styles}</style>
+                    ${htmlContent}
+                </div>
+            </foreignObject>
+        </svg>
+    `;
 
     const encodedData = btoa(decodeURIComponent(encodeURIComponent(svgData)));
     const url = `data:image/svg+xml;base64,${encodedData}`;
