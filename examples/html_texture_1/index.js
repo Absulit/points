@@ -1,6 +1,9 @@
 import vert from './vert.js';
 import frag from './frag.js';
 import Points from 'points';
+
+let container = null;
+
 const demo6 = {
     vert,
     frag,
@@ -16,10 +19,8 @@ const demo6 = {
 
 
         const content = document.getElementsByClassName('content column right')[0]
-        console.log(content);
 
-
-        const container = document.createElement('div');
+        container = document.createElement('div');
         container.id = 'test-container';
 
         const pointsEl = document.createElement('div');
@@ -30,13 +31,15 @@ const demo6 = {
         content.appendChild(container)
         console.log(pointsEl);
 
-
         await points.setTextureElement('image', pointsEl);
         points.setSampler('imageSampler', null);
 
     },
     update: points => {
 
+    },
+    remove: () => {
+        container.remove();
     }
 }
 
@@ -44,4 +47,4 @@ const demo6 = {
 
 
 
-export default demo6;
+export default demo6;    // only the color from each vertex
