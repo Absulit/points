@@ -8,11 +8,12 @@ const demo6 = {
      * @param {Points} points
      */
     init: async points => {
-    // <div id="test-container">
-    //     <div id="test">
-    //         test
-    //     </div>
-    // </div>
+        // <div id="test-container">
+        //     <div id="test">
+        //         test
+        //     </div>
+        // </div>
+
 
         const content = document.getElementsByClassName('content column right')[0]
         console.log(content);
