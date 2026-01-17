@@ -121,11 +121,9 @@ export async function elToImage(element, styles) {
 
     const svgData = `
         <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
+            <defs><style type="text/css">${fontFace}${styles}</style></defs>
             <foreignObject width="100%" height="100%">
-                <div xmlns="http://www.w3.org/1999/xhtml">
-                    <style>${fontFace}${styles}</style>
-                    ${htmlContent}
-                </div>
+                <div xmlns="http://www.w3.org/1999/xhtml">${htmlContent}</div>
             </foreignObject>
         </svg>
     `;
