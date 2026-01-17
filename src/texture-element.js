@@ -29,6 +29,49 @@ export function getCSS(el) {
 }
 
 /**
+ * Gets the url of the font requested from the loaded CSS.
+ * @param {String} familyName
+ * @returns
+ */
+function getFontSource(familyName) {
+    let urlPath = null;
+    for (let sheet of document.styleSheets) {
+        try {
+            for (let rule of sheet.cssRules) {
+                if (rule instanceof CSSFontFaceRule) {
+                    if (rule.style.fontFamily === familyName) {
+                        const regex = /url\(['"]?([^'"]+)['"]?\)/;
+                        const match = rule.style.src.match(regex);
+                        if (match) {
+                            urlPath = match[1];
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            console.warn('Can\'t read stylesheet (CORS?): ', e);
+        }
+    }
+    return urlPath;
+}
+
+/**
+ * From the css in the HTMLElement, get the font-family attribute value to be
+ * used later to get the source.
+ * @param {String} cssString
+ * @returns
+ */
+function getFontFamily(cssString) {
+    let fontFamily = null;
+    const regex = /font-family:\s*([^;]+)/;
+    const match = cssString.match(regex);
+    if (match) {
+        fontFamily = match[1].trim();
+    }
+    return fontFamily;
+}
+
+/**
  * Renders a `HTMLElement` as image along with some CSS.
  * @param {HTMLElement} element Element to render.
  * @param {String} styles CSS styles to render the element with.
@@ -40,6 +83,14 @@ export async function elToImage(element, styles) {
     console.log(width, height);
 
     styles ??= '';
+    console.log(styles);
+    const fontFamily = getFontFamily(styles);
+
+    if (fontFamily) {
+        const fontSource = getFontSource(fontFamily);
+        console.log(fontSource);
+    }
+
 
     const htmlContent = new XMLSerializer().serializeToString(element);
 

@@ -202,6 +202,11 @@ div.dg.ac {
   /* top: -100vh; */
 }
 
+@font-face {
+  font-family: 'molle';
+  src: url('./../../img/molle.woff2') format('woff2');
+}
+
 #test {
   color: white;
   background: #833AB4;
@@ -213,7 +218,7 @@ div.dg.ac {
   text-shadow: #030f06;
   /* width: 100px;
   height: 100px; */
-  font-family: monospace;
+  font-family: molle;
   text-shadow:
     3px 3px 0 #000,
     -1px -1px 0 #000,

@@ -18,7 +18,7 @@ const demo6 = {
         // </div>
 
 
-        const content = document.getElementsByClassName('content column right')[0]
+        const content = document.getElementsByClassName('content column right')[0];
 
         container = document.createElement('div');
         container.id = 'test-container';
@@ -28,7 +28,7 @@ const demo6 = {
         pointsEl.textContent = 'POINTS';
 
         container.appendChild(pointsEl);
-        content.appendChild(container)
+        content.appendChild(container);
         console.log(pointsEl);
 
         await points.setTextureElement('image', pointsEl);
