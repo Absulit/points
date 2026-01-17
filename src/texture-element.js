@@ -107,7 +107,7 @@ export async function elToImage(element, styles) {
     styles ??= '';
     const fontFamily = getFontFamily(styles);
 
-    let fontFace = null;
+    let fontFace = '';
     if (fontFamily) {
         const fontSource = getFontSource(fontFamily);
         if (fontSource) {
