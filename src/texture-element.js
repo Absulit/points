@@ -34,16 +34,22 @@ export function getCSS(el) {
  * @returns
  */
 function getFontSource(familyName) {
-    let urlPath = null;
+    let source = null;
     for (let sheet of document.styleSheets) {
         try {
             for (let rule of sheet.cssRules) {
                 if (rule instanceof CSSFontFaceRule) {
+                    console.log(rule.cssText);
+
                     if (rule.style.fontFamily === familyName) {
                         const regex = /url\(['"]?([^'"]+)['"]?\)/;
                         const match = rule.style.src.match(regex);
                         if (match) {
-                            urlPath = match[1];
+                            const url = match[1];
+                            source = {
+                                url,
+                                fontFace: rule.cssText
+                            }
                         }
                     }
                 }
@@ -52,7 +58,7 @@ function getFontSource(familyName) {
             console.warn('Can\'t read stylesheet (CORS?): ', e);
         }
     }
-    return urlPath;
+    return source;
 }
 
 /**
@@ -72,6 +78,23 @@ function getFontFamily(cssString) {
 }
 
 /**
+ * Converts a font to b64 to embed in the foreingObject
+ * @param {String} url path to font file
+ * @returns
+ */
+async function fontToB64(url) {
+    const response = await fetch(url);
+    const blob = await response.blob();
+
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+    });
+}
+
+/**
  * Renders a `HTMLElement` as image along with some CSS.
  * @param {HTMLElement} element Element to render.
  * @param {String} styles CSS styles to render the element with.
@@ -80,17 +103,19 @@ function getFontFamily(cssString) {
 export async function elToImage(element, styles) {
     const width = element.offsetWidth;
     const height = element.offsetHeight;
-    console.log(width, height);
 
     styles ??= '';
-    console.log(styles);
     const fontFamily = getFontFamily(styles);
 
+    let fontFace = null;
     if (fontFamily) {
         const fontSource = getFontSource(fontFamily);
-        console.log(fontSource);
+        if (fontSource) {
+            const b64 = await fontToB64(fontSource.url);
+            const regex = /url\((['"]?)[^'"]+\1\)/;
+            fontFace = fontSource.fontFace.replace(regex, `url($1${b64}$1)`);
+        }
     }
-
 
     const htmlContent = new XMLSerializer().serializeToString(element);
 
@@ -98,7 +123,7 @@ export async function elToImage(element, styles) {
         <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
             <foreignObject width="100%" height="100%">
                 <div xmlns="http://www.w3.org/1999/xhtml">
-                    <style>${styles}</style>
+                    <style>${fontFace}${styles}</style>
                     ${htmlContent}
                 </div>
             </foreignObject>

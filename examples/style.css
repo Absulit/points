@@ -204,7 +204,7 @@ div.dg.ac {
 
 @font-face {
   font-family: 'molle';
-  src: url('./../../img/molle.woff2') format('woff2');
+  src: url('./../../fonts/molle.woff2') format('woff2');
 }
 
 #test {
@@ -216,8 +216,8 @@ div.dg.ac {
   font-size: 50px;
   font-weight: bold;
   text-shadow: #030f06;
-  /* width: 100px;
-  height: 100px; */
+  width: 200px;
+  height: 50px;
   font-family: molle;
   text-shadow:
     3px 3px 0 #000,
