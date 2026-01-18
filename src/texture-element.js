@@ -1,6 +1,6 @@
 /**
  * Utility methods to for the {@link Points#setTextureElement | setTextureElement()}
- * @module texture-string
+ * @module texture-element
  * @ignore
  */
 
@@ -101,8 +101,7 @@ async function fontToB64(url) {
  * @returns {Promise<Image>}
  */
 export async function elToImage(element, styles) {
-    const width = element.offsetWidth;
-    const height = element.offsetHeight;
+    const { offsetWidth: width, offsetHeight: height } = element;
 
     styles ??= '';
     const fontFamily = getFontFamily(styles);
