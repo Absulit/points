@@ -5,6 +5,8 @@
  * @ignore
  */
 
+const cache = new Map();
+
 /**
  * Get the CSS associated with a specific `HTMLElement`.
  * @param {HTMLElement} el
@@ -40,8 +42,6 @@ function getFontSource(familyName) {
         try {
             for (let rule of sheet.cssRules) {
                 if (rule instanceof CSSFontFaceRule) {
-                    console.log(rule.cssText);
-
                     if (rule.style.fontFamily === familyName) {
                         const regex = /url\(['"]?([^'"]+)['"]?\)/;
                         const match = rule.style.src.match(regex);
@@ -107,15 +107,17 @@ export async function elToImage(element, styles) {
     styles ??= '';
     const fontFamily = getFontFamily(styles);
 
-    let fontFace = '';
-    if (fontFamily) {
+    let fontFace = cache.get(fontFamily) || null;
+    if (!fontFace && fontFamily) {
         const fontSource = getFontSource(fontFamily);
         if (fontSource) {
             const b64 = await fontToB64(fontSource.url);
             const regex = /url\((['"]?)[^'"]+\1\)/;
             fontFace = fontSource.fontFace.replace(regex, `url($1${b64}$1)`);
+            cache.set(fontFamily, fontFace);
         }
     }
+    fontFace ??= '';
 
     const htmlContent = new XMLSerializer().serializeToString(element);
 
