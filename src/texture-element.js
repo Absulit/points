@@ -25,7 +25,7 @@ export function getCSS(el) {
                 }
             }
         } catch (e) {
-            console.warn("Could not read stylesheet: " + sheet.href);
+            console.warn('Could not read stylesheet: ' + sheet.href);
         }
     }
     return matchedRules;
