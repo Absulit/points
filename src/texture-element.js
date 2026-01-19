@@ -156,3 +156,10 @@ export async function elToImage(element, styles) {
         img.src = url;
     });
 }
+
+/**
+ * Utilitary method to clear the cache without exposing it.
+ */
+export function clearCache() {
+    cache.clear();
+}

@@ -13,7 +13,7 @@ import LayersArray from './LayersArray.js';
 import UniformsArray from './UniformsArray.js';
 import getStorageAccessMode, { bindingModes, entriesModes } from './storage-accessmode.js';
 import { cross, dot, normalize, sub } from './matrix.js';
-import { elToImage, getCSS } from './texture-element.js';
+import { clearCache, elToImage, getCSS } from './texture-element.js';
 
 /**
  * Class to be used to decide if the output textures can hold more data beyond
@@ -2733,6 +2733,8 @@ class Points {
             const stream = textureExternal?.video.srcObject;
             stream?.getTracks().forEach(track => track.stop());
         })
+
+        clearCache();
     }
 }
 
