@@ -742,6 +742,14 @@ class Points {
      * @param {HTMLElement} element element loaded in the DOM or dynamically
      * @param {GPUShaderStage} shaderType in what shader type it will exist only
      * @returns {Object}
+     *
+     * @example
+     * // js
+     * const element = document.getElementById('my_element')
+     * await points.setTextureElement('image', element);
+     *
+     * // wgsl string
+     * let color = texture(image, imageSampler, in.uvr, true);
      */
     async setTextureElement(name, element, shaderType = null) {
         const styles = getCSS(element);

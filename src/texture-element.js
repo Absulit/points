@@ -1,5 +1,6 @@
 /**
  * Utility methods to for the {@link Points#setTextureElement | setTextureElement()}
+ * https://web.archive.org/web/20181006205840/https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Drawing_DOM_objects_into_a_canvas
  * @module texture-element
  * @ignore
  */
@@ -119,7 +120,7 @@ export async function elToImage(element, styles) {
     const htmlContent = new XMLSerializer().serializeToString(element);
 
     const svgData = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
+        <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
             <defs><style type="text/css">${fontFace}${styles}</style></defs>
             <foreignObject width="100%" height="100%">
                 <div xmlns="http://www.w3.org/1999/xhtml">${htmlContent}</div>
@@ -140,7 +141,10 @@ export async function elToImage(element, styles) {
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0);
 
-            resolve(canvas.toDataURL('image/png'));
+            canvas.toBlob(blob => {
+                const url = URL.createObjectURL(blob);
+                resolve(url);
+            });
         };
 
         img.onerror = () => {
