@@ -182,6 +182,8 @@ You can code freely without the use of any of the provided [support modules (mat
         - [Sampler - setSampler](docs/send_data_into_the_shaders.md#sampler---setsampler)
         - [Texture - setTexture2d](docs/send_data_into_the_shaders.md#texture---settexture2d)
         - [Texture Image - setTextureImage](docs/send_data_into_the_shaders.md#textureimage---settextureimage)
+        - [Texture Image - setTextureElement](docs/send_data_into_the_shaders.md#textureimage---settextureelement)
+        - [Texture Image - setTextureString](docs/send_data_into_the_shaders.md#textureimage---settexturestring)
         - [Texture 2d Array - setTextureImageArray](docs/send_data_into_the_shaders.md#texture2darray---settextureimagearray)
         - [Storage - setStorage](docs/send_data_into_the_shaders.md#storage---setstorage)
         - [Storage Map - setStorageMap](docs/send_data_into_the_shaders.md#storagemap---setstoragemap)
