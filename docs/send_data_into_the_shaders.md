@@ -142,6 +142,47 @@ let startPosition = vec2(.0);
 let rgbaImage = texturePosition(image, mySampler, startPosition, uv, false);
 ```
 
+## TextureImage - setTextureElement
+
+With `setTextureElement` you can pass any `HTMLElement` and sample it just like with `setTextureImage`.
+All the CSS associated with that element with be loaded to get its final appearance.
+
+The font family needs to be explicitly declared, and if the font comes from an external file,
+you need to declare it with the `@font-face` rule. A font dynamically loaded via JavaScript wont work.
+
+Also, the transform property has issues with this method, since it needs a "repaint" or "reflow", so by the time the transform is executed, the image has already been calculated.
+
+It's also recommended to declare its width and height.
+
+Animation will not work.
+
+```css
+@font-face {
+    font-family: 'molle';
+    src: url('./../../fonts/molle.woff2') format('woff2');
+}
+```
+
+```js
+// main.js
+async function init() {
+    let renderPasses = [shaders.vert, shaders.compute, shaders.frag];
+    const myElement = document.getElementById('myElement');
+    // await since the resource is async we need to wait for it to be ready
+    await points.setTextureElement('image', myElement);
+
+    // more init code
+    await points.init(renderPasses);
+    update();
+}
+```
+
+```rust
+// frag.js
+let color = texture(image, mySampler, in.uvr, true);
+```
+[🔗 see Cube 1 Example](https://absulit.github.io/points/examples/index.html#html_texture_1)
+
 ## Texture2dArray - setTextureImageArray
 
 With `setTextureImageArray` you can send a list of images of the same dimensions to wgsl and access each one of them with an index.

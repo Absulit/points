@@ -736,7 +736,7 @@ class Points {
     /**
      * Loads a `HTMLElement` as `texture_2d`. It will automatically interpret
      * the CSS associated with the element to render it.
-     * Fonts need to be explicitly described in the element.
+     * `@font-family` needs to be explicitly described in the element's css.
      * This will only generate an image, so animations will not work.
      * @param {String} name identifier it will have in the shaders
      * @param {HTMLElement} element element loaded in the DOM or dynamically
