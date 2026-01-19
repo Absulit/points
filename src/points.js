@@ -784,7 +784,7 @@ class Points {
      * );
      *
      * // wgsl string
-     * let textColors = texturePosition(textImg, imageSampler, position, in.uvr, true);
+     * let textColors = texture(textImg, imageSampler, in.uvr, true);
      *
      */
     async setTextureString(name, text, path, size, offset = 0, shaderType = null) {

@@ -181,7 +181,27 @@ async function init() {
 // frag.js
 let color = texture(image, mySampler, in.uvr, true);
 ```
-[🔗 see Cube 1 Example](https://absulit.github.io/points/examples/index.html#html_texture_1)
+[🔗 see HTML Texture 1 Example](https://absulit.github.io/points/examples/index.html#html_texture_1)
+
+## TextureImage - setTextureString
+
+With the help of an associated sprite/atlas in UTF-16 chars, it will load the string of characters as a single image.
+
+This opposite to using the `sprite()` method from the `'points/image'` module, where you have to load iteratively each char which is slower that loading the whole texture.
+
+```js
+await points.setTextureString(
+    'textImg',
+    'Custom Text',
+    './../img/inconsolata_regular_8x22.png',
+    size,
+    -32
+);
+```
+
+```rust
+let textColors = texture(textImg, imageSampler, in.uvr, true);
+```
 
 ## Texture2dArray - setTextureImageArray
 
