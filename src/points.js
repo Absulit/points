@@ -13,6 +13,7 @@ import LayersArray from './LayersArray.js';
 import UniformsArray from './UniformsArray.js';
 import getStorageAccessMode, { bindingModes, entriesModes } from './storage-accessmode.js';
 import { cross, dot, normalize, sub } from './matrix.js';
+import { clearCache, elToImage, getCSS } from './texture-element.js';
 
 /**
  * Class to be used to decide if the output textures can hold more data beyond
@@ -733,6 +734,31 @@ class Points {
     }
 
     /**
+     * Loads a `HTMLElement` as `texture_2d`. It will automatically interpret
+     * the CSS associated with the element to render it.
+     * `@font-family` needs to be explicitly described in the element's css.
+     * This will only generate an image, so animations will not work.
+     * @param {String} name identifier it will have in the shaders
+     * @param {HTMLElement} element element loaded in the DOM or dynamically
+     * @param {GPUShaderStage} shaderType in what shader type it will exist only
+     * @returns {Object}
+     *
+     * @example
+     * // js
+     * const element = document.getElementById('my_element')
+     * await points.setTextureElement('image', element);
+     *
+     * // wgsl string
+     * let color = texture(image, imageSampler, in.uvr, true);
+     */
+    async setTextureElement(name, element, shaderType = null) {
+        const styles = getCSS(element);
+        const cssText = styles.map(style => style.cssText ).join('\n');
+        const path = await elToImage(element, cssText);
+        return await this.setTextureImage(name, path, shaderType);
+    }
+
+    /**
      * Loads a text string as a texture.<br>
      * Using an Atlas or a Spritesheet with UTF-16 chars (`path`) it will create a new texture
      * that contains only the `text` characters.<br>
@@ -758,7 +784,7 @@ class Points {
      * );
      *
      * // wgsl string
-     * let textColors = texturePosition(textImg, imageSampler, position, in.uvr, true);
+     * let textColors = texture(textImg, imageSampler, in.uvr, true);
      *
      */
     async setTextureString(name, text, path, size, offset = 0, shaderType = null) {
@@ -2707,6 +2733,8 @@ class Points {
             const stream = textureExternal?.video.srcObject;
             stream?.getTracks().forEach(track => track.stop());
         })
+
+        clearCache();
     }
 }
 

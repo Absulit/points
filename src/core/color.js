@@ -140,6 +140,7 @@ const BLACK = vec4(0.,0.,0.,1.);
 /**
  * Layers two colors by cropping the color in the back,
  * based on the alpha value.
+ * @type {String}
  * @param {vec4f} back `vec4f`
  * @param {vec4f} front `vec4f`
  * @returns {vec4f}
@@ -150,17 +151,52 @@ const BLACK = vec4(0.,0.,0.,1.);
  * // wgsl string
  * ${layer}
  *
- * let rgbaImage1 = texturePosition(image1, imageSampler, position, uvr, true);
- * let rgbaImage2 = texturePosition(image2, imageSampler, position, uvr, true);
- * let rgbaImage3 = texturePosition(image3, imageSampler, position, uvr, true);
+ * let rgbaImage1 = texture(image1, imageSampler, uvr, true);
+ * let rgbaImage2 = texture(image2, imageSampler, uvr, true);
+ * let rgbaImage3 = texture(image3, imageSampler, uvr, true);
  *
  * var finalColor:vec4f = layer(rgbaImage2, rgbaImage3);
  * finalColor = layer(rgbaImage1, finalColor);
  */
 export const layer = /*wgsl*/`
 // https://stackoverflow.com/a/24501192/507186
+// math has been corrected from the stackoverflow method
+// to avoid a black like/ring
 fn layer(back:vec4f, front: vec4f) -> vec4f {
-    return front * front.a + back * (1. - front.a);
+    let rgb = front.rgb * front.a + back.rgb * (1. - front.a);
+    let a = front.a + back.a * (1. - front.a);
+    return vec4f(rgb, a);
+}
+`;
+
+/**
+ * Same as layer but with premultiplied alpha.
+ * The consideration here is that the back param already has the alpha applied.
+ * Layers two colors by cropping the color in the back,
+ * based on the alpha value.
+ * @type {String}
+ * @param {vec4f} back `vec4f`
+ * @param {vec4f} front `vec4f`
+ * @returns {vec4f}
+ * @example
+ * // js
+ * import { layerPremultiplied } from 'points/color';
+ *
+ * // wgsl string
+ * ${layer}
+ *
+ * let rgbaImage1 = texture(image1, imageSampler, uvr, true);
+ * let rgbaImage2 = texture(image2, imageSampler, uvr, true);
+ * let rgbaImage3 = texture(image3, imageSampler, uvr, true);
+ *
+ * var finalColor:vec4f = layerPremultiplied(rgbaImage2, rgbaImage3);
+ * finalColor = layerPremultiplied(rgbaImage1, finalColor);
+ */
+export const layerPremultiplied = /*wgsl*/`
+fn layerPremultiplied(back: vec4f, front: vec4f) -> vec4f {
+    let out_a = front.a + back.a * (1. - front.a);
+    let out_rgb = (front.rgb * front.a) + (back.rgb * back.a * (1. - front.a));
+    return vec4f(out_rgb, out_a);
 }
 `;
 
