@@ -753,7 +753,7 @@ class Points {
      */
     async setTextureElement(name, element, shaderType = null) {
         const styles = getCSS(element);
-        const cssText = styles.map(style => style.cssText ).join('\n');
+        const cssText = styles.map(style => style.cssText).join('\n');
         const path = await elToImage(element, cssText);
         return await this.setTextureImage(name, path, shaderType);
     }
@@ -2655,6 +2655,20 @@ class Points {
     }
     get fullscreen() {
         return this.#fullscreen;
+    }
+
+    /**
+     * Gets the current time elapsed in milliseconds.
+     */
+    get time() {
+        return this.#time;
+    }
+
+    /**
+     * Get the time elapsed since the last frame was renderd, in milliseconds.
+     */
+    get deltaTime() {
+        return this.#delta;
     }
 
     /**
