@@ -247,7 +247,7 @@ async function init() {
     optionsFolder = gui.addFolder(FOLDER_NAME);
 
     await shaders.init(points, optionsFolder);
-    let renderPasses = shaders.renderPasses || [new RenderPass(shaders.vert, shaders.frag, shaders.compute)];
+    const renderPasses = shaders.renderPasses || [new RenderPass(shaders.vert, shaders.frag, shaders.compute)];
     // await points.addPostRenderPass(RenderPasses.GRAYSCALE);
     if (await points.init(renderPasses)) {
         requestToCancel = false;
