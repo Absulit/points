@@ -37,8 +37,6 @@ async function init() {
     await points.init(renderPasses);
     // call `points.update()` methods to render a new frame
     points.update(update);
-
-
 }
 ```
 
@@ -53,4 +51,3 @@ function update() {
 // call init
 init();
 ```
-
