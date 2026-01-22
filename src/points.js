@@ -104,6 +104,8 @@ class Points {
     #dataSize = null;
     #screenResized = false;
     #textureUpdated = false;
+    #animationFrameId = null;
+    #updateCallback = null;
 
     constructor(canvasId) {
         this.#canvasId = canvasId;
@@ -2397,6 +2399,20 @@ class Points {
         }
     }
 
+    #renderLoop = async () => {
+        // the updateCallback might not exist yet, so even with a
+        // animationFrameId ready we have to stop it
+        if (!this.#updateCallback) {
+            console.log('update cancel 2', this.#animationFrameId);
+            cancelAnimationFrame(this.#animationFrameId);
+            return;
+        }
+
+        this.#updateCallback();
+        await this.update2();
+        this.#animationFrameId = requestAnimationFrame(this.#renderLoop);
+    }
+
     /**
      * Method executed on each {@link https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame | requestAnimationFrame}.
      * Here's where all the calls to update data will be executed.
@@ -2409,7 +2425,22 @@ class Points {
      *     requestAnimationFrame(update);
      * }
      */
-    async update() {
+    async update(updateCallback) {
+        this.#updateCallback = updateCallback;
+        // if updateCallback is null the user removed it
+        if (!this.#updateCallback) {
+            cancelAnimationFrame(this.#animationFrameId);
+            return;
+        }
+        this.#animationFrameId = requestAnimationFrame(this.#renderLoop);
+    }
+
+    async update2() {
+        // if updateCallback is null the user removed it
+        if (!this.#updateCallback) {
+            cancelAnimationFrame(this.#animationFrameId);
+            return;
+        }
         if (!this.#canvas || !this.#device) return;
         //--------------------------------------------
         this.#delta = this.#clock.getDelta();

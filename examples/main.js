@@ -138,14 +138,11 @@ const descInfoEl = infoEl.querySelector('#info-desc');
 const authorInfoEl = infoEl.querySelector('#info-author');
 const authorLinkEl = infoEl.querySelector('#author-link');
 
-let animationFrameId = null;
 let requestToCancel = false;
 
 async function loadShaderByIndex(index) {
     console.clear();
-    if (animationFrameId) {
-        requestToCancel = true;
-    }
+    requestToCancel = true;
     if (index > shaderProjects.length) {
         index = 0;
     }
@@ -235,15 +232,12 @@ recordingOptions.forEach(recordingOption => {
 /***************/
 
 let points;
-
 let shaders;
 
 await loadShaderByURI();
 
 async function init() {
-    if (animationFrameId) {
-        requestToCancel = true;
-    }
+    requestToCancel = true;
 
     canvas.width = 800;
     canvas.height = 800;
@@ -258,7 +252,7 @@ async function init() {
     if (await points.init(renderPasses)) {
         requestToCancel = false;
         points.fitWindow = isFitWindowData.isFitWindow;
-        update();
+        points.update(update);
     } else {
         const el = document.getElementById('nowebgpu');
         el.classList.toggle('show');
@@ -267,23 +261,19 @@ async function init() {
 
 async function update() {
     if (requestToCancel) {
-        cancelAnimationFrame(animationFrameId);
+        points.update(null);
         return
     }
-    stats.begin();
 
+    stats.begin();
     // code here
 
     shaders.update(points);
-    await points.update();
-
     await shaders.read?.(points);
+
     //
-
     stats.end();
-
     capturer.capture(points.canvas);
-    animationFrameId = requestAnimationFrame(update);
 }
 
 loadShaderByIndex(selectedShader.index);
