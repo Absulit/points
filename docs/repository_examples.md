@@ -35,18 +35,17 @@ async function init() {
 
     // we pass the array of renderPasses
     await points.init(renderPasses);
+    // call `points.update()` methods to render a new frame
+    points.update(update);
 
-    // first call to update
-    update();
+
 }
 ```
 
 ```js
-// call the `base.update()`, and `points.update()` methods to render a new frame
+// all the code to update uniforms or any other animation variables
 function update() {
     base.update();
-    points.update();
-    requestAnimationFrame(update);
 }
 ```
 
