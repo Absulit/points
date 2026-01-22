@@ -2399,7 +2399,7 @@ class Points {
         }
     }
 
-    #renderLoop = async () => {
+    #animationFrame = async () => {
         // the updateCallback might not exist yet, so even with a
         // animationFrameId ready we have to stop it
         if (!this.#updateCallback) {
@@ -2408,8 +2408,8 @@ class Points {
         }
 
         this.#updateCallback(this.#time, this.#delta);
-        await this.update2();
-        this.#animationFrameId = requestAnimationFrame(this.#renderLoop);
+        await this.#frame();
+        this.#animationFrameId = requestAnimationFrame(this.#animationFrame);
     }
 
     /**
@@ -2437,10 +2437,17 @@ class Points {
             cancelAnimationFrame(this.#animationFrameId);
             return;
         }
-        this.#animationFrameId = requestAnimationFrame(this.#renderLoop);
+        this.#animationFrameId = requestAnimationFrame(this.#animationFrame);
     }
 
-    async update2() {
+    /**
+     * This is what is actually executed on each #animationFrame after the
+     * #updateCallback (user function) method
+     * Here are all the internal updates like uniforms and variables and actual
+     * execution of the pipeline and actual execution of the encoder.
+     * @returns
+     */
+    async #frame() {
         // if updateCallback is null the user removed it
         if (!this.#updateCallback) {
             cancelAnimationFrame(this.#animationFrameId);
