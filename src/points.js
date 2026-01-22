@@ -2421,6 +2421,7 @@ class Points {
      * to create animations. These are the same internal values in `params.time`
      * and `params.deltaTime`.
      * @example
+     * points.setUniform('myvar', 3);
      * await points.init(renderPasses);
      * points.update(update);
      *
