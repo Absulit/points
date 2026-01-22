@@ -259,7 +259,7 @@ async function init() {
     }
 }
 
-async function update() {
+async function update(t, dt) {
     if (requestToCancel) {
         points.update(null);
         return
@@ -268,7 +268,7 @@ async function update() {
     stats.begin();
     // code here
 
-    shaders.update(points);
+    shaders.update(points, t, dt);
     await shaders.read?.(points);
 
     //

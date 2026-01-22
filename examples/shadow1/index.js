@@ -97,8 +97,8 @@ const base = {
     /**
      * @param {Points} points
      */
-    update: points => {
-        const { time: t, timeDelta: td } = points;
+    update: (points, t, dt) => {
+        // const { time: t, timeDelta: td } = points;
         const { left, right, top, bottom, near, far, position, lookAt } = light;
         const p = position;
         p[0] = -Math.sin(t) * .5 + position[0]

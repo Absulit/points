@@ -2403,12 +2403,11 @@ class Points {
         // the updateCallback might not exist yet, so even with a
         // animationFrameId ready we have to stop it
         if (!this.#updateCallback) {
-            console.log('update cancel 2', this.#animationFrameId);
             cancelAnimationFrame(this.#animationFrameId);
             return;
         }
 
-        this.#updateCallback();
+        this.#updateCallback(this.#time, this.#delta);
         await this.update2();
         this.#animationFrameId = requestAnimationFrame(this.#renderLoop);
     }
