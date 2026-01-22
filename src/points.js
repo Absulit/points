@@ -43,11 +43,10 @@ class PresentationFormat {
  * ];
  *
  * await points.init(renderPasses);
- * update();
+ * points.update(update);
  *
  * function update() {
- *     points.update();
- *     requestAnimationFrame(update);
+ * // update uniforms and other animation variables
  * }
  *
  */
@@ -104,6 +103,8 @@ class Points {
     #dataSize = null;
     #screenResized = false;
     #textureUpdated = false;
+    #animationFrameId = null;
+    #updateCallback = null;
 
     constructor(canvasId) {
         this.#canvasId = canvasId;
@@ -753,7 +754,7 @@ class Points {
      */
     async setTextureElement(name, element, shaderType = null) {
         const styles = getCSS(element);
-        const cssText = styles.map(style => style.cssText ).join('\n');
+        const cssText = styles.map(style => style.cssText).join('\n');
         const path = await elToImage(element, cssText);
         return await this.setTextureImage(name, path, shaderType);
     }
@@ -2397,19 +2398,60 @@ class Points {
         }
     }
 
+    #animationFrame = async () => {
+        // the updateCallback might not exist yet, so even with a
+        // animationFrameId ready we have to stop it
+        if (!this.#updateCallback) {
+            cancelAnimationFrame(this.#animationFrameId);
+            return;
+        }
+
+        this.#updateCallback(this.#time, this.#delta);
+        await this.#frame();
+        this.#animationFrameId = requestAnimationFrame(this.#animationFrame);
+    }
+
     /**
      * Method executed on each {@link https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame | requestAnimationFrame}.
      * Here's where all the calls to update data will be executed.
+     * @param {(time:Number, deltaTime:Number) => {}} updateCallback method called on each frame update.
+     * Here you will update uniforms, storage and general variables.
+     * You will also have the `time` and `deltaTime` values used inside the library
+     * to create animations. These are the same internal values in `params.time`
+     * and `params.deltaTime`.
      * @example
+     * points.setUniform('myvar', 3);
      * await points.init(renderPasses);
-     * update();
+     * points.update(update);
      *
-     * function update() {
-     *     points.update();
-     *     requestAnimationFrame(update);
+     * function update(time, timeDelta) {
+     *     // update uniforms and other animation variables
+     *     points.setUniform('myvar', 3); // already existing uniform to update
      * }
      */
-    async update() {
+    update(updateCallback) {
+        this.#updateCallback = updateCallback;
+        // if updateCallback is null the user removed it
+        if (!this.#updateCallback) {
+            cancelAnimationFrame(this.#animationFrameId);
+            return;
+        }
+        this.#animationFrameId = requestAnimationFrame(this.#animationFrame);
+    }
+
+    /**
+     * This is what is actually executed on each #animationFrame after the
+     * #updateCallback (user function) method
+     * Here are all the internal updates like uniforms and variables and actual
+     * execution of the pipeline and actual execution of the encoder.
+     * @returns
+     */
+    async #frame() {
+        // if updateCallback is null the user removed it
+        if (!this.#updateCallback) {
+            cancelAnimationFrame(this.#animationFrameId);
+            return;
+        }
         if (!this.#canvas || !this.#device) return;
         //--------------------------------------------
         this.#delta = this.#clock.getDelta();
@@ -2655,6 +2697,20 @@ class Points {
     }
     get fullscreen() {
         return this.#fullscreen;
+    }
+
+    /**
+     * Gets the current time elapsed in milliseconds.
+     */
+    get time() {
+        return this.#time;
+    }
+
+    /**
+     * Get the time elapsed since the last frame was renderd, in milliseconds.
+     */
+    get deltaTime() {
+        return this.#delta;
     }
 
     /**

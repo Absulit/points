@@ -138,14 +138,11 @@ const descInfoEl = infoEl.querySelector('#info-desc');
 const authorInfoEl = infoEl.querySelector('#info-author');
 const authorLinkEl = infoEl.querySelector('#author-link');
 
-let animationFrameId = null;
 let requestToCancel = false;
 
 async function loadShaderByIndex(index) {
     console.clear();
-    if (animationFrameId) {
-        requestToCancel = true;
-    }
+    requestToCancel = true;
     if (index > shaderProjects.length) {
         index = 0;
     }
@@ -235,15 +232,12 @@ recordingOptions.forEach(recordingOption => {
 /***************/
 
 let points;
-
 let shaders;
 
 await loadShaderByURI();
 
 async function init() {
-    if (animationFrameId) {
-        requestToCancel = true;
-    }
+    requestToCancel = true;
 
     canvas.width = 800;
     canvas.height = 800;
@@ -253,37 +247,33 @@ async function init() {
     optionsFolder = gui.addFolder(FOLDER_NAME);
 
     await shaders.init(points, optionsFolder);
-    let renderPasses = shaders.renderPasses || [new RenderPass(shaders.vert, shaders.frag, shaders.compute)];
+    const renderPasses = shaders.renderPasses || [new RenderPass(shaders.vert, shaders.frag, shaders.compute)];
     // await points.addPostRenderPass(RenderPasses.GRAYSCALE);
     if (await points.init(renderPasses)) {
         requestToCancel = false;
         points.fitWindow = isFitWindowData.isFitWindow;
-        update();
+        points.update(update);
     } else {
         const el = document.getElementById('nowebgpu');
         el.classList.toggle('show');
     }
 }
 
-async function update() {
+async function update(t, dt) {
     if (requestToCancel) {
-        cancelAnimationFrame(animationFrameId);
+        points.update(null);
         return
     }
-    stats.begin();
 
+    stats.begin();
     // code here
 
-    shaders.update(points);
-    await points.update();
-
+    shaders.update(points, t, dt);
     await shaders.read?.(points);
+
     //
-
     stats.end();
-
     capturer.capture(points.canvas);
-    animationFrameId = requestAnimationFrame(update);
 }
 
 loadShaderByIndex(selectedShader.index);

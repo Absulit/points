@@ -28,17 +28,13 @@ async function init() {
 
     // more init code
     await points.init(renderPasses);
-    update();
+    points.update(update);
 }
 
 function update() {
     valueToUpdate += 1;
     // updated valueToUpdate value increases on each frame
     points.setUniform('valueToUpdate', valueToUpdate);
-
-    // more update code
-    points.update();
-    requestAnimationFrame(update);
 }
 ```
 
@@ -316,7 +312,7 @@ async function init() {
     points.setStorageMap('rands', data, `array<f32, ${dataAmount}>`);
 
     await points.init(renderPasses);
-    update();
+    points.update(update);
 }
 
 // if the amount of data is way too large, then this is a performance bottleneck.
@@ -328,10 +324,6 @@ function update() {
         data.push(Math.random());
     }
     points.setStorageMap('rands', data);
-
-    // more update code
-    points.update();
-    requestAnimationFrame(update);
 }
 ```
 
