@@ -2425,8 +2425,8 @@ class Points {
      * points.update(update);
      *
      * function update(time, timeDelta) {
+     *     // update uniforms and other animation variables
      *     points.setUniform('myvar', 3); // already existing uniform to update
-     *     requestAnimationFrame(update);
      * }
      */
     update(updateCallback) {
