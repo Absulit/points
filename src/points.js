@@ -2415,16 +2415,21 @@ class Points {
     /**
      * Method executed on each {@link https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame | requestAnimationFrame}.
      * Here's where all the calls to update data will be executed.
+     * @param {(time:Number, deltaTime:Number) => {}} updateCallback method called on each frame update.
+     * Here you will update uniforms, storage and general variables.
+     * You will also have the `time` and `deltaTime` values used inside the library
+     * to create animations. These are the same internal values in `params.time`
+     * and `params.deltaTime`.
      * @example
      * await points.init(renderPasses);
-     * update();
+     * points.update(update);
      *
-     * function update() {
-     *     points.update();
+     * function update(time, timeDelta) {
+     *     points.setUniform('myvar', 3); // already existing uniform to update
      *     requestAnimationFrame(update);
      * }
      */
-    async update(updateCallback) {
+    update(updateCallback) {
         this.#updateCallback = updateCallback;
         // if updateCallback is null the user removed it
         if (!this.#updateCallback) {
