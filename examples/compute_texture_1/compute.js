@@ -7,7 +7,7 @@ const compute = /*wgsl*/`
 // @builtin(local_invocation_id) LID: vec3u
 @compute @workgroup_size(8,8,1)
 fn main(in: ComputeIn) {
-    let time = params.time;
+    textureStore(writeTexture, vec2u(0,0), vec4f(1,0,0,1));
 }
 `;
 
