@@ -1,13 +1,11 @@
 import { PI, rotateVector } from 'points/math';
 import { snoise } from 'points/noise2d';
-import { structs } from './structs.js';
 
 const frag = /*wgsl*/`
 
 ${rotateVector}
 ${PI}
 ${snoise}
-${structs}
 
 fn paletteLerp(a:array<vec3f,6>, value:f32) -> vec3f {
     let numElements = 6.;

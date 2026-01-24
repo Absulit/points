@@ -105,6 +105,7 @@ class Points {
     #textureUpdated = false;
     #animationFrameId = null;
     #updateCallback = null;
+    #imports = [];
 
     constructor(canvasId) {
         this.#canvasId = canvasId;
@@ -1430,6 +1431,12 @@ class Points {
         // renderPass.hasComputeShader && (dynamicGroupBindingsCompute += this.#createDynamicGroupBindingsUpdate(GPUShaderStage.COMPUTE, renderPass, 2));
         // dynamicGroupBindingsFragment += this.#createDynamicGroupBindingsUpdate(GPUShaderStage.FRAGMENT, renderPass, 2);
 
+        this.#imports.forEach(i => {
+            dynamicGroupBindingsVertex = i + dynamicGroupBindingsVertex;
+            dynamicGroupBindingsCompute = i + dynamicGroupBindingsCompute;
+            dynamicGroupBindingsFragment = i + dynamicGroupBindingsFragment;
+        })
+        this.#imports = null;
 
         renderPass.hasVertexShader && (colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + defaultVertexBody + colorsVertWGSL);
         renderPass.hasComputeShader && (colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + colorsComputeWGSL);
@@ -2673,6 +2680,24 @@ class Points {
                 }
             }
         }
+    }
+
+    /**
+     * Import and prepend a common string to all RenderPass.
+     * If a list of common functions or structs needs to be appended to all
+     * RenderPass.
+     * @param {String} common string to prepend
+     *
+     * @example
+     * import { structs } from './structs.js';
+     * points.import(structs);
+     *
+     */
+    import(common) {
+        if(!this.#imports){
+            throw `can't call import after init`;
+        }
+        this.#imports.push(common);
     }
 
     /**
