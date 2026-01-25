@@ -3,6 +3,7 @@ import compute0 from './compute.js';
 import frag1 from './frag.js';
 import Points, { RenderPass } from 'points';
 import { isMobile } from 'utils';
+import { structs } from './structs.js';
 
 const options = {
     maxLife: 100,
@@ -50,6 +51,8 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+        points.import(structs);
+
         await points.setTextureWebcam('webcam');
 
         points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
