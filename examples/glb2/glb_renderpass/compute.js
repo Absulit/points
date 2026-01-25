@@ -1,9 +1,7 @@
-import { structs } from '../structs.js';
 import { rand } from 'points/random';
 
 const compute = /*wgsl*/`
 
-${structs}
 ${rand}
 
 const HWIDTH = WIDTH / 2;

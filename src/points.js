@@ -1436,7 +1436,6 @@ class Points {
             dynamicGroupBindingsCompute = i + dynamicGroupBindingsCompute;
             dynamicGroupBindingsFragment = i + dynamicGroupBindingsFragment;
         })
-        this.#imports = null;
 
         renderPass.hasVertexShader && (colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + defaultVertexBody + colorsVertWGSL);
         renderPass.hasComputeShader && (colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + colorsComputeWGSL);
