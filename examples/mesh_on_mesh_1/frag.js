@@ -1,9 +1,7 @@
-import { structs } from './structs.js';
 import { RED } from 'points/color';
 
 const frag = /*wgsl*/`
 
-${structs}
 ${RED}
 
 @fragment
