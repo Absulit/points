@@ -5,10 +5,8 @@ import { texturePosition } from 'points/image';
 import { brightness } from 'points/color';
 import { sdfCircle } from 'points/sdf';
 import { RED } from 'points/color';
-import { structs } from './structs.js';
 const frag = /*wgsl*/`
 
-${structs}
 ${fnusin}
 ${snoise}
 ${texturePosition}
