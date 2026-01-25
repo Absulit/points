@@ -1,11 +1,9 @@
-import { structs } from './../structs.js';
 import { polar, TAU } from 'points/math';
 import { rand, random } from 'points/random';
 import { snoise } from 'points/noise2d';
 
 const compute = /*wgsl*/`
 
-${structs}
 ${TAU}
 ${polar}
 ${rand}

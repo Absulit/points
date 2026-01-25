@@ -3,6 +3,7 @@ import compute0 from './r0/compute.js';
 import compute1 from './r1/compute.js';
 import frag1 from './r1/frag.js';
 import Points, { RenderPass } from 'points';
+import { structs } from './structs.js';
 
 const options = {
     maxLife: 34,
@@ -29,6 +30,8 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+        points.import(structs);
+
         points.setStorage('particles', `array<Particle, ${numParticles}>`);
         points.setConstant('NUMPARTICLES', numParticles, 'u32');
 
