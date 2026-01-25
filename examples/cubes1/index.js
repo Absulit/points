@@ -4,6 +4,7 @@ import vert from './cube_renderpass/vert.js';
 import frag from './cube_renderpass/frag.js';
 import compute from './cube_renderpass/compute.js';
 import { isMobile } from 'utils';
+import { structs } from './structs.js';
 
 const options = {
     val: .98,
@@ -56,6 +57,8 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+        points.import(structs);
+
         points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
         points.setConstant('WORKGROUP_X', WORKGROUP_X, 'u32');
         points.setConstant('WORKGROUP_Y', WORKGROUP_Y, 'u32');

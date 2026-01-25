@@ -8,6 +8,7 @@ import compute from './glb_renderpass/compute.js';
 import vertdepth from './depth_renderpass/vert.js';
 import fragdepth from './depth_renderpass/frag.js';
 import { loadAndExtract, isMobile } from 'utils';
+import { structs } from './structs.js';
 
 const options = {
     mode: 1,
@@ -68,6 +69,8 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+        points.import(structs);
+
         // points.addRenderPass(RenderPasses.COLOR);
         // points.addRenderPass(RenderPasses.PIXELATE);
         // points.addRenderPass(RenderPasses.FILM_GRAIN);

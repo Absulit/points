@@ -9,6 +9,7 @@ import frag from './r0/frag.js';
 import vert1 from './r1/vert.js';
 import frag1 from './r1/frag.js';
 import Points, { CullMode, RenderPass } from 'points';
+import { structs } from './structs.js';
 
 const options = {
     ambientFactor: 0.2,
@@ -63,6 +64,8 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+        points.import(structs);
+
         const descriptor = {
             addressModeU: 'clamp-to-edge',
             addressModeV: 'clamp-to-edge',

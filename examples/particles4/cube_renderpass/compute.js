@@ -1,10 +1,8 @@
 import { PI, TAU } from 'points/math';
-import { structs } from '../structs.js';
 import { rand } from 'points/random';
 
 const compute = /*wgsl*/`
 
-${structs}
 ${PI}
 ${TAU}
 ${rand}

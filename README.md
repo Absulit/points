@@ -200,6 +200,7 @@ You can code freely without the use of any of the provided [support modules (mat
 - [UV Coordinates and Textures Considerations](docs/uv_coordinates_and_textures_considerations.md)
 - [Support Modules](docs/support_modules.md)
     - [How to use them](docs/support_modules.md#how-to-use-them)
+    - [Import code to all RenderPass shaders - Points.import()](docs/support_modules.md#import-code-to-all-renderpass-shaders-pointsimport)
 - [RenderPasses for Post Processing](docs/render_passes_and_post_processing.md)
 - [Legacy folder (original project)](docs/legacy_folder.md)
 

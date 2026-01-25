@@ -1,9 +1,7 @@
-import { structs } from './structs.js';
 import { sdfCircle } from 'points/sdf';
 
 const frag = /*wgsl*/`
 
-${structs}
 ${sdfCircle}
 
 @fragment

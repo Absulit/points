@@ -2,6 +2,7 @@ import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
 import Points, { RenderPass, RenderPasses } from 'points';
+import { structs } from './structs.js';
 
 const options = {
     sliderA: 0.619,
@@ -35,6 +36,8 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+        points.import(structs);
+
         points.setConstant('UNIT', 1 / 8, 'f32');
         points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
         points.setConstant('SIDE', SIDE, 'u32');
