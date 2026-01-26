@@ -107,6 +107,7 @@ class Points {
     #updateCallback = null;
     #imports = [];
     #initialized = false;
+    #debug = true;
 
     constructor(canvasId) {
         this.#canvasId = canvasId;
@@ -243,7 +244,7 @@ class Points {
         }
         if (uniformToUpdate && structName) {
             // if name exists is an update
-            console.warn(`setUniform(${name}, [${value}], ${structName}) can't set the structName of an already defined uniform.`);
+            this.#debug && console.warn(`setUniform(${name}, [${value}], ${structName}) can't set the structName of an already defined uniform.`);
         }
         if (uniformToUpdate) {
             uniformToUpdate.value = value;
@@ -267,7 +268,7 @@ class Points {
         const uniformToUpdate = this.#nameExists(this.#meshUniforms, name);
         if (uniformToUpdate && structName) {
             // if name exists is an update
-            console.warn(`#setMeshUniform(${name}, [${value}], ${structName}) can't set the structName of an already defined uniform.`);
+            this.#debug && console.warn(`#setMeshUniform(${name}, [${value}], ${structName}) can't set the structName of an already defined uniform.`);
         }
         if (uniformToUpdate) {
             uniformToUpdate.value = value;
@@ -568,7 +569,7 @@ class Points {
         }
         const exists = this.#nameExists(this.#samplers, name)
         if (exists) {
-            console.warn(`setSampler: \`${name}\` already exists.`);
+            this.#debug && console.warn(`setSampler: \`${name}\` already exists.`);
             return exists;
         }
         // Create a sampler with linear filtering for smooth interpolation.
@@ -620,7 +621,7 @@ class Points {
     setTexture2d(name, copyCurrentTexture, shaderType, renderPassIndex) {
         const exists = this.#nameExists(this.#textures2d, name);
         if (exists) {
-            console.warn(`setTexture2d: \`${name}\` already exists.`);
+            this.#debug && console.warn(`setTexture2d: \`${name}\` already exists.`);
             return exists;
         }
         const texture2d = {
@@ -645,7 +646,7 @@ class Points {
     setTextureDepth2d(name, shaderType, renderPassIndex) {
         const exists = this.#nameExists(this.#texturesDepth2d, name);
         if (exists) {
-            console.warn(`setTextureDepth2d: \`${name}\` already exists.`);
+            this.#debug && console.warn(`setTextureDepth2d: \`${name}\` already exists.`);
             return exists;
         }
         renderPassIndex ||= 0;
@@ -1445,19 +1446,23 @@ class Points {
         renderPass.hasVertexShader && (colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + defaultVertexBody + colorsVertWGSL);
         renderPass.hasComputeShader && (colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + colorsComputeWGSL);
         renderPass.hasFragmentShader && (colorsFragWGSL = dynamicGroupBindingsFragment + defaultStructs + colorsFragWGSL);
-        console.groupCollapsed(`Render Pass ${index}: (${renderPass.name})`);
-        console.groupCollapsed('VERTEX');
-        console.log(colorsVertWGSL);
-        console.groupEnd();
-        if (renderPass.hasComputeShader) {
-            console.groupCollapsed('COMPUTE');
-            console.log(colorsComputeWGSL);
+
+        if (this.#debug) {
+            console.groupCollapsed(`Render Pass ${index}: (${renderPass.name})`);
+            console.groupCollapsed('VERTEX');
+            console.log(colorsVertWGSL);
+            console.groupEnd();
+            if (renderPass.hasComputeShader) {
+                console.groupCollapsed('COMPUTE');
+                console.log(colorsComputeWGSL);
+                console.groupEnd();
+            }
+            console.groupCollapsed('FRAGMENT');
+            console.log(colorsFragWGSL);
+            console.groupEnd();
             console.groupEnd();
         }
-        console.groupCollapsed('FRAGMENT');
-        console.log(colorsFragWGSL);
-        console.groupEnd();
-        console.groupEnd();
+
         renderPass.hasVertexShader && (renderPass.compiledShaders.vertex = colorsVertWGSL);
         renderPass.hasComputeShader && (renderPass.compiledShaders.compute = colorsComputeWGSL);
         renderPass.hasFragmentShader && (renderPass.compiledShaders.fragment = colorsFragWGSL);
@@ -1500,8 +1505,6 @@ class Points {
             throw ' `setBindingTexture` requires at least one Compute Shader in a `RenderPass`'
         }
 
-        //
-        // let adapter = null;
         if (!this.#adapter) {
             try {
                 this.#adapter = await navigator.gpu.requestAdapter();
@@ -1515,7 +1518,7 @@ class Points {
             this.#device.label = (new Date()).getMilliseconds();
         }
 
-        console.log(this.#device.limits);
+        this.#debug && console.log(this.#device.limits);
 
         this.#device.lost.then(info => console.log(info));
         if (this.#canvas !== null) this.#context = this.#canvas.getContext('webgpu');
@@ -1565,7 +1568,7 @@ class Points {
 
         if (requiredNotFound?.length) {
             const paramsRequired = requiredNotFound.join(', ');
-            console.warn(`addRenderPass: (${renderPass.name}) parameters required: ${paramsRequired}`);
+            this.#debug && console.warn(`addRenderPass: (${renderPass.name}) parameters required: ${paramsRequired}`);
         }
 
         this.#postRenderPasses.push(renderPass);
@@ -2808,6 +2811,23 @@ class Points {
      */
     set presentationFormat(value) {
         this.#presentationFormat = value;
+    }
+
+    get debug() {
+        return this.#debug;
+    }
+    /**
+     * Shows or hides all the logs and warnings from the library.
+     * Meant to be set as false in production environment.
+     * By default is shows all the logs for development.
+     * @param {Boolean} val
+     * @default true
+     * @example
+     *
+     * points.debug = false;
+     */
+    set debug(val) {
+        this.#debug = val
     }
 
     destroy() {

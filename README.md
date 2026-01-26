@@ -171,6 +171,7 @@ You can code freely without the use of any of the provided [support modules (mat
     - [Face Direction - FrontFace](docs/renderpass.md#face-direction---frontface)
 - [Using the examples for a custom project](docs/create_your_custom_shader_project.md)
 - Data Input and Output
+    - [Debug (errors, warnings and logs)](docs/debug.md)
     - [Default data available to read](docs/default_data_to_read.md)
         - [Params Uniform](docs/default_data_to_read.md#params-uniform)
         - [Parameters in vert.js that go to frag.js](docs/default_data_to_read.md#parameters-in-vertjs-that-go-to-fragjs)
