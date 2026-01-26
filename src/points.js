@@ -1505,8 +1505,6 @@ class Points {
             throw ' `setBindingTexture` requires at least one Compute Shader in a `RenderPass`'
         }
 
-        //
-        // let adapter = null;
         if (!this.#adapter) {
             try {
                 this.#adapter = await navigator.gpu.requestAdapter();
@@ -2820,9 +2818,13 @@ class Points {
     }
     /**
      * Shows or hides all the logs and warnings from the library.
-     * Meath to be set as false in production environment.
+     * Meant to be set as false in production environment.
      * Default true;
      * @param {Boolean} val
+     *
+     * @example
+     *
+     * points.debug = false;
      */
     set debug(val) {
         this.#debug = val
