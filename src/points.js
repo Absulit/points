@@ -2819,9 +2819,9 @@ class Points {
     /**
      * Shows or hides all the logs and warnings from the library.
      * Meant to be set as false in production environment.
-     * Default true;
+     * By default is shows all the logs for development.
      * @param {Boolean} val
-     *
+     * @default true
      * @example
      *
      * points.debug = false;
