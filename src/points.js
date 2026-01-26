@@ -244,7 +244,7 @@ class Points {
         }
         if (uniformToUpdate && structName) {
             // if name exists is an update
-            console.warn(`setUniform(${name}, [${value}], ${structName}) can't set the structName of an already defined uniform.`);
+            this.#debug && console.warn(`setUniform(${name}, [${value}], ${structName}) can't set the structName of an already defined uniform.`);
         }
         if (uniformToUpdate) {
             uniformToUpdate.value = value;
@@ -268,7 +268,7 @@ class Points {
         const uniformToUpdate = this.#nameExists(this.#meshUniforms, name);
         if (uniformToUpdate && structName) {
             // if name exists is an update
-            console.warn(`#setMeshUniform(${name}, [${value}], ${structName}) can't set the structName of an already defined uniform.`);
+            this.#debug && console.warn(`#setMeshUniform(${name}, [${value}], ${structName}) can't set the structName of an already defined uniform.`);
         }
         if (uniformToUpdate) {
             uniformToUpdate.value = value;
@@ -569,7 +569,7 @@ class Points {
         }
         const exists = this.#nameExists(this.#samplers, name)
         if (exists) {
-            console.warn(`setSampler: \`${name}\` already exists.`);
+            this.#debug && console.warn(`setSampler: \`${name}\` already exists.`);
             return exists;
         }
         // Create a sampler with linear filtering for smooth interpolation.
@@ -621,7 +621,7 @@ class Points {
     setTexture2d(name, copyCurrentTexture, shaderType, renderPassIndex) {
         const exists = this.#nameExists(this.#textures2d, name);
         if (exists) {
-            console.warn(`setTexture2d: \`${name}\` already exists.`);
+            this.#debug && console.warn(`setTexture2d: \`${name}\` already exists.`);
             return exists;
         }
         const texture2d = {
@@ -646,7 +646,7 @@ class Points {
     setTextureDepth2d(name, shaderType, renderPassIndex) {
         const exists = this.#nameExists(this.#texturesDepth2d, name);
         if (exists) {
-            console.warn(`setTextureDepth2d: \`${name}\` already exists.`);
+            this.#debug && console.warn(`setTextureDepth2d: \`${name}\` already exists.`);
             return exists;
         }
         renderPassIndex ||= 0;
@@ -1570,7 +1570,7 @@ class Points {
 
         if (requiredNotFound?.length) {
             const paramsRequired = requiredNotFound.join(', ');
-            console.warn(`addRenderPass: (${renderPass.name}) parameters required: ${paramsRequired}`);
+            this.#debug && console.warn(`addRenderPass: (${renderPass.name}) parameters required: ${paramsRequired}`);
         }
 
         this.#postRenderPasses.push(renderPass);
