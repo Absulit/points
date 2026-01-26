@@ -106,6 +106,7 @@ class Points {
     #animationFrameId = null;
     #updateCallback = null;
     #imports = [];
+    #initialized = false;
 
     constructor(canvasId) {
         this.#canvasId = canvasId;
@@ -236,6 +237,10 @@ class Points {
      */
     setUniform(name, value, structName = null) {
         const uniformToUpdate = this.#nameExists(this.#uniforms, name);
+
+        if (!uniformToUpdate && this.#initialized) {
+            console.error(`'${name}' uniform needs to be declared before the init() prior to call it in update().`);
+        }
         if (uniformToUpdate && structName) {
             // if name exists is an update
             console.warn(`setUniform(${name}, [${value}], ${structName}) can't set the structName of an already defined uniform.`);
@@ -1539,6 +1544,8 @@ class Points {
         this.#createBuffers();
         this.#createPipeline();
 
+        this.#initialized = true;
+
         return true;
     }
 
@@ -2682,7 +2689,7 @@ class Points {
     }
 
     /**
-     * Import and prepend a common string to all RenderPass.
+     * Import and prepend a common string to all RenderPass shaders.
      * If a list of common functions or structs needs to be appended to all
      * RenderPass.
      * @param {String} common string to prepend
@@ -2693,7 +2700,7 @@ class Points {
      *
      */
     import(common) {
-        if(!this.#imports){
+        if (!this.#imports) {
             throw `can't call import after init`;
         }
         this.#imports.push(common);
@@ -2804,7 +2811,7 @@ class Points {
     }
 
     destroy() {
-
+        this.#initialized = false;
         this.#uniforms = new UniformsArray();
         this.#meshUniforms = new UniformsArray();
         this.#cameraUniforms = new UniformsArray();
