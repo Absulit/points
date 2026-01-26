@@ -107,6 +107,7 @@ class Points {
     #updateCallback = null;
     #imports = [];
     #initialized = false;
+    #debug = true;
 
     constructor(canvasId) {
         this.#canvasId = canvasId;
@@ -1445,19 +1446,23 @@ class Points {
         renderPass.hasVertexShader && (colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + defaultVertexBody + colorsVertWGSL);
         renderPass.hasComputeShader && (colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + colorsComputeWGSL);
         renderPass.hasFragmentShader && (colorsFragWGSL = dynamicGroupBindingsFragment + defaultStructs + colorsFragWGSL);
-        console.groupCollapsed(`Render Pass ${index}: (${renderPass.name})`);
-        console.groupCollapsed('VERTEX');
-        console.log(colorsVertWGSL);
-        console.groupEnd();
-        if (renderPass.hasComputeShader) {
-            console.groupCollapsed('COMPUTE');
-            console.log(colorsComputeWGSL);
+
+        if (this.#debug) {
+            console.groupCollapsed(`Render Pass ${index}: (${renderPass.name})`);
+            console.groupCollapsed('VERTEX');
+            console.log(colorsVertWGSL);
+            console.groupEnd();
+            if (renderPass.hasComputeShader) {
+                console.groupCollapsed('COMPUTE');
+                console.log(colorsComputeWGSL);
+                console.groupEnd();
+            }
+            console.groupCollapsed('FRAGMENT');
+            console.log(colorsFragWGSL);
+            console.groupEnd();
             console.groupEnd();
         }
-        console.groupCollapsed('FRAGMENT');
-        console.log(colorsFragWGSL);
-        console.groupEnd();
-        console.groupEnd();
+
         renderPass.hasVertexShader && (renderPass.compiledShaders.vertex = colorsVertWGSL);
         renderPass.hasComputeShader && (renderPass.compiledShaders.compute = colorsComputeWGSL);
         renderPass.hasFragmentShader && (renderPass.compiledShaders.fragment = colorsFragWGSL);
@@ -1515,7 +1520,7 @@ class Points {
             this.#device.label = (new Date()).getMilliseconds();
         }
 
-        console.log(this.#device.limits);
+        this.#debug && console.log(this.#device.limits);
 
         this.#device.lost.then(info => console.log(info));
         if (this.#canvas !== null) this.#context = this.#canvas.getContext('webgpu');
@@ -2808,6 +2813,19 @@ class Points {
      */
     set presentationFormat(value) {
         this.#presentationFormat = value;
+    }
+
+    get debug() {
+        return this.#debug;
+    }
+    /**
+     * Shows or hides all the logs and warnings from the library.
+     * Meath to be set as false in production environment.
+     * Default true;
+     * @param {Boolean} val
+     */
+    set debug(val) {
+        this.#debug = val
     }
 
     destroy() {
