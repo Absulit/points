@@ -194,6 +194,8 @@ class RenderPass {
     #bundle = null;
     #device = null;
 
+    #enabled = true;
+
     /**
      * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
      * This is useful for PostProcessing.
@@ -614,6 +616,25 @@ class RenderPass {
      */
     set device(val) {
         this.#device = val;
+    }
+
+    get enabled() {
+        return this.#enabled;
+    }
+
+    /**
+     * Disable the current RenderPass during runtime if the pass has
+     * no other passes dependencies like sharing a texture.
+     *
+     * @param {Boolean} val
+     *
+     * @example
+     * const renderPass = new RenderPass()
+     *
+     * renderPass.enabled = false;
+     */
+    set enabled(val) {
+        this.#enabled = val;
     }
 
     /**

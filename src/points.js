@@ -2508,6 +2508,9 @@ class Points {
         const swapChainTexture = this.#context.getCurrentTexture();
 
         this.#renderPasses.forEach(renderPass => {
+            if (!renderPass.enabled) {
+                return; // continue
+            }
 
             const isSameDevice = this.#device === renderPass.device;
 
