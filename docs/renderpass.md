@@ -128,3 +128,12 @@ const r1 = new RenderPass(vert1, frag1);
 r1.frontFace = FrontFace.CW;
 
 ```
+
+## Disable a RenderPass at runtime
+
+A RenderPass can be excluded from the execution by setting the enabled attribute as `false`, and included again by setting it as `true`.
+
+```js
+const renderPass = new RenderPass(vert1, frag1);
+renderPass.enabled = false;
+```
