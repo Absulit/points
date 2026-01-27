@@ -19,9 +19,9 @@ ${sdfRect}
 @fragment
 fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    let rect = sdfRect(vec2f(.1), vec2f(.9), in.uvr);
+    let rect = sdfRect(vec2f(.01), vec2f(.99), in.uvr);
 
-    let finalColor:vec4f = vec4(rect);
+    let finalColor = vec4(fract(in.uvr * 20), 0, 1) * rect;
 
     return finalColor;
 }
