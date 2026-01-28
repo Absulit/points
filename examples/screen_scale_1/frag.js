@@ -27,7 +27,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     let center = vec2f(.5) * in.ratio;
     let rect = sdfRect(vec2f(.01), vec2f(.99), in.uvr);
     let circle = sdfCircle(center, .01, .001, in.uvr);
-    let line = sdfLine(vec2f(.5 * in.ratio.x, 1), vec2f(.5 * in.ratio.x, 0), 2, in.uvr);
+    let line = sdfLine(vec2f(.5 * in.ratio.x, in.ratio.y), vec2f(.5 * in.ratio.x, 0), 2, in.uvr);
 
     let circleTopRight = sdfCircle(vec2f(in.ratio), CIRCLERADIUS, .001, in.uvr);
     let circleBottomRight = sdfCircle(vec2f(1,0) * in.ratio, CIRCLERADIUS, .001, in.uvr);
