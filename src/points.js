@@ -32,6 +32,25 @@ class PresentationFormat {
 }
 
 /**
+ * Class to be used to select how the content should be displayed on different
+ * screen sizes.
+ * WIDTH: Preserves the visibility of the width, but might crop the height.
+ * HEIGHT: Preserves the visibility of the height, but might crop the width.
+ * SHOW_ALL: Preserves both, but might show black bars or extended empty content
+ * beyond the limits of the UV.
+ *
+ * @example
+ *
+ * points.scaleMode = ScaleMode.SHOW_ALL;
+ */
+
+class ScaleMode {
+    static WIDTH = 0;
+    static HEIGHT = 1;
+    static SHOW_ALL = this.WIDTH | this.HEIGHT;
+}
+
+/**
  * Main class Points, this is the entry point of an application with this library.
  * @example
  * import Points from 'points';
@@ -108,6 +127,7 @@ class Points {
     #imports = [];
     #initialized = false;
     #debug = true;
+    #scaleMode = ScaleMode.WIDTH;
 
     constructor(canvasId) {
         this.#canvasId = canvasId;
@@ -2831,6 +2851,26 @@ class Points {
      */
     set debug(val) {
         this.#debug = val
+    }
+
+    get scaleMode() {
+        return this.#scaleMode;
+    }
+
+    /**
+     * To set how the content should be displayed on different screen sizes.
+     * ScaleMode.WIDTH: Preserves the visibility of the width, but might crop the height.
+     * ScaleMode.HEIGHT: Preserves the visibility of the height, but might crop the width.
+     * ScaleMode.SHOW_ALL: Preserves both, but might show black bars or extended empty content
+     * beyond the limits of the UV.
+     * @param {ScaleMode} val
+     * @default ScaleMode.WIDTH
+     * @example
+     *
+     * points.scaleMode = ScaleMode.SHOW_ALL;
+     */
+    set scaleMode(val) {
+        this.#scaleMode = val;
     }
 
     destroy() {
