@@ -34,9 +34,16 @@ export const defaultVertexBody = /*wgsl*/`
 fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) -> FragmentIn {
     var result: FragmentIn;
 
-    let ratioX = params.screen.x / params.screen.y;
-    let ratioY = 1. / ratioX / (params.screen.y / params.screen.x);
+    var ratioX = params.screen.x / params.screen.y;
+    var ratioY = 1.;
 
+    if(params.screen.x > params.screen.y){
+        ratioX = params.screen.x / params.screen.y;
+        ratioY = 1.;
+    }else{
+        ratioX = 1.;
+        ratioY = params.screen.y / params.screen.x;
+    }
 
     result.ratio = vec2(ratioX, ratioY);
     result.position = position;
@@ -48,8 +55,7 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) ->
     if(params.screen.x > params.screen.y){
         result.uvr = vec2(uv.x * result.ratio.x, uv.y); // fits to height (cuts width)
     }else{
-        result.uvr = vec2(uv.x, uv.y / result.ratio.x); // fits to width (cuts height)
-        result.ratio = vec2(ratioY, ratioX); // invert ratios because they become wrong
+        result.uvr = vec2(uv.x * result.ratio.x, uv.y * result.ratio.y); // fits to width (cuts height)
     }
 
     result.mouse = vec2(params.mouse.x / params.screen.x, params.mouse.y / params.screen.y);
