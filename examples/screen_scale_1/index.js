@@ -1,7 +1,7 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
-import Points from 'points';
+import Points, { ScaleMode } from 'points';
 
 const options = {
     val: 0,
@@ -21,7 +21,7 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
-
+        points.scaleMode = ScaleMode.SHOW_ALL;
         // Add elements to dat gui
         // create an uniform and get value from options
         points.setUniform('val', options.val);

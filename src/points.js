@@ -45,8 +45,8 @@ class PresentationFormat {
  */
 
 class ScaleMode {
-    static WIDTH = 0;
-    static HEIGHT = 1;
+    static WIDTH = 1;
+    static HEIGHT = 2;
     static SHOW_ALL = this.WIDTH | this.HEIGHT;
 }
 
@@ -127,7 +127,7 @@ class Points {
     #imports = [];
     #initialized = false;
     #debug = true;
-    #scaleMode = ScaleMode.WIDTH;
+    #scaleMode = ScaleMode.HEIGHT;
 
     constructor(canvasId) {
         this.#canvasId = canvasId;
@@ -2865,7 +2865,7 @@ class Points {
      * ScaleMode.SHOW_ALL: Preserves both, but might show black bars or extended empty content
      * beyond the limits of the UV.
      * @param {ScaleMode} val
-     * @default ScaleMode.WIDTH
+     * @default ScaleMode.HEIGHT
      * @example
      *
      * points.scaleMode = ScaleMode.SHOW_ALL;
@@ -2891,4 +2891,4 @@ class Points {
 }
 
 export default Points;
-export { RenderPass, RenderPasses, PrimitiveTopology, CullMode, LoadOp, PresentationFormat, FrontFace };
+export { RenderPass, RenderPasses, PrimitiveTopology, CullMode, LoadOp, PresentationFormat, FrontFace, ScaleMode };
