@@ -1,8 +1,9 @@
-import { sdfRect } from "points/sdf";
+import { sdfCircle, sdfRect } from "points/sdf";
 
 const frag = /*wgsl*/`
 
 ${sdfRect}
+${sdfCircle}
 
 /**
  * VertexIn
@@ -19,11 +20,14 @@ ${sdfRect}
 @fragment
 fn main(in: FragmentIn) -> @location(0) vec4f {
 
+    let center = vec2f(.5) * in.ratio;
     let rect = sdfRect(vec2f(.01), vec2f(.99), in.uvr);
+    let circle = sdfCircle(vec2f(), .1, .001, in.uvr - center);
 
-    let finalColor = vec4(fract(in.uvr * 20), 0, 1) * rect;
+    let rectColor = vec4(fract(in.uvr * 20), 0, 1) * rect;
+    let circleColor = vec4f(circle);
 
-    return finalColor;
+    return rectColor + circleColor;
 }
 `;
 
