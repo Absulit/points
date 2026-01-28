@@ -171,6 +171,7 @@ class Points {
         this.setUniform(UniformKeys.SCREEN, [0, 0], 'vec2f');
         this.setUniform(UniformKeys.MOUSE, [0, 0], 'vec2f');
         this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta, 'vec2f');
+        this.setUniform(UniformKeys.SCALE_MODE, this.#scaleMode);
     }
 
     #resizeCanvasToFitWindow = () => {
@@ -2871,6 +2872,7 @@ class Points {
      */
     set scaleMode(val) {
         this.#scaleMode = val;
+        this.setUniform(UniformKeys.SCALE_MODE, this.#scaleMode);
     }
 
     destroy() {

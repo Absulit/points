@@ -61,6 +61,12 @@ class UniformKeys {
      * @static
      */
     static MOUSE_DELTA = 'mouseDelta';
+    /**
+     * To set the screen `ScaleMode`.
+     * @type {string}
+     * @static
+     */
+    static SCALE_MODE = 'scaleMode';
 }
 
 export default UniformKeys;
