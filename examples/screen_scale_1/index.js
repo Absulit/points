@@ -16,7 +16,7 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
-        points.scaleMode = ScaleMode.SHOW_ALL;
+        points.scaleMode = ScaleMode.COVER;
 
         points.setUniform('val', options.val);
 
