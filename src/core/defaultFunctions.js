@@ -93,7 +93,7 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) ->
     }else{
         if(params.scaleMode == SCALE_MODE_FIT_HEIGHT){
             result.uvr = vec2(uv.x * result.ratio.x, uv.y); // fits to height (cuts width)
-        }else{
+        }else if(params.scaleMode == SCALE_MODE_FIT_WIDTH){
             result.uvr = vec2(uv.x * result.ratio.x, uv.y * result.ratio.y); // fits to width (cuts height)
         }
     }
