@@ -69,11 +69,13 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) ->
         let x_gretear_than_y = step(params.screen.y, params.screen.x);
         result.uvr = mix(fits_to_width, fits_to_height, x_gretear_than_y);
     }else if(params.scaleMode == SCALE_MODE_COVER){
-        if(params.screen.y > params.screen.x){
-            result.uvr = fits_to_height; // fits to height (cuts width)
-        }else{
-            result.uvr = fits_to_width; // fits to width (cuts height)
-        }
+        let y_gretear_than_x = step(params.screen.x, params.screen.y);
+        result.uvr = mix(fits_to_width, fits_to_height, y_gretear_than_x);
+        // if(params.screen.y > params.screen.x){
+        //     result.uvr = fits_to_height; // fits to height (cuts width)
+        // }else{
+        //     result.uvr = fits_to_width; // fits to width (cuts height)
+        // }
     }else{
         if(params.scaleMode == SCALE_MODE_HEIGHT){
             result.uvr = fits_to_height; // fits to height (cuts width)
