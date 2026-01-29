@@ -16,7 +16,7 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
-        points.scaleMode = ScaleMode.FIT;
+        points.scaleMode = ScaleMode.FIT_HEIGHT;
 
         points.setUniform('val', options.val);
 

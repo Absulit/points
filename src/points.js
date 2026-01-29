@@ -49,6 +49,8 @@ class ScaleMode {
     static FIT_HEIGHT = 2;
     static FIT = 4;
     static COVER = 8;
+    static COVER_WIDTH = 16;
+    static COVER_HEIGHT = 32;
 }
 
 /**

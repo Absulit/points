@@ -32,10 +32,12 @@
  */
 export const defaultVertexBody = /*wgsl*/`
 
-const SCALE_MODE_FIT_WIDTH = 1; // fit width
-const SCALE_MODE_FIT_HEIGHT = 2; // fit height
-const SCALE_MODE_FIT = 4; // fit
-const SCALE_MODE_COVER = 8; // cover width cover height ?
+const SCALE_MODE_FIT_WIDTH = 1;
+const SCALE_MODE_FIT_HEIGHT = 2;
+const SCALE_MODE_FIT = 4;
+const SCALE_MODE_COVER = 8;
+const SCALE_MODE_COVER_WITH = 16;
+const SCALE_MODE_COVER_HEIGHT = 32;
 fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) -> FragmentIn {
     var result: FragmentIn;
 

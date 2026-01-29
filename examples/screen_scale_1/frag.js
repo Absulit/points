@@ -34,7 +34,8 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     let circleBottomLeft = sdfCircle(vec2f(0,0), CIRCLERADIUS, .001, in.uvr);
     let circleTopLeft = sdfCircle(vec2f(0,1) * in.ratio, CIRCLERADIUS, .001, in.uvr);
 
-    let rectColor = vec4(fract(in.uvr * 20), 0, 1) * rect;
+    let rectColor = vec4(fract(in.uvr * 20), in.uvr.y, 1) * rect;
+    // let rectColor = vec4(in.uvr, in.uvr.y, 1) * rect;
     let circleColor = vec4f(circle);
 
     let circleTopRightColor = vec4f(circleTopRight);
