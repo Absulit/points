@@ -64,7 +64,7 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) ->
         if(params.scaleMode == SCALE_MODE_FIT_HEIGHT){
             ratioX = params.screen.x / params.screen.y;
             ratioY = 1.;
-        }else{
+        }else if(params.scaleMode == SCALE_MODE_FIT_WIDTH){
             ratioX = 1.;
             ratioY = params.screen.y / params.screen.x;
         }
