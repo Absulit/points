@@ -45,8 +45,8 @@ class PresentationFormat {
  */
 
 class ScaleMode {
-    static WIDTH = 1;
-    static HEIGHT = 2;
+    static FIT_WIDTH = 1;
+    static FIT_HEIGHT = 2;
     static FIT = 4;
     static COVER = 8;
 }
