@@ -32,9 +32,9 @@
  */
 export const defaultVertexBody = /*wgsl*/`
 
-const SCALE_MODE_FIT_WIDTH = 1;
-const SCALE_MODE_FIT_HEIGHT = 2;
-const SCALE_MODE_FIT = 4;
+const SCALE_MODE_FIT = 1;
+const SCALE_MODE_FIT_WIDTH = 2;
+const SCALE_MODE_FIT_HEIGHT = 4;
 const SCALE_MODE_COVER = 8;
 const SCALE_MODE_COVER_WITH = 16;
 const SCALE_MODE_COVER_HEIGHT = 32;
