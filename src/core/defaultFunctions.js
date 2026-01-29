@@ -32,17 +32,17 @@
  */
 export const defaultVertexBody = /*wgsl*/`
 
-const SCALE_MODE_WIDTH = 1;
-const SCALE_MODE_HEIGHT = 2;
-const SCALE_MODE_SHOW_ALL = 4; // fit
-const SCALE_MODE_COVER = 8;
+const SCALE_MODE_WIDTH = 1; // fit width
+const SCALE_MODE_HEIGHT = 2; // fit height
+const SCALE_MODE_FIT = 4; // fit
+const SCALE_MODE_COVER = 8; // cover width cover height ?
 fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) -> FragmentIn {
     var result: FragmentIn;
 
     var ratioX = params.screen.x / params.screen.y;
     var ratioY = 1.;
 
-    if(params.scaleMode == SCALE_MODE_SHOW_ALL){
+    if(params.scaleMode == SCALE_MODE_FIT){
         if(params.screen.x > params.screen.y){
             ratioX = params.screen.x / params.screen.y;
             ratioY = 1.;
@@ -75,7 +75,7 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) ->
     result.uvr = vec2(uv.x * result.ratio.x, uv.y); // fits to height (cuts width)
     // result.uvr = vec2(uv.x , uv.y / result.ratio.x); // fits to width (cuts height)
 
-    if(params.scaleMode == SCALE_MODE_SHOW_ALL){
+    if(params.scaleMode == SCALE_MODE_FIT){
         if(params.screen.x > params.screen.y){
             result.uvr = vec2(uv.x * result.ratio.x, uv.y); // fits to height (cuts width)
         }else{
