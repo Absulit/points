@@ -64,23 +64,24 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) ->
     // result.uvr = vec2(uv.x , uv.y / result.ratio.x); // fits to width (cuts height)
 
     if(params.scaleMode == SCALE_MODE_FIT){
+        // let x_gretear_than_y = step(params.screen.y, params.screen.x);
         if(params.screen.x > params.screen.y){
             result.uvr = vec2(uv.x * result.ratio.x, uv.y); // fits to height (cuts width)
         }else{
-            result.uvr = vec2(uv.x * result.ratio.x, uv.y * result.ratio.y); // fits to width (cuts height)
+            result.uvr = vec2(uv.x, uv.y * result.ratio.y); // fits to width (cuts height)
         }
     }else if(params.scaleMode == SCALE_MODE_COVER){
         if(params.screen.y > params.screen.x){
             result.uvr = vec2(uv.x * result.ratio.x, uv.y); // fits to height (cuts width)
         }else{
-            result.uvr = vec2(uv.x * result.ratio.x, uv.y * result.ratio.y); // fits to width (cuts height)
+            result.uvr = vec2(uv.x, uv.y * result.ratio.y); // fits to width (cuts height)
         }
 
     }else{
         if(params.scaleMode == SCALE_MODE_HEIGHT){
             result.uvr = vec2(uv.x * result.ratio.x, uv.y); // fits to height (cuts width)
         }else if(params.scaleMode == SCALE_MODE_WIDTH){
-            result.uvr = vec2(uv.x * result.ratio.x, uv.y * result.ratio.y); // fits to width (cuts height)
+            result.uvr = vec2(uv.x, uv.y * result.ratio.y); // fits to width (cuts height)
         }
     }
 
