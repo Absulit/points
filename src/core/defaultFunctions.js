@@ -43,29 +43,17 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) ->
     var ratioY = 1.;
 
     if(params.scaleMode == SCALE_MODE_FIT){
-        if(params.screen.x > params.screen.y){
-            ratioX = params.screen.x / params.screen.y;
-            ratioY = 1.;
-        }else{
-            ratioX = 1.;
-            ratioY = params.screen.y / params.screen.x;
-        }
+        let x_gretear_than_y = step(params.screen.y, params.screen.x);
+        ratioX = mix(1., params.screen.x / params.screen.y, x_gretear_than_y);
+        ratioY = mix(params.screen.y / params.screen.x, 1., x_gretear_than_y);
     }else if(params.scaleMode == SCALE_MODE_COVER){
-        if(params.screen.x > params.screen.y){
-            ratioX = 1.;
-            ratioY = params.screen.y / params.screen.x;
-        }else{
-            ratioX = params.screen.x / params.screen.y;
-            ratioY = 1.;
-        }
+        let x_gretear_than_y = step(params.screen.y, params.screen.x);
+        ratioX = mix(params.screen.x / params.screen.y, 1., x_gretear_than_y);
+        ratioY = mix(1., params.screen.y / params.screen.x, x_gretear_than_y);
     }else{
-        if(params.scaleMode == SCALE_MODE_HEIGHT){
-            ratioX = params.screen.x / params.screen.y;
-            ratioY = 1.;
-        }else if(params.scaleMode == SCALE_MODE_WIDTH){
-            ratioX = 1.;
-            ratioY = params.screen.y / params.screen.x;
-        }
+        let scale_mode_equals_height = params.scaleMode == SCALE_MODE_HEIGHT; // else SCALE_MODE_WIDTH
+        ratioX = select(1., params.screen.x / params.screen.y, scale_mode_equals_height);
+        ratioY = select(params.screen.y / params.screen.x, 1., scale_mode_equals_height);
     }
 
     result.ratio = vec2(ratioX, ratioY);
