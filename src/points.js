@@ -69,7 +69,7 @@ class ScaleMode {
 
     static FIT = 1;
     /**
-     * ``text
+     * ```text
      * Not all content is visible.
      * No black bars shown.
      * Content is cropped on the sides.
