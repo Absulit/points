@@ -71,17 +71,9 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) ->
     }else if(params.scaleMode == SCALE_MODE_COVER){
         let y_gretear_than_x = step(params.screen.x, params.screen.y);
         result.uvr = mix(fits_to_width, fits_to_height, y_gretear_than_x);
-        // if(params.screen.y > params.screen.x){
-        //     result.uvr = fits_to_height; // fits to height (cuts width)
-        // }else{
-        //     result.uvr = fits_to_width; // fits to width (cuts height)
-        // }
     }else{
-        if(params.scaleMode == SCALE_MODE_HEIGHT){
-            result.uvr = fits_to_height; // fits to height (cuts width)
-        }else if(params.scaleMode == SCALE_MODE_WIDTH){
-            result.uvr = fits_to_width; // fits to width (cuts height)
-        }
+        let scale_mode_equals_height = params.scaleMode == SCALE_MODE_HEIGHT; // else SCALE_MODE_WIDTH
+        result.uvr = select(fits_to_width, fits_to_height, scale_mode_equals_height);
     }
 
     result.mouse = vec2(params.mouse.x / params.screen.x, params.mouse.y / params.screen.y);
