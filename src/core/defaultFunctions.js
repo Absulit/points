@@ -49,6 +49,10 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) ->
 
     let x_gretear_than_y = step(params.screen.y, params.screen.x);
     let y_gretear_than_x = step(params.screen.x, params.screen.y);
+
+    let scale_mode_equals_fit = params.scaleMode == SCALE_MODE_FIT;
+    let scale_mode_equals_cover = params.scaleMode == SCALE_MODE_COVER;
+
     if(params.scaleMode == SCALE_MODE_FIT){
         ratioX = mix(1., ratio_from_x, x_gretear_than_y);
         ratioY = mix(ratio_from_y, 1., x_gretear_than_y);
@@ -69,8 +73,6 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) ->
     let uvr_fit = mix(fits_to_width, fits_to_height, x_gretear_than_y);
     let uvr_cover = mix(fits_to_width, fits_to_height, y_gretear_than_x);
 
-    let scale_mode_equals_fit = params.scaleMode == SCALE_MODE_FIT;
-    let scale_mode_equals_cover = params.scaleMode == SCALE_MODE_COVER;
     result.uvr = select(
         select(result.uvr, uvr_cover, scale_mode_equals_cover), // is last else or default
         uvr_fit,
