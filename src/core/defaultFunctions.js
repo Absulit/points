@@ -63,8 +63,7 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) ->
     result.position = position;
     result.color = color;
     result.uv = uv;
-    result.uvr = vec2(uv.x * result.ratio.x, uv.y); // fits to height (cuts width)
-    // result.uvr = vec2(uv.x , uv.y / result.ratio.x); // fits to width (cuts height)
+    result.uvr = vec2();
 
     let fits_to_height = vec2(uv.x * result.ratio.x, uv.y); // (cuts width)
     let fits_to_width = vec2(uv.x, uv.y * result.ratio.y); // (cuts height)
@@ -80,7 +79,7 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) ->
     }
 
     result.mouse = vec2(params.mouse.x / params.screen.x, params.mouse.y / params.screen.y);
-    result.mouse = result.mouse * vec2(1.,-1.) - vec2(0., -1.); // flip and move up
+    result.mouse = result.mouse * vec2(1., -1.) - vec2(0., -1.); // flip and move up
     result.normal = normal;
 
     return result;
