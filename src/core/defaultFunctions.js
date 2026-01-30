@@ -68,11 +68,14 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) ->
 
     let uvr_fit = mix(fits_to_width, fits_to_height, x_gretear_than_y);
     let uvr_cover = mix(fits_to_width, fits_to_height, y_gretear_than_x);
-    if(params.scaleMode == SCALE_MODE_FIT){
-        result.uvr = uvr_fit;
-    }else if(params.scaleMode == SCALE_MODE_COVER){
-        result.uvr = uvr_cover;
-    }
+
+    let scale_mode_equals_fit = params.scaleMode == SCALE_MODE_FIT;
+    let scale_mode_equals_cover = params.scaleMode == SCALE_MODE_COVER;
+    result.uvr = select(
+        select(result.uvr, uvr_cover, scale_mode_equals_cover), // is last else or default
+        uvr_fit,
+        scale_mode_equals_fit
+    );
 
     result.mouse = vec2(params.mouse.x / params.screen.x, params.mouse.y / params.screen.y);
     result.mouse = result.mouse * vec2(1., -1.) - vec2(0., -1.); // flip and move up
