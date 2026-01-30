@@ -39,21 +39,24 @@ const SCALE_MODE_HEIGHT = 8;
 fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) -> FragmentIn {
     var result: FragmentIn;
 
-    var ratioX = params.screen.x / params.screen.y;
-    var ratioY = 1.;
+    var ratioX = 0.;
+    var ratioY = 0.;
+
+    let ratio_from_x = params.screen.x / params.screen.y;
+    let ratio_from_y = params.screen.y / params.screen.x;
 
     if(params.scaleMode == SCALE_MODE_FIT){
         let x_gretear_than_y = step(params.screen.y, params.screen.x);
-        ratioX = mix(1., params.screen.x / params.screen.y, x_gretear_than_y);
-        ratioY = mix(params.screen.y / params.screen.x, 1., x_gretear_than_y);
+        ratioX = mix(1., ratio_from_x, x_gretear_than_y);
+        ratioY = mix(ratio_from_y, 1., x_gretear_than_y);
     }else if(params.scaleMode == SCALE_MODE_COVER){
         let x_gretear_than_y = step(params.screen.y, params.screen.x);
-        ratioX = mix(params.screen.x / params.screen.y, 1., x_gretear_than_y);
-        ratioY = mix(1., params.screen.y / params.screen.x, x_gretear_than_y);
+        ratioX = mix(ratio_from_x, 1., x_gretear_than_y);
+        ratioY = mix(1., ratio_from_y, x_gretear_than_y);
     }else{
         let scale_mode_equals_height = params.scaleMode == SCALE_MODE_HEIGHT; // else SCALE_MODE_WIDTH
-        ratioX = select(1., params.screen.x / params.screen.y, scale_mode_equals_height);
-        ratioY = select(params.screen.y / params.screen.x, 1., scale_mode_equals_height);
+        ratioX = select(1., ratio_from_x, scale_mode_equals_height);
+        ratioY = select(ratio_from_y, 1., scale_mode_equals_height);
     }
 
     result.ratio = vec2(ratioX, ratioY);
