@@ -1,9 +1,15 @@
 import vert from './vert.js';
 import frag from './frag.js';
+import Points, { ScaleMode } from 'points';
 const imagescale1 = {
     vert,
     frag,
+    /**
+     *
+     * @param {Points} points
+     */
     init: async points => {
+        points.scaleMode = ScaleMode.FIT;
         const descriptor = {
             addressModeU: 'clamp-to-edge',
             addressModeV: 'clamp-to-edge',
