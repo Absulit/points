@@ -1,6 +1,6 @@
 import vert from './vert.js';
 import frag from './frag.js';
-import Points from 'points';
+import Points, { ScaleMode } from 'points';
 
 let container = null;
 
@@ -11,6 +11,9 @@ const demo6 = {
      * @param {Points} points
      */
     init: async points => {
+
+        points.scaleMode = ScaleMode.FIT;
+
         // <div id="test-container">
         //     <div id="test">
         //         test
