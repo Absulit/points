@@ -57,17 +57,20 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) ->
     let scale_mode_equals_fit = params.scaleMode == SCALE_MODE_FIT;
     let scale_mode_equals_cover = params.scaleMode == SCALE_MODE_COVER;
 
-    if(params.scaleMode == SCALE_MODE_FIT){
-        ratio = vec2f(
-            mix(1., ratio_from_x, x_gretear_than_y),
-            mix(ratio_from_y, 1., x_gretear_than_y)
-        );
-    }else if(params.scaleMode == SCALE_MODE_COVER){
-        ratio = vec2f(
-            mix(ratio_from_x, 1., x_gretear_than_y),
-            mix(1., ratio_from_y, x_gretear_than_y)
-        );
-    }
+    let ratio_to_fit = vec2f(
+        mix(1., ratio_from_x, x_gretear_than_y),
+        mix(ratio_from_y, 1., x_gretear_than_y)
+    );
+    let ratio_to_cover = vec2f(
+        mix(ratio_from_x, 1., x_gretear_than_y),
+        mix(1., ratio_from_y, x_gretear_than_y)
+    );
+
+    ratio = select(
+        select(ratio, ratio_to_cover, scale_mode_equals_cover),
+        ratio_to_fit,
+        scale_mode_equals_fit
+    );
 
     result.ratio = ratio;
     result.position = position;
