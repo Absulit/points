@@ -95,3 +95,79 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) ->
     return result;
 }
 `;
+
+// Given that the defaultVertexBody function is optimized now, it may be difficult to remember
+// how it was made and the IF statements that made it up, I've dediced to keep a copy
+// of how it was before the optimization
+// https://github.com/Absulit/points/blob/ca942574c8d72176d7ef5f4d738419aa54c555ab/src/core/defaultFunctions.js
+//
+// const SCALE_MODE_FIT = 1;
+// const SCALE_MODE_COVER = 2;
+// const SCALE_MODE_WIDTH = 4;
+// const SCALE_MODE_HEIGHT = 8;
+// fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) -> FragmentIn {
+//     var result: FragmentIn;
+
+//     var ratioX = params.screen.x / params.screen.y;
+//     var ratioY = 1.;
+
+//     if(params.scaleMode == SCALE_MODE_FIT){
+//         if(params.screen.x > params.screen.y){
+//             ratioX = params.screen.x / params.screen.y;
+//             ratioY = 1.;
+//         }else{
+//             ratioX = 1.;
+//             ratioY = params.screen.y / params.screen.x;
+//         }
+//     }else if(params.scaleMode == SCALE_MODE_COVER){
+//         if(params.screen.x > params.screen.y){
+//             ratioX = 1.;
+//             ratioY = params.screen.y / params.screen.x;
+//         }else{
+//             ratioX = params.screen.x / params.screen.y;
+//             ratioY = 1.;
+//         }
+//     }else{
+//         if(params.scaleMode == SCALE_MODE_HEIGHT){
+//             ratioX = params.screen.x / params.screen.y;
+//             ratioY = 1.;
+//         }else if(params.scaleMode == SCALE_MODE_WIDTH){
+//             ratioX = 1.;
+//             ratioY = params.screen.y / params.screen.x;
+//         }
+//     }
+
+//     result.ratio = vec2(ratioX, ratioY);
+//     result.position = position;
+//     result.color = color;
+//     result.uv = uv;
+//     result.uvr = vec2(uv.x * result.ratio.x, uv.y); // fits to height (cuts width)
+//     // result.uvr = vec2(uv.x , uv.y / result.ratio.x); // fits to width (cuts height)
+
+//     if(params.scaleMode == SCALE_MODE_FIT){
+//         if(params.screen.x > params.screen.y){
+//             result.uvr = vec2(uv.x * result.ratio.x, uv.y); // fits to height (cuts width)
+//         }else{
+//             result.uvr = vec2(uv.x * result.ratio.x, uv.y * result.ratio.y); // fits to width (cuts height)
+//         }
+//     }else if(params.scaleMode == SCALE_MODE_COVER){
+//         if(params.screen.y > params.screen.x){
+//             result.uvr = vec2(uv.x * result.ratio.x, uv.y); // fits to height (cuts width)
+//         }else{
+//             result.uvr = vec2(uv.x * result.ratio.x, uv.y * result.ratio.y); // fits to width (cuts height)
+//         }
+
+//     }else{
+//         if(params.scaleMode == SCALE_MODE_HEIGHT){
+//             result.uvr = vec2(uv.x * result.ratio.x, uv.y); // fits to height (cuts width)
+//         }else if(params.scaleMode == SCALE_MODE_WIDTH){
+//             result.uvr = vec2(uv.x * result.ratio.x, uv.y * result.ratio.y); // fits to width (cuts height)
+//         }
+//     }
+
+//     result.mouse = vec2(params.mouse.x / params.screen.x, params.mouse.y / params.screen.y);
+//     result.mouse = result.mouse * vec2(1.,-1.) - vec2(0., -1.); // flip and move up
+//     result.normal = normal;
+
+//     return result;
+// }
