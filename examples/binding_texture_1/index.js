@@ -5,7 +5,7 @@ import frag from './pass0/frag.js';
 
 import compute2 from './pass1/compute.js';
 import frag2 from './pass1/frag.js';
-import Points, { RenderPass } from 'points';
+import Points, { RenderPass, ScaleMode } from 'points';
 
 const base = {
 
@@ -18,6 +18,7 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+        points.scaleMode = ScaleMode.FIT;
         points.setSampler('imageSampler', null);
         points.setBindingTexture('writeTexture', 'readTexture');
         points.setTexture2d('renderLayer0', true, 0);
