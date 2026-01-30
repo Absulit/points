@@ -1,5 +1,6 @@
 import vert from './vert.js';
 import frag from './frag.js';
+import Points, { ScaleMode } from 'points';
 
 const options = {
     scale: 1,
@@ -10,7 +11,13 @@ const options = {
 const imagetexture2 = {
     vert,
     frag,
+    /**
+     *
+     * @param {Points} points
+     * @param {*} folder
+     */
     init: async (points, folder) => {
+        points.scaleMode = ScaleMode.FIT;
         points.setSampler('feedbackSampler', null);
         // await points.setTextureImage('image', './../img/carmen_lyra_423x643.jpg');
         // await points.setTextureImage('image', './../img/old_king_600x600.jpg');
