@@ -44,8 +44,12 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) ->
 
     let scale_mode_equals_height = params.scaleMode == SCALE_MODE_HEIGHT; // else SCALE_MODE_WIDTH
 
-    var ratioX = select(1., ratio_from_x, scale_mode_equals_height);
-    var ratioY = select(ratio_from_y, 1., scale_mode_equals_height);
+    // var ratioX = select(1., ratio_from_x, scale_mode_equals_height);
+    // var ratioY = select(ratio_from_y, 1., scale_mode_equals_height);
+    var ratio = vec2f(
+        select(1., ratio_from_x, scale_mode_equals_height),
+        select(ratio_from_y, 1., scale_mode_equals_height)
+    );
 
     let x_gretear_than_y = step(params.screen.y, params.screen.x);
     let y_gretear_than_x = step(params.screen.x, params.screen.y);
@@ -54,14 +58,18 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) ->
     let scale_mode_equals_cover = params.scaleMode == SCALE_MODE_COVER;
 
     if(params.scaleMode == SCALE_MODE_FIT){
-        ratioX = mix(1., ratio_from_x, x_gretear_than_y);
-        ratioY = mix(ratio_from_y, 1., x_gretear_than_y);
+        ratio = vec2f(
+            mix(1., ratio_from_x, x_gretear_than_y),
+            mix(ratio_from_y, 1., x_gretear_than_y)
+        );
     }else if(params.scaleMode == SCALE_MODE_COVER){
-        ratioX = mix(ratio_from_x, 1., x_gretear_than_y);
-        ratioY = mix(1., ratio_from_y, x_gretear_than_y);
+        ratio = vec2f(
+            mix(ratio_from_x, 1., x_gretear_than_y),
+            mix(1., ratio_from_y, x_gretear_than_y)
+        );
     }
 
-    result.ratio = vec2(ratioX, ratioY);
+    result.ratio = ratio;
     result.position = position;
     result.color = color;
     result.uv = uv;
