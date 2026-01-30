@@ -10,10 +10,17 @@ const options = {
 
 import vert from './vert.js';
 import frag from './frag.js';
+import Points, { ScaleMode } from 'points';
 const videotexture1 = {
     vert,
     frag,
+    /**
+     *
+     * @param {Points} points
+     * @param {*} folder
+     */
     init: async (points, folder) => {
+        points.scaleMode = ScaleMode.FIT;
         points.setSampler('feedbackSampler', null);
         await points.setTextureVideo(
             'video',
