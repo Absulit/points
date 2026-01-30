@@ -1,7 +1,7 @@
 import vert from './vert.js';
 import frag0 from './frag0.js';
 import frag1 from './frag1.js';
-import Points from 'points';
+import Points, { ScaleMode } from 'points';
 import { RenderPass } from 'points';
 
 const options = {
@@ -24,7 +24,7 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
-
+        points.scaleMode = ScaleMode.FIT;
         // Add elements to dat gui
         // create an uniform and get value from options
         points.setUniform('rotation', options.rotation);
