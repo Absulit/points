@@ -1,12 +1,20 @@
 import vert from './vert.js';
 import frag from './frag.js';
+import Points, { ScaleMode } from 'points';
 
 const options = { scale: 1, bloom: .133 }
 
 const bloom1 = {
     vert,
     frag,
+    /**
+     *
+     * @param {Points} points
+     * @param {*} folder
+     */
     init: async (points, folder) => {
+        points.scaleMode = ScaleMode.FIT;
+
         const descriptor = {
             addressModeU: 'repeat',
             addressModeV: 'repeat',
