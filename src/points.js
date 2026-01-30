@@ -17,7 +17,7 @@ import { clearCache, elToImage, getCSS } from './texture-element.js';
 
 /**
  * Class to be used to decide if the output textures can hold more data beyond
- * the range from 0..1, thing is useful for HDR images.
+ * the range from 0..1. Useful for HDR images.
  *
  * @example
  *
