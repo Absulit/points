@@ -66,11 +66,12 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) ->
     let fits_to_width = vec2(uv.x, uv.y * result.ratio.y); // (cuts height)
     result.uvr = select(fits_to_width, fits_to_height, scale_mode_equals_height);
 
+    let uvr_fit = mix(fits_to_width, fits_to_height, x_gretear_than_y);
+    let uvr_cover = mix(fits_to_width, fits_to_height, y_gretear_than_x);
     if(params.scaleMode == SCALE_MODE_FIT){
-        result.uvr = mix(fits_to_width, fits_to_height, x_gretear_than_y);
+        result.uvr = uvr_fit;
     }else if(params.scaleMode == SCALE_MODE_COVER){
-
-        result.uvr = mix(fits_to_width, fits_to_height, y_gretear_than_x);
+        result.uvr = uvr_cover;
     }
 
     result.mouse = vec2(params.mouse.x / params.screen.x, params.mouse.y / params.screen.y);
