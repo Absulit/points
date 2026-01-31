@@ -49,19 +49,19 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) ->
         select(ratio_from_y, 1., scale_mode_equals_height)
     );
 
-    let x_gretear_than_y = step(params.screen.y, params.screen.x);
-    let y_gretear_than_x = step(params.screen.x, params.screen.y);
+    let x_gretear_than_y = params.screen.y < params.screen.x;
+    let y_gretear_than_x = params.screen.x < params.screen.y;
 
     let scale_mode_equals_fit = params.scaleMode == SCALE_MODE_FIT;
     let scale_mode_equals_cover = params.scaleMode == SCALE_MODE_COVER;
 
     let ratio_to_fit = vec2f(
-        mix(1., ratio_from_x, x_gretear_than_y),
-        mix(ratio_from_y, 1., x_gretear_than_y)
+        select(1., ratio_from_x, x_gretear_than_y),
+        select(ratio_from_y, 1., x_gretear_than_y)
     );
     let ratio_to_cover = vec2f(
-        mix(ratio_from_x, 1., x_gretear_than_y),
-        mix(1., ratio_from_y, x_gretear_than_y)
+        select(ratio_from_x, 1., x_gretear_than_y),
+        select(1., ratio_from_y, x_gretear_than_y)
     );
 
     ratio = select(
@@ -79,8 +79,8 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) ->
     let fits_to_width = vec2(uv.x, uv.y * result.ratio.y); // (cuts height)
     result.uvr = select(fits_to_width, fits_to_height, scale_mode_equals_height);
 
-    let uvr_fit = mix(fits_to_width, fits_to_height, x_gretear_than_y);
-    let uvr_cover = mix(fits_to_width, fits_to_height, y_gretear_than_x);
+    let uvr_fit = select(fits_to_width, fits_to_height, x_gretear_than_y);
+    let uvr_cover = select(fits_to_width, fits_to_height, y_gretear_than_x);
 
     result.uvr = select(
         select(result.uvr, uvr_cover, scale_mode_equals_cover), // is last else or default

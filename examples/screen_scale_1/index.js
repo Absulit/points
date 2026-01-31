@@ -18,7 +18,7 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
-        points.scaleMode = ScaleMode.FIT;
+        points.scaleMode = ScaleMode.HEIGHT;
 
         folder.add({ default: ScaleMode.HEIGHT }, 'default', dropdown)
             .onChange(value => points.scaleMode = value)
