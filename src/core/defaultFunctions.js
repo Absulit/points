@@ -46,7 +46,7 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) ->
 
     var ratio = select(
         vec2f(1., ratio_from_y),
-        vec2f(ratio_from_x, 1),
+        vec2f(ratio_from_x, 1.),
         scale_mode_equals_height
     );
 
@@ -56,9 +56,10 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) ->
     let scale_mode_equals_fit = params.scaleMode == SCALE_MODE_FIT;
     let scale_mode_equals_cover = params.scaleMode == SCALE_MODE_COVER;
 
-    let ratio_to_fit = vec2f(
-        select(1., ratio_from_x, x_gretear_than_y),
-        select(ratio_from_y, 1., x_gretear_than_y)
+    let ratio_to_fit = select(
+        vec2f(1., ratio_from_y),
+        vec2f(ratio_from_x, 1.),
+        x_gretear_than_y
     );
     let ratio_to_cover = vec2f(
         select(ratio_from_x, 1., x_gretear_than_y),
