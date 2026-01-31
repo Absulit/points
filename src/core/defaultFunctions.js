@@ -44,9 +44,10 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) ->
 
     let scale_mode_equals_height = params.scaleMode == SCALE_MODE_HEIGHT; // else SCALE_MODE_WIDTH
 
-    var ratio = vec2f(
-        select(1., ratio_from_x, scale_mode_equals_height),
-        select(ratio_from_y, 1., scale_mode_equals_height)
+    var ratio = select(
+        vec2f(1., ratio_from_y),
+        vec2f(ratio_from_x, 1),
+        scale_mode_equals_height
     );
 
     let x_gretear_than_y = params.screen.y < params.screen.x;
