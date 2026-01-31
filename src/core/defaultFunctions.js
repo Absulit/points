@@ -54,7 +54,6 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) ->
     );
 
     let is_landscape = params.screen.y < params.screen.x;
-    // let y_gretear_than_x = params.screen.x < params.screen.y;
 
     let scale_mode_equals_fit = params.scaleMode == SCALE_MODE_FIT;
     let scale_mode_equals_cover = params.scaleMode == SCALE_MODE_COVER;
@@ -80,19 +79,7 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) ->
     result.position = position;
     result.color = color;
     result.uv = uv;
-
-    let fits_to_height = vec2(uv.x * result.ratio.x, uv.y); // (cuts width)
-    let fits_to_width = vec2(uv.x, uv.y * result.ratio.y); // (cuts height)
-    result.uvr = select(fits_to_width, fits_to_height, scale_mode_equals_height);
-
-    let uvr_fit = select(fits_to_width, fits_to_height, is_landscape);
-    let uvr_cover = select(fits_to_height, fits_to_width, is_landscape);
-
-    result.uvr = select(
-        select(result.uvr, uvr_cover, scale_mode_equals_cover), // is last else or default
-        uvr_fit,
-        scale_mode_equals_fit
-    );
+    result.uvr = uv * ratio;
 
     result.mouse = vec2(params.mouse.x / params.screen.x, params.mouse.y / params.screen.y);
     result.mouse = result.mouse * vec2(1., -1.) - vec2(0., -1.); // flip and move up
