@@ -40,7 +40,7 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) ->
     var result: FragmentIn;
 
     let ratio_from_x = params.screen.x / params.screen.y;
-    let ratio_from_y = 1. / ratio_from_x; // params.screen.y / params.screen.x;
+    let ratio_from_y = 1. / ratio_from_x; // params.screen.y / params.screen.x; // TODO: move to CPU
 
     let scale_mode_equals_height = params.scaleMode == SCALE_MODE_HEIGHT; // else SCALE_MODE_WIDTH
 
