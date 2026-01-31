@@ -196,6 +196,7 @@ class Points {
     #mouseClick = false;
     #mouseWheel = false;
     #mouseDelta = [0, 0];
+    #ratio = [0, 0];
     #fullscreen = false;
     #fitWindow = false;
     #lastFitWindow = false;
@@ -254,7 +255,7 @@ class Points {
         this.setUniform(UniformKeys.SCREEN, [0, 0], 'vec2f');
         this.setUniform(UniformKeys.MOUSE, [0, 0], 'vec2f');
         this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta, 'vec2f');
-        this.setUniform(UniformKeys.SCALE_MODE, this.#scaleMode);
+        this.setUniform(UniformKeys.RATIO, this.#ratio, 'vec2f');
     }
 
     #resizeCanvasToFitWindow = () => {
@@ -309,6 +310,37 @@ class Points {
                 this.#createTextureBindingToCopy(texture2d);
             }
         })
+
+        this.#setRatio();
+    }
+
+    /**
+     * Calculates the ratio that the screen should have depending on the
+     * `ScaleMode`
+     */
+    #setRatio = () => {
+        // https://github.com/Absulit/points/blob/ca942574c8d72176d7ef5f4d738419aa54c555ab/src/core/defaultFunctions.js
+        const ratio_from_x = this.#canvas.width / this.#canvas.height;
+        const ratio_from_y = 1 / ratio_from_x; // this.#canvas.height / this.#canvas.width;
+
+        const scale_mode_equals_height = this.#scaleMode === ScaleMode.HEIGHT; // else ScaleMode.WIDTH
+
+        const ratio_landscape = [ratio_from_x, 1];
+        const ratio_portrait = [1, ratio_from_y];
+
+        const ratio = scale_mode_equals_height ? ratio_landscape : ratio_portrait;
+
+        const is_landscape = this.#canvas.height < this.#canvas.width;
+
+        const scale_mode_equals_fit = this.#scaleMode === ScaleMode.FIT;
+        const scale_mode_equals_cover = this.#scaleMode === ScaleMode.COVER;
+        const ratio_to_fit = is_landscape ? ratio_landscape : ratio_portrait;
+        const ratio_to_cover = is_landscape ? ratio_portrait : ratio_landscape;
+
+        const e = scale_mode_equals_cover ? ratio_to_cover : ratio;
+        this.#ratio = scale_mode_equals_fit ? ratio_to_fit : e;
+
+        this.setUniform(UniformKeys.RATIO, this.#ratio);
     }
 
     #onMouseMove = e => {
@@ -2934,7 +2966,7 @@ class Points {
      * points.debug = false;
      */
     set debug(val) {
-        this.#debug = val
+        this.#debug = val;
     }
 
     get scaleMode() {
@@ -2947,15 +2979,15 @@ class Points {
      * ScaleMode.HEIGHT: Preserves the visibility of the height, but might crop the width.
      * ScaleMode.SHOW_ALL: Preserves both, but might show black bars or extended empty content
      * beyond the limits of the UV.
-     * @param {ScaleMode} val
+     * @param {ScaleMode|Number} val
      * @default ScaleMode.HEIGHT
      * @example
      *
      * points.scaleMode = ScaleMode.SHOW_ALL;
      */
     set scaleMode(val) {
-        this.#scaleMode = val;
-        this.setUniform(UniformKeys.SCALE_MODE, this.#scaleMode);
+        this.#scaleMode = +val;
+        this.#setRatio();
     }
 
     destroy() {

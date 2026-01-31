@@ -62,11 +62,11 @@ class UniformKeys {
      */
     static MOUSE_DELTA = 'mouseDelta';
     /**
-     * To set the screen `ScaleMode`.
+     * To set `in.ratio` and `in.uvr`.
      * @type {string}
      * @static
      */
-    static SCALE_MODE = 'scaleMode';
+    static RATIO = 'ratio';
 }
 
 export default UniformKeys;
