@@ -3,10 +3,12 @@ import compute from './compute.js';
 import frag from './frag.js';
 import Points, { ScaleMode } from 'points';
 
-const options = {
-    val: 0,
-    bool: false,
-}
+const dropdown = {
+    'FIT': ScaleMode.FIT,
+    'COVER': ScaleMode.COVER,
+    'WIDTH': ScaleMode.WIDTH,
+    'HEIGHT': ScaleMode.HEIGHT
+};
 
 const base = {
     vert,
@@ -18,10 +20,9 @@ const base = {
     init: async (points, folder) => {
         points.scaleMode = ScaleMode.FIT;
 
-        points.setUniform('val', options.val);
-
-        folder.add(options, 'val', -1, 1, .0001).name('Val');
-        folder.add(options, 'bool').name('Bool');
+        folder.add({ default: ScaleMode.HEIGHT }, 'default', dropdown)
+            .onChange(value => points.scaleMode = value)
+            .name('ScaleMode');
 
         folder.open();
     },
@@ -29,7 +30,6 @@ const base = {
      * @param {Points} points
      */
     update: points => {
-        points.setUniform('val', options.val);
     }
 }
 
