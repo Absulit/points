@@ -61,9 +61,10 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) ->
         vec2f(ratio_from_x, 1.),
         x_gretear_than_y
     );
-    let ratio_to_cover = vec2f(
-        select(ratio_from_x, 1., x_gretear_than_y),
-        select(1., ratio_from_y, x_gretear_than_y)
+    let ratio_to_cover = select(
+        vec2f(ratio_from_x, 1.),
+        vec2f(1., ratio_from_y),
+        x_gretear_than_y
     );
 
     ratio = select(
