@@ -40,7 +40,7 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) ->
     var result: FragmentIn;
 
     let ratio_from_x = params.screen.x / params.screen.y;
-    let ratio_from_y = params.screen.y / params.screen.x;
+    let ratio_from_y = 1. / ratio_from_x; // params.screen.y / params.screen.x;
 
     let scale_mode_equals_height = params.scaleMode == SCALE_MODE_HEIGHT; // else SCALE_MODE_WIDTH
 
@@ -53,8 +53,8 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) ->
         scale_mode_equals_height
     );
 
-    let x_gretear_than_y = params.screen.y < params.screen.x;
-    let y_gretear_than_x = params.screen.x < params.screen.y;
+    let is_landscape = params.screen.y < params.screen.x;
+    // let y_gretear_than_x = params.screen.x < params.screen.y;
 
     let scale_mode_equals_fit = params.scaleMode == SCALE_MODE_FIT;
     let scale_mode_equals_cover = params.scaleMode == SCALE_MODE_COVER;
@@ -62,12 +62,12 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) ->
     let ratio_to_fit = select(
         ratio_portrait,
         ratio_landscape,
-        x_gretear_than_y
+        is_landscape
     );
     let ratio_to_cover = select(
         ratio_landscape,
         ratio_portrait,
-        x_gretear_than_y
+        is_landscape
     );
 
     ratio = select(
@@ -85,8 +85,8 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) ->
     let fits_to_width = vec2(uv.x, uv.y * result.ratio.y); // (cuts height)
     result.uvr = select(fits_to_width, fits_to_height, scale_mode_equals_height);
 
-    let uvr_fit = select(fits_to_width, fits_to_height, x_gretear_than_y);
-    let uvr_cover = select(fits_to_width, fits_to_height, y_gretear_than_x);
+    let uvr_fit = select(fits_to_width, fits_to_height, is_landscape);
+    let uvr_cover = select(fits_to_height, fits_to_width, is_landscape);
 
     result.uvr = select(
         select(result.uvr, uvr_cover, scale_mode_equals_cover), // is last else or default
