@@ -323,22 +323,27 @@ class Points {
         const ratio_from_x = this.#canvas.width / this.#canvas.height;
         const ratio_from_y = 1 / ratio_from_x; // this.#canvas.height / this.#canvas.width;
 
-        const scale_mode_equals_height = this.#scaleMode === ScaleMode.HEIGHT; // else ScaleMode.WIDTH
-
         const ratio_landscape = [ratio_from_x, 1];
         const ratio_portrait = [1, ratio_from_y];
 
-        const ratio = scale_mode_equals_height ? ratio_landscape : ratio_portrait;
-
         const is_landscape = this.#canvas.height < this.#canvas.width;
 
-        const scale_mode_equals_fit = this.#scaleMode === ScaleMode.FIT;
-        const scale_mode_equals_cover = this.#scaleMode === ScaleMode.COVER;
-        const ratio_to_fit = is_landscape ? ratio_landscape : ratio_portrait;
-        const ratio_to_cover = is_landscape ? ratio_portrait : ratio_landscape;
+        let ratio;
 
-        const e = scale_mode_equals_cover ? ratio_to_cover : ratio;
-        this.#ratio = scale_mode_equals_fit ? ratio_to_fit : e;
+        if (this.#scaleMode === ScaleMode.FIT) {
+            ratio = is_landscape ? ratio_landscape : ratio_portrait;
+        } else if (this.#scaleMode === ScaleMode.COVER) {
+            ratio = is_landscape ? ratio_portrait : ratio_landscape;
+        } else if (this.#scaleMode === ScaleMode.HEIGHT) {
+            ratio = ratio_landscape;
+        } else {
+            ratio = ratio_portrait;
+        }
+
+        // to avoid creating new object, we just overwrite/copy the data.
+        // meaning we use the same reference of #ratio
+        this.#ratio[0] = ratio[0];
+        this.#ratio[1] = ratio[1];
 
         this.setUniform(UniformKeys.RATIO, this.#ratio);
     }
