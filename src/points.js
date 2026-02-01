@@ -218,17 +218,22 @@ class Points {
         if (this.#canvasId) {
             this.#canvas.addEventListener('click', e => {
                 this.#mouseClick = true;
+                this.setUniform(UniformKeys.MOUSE_CLICK, this.#mouseClick);
             });
             this.#canvas.addEventListener('mousemove', this.#onMouseMove, { passive: true });
             this.#canvas.addEventListener('mousedown', e => {
                 this.#mouseDown = true;
+                this.setUniform(UniformKeys.MOUSE_DOWN, this.#mouseDown);
             });
             this.#canvas.addEventListener('mouseup', e => {
                 this.#mouseDown = false;
+                this.setUniform(UniformKeys.MOUSE_DOWN, this.#mouseDown);
             });
             this.#canvas.addEventListener('wheel', e => {
                 this.#mouseWheel = true;
                 this.#mouseDelta = [e.deltaX, e.deltaY];
+                this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
+                this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta);
             }, { passive: true });
             this.#originalCanvasWidth = this.#canvas.clientWidth;
             this.#originalCanvasHeigth = this.#canvas.clientHeight;
@@ -2617,11 +2622,7 @@ class Points {
         this.setUniform(UniformKeys.TIME, this.#time);
         this.setUniform(UniformKeys.DELTA, this.#delta);
         this.setUniform(UniformKeys.EPOCH, this.#epoch);
-        this.setUniform(UniformKeys.MOUSE_CLICK, this.#mouseClick);
-        this.setUniform(UniformKeys.MOUSE_DOWN, this.#mouseDown);
-        this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
         this.setUniform(UniformKeys.SCREEN, [this.#canvas.width, this.#canvas.height]);
-        this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta);
         //--------------------------------------------
         this.#writeParametersUniforms();
         this.#writeStorages();
@@ -2814,6 +2815,9 @@ class Points {
         this.#mouseClick = false;
         this.#mouseWheel = false;
         this.#mouseDelta = [0, 0];
+        this.setUniform(UniformKeys.MOUSE_CLICK, this.#mouseClick);
+        this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
+        this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta);
         await this.read();
     }
     async read() {
