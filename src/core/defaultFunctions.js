@@ -39,9 +39,7 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) ->
     result.color = color;
     result.uv = uv;
     result.uvr = uv * params.ratio;
-
-    result.mouse = vec2(params.mouse.x / params.screen.x, params.mouse.y / params.screen.y);
-    result.mouse = result.mouse * vec2(1., -1.) - vec2(0., -1.); // flip and move up
+    result.mouse = params._mouse_normalized;
     result.normal = normal;
 
     return result;
