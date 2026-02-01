@@ -2894,11 +2894,14 @@ class Points {
     }
 
     /**
-     * To set how the content should be displayed on different screen sizes.
-     * ScaleMode.WIDTH: Preserves the visibility of the width, but might crop the height.
-     * ScaleMode.HEIGHT: Preserves the visibility of the height, but might crop the width.
-     * ScaleMode.SHOW_ALL: Preserves both, but might show black bars or extended empty content
-     * beyond the limits of the UV.
+     * Select how the content should be displayed on different
+     * screen sizes.
+     * ```text
+     * FIT: Preserves both, but might show black bars or extend empty content. All content is visible.
+     * COVER: Preserves both, but might crop width or height. All screen is covered.
+     * WIDTH: Preserves the visibility of the width, but might crop the height.
+     * HEIGHT: Preserves the visibility of the height, but might crop the width.
+     * ```
      * @param {ScaleMode|Number} val
      * @default ScaleMode.HEIGHT
      * @example
