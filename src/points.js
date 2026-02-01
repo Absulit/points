@@ -190,8 +190,7 @@ class Points {
     #time = 0;
     #delta = 0;
     #epoch = 0;
-    #mouseX = 0;
-    #mouseY = 0;
+    #mouse = [0, 0];
     #mouseDown = false;
     #mouseClick = false;
     #mouseWheel = false;
@@ -253,7 +252,7 @@ class Points {
         this.setUniform(UniformKeys.MOUSE_DOWN, this.#mouseDown);
         this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
         this.setUniform(UniformKeys.SCREEN, [0, 0], 'vec2f');
-        this.setUniform(UniformKeys.MOUSE, [0, 0], 'vec2f');
+        this.setUniform(UniformKeys.MOUSE, this.#mouse, 'vec2f');
         this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta, 'vec2f');
         this.setUniform(UniformKeys.RATIO, this.#ratio, 'vec2f');
     }
@@ -351,8 +350,9 @@ class Points {
     #onMouseMove = e => {
         // get position relative to canvas
         const rect = this.#canvas.getBoundingClientRect();
-        this.#mouseX = e.clientX - rect.left;
-        this.#mouseY = e.clientY - rect.top;
+        this.#mouse[0] = e.clientX - rect.left;
+        this.#mouse[1] = e.clientY - rect.top;
+        this.setUniform(UniformKeys.MOUSE, this.#mouse);
     }
 
     /**
@@ -2621,7 +2621,6 @@ class Points {
         this.setUniform(UniformKeys.MOUSE_DOWN, this.#mouseDown);
         this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
         this.setUniform(UniformKeys.SCREEN, [this.#canvas.width, this.#canvas.height]);
-        this.setUniform(UniformKeys.MOUSE, [this.#mouseX, this.#mouseY]);
         this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta);
         //--------------------------------------------
         this.#writeParametersUniforms();
