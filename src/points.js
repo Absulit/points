@@ -14,6 +14,7 @@ import UniformsArray from './UniformsArray.js';
 import getStorageAccessMode, { bindingModes, entriesModes } from './storage-accessmode.js';
 import { cross, dot, normalize, sub } from './matrix.js';
 import { clearCache, elToImage, getCSS } from './texture-element.js';
+import ScaleMode from './ScaleMode.js';
 
 /**
  * Class to be used to decide if the output textures can hold more data beyond
@@ -29,108 +30,6 @@ class PresentationFormat {
     static RGBA8UNORM = 'rgba8unorm';
     static RGBA16FLOAT = 'rgba16float';
     static RGBA32FLOAT = 'rgba32float';
-}
-
-/**
- * Class to be used to select how the content should be displayed on different
- * screen sizes.
- * FIT: Preserves both, but might show black bars or extend empty content. All content is visible.
- * COVER: Preserves both, but might crop width or height. All screen is covered.
- * WIDTH: Preserves the visibility of the width, but might crop the height.
- * HEIGHT: Preserves the visibility of the height, but might crop the width.
- * beyond the limits of the UV.
- *
- * @example
- *
- * points.scaleMode = ScaleMode.COVER;
- */
-
-class ScaleMode {
-    /**
-     * ```text
-     * All content is visible.
-     * Black bars shown to compensate.
-     * No content is cropped.
-     *
-     * PORTRAIT        LANDSCAPE
-     * ░░░░░░░░░░░░░░░ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ░░░░░░░░░░░░░░░ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ░░░░░░░░░░░░░░░
-     * ░░░░░░░░░░░░░░░
-     * ```
-     */
-
-    static FIT = 1;
-    /**
-     * ```text
-     * Not all content is visible.
-     * No black bars shown.
-     * Content is cropped on the sides.
-     * `
-     * PORTRAIT            LANDSCAPE
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ```
-     */
-    static COVER = 2;
-    /**
-     * ```text
-     * Content is visible in portrait.
-     * Black bars shown to compensate in portrait.
-     * Content is cropped in landscape.
-     *
-     * PORTRAIT        LANDSCAPE
-     * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ```
-     */
-    static WIDTH = 4;
-    /**
-     * ```text
-     * Not all content is visible.
-     * Black bars shown to compensate in landscape.
-     * Content is cropped in portrait.
-     *
-     * PORTRAIT            LANDSCAPE
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
-     * ```
-     */
-    static HEIGHT = 8;
 }
 
 /**
