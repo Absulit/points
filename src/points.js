@@ -195,6 +195,7 @@ class Points {
     #mouseClick = false;
     #mouseWheel = false;
     #mouseDelta = [0, 0];
+    #screen = [0, 0];
     #ratio = [0, 0];
     #fullscreen = false;
     #fitWindow = false;
@@ -257,7 +258,7 @@ class Points {
         this.setUniform(UniformKeys.MOUSE_CLICK, this.#mouseClick);
         this.setUniform(UniformKeys.MOUSE_DOWN, this.#mouseDown);
         this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
-        this.setUniform(UniformKeys.SCREEN, [0, 0], 'vec2f');
+        this.setUniform(UniformKeys.SCREEN, this.#screen, 'vec2f');
         this.setUniform(UniformKeys.MOUSE, this.#mouse, 'vec2f');
         this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta, 'vec2f');
         this.setUniform(UniformKeys.RATIO, this.#ratio, 'vec2f');
@@ -285,6 +286,9 @@ class Points {
         // this was not happening before the speed up refactor
         this.#canvas.width = canvas.clientWidth;
         this.#canvas.height = canvas.clientHeight;
+        this.#screen[0] = this.#canvas.width;
+        this.#screen[1] = this.#canvas.height;
+        this.setUniform(UniformKeys.SCREEN, this.#screen);
 
         this.#presentationSize = [
             this.#canvas.clientWidth,
@@ -2623,7 +2627,6 @@ class Points {
         this.setUniform(UniformKeys.TIME, this.#time);
         this.setUniform(UniformKeys.DELTA, this.#delta);
         this.setUniform(UniformKeys.EPOCH, this.#epoch);
-        this.setUniform(UniformKeys.SCREEN, [this.#canvas.width, this.#canvas.height]);
         //--------------------------------------------
         this.#writeParametersUniforms();
         this.#writeStorages();
