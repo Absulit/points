@@ -191,6 +191,7 @@ class Points {
     #delta = 0;
     #epoch = 0;
     #mouse = [0, 0];
+    #mouseNormalized = [0, 0];
     #mouseDown = false;
     #mouseClick = false;
     #mouseWheel = false;
@@ -365,10 +366,11 @@ class Points {
         this.#mouse[1] = e.clientY - rect.top;
         // result.mouse = vec2(params.mouse.x / params.screen.x, params.mouse.y / params.screen.y);
         // result.mouse = result.mouse * vec2(1., -1.) - vec2(0., -1.); // flip and move up
-        const mouseNormalized = [this.#mouse[0] / this.#screen[0], this.#mouse[1] / this.#screen[1]];
-        mouseNormalized[1] = (mouseNormalized[1] * - 1) - -1; // flip and move up
+        this.#mouseNormalized[0] = this.#mouse[0] / this.#screen[0];
+        this.#mouseNormalized[1] = this.#mouse[1] / this.#screen[1];
+        this.#mouseNormalized[1] = (this.#mouseNormalized[1] * - 1) - -1; // flip and move up
         this.setUniform(UniformKeys.MOUSE, this.#mouse);
-        this.setUniform('_mouse_normalized', mouseNormalized);
+        this.setUniform('_mouse_normalized', this.#mouseNormalized);
     }
 
     /**
