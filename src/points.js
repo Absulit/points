@@ -231,7 +231,8 @@ class Points {
             });
             this.#canvas.addEventListener('wheel', e => {
                 this.#mouseWheel = true;
-                this.#mouseDelta = [e.deltaX, e.deltaY];
+                this.#mouseDelta[0] = e.deltaX;
+                this.#mouseDelta[1] = e.deltaY;
                 this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
                 this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta);
             }, { passive: true });
@@ -2814,7 +2815,8 @@ class Points {
         // reset mouse values because it doesn't happen by itself
         this.#mouseClick = false;
         this.#mouseWheel = false;
-        this.#mouseDelta = [0, 0];
+        this.#mouseDelta[0] = 0;
+        this.#mouseDelta[1] = 0;
         this.setUniform(UniformKeys.MOUSE_CLICK, this.#mouseClick);
         this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
         this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta);
