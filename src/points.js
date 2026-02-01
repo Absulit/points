@@ -2906,7 +2906,7 @@ class Points {
      * @default ScaleMode.HEIGHT
      * @example
      *
-     * points.scaleMode = ScaleMode.SHOW_ALL;
+     * points.scaleMode = ScaleMode.COVER;
      */
     set scaleMode(val) {
         this.#scaleMode = +val;
