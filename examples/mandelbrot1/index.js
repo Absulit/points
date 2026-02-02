@@ -1,6 +1,6 @@
 import vert from './vert.js';
 import frag from './frag.js';
-import Points from 'points';
+import Points, { ScaleMode } from 'points';
 
 const options = {
     numIterations: 40,
@@ -14,6 +14,7 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+        points.scaleMode = ScaleMode.FIT;
         points.setUniform('scale', options.scale);
         points.setUniform('numIterations', options.numIterations);
         points.setStorage('variables', 'Variable', false, GPUShaderStage.FRAGMENT);

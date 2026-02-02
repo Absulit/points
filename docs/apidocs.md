@@ -11,7 +11,7 @@ Looking for an explanation on how to use POINTS? follow this link:
 
 ## Main classes:<br>
 ```js
-import Points { RenderPass, RenderPasses, PrimitiveTopology, CullMode, LoadOp, PresentationFormat, FrontFace } from 'points';
+import Points { RenderPass, RenderPasses, PrimitiveTopology, CullMode, LoadOp, PresentationFormat, FrontFace, ScaleMode } from 'points';
 ```
 
 {@link Points|Points}<br>
@@ -23,6 +23,7 @@ import Points { RenderPass, RenderPasses, PrimitiveTopology, CullMode, LoadOp, P
 {@link LoadOp|LoadOp}<br>
 {@link PresentationFormat|PresentationFormat}<br>
 {@link FrontFace|FrontFace}<br>
+{@link ScaleMode|ScaleMode}<br>
 
 ## Submodules with helper wgsl functions:
 

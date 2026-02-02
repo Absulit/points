@@ -1,7 +1,7 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
-import Points, { RenderPass, RenderPasses } from 'points';
+import Points, { RenderPass, RenderPasses, ScaleMode } from 'points';
 
 const options = {
 }
@@ -17,6 +17,8 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+
+        points.scaleMode = ScaleMode.HEIGHT;
 
         points.setSampler('imageSampler', null);
         await points.setTextureVideo(

@@ -1,7 +1,7 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
-import { RenderPass } from 'points';
+import Points, { RenderPass, ScaleMode } from 'points';
 
 const options = {
     squareSize: .103,
@@ -13,7 +13,13 @@ const shapes1 = {
     renderPasses: [
         new RenderPass(vert, frag, compute, 128, 1, 1)
     ],
+    /**
+     *
+     * @param {Points} points
+     * @param {*} folder
+     */
     init: async (points, folder) => {
+        points.scaleMode = ScaleMode.FIT;
         const numPoints = 128;
         points.setUniform('numPoints', numPoints);
         points.setStorage('points', `array<vec2f, ${numPoints}>`);

@@ -14,22 +14,8 @@ import UniformsArray from './UniformsArray.js';
 import getStorageAccessMode, { bindingModes, entriesModes } from './storage-accessmode.js';
 import { cross, dot, normalize, sub } from './matrix.js';
 import { clearCache, elToImage, getCSS } from './texture-element.js';
-
-/**
- * Class to be used to decide if the output textures can hold more data beyond
- * the range from 0..1, thing is useful for HDR images.
- *
- * @example
- *
- * points.presentationFormat = PresentationFormat.RGBA16FLOAT;
- *
- */
-class PresentationFormat {
-    static BGRA8UNORM = 'bgra8unorm';
-    static RGBA8UNORM = 'rgba8unorm';
-    static RGBA16FLOAT = 'rgba16float';
-    static RGBA32FLOAT = 'rgba32float';
-}
+import PresentationFormat from './PresentationFormat.js';
+import ScaleMode from './ScaleMode.js';
 
 /**
  * Main class Points, this is the entry point of an application with this library.
@@ -88,12 +74,14 @@ class Points {
     #time = 0;
     #delta = 0;
     #epoch = 0;
-    #mouseX = 0;
-    #mouseY = 0;
+    #mouse = [0, 0];
+    #mouseNormalized = [0, 0];
     #mouseDown = false;
     #mouseClick = false;
     #mouseWheel = false;
     #mouseDelta = [0, 0];
+    #screen = [0, 0];
+    #ratio = [0, 0];
     #fullscreen = false;
     #fitWindow = false;
     #lastFitWindow = false;
@@ -108,6 +96,7 @@ class Points {
     #imports = [];
     #initialized = false;
     #debug = true;
+    #scaleMode = ScaleMode.HEIGHT;
 
     constructor(canvasId) {
         this.#canvasId = canvasId;
@@ -115,17 +104,23 @@ class Points {
         if (this.#canvasId) {
             this.#canvas.addEventListener('click', e => {
                 this.#mouseClick = true;
+                this.setUniform(UniformKeys.MOUSE_CLICK, this.#mouseClick);
             });
             this.#canvas.addEventListener('mousemove', this.#onMouseMove, { passive: true });
             this.#canvas.addEventListener('mousedown', e => {
                 this.#mouseDown = true;
+                this.setUniform(UniformKeys.MOUSE_DOWN, this.#mouseDown);
             });
             this.#canvas.addEventListener('mouseup', e => {
                 this.#mouseDown = false;
+                this.setUniform(UniformKeys.MOUSE_DOWN, this.#mouseDown);
             });
             this.#canvas.addEventListener('wheel', e => {
                 this.#mouseWheel = true;
-                this.#mouseDelta = [e.deltaX, e.deltaY];
+                this.#mouseDelta[0] = e.deltaX;
+                this.#mouseDelta[1] = e.deltaY;
+                this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
+                this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta);
             }, { passive: true });
             this.#originalCanvasWidth = this.#canvas.clientWidth;
             this.#originalCanvasHeigth = this.#canvas.clientHeight;
@@ -148,9 +143,11 @@ class Points {
         this.setUniform(UniformKeys.MOUSE_CLICK, this.#mouseClick);
         this.setUniform(UniformKeys.MOUSE_DOWN, this.#mouseDown);
         this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
-        this.setUniform(UniformKeys.SCREEN, [0, 0], 'vec2f');
-        this.setUniform(UniformKeys.MOUSE, [0, 0], 'vec2f');
+        this.setUniform(UniformKeys.SCREEN, this.#screen, 'vec2f');
+        this.setUniform(UniformKeys.MOUSE, this.#mouse, 'vec2f');
         this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta, 'vec2f');
+        this.setUniform(UniformKeys.RATIO, this.#ratio, 'vec2f');
+        this.setUniform('_mouse_normalized', [0, 0], 'vec2f');
     }
 
     #resizeCanvasToFitWindow = () => {
@@ -175,6 +172,9 @@ class Points {
         // this was not happening before the speed up refactor
         this.#canvas.width = canvas.clientWidth;
         this.#canvas.height = canvas.clientHeight;
+        this.#screen[0] = this.#canvas.width;
+        this.#screen[1] = this.#canvas.height;
+        this.setUniform(UniformKeys.SCREEN, this.#screen);
 
         this.#presentationSize = [
             this.#canvas.clientWidth,
@@ -205,13 +205,56 @@ class Points {
                 this.#createTextureBindingToCopy(texture2d);
             }
         })
+
+        this.#setRatio();
+    }
+
+    /**
+     * Calculates the ratio that the screen should have depending on the
+     * `ScaleMode`
+     */
+    #setRatio = () => {
+        // https://github.com/Absulit/points/blob/ca942574c8d72176d7ef5f4d738419aa54c555ab/src/core/defaultFunctions.js
+        const ratio_from_x = this.#canvas.width / this.#canvas.height;
+        const ratio_from_y = 1 / ratio_from_x; // this.#canvas.height / this.#canvas.width;
+
+        const ratio_landscape = [ratio_from_x, 1];
+        const ratio_portrait = [1, ratio_from_y];
+
+        const is_landscape = this.#canvas.height < this.#canvas.width;
+
+        let ratio;
+
+        if (this.#scaleMode === ScaleMode.FIT) {
+            ratio = is_landscape ? ratio_landscape : ratio_portrait;
+        } else if (this.#scaleMode === ScaleMode.COVER) {
+            ratio = is_landscape ? ratio_portrait : ratio_landscape;
+        } else if (this.#scaleMode === ScaleMode.HEIGHT) {
+            ratio = ratio_landscape;
+        } else {
+            ratio = ratio_portrait;
+        }
+
+        // to avoid creating new object, we just overwrite/copy the data.
+        // meaning we use the same reference of #ratio
+        this.#ratio[0] = ratio[0];
+        this.#ratio[1] = ratio[1];
+
+        this.setUniform(UniformKeys.RATIO, this.#ratio);
     }
 
     #onMouseMove = e => {
         // get position relative to canvas
         const rect = this.#canvas.getBoundingClientRect();
-        this.#mouseX = e.clientX - rect.left;
-        this.#mouseY = e.clientY - rect.top;
+        this.#mouse[0] = e.clientX - rect.left;
+        this.#mouse[1] = e.clientY - rect.top;
+        // result.mouse = vec2(params.mouse.x / params.screen.x, params.mouse.y / params.screen.y);
+        // result.mouse = result.mouse * vec2(1., -1.) - vec2(0., -1.); // flip and move up
+        this.#mouseNormalized[0] = this.#mouse[0] / this.#screen[0];
+        this.#mouseNormalized[1] = this.#mouse[1] / this.#screen[1];
+        this.#mouseNormalized[1] = (this.#mouseNormalized[1] * - 1) - -1; // flip and move up
+        this.setUniform(UniformKeys.MOUSE, this.#mouse);
+        this.setUniform('_mouse_normalized', this.#mouseNormalized);
     }
 
     /**
@@ -2476,12 +2519,6 @@ class Points {
         this.setUniform(UniformKeys.TIME, this.#time);
         this.setUniform(UniformKeys.DELTA, this.#delta);
         this.setUniform(UniformKeys.EPOCH, this.#epoch);
-        this.setUniform(UniformKeys.MOUSE_CLICK, this.#mouseClick);
-        this.setUniform(UniformKeys.MOUSE_DOWN, this.#mouseDown);
-        this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
-        this.setUniform(UniformKeys.SCREEN, [this.#canvas.width, this.#canvas.height]);
-        this.setUniform(UniformKeys.MOUSE, [this.#mouseX, this.#mouseY]);
-        this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta);
         //--------------------------------------------
         this.#writeParametersUniforms();
         this.#writeStorages();
@@ -2673,7 +2710,11 @@ class Points {
         // reset mouse values because it doesn't happen by itself
         this.#mouseClick = false;
         this.#mouseWheel = false;
-        this.#mouseDelta = [0, 0];
+        this.#mouseDelta[0] = 0;
+        this.#mouseDelta[1] = 0;
+        this.setUniform(UniformKeys.MOUSE_CLICK, this.#mouseClick);
+        this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
+        this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta);
         await this.read();
     }
     async read() {
@@ -2830,7 +2871,31 @@ class Points {
      * points.debug = false;
      */
     set debug(val) {
-        this.#debug = val
+        this.#debug = val;
+    }
+
+    get scaleMode() {
+        return this.#scaleMode;
+    }
+
+    /**
+     * Select how the content should be displayed on different
+     * screen sizes.
+     * ```text
+     * FIT: Preserves both, but might show black bars or extend empty content. All content is visible.
+     * COVER: Preserves both, but might crop width or height. All screen is covered.
+     * WIDTH: Preserves the visibility of the width, but might crop the height.
+     * HEIGHT: Preserves the visibility of the height, but might crop the width.
+     * ```
+     * @param {ScaleMode|Number} val
+     * @default ScaleMode.HEIGHT
+     * @example
+     *
+     * points.scaleMode = ScaleMode.COVER;
+     */
+    set scaleMode(val) {
+        this.#scaleMode = +val;
+        this.#setRatio();
     }
 
     destroy() {
@@ -2849,4 +2914,4 @@ class Points {
 }
 
 export default Points;
-export { RenderPass, RenderPasses, PrimitiveTopology, CullMode, LoadOp, PresentationFormat, FrontFace };
+export { RenderPass, RenderPasses, PrimitiveTopology, CullMode, LoadOp, PresentationFormat, FrontFace, ScaleMode };

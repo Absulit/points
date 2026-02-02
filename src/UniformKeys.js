@@ -61,6 +61,12 @@ class UniformKeys {
      * @static
      */
     static MOUSE_DELTA = 'mouseDelta';
+    /**
+     * To set `in.ratio` and `in.uvr`.
+     * @type {string}
+     * @static
+     */
+    static RATIO = 'ratio';
 }
 
 export default UniformKeys;
