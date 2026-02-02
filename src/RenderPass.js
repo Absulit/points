@@ -1224,6 +1224,8 @@ class RenderPass {
         this.#computePipeline = null;
         this.#renderPipeline = null;
 
+        this.#vertexBuffer.destroy();
+
         this.#computeBindGroup = null;
         this.#fragmentBindGroup = null;
         this.#vertexBindGroup = null;
