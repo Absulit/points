@@ -14,23 +14,8 @@ import UniformsArray from './UniformsArray.js';
 import getStorageAccessMode, { bindingModes, entriesModes } from './storage-accessmode.js';
 import { cross, dot, normalize, sub } from './matrix.js';
 import { clearCache, elToImage, getCSS } from './texture-element.js';
+import PresentationFormat from './PresentationFormat.js';
 import ScaleMode from './ScaleMode.js';
-
-/**
- * Class to be used to decide if the output textures can hold more data beyond
- * the range from 0..1. Useful for HDR images.
- *
- * @example
- *
- * points.presentationFormat = PresentationFormat.RGBA16FLOAT;
- *
- */
-class PresentationFormat {
-    static BGRA8UNORM = 'bgra8unorm';
-    static RGBA8UNORM = 'rgba8unorm';
-    static RGBA16FLOAT = 'rgba16float';
-    static RGBA32FLOAT = 'rgba32float';
-}
 
 /**
  * Main class Points, this is the entry point of an application with this library.
