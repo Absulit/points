@@ -2907,6 +2907,8 @@ class Points {
 
         this.#storage.forEach(s => s.buffer.destroy());
         this.#uniforms.buffer.destroy();
+        this.#meshUniforms?.buffer?.destroy();
+        this.#cameraUniforms?.buffer?.destroy();
 
         this.#initialized = false;
         this.#uniforms = new UniformsArray();
