@@ -2899,6 +2899,12 @@ class Points {
     }
 
     destroy() {
+        this.#textures2d.forEach(t => t.texture.destroy());
+        this.#renderPasses.forEach(renderPass => {
+            renderPass.destroy();
+            renderPass = null;
+        })
+
         this.#initialized = false;
         this.#uniforms = new UniformsArray();
         this.#meshUniforms = new UniformsArray();
