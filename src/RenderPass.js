@@ -1221,10 +1221,15 @@ class RenderPass {
 
     destroy() {
         this.#textureDepth.destroy();
-        this.#computePipeline = null;
-        this.#renderPipeline = null;
+
 
         this.#vertexBuffer.destroy();
+
+        this.#compiledShaders = {
+            vertex: '',
+            compute: '',
+            fragment: '',
+        };
 
         this.#computeBindGroup = null;
         this.#fragmentBindGroup = null;
@@ -1232,6 +1237,11 @@ class RenderPass {
         this.#bindGroupLayoutFragment = null;
         this.#bindGroupLayoutVertex = null;
         this.#bindGroupLayoutCompute = null;
+
+        this.#computePipeline = null;
+        this.#renderPipeline = null;
+
+        this.#bundle = null;
     }
 
 }

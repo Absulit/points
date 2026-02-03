@@ -2904,6 +2904,7 @@ class Points {
             renderPass.destroy();
             renderPass = null;
         })
+        this.#renderPasses = null;
 
         this.#storage.forEach(s => s.buffer.destroy());
         this.#uniforms.buffer.destroy();
