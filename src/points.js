@@ -2902,6 +2902,12 @@ class Points {
         this.#texturesDepth2d.forEach(t => t.texture.destroy());
         this.#texturesDepth2d = [];
 
+        this.#textures2dArray.forEach(t => t.texture.destroy());
+        this.#textures2dArray = [];
+
+        this.#texturesStorage2d.forEach(t => t.texture.destroy());
+        this.#texturesStorage2d = [];
+
         this.#renderPasses.forEach(renderPass => {
             renderPass.destroy();
             renderPass = null;
@@ -2931,7 +2937,7 @@ class Points {
             stream?.getTracks().forEach(track => track.stop());
             textureExternal.texture = null;
         })
-        this.#texturesExternal = null;
+        this.#texturesExternal = [];
 
         clearCache();
     }
