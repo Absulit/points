@@ -2896,7 +2896,7 @@ class Points {
     }
 
     destroy() {
-        // this.#events = new Map();
+        this.#events = new Map();
         this.#textures2d.forEach(t => t.texture.destroy());
         this.#textures2d = [];
 
