@@ -2895,7 +2895,13 @@ class Points {
     }
 
     destroy() {
+        // this.#events = new Map();
         this.#textures2d.forEach(t => t.texture.destroy());
+        this.#textures2d = [];
+
+        this.#texturesDepth2d.forEach(t => t.texture.destroy());
+        this.#texturesDepth2d = [];
+
         this.#renderPasses.forEach(renderPass => {
             renderPass.destroy();
             renderPass = null;
