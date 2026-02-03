@@ -1079,7 +1079,8 @@ class Points {
             texture: null,
             size: size,
             usesRenderPass,
-            internal: false
+            internal: false,
+            name: `${writeName}::${readName}`
         }
         this.#bindingTextures.push(bindingTexture);
         return bindingTexture;
@@ -2908,6 +2909,9 @@ class Points {
         this.#texturesStorage2d.forEach(t => t.texture.destroy());
         this.#texturesStorage2d = [];
 
+        this.#bindingTextures.forEach(t => t.texture.destroy());
+        this.#bindingTextures = []; // TODO: review why so many Texture Views
+
         this.#renderPasses.forEach(renderPass => {
             renderPass.destroy();
             renderPass = null;
@@ -2928,8 +2932,8 @@ class Points {
         this.#samplers = [];
 
         this.#layers.forEach(l => l.buffer.destroy()); // TODO: review why buffer here
-        this.#layers?.buffer.destroy();
-        this.#layers = [];
+        this.#layers?.buffer?.destroy();
+        this.#layers = new LayersArray();
 
         this.#initialized = false;
         this.#uniforms = new UniformsArray();
@@ -2944,6 +2948,8 @@ class Points {
         this.#texturesExternal = [];
 
         clearCache();
+        this.#constants = [];
+        this.#clock = new Clock();
     }
 }
 
