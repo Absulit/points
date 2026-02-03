@@ -48,7 +48,6 @@ class Points {
     /** @type {Array<RenderPass>} */
     #renderPasses = null;
     #postRenderPasses = [];
-    #buffer = null;
     #presentationSize = null;
     #numColumns = 1;
     #numRows = 1;
@@ -2770,9 +2769,6 @@ class Points {
     get context() {
         return this.#context;
     }
-    get buffer() {
-        return this.#buffer;
-    }
     get fullscreen() {
         return this.#fullscreen;
     }
@@ -2917,7 +2913,7 @@ class Points {
         this.#meshUniforms?.buffer?.destroy();
         this.#cameraUniforms?.buffer?.destroy();
         this.#samplers.forEach(s => null);
-        this.#samplers = null;
+        this.#samplers = [];
 
         this.#initialized = false;
         this.#uniforms = new UniformsArray();
