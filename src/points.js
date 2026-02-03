@@ -97,33 +97,42 @@ class Points {
     #debug = true;
     #scaleMode = ScaleMode.HEIGHT;
 
+    #abortController = new AbortController();
+
     constructor(canvasId) {
+        const { signal } = this.#abortController;
+        const listenerOptions = { signal };
         this.#canvasId = canvasId;
         this.#canvas = document.getElementById(this.#canvasId);
         if (this.#canvasId) {
             this.#canvas.addEventListener('click', e => {
                 this.#mouseClick = true;
                 this.setUniform(UniformKeys.MOUSE_CLICK, this.#mouseClick);
+            }, listenerOptions);
+            this.#canvas.addEventListener('mousemove', this.#onMouseMove, {
+                passive: true, signal
             });
-            this.#canvas.addEventListener('mousemove', this.#onMouseMove, { passive: true });
             this.#canvas.addEventListener('mousedown', e => {
                 this.#mouseDown = true;
                 this.setUniform(UniformKeys.MOUSE_DOWN, this.#mouseDown);
-            });
+            }, listenerOptions);
             this.#canvas.addEventListener('mouseup', e => {
                 this.#mouseDown = false;
                 this.setUniform(UniformKeys.MOUSE_DOWN, this.#mouseDown);
-            });
+            }, listenerOptions);
             this.#canvas.addEventListener('wheel', e => {
                 this.#mouseWheel = true;
                 this.#mouseDelta[0] = e.deltaX;
                 this.#mouseDelta[1] = e.deltaY;
                 this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
                 this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta);
-            }, { passive: true });
+            }, { passive: true, signal });
             this.#originalCanvasWidth = this.#canvas.clientWidth;
             this.#originalCanvasHeigth = this.#canvas.clientHeight;
-            window.addEventListener('resize', this.#resizeCanvasToFitWindow, false);
+            window.addEventListener('resize', this.#resizeCanvasToFitWindow, {
+                signal,
+                capture: false
+            });
             document.addEventListener('fullscreenchange', e => {
                 this.#fullscreen = !!document.fullscreenElement;
                 if (!this.#fullscreen && !this.#fitWindow) {
@@ -132,7 +141,7 @@ class Points {
                 if (!this.#fullscreen) {
                     this.fitWindow = this.#lastFitWindow;
                 }
-            });
+            }, listenerOptions);
         }
 
         // initializing internal uniforms
@@ -179,6 +188,7 @@ class Points {
             this.#canvas.clientWidth,
             this.#canvas.clientHeight,
         ];
+
         this.#context.configure({
             label: '_context',
             device: this.#device,
@@ -983,6 +993,11 @@ class Points {
         audio.volume = volume;
         audio.autoplay = autoplay;
         audio.loop = loop;
+        const { signal } = this.#abortController;
+        const listenerOptions = {
+            signal,
+            capture: false
+        }
         const sound = {
             name: name,
             path: path,
@@ -995,8 +1010,8 @@ class Points {
         const audioContext = new AudioContext();
         const resume = _ => { audioContext.resume() }
         if (audioContext.state === 'suspended') {
-            document.body.addEventListener('touchend', resume, false);
-            document.body.addEventListener('click', resume, false);
+            document.body.addEventListener('touchend', resume, listenerOptions);
+            document.body.addEventListener('click', resume, listenerOptions);
         }
         const source = audioContext.createMediaElementSource(audio);
         // // audioContext.createMediaStreamSource()
@@ -2901,6 +2916,9 @@ class Points {
     }
 
     destroy() {
+        cancelAnimationFrame(this.#animationFrameId);
+        this.#abortController.abort();
+
         this.#events = new Map();
         this.#textures2d.forEach(t => t.texture.destroy());
         this.#textures2d = [];
@@ -2922,9 +2940,6 @@ class Points {
             renderPass = null;
         })
         this.#renderPasses = null;
-        this.#device.destroy();
-        this.#device = null;
-        this.#adapter = null;
 
         this.#storage.forEach(s => s.buffer.destroy());
         this.#storage = [];
