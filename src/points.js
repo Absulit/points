@@ -538,10 +538,15 @@ class Points {
         let arrayBuffer = null;
         let arrayBufferCopy = null;
         if (storageItem) {
-            await storageItem.buffer.mapAsync(GPUMapMode.READ);
-            arrayBuffer = storageItem.buffer.getMappedRange();
-            arrayBufferCopy = new Float32Array(arrayBuffer.slice(0));
-            storageItem.buffer.unmap();
+            try {
+                await storageItem.buffer.mapAsync(GPUMapMode.READ);
+                arrayBuffer = storageItem.buffer.getMappedRange();
+                arrayBufferCopy = new Float32Array(arrayBuffer.slice(0));
+                storageItem.buffer.unmap();
+            } catch (error) {
+                // if we switch projects mapasync fails
+                // we ignore it
+            }
         }
         return arrayBufferCopy;
     }
