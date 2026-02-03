@@ -2905,11 +2905,19 @@ class Points {
             renderPass = null;
         })
         this.#renderPasses = null;
+        this.#device.destroy();
+        this.#device = null;
+        this.#adapter = null;
 
         this.#storage.forEach(s => s.buffer.destroy());
+        this.#storage = [];
+        this.#readStorage.forEach(s => s.buffer.destroy());
+        this.#readStorage = [];
         this.#uniforms.buffer.destroy();
         this.#meshUniforms?.buffer?.destroy();
         this.#cameraUniforms?.buffer?.destroy();
+        this.#samplers.forEach(s => null);
+        this.#samplers = null;
 
         this.#initialized = false;
         this.#uniforms = new UniformsArray();
@@ -2919,7 +2927,9 @@ class Points {
         this.#texturesExternal.forEach(textureExternal => {
             const stream = textureExternal?.video.srcObject;
             stream?.getTracks().forEach(track => track.stop());
+            textureExternal.texture = null;
         })
+        this.#texturesExternal = null;
 
         clearCache();
     }

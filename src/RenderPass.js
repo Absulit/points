@@ -1220,6 +1220,7 @@ class RenderPass {
     }
 
     destroy() {
+        this.#device = null;
         this.#textureDepth.destroy();
 
 
