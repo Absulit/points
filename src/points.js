@@ -2927,6 +2927,10 @@ class Points {
         this.#samplers.forEach(s => null);
         this.#samplers = [];
 
+        this.#layers.forEach(l => l.buffer.destroy()); // TODO: review why buffer here
+        this.#layers?.buffer.destroy();
+        this.#layers = [];
+
         this.#initialized = false;
         this.#uniforms = new UniformsArray();
         this.#meshUniforms = new UniformsArray();
