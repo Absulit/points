@@ -100,10 +100,14 @@ class Points {
     #abortController = new AbortController();
 
     constructor(canvasId) {
-        const { signal } = this.#abortController;
-        const listenerOptions = { signal };
         this.#canvasId = canvasId;
         this.#canvas = document.getElementById(this.#canvasId);
+        this.#baseInit();
+    }
+
+    #baseInit() {
+        const { signal } = this.#abortController;
+        const listenerOptions = { signal };
         if (this.#canvasId) {
             this.#canvas.addEventListener('click', e => {
                 this.#mouseClick = true;
@@ -2915,43 +2919,53 @@ class Points {
         this.#setRatio();
     }
 
-    destroy() {
+    /**
+     * Reset memory before calling again `init()`, this without calling
+     * the constructor `new Points()`.
+     * Useful to switch to a new set of shaders and erase internal references,
+     * basically cleaning memory to start again. It also calls `.destroy()` on
+     * buffers and textures.
+     * A call to the constructor doesn't do this.
+     * If you are going to call `destroy()` afterwards, there's no need to call
+     * `reset()`.
+     */
+    reset() {
         cancelAnimationFrame(this.#animationFrameId);
         this.#abortController.abort();
 
         this.#events = new Map();
-        this.#textures2d.forEach(t => t.texture.destroy());
+        this.#textures2d?.forEach(t => t.texture.destroy());
         this.#textures2d = [];
 
-        this.#texturesDepth2d.forEach(t => t.texture.destroy());
+        this.#texturesDepth2d?.forEach(t => t.texture.destroy());
         this.#texturesDepth2d = [];
 
-        this.#textures2dArray.forEach(t => t.texture.destroy());
+        this.#textures2dArray?.forEach(t => t.texture.destroy());
         this.#textures2dArray = [];
 
-        this.#texturesStorage2d.forEach(t => t.texture.destroy());
+        this.#texturesStorage2d?.forEach(t => t.texture.destroy());
         this.#texturesStorage2d = [];
 
-        this.#bindingTextures.forEach(t => t.texture.destroy());
+        this.#bindingTextures?.forEach(t => t.texture.destroy());
         this.#bindingTextures = []; // TODO: review why so many Texture Views
 
-        this.#renderPasses.forEach(renderPass => {
+        this.#renderPasses?.forEach(renderPass => {
             renderPass.destroy();
             renderPass = null;
         })
         this.#renderPasses = null;
 
-        this.#storage.forEach(s => s.buffer.destroy());
+        this.#storage?.forEach(s => s.buffer.destroy());
         this.#storage = [];
-        this.#readStorage.forEach(s => s.buffer.destroy());
+        this.#readStorage?.forEach(s => s.buffer.destroy());
         this.#readStorage = [];
-        this.#uniforms.buffer.destroy();
+        this.#uniforms?.buffer.destroy();
         this.#meshUniforms?.buffer?.destroy();
         this.#cameraUniforms?.buffer?.destroy();
-        this.#samplers.forEach(s => null);
+        this.#samplers?.forEach(s => null);
         this.#samplers = [];
 
-        this.#layers.forEach(l => l.buffer.destroy()); // TODO: review why buffer here
+        this.#layers?.forEach(l => l.buffer.destroy()); // TODO: review why buffer here
         this.#layers?.buffer?.destroy();
         this.#layers = new LayersArray();
 
@@ -2960,7 +2974,7 @@ class Points {
         this.#meshUniforms = new UniformsArray();
         this.#cameraUniforms = new UniformsArray();
 
-        this.#texturesExternal.forEach(textureExternal => {
+        this.#texturesExternal?.forEach(textureExternal => {
             const stream = textureExternal?.video.srcObject;
             stream?.getTracks().forEach(track => track.stop());
             textureExternal.texture = null;
@@ -2970,6 +2984,77 @@ class Points {
         clearCache();
         this.#constants = [];
         this.#clock = new Clock();
+
+        this.#baseInit();
+    }
+
+    /**
+     * Nuke everything from memory.
+     * Similar to reset, but it nullyfies everything to be garbage collected.
+     * Calls `.destroy()` on buffers and textures and the device.
+     * This would force a call to the constructor or to `reset()`.
+     * If you are going to call `reset()` afterwards, then
+     * there's no need to call `destroy()`.
+     */
+    destroy() {
+        cancelAnimationFrame(this.#animationFrameId);
+        this.#abortController.abort();
+
+        this.#events = null;
+        this.#textures2d.forEach(t => t.texture.destroy());
+        this.#textures2d = null;
+
+        this.#texturesDepth2d.forEach(t => t.texture.destroy());
+        this.#texturesDepth2d = null;
+
+        this.#textures2dArray.forEach(t => t.texture.destroy());
+        this.#textures2dArray = null;
+
+        this.#texturesStorage2d.forEach(t => t.texture.destroy());
+        this.#texturesStorage2d = null;
+
+        this.#bindingTextures.forEach(t => t.texture.destroy());
+        this.#bindingTextures = null; // TODO: review why so many Texture Views
+
+        this.#renderPasses.forEach(renderPass => {
+            renderPass.destroy();
+            renderPass = null;
+        })
+        this.#renderPasses = null;
+
+        this.#storage.forEach(s => s.buffer.destroy());
+        this.#storage = null;
+        this.#readStorage.forEach(s => s.buffer.destroy());
+        this.#readStorage = null;
+        this.#uniforms.buffer.destroy();
+        this.#meshUniforms?.buffer?.destroy();
+        this.#cameraUniforms?.buffer?.destroy();
+        this.#samplers.forEach(s => null);
+        this.#samplers = null;
+
+        this.#layers.forEach(l => l.buffer.destroy()); // TODO: review why buffer here
+        this.#layers?.buffer?.destroy();
+        this.#layers = null;
+
+        this.#initialized = null;
+        this.#uniforms = null;
+        this.#meshUniforms = null;
+        this.#cameraUniforms = null;
+
+        this.#texturesExternal.forEach(textureExternal => {
+            const stream = textureExternal?.video.srcObject;
+            stream?.getTracks().forEach(track => track.stop());
+            textureExternal.texture = null;
+        })
+        this.#texturesExternal = null;
+
+        clearCache();
+        this.#constants = null;
+        this.#clock = null;
+
+        this.#device.destroy();
+        this.#device = null;
+        this.#adapter = null;
     }
 }
 
