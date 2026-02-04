@@ -27,6 +27,8 @@ fn main(in: ComputeIn) {
 
     let index = resultCell.y + resultCell.x * u32(secondMatrix.size.y);
     resultMatrix.numbers[index] = result;
+    result_test_data[index] = result;
+    result_test.updated = 1;
 
 }
 `;

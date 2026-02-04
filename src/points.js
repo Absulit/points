@@ -555,6 +555,16 @@ class Points {
         this.#storage.push(storage);
         return storage;
     }
+
+    /**
+     * To read data back from a `setStorage` with `read` param `true`
+
+     * @param {String} name name of the Storage to read data from
+     * @warning If there's en error or warning here
+     * `[Buffer "name"] used in submit while mapped.`
+     * the update (or function that calls this method) needs an `await`
+     * @returns
+     */
     async readStorage(name) {
         let storageItem = this.#readStorage.find(storageItem => storageItem.name === name);
         let arrayBuffer = null;
@@ -1836,10 +1846,12 @@ class Points {
             } else {
                 storageItem.buffer = this.#createBuffer(storageItem.structSize, usage);
             }
+            storageItem.buffer.label = storageItem.name;
         });
         //--------------------------------------------
         this.#readStorage.forEach(readStorageItem => {
             readStorageItem.buffer = this.#device.createBuffer({
+                label: readStorageItem.name,
                 size: readStorageItem.size,
                 usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
             });

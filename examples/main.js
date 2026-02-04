@@ -268,7 +268,7 @@ async function update(t, dt) {
     stats.begin();
     // code here
 
-    shaders.update(points, t, dt);
+    await shaders.update(points, t, dt);
     await shaders.read?.(points);
 
     //
