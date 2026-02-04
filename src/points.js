@@ -2928,6 +2928,7 @@ class Points {
      * A call to the constructor doesn't do this.
      * If you are going to call `destroy()` afterwards, there's no need to call
      * `reset()`.
+     * This keeps the Device and Adapter alive.
      */
     reset() {
         cancelAnimationFrame(this.#animationFrameId);
@@ -2983,6 +2984,7 @@ class Points {
 
         clearCache();
         this.#constants = [];
+        this.#imports = [];
         this.#clock = new Clock();
 
         this.#baseInit();
@@ -2991,7 +2993,7 @@ class Points {
     /**
      * Nuke everything from memory.
      * Similar to reset, but it nullyfies everything to be garbage collected.
-     * Calls `.destroy()` on buffers and textures and the device.
+     * Calls `.destroy()` on buffers, textures, the Device and Adapter.
      * This would force a call to the constructor or to `reset()`.
      * If you are going to call `reset()` afterwards, then
      * there's no need to call `destroy()`.
@@ -3050,6 +3052,7 @@ class Points {
 
         clearCache();
         this.#constants = null;
+        this.#imports = null;
         this.#clock = null;
 
         this.#device.destroy();
