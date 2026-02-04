@@ -67,8 +67,6 @@ class Points {
     #texturesStorage2d = [];
     #bindingTextures = [];
     #layers = new LayersArray();
-    #originalCanvasWidth = null;
-    #originalCanvasHeigth = null;
     #clock = new Clock();
     #time = 0;
     #delta = 0;
@@ -143,8 +141,6 @@ class Points {
                 this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
                 this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta);
             }, { passive: true, signal });
-            this.#originalCanvasWidth = this.#canvas.clientWidth;
-            this.#originalCanvasHeigth = this.#canvas.clientHeight;
             window.addEventListener('resize', this.#resizeCanvasToFitWindow, {
                 signal,
                 capture: false
