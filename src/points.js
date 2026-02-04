@@ -96,8 +96,7 @@ class Points {
     #initialized = false;
     #debug = true;
     #scaleMode = ScaleMode.HEIGHT;
-
-    #abortController = new AbortController();
+    #abortController = null;
 
     constructor(canvasId) {
         this.#canvasId = canvasId;
@@ -106,9 +105,12 @@ class Points {
     }
 
     #baseInit() {
+        this.#abortController = new AbortController();
         const { signal } = this.#abortController;
         const listenerOptions = { signal };
         if (this.#canvasId) {
+            this.#canvas.width = 800; // TODO: remove
+            this.#canvas.height = 800;
             this.#canvas.addEventListener('click', e => {
                 this.#mouseClick = true;
                 this.setUniform(UniformKeys.MOUSE_CLICK, this.#mouseClick);
@@ -182,8 +184,8 @@ class Points {
     #setScreenSize = () => {
         // assigning size here because both sizes must match for the full screen
         // this was not happening before the speed up refactor
-        this.#canvas.width = canvas.clientWidth;
-        this.#canvas.height = canvas.clientHeight;
+        this.#canvas.width = this.#canvas.clientWidth;
+        this.#canvas.height = this.#canvas.clientHeight;
         this.#screen[0] = this.#canvas.width;
         this.#screen[1] = this.#canvas.height;
         this.setUniform(UniformKeys.SCREEN, this.#screen);
@@ -2933,6 +2935,7 @@ class Points {
     reset() {
         cancelAnimationFrame(this.#animationFrameId);
         this.#abortController.abort();
+        this.#fitWindow = false;
 
         this.#events = new Map();
         this.#textures2d?.forEach(t => t.texture.destroy());
