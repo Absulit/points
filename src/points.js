@@ -563,7 +563,7 @@ class Points {
      * @warning If there's en error or warning here
      * `[Buffer "name"] used in submit while mapped.`
      * the update (or function that calls this method) needs an `await`
-     * @returns
+     * @returns {Float32Array} Array with the result
      */
     async readStorage(name) {
         let storageItem = this.#readStorage.find(storageItem => storageItem.name === name);
