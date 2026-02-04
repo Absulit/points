@@ -3,12 +3,12 @@
 
 import compute from './compute.js';
 
-let read = false;
+let read;
 
 const data1 = {
     compute,
     init: async points => {
-
+        read = false;
         const firstMatrix = [
             2 /* rows */, 4 /* columns */,
             1, 2, 3, 4,
