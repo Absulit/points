@@ -97,8 +97,20 @@ class Points {
     #debug = true;
     #scaleMode = ScaleMode.HEIGHT;
     #abortController = null;
+    #canvasWidth = null;
+    #canvasHeight = null;
 
-    constructor(canvasId) {
+    /**
+     * Constructor of `Points`.
+     * Set a width and height to be used if no `fitWindow` is called, and also
+     * to be used by the `ScaleMode` to decide how to resize the screen content.
+     * @param {String} canvasId id of an existing canvas
+     * @param {Number} width default width
+     * @param {Number} height default height
+     */
+    constructor(canvasId, width = 800, height = 800) {
+        this.#canvasWidth = width;
+        this.#canvasHeight = height;
         this.#canvasId = canvasId;
         this.#canvas = document.getElementById(this.#canvasId);
         this.#baseInit();
@@ -109,8 +121,8 @@ class Points {
         const { signal } = this.#abortController;
         const listenerOptions = { signal };
         if (this.#canvasId) {
-            this.#canvas.width = 800; // TODO: remove
-            this.#canvas.height = 800;
+            this.#canvas.width = this.#canvasWidth;
+            this.#canvas.height = this.#canvasHeight;
             this.#canvas.addEventListener('click', e => {
                 this.#mouseClick = true;
                 this.setUniform(UniformKeys.MOUSE_CLICK, this.#mouseClick);
