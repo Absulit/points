@@ -159,7 +159,7 @@ async function loadShaderByIndex(index) {
 
     changeUri(shaderProject.uri);
     shaders?.remove?.();
-    points?.destroy();
+    points?.reset();
     shaders = (await import(shaderProject.path)).default;
     await init();
 
@@ -230,7 +230,7 @@ recordingOptions.forEach(recordingOption => {
 });
 
 /***************/
-
+/** @type {Points} */
 let points;
 let shaders;
 
@@ -239,9 +239,9 @@ await loadShaderByURI();
 async function init() {
     requestToCancel = true;
 
-    canvas.width = 800;
-    canvas.height = 800;
-    points = new Points('canvas');
+    if (!points) {
+        points = new Points('canvas');
+    }
 
     gui.removeFolder(optionsFolder);
     optionsFolder = gui.addFolder(FOLDER_NAME);
