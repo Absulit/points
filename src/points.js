@@ -2955,6 +2955,11 @@ class Points {
             renderPass = null;
         })
         this.#renderPasses = null;
+        this.#postRenderPasses?.forEach(renderPass => {
+            renderPass.destroy();
+            renderPass = null;
+        })
+        this.#postRenderPasses = [];
 
         this.#storage?.forEach(s => s.buffer.destroy());
         this.#storage = [];
@@ -3023,6 +3028,11 @@ class Points {
             renderPass = null;
         })
         this.#renderPasses = null;
+        this.#postRenderPasses.forEach(renderPass => {
+            renderPass.destroy();
+            renderPass = null;
+        })
+        this.#postRenderPasses = null;
 
         this.#storage.forEach(s => s.buffer.destroy());
         this.#storage = null;
