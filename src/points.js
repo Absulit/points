@@ -121,8 +121,6 @@ class Points {
         const { signal } = this.#abortController;
         const listenerOptions = { signal };
         if (this.#canvasId) {
-            this.#canvas.width = this.#canvasWidth;
-            this.#canvas.height = this.#canvasHeight;
             this.#canvas.addEventListener('click', e => {
                 this.#mouseClick = true;
                 this.setUniform(UniformKeys.MOUSE_CLICK, this.#mouseClick);
@@ -188,8 +186,8 @@ class Points {
 
     #resizeCanvasToDefault = () => {
         this.#screenResized = true;
-        this.#canvas.width = this.#originalCanvasWidth;
-        this.#canvas.height = this.#originalCanvasHeigth;
+        this.#canvas.width = this.#canvasWidth;
+        this.#canvas.height = this.#canvasHeight;
         this.#setScreenSize();
     }
 
