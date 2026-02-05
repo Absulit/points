@@ -42,7 +42,7 @@ npx tsc
 npm publish --dry-run
 npx jsr publish --dry-run --allow-dirty
 
-# rm -rf ./apidocs/
-# mkdir apidocs
-# npx jsdoc -c jsdoc.json
+rm -rf ./apidocs/
+mkdir apidocs
+npx jsdoc -c jsdoc.json
 
