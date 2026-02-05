@@ -3932,6 +3932,7 @@ class Points {
 
     #baseInit() {
         this.#scaleMode = ScaleMode.HEIGHT;
+        this.#presentationFormat = null;
         this.#abortController = new AbortController();
         const { signal } = this.#abortController;
         const listenerOptions = { signal };
