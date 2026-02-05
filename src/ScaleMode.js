@@ -10,6 +10,8 @@
  * @example
  *
  * points.scaleMode = ScaleMode.COVER;
+ *
+ * @class ScaleMode
  */
 
 export default class ScaleMode {
@@ -32,6 +34,7 @@ export default class ScaleMode {
      * ░░░░░░░░░░░░░░░
      * ░░░░░░░░░░░░░░░
      * ```
+     * @memberof ScaleMode
      */
 
     static FIT = 1;
@@ -54,6 +57,7 @@ export default class ScaleMode {
      * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
      * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
      * ```
+     * @memberof ScaleMode
      */
     static COVER = 2;
     /**
@@ -75,6 +79,7 @@ export default class ScaleMode {
      * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
      * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
      * ```
+     * @memberof ScaleMode
      */
     static WIDTH = 4;
     /**
@@ -96,6 +101,7 @@ export default class ScaleMode {
      * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
      * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
      * ```
+     * @memberof ScaleMode
      */
     static HEIGHT = 8;
 }
