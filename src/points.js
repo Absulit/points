@@ -48,7 +48,6 @@ class Points {
     /** @type {Array<RenderPass>} */
     #renderPasses = null;
     #postRenderPasses = [];
-    #buffer = null;
     #presentationSize = null;
     #numColumns = 1;
     #numRows = 1;
@@ -68,8 +67,6 @@ class Points {
     #texturesStorage2d = [];
     #bindingTextures = [];
     #layers = new LayersArray();
-    #originalCanvasWidth = null;
-    #originalCanvasHeigth = null;
     #clock = new Clock();
     #time = 0;
     #delta = 0;
@@ -97,34 +94,58 @@ class Points {
     #initialized = false;
     #debug = true;
     #scaleMode = ScaleMode.HEIGHT;
+    #abortController = null;
+    #canvasWidth = null;
+    #canvasHeight = null;
 
-    constructor(canvasId) {
+    /**
+     * Constructor of `Points`.
+     * Set a width and height to be used if no `fitWindow` is called, and also
+     * to be used by the `ScaleMode` to decide how to resize the screen content.
+     * @param {String} canvasId id of an existing canvas
+     * @param {Number} width default width
+     * @param {Number} height default height
+     */
+    constructor(canvasId, width = 800, height = 800) {
+        this.#canvasWidth = width;
+        this.#canvasHeight = height;
         this.#canvasId = canvasId;
         this.#canvas = document.getElementById(this.#canvasId);
+        this.#baseInit();
+    }
+
+    #baseInit() {
+        this.#scaleMode = ScaleMode.HEIGHT;
+        this.#abortController = new AbortController();
+        const { signal } = this.#abortController;
+        const listenerOptions = { signal };
         if (this.#canvasId) {
             this.#canvas.addEventListener('click', e => {
                 this.#mouseClick = true;
                 this.setUniform(UniformKeys.MOUSE_CLICK, this.#mouseClick);
+            }, listenerOptions);
+            this.#canvas.addEventListener('mousemove', this.#onMouseMove, {
+                passive: true, signal
             });
-            this.#canvas.addEventListener('mousemove', this.#onMouseMove, { passive: true });
             this.#canvas.addEventListener('mousedown', e => {
                 this.#mouseDown = true;
                 this.setUniform(UniformKeys.MOUSE_DOWN, this.#mouseDown);
-            });
+            }, listenerOptions);
             this.#canvas.addEventListener('mouseup', e => {
                 this.#mouseDown = false;
                 this.setUniform(UniformKeys.MOUSE_DOWN, this.#mouseDown);
-            });
+            }, listenerOptions);
             this.#canvas.addEventListener('wheel', e => {
                 this.#mouseWheel = true;
                 this.#mouseDelta[0] = e.deltaX;
                 this.#mouseDelta[1] = e.deltaY;
                 this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
                 this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta);
-            }, { passive: true });
-            this.#originalCanvasWidth = this.#canvas.clientWidth;
-            this.#originalCanvasHeigth = this.#canvas.clientHeight;
-            window.addEventListener('resize', this.#resizeCanvasToFitWindow, false);
+            }, { passive: true, signal });
+            window.addEventListener('resize', this.#resizeCanvasToFitWindow, {
+                signal,
+                capture: false
+            });
             document.addEventListener('fullscreenchange', e => {
                 this.#fullscreen = !!document.fullscreenElement;
                 if (!this.#fullscreen && !this.#fitWindow) {
@@ -133,7 +154,7 @@ class Points {
                 if (!this.#fullscreen) {
                     this.fitWindow = this.#lastFitWindow;
                 }
-            });
+            }, listenerOptions);
         }
 
         // initializing internal uniforms
@@ -162,16 +183,16 @@ class Points {
 
     #resizeCanvasToDefault = () => {
         this.#screenResized = true;
-        this.#canvas.width = this.#originalCanvasWidth;
-        this.#canvas.height = this.#originalCanvasHeigth;
+        this.#canvas.width = this.#canvasWidth;
+        this.#canvas.height = this.#canvasHeight;
         this.#setScreenSize();
     }
 
     #setScreenSize = () => {
         // assigning size here because both sizes must match for the full screen
         // this was not happening before the speed up refactor
-        this.#canvas.width = canvas.clientWidth;
-        this.#canvas.height = canvas.clientHeight;
+        this.#canvas.width = this.#canvas.clientWidth;
+        this.#canvas.height = this.#canvas.clientHeight;
         this.#screen[0] = this.#canvas.width;
         this.#screen[1] = this.#canvas.height;
         this.setUniform(UniformKeys.SCREEN, this.#screen);
@@ -180,6 +201,7 @@ class Points {
             this.#canvas.clientWidth,
             this.#canvas.clientHeight,
         ];
+
         this.#context.configure({
             label: '_context',
             device: this.#device,
@@ -534,15 +556,30 @@ class Points {
         this.#storage.push(storage);
         return storage;
     }
+
+    /**
+     * To read data back from a `setStorage` with `read` param `true`
+
+     * @param {String} name name of the Storage to read data from
+     * @warning If there's en error or warning here
+     * `[Buffer "name"] used in submit while mapped.`
+     * the update (or function that calls this method) needs an `await`
+     * @returns {Float32Array} Array with the result
+     */
     async readStorage(name) {
         let storageItem = this.#readStorage.find(storageItem => storageItem.name === name);
         let arrayBuffer = null;
         let arrayBufferCopy = null;
         if (storageItem) {
-            await storageItem.buffer.mapAsync(GPUMapMode.READ);
-            arrayBuffer = storageItem.buffer.getMappedRange();
-            arrayBufferCopy = new Float32Array(arrayBuffer.slice(0));
-            storageItem.buffer.unmap();
+            try {
+                await storageItem.buffer.mapAsync(GPUMapMode.READ);
+                arrayBuffer = storageItem.buffer.getMappedRange();
+                arrayBufferCopy = new Float32Array(arrayBuffer.slice(0));
+                storageItem.buffer.unmap();
+            } catch (error) {
+                // if we switch projects mapasync fails
+                // we ignore it
+            }
         }
         return arrayBufferCopy;
     }
@@ -979,6 +1016,11 @@ class Points {
         audio.volume = volume;
         audio.autoplay = autoplay;
         audio.loop = loop;
+        const { signal } = this.#abortController;
+        const listenerOptions = {
+            signal,
+            capture: false
+        }
         const sound = {
             name: name,
             path: path,
@@ -991,8 +1033,8 @@ class Points {
         const audioContext = new AudioContext();
         const resume = _ => { audioContext.resume() }
         if (audioContext.state === 'suspended') {
-            document.body.addEventListener('touchend', resume, false);
-            document.body.addEventListener('click', resume, false);
+            document.body.addEventListener('touchend', resume, listenerOptions);
+            document.body.addEventListener('click', resume, listenerOptions);
         }
         const source = audioContext.createMediaElementSource(audio);
         // // audioContext.createMediaStreamSource()
@@ -1080,7 +1122,8 @@ class Points {
             texture: null,
             size: size,
             usesRenderPass,
-            internal: false
+            internal: false,
+            name: `${writeName}::${readName}`
         }
         this.#bindingTextures.push(bindingTexture);
         return bindingTexture;
@@ -1804,10 +1847,12 @@ class Points {
             } else {
                 storageItem.buffer = this.#createBuffer(storageItem.structSize, usage);
             }
+            storageItem.buffer.label = storageItem.name;
         });
         //--------------------------------------------
         this.#readStorage.forEach(readStorageItem => {
             readStorageItem.buffer = this.#device.createBuffer({
+                label: readStorageItem.name,
                 size: readStorageItem.size,
                 usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
             });
@@ -2770,9 +2815,6 @@ class Points {
     get context() {
         return this.#context;
     }
-    get buffer() {
-        return this.#buffer;
-    }
     get fullscreen() {
         return this.#fullscreen;
     }
@@ -2898,18 +2940,156 @@ class Points {
         this.#setRatio();
     }
 
-    destroy() {
+    /**
+     * Reset memory before calling again `init()`, this without calling
+     * the constructor `new Points()`.
+     * Useful to switch to a new set of shaders and erase internal references,
+     * basically cleaning memory to start again. It also calls `.destroy()` on
+     * buffers and textures.
+     * A call to the constructor doesn't do this.
+     * If you are going to call `destroy()` afterwards, there's no need to call
+     * `reset()`.
+     * This keeps the Device and Adapter alive.
+     */
+    reset() {
+        cancelAnimationFrame(this.#animationFrameId);
+        this.#abortController.abort();
+        this.#fitWindow = false;
+
+        this.#events = new Map();
+        this.#textures2d?.forEach(t => t.texture.destroy());
+        this.#textures2d = [];
+
+        this.#texturesDepth2d?.forEach(t => t.texture.destroy());
+        this.#texturesDepth2d = [];
+
+        this.#textures2dArray?.forEach(t => t.texture.destroy());
+        this.#textures2dArray = [];
+
+        this.#texturesStorage2d?.forEach(t => t.texture.destroy());
+        this.#texturesStorage2d = [];
+
+        this.#bindingTextures?.forEach(t => t.texture.destroy());
+        this.#bindingTextures = []; // TODO: review why so many Texture Views
+
+        this.#renderPasses?.forEach(renderPass => {
+            renderPass.destroy();
+            renderPass = null;
+        })
+        this.#renderPasses = null;
+        this.#postRenderPasses?.forEach(renderPass => {
+            renderPass.destroy();
+            renderPass = null;
+        })
+        this.#postRenderPasses = [];
+
+        this.#storage?.forEach(s => s.buffer.destroy());
+        this.#storage = [];
+        this.#readStorage?.forEach(s => s.buffer.destroy());
+        this.#readStorage = [];
+        this.#uniforms?.buffer.destroy();
+        this.#meshUniforms?.buffer?.destroy();
+        this.#cameraUniforms?.buffer?.destroy();
+        this.#samplers?.forEach(s => null);
+        this.#samplers = [];
+
+        this.#layers?.forEach(l => l.buffer.destroy()); // TODO: review why buffer here
+        this.#layers?.buffer?.destroy();
+        this.#layers = new LayersArray();
+
         this.#initialized = false;
         this.#uniforms = new UniformsArray();
         this.#meshUniforms = new UniformsArray();
         this.#cameraUniforms = new UniformsArray();
 
+        this.#texturesExternal?.forEach(textureExternal => {
+            const stream = textureExternal?.video.srcObject;
+            stream?.getTracks().forEach(track => track.stop());
+            textureExternal.texture = null;
+        })
+        this.#texturesExternal = [];
+
+        clearCache();
+        this.#constants = [];
+        this.#imports = [];
+        this.#clock = new Clock();
+
+        this.#baseInit();
+    }
+
+    /**
+     * Nuke everything from memory.
+     * Similar to reset, but it nullyfies everything to be garbage collected.
+     * Calls `.destroy()` on buffers, textures, the Device and Adapter.
+     * This would force a call to the constructor or to `reset()`.
+     * If you are going to call `reset()` afterwards, then
+     * there's no need to call `destroy()`.
+     */
+    destroy() {
+        cancelAnimationFrame(this.#animationFrameId);
+        this.#abortController.abort();
+
+        this.#events = null;
+        this.#textures2d.forEach(t => t.texture.destroy());
+        this.#textures2d = null;
+
+        this.#texturesDepth2d.forEach(t => t.texture.destroy());
+        this.#texturesDepth2d = null;
+
+        this.#textures2dArray.forEach(t => t.texture.destroy());
+        this.#textures2dArray = null;
+
+        this.#texturesStorage2d.forEach(t => t.texture.destroy());
+        this.#texturesStorage2d = null;
+
+        this.#bindingTextures.forEach(t => t.texture.destroy());
+        this.#bindingTextures = null; // TODO: review why so many Texture Views
+
+        this.#renderPasses.forEach(renderPass => {
+            renderPass.destroy();
+            renderPass = null;
+        })
+        this.#renderPasses = null;
+        this.#postRenderPasses.forEach(renderPass => {
+            renderPass.destroy();
+            renderPass = null;
+        })
+        this.#postRenderPasses = null;
+
+        this.#storage.forEach(s => s.buffer.destroy());
+        this.#storage = null;
+        this.#readStorage.forEach(s => s.buffer.destroy());
+        this.#readStorage = null;
+        this.#uniforms.buffer.destroy();
+        this.#meshUniforms?.buffer?.destroy();
+        this.#cameraUniforms?.buffer?.destroy();
+        this.#samplers.forEach(s => null);
+        this.#samplers = null;
+
+        this.#layers.forEach(l => l.buffer.destroy()); // TODO: review why buffer here
+        this.#layers?.buffer?.destroy();
+        this.#layers = null;
+
+        this.#initialized = null;
+        this.#uniforms = null;
+        this.#meshUniforms = null;
+        this.#cameraUniforms = null;
+
         this.#texturesExternal.forEach(textureExternal => {
             const stream = textureExternal?.video.srcObject;
             stream?.getTracks().forEach(track => track.stop());
+            textureExternal.texture = null;
         })
+        this.#texturesExternal = null;
 
         clearCache();
+        this.#constants = null;
+        this.#imports = null;
+        this.#clock = null;
+
+        this.#device.destroy();
+        this.#device = null;
+        this.#adapter = null;
     }
 }
 

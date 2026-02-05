@@ -1,14 +1,19 @@
 // original article on compute shaders
 // https://developer.chrome.com/articles/gpu-compute/
 
+import Points from 'points';
 import compute from './compute.js';
 
 let read = false;
 
 const data1 = {
     compute,
+    /**
+     *
+     * @param {Points} points
+     */
     init: async points => {
-
+        read = false;
         const firstMatrix = [
             2 /* rows */, 4 /* columns */,
             1, 2, 3, 4,
@@ -31,14 +36,21 @@ const data1 = {
         // let resultMatrixBufferSize = 2 + firstMatrix[0] * secondMatrix[1];
         // console.log(resultMatrixBufferSize);
         points.setStorage('resultMatrix', 'Matrix', true);
+
+        // reading the result with an event
+        points.addEventListener('result_test', data => {
+            // const [a, b, c, d] = data;
+            // console.log('---- result', a, b, c, d);
+        }, 4);
+
     },
     update: async points => {
 
     },
     read: async points => {
-        if(!read){
-            let result = await points.readStorage('resultMatrix');
-            console.log(result);
+        if (!read) {
+            let [a, b, c, d] = await points.readStorage('resultMatrix');
+            console.log(a, b, c, d);
             read = true;
         }
     }

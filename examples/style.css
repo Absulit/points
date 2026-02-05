@@ -228,3 +228,9 @@ div.dg.ac {
     1px 1px 0 #000;
   padding: .5em;
 }
+
+.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+  cursor: not-allowed;
+}

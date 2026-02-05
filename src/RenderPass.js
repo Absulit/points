@@ -1219,6 +1219,31 @@ class RenderPass {
         return this.#meshes;
     }
 
+    destroy() {
+        this.#device = null;
+        this.#textureDepth.destroy();
+
+
+        this.#vertexBuffer.destroy();
+
+        this.#compiledShaders = {
+            vertex: '',
+            compute: '',
+            fragment: '',
+        };
+
+        this.#computeBindGroup = null;
+        this.#fragmentBindGroup = null;
+        this.#vertexBindGroup = null;
+        this.#bindGroupLayoutFragment = null;
+        this.#bindGroupLayoutVertex = null;
+        this.#bindGroupLayoutCompute = null;
+
+        this.#computePipeline = null;
+        this.#renderPipeline = null;
+
+        this.#bundle = null;
+    }
 
 }
 

@@ -203,6 +203,9 @@ You can code freely without the use of any of the provided [support modules (mat
     - [How to use them](docs/support_modules.md#how-to-use-them)
     - [Import code to all RenderPass shaders - Points.import()](docs/support_modules.md#import-code-to-all-renderpass-shaders-pointsimport)
 - [RenderPasses for Post Processing](docs/render_passes_and_post_processing.md)
+- [Memory Management](docs/memory_management.md)
+    - [Switch to a new set of RenderPass - Points.reset()](docs/memory_management.md#switch-to-a-new-set-of-renderpass---pointsreset)
+    - [Remove Points instance - Points.destroy()](docs/memory_management.md#remove-points-instance---pointsdestroy)
 - [Legacy folder (original project)](docs/legacy_folder.md)
 
 # Collaborators

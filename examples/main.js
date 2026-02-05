@@ -2,7 +2,7 @@
 import * as dat from 'datgui';
 import Points, { RenderPass } from 'points';
 import { shaderProjects } from './index_files/shader_projects.js';
-import { isMobile } from 'utils';
+import { isMobile, setDisabled } from 'utils';
 import CanvasRecorder from './../src/CanvasRecorder.js';
 
 
@@ -141,6 +141,8 @@ const authorLinkEl = infoEl.querySelector('#author-link');
 let requestToCancel = false;
 
 async function loadShaderByIndex(index) {
+    // disable ui
+    setDisabled(nav, true);
     console.clear();
     requestToCancel = true;
     if (index > shaderProjects.length) {
@@ -159,7 +161,7 @@ async function loadShaderByIndex(index) {
 
     changeUri(shaderProject.uri);
     shaders?.remove?.();
-    points?.destroy();
+    points?.reset();
     shaders = (await import(shaderProject.path)).default;
     await init();
 
@@ -230,7 +232,7 @@ recordingOptions.forEach(recordingOption => {
 });
 
 /***************/
-
+/** @type {Points} */
 let points;
 let shaders;
 
@@ -239,9 +241,9 @@ await loadShaderByURI();
 async function init() {
     requestToCancel = true;
 
-    canvas.width = 800;
-    canvas.height = 800;
-    points = new Points('canvas');
+    if (!points) {
+        points = new Points('canvas');
+    }
 
     gui.removeFolder(optionsFolder);
     optionsFolder = gui.addFolder(FOLDER_NAME);
@@ -253,6 +255,8 @@ async function init() {
         requestToCancel = false;
         points.fitWindow = isFitWindowData.isFitWindow;
         points.update(update);
+        // enable ui
+        setDisabled(nav, false);
     } else {
         const el = document.getElementById('nowebgpu');
         el.classList.toggle('show');
@@ -268,7 +272,7 @@ async function update(t, dt) {
     stats.begin();
     // code here
 
-    shaders.update(points, t, dt);
+    await shaders.update(points, t, dt);
     await shaders.read?.(points);
 
     //

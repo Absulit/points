@@ -117,3 +117,8 @@ export async function loadAndExtract(url) {
 
     return results;
 }
+
+export function setDisabled(el, value) {
+    el.disabled = value;
+    el.classList.toggle('disabled', value);
+}
