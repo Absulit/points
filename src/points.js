@@ -2515,10 +2515,12 @@ class Points {
         this.#animationFrameId = requestAnimationFrame(this.#animationFrame);
     }
 
+
+
     /**
      * Method executed on each {@link https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame | requestAnimationFrame}.
      * Here's where all the calls to update data will be executed.
-     * @param {(time:Number, deltaTime:Number) => {}} updateCallback method called on each frame update.
+     * @param {function(time:Number, deltaTime:number)} updateCallback method called on each frame update.
      * Here you will update uniforms, storage and general variables.
      * You will also have the `time` and `deltaTime` values used inside the library
      * to create animations. These are the same internal values in `params.time`
