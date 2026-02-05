@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en" data-color-scheme="auto">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Class: CanvasRecorder | Points</title>
+    <title>Source: ScaleMode.js | Points</title>
     <meta name="description" content="A Generative Art library made in WebGPU"><meta name="keywords" content="javascript, webgl, crative-coding, shaders, generative-art, webgpu, genart, wgsl">
     <link rel="icon" title="dummy" href="data:image/x-icon;base64,AA">
     <script src="scripts/docolatte.min.js"></script>
@@ -22,7 +23,7 @@
         </div>
         <div class="topbar">
             <h1 class="page-title">
-                <a href="#">Class: CanvasRecorder</a>
+                <a href="#">Source: ScaleMode.js</a>
             </h1>
             <a class="light-switch" title="Switch light/dark mode" href="#"><i class="label auto">
 <svg  class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -38,339 +39,115 @@
 
 
 
-
-<article class="doc">
-    <header>
-        
-            <h2 class="name"><span class="attribs"><span class="attributes"></span></span>CanvasRecorder<span class="signature">(canvas, options)</span><span class="type-signature"></span></h2>
-            
-        
-    </header>
-
-    <div class="container-overview">
     
-        
-
-    
-
-    
-    <h4 class="name" id="CanvasRecorder"><span class="attributes"></span>new CanvasRecorder<span class="signature">(canvas, options)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Records video from a Canvas to a file.</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<div class="table-wrap">
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name">
-                    <code>canvas</code>
-                </td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">HTMLCanvasElement</span>
-
-            
-            </td>
-
-            
-
-            <td class="description last"><p>Canvas to record</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name">
-                    <code>options</code>
-                </td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-            
-            </td>
-
-            
-
-            <td class="description last"><p><code>MediaRecorder</code> options</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-</div>
-
-
-
-
-
-
-<dl class="details">
-<dt class="tag-source">Source:</dt>
-<dd class="tag-source">
-    <a href="CanvasRecorder.js.html">CanvasRecorder.js</a>, <a href="CanvasRecorder.js.html#line6">line 6</a>
-</dd>
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <h5>Example</h5>
-    
-
-    <pre class="prettyprint lang-js"><code>const recorder = new CanvasRecorder(canvas);</code></pre>
-
-
-
-
-    
-    </div>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="getPNG"><span class="attributes"></span>getPNG<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Retrieves the current frame as a PNG and downloads the image.</p>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-<dt class="tag-source">Source:</dt>
-<dd class="tag-source">
-    <a href="CanvasRecorder.js.html">CanvasRecorder.js</a>, <a href="CanvasRecorder.js.html#line52">line 52</a>
-</dd>
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="start"><span class="attributes"></span>start<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Starts the video recording.</p>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-<dt class="tag-source">Source:</dt>
-<dd class="tag-source">
-    <a href="CanvasRecorder.js.html">CanvasRecorder.js</a>, <a href="CanvasRecorder.js.html#line27">line 27</a>
-</dd>
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="stop"><span class="attributes"></span>stop<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Stops the video recording and downloads the video.</p>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-<dt class="tag-source">Source:</dt>
-<dd class="tag-source">
-    <a href="CanvasRecorder.js.html">CanvasRecorder.js</a>, <a href="CanvasRecorder.js.html#line45">line 45</a>
-</dd>
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-    
-
-    
-
-    
+<article class="src">
+    <pre class="prettyprint source linenums lang-js"><span class="_char">_</span><code>/**
+ * Class to be used to select how the content should be displayed on different
+ * screen sizes.
+ * ```text
+ * FIT: Preserves both, but might show black bars or extend empty content. All content is visible.
+ * COVER: Preserves both, but might crop width or height. All screen is covered.
+ * WIDTH: Preserves the visibility of the width, but might crop the height.
+ * HEIGHT: Preserves the visibility of the height, but might crop the width.
+ * ```
+ * @example
+ *
+ * points.scaleMode = ScaleMode.COVER;
+ *
+ * @class ScaleMode
+ */
+
+export default class ScaleMode {
+    /**
+     * ```text
+     * All content is visible.
+     * Black bars shown to compensate.
+     * No content is cropped.
+     *
+     * PORTRAIT        LANDSCAPE
+     * ░░░░░░░░░░░░░░░ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ░░░░░░░░░░░░░░░ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ░░░░░░░░░░░░░░░
+     * ░░░░░░░░░░░░░░░
+     * ```
+     * @memberof ScaleMode
+     */
+
+    static FIT = 1;
+    /**
+     * ```text
+     * Not all content is visible.
+     * No black bars shown.
+     * Content is cropped on the sides.
+     * `
+     * PORTRAIT            LANDSCAPE
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ```
+     * @memberof ScaleMode
+     */
+    static COVER = 2;
+    /**
+     * ```text
+     * Content is visible in portrait.
+     * Black bars shown to compensate in portrait.
+     * Content is cropped in landscape.
+     *
+     * PORTRAIT        LANDSCAPE
+     * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ```
+     * @memberof ScaleMode
+     */
+    static WIDTH = 4;
+    /**
+     * ```text
+     * Not all content is visible.
+     * Black bars shown to compensate in landscape.
+     * Content is cropped in portrait.
+     *
+     * PORTRAIT            LANDSCAPE
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
+     * ```
+     * @memberof ScaleMode
+     */
+    static HEIGHT = 8;
+}</code></pre>
 </article>
 
 
@@ -392,7 +169,7 @@
                     Documentation generated by <a rel="external" href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a><wbr>
                     using <a rel="external" href="https://github.com/amekusa/docolatte">Docolatte</a> theme
                     
-                    <wbr>on <time datetime="2026-02-05T20:38:50.768Z">Thu, 05 Feb 2026 20:38:50 GMT</time>
+                    <wbr>on <time datetime="2026-02-05T20:38:50.702Z">Thu, 05 Feb 2026 20:38:50 GMT</time>
                     
                 </p>
                 

@@ -234,6 +234,19 @@ export class RenderPass {
     set device(val: GPUDevice);
     get device(): GPUDevice;
     /**
+     * Disable the current RenderPass during runtime if the pass has
+     * no other passes dependencies like sharing a texture.
+     *
+     * @param {Boolean} val
+     *
+     * @example
+     * const renderPass = new RenderPass()
+     *
+     * renderPass.enabled = false;
+     */
+    set enabled(val: boolean);
+    get enabled(): boolean;
+    /**
      * - **currently for internal use**<br>
      * - **might be private in the future**<br>
      * Adds two triangles as a quad called Point
@@ -431,6 +444,7 @@ export class RenderPass {
      * ids and names of the meshes
      */
     get meshes(): any[];
+    destroy(): void;
     #private;
 }
 /**
@@ -461,11 +475,10 @@ export class RenderPass {
  *
  * await points.init(renderPasses);
  *
- * update();
+ * points.update(update);
  *
  * function update() {
- *     points.update();
- *     requestAnimationFrame(update);
+ * // update uniforms and other animation variables
  * }
  */
 export class RenderPasses {
@@ -542,16 +555,23 @@ export class RenderPasses {
  * ];
  *
  * await points.init(renderPasses);
- * update();
+ * points.update(update);
  *
  * function update() {
- *     points.update();
- *     requestAnimationFrame(update);
+ * // update uniforms and other animation variables
  * }
  *
  */
 declare class Points {
-    constructor(canvasId: any);
+    /**
+     * Constructor of `Points`.
+     * Set a width and height to be used if no `fitWindow` is called, and also
+     * to be used by the `ScaleMode` to decide how to resize the screen content.
+     * @param {String} canvasId id of an existing canvas
+     * @param {Number} width default width
+     * @param {Number} height default height
+     */
+    constructor(canvasId: string, width?: number, height?: number);
     /**
      * If the canvas has a fixed size e.g. `800x800`, `fitWindow` will fill
      * the available window space.
@@ -693,7 +713,16 @@ declare class Points {
      * resultMatrix.size = vec2(firstMatrix.size.x, secondMatrix.size.y);
      */
     setStorageMap(name: string, arrayData: Uint8Array<ArrayBuffer> | Array<number> | number, structName: string, read?: boolean, shaderType?: GPUShaderStage): any;
-    readStorage(name: any): Promise<Float32Array<any>>;
+    /**
+     * To read data back from a `setStorage` with `read` param `true`
+
+     * @param {String} name name of the Storage to read data from
+     * @warning If there's en error or warning here
+     * `[Buffer "name"] used in submit while mapped.`
+     * the update (or function that calls this method) needs an `await`
+     * @returns {Float32Array} Array with the result
+     */
+    readStorage(name: string): Float32Array;
     /**
      * Layers of data made of `vec4f`.
      * This creates a storage array named `layers` of the size
@@ -766,7 +795,7 @@ declare class Points {
      * @param {String} name
      * @param {GPUShaderStage} shaderType
      * @param {Number} renderPassIndex
-     * @returns
+     * @returns {Object}
      */
     setTextureDepth2d(name: string, shaderType: GPUShaderStage, renderPassIndex: number): any;
     copyTexture(nameTextureA: any, nameTextureB: any): void;
@@ -787,6 +816,25 @@ declare class Points {
      * let rgba = texturePosition(image, imageSampler, position, in.uvr, true);
      */
     setTextureImage(name: string, path: string, shaderType?: GPUShaderStage): any;
+    /**
+     * Loads a `HTMLElement` as `texture_2d`. It will automatically interpret
+     * the CSS associated with the element to render it.
+     * `@font-family` needs to be explicitly described in the element's css.
+     * This will only generate an image, so animations will not work.
+     * @param {String} name identifier it will have in the shaders
+     * @param {HTMLElement} element element loaded in the DOM or dynamically
+     * @param {GPUShaderStage} shaderType in what shader type it will exist only
+     * @returns {Object}
+     *
+     * @example
+     * // js
+     * const element = document.getElementById('my_element')
+     * await points.setTextureElement('image', element);
+     *
+     * // wgsl string
+     * let color = texture(image, imageSampler, in.uvr, true);
+     */
+    setTextureElement(name: string, element: HTMLElement, shaderType?: GPUShaderStage): any;
     /**
      * Loads a text string as a texture.<br>
      * Using an Atlas or a Spritesheet with UTF-16 chars (`path`) it will create a new texture
@@ -813,7 +861,7 @@ declare class Points {
      * );
      *
      * // wgsl string
-     * let textColors = texturePosition(textImg, imageSampler, position, in.uvr, true);
+     * let textColors = texture(textImg, imageSampler, in.uvr, true);
      *
      */
     setTextureString(name: string, text: string, path: string, size: {
@@ -1054,17 +1102,35 @@ declare class Points {
     /**
      * Method executed on each {@link https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame | requestAnimationFrame}.
      * Here's where all the calls to update data will be executed.
+     * @param {function(time:Number, deltaTime:number)} updateCallback method called on each frame update.
+     * Here you will update uniforms, storage and general variables.
+     * You will also have the `time` and `deltaTime` values used inside the library
+     * to create animations. These are the same internal values in `params.time`
+     * and `params.deltaTime`.
      * @example
+     * points.setUniform('myvar', 3);
      * await points.init(renderPasses);
-     * update();
+     * points.update(update);
      *
-     * function update() {
-     *     points.update();
-     *     requestAnimationFrame(update);
+     * function update(time, timeDelta) {
+     *     // update uniforms and other animation variables
+     *     points.setUniform('myvar', 3); // already existing uniform to update
      * }
      */
-    update(): Promise<void>;
+    update(updateCallback: any): void;
     read(): Promise<void>;
+    /**
+     * Import and prepend a common string to all RenderPass shaders.
+     * If a list of common functions or structs needs to be appended to all
+     * RenderPass.
+     * @param {String} common string to prepend
+     *
+     * @example
+     * import { structs } from './structs.js';
+     * points.import(structs);
+     *
+     */
+    import(common: string): void;
     /**
      * Reference to the canvas assigned in the constructor
      * @type {HTMLCanvasElement}
@@ -1075,7 +1141,6 @@ declare class Points {
      */
     get device(): GPUDevice;
     get context(): any;
-    get buffer(): any;
     /**
      * Triggers the app to run in full screen mode
      * @type {Boolean}
@@ -1085,6 +1150,14 @@ declare class Points {
      */
     set fullscreen(value: boolean);
     get fullscreen(): boolean;
+    /**
+     * Gets the current time elapsed in milliseconds.
+     */
+    get time(): number;
+    /**
+     * Get the time elapsed since the last frame was renderd, in milliseconds.
+     */
+    get deltaTime(): number;
     /**
      * Set the maximum range the render textures can hold.
      * If you need HDR values use `16` or `32` float formats.
@@ -1099,6 +1172,55 @@ declare class Points {
      */
     set presentationFormat(value: PresentationFormat | string | GPUTextureFormat);
     get presentationFormat(): PresentationFormat | string | GPUTextureFormat;
+    /**
+     * Shows or hides all the logs and warnings from the library.
+     * Meant to be set as false in production environment.
+     * By default is shows all the logs for development.
+     * @param {Boolean} val
+     * @default true
+     * @example
+     *
+     * points.debug = false;
+     */
+    set debug(val: boolean);
+    get debug(): boolean;
+    /**
+     * Select how the content should be displayed on different
+     * screen sizes.
+     * ```text
+     * FIT: Preserves both, but might show black bars or extend empty content. All content is visible.
+     * COVER: Preserves both, but might crop width or height. All screen is covered.
+     * WIDTH: Preserves the visibility of the width, but might crop the height.
+     * HEIGHT: Preserves the visibility of the height, but might crop the width.
+     * ```
+     * @param {ScaleMode|Number} val
+     * @default ScaleMode.HEIGHT
+     * @example
+     *
+     * points.scaleMode = ScaleMode.COVER;
+     */
+    set scaleMode(val: ScaleMode | number);
+    get scaleMode(): ScaleMode | number;
+    /**
+     * Reset memory before calling again `init()`, this without calling
+     * the constructor `new Points()`.
+     * Useful to switch to a new set of shaders and erase internal references,
+     * basically cleaning memory to start again. It also calls `.destroy()` on
+     * buffers and textures.
+     * A call to the constructor doesn't do this.
+     * If you are going to call `destroy()` afterwards, there's no need to call
+     * `reset()`.
+     * This keeps the Device and Adapter alive.
+     */
+    reset(): void;
+    /**
+     * Nuke everything from memory.
+     * Similar to reset, but it nullyfies everything to be garbage collected.
+     * Calls `.destroy()` on buffers, textures, the Device and Adapter.
+     * This would force a call to the constructor or to `reset()`.
+     * If you are going to call `reset()` afterwards, then
+     * there's no need to call `destroy()`.
+     */
     destroy(): void;
     #private;
 }
@@ -1191,5 +1313,110 @@ declare class RGBAColor {
      */
     euclideanDistance(color: RGBAColor): number;
     #private;
+}
+/**
+ * Class to be used to select how the content should be displayed on different
+ * screen sizes.
+ * ```text
+ * FIT: Preserves both, but might show black bars or extend empty content. All content is visible.
+ * COVER: Preserves both, but might crop width or height. All screen is covered.
+ * WIDTH: Preserves the visibility of the width, but might crop the height.
+ * HEIGHT: Preserves the visibility of the height, but might crop the width.
+ * ```
+ * @example
+ *
+ * points.scaleMode = ScaleMode.COVER;
+ *
+ * @class ScaleMode
+ */
+declare class ScaleMode {
+    /**
+     * ```text
+     * All content is visible.
+     * Black bars shown to compensate.
+     * No content is cropped.
+     *
+     * PORTRAIT        LANDSCAPE
+     * ░░░░░░░░░░░░░░░ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ░░░░░░░░░░░░░░░ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ░░░░░░░░░░░░░░░
+     * ░░░░░░░░░░░░░░░
+     * ```
+     * @memberof ScaleMode
+     */
+    static FIT: number;
+    /**
+     * ```text
+     * Not all content is visible.
+     * No black bars shown.
+     * Content is cropped on the sides.
+     * `
+     * PORTRAIT            LANDSCAPE
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ```
+     * @memberof ScaleMode
+     */
+    static COVER: number;
+    /**
+     * ```text
+     * Content is visible in portrait.
+     * Black bars shown to compensate in portrait.
+     * Content is cropped in landscape.
+     *
+     * PORTRAIT        LANDSCAPE
+     * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ```
+     * @memberof ScaleMode
+     */
+    static WIDTH: number;
+    /**
+     * ```text
+     * Not all content is visible.
+     * Black bars shown to compensate in landscape.
+     * Content is cropped in portrait.
+     *
+     * PORTRAIT            LANDSCAPE
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
+     * ```
+     * @memberof ScaleMode
+     */
+    static HEIGHT: number;
 }
 export { Points as default };

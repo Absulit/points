@@ -200,6 +200,7 @@ export const brightnessC: string;
 /**
  * Layers two colors by cropping the color in the back,
  * based on the alpha value.
+ * @type {String}
  * @param {vec4f} back `vec4f`
  * @param {vec4f} front `vec4f`
  * @returns {vec4f}
@@ -210,11 +211,35 @@ export const brightnessC: string;
  * // wgsl string
  * ${layer}
  *
- * let rgbaImage1 = texturePosition(image1, imageSampler, position, uvr, true);
- * let rgbaImage2 = texturePosition(image2, imageSampler, position, uvr, true);
- * let rgbaImage3 = texturePosition(image3, imageSampler, position, uvr, true);
+ * let rgbaImage1 = texture(image1, imageSampler, uvr, true);
+ * let rgbaImage2 = texture(image2, imageSampler, uvr, true);
+ * let rgbaImage3 = texture(image3, imageSampler, uvr, true);
  *
  * var finalColor:vec4f = layer(rgbaImage2, rgbaImage3);
  * finalColor = layer(rgbaImage1, finalColor);
  */
-export const layer: "\n// https://stackoverflow.com/a/24501192/507186\nfn layer(back:vec4f, front: vec4f) -> vec4f {\n    return front * front.a + back * (1. - front.a);\n}\n";
+export const layer: string;
+/**
+ * Same as layer but with premultiplied alpha.
+ * The consideration here is that the back param already has the alpha applied.
+ * Layers two colors by cropping the color in the back,
+ * based on the alpha value.
+ * @type {String}
+ * @param {vec4f} back `vec4f`
+ * @param {vec4f} front `vec4f`
+ * @returns {vec4f}
+ * @example
+ * // js
+ * import { layerPremultiplied } from 'points/color';
+ *
+ * // wgsl string
+ * ${layer}
+ *
+ * let rgbaImage1 = texture(image1, imageSampler, uvr, true);
+ * let rgbaImage2 = texture(image2, imageSampler, uvr, true);
+ * let rgbaImage3 = texture(image3, imageSampler, uvr, true);
+ *
+ * var finalColor:vec4f = layerPremultiplied(rgbaImage2, rgbaImage3);
+ * finalColor = layerPremultiplied(rgbaImage1, finalColor);
+ */
+export const layerPremultiplied: string;

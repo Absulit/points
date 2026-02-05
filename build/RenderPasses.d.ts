@@ -27,11 +27,10 @@ export { RenderPasses as default };
  *
  * await points.init(renderPasses);
  *
- * update();
+ * points.update(update);
  *
  * function update() {
- *     points.update();
- *     requestAnimationFrame(update);
+ * // update uniforms and other animation variables
  * }
  */
 declare class RenderPasses {
