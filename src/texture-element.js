@@ -34,7 +34,7 @@ export function getCSS(el) {
 /**
  * Gets the url of the font requested from the loaded CSS.
  * @param {String} familyName
- * @returns
+ * @returns {{url:String, fontFace:String}|null}
  */
 function getFontSource(familyName) {
     let source = null;
@@ -66,7 +66,7 @@ function getFontSource(familyName) {
  * From the css in the HTMLElement, get the font-family attribute value to be
  * used later to get the source.
  * @param {String} cssString
- * @returns
+ * @returns {Strng|null}
  */
 function getFontFamily(cssString) {
     let fontFamily = null;
@@ -81,7 +81,7 @@ function getFontFamily(cssString) {
 /**
  * Converts a font to b64 to embed in the foreingObject
  * @param {String} url path to font file
- * @returns
+ * @returns {Promise<String>}
  */
 async function fontToB64(url) {
     const response = await fetch(url);
