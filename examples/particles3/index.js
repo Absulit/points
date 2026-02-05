@@ -42,6 +42,7 @@ const instancedParticlesRenderPass = new RenderPass(vert, frag1, compute0, WORKG
 instancedParticlesRenderPass.depthWriteEnabled = false;
 instancedParticlesRenderPass.addPlane('plane', { x: 0, y: 0 }, { width: 2, height: 2 }).instanceCount = NUMPARTICLES;
 
+const notificationMsg = `This demo uses a webcam, but it seems you don't have one, \nso we replaced it with a video.`;
 
 const base = {
     renderPasses: [
@@ -52,21 +53,21 @@ const base = {
      */
     init: async (points, folder) => {
         points.import(structs);
-        try {
-            await points.setTextureWebcam('webcam');
-        } catch (error) {
-            const permission = await Notification.requestPermission();
-            if (permission === 'granted') {
-                new Notification('Points - Particles 3', {
-                    body: `This demo uses a webcam, but it seems you don't have one, \nso we replaced it with a video.`,
-                    //icon: 'https://your-icon-url.png'
-                });
-            } else {
-                alert(`This demo uses a webcam, but it seems you don't have one, \nso we replaced it with a video.`)
-            }
 
-            await points.setTextureVideo('webcam', './../img/6982698-hd_1440_1080_25fps_800x800.mp4');
-        }
+        await points.setTextureWebcam('webcam')
+            .catch(async err => {
+                const permission = await Notification.requestPermission();
+                if (permission === 'granted') {
+                    new Notification('Points - Particles 3', {
+                        body: notificationMsg,
+                        //icon: 'https://your-icon-url.png'
+                    });
+                } else {
+                    alert(notificationMsg)
+                }
+
+                await points.setTextureVideo('webcam', './../img/6982698-hd_1440_1080_25fps_800x800.mp4');
+            });
 
         points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
         points.setConstant('WORKGROUP_X', WORKGROUP_X, 'u32');
