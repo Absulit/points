@@ -3,6 +3,94 @@
  */
 export type SignedNumber = number;
 /**
+ * To tell the {@link RenderPass} what polygons should be discarded
+ * Default `BACK`
+ * @example
+ *
+ * renderPass.cullMode = CullMode.BACK;
+ */
+export class CullMode {
+    /** @type {GPUCullMode} */
+    static NONE: GPUCullMode;
+    /** @type {GPUCullMode} */
+    static FRONT: GPUCullMode;
+    /** @type {GPUCullMode} */
+    static BACK: GPUCullMode;
+}
+/**
+ * To tell the {@link RenderPass} what polygons are Front Facing
+ * Default `CCW`
+ * @example
+ *
+ * renderPass.frontFace = FrontFace.CCW;
+ */
+export class FrontFace {
+    /** @type {GPUFrontFace} */
+    static CCW: GPUFrontFace;
+    /** @type {GPUFrontFace} */
+    static CW: GPUFrontFace;
+}
+/**
+ * To tell the {@link RenderPass} how the data from the previous RenderPass
+ * is preserved on screen or cleared.
+ * Default `CLEAR`
+ * @example
+ *
+ * renderPass.loadOp = LoadOp.LOAD;
+ */
+export class LoadOp {
+    /** @type {GPULoadOp} */
+    static CLEAR: GPULoadOp;
+    /** @type {GPULoadOp} */
+    static LOAD: GPULoadOp;
+}
+/**
+ * Class to be used to decide if the output textures can hold more data beyond
+ * the range from 0..1. Useful for HDR images.
+ *
+ * @example
+ * points.presentationFormat = PresentationFormat.RGBA16FLOAT;
+ *
+ * @class PresentationFormat
+ */
+export class PresentationFormat {
+    /**
+     * @memberof PresentationFormat
+     */
+    static BGRA8UNORM: string;
+    /**
+     * @memberof PresentationFormat
+     */
+    static RGBA8UNORM: string;
+    /**
+     * @memberof PresentationFormat
+     */
+    static RGBA16FLOAT: string;
+    /**
+     * @memberof PresentationFormat
+     */
+    static RGBA32FLOAT: string;
+}
+/**
+ * To tell the {@link RenderPass} how to display the triangles.
+ * Default `TRIANGLE_LIST`
+ * @example
+ *
+ * renderPass.topology = PrimitiveTopology.POINT_LIST;
+ */
+export class PrimitiveTopology {
+    /** @type {GPUPrimitiveTopology} */
+    static POINT_LIST: GPUPrimitiveTopology;
+    /** @type {GPUPrimitiveTopology} */
+    static LINE_LIST: GPUPrimitiveTopology;
+    /** @type {GPUPrimitiveTopology} */
+    static LINE_STRIP: GPUPrimitiveTopology;
+    /** @type {GPUPrimitiveTopology} */
+    static TRIANGLE_LIST: GPUPrimitiveTopology;
+    /** @type {GPUPrimitiveTopology} */
+    static TRIANGLE_STRIP: GPUPrimitiveTopology;
+}
+/**
  * A RenderPass is a way to have a block of shaders to pass to your application pipeline and
  * these render passes will be executed in the order you pass them in the {@link Points#init} method.
  *
@@ -542,6 +630,111 @@ export class RenderPasses {
      * points.addRenderPass(RenderPasses.CRT, { scale: .05 });
      */
     static CRT: RenderPass;
+}
+/**
+ * Class to be used to select how the content should be displayed on different
+ * screen sizes.
+ * ```text
+ * FIT: Preserves both, but might show black bars or extend empty content. All content is visible.
+ * COVER: Preserves both, but might crop width or height. All screen is covered.
+ * WIDTH: Preserves the visibility of the width, but might crop the height.
+ * HEIGHT: Preserves the visibility of the height, but might crop the width.
+ * ```
+ * @example
+ *
+ * points.scaleMode = ScaleMode.COVER;
+ *
+ * @class ScaleMode
+ */
+export class ScaleMode {
+    /**
+     * ```text
+     * All content is visible.
+     * Black bars shown to compensate.
+     * No content is cropped.
+     *
+     * PORTRAIT        LANDSCAPE
+     * ░░░░░░░░░░░░░░░ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ░░░░░░░░░░░░░░░ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ░░░░░░░░░░░░░░░
+     * ░░░░░░░░░░░░░░░
+     * ```
+     * @memberof ScaleMode
+     */
+    static FIT: number;
+    /**
+     * ```text
+     * Not all content is visible.
+     * No black bars shown.
+     * Content is cropped on the sides.
+     * `
+     * PORTRAIT            LANDSCAPE
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ```
+     * @memberof ScaleMode
+     */
+    static COVER: number;
+    /**
+     * ```text
+     * Content is visible in portrait.
+     * Black bars shown to compensate in portrait.
+     * Content is cropped in landscape.
+     *
+     * PORTRAIT        LANDSCAPE
+     * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ```
+     * @memberof ScaleMode
+     */
+    static WIDTH: number;
+    /**
+     * ```text
+     * Not all content is visible.
+     * Black bars shown to compensate in landscape.
+     * Content is cropped in portrait.
+     *
+     * PORTRAIT            LANDSCAPE
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
+     * ```
+     * @memberof ScaleMode
+     */
+    static HEIGHT: number;
 }
 /**
  * Main class Points, this is the entry point of an application with this library.
@@ -1224,48 +1417,6 @@ declare class Points {
     destroy(): void;
     #private;
 }
-/**
- * To tell the {@link RenderPass} how the data from the previous RenderPass
- * is preserved on screen or cleared.
- * Default `CLEAR`
- * @example
- *
- * renderPass.loadOp = LoadOp.LOAD;
- */
-declare class LoadOp {
-    /** @type {GPULoadOp} */
-    static CLEAR: GPULoadOp;
-    /** @type {GPULoadOp} */
-    static LOAD: GPULoadOp;
-}
-/**
- * To tell the {@link RenderPass} what polygons should be discarded
- * Default `BACK`
- * @example
- *
- * renderPass.cullMode = CullMode.BACK;
- */
-declare class CullMode {
-    /** @type {GPUCullMode} */
-    static NONE: GPUCullMode;
-    /** @type {GPUCullMode} */
-    static FRONT: GPUCullMode;
-    /** @type {GPUCullMode} */
-    static BACK: GPUCullMode;
-}
-/**
- * To tell the {@link RenderPass} what polygons are Front Facing
- * Default `CCW`
- * @example
- *
- * renderPass.frontFace = FrontFace.CCW;
- */
-declare class FrontFace {
-    /** @type {GPUFrontFace} */
-    static CCW: GPUFrontFace;
-    /** @type {GPUFrontFace} */
-    static CW: GPUFrontFace;
-}
 declare class Coordinate {
     constructor(x?: number, y?: number, z?: number);
     set x(value: number);
@@ -1313,110 +1464,5 @@ declare class RGBAColor {
      */
     euclideanDistance(color: RGBAColor): number;
     #private;
-}
-/**
- * Class to be used to select how the content should be displayed on different
- * screen sizes.
- * ```text
- * FIT: Preserves both, but might show black bars or extend empty content. All content is visible.
- * COVER: Preserves both, but might crop width or height. All screen is covered.
- * WIDTH: Preserves the visibility of the width, but might crop the height.
- * HEIGHT: Preserves the visibility of the height, but might crop the width.
- * ```
- * @example
- *
- * points.scaleMode = ScaleMode.COVER;
- *
- * @class ScaleMode
- */
-declare class ScaleMode {
-    /**
-     * ```text
-     * All content is visible.
-     * Black bars shown to compensate.
-     * No content is cropped.
-     *
-     * PORTRAIT        LANDSCAPE
-     * ░░░░░░░░░░░░░░░ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ░░░░░░░░░░░░░░░ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ░░░░░░░░░░░░░░░
-     * ░░░░░░░░░░░░░░░
-     * ```
-     * @memberof ScaleMode
-     */
-    static FIT: number;
-    /**
-     * ```text
-     * Not all content is visible.
-     * No black bars shown.
-     * Content is cropped on the sides.
-     * `
-     * PORTRAIT            LANDSCAPE
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ```
-     * @memberof ScaleMode
-     */
-    static COVER: number;
-    /**
-     * ```text
-     * Content is visible in portrait.
-     * Black bars shown to compensate in portrait.
-     * Content is cropped in landscape.
-     *
-     * PORTRAIT        LANDSCAPE
-     * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ```
-     * @memberof ScaleMode
-     */
-    static WIDTH: number;
-    /**
-     * ```text
-     * Not all content is visible.
-     * Black bars shown to compensate in landscape.
-     * Content is cropped in portrait.
-     *
-     * PORTRAIT            LANDSCAPE
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
-     * ```
-     * @memberof ScaleMode
-     */
-    static HEIGHT: number;
 }
 export { Points as default };

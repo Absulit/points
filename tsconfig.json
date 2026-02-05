@@ -19,6 +19,7 @@
     "files": [
         "src/types/index.d.ts",
         "build/RenderPass.js",
+        "build/ScaleMode.js",
         "build/RenderPasses.js",
         "build/points.js",
         "build/core/animation.js",
