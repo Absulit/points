@@ -721,7 +721,7 @@ class Points {
      * @param {String} name
      * @param {GPUShaderStage} shaderType
      * @param {Number} renderPassIndex
-     * @returns
+     * @returns {Object}
      */
     setTextureDepth2d(name, shaderType, renderPassIndex) {
         const exists = this.#nameExists(this.#texturesDepth2d, name);
@@ -2548,7 +2548,6 @@ class Points {
      * #updateCallback (user function) method
      * Here are all the internal updates like uniforms and variables and actual
      * execution of the pipeline and actual execution of the encoder.
-     * @returns
      */
     async #frame() {
         // if updateCallback is null the user removed it
