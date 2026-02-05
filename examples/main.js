@@ -2,7 +2,7 @@
 import * as dat from 'datgui';
 import Points, { RenderPass } from 'points';
 import { shaderProjects } from './index_files/shader_projects.js';
-import { isMobile } from 'utils';
+import { isMobile, setDisabled } from 'utils';
 import CanvasRecorder from './../src/CanvasRecorder.js';
 
 
@@ -141,6 +141,8 @@ const authorLinkEl = infoEl.querySelector('#author-link');
 let requestToCancel = false;
 
 async function loadShaderByIndex(index) {
+    // disable ui
+    setDisabled(nav, true);
     console.clear();
     requestToCancel = true;
     if (index > shaderProjects.length) {
@@ -253,6 +255,8 @@ async function init() {
         requestToCancel = false;
         points.fitWindow = isFitWindowData.isFitWindow;
         points.update(update);
+        // enable ui
+        setDisabled(nav, false);
     } else {
         const el = document.getElementById('nowebgpu');
         el.classList.toggle('show');

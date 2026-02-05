@@ -2,7 +2,7 @@ import vert from './vert.js';
 import compute0 from './compute.js';
 import frag1 from './frag.js';
 import Points, { RenderPass } from 'points';
-import { isMobile } from 'utils';
+import { isMobile, setDisabled } from 'utils';
 import { structs } from './structs.js';
 
 const options = {
@@ -22,7 +22,7 @@ let THREADS_X = 256;
 let THREADS_Y = 1;
 let THREADS_Z = 1;
 
-if(options.isMobile){
+if (options.isMobile) {
     WORKGROUP_X = 8;
     WORKGROUP_Y = 4;
     WORKGROUP_Z = 2;
@@ -52,8 +52,21 @@ const base = {
      */
     init: async (points, folder) => {
         points.import(structs);
+        try {
+            await points.setTextureWebcam('webcam');
+        } catch (error) {
+            const permission = await Notification.requestPermission();
+            if (permission === 'granted') {
+                new Notification('Points - Particles 3', {
+                    body: `This demo uses a webcam, but it seems you don't have one, \nso we replaced it with a video.`,
+                    //icon: 'https://your-icon-url.png'
+                });
+            } else {
+                alert(`This demo uses a webcam, but it seems you don't have one, \nso we replaced it with a video.`)
+            }
 
-        await points.setTextureWebcam('webcam');
+            await points.setTextureVideo('webcam', './../img/6982698-hd_1440_1080_25fps_800x800.mp4');
+        }
 
         points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
         points.setConstant('WORKGROUP_X', WORKGROUP_X, 'u32');
