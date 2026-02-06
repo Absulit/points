@@ -1,8 +1,4 @@
-import { structs } from '../structs.js';
-
 const vert = /*wgsl*/`
-
-${structs}
 
 fn rotationMatrix(rotation: vec3f) -> mat3x3<f32> {
     let cx = cos(rotation.x);

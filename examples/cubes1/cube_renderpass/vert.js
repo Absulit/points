@@ -1,9 +1,7 @@
 import { fnusin, fusin } from 'points/animation';
-import { structs } from '../structs.js';
 
 const vert = /*wgsl*/`
 
-${structs}
 ${fusin}
 ${fnusin}
 

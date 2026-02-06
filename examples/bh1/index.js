@@ -1,6 +1,7 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
+import Points, { ScaleMode } from 'points';
 
 const options = {
     enabled: true,
@@ -40,6 +41,8 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+
+        points.scaleMode = ScaleMode.FIT
 
         const descriptor = {
             addressModeU: 'repeat',

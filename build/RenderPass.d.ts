@@ -291,6 +291,19 @@ declare class RenderPass {
     set device(val: GPUDevice);
     get device(): GPUDevice;
     /**
+     * Disable the current RenderPass during runtime if the pass has
+     * no other passes dependencies like sharing a texture.
+     *
+     * @param {Boolean} val
+     *
+     * @example
+     * const renderPass = new RenderPass()
+     *
+     * renderPass.enabled = false;
+     */
+    set enabled(val: boolean);
+    get enabled(): boolean;
+    /**
      * - **currently for internal use**<br>
      * - **might be private in the future**<br>
      * Adds two triangles as a quad called Point
@@ -488,6 +501,7 @@ declare class RenderPass {
      * ids and names of the meshes
      */
     get meshes(): any[];
+    destroy(): void;
     #private;
 }
 export { RenderPass as default };

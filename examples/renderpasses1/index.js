@@ -4,7 +4,7 @@ import frag1 from './renderpass1/frag.js';
 import vert2 from './renderpass2/vert.js';
 import frag2 from './renderpass2/frag.js';
 
-import { RenderPass } from 'points';
+import Points, { RenderPass, ScaleMode } from 'points';
 
 const options = {
     rotation: .8,
@@ -18,7 +18,13 @@ const renderpasses1 = {
         new RenderPass(vert1, frag1),
         new RenderPass(vert2, frag2),
     ],
+    /**
+     *
+     * @param {Points} points
+     * @param {*} folder
+     */
     init: async (points, folder) => {
+        points.scaleMode = ScaleMode.FIT;
         points.setSampler('imageSampler', null);
         // await points.setTextureImage('image', './../img/carmen_lyra_423x643.jpg');
         // await points.setTextureImage('image', './../img/old_king_600x600.jpg');

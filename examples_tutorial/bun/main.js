@@ -67,10 +67,9 @@ const renderPasses = [
 
 // call the POINTS init method and then the update method
 await points.init(renderPasses);
-update();
-
 // call `points.update()` methods to render a new frame
+points.update(update)
+
 function update() {
-    points.update();
-    requestAnimationFrame(update);
+    // update uniforms, etc
 }
