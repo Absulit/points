@@ -1,11 +1,9 @@
 import { PI, TAU } from 'points/math';
-import { structs } from '../structs.js';
 import { rand } from 'points/random';
 import { snoise } from 'points/noise2d';
 
 const compute = /*wgsl*/`
 
-${structs}
 ${PI}
 ${TAU}
 ${rand}

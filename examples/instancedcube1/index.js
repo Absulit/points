@@ -1,7 +1,8 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
-import Points, { RenderPass, RenderPasses } from 'points';
+import Points, { RenderPass, RenderPasses, ScaleMode } from 'points';
+import { structs } from './structs.js';
 
 const options = {
     sliderA: 0.619,
@@ -35,6 +36,9 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+        points.scaleMode = ScaleMode.HEIGHT;
+        points.import(structs);
+
         points.setConstant('UNIT', 1 / 8, 'f32');
         points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
         points.setConstant('SIDE', SIDE, 'u32');
@@ -48,10 +52,13 @@ const base = {
         points.setStorage('particles', `array<Particle, ${NUMPARTICLES}>`, false);
         points.setStorage('variables', 'Variable', false);
 
+        points.setCameraPerspective('camera', [0, 0, 0]);
+
         points.addRenderPass(RenderPasses.LENS_DISTORTION, { amount: .85, distance: .005 });
         points.addRenderPass(RenderPasses.BLOOM, { amount: .1 });
     },
     update: points => {
+        points.setCameraPerspective('camera', [0, 0, 3]);
     }
 }
 

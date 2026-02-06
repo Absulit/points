@@ -1,14 +1,11 @@
 import { rotXAxis, rotYAxis, rotZAxis, TAU } from "points/math";
-import { structs } from "./../structs.js";
 
 const vert = /*wgsl*/`
 
-${structs}
 ${rotXAxis}
 ${rotYAxis}
 ${rotZAxis}
 ${TAU}
-
 
 fn translateMatrix(pos:vec3f) -> mat4x4f {
     return mat4x4f(

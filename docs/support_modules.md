@@ -53,3 +53,28 @@ ${PI}
 
 export default frag;
 ```
+
+## Import code to all RenderPass shaders Points.import()
+
+You can prepend anything to all RenderPass with the `Points.import()` method.
+
+This differs from a single method imported from a module, in this case what you
+want to import, is needed in all RenderPass shaders.
+
+As an example, in several of the `examples/` folder demos, you will see there's
+a 'structs.js' file, this has a set of common structs. Because of the way the
+library is made, declaring a uniform or storage buffer means all the RenderPass
+and its shaders have a reference to that buffer, but that also means that if a
+buffer is from a custom type, you need to declare that type everywhere.
+
+Importing these structs to all shaders is not a big deal, but with several
+RenderPass it can become a taxing task. This can be addressed with a single line
+of code in the main application
+
+```js
+import { structs } from './structs.js';
+
+// ...
+
+points.import(structs);
+```

@@ -13,22 +13,9 @@ import LayersArray from './LayersArray.js';
 import UniformsArray from './UniformsArray.js';
 import getStorageAccessMode, { bindingModes, entriesModes } from './storage-accessmode.js';
 import { cross, dot, normalize, sub } from './matrix.js';
-
-/**
- * Class to be used to decide if the output textures can hold more data beyond
- * the range from 0..1, thing is useful for HDR images.
- *
- * @example
- *
- * points.presentationFormat = PresentationFormat.RGBA16FLOAT;
- *
- */
-class PresentationFormat {
-    static BGRA8UNORM = 'bgra8unorm';
-    static RGBA8UNORM = 'rgba8unorm';
-    static RGBA16FLOAT = 'rgba16float';
-    static RGBA32FLOAT = 'rgba32float';
-}
+import { clearCache, elToImage, getCSS } from './texture-element.js';
+import PresentationFormat from './PresentationFormat.js';
+import ScaleMode from './ScaleMode.js';
 
 /**
  * Main class Points, this is the entry point of an application with this library.
@@ -42,11 +29,10 @@ class PresentationFormat {
  * ];
  *
  * await points.init(renderPasses);
- * update();
+ * points.update(update);
  *
  * function update() {
- *     points.update();
- *     requestAnimationFrame(update);
+ * // update uniforms and other animation variables
  * }
  *
  */
@@ -62,7 +48,6 @@ class Points {
     /** @type {Array<RenderPass>} */
     #renderPasses = null;
     #postRenderPasses = [];
-    #buffer = null;
     #presentationSize = null;
     #numColumns = 1;
     #numRows = 1;
@@ -82,18 +67,18 @@ class Points {
     #texturesStorage2d = [];
     #bindingTextures = [];
     #layers = new LayersArray();
-    #originalCanvasWidth = null;
-    #originalCanvasHeigth = null;
     #clock = new Clock();
     #time = 0;
     #delta = 0;
     #epoch = 0;
-    #mouseX = 0;
-    #mouseY = 0;
+    #mouse = [0, 0];
+    #mouseNormalized = [0, 0];
     #mouseDown = false;
     #mouseClick = false;
     #mouseWheel = false;
     #mouseDelta = [0, 0];
+    #screen = [0, 0];
+    #ratio = [0, 0];
     #fullscreen = false;
     #fitWindow = false;
     #lastFitWindow = false;
@@ -103,28 +88,65 @@ class Points {
     #dataSize = null;
     #screenResized = false;
     #textureUpdated = false;
+    #animationFrameId = null;
+    #updateCallback = null;
+    #imports = [];
+    #initialized = false;
+    #debug = true;
+    #scaleMode = ScaleMode.HEIGHT;
+    #abortController = null;
+    #canvasWidth = null;
+    #canvasHeight = null;
 
-    constructor(canvasId) {
+    /**
+     * Constructor of `Points`.
+     * Set a width and height to be used if no `fitWindow` is called, and also
+     * to be used by the `ScaleMode` to decide how to resize the screen content.
+     * @param {String} canvasId id of an existing canvas
+     * @param {Number} width default width
+     * @param {Number} height default height
+     */
+    constructor(canvasId, width = 800, height = 800) {
+        this.#canvasWidth = width;
+        this.#canvasHeight = height;
         this.#canvasId = canvasId;
         this.#canvas = document.getElementById(this.#canvasId);
+        this.#baseInit();
+    }
+
+    #baseInit() {
+        this.#scaleMode = ScaleMode.HEIGHT;
+        this.#presentationFormat = null;
+        this.#abortController = new AbortController();
+        const { signal } = this.#abortController;
+        const listenerOptions = { signal };
         if (this.#canvasId) {
             this.#canvas.addEventListener('click', e => {
                 this.#mouseClick = true;
+                this.setUniform(UniformKeys.MOUSE_CLICK, this.#mouseClick);
+            }, listenerOptions);
+            this.#canvas.addEventListener('mousemove', this.#onMouseMove, {
+                passive: true, signal
             });
-            this.#canvas.addEventListener('mousemove', this.#onMouseMove, { passive: true });
             this.#canvas.addEventListener('mousedown', e => {
                 this.#mouseDown = true;
-            });
+                this.setUniform(UniformKeys.MOUSE_DOWN, this.#mouseDown);
+            }, listenerOptions);
             this.#canvas.addEventListener('mouseup', e => {
                 this.#mouseDown = false;
-            });
+                this.setUniform(UniformKeys.MOUSE_DOWN, this.#mouseDown);
+            }, listenerOptions);
             this.#canvas.addEventListener('wheel', e => {
                 this.#mouseWheel = true;
-                this.#mouseDelta = [e.deltaX, e.deltaY];
-            }, { passive: true });
-            this.#originalCanvasWidth = this.#canvas.clientWidth;
-            this.#originalCanvasHeigth = this.#canvas.clientHeight;
-            window.addEventListener('resize', this.#resizeCanvasToFitWindow, false);
+                this.#mouseDelta[0] = e.deltaX;
+                this.#mouseDelta[1] = e.deltaY;
+                this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
+                this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta);
+            }, { passive: true, signal });
+            window.addEventListener('resize', this.#resizeCanvasToFitWindow, {
+                signal,
+                capture: false
+            });
             document.addEventListener('fullscreenchange', e => {
                 this.#fullscreen = !!document.fullscreenElement;
                 if (!this.#fullscreen && !this.#fitWindow) {
@@ -133,7 +155,7 @@ class Points {
                 if (!this.#fullscreen) {
                     this.fitWindow = this.#lastFitWindow;
                 }
-            });
+            }, listenerOptions);
         }
 
         // initializing internal uniforms
@@ -143,9 +165,11 @@ class Points {
         this.setUniform(UniformKeys.MOUSE_CLICK, this.#mouseClick);
         this.setUniform(UniformKeys.MOUSE_DOWN, this.#mouseDown);
         this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
-        this.setUniform(UniformKeys.SCREEN, [0, 0], 'vec2f');
-        this.setUniform(UniformKeys.MOUSE, [0, 0], 'vec2f');
+        this.setUniform(UniformKeys.SCREEN, this.#screen, 'vec2f');
+        this.setUniform(UniformKeys.MOUSE, this.#mouse, 'vec2f');
         this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta, 'vec2f');
+        this.setUniform(UniformKeys.RATIO, this.#ratio, 'vec2f');
+        this.setUniform('_mouse_normalized', [0, 0], 'vec2f');
     }
 
     #resizeCanvasToFitWindow = () => {
@@ -160,21 +184,25 @@ class Points {
 
     #resizeCanvasToDefault = () => {
         this.#screenResized = true;
-        this.#canvas.width = this.#originalCanvasWidth;
-        this.#canvas.height = this.#originalCanvasHeigth;
+        this.#canvas.width = this.#canvasWidth;
+        this.#canvas.height = this.#canvasHeight;
         this.#setScreenSize();
     }
 
     #setScreenSize = () => {
         // assigning size here because both sizes must match for the full screen
         // this was not happening before the speed up refactor
-        this.#canvas.width = canvas.clientWidth;
-        this.#canvas.height = canvas.clientHeight;
+        this.#canvas.width = this.#canvas.clientWidth;
+        this.#canvas.height = this.#canvas.clientHeight;
+        this.#screen[0] = this.#canvas.width;
+        this.#screen[1] = this.#canvas.height;
+        this.setUniform(UniformKeys.SCREEN, this.#screen);
 
         this.#presentationSize = [
             this.#canvas.clientWidth,
             this.#canvas.clientHeight,
         ];
+
         this.#context.configure({
             label: '_context',
             device: this.#device,
@@ -200,13 +228,56 @@ class Points {
                 this.#createTextureBindingToCopy(texture2d);
             }
         })
+
+        this.#setRatio();
+    }
+
+    /**
+     * Calculates the ratio that the screen should have depending on the
+     * `ScaleMode`
+     */
+    #setRatio = () => {
+        // https://github.com/Absulit/points/blob/ca942574c8d72176d7ef5f4d738419aa54c555ab/src/core/defaultFunctions.js
+        const ratio_from_x = this.#canvas.width / this.#canvas.height;
+        const ratio_from_y = 1 / ratio_from_x; // this.#canvas.height / this.#canvas.width;
+
+        const ratio_landscape = [ratio_from_x, 1];
+        const ratio_portrait = [1, ratio_from_y];
+
+        const is_landscape = this.#canvas.height < this.#canvas.width;
+
+        let ratio;
+
+        if (this.#scaleMode === ScaleMode.FIT) {
+            ratio = is_landscape ? ratio_landscape : ratio_portrait;
+        } else if (this.#scaleMode === ScaleMode.COVER) {
+            ratio = is_landscape ? ratio_portrait : ratio_landscape;
+        } else if (this.#scaleMode === ScaleMode.HEIGHT) {
+            ratio = ratio_landscape;
+        } else {
+            ratio = ratio_portrait;
+        }
+
+        // to avoid creating new object, we just overwrite/copy the data.
+        // meaning we use the same reference of #ratio
+        this.#ratio[0] = ratio[0];
+        this.#ratio[1] = ratio[1];
+
+        this.setUniform(UniformKeys.RATIO, this.#ratio);
     }
 
     #onMouseMove = e => {
         // get position relative to canvas
         const rect = this.#canvas.getBoundingClientRect();
-        this.#mouseX = e.clientX - rect.left;
-        this.#mouseY = e.clientY - rect.top;
+        this.#mouse[0] = e.clientX - rect.left;
+        this.#mouse[1] = e.clientY - rect.top;
+        // result.mouse = vec2(params.mouse.x / params.screen.x, params.mouse.y / params.screen.y);
+        // result.mouse = result.mouse * vec2(1., -1.) - vec2(0., -1.); // flip and move up
+        this.#mouseNormalized[0] = this.#mouse[0] / this.#screen[0];
+        this.#mouseNormalized[1] = this.#mouse[1] / this.#screen[1];
+        this.#mouseNormalized[1] = (this.#mouseNormalized[1] * - 1) - -1; // flip and move up
+        this.setUniform(UniformKeys.MOUSE, this.#mouse);
+        this.setUniform('_mouse_normalized', this.#mouseNormalized);
     }
 
     /**
@@ -233,9 +304,13 @@ class Points {
      */
     setUniform(name, value, structName = null) {
         const uniformToUpdate = this.#nameExists(this.#uniforms, name);
+
+        if (!uniformToUpdate && this.#initialized) {
+            console.error(`'${name}' uniform needs to be declared before the init() prior to call it in update().`);
+        }
         if (uniformToUpdate && structName) {
             // if name exists is an update
-            console.warn(`setUniform(${name}, [${value}], ${structName}) can't set the structName of an already defined uniform.`);
+            this.#debug && console.warn(`setUniform(${name}, [${value}], ${structName}) can't set the structName of an already defined uniform.`);
         }
         if (uniformToUpdate) {
             uniformToUpdate.value = value;
@@ -259,7 +334,7 @@ class Points {
         const uniformToUpdate = this.#nameExists(this.#meshUniforms, name);
         if (uniformToUpdate && structName) {
             // if name exists is an update
-            console.warn(`#setMeshUniform(${name}, [${value}], ${structName}) can't set the structName of an already defined uniform.`);
+            this.#debug && console.warn(`#setMeshUniform(${name}, [${value}], ${structName}) can't set the structName of an already defined uniform.`);
         }
         if (uniformToUpdate) {
             uniformToUpdate.value = value;
@@ -482,15 +557,30 @@ class Points {
         this.#storage.push(storage);
         return storage;
     }
+
+    /**
+     * To read data back from a `setStorage` with `read` param `true`
+
+     * @param {String} name name of the Storage to read data from
+     * @warning If there's en error or warning here
+     * `[Buffer "name"] used in submit while mapped.`
+     * the update (or function that calls this method) needs an `await`
+     * @returns {Float32Array} Array with the result
+     */
     async readStorage(name) {
         let storageItem = this.#readStorage.find(storageItem => storageItem.name === name);
         let arrayBuffer = null;
         let arrayBufferCopy = null;
         if (storageItem) {
-            await storageItem.buffer.mapAsync(GPUMapMode.READ);
-            arrayBuffer = storageItem.buffer.getMappedRange();
-            arrayBufferCopy = new Float32Array(arrayBuffer.slice(0));
-            storageItem.buffer.unmap();
+            try {
+                await storageItem.buffer.mapAsync(GPUMapMode.READ);
+                arrayBuffer = storageItem.buffer.getMappedRange();
+                arrayBufferCopy = new Float32Array(arrayBuffer.slice(0));
+                storageItem.buffer.unmap();
+            } catch (error) {
+                // if we switch projects mapasync fails
+                // we ignore it
+            }
         }
         return arrayBufferCopy;
     }
@@ -560,7 +650,7 @@ class Points {
         }
         const exists = this.#nameExists(this.#samplers, name)
         if (exists) {
-            console.warn(`setSampler: \`${name}\` already exists.`);
+            this.#debug && console.warn(`setSampler: \`${name}\` already exists.`);
             return exists;
         }
         // Create a sampler with linear filtering for smooth interpolation.
@@ -612,7 +702,7 @@ class Points {
     setTexture2d(name, copyCurrentTexture, shaderType, renderPassIndex) {
         const exists = this.#nameExists(this.#textures2d, name);
         if (exists) {
-            console.warn(`setTexture2d: \`${name}\` already exists.`);
+            this.#debug && console.warn(`setTexture2d: \`${name}\` already exists.`);
             return exists;
         }
         const texture2d = {
@@ -632,12 +722,12 @@ class Points {
      * @param {String} name
      * @param {GPUShaderStage} shaderType
      * @param {Number} renderPassIndex
-     * @returns
+     * @returns {Object}
      */
     setTextureDepth2d(name, shaderType, renderPassIndex) {
         const exists = this.#nameExists(this.#texturesDepth2d, name);
         if (exists) {
-            console.warn(`setTextureDepth2d: \`${name}\` already exists.`);
+            this.#debug && console.warn(`setTextureDepth2d: \`${name}\` already exists.`);
             return exists;
         }
         renderPassIndex ||= 0;
@@ -733,6 +823,31 @@ class Points {
     }
 
     /**
+     * Loads a `HTMLElement` as `texture_2d`. It will automatically interpret
+     * the CSS associated with the element to render it.
+     * `@font-family` needs to be explicitly described in the element's css.
+     * This will only generate an image, so animations will not work.
+     * @param {String} name identifier it will have in the shaders
+     * @param {HTMLElement} element element loaded in the DOM or dynamically
+     * @param {GPUShaderStage} shaderType in what shader type it will exist only
+     * @returns {Object}
+     *
+     * @example
+     * // js
+     * const element = document.getElementById('my_element')
+     * await points.setTextureElement('image', element);
+     *
+     * // wgsl string
+     * let color = texture(image, imageSampler, in.uvr, true);
+     */
+    async setTextureElement(name, element, shaderType = null) {
+        const styles = getCSS(element);
+        const cssText = styles.map(style => style.cssText).join('\n');
+        const path = await elToImage(element, cssText);
+        return await this.setTextureImage(name, path, shaderType);
+    }
+
+    /**
      * Loads a text string as a texture.<br>
      * Using an Atlas or a Spritesheet with UTF-16 chars (`path`) it will create a new texture
      * that contains only the `text` characters.<br>
@@ -758,7 +873,7 @@ class Points {
      * );
      *
      * // wgsl string
-     * let textColors = texturePosition(textImg, imageSampler, position, in.uvr, true);
+     * let textColors = texture(textImg, imageSampler, in.uvr, true);
      *
      */
     async setTextureString(name, text, path, size, offset = 0, shaderType = null) {
@@ -902,6 +1017,11 @@ class Points {
         audio.volume = volume;
         audio.autoplay = autoplay;
         audio.loop = loop;
+        const { signal } = this.#abortController;
+        const listenerOptions = {
+            signal,
+            capture: false
+        }
         const sound = {
             name: name,
             path: path,
@@ -914,8 +1034,8 @@ class Points {
         const audioContext = new AudioContext();
         const resume = _ => { audioContext.resume() }
         if (audioContext.state === 'suspended') {
-            document.body.addEventListener('touchend', resume, false);
-            document.body.addEventListener('click', resume, false);
+            document.body.addEventListener('touchend', resume, listenerOptions);
+            document.body.addEventListener('click', resume, listenerOptions);
         }
         const source = audioContext.createMediaElementSource(audio);
         // // audioContext.createMediaStreamSource()
@@ -1003,7 +1123,8 @@ class Points {
             texture: null,
             size: size,
             usesRenderPass,
-            internal: false
+            internal: false,
+            name: `${writeName}::${readName}`
         }
         this.#bindingTextures.push(bindingTexture);
         return bindingTexture;
@@ -1403,23 +1524,32 @@ class Points {
         // renderPass.hasComputeShader && (dynamicGroupBindingsCompute += this.#createDynamicGroupBindingsUpdate(GPUShaderStage.COMPUTE, renderPass, 2));
         // dynamicGroupBindingsFragment += this.#createDynamicGroupBindingsUpdate(GPUShaderStage.FRAGMENT, renderPass, 2);
 
+        this.#imports.forEach(i => {
+            dynamicGroupBindingsVertex = i + dynamicGroupBindingsVertex;
+            dynamicGroupBindingsCompute = i + dynamicGroupBindingsCompute;
+            dynamicGroupBindingsFragment = i + dynamicGroupBindingsFragment;
+        })
 
         renderPass.hasVertexShader && (colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + defaultVertexBody + colorsVertWGSL);
         renderPass.hasComputeShader && (colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + colorsComputeWGSL);
         renderPass.hasFragmentShader && (colorsFragWGSL = dynamicGroupBindingsFragment + defaultStructs + colorsFragWGSL);
-        console.groupCollapsed(`Render Pass ${index}: (${renderPass.name})`);
-        console.groupCollapsed('VERTEX');
-        console.log(colorsVertWGSL);
-        console.groupEnd();
-        if (renderPass.hasComputeShader) {
-            console.groupCollapsed('COMPUTE');
-            console.log(colorsComputeWGSL);
+
+        if (this.#debug) {
+            console.groupCollapsed(`Render Pass ${index}: (${renderPass.name})`);
+            console.groupCollapsed('VERTEX');
+            console.log(colorsVertWGSL);
+            console.groupEnd();
+            if (renderPass.hasComputeShader) {
+                console.groupCollapsed('COMPUTE');
+                console.log(colorsComputeWGSL);
+                console.groupEnd();
+            }
+            console.groupCollapsed('FRAGMENT');
+            console.log(colorsFragWGSL);
+            console.groupEnd();
             console.groupEnd();
         }
-        console.groupCollapsed('FRAGMENT');
-        console.log(colorsFragWGSL);
-        console.groupEnd();
-        console.groupEnd();
+
         renderPass.hasVertexShader && (renderPass.compiledShaders.vertex = colorsVertWGSL);
         renderPass.hasComputeShader && (renderPass.compiledShaders.compute = colorsComputeWGSL);
         renderPass.hasFragmentShader && (renderPass.compiledShaders.fragment = colorsFragWGSL);
@@ -1462,8 +1592,6 @@ class Points {
             throw ' `setBindingTexture` requires at least one Compute Shader in a `RenderPass`'
         }
 
-        //
-        // let adapter = null;
         if (!this.#adapter) {
             try {
                 this.#adapter = await navigator.gpu.requestAdapter();
@@ -1477,7 +1605,7 @@ class Points {
             this.#device.label = (new Date()).getMilliseconds();
         }
 
-        console.log(this.#device.limits);
+        this.#debug && console.log(this.#device.limits);
 
         this.#device.lost.then(info => console.log(info));
         if (this.#canvas !== null) this.#context = this.#canvas.getContext('webgpu');
@@ -1506,6 +1634,8 @@ class Points {
         this.#createBuffers();
         this.#createPipeline();
 
+        this.#initialized = true;
+
         return true;
     }
 
@@ -1525,7 +1655,7 @@ class Points {
 
         if (requiredNotFound?.length) {
             const paramsRequired = requiredNotFound.join(', ');
-            console.warn(`addRenderPass: (${renderPass.name}) parameters required: ${paramsRequired}`);
+            this.#debug && console.warn(`addRenderPass: (${renderPass.name}) parameters required: ${paramsRequired}`);
         }
 
         this.#postRenderPasses.push(renderPass);
@@ -1718,10 +1848,12 @@ class Points {
             } else {
                 storageItem.buffer = this.#createBuffer(storageItem.structSize, usage);
             }
+            storageItem.buffer.label = storageItem.name;
         });
         //--------------------------------------------
         this.#readStorage.forEach(readStorageItem => {
             readStorageItem.buffer = this.#device.createBuffer({
+                label: readStorageItem.name,
                 size: readStorageItem.size,
                 usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
             });
@@ -2371,19 +2503,61 @@ class Points {
         }
     }
 
+    #animationFrame = async () => {
+        // the updateCallback might not exist yet, so even with a
+        // animationFrameId ready we have to stop it
+        if (!this.#updateCallback) {
+            cancelAnimationFrame(this.#animationFrameId);
+            return;
+        }
+
+        this.#updateCallback(this.#time, this.#delta);
+        await this.#frame();
+        this.#animationFrameId = requestAnimationFrame(this.#animationFrame);
+    }
+
+
+
     /**
      * Method executed on each {@link https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame | requestAnimationFrame}.
      * Here's where all the calls to update data will be executed.
+     * @param {function(time:Number, deltaTime:number)} updateCallback method called on each frame update.
+     * Here you will update uniforms, storage and general variables.
+     * You will also have the `time` and `deltaTime` values used inside the library
+     * to create animations. These are the same internal values in `params.time`
+     * and `params.deltaTime`.
      * @example
+     * points.setUniform('myvar', 3);
      * await points.init(renderPasses);
-     * update();
+     * points.update(update);
      *
-     * function update() {
-     *     points.update();
-     *     requestAnimationFrame(update);
+     * function update(time, timeDelta) {
+     *     // update uniforms and other animation variables
+     *     points.setUniform('myvar', 3); // already existing uniform to update
      * }
      */
-    async update() {
+    update(updateCallback) {
+        this.#updateCallback = updateCallback;
+        // if updateCallback is null the user removed it
+        if (!this.#updateCallback) {
+            cancelAnimationFrame(this.#animationFrameId);
+            return;
+        }
+        this.#animationFrameId = requestAnimationFrame(this.#animationFrame);
+    }
+
+    /**
+     * This is what is actually executed on each #animationFrame after the
+     * #updateCallback (user function) method
+     * Here are all the internal updates like uniforms and variables and actual
+     * execution of the pipeline and actual execution of the encoder.
+     */
+    async #frame() {
+        // if updateCallback is null the user removed it
+        if (!this.#updateCallback) {
+            cancelAnimationFrame(this.#animationFrameId);
+            return;
+        }
         if (!this.#canvas || !this.#device) return;
         //--------------------------------------------
         this.#delta = this.#clock.getDelta();
@@ -2392,12 +2566,6 @@ class Points {
         this.setUniform(UniformKeys.TIME, this.#time);
         this.setUniform(UniformKeys.DELTA, this.#delta);
         this.setUniform(UniformKeys.EPOCH, this.#epoch);
-        this.setUniform(UniformKeys.MOUSE_CLICK, this.#mouseClick);
-        this.setUniform(UniformKeys.MOUSE_DOWN, this.#mouseDown);
-        this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
-        this.setUniform(UniformKeys.SCREEN, [this.#canvas.width, this.#canvas.height]);
-        this.setUniform(UniformKeys.MOUSE, [this.#mouseX, this.#mouseY]);
-        this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta);
         //--------------------------------------------
         this.#writeParametersUniforms();
         this.#writeStorages();
@@ -2424,6 +2592,9 @@ class Points {
         const swapChainTexture = this.#context.getCurrentTexture();
 
         this.#renderPasses.forEach(renderPass => {
+            if (!renderPass.enabled) {
+                return; // continue
+            }
 
             const isSameDevice = this.#device === renderPass.device;
 
@@ -2586,7 +2757,11 @@ class Points {
         // reset mouse values because it doesn't happen by itself
         this.#mouseClick = false;
         this.#mouseWheel = false;
-        this.#mouseDelta = [0, 0];
+        this.#mouseDelta[0] = 0;
+        this.#mouseDelta[1] = 0;
+        this.setUniform(UniformKeys.MOUSE_CLICK, this.#mouseClick);
+        this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
+        this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta);
         await this.read();
     }
     async read() {
@@ -2608,6 +2783,24 @@ class Points {
     }
 
     /**
+     * Import and prepend a common string to all RenderPass shaders.
+     * If a list of common functions or structs needs to be appended to all
+     * RenderPass.
+     * @param {String} common string to prepend
+     *
+     * @example
+     * import { structs } from './structs.js';
+     * points.import(structs);
+     *
+     */
+    import(common) {
+        if (!this.#imports) {
+            throw `can't call import after init`;
+        }
+        this.#imports.push(common);
+    }
+
+    /**
      * Reference to the canvas assigned in the constructor
      * @type {HTMLCanvasElement}
      */
@@ -2624,11 +2817,22 @@ class Points {
     get context() {
         return this.#context;
     }
-    get buffer() {
-        return this.#buffer;
-    }
     get fullscreen() {
         return this.#fullscreen;
+    }
+
+    /**
+     * Gets the current time elapsed in milliseconds.
+     */
+    get time() {
+        return this.#time;
+    }
+
+    /**
+     * Get the time elapsed since the last frame was renderd, in milliseconds.
+     */
+    get deltaTime() {
+        return this.#delta;
     }
 
     /**
@@ -2697,18 +2901,199 @@ class Points {
         this.#presentationFormat = value;
     }
 
-    destroy() {
+    get debug() {
+        return this.#debug;
+    }
+    /**
+     * Shows or hides all the logs and warnings from the library.
+     * Meant to be set as false in production environment.
+     * By default is shows all the logs for development.
+     * @param {Boolean} val
+     * @default true
+     * @example
+     *
+     * points.debug = false;
+     */
+    set debug(val) {
+        this.#debug = val;
+    }
 
+    get scaleMode() {
+        return this.#scaleMode;
+    }
+
+    /**
+     * Select how the content should be displayed on different
+     * screen sizes.
+     * ```text
+     * FIT: Preserves both, but might show black bars or extend empty content. All content is visible.
+     * COVER: Preserves both, but might crop width or height. All screen is covered.
+     * WIDTH: Preserves the visibility of the width, but might crop the height.
+     * HEIGHT: Preserves the visibility of the height, but might crop the width.
+     * ```
+     * @param {ScaleMode|Number} val
+     * @default ScaleMode.HEIGHT
+     * @example
+     *
+     * points.scaleMode = ScaleMode.COVER;
+     */
+    set scaleMode(val) {
+        this.#scaleMode = +val;
+        this.#setRatio();
+    }
+
+    /**
+     * Reset memory before calling again `init()`, this without calling
+     * the constructor `new Points()`.
+     * Useful to switch to a new set of shaders and erase internal references,
+     * basically cleaning memory to start again. It also calls `.destroy()` on
+     * buffers and textures.
+     * A call to the constructor doesn't do this.
+     * If you are going to call `destroy()` afterwards, there's no need to call
+     * `reset()`.
+     * This keeps the Device and Adapter alive.
+     */
+    reset() {
+        cancelAnimationFrame(this.#animationFrameId);
+        this.#abortController.abort();
+        this.#fitWindow = false;
+
+        this.#events = new Map();
+        this.#textures2d?.forEach(t => t.texture.destroy());
+        this.#textures2d = [];
+
+        this.#texturesDepth2d?.forEach(t => t.texture.destroy());
+        this.#texturesDepth2d = [];
+
+        this.#textures2dArray?.forEach(t => t.texture.destroy());
+        this.#textures2dArray = [];
+
+        this.#texturesStorage2d?.forEach(t => t.texture.destroy());
+        this.#texturesStorage2d = [];
+
+        this.#bindingTextures?.forEach(t => t.texture.destroy());
+        this.#bindingTextures = []; // TODO: review why so many Texture Views
+
+        this.#renderPasses?.forEach(renderPass => {
+            renderPass.destroy();
+            renderPass = null;
+        })
+        this.#renderPasses = null;
+        this.#postRenderPasses?.forEach(renderPass => {
+            renderPass.destroy();
+            renderPass = null;
+        })
+        this.#postRenderPasses = [];
+
+        this.#storage?.forEach(s => s.buffer.destroy());
+        this.#storage = [];
+        this.#readStorage?.forEach(s => s.buffer.destroy());
+        this.#readStorage = [];
+        this.#uniforms?.buffer.destroy();
+        this.#meshUniforms?.buffer?.destroy();
+        this.#cameraUniforms?.buffer?.destroy();
+        this.#samplers?.forEach(s => null);
+        this.#samplers = [];
+
+        this.#layers?.forEach(l => l.buffer.destroy()); // TODO: review why buffer here
+        this.#layers?.buffer?.destroy();
+        this.#layers = new LayersArray();
+
+        this.#initialized = false;
         this.#uniforms = new UniformsArray();
         this.#meshUniforms = new UniformsArray();
         this.#cameraUniforms = new UniformsArray();
 
+        this.#texturesExternal?.forEach(textureExternal => {
+            const stream = textureExternal?.video.srcObject;
+            stream?.getTracks().forEach(track => track.stop());
+            textureExternal.texture = null;
+        })
+        this.#texturesExternal = [];
+
+        clearCache();
+        this.#constants = [];
+        this.#imports = [];
+        this.#clock = new Clock();
+
+        this.#baseInit();
+    }
+
+    /**
+     * Nuke everything from memory.
+     * Similar to reset, but it nullyfies everything to be garbage collected.
+     * Calls `.destroy()` on buffers, textures, the Device and Adapter.
+     * This would force a call to the constructor or to `reset()`.
+     * If you are going to call `reset()` afterwards, then
+     * there's no need to call `destroy()`.
+     */
+    destroy() {
+        cancelAnimationFrame(this.#animationFrameId);
+        this.#abortController.abort();
+
+        this.#events = null;
+        this.#textures2d.forEach(t => t.texture.destroy());
+        this.#textures2d = null;
+
+        this.#texturesDepth2d.forEach(t => t.texture.destroy());
+        this.#texturesDepth2d = null;
+
+        this.#textures2dArray.forEach(t => t.texture.destroy());
+        this.#textures2dArray = null;
+
+        this.#texturesStorage2d.forEach(t => t.texture.destroy());
+        this.#texturesStorage2d = null;
+
+        this.#bindingTextures.forEach(t => t.texture.destroy());
+        this.#bindingTextures = null; // TODO: review why so many Texture Views
+
+        this.#renderPasses.forEach(renderPass => {
+            renderPass.destroy();
+            renderPass = null;
+        })
+        this.#renderPasses = null;
+        this.#postRenderPasses.forEach(renderPass => {
+            renderPass.destroy();
+            renderPass = null;
+        })
+        this.#postRenderPasses = null;
+
+        this.#storage.forEach(s => s.buffer.destroy());
+        this.#storage = null;
+        this.#readStorage.forEach(s => s.buffer.destroy());
+        this.#readStorage = null;
+        this.#uniforms.buffer.destroy();
+        this.#meshUniforms?.buffer?.destroy();
+        this.#cameraUniforms?.buffer?.destroy();
+        this.#samplers.forEach(s => null);
+        this.#samplers = null;
+
+        this.#layers.forEach(l => l.buffer.destroy()); // TODO: review why buffer here
+        this.#layers?.buffer?.destroy();
+        this.#layers = null;
+
+        this.#initialized = null;
+        this.#uniforms = null;
+        this.#meshUniforms = null;
+        this.#cameraUniforms = null;
+
         this.#texturesExternal.forEach(textureExternal => {
             const stream = textureExternal?.video.srcObject;
             stream?.getTracks().forEach(track => track.stop());
+            textureExternal.texture = null;
         })
+        this.#texturesExternal = null;
+
+        clearCache();
+        this.#constants = null;
+        this.#imports = null;
+        this.#clock = null;
+
+        this.#device.destroy();
+        this.#device = null;
+        this.#adapter = null;
     }
 }
 
 export default Points;
-export { RenderPass, RenderPasses, PrimitiveTopology, CullMode, LoadOp, PresentationFormat, FrontFace };
+export { RenderPass, RenderPasses, PrimitiveTopology, CullMode, LoadOp, PresentationFormat, FrontFace, ScaleMode };

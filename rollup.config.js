@@ -9,6 +9,24 @@ export default [
     plugins: []
   },
   {
+    input: 'src/ScaleMode.js',
+    output: {
+      file: 'build/ScaleMode.js',
+      format: 'esm',
+      banner: '/* @ts-self-types="./ScaleMode.d.ts" */'
+    },
+    plugins: []
+  },
+  {
+    input: 'src/PresentationFormat.js',
+    output: {
+      file: 'build/PresentationFormat.js',
+      format: 'esm',
+      banner: '/* @ts-self-types="./PresentationFormat.d.ts" */'
+    },
+    plugins: []
+  },
+  {
     input: 'src/RenderPasses.js',
     output: {
       file: 'build/RenderPasses.js',

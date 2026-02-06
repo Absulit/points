@@ -1,15 +1,12 @@
 import { fnusin } from 'points/animation';
 import { RED } from 'points/color';
-import { structs } from './../structs.js';
 
 const frag = /*wgsl*/`
 
-${structs}
 ${fnusin}
 ${RED}
 
 const shadowDepthTextureSize = 1024.;
-
 
 /**
  * VertexIn

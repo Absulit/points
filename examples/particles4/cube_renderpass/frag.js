@@ -1,8 +1,4 @@
-import { structs } from '../structs.js';
-
 const frag = /*wgsl*/`
-
-${structs}
 
 @fragment
 fn main(

@@ -2,6 +2,7 @@
 import Points, { FrontFace, RenderPass, RenderPasses } from 'points';
 import { mesh_renderpass } from './mesh_renderpass/index.js';
 import { loadAndExtract } from 'utils';
+import { structs } from './structs.js';
 
 const options = {
     mode: 1
@@ -23,6 +24,8 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+        points.import(structs);
+
         await points.setTextureImage('albedo', texture);
         points.setSampler('imageSampler', null);
 

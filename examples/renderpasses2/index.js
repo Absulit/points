@@ -3,6 +3,9 @@ import frag1 from './renderpass1/frag.js';
 
 import { RenderPass, RenderPasses } from 'points';
 
+const options = {
+}
+
 const renderpasses1 = {
     /**
      * Render Passes expect to have an order
@@ -19,11 +22,35 @@ const renderpasses1 = {
         // RenderPasses.BLUR,
         // RenderPasses.WAVES,
     ],
-    init: async points => {
+    init: async (points, folder) => {
         points.setSampler('imageSampler', null);
         // await points.setTextureImage('image', './../img/carmen_lyra_423x643.jpg');
         // await points.setTextureImage('image', './../img/old_king_600x600.jpg');
         await points.setTextureImage('image', './../img/absulit_800x800.jpg');
+
+        const passesUsed = [
+            RenderPasses.GRAYSCALE,
+            RenderPasses.CHROMATIC_ABERRATION,
+            RenderPasses.COLOR,
+            RenderPasses.PIXELATE,
+            RenderPasses.LENS_DISTORTION,
+            RenderPasses.FILM_GRAIN,
+            RenderPasses.BLOOM,
+            RenderPasses.BLUR,
+            RenderPasses.WAVES,
+        ]
+
+        passesUsed.forEach(pass => {
+            options[pass.name] = true;
+            folder.add(options, pass.name)
+                .name(pass.name)
+                .onChange(value => {
+                    pass.enabled = value;
+                });
+        })
+
+        folder.open();
+
 
         points.addRenderPass(RenderPasses.GRAYSCALE);
         points.addRenderPass(RenderPasses.CHROMATIC_ABERRATION, { distance: .02 });

@@ -9,6 +9,7 @@ import frag from './r0/frag.js';
 import vert1 from './r1/vert.js';
 import frag1 from './r1/frag.js';
 import Points, { CullMode, RenderPass } from 'points';
+import { structs } from './structs.js';
 
 const options = {
     ambientFactor: 0.2,
@@ -54,8 +55,6 @@ r1.cullMode = CullMode.NONE;
 r1.addSphere('sphere1', spherePosition, sphereColor);
 r1.addPlane('plane1', planePosition, planeDimensions, planeColor, planeSegments);
 
-let t = 0;
-
 const base = {
     renderPasses: [
         r0,
@@ -65,6 +64,8 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+        points.import(structs);
+
         const descriptor = {
             addressModeU: 'clamp-to-edge',
             addressModeV: 'clamp-to-edge',
@@ -99,18 +100,17 @@ const base = {
     /**
      * @param {Points} points
      */
-    update: points => {
+    update: (points, t, dt) => {
+        // const { time: t, timeDelta: td } = points;
         const { left, right, top, bottom, near, far, position, lookAt } = light;
         const p = position;
-        p[0] = -Math.sin(t * .01) * .5 + position[0]
+        p[0] = -Math.sin(t) * .5 + position[0]
         points.setCameraOrthographic('light', left, right, top, bottom, near, far, position, lookAt);
         points.setCameraPerspective('camera', camera.position, camera.lookAt);
 
         points.setUniform('ambientFactor', options.ambientFactor);
         points.setUniform('albedoFactor', options.albedoFactor);
         points.setUniform('lambertMax', options.lambertMax);
-
-        t++;
     }
 }
 

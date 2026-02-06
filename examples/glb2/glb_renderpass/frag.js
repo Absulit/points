@@ -1,11 +1,8 @@
 import { fnusin } from 'points/animation';
-import { structs } from '../structs.js';
 
 const frag = /*wgsl*/`
 
-${structs}
 ${fnusin}
-
 
 @fragment
 fn main(in: FragmentIn) -> @location(0) vec4f {

@@ -3,6 +3,7 @@ import compute from './compute.js';
 import frag from './frag.js';
 import Points, { RenderPass } from 'points';
 import { loadAndExtract, isMobile } from 'utils';
+import { structs } from './structs.js';
 
 const options = {
     visibility: true,
@@ -64,6 +65,8 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+        points.import(structs);
+
         points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
         points.setConstant('WORKGROUP_X', WORKGROUP_X, 'u32');
         points.setConstant('WORKGROUP_Y', WORKGROUP_Y, 'u32');

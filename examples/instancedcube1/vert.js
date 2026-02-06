@@ -1,8 +1,4 @@
-import { structs } from './structs.js';
-
 const vert = /*wgsl*/`
-
-${structs}
 
 fn rotateX(p:vec3<f32>, rads:f32 ) -> vec3<f32> {
     let s = sin(rads);
@@ -45,7 +41,9 @@ fn main(in: VertexIn) -> FragmentIn {
     let world = scaled + pt;
 
     // Project to clip space (assuming orthographic projection)
-    let clip = vec4f(world, 1.0);
+    // let clip = vec4f(world, 1.0);
+    let clip = camera.camera_projection * camera.camera_view * vec4f(world, 1.);
+
 
     return defaultVertexBody(clip, particle.color, in.uv, in.normal);
 }

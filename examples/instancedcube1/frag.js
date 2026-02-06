@@ -5,10 +5,8 @@ import { texturePosition } from 'points/image';
 import { brightness } from 'points/color';
 import { sdfCircle } from 'points/sdf';
 import { RED } from 'points/color';
-import { structs } from './structs.js';
 const frag = /*wgsl*/`
 
-${structs}
 ${fnusin}
 ${snoise}
 ${texturePosition}
@@ -21,7 +19,7 @@ const CENTER = vec2(.5);
 
 @fragment
 fn main(in: FragmentIn) -> @location(0) vec4f {
-    let c = sdfCircle(CENTER, .4, .1, in.uvr);
+    let c = sdfCircle(CENTER, .4, .1, in.uv);
 
     return vec4(in.uv * c, c, c);
 }

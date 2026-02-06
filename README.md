@@ -130,12 +130,11 @@ You can code freely without the use of any of the provided [support modules (mat
 
         // call the POINTS init method and then the update method
         await points.init([renderPass]);
-        update();
-
         // call `points.update()` methods to render a new frame
+        points.update(update)
+
         function update() {
-            points.update();
-            requestAnimationFrame(update);
+            // update uniforms, etc
         }
     </script>
 
@@ -172,6 +171,7 @@ You can code freely without the use of any of the provided [support modules (mat
     - [Face Direction - FrontFace](docs/renderpass.md#face-direction---frontface)
 - [Using the examples for a custom project](docs/create_your_custom_shader_project.md)
 - Data Input and Output
+    - [Debug (errors, warnings and logs)](docs/debug.md)
     - [Default data available to read](docs/default_data_to_read.md)
         - [Params Uniform](docs/default_data_to_read.md#params-uniform)
         - [Parameters in vert.js that go to frag.js](docs/default_data_to_read.md#parameters-in-vertjs-that-go-to-fragjs)
@@ -182,6 +182,8 @@ You can code freely without the use of any of the provided [support modules (mat
         - [Sampler - setSampler](docs/send_data_into_the_shaders.md#sampler---setsampler)
         - [Texture - setTexture2d](docs/send_data_into_the_shaders.md#texture---settexture2d)
         - [Texture Image - setTextureImage](docs/send_data_into_the_shaders.md#textureimage---settextureimage)
+        - [Texture Image - setTextureElement](docs/send_data_into_the_shaders.md#textureimage---settextureelement)
+        - [Texture Image - setTextureString](docs/send_data_into_the_shaders.md#textureimage---settexturestring)
         - [Texture 2d Array - setTextureImageArray](docs/send_data_into_the_shaders.md#texture2darray---settextureimagearray)
         - [Storage - setStorage](docs/send_data_into_the_shaders.md#storage---setstorage)
         - [Storage Map - setStorageMap](docs/send_data_into_the_shaders.md#storagemap---setstoragemap)
@@ -199,7 +201,11 @@ You can code freely without the use of any of the provided [support modules (mat
 - [UV Coordinates and Textures Considerations](docs/uv_coordinates_and_textures_considerations.md)
 - [Support Modules](docs/support_modules.md)
     - [How to use them](docs/support_modules.md#how-to-use-them)
+    - [Import code to all RenderPass shaders - Points.import()](docs/support_modules.md#import-code-to-all-renderpass-shaders-pointsimport)
 - [RenderPasses for Post Processing](docs/render_passes_and_post_processing.md)
+- [Memory Management](docs/memory_management.md)
+    - [Switch to a new set of RenderPass - Points.reset()](docs/memory_management.md#switch-to-a-new-set-of-renderpass---pointsreset)
+    - [Remove Points instance - Points.destroy()](docs/memory_management.md#remove-points-instance---pointsdestroy)
 - [Legacy folder (original project)](docs/legacy_folder.md)
 
 # Collaborators
