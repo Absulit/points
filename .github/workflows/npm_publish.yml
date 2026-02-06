@@ -10,23 +10,21 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write # Required for OIDC/Provenance
+      id-token: write 
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '24' # 2026 LTS - ensures npm v11+
-          registry-url: 'https://registry.npmjs.org'
+          node-version: '24' # 2026 LTS
+          # Remove registry-url here if you use publishConfig in package.json
+          # to prevent it from creating a conflicting .npmrc
 
-      # No 'npm install -g npm@latest' needed if using Node 24
-
-      - name: Install dependencies
-        run: npm ci
+      - run: npm ci
 
       - name: Publish to npm
-        # No secrets.NPM_TOKEN needed if Trusted Publishing is set up on npmjs.com
         run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ""
