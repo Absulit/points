@@ -1,5 +1,4 @@
 # .github/workflows/npm_publish.yml
-
 name: Publish to npmjs.com
 
 on:
@@ -11,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write
+      id-token: write # Required for OIDC/Provenance
 
     steps:
       - name: Checkout code
@@ -20,12 +19,14 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: '24' # 2026 LTS - ensures npm v11+
           registry-url: 'https://registry.npmjs.org'
 
-      - run: npm install -g npm@latest
-      
+      # No 'npm install -g npm@latest' needed if using Node 24
+
+      - name: Install dependencies
+        run: npm ci
+
       - name: Publish to npm
-        # No NODE_AUTH_TOKEN needed if Trusted Publishing is active!
+        # No secrets.NPM_TOKEN needed if Trusted Publishing is set up on npmjs.com
         run: npm publish --provenance --access public
-   
