@@ -3,7 +3,8 @@
   "version": "0.7.0",
   "type": "module",
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "description": "A Generative Art library made in WebGPU",
   "main": "build/points.min.js",
