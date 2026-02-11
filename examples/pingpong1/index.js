@@ -2,9 +2,10 @@ import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
 import Points, { ScaleMode } from 'points';
+import { structs } from './structs.js';
 
 const options = {
-    val: 0,
+    speed: 1,
 }
 
 const base = {
@@ -16,10 +17,14 @@ const base = {
      */
     init: async (points, folder) => {
         points.scaleMode = ScaleMode.FIT;
+        points.import(structs);
 
-        points.setUniform('val', options.val);
+        points.setStorage('inputColor', 'vec4f');
+        points.setStorage('outputColor', 'vec4f');
 
-        folder.add(options, 'val', -1, 1, .0001).name('Val');
+
+        points.setUniform('speed', options.speed);
+        folder.add(options, 'speed', -1, 1, .0001).name('speed');
 
         folder.open();
     },
@@ -27,7 +32,7 @@ const base = {
      * @param {Points} points
      */
     update: points => {
-        points.setUniform('val', options.val);
+        points.setUniform('speed', options.speed);
     }
 }
 
