@@ -125,6 +125,20 @@ class RenderPass {
      * @type {GPUBindGroup}
      */
     #vertexBindGroup = null;
+
+    /**
+     * @type {GPUBindGroup}
+     */
+    #computeBindGroupSwap = null;
+    /**
+     * @type {GPUBindGroup}
+     */
+    #fragmentBindGroupSwap = null;
+    /**
+     * @type {GPUBindGroup}
+     */
+    #vertexBindGroupSwap = null;
+
     /**
      * @type {GPUBindGroupLayout}
      */
@@ -311,6 +325,30 @@ class RenderPass {
 
     get vertexBindGroup() {
         return this.#vertexBindGroup;
+    }
+
+    set computeBindGroupSwap(value) {
+        this.#computeBindGroupSwap = value;
+    }
+
+    get computeBindGroupSwap() {
+        return this.#computeBindGroupSwap;
+    }
+
+    set fragmentBindGroupSwap(value) {
+        this.#fragmentBindGroupSwap = value;
+    }
+
+    get fragmentBindGroupSwap() {
+        return this.#fragmentBindGroupSwap;
+    }
+
+    set vertexBindGroupSwap(value) {
+        this.#vertexBindGroupSwap = value;
+    }
+
+    get vertexBindGroupSwap() {
+        return this.#vertexBindGroupSwap;
     }
 
     set bindGroupLayoutFragment(value) {

@@ -19,8 +19,8 @@ const base = {
         points.scaleMode = ScaleMode.FIT;
         points.import(structs);
 
-        // points.setStorage('inputColor', 'vec4f');
-        // points.setStorage('outputColor', 'vec4f');
+        // points.setStorage('colorInput', 'vec4f');
+        // points.setStorage('colorOutput', 'vec4f');
         points.setStorageSwap('color', 'vec4f');
 
 

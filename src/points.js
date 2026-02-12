@@ -102,6 +102,7 @@ class Points {
     #abortController = null;
     #canvasWidth = null;
     #canvasHeight = null;
+    #pingPongEnabled = false;
 
 
     /**
@@ -485,16 +486,23 @@ class Points {
         return storage;
     }
 
-    setStorageSwap(name, structName, read, shaderType = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE, arrayData = null){
+    setStorageSwap(name, structName, read, shaderType = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE, arrayData = null) {
         const nameInput = `${name}Input`;
         const nameOutput = `${name}Output`;
 
         const storageInput = this.setStorage(nameInput, structName, read, shaderType, arrayData);
         const storageOutput = this.setStorage(nameOutput, structName, read, shaderType, arrayData);
 
-        storageInput.isPingPong = true;
-        storageOutput.isPingPong = true;
+        storageInput.pingPong = {
+            swapTo: storageOutput,
+        };
+        storageInput.indexUpdated = false;
+        storageOutput.pingPong = {
+            swapTo: storageInput,
+        };
+        storageOutput.indexUpdated = false;
 
+        this.#pingPongEnabled = true;
     }
 
     /**
@@ -1586,7 +1594,7 @@ class Points {
     #generateDataSize = () => {
         const allShaders = this.#renderPasses.map(renderPass => {
             const { vertex, compute, fragment } = renderPass.compiledShaders;
-            return vertex + compute + fragment;;
+            return vertex + compute + fragment;
         }).join('\n');
         this.#dataSize = dataSize(allShaders);
         // since uniforms are in a sigle struct
@@ -2197,21 +2205,32 @@ class Points {
                 let type = getStorageAccessMode(shaderStage, storageItem.shaderStage);
                 type = entriesModes[type];
 
-                entries.push(
-                    {
-                        binding: bindingIndex++,
-                        resource: {
-                            label: 'storage',
-                            buffer: storageItem.buffer
-                        },
-                        buffer: {
-                            type
-                        },
-                        // visibility
-                    }
-                );
+                const entry = {
+                    binding: bindingIndex++,
+                    resource: {
+                        label: 'storage',
+                        buffer: storageItem.buffer
+                    },
+                    buffer: {
+                        type
+                    },
+                    // visibility
+                }
+                this.#pingPongEnabled && (storageItem.entry = entry);
+                entries.push(entry);
             }
         });
+        if (this.#pingPongEnabled) {
+            this.#storage.forEach(storageItem => {
+                if (storageItem.pingPong && !storageItem.indexUpdated && !storageItem.pingPong.swapTo.indexUpdated) {
+                    [storageItem.pingPong.swapTo.entry.binding, storageItem.entry.binding] =
+                        [storageItem.entry.binding, storageItem.pingPong.swapTo.entry.binding];
+                    storageItem.indexUpdated = true;
+                }
+            })
+            this.#storage.forEach(storageItem => storageItem.indexUpdated = false); // TODO remove this for something better
+        }
+        //--
         if (this.#layers.length) {
             if (!this.#layers.shaderStage || this.#layers.shaderStage & shaderStage) {
                 entries.push(
@@ -2392,7 +2411,8 @@ class Points {
             }
         });
 
-        entries.forEach(entry => entry.visibility = shaderStage);
+        entries.forEach(entry => entry.visibility = shaderType);
+        // console.log(entries);debugger
 
         return entries;
     }
@@ -2433,7 +2453,11 @@ class Points {
         const hasVertexShader = (shaderStage === GPUShaderStage.VERTEX) && renderPass.hasVertexShader;
         const hasFragmentShader = (shaderStage === GPUShaderStage.FRAGMENT) && renderPass.hasFragmentShader;
 
-        const entries = this.#createEntries(shaderStage, renderPass);
+        const entries = this.#createEntries(shaderType, renderPass);
+        let entriesSwap = null;
+        if(this.#pingPongEnabled){
+            entriesSwap = this.#createEntries(shaderType, renderPass);
+        }
 
         if (entries.length) {
             const bindGroupLayout = this.#device.createBindGroupLayout({ entries });
@@ -2443,17 +2467,29 @@ class Points {
                 entries
             });
 
+            let bindGroupSwap = null;
+            if(entriesSwap){
+                bindGroupSwap = this.#device.createBindGroup({
+                    label: `_createBindGroup a ${shaderType} - ${renderPass.name}`,
+                    layout: bindGroupLayout,
+                    entries: entriesSwap
+                });
+            }
+
             if (hasComputeShader) {
                 renderPass.bindGroupLayoutCompute = bindGroupLayout;
-                renderPass.computeBindGroup = bindGroup
+                renderPass.computeBindGroup = bindGroup;
+                renderPass.computeBindGroupSwap = bindGroupSwap;
             }
             if (hasVertexShader) {
                 renderPass.bindGroupLayoutVertex = bindGroupLayout;
-                renderPass.vertexBindGroup = bindGroup
+                renderPass.vertexBindGroup = bindGroup;
+                renderPass.vertexBindGroupSwap = bindGroupSwap;
             }
             if (hasFragmentShader) {
                 renderPass.bindGroupLayoutFragment = bindGroupLayout;
-                renderPass.fragmentBindGroup = bindGroup
+                renderPass.fragmentBindGroup = bindGroup;
+                renderPass.fragmentBindGroupSwap = bindGroupSwap;
             }
 
             // const entriesUpdate = this.#createEntriesUpdate(shaderStage, renderPass);
@@ -3097,6 +3133,8 @@ class Points {
         this.#constants = new Constants();
         this.#imports = [];
         this.#clock = new Clock();
+
+        this.#pingPongEnabled = false;
 
         this.#baseInit();
     }
