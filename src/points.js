@@ -485,6 +485,18 @@ class Points {
         return storage;
     }
 
+    setStorageSwap(name, structName, read, shaderType = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE, arrayData = null){
+        const nameInput = `${name}Input`;
+        const nameOutput = `${name}Output`;
+
+        const storageInput = this.setStorage(nameInput, structName, read, shaderType, arrayData);
+        const storageOutput = this.setStorage(nameOutput, structName, read, shaderType, arrayData);
+
+        storageInput.isPingPong = true;
+        storageOutput.isPingPong = true;
+
+    }
+
     /**
      * @deprecated Since v0.8.0 use {@link setStorage}
      * Creates a persistent memory buffer across every frame call that can be updated.

@@ -8,7 +8,7 @@ const compute = /*wgsl*/`
 @compute @workgroup_size(8,8,1)
 fn main(in: ComputeIn) {
 
-    let lastColor = inputColor;
+    let lastColor = colorInput;
 
     var nextColor:vec4f;
     nextColor.r = fract(lastColor.r + 0.005);
@@ -16,7 +16,7 @@ fn main(in: ComputeIn) {
     nextColor.b = fract(lastColor.b + 0.01);
     nextColor.a = 1.0;
 
-    outputColor = nextColor;
+    colorOutput = nextColor;
 }
 `;
 

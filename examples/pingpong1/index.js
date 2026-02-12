@@ -19,12 +19,15 @@ const base = {
         points.scaleMode = ScaleMode.FIT;
         points.import(structs);
 
-        points.setStorage('inputColor', 'vec4f');
-        points.setStorage('outputColor', 'vec4f');
+        // points.setStorage('inputColor', 'vec4f');
+        // points.setStorage('outputColor', 'vec4f');
+        points.setStorageSwap('color', 'vec4f');
 
 
         points.setUniform('speed', options.speed);
         folder.add(options, 'speed', -1, 1, .0001).name('speed');
+
+        // points.swap('inputColor', 'outputColor')
 
         folder.open();
     },
