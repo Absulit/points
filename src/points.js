@@ -1370,11 +1370,7 @@ class Points {
                 // and storageItem.shaderStage is the stage required by the buffer in setStorage
 
                 let accessMode = getStorageAccessMode(shaderType, storageItem.shaderType);
-                console.log(accessMode);
-
                 accessMode = bindingModes[accessMode];
-                console.log(storageItem.shaderType, storageItem.name, accessMode);
-
 
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, ${accessMode}> ${storageItem.name}: ${T};\n`
                 bindingIndex += 1;
