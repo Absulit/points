@@ -17,6 +17,9 @@ fn main(in: ComputeIn) {
     nextColor.a = 1.0;
 
     colorOutput = nextColor;
+
+    event_data[0] = nextColor.r;
+    event.updated = 1;
 }
 `;
 

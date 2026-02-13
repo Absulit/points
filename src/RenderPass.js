@@ -208,6 +208,7 @@ class RenderPass {
     }
 
     #bundle = null;
+    #bundleSwap = null;
     #device = null;
 
     #enabled = true;
@@ -645,6 +646,18 @@ class RenderPass {
      */
     set bundle(val) {
         this.#bundle = val;
+    }
+
+    get bundleSwap() {
+        return this.#bundleSwap;
+    }
+
+    /**
+     * Render Bundle for performance
+     * @param {GPURenderBundle} val
+     */
+    set bundleSwap(val) {
+        this.#bundleSwap = val;
     }
 
     get device() {

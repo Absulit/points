@@ -27,7 +27,10 @@ const base = {
         points.setUniform('speed', options.speed);
         folder.add(options, 'speed', -1, 1, .0001).name('speed');
 
-        // points.swap('inputColor', 'outputColor')
+        points.addEventListener('event', data => {
+            console.log(data[0]);
+
+        },4)
 
         folder.open();
     },
@@ -36,6 +39,7 @@ const base = {
      */
     update: points => {
         points.setUniform('speed', options.speed);
+        points.swap()
     }
 }
 

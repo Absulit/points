@@ -103,6 +103,7 @@ class Points {
     #canvasWidth = null;
     #canvasHeight = null;
     #pingPongEnabled = false;
+    #isPingPongRequested = false;
 
 
     /**
@@ -490,8 +491,8 @@ class Points {
         const nameInput = `${name}Input`;
         const nameOutput = `${name}Output`;
 
-        const storageInput = this.setStorage(nameInput, structName, read, shaderType, arrayData);
-        const storageOutput = this.setStorage(nameOutput, structName, read, shaderType, arrayData);
+        const storageInput = this.setStorage(nameInput, structName, true, shaderType, arrayData);
+        const storageOutput = this.setStorage(nameOutput, structName, false, shaderType, arrayData);
 
         storageInput.pingPong = {
             swapTo: storageOutput,
@@ -1368,8 +1369,12 @@ class Points {
                 // shaderStage means: this is the current GPUShaderStage we are at
                 // and storageItem.shaderStage is the stage required by the buffer in setStorage
 
-                let accessMode = getStorageAccessMode(shaderStage, storageItem.shaderStage);
+                let accessMode = getStorageAccessMode(shaderType, storageItem.shaderType);
+                console.log(accessMode);
+
                 accessMode = bindingModes[accessMode];
+                console.log(storageItem.shaderType, storageItem.name, accessMode);
+
 
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, ${accessMode}> ${storageItem.name}: ${T};\n`
                 bindingIndex += 1;
@@ -2448,16 +2453,19 @@ class Points {
      * @param {RenderPass} renderPass
      * @param {GPUShaderStage} shaderStage
      */
-    #createBindGroup(renderPass, shaderStage) {
-        const hasComputeShader = (shaderStage === GPUShaderStage.COMPUTE) && renderPass.hasComputeShader;
-        const hasVertexShader = (shaderStage === GPUShaderStage.VERTEX) && renderPass.hasVertexShader;
-        const hasFragmentShader = (shaderStage === GPUShaderStage.FRAGMENT) && renderPass.hasFragmentShader;
+    // maybe pass a SWAP param, and if entries has a pingpong then swap
+    // or if it has SWAP/Pingpong param then create two entries
+    #createBindGroup(renderPass, shaderType) {
+        const hasComputeShader = (shaderType === GPUShaderStage.COMPUTE) && renderPass.hasComputeShader;
+        const hasVertexShader = (shaderType === GPUShaderStage.VERTEX) && renderPass.hasVertexShader;
+        const hasFragmentShader = (shaderType === GPUShaderStage.FRAGMENT) && renderPass.hasFragmentShader;
 
         const entries = this.#createEntries(shaderType, renderPass);
         let entriesSwap = null;
-        if(this.#pingPongEnabled){
+        if (this.#pingPongEnabled) {
             entriesSwap = this.#createEntries(shaderType, renderPass);
         }
+        console.log(entriesSwap);
 
         if (entries.length) {
             const bindGroupLayout = this.#device.createBindGroupLayout({ entries });
@@ -2468,7 +2476,7 @@ class Points {
             });
 
             let bindGroupSwap = null;
-            if(entriesSwap){
+            if (entriesSwap) {
                 bindGroupSwap = this.#device.createBindGroup({
                     label: `_createBindGroup a ${shaderType} - ${renderPass.name}`,
                     layout: bindGroupLayout,
@@ -2520,7 +2528,11 @@ class Points {
         const hasVertexShader = (shaderStage === GPUShaderStage.VERTEX) && renderPass.hasVertexShader;
         const hasFragmentShader = (shaderStage === GPUShaderStage.FRAGMENT) && renderPass.hasFragmentShader;
 
-        const entries = this.#createEntries(shaderStage, renderPass);
+        const entries = this.#createEntries(shaderType, renderPass);
+        let entriesSwap = null;
+        if (this.#pingPongEnabled) {
+            entriesSwap = this.#createEntries(shaderType, renderPass);
+        }
 
         if (entries.length) {
             let bindGroupLayout = null;
@@ -2541,14 +2553,27 @@ class Points {
                 entries
             });
 
+            let bindGroupSwap = null;
+            if (entriesSwap) {
+                bindGroupSwap = this.#device.createBindGroup({
+                    label: `_createBindGroup a ${shaderType} - ${renderPass.name}`,
+                    layout: bindGroupLayout,
+                    entries: entriesSwap
+                });
+            }
+
+
             if (hasComputeShader) {
-                renderPass.computeBindGroup = bindGroup
+                renderPass.computeBindGroup = bindGroup;
+                renderPass.computeBindGroupSwap = bindGroupSwap;
             }
             if (hasVertexShader) {
-                renderPass.vertexBindGroup = bindGroup
+                renderPass.vertexBindGroup = bindGroup;
+                renderPass.vertexBindGroupSwap = bindGroupSwap;
             }
             if (hasFragmentShader) {
-                renderPass.fragmentBindGroup = bindGroup
+                renderPass.fragmentBindGroup = bindGroup;
+                renderPass.fragmentBindGroupSwap = bindGroupSwap;
             }
 
 
@@ -2689,12 +2714,17 @@ class Points {
 
                     /** @type {GPURenderBundleEncoder} */
                     const bundleEncoder = this.#device.createRenderBundleEncoder(bundleEncoderDescriptor);
+                    const bundleEncoderSwap = this.#device.createRenderBundleEncoder(bundleEncoderDescriptor);
 
                     bundleEncoder.setPipeline(renderPass.renderPipeline);
+                    bundleEncoderSwap.setPipeline(renderPass.renderPipeline);
 
                     if (this.#uniforms.list.length) {
                         bundleEncoder.setBindGroup(0, renderPass.vertexBindGroup);
                         bundleEncoder.setBindGroup(1, renderPass.fragmentBindGroup);
+
+                        bundleEncoderSwap.setBindGroup(0, renderPass.vertexBindGroupSwap);
+                        bundleEncoderSwap.setBindGroup(1, renderPass.fragmentBindGroupSwap);
                     }
 
                     // IF renderPass.meshUpdated
@@ -2703,7 +2733,9 @@ class Points {
                     renderPass.meshUpdated = false;
                     // END IF renderPass.meshUpdated
 
+                    console.log(renderPass.fragmentBindGroup === renderPass.fragmentBindGroupSwap);
                     bundleEncoder.setVertexBuffer(0, renderPass.vertexBuffer);
+                    bundleEncoderSwap.setVertexBuffer(0, renderPass.vertexBuffer);
 
                     // TODO: move this to renderPass because we can ask this just one time and have it as property
                     const isThereInstancing = renderPass.meshes.some(mesh => mesh.instanceCount > 1);
@@ -2711,14 +2743,29 @@ class Points {
                         let vertexOffset = 0;
                         renderPass.meshes.forEach(mesh => {
                             bundleEncoder.draw(mesh.verticesCount, mesh.instanceCount, vertexOffset, 0);
+                            bundleEncoderSwap.draw(mesh.verticesCount, mesh.instanceCount, vertexOffset, 0);
                             vertexOffset = mesh.verticesCount;
                         })
                     } else {
                         // no instancing, regular draw with all the meshes
                         bundleEncoder.draw(renderPass.vertexBufferInfo.vertexCount, 1);
+                        bundleEncoderSwap.draw(renderPass.vertexBufferInfo.vertexCount, 1);
                     }
                     renderPass.bundle = bundleEncoder.finish();
+                    renderPass.bundle.label = 1;
+                    renderPass.bundleSwap = bundleEncoderSwap.finish();
+                    renderPass.bundleSwap.label = 2;
                     renderPass.device = this.#device;
+                }
+
+                if (this.#isPingPongRequested) {
+                    // console.log(renderPass.bundle, renderPass.bundleSwap);
+                    [renderPass.bundle, renderPass.bundleSwap] = [renderPass.bundleSwap, renderPass.bundle];
+                    // [renderPass.computeBindGroup, renderPass.computeBindGroupSwap] = [renderPass.computeBindGroupSwap, renderPass.computeBindGroup];
+                    // [renderPass.vertexBindGroup, renderPass.vertexBindGroupSwap] = [renderPass.vertexBindGroupSwap, renderPass.vertexBindGroup];
+                    // [renderPass.fragmentBindGroup, renderPass.fragmentBindGroupSwap] = [renderPass.fragmentBindGroupSwap, renderPass.fragmentBindGroup];
+                    // console.log('swap');
+
                 }
 
                 const passEncoder = commandEncoder.beginRenderPass(renderPass.descriptor);
@@ -2762,6 +2809,11 @@ class Points {
                     this.#passBindGroup(renderPass, GPUShaderStage.COMPUTE);
                 }
 
+                if (this.#isPingPongRequested) {
+                    // console.log(renderPass.computeBindGroup, renderPass.computeBindGroupSwap);
+                    [renderPass.computeBindGroup, renderPass.computeBindGroupSwap] = [renderPass.computeBindGroupSwap, renderPass.computeBindGroup];
+                }
+
                 const passEncoder = commandEncoder.beginComputePass();
                 passEncoder.setPipeline(renderPass.computePipeline);
                 if (this.#uniforms.list.length) {
@@ -2777,6 +2829,7 @@ class Points {
         });
         this.#screenResized = false;
         this.#textureUpdated = false;
+        this.#isPingPongRequested = false;
 
 
         // let descriptor0 = null;
@@ -2875,6 +2928,11 @@ class Points {
             throw `can't call import after init`;
         }
         this.#imports.push(common);
+    }
+
+
+    swap() {
+        this.#isPingPongRequested = true;
     }
 
     /**
@@ -3135,6 +3193,7 @@ class Points {
         this.#clock = new Clock();
 
         this.#pingPongEnabled = false;
+        this.#isPingPongRequested = false;
 
         this.#baseInit();
     }
