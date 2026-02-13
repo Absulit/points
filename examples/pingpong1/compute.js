@@ -5,20 +5,14 @@ const compute = /*wgsl*/`
 // @builtin(global_invocation_id) GID: vec3u,
 // @builtin(workgroup_id)  in.WID: vec3u,
 // @builtin(local_invocation_id) LID: vec3u
-@compute @workgroup_size(8,8,1)
+@compute @workgroup_size(64)
 fn main(in: ComputeIn) {
 
-    let lastColor = colorInput;
+    let i = in.GID.x;
+    // Simple operation: copy + scale
+    bufferOutput[i] = bufferInput[i] + .5;
 
-    var nextColor:vec4f;
-    nextColor.r = fract(lastColor.r + 0.005);
-    nextColor.g = fract(lastColor.g + 0.007);
-    nextColor.b = fract(lastColor.b + 0.01);
-    nextColor.a = 1.0;
-
-    colorOutput = nextColor;
-
-    event_data[0] = nextColor.r;
+    event_data[0] = bufferInput[i];
     event.updated = 1;
 }
 `;
