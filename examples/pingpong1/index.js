@@ -1,17 +1,19 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
-import Points, { ScaleMode } from 'points';
+import Points, { RenderPass, ScaleMode } from 'points';
 import { structs } from './structs.js';
 
 const options = {
     speed: 1,
 }
 
+const r0 = new RenderPass(vert, frag, compute, 1, 1, 1);
+
 const base = {
-    vert,
-    compute,
-    frag,
+    renderPasses: [
+        r0
+    ],
     /**
      * @param {Points} points
      */
@@ -30,7 +32,7 @@ const base = {
         points.addEventListener('event', data => {
             console.log(data[0]);
 
-        },4)
+        }, 4)
 
         folder.open();
     },
