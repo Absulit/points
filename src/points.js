@@ -492,7 +492,7 @@ class Points {
         const nameOutput = `${name}Output`;
 
         const storageInput = this.setStorage(nameInput, structName, true, shaderType, arrayData);
-        const storageOutput = this.setStorage(nameOutput, structName, false, shaderType, arrayData);
+        const storageOutput = this.setStorage(nameOutput, structName, true, shaderType, arrayData);
 
         storageInput.pingPong = {
             swapTo: storageOutput,
