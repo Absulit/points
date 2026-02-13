@@ -23,7 +23,7 @@ const base = {
 
         // points.setStorage('colorInput', 'vec4f');
         // points.setStorage('colorOutput', 'vec4f');
-        points.setStorageSwap('color', 'vec4f');
+        points.setStorageSwap('buffer', 'array<f32, 64>');
 
 
         points.setUniform('speed', options.speed);
