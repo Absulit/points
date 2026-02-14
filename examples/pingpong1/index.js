@@ -10,6 +10,8 @@ const options = {
 
 const r0 = new RenderPass(vert, frag, compute, 1, 1, 1);
 
+let bufferIndex = 0;
+
 const base = {
     renderPasses: [
         r0
@@ -24,6 +26,9 @@ const base = {
         // points.setStorage('colorInput', 'vec4f');
         // points.setStorage('colorOutput', 'vec4f');
         points.setStorageSwap('buffer', 'array<f32, 64>');
+
+        // points.setStorage('buffer', 'array<f32, 2>');
+        // points.setUniform('bufferIndex', bufferIndex, 'u32');
 
 
         points.setUniform('speed', options.speed);
@@ -41,7 +46,8 @@ const base = {
      */
     update: points => {
         points.setUniform('speed', options.speed);
-        points.swap()
+        bufferIndex = bufferIndex++ % 2;
+        points.setUniform('bufferIndex', bufferIndex);
     }
 }
 

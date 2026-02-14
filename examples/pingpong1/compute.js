@@ -12,7 +12,12 @@ fn main(in: ComputeIn) {
     // Simple operation: copy + scale
     bufferOutput[i] = bufferInput[i] + .5;
 
+    // let indexNext = (params.bufferIndex + 1) % 2;
+    // buffer[indexNext] = buffer[params.bufferIndex];
+    // buffer[params.bufferIndex] = buffer[indexNext] + .001;
+
     event_data[0] = bufferInput[i];
+    // event_data[0] = buffer[params.bufferIndex];
     event.updated = 1;
 }
 `;
