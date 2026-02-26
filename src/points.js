@@ -2601,7 +2601,7 @@ class Points {
             // texturesExternal means there's a video
             // if there's a video it needs to be updated no matter what.
             // Also, it needs to be updated if the screen size changes
-            const updateBundle = !isSameDevice || !renderPass.bundle || this.#texturesExternal.length || this.#screenResized || this.#textureUpdated;
+            const updateBundle = !isSameDevice || !renderPass.bundle || this.#texturesExternal.length || this.#screenResized || this.#textureUpdated /*|| renderPass.MESH_UPDATED*/;
 
             if (renderPass.hasVertexAndFragmentShader) {
                 renderPass.descriptor.colorAttachments[0].view = swapChainTexture.createView();
@@ -2631,6 +2631,20 @@ class Points {
                         bundleEncoder.setBindGroup(0, renderPass.vertexBindGroup);
                         bundleEncoder.setBindGroup(1, renderPass.fragmentBindGroup);
                     }
+
+
+                    if (renderPass.MESH_UPDATED) {
+                        renderPass.vertexBufferInfo = new VertexBufferInfo(renderPass.vertexArray);
+                        renderPass.vertexBuffer = this.#createAndMapBuffer(renderPass.vertexArray, GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST);
+                        // this.#compileRenderPass(renderPass, renderPass.index);
+                        // this.#generateDataSize();
+                        // this.#createBuffers();
+                        // this.#createPipeline();
+                        console.log(3);
+
+                        renderPass.MESH_UPDATED = false;
+                    }
+
                     bundleEncoder.setVertexBuffer(0, renderPass.vertexBuffer);
 
                     // TODO: move this to renderPass because we can ask this just one time and have it as property

@@ -234,7 +234,7 @@ class RenderPass {
         this.#workgroupCountX = workgroupCountX || 8;
         this.#workgroupCountY = workgroupCountY || 8;
         this.#workgroupCountZ = workgroupCountZ || 1;
-        Object.seal(this);
+        // Object.seal(this);
     }
 
     /**
@@ -692,6 +692,7 @@ class RenderPass {
 
     /**
      * Adds a mesh quad
+     * @deprecated Since v0.8.0 use {@link setPlane}
      * @param {String} name The name will show up in the `mesh` Uniform.
      * @param {{x:Number, y:Number, z:Number}} coordinate
      * @param {{width:Number, height:Number}} dimensions
@@ -763,6 +764,96 @@ class RenderPass {
         };
         this.#meshes.push(mesh);
         ++this.#meshCounter;
+
+        return mesh;
+    }
+
+    /**
+     * Adds or replaces a mesh quad
+     * @param {String} name The name will show up in the `mesh` Uniform.
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {{width:Number, height:Number}} dimensions
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     * @param {{x:Number, y:Number }} segments mesh subdivisions
+     *
+     * @example
+     *
+     * renderPass.setPlane('plane', { x: 0, y: 0, z: 0 }, { width: 2, height: 2 }).instanceCount = NUMPARTICLES;
+     */
+    setPlane(
+        name,
+        coordinate = { x: 0, y: 0, z: 0 },
+        dimensions = { width: 1, height: 1 },
+        color = { r: 1, g: 0, b: 1, a: 0 },
+        segments = { x: 1, y: 1 }
+    ) {
+        const meshExists = this.#nameExists(this.#meshes, name);
+
+        const { x, y, z } = coordinate;
+        const { width, height } = dimensions;
+        const { x: sx, y: sy } = segments;
+        const hw = width / 2;
+        const hh = height / 2;
+
+        const { r, g, b, a } = color;
+        const normal = [0, 0, 1];
+
+        const id = this.#meshCounter;
+
+        const grid = [];
+        for (let iy = 0; iy <= sy; iy++) {
+            const v = iy / sy;
+            const posY = y - hh + v * height;
+
+            for (let ix = 0; ix <= sx; ix++) {
+                const u = ix / sx;
+                const posX = x - hw + u * width;
+
+                grid.push({
+                    position: [posX, posY, z],
+                    uv: [u, v]
+                });
+            }
+        }
+
+        const vertexArray = [];
+        for (let iy = 0; iy < sy; iy++) {
+            for (let ix = 0; ix < sx; ix++) {
+                const rowSize = sx + 1;
+                const i0 = iy * rowSize + ix;
+                const i1 = i0 + 1;
+                const i2 = i0 + rowSize;
+                const i3 = i2 + 1;
+
+                const quad = [
+                    grid[i0], grid[i1], grid[i3],
+                    grid[i0], grid[i3], grid[i2]
+                ];
+
+                quad.forEach(({ position: [vx, vy, vz], uv: [u, v] }, i) => {
+                    vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normal, id, ...BARYCENTRICS[i % 3]);
+                })
+            }
+        }
+
+        if (meshExists) {
+            meshExists.vertexArray = vertexArray;
+            meshExists.verticesCount = sx * sy * 6;
+            this.#updateVertexArray();
+            this.MESH_UPDATED = true;
+            return meshExists;
+        }
+
+        const mesh = {
+            name,
+            id,
+            instanceCount: 1,
+            verticesCount: sx * sy * 6,
+            vertexArray,
+        };
+        this.#meshes.push(mesh);
+        ++this.#meshCounter;
+        this.#updateVertexArray();
 
         return mesh;
     }
@@ -866,6 +957,7 @@ class RenderPass {
 
     /**
      * Adds a mesh sphere
+     * @deprecated since v0.8.0. Use {@link setSphere}
      * @param {String} name The name will show up in the `mesh` Uniform.
      * @param {{x:Number, y:Number, z:Number}} coordinate
      * @param {{r:Number, g:Number, b:Number, a:Number}} color
@@ -946,6 +1038,104 @@ class RenderPass {
         this.#meshes.push(mesh);
 
         ++this.#meshCounter;
+
+        return mesh;
+    }
+
+    /**
+     * Adds or replaces a mesh sphere
+     * @param {String} name The name will show up in the `mesh` Uniform.
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     * @param {Number} radius
+     * @param {Number} segments
+     * @param {Number} rings
+     *
+     * @example
+     *
+     * renderPass.addSphere('sphere').instanceCount = 100;
+     */
+    setSphere(
+        name,
+        coordinate = { x: 0, y: 0, z: 0 },
+        color = { r: 1, g: 0, b: 1, a: 0 },
+        radius = 1,
+        segments = 16,
+        rings = 12
+    ) {
+        const meshExists = this.#nameExists(this.#meshes, name);
+
+        const { x, y, z } = coordinate;
+        const { r, g, b, a } = color;
+
+        const vertexGrid = [];
+
+        // generate vertices
+        let k = 0;
+        for (let lat = 0; lat <= rings; lat++) {
+            const theta = (lat * Math.PI) / rings;
+            const sinTheta = Math.sin(theta);
+            const cosTheta = Math.cos(theta);
+
+            vertexGrid[lat] = [];
+
+            for (let lon = 0; lon <= segments; lon++) {
+                const phi = (lon * 2 * Math.PI) / segments;
+                const sinPhi = Math.sin(phi);
+                const cosPhi = Math.cos(phi);
+
+                const nx = cosPhi * sinTheta;
+                const ny = cosTheta;
+                const nz = sinPhi * sinTheta;
+
+                const vx = x + radius * nx;
+                const vy = y + radius * ny;
+                const vz = z + radius * nz;
+
+                const u = lon / segments;
+                const v = lat / rings;
+
+                vertexGrid[lat][lon] = [vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, this.#meshCounter];
+            }
+        }
+
+        const b0 = BARYCENTRICS[0];
+        const b1 = BARYCENTRICS[1];
+        const b2 = BARYCENTRICS[2];
+        // generate triangles
+        const vertexArray = [];
+        for (let lat = 0; lat < rings; lat++) {
+            for (let lon = 0; lon < segments; lon++) {
+                const v1 = vertexGrid[lat][lon];
+                const v2 = vertexGrid[lat + 1][lon];
+                const v3 = vertexGrid[lat + 1][lon + 1];
+                const v4 = vertexGrid[lat][lon + 1];
+
+                // triangle 1
+                vertexArray.push(...v1, ...b0, ...v3, ...b1, ...v2, ...b2);
+                // triangle 2
+                vertexArray.push(...v1, ...b0, ...v4, ...b1, ...v3, ...b2);
+            }
+        }
+
+        if (meshExists) {
+            meshExists.vertexArray = vertexArray;
+            meshExists.verticesCount = rings * segments * 6;
+            this.#updateVertexArray();
+            this.MESH_UPDATED = true;
+            return meshExists;
+        }
+
+        const mesh = {
+            name,
+            id: this.#meshCounter,
+            instanceCount: 1,
+            verticesCount: rings * segments * 6,
+            vertexArray
+        }
+        this.#meshes.push(mesh);
+        ++this.#meshCounter;
+        this.#updateVertexArray();
 
         return mesh;
     }
@@ -1167,6 +1357,7 @@ class RenderPass {
 
     /**
      * Add a external mesh with the provided required data.
+     * @deprecated since v0.8.0. Use {@link setMesh}
      * @param {String} name The name will show up in the `mesh` Uniform.
      * @param {Array<{x:Number, y:Number, z:Number}>} vertices
      * @param {Array<{r:Number, g:Number, b:Number, a:Number}>} colors
@@ -1207,6 +1398,77 @@ class RenderPass {
         }
         this.#meshes.push(mesh);
         ++this.#meshCounter;
+
+        return mesh;
+    }
+
+    #nameExists(arrayOfObjects, name) {
+        return arrayOfObjects.find(obj => obj.name == name);
+    }
+
+    #updateVertexArray() {
+        this.#vertexArray = [];
+        this.#meshes.forEach(mesh => {
+            mesh.vertexArray.forEach(item => this.#vertexArray.push(item));
+        })
+    }
+
+    /**
+     * Add or replace external mesh with the provided required data.
+     * @param {String} name The name will show up in the `mesh` Uniform.
+     * @param {Array<{x:Number, y:Number, z:Number}>} vertices
+     * @param {Array<{r:Number, g:Number, b:Number, a:Number}>} colors
+     * @param {Array<{u:Number, v:Number}>} uvs
+     * @param {Array<Number>} normals
+     *
+     * @example
+     *
+     * const url = '../models/monkey.glb';
+     * const data = await loadAndExtract(url);
+     * const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0]
+     * renderPass.setMesh('monkey', positions, colors, colorSize, uvs, normals, indices)
+     * renderPass.depthWriteEnabled = true;
+     *
+     */
+    setMesh(name, vertices, colors, colorSize, uvs, normals, indices) {
+        const meshExists = this.#nameExists(this.#meshes, name);
+
+        const verticesCount = indices.length;
+
+        const vertexArray = [];
+        for (let i = 0; i < verticesCount; i++) {
+            const index = indices[i];
+            const vertex = vertices.slice(index * 3, index * 3 + 3);
+
+            const color = colors?.slice(index * colorSize, index * colorSize + colorSize);
+            const uv = uvs.slice(index * 2, index * 2 + 2);
+            const normal = normals.slice(index * 3, index * 3 + 3);
+
+            const [x, y, z] = vertex;
+            const [r, g, b] = color || [1, 0, 1];
+            const [u, v] = uv;
+            // this.#vertexArray.push(+x, +y, +z, 1, r, g, b, 1, u, v, ...normal, this.#meshCounter, ...BARYCENTRICS[i % 3]);
+            vertexArray.push(+x, +y, +z, 1, r, g, b, 1, u, v, ...normal, this.#meshCounter, ...BARYCENTRICS[i % 3]);
+        }
+
+        if (meshExists) {
+            meshExists.vertexArray = vertexArray;
+            meshExists.verticesCount = verticesCount;
+            this.#updateVertexArray();
+            this.MESH_UPDATED = true;
+            return meshExists;
+        }
+
+        const mesh = {
+            name,
+            id: this.#meshCounter,
+            instanceCount: 1,
+            verticesCount,
+            vertexArray,
+        }
+        this.#meshes.push(mesh);
+        ++this.#meshCounter;
+        this.#updateVertexArray();
 
         return mesh;
     }
