@@ -1186,6 +1186,10 @@ class RenderPass {
 
         // generate vertices
         let k = 0;
+        let meshCounter = this.#meshCounter;
+        if(meshExists){
+            meshCounter = meshExists.id;
+        }
         for (let lat = 0; lat <= rings; lat++) {
             const theta = (lat * Math.PI) / rings;
             const sinTheta = Math.sin(theta);
@@ -1209,7 +1213,7 @@ class RenderPass {
                 const u = lon / segments;
                 const v = lat / rings;
 
-                vertexGrid[lat][lon] = [vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, this.#meshCounter];
+                vertexGrid[lat][lon] = [vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, meshCounter];
             }
         }
 
