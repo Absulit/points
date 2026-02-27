@@ -860,6 +860,7 @@ class RenderPass {
 
     /**
      * Adds a mesh cube
+     * @deprecated since v0.8.0. Use {@link setCube}
      * @param {String} name The name will show up in the `mesh` Uniform.
      * @param {{x:Number, y:Number, z:Number}} coordinate
      * @param {{width:Number, height:Number, depth:Number}} dimensions
@@ -951,6 +952,115 @@ class RenderPass {
         this.#meshes.push(mesh);
 
         ++this.#meshCounter;
+
+        return mesh;
+    }
+
+    /**
+     * Adds or replaces a mesh cube
+     * @param {String} name The name will show up in the `mesh` Uniform.
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {{width:Number, height:Number, depth:Number}} dimensions
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     *
+     * @example
+     *
+     * renderPass.setCube('base_cube').instanceCount = NUMPARTICLES;
+     */
+    setCube(
+        name,
+        coordinate = { x: 0, y: 0, z: 0 },
+        dimensions = { width: 1, height: 1, depth: 1 },
+        color = { r: 1, g: 0, b: 1, a: 0 }
+    ) {
+        const meshExists = this.#nameExists(this.#meshes, name);
+
+        const { x, y, z } = coordinate;
+        const { width, height, depth } = dimensions;
+        const hw = width / 2;
+        const hh = height / 2;
+        const hd = depth / 2;
+
+        const corners = [
+            [x - hw, y - hh, z - hd], // 0: left-bottom-back
+            [x + hw, y - hh, z - hd], // 1: right-bottom-back
+            [x + hw, y + hh, z - hd], // 2: right-top-back
+            [x - hw, y + hh, z - hd], // 3: left-top-back
+            [x - hw, y - hh, z + hd], // 4: left-bottom-front
+            [x + hw, y - hh, z + hd], // 5: right-bottom-front
+            [x + hw, y + hh, z + hd], // 6: right-top-front
+            [x - hw, y + hh, z + hd], // 7: left-top-front
+        ];
+
+        const faceUVs = [
+            [[0, 0], [1, 0], [1, 1], [0, 1]], // back
+            [[0, 0], [1, 0], [1, 1], [0, 1]], // front
+            [[0, 0], [1, 0], [1, 1], [0, 1]], // left
+            [[0, 0], [1, 0], [1, 1], [0, 1]], // right
+            [[0, 0], [1, 0], [1, 1], [0, 1]], // top
+            [[0, 0], [1, 0], [1, 1], [0, 1]], // bottom
+        ];
+
+        const faceNormals = [
+            [0, 0, -1],  // back
+            [0, 0, 1],   // front
+            [-1, 0, 0],  // left
+            [1, 0, 0],   // right
+            [0, 1, 0],   // top
+            [0, -1, 0],  // bottom
+        ];
+
+        const faces = [
+            [0, 3, 2, 1], // back
+            [4, 5, 6, 7], // front
+            [0, 4, 7, 3], // left
+            [5, 1, 2, 6], // right
+            [3, 7, 6, 2], // top
+            [0, 1, 5, 4], // bottom
+        ];
+
+        const vertexArray = [];
+        for (let i = 0; i < 6; i++) {
+            const [i0, i1, i2, i3] = faces[i];
+            // const color = faceColors[i];
+            const { r, g, b, a } = color;
+            const normals = faceNormals[i];
+
+            const v = [corners[i0], corners[i1], corners[i2], corners[i3]];
+
+            const uv = faceUVs[i];
+            const verts = [
+                [v[0], uv[0]],
+                [v[1], uv[1]],
+                [v[2], uv[2]],
+                [v[0], uv[0]],
+                [v[2], uv[2]],
+                [v[3], uv[3]],
+            ];
+
+            verts.forEach(([[vx, vy, vz], [u, v]], i) => {
+                vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normals, this.#meshCounter, ...BARYCENTRICS[i % 3]);
+            })
+        }
+
+        if (meshExists) {
+            meshExists.vertexArray = vertexArray;
+            meshExists.verticesCount = 36;
+            this.#updateVertexArray();
+            this.MESH_UPDATED = true;
+            return meshExists;
+        }
+
+        const mesh = {
+            name,
+            id: this.#meshCounter,
+            instanceCount: 1,
+            verticesCount: 36,
+            vertexArray,
+        }
+        this.#meshes.push(mesh);
+        ++this.#meshCounter;
+        this.#updateVertexArray();
 
         return mesh;
     }
