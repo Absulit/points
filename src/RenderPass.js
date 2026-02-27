@@ -1554,6 +1554,10 @@ class RenderPass {
         const verticesCount = indices.length;
 
         const vertexArray = [];
+        let meshCounter = this.#meshCounter;
+        if(meshExists){
+            meshCounter = meshExists.id;
+        }
         for (let i = 0; i < verticesCount; i++) {
             const index = indices[i];
             const vertex = vertices.slice(index * 3, index * 3 + 3);
@@ -1566,7 +1570,7 @@ class RenderPass {
             const [r, g, b] = color || [1, 0, 1];
             const [u, v] = uv;
             // this.#vertexArray.push(+x, +y, +z, 1, r, g, b, 1, u, v, ...normal, this.#meshCounter, ...BARYCENTRICS[i % 3]);
-            vertexArray.push(+x, +y, +z, 1, r, g, b, 1, u, v, ...normal, this.#meshCounter, ...BARYCENTRICS[i % 3]);
+            vertexArray.push(+x, +y, +z, 1, r, g, b, 1, u, v, ...normal, meshCounter, ...BARYCENTRICS[i % 3]);
         }
 
         if (meshExists) {
