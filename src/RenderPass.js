@@ -1020,6 +1020,10 @@ class RenderPass {
         ];
 
         const vertexArray = [];
+        let meshCounter = this.#meshCounter;
+        if(meshExists){
+            meshCounter = meshExists.id;
+        }
         for (let i = 0; i < 6; i++) {
             const [i0, i1, i2, i3] = faces[i];
             // const color = faceColors[i];
@@ -1039,13 +1043,13 @@ class RenderPass {
             ];
 
             verts.forEach(([[vx, vy, vz], [u, v]], i) => {
-                vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normals, this.#meshCounter, ...BARYCENTRICS[i % 3]);
+                vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normals, meshCounter, ...BARYCENTRICS[i % 3]);
             })
         }
 
         if (meshExists) {
             meshExists.vertexArray = vertexArray;
-            meshExists.verticesCount = 36;
+            // meshExists.verticesCount = 36;
             this.#updateVertexArray();
             this.MESH_UPDATED = true;
             return meshExists;
