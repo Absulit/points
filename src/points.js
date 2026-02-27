@@ -552,7 +552,8 @@ class Points {
             array: arrayData,
             buffer: null,
             read,
-            internal: false
+            size: null, // TODO: document this: to force allocate more space in case an update is greater than the default array size
+            internal: false,
         }
         this.#storage.push(storage);
         return storage;
@@ -1844,7 +1845,7 @@ class Points {
             storageItem.usage = usage;
             if (storageItem.mapped) {
                 const values = new Float32Array(storageItem.array);
-                storageItem.buffer = this.#createAndMapBuffer(values, usage);
+                storageItem.buffer = this.#createAndMapBuffer(values, usage, true, storageItem.size);
             } else {
                 storageItem.buffer = this.#createBuffer(storageItem.structSize, usage);
             }
