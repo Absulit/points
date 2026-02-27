@@ -1049,7 +1049,7 @@ class RenderPass {
 
         if (meshExists) {
             meshExists.vertexArray = vertexArray;
-            // meshExists.verticesCount = 36;
+            meshExists.verticesCount = 36;
             this.#updateVertexArray();
             this.MESH_UPDATED = true;
             return meshExists;
