@@ -1569,7 +1569,6 @@ class RenderPass {
             const [x, y, z] = vertex;
             const [r, g, b] = color || [1, 0, 1];
             const [u, v] = uv;
-            // this.#vertexArray.push(+x, +y, +z, 1, r, g, b, 1, u, v, ...normal, this.#meshCounter, ...BARYCENTRICS[i % 3]);
             vertexArray.push(+x, +y, +z, 1, r, g, b, 1, u, v, ...normal, meshCounter, ...BARYCENTRICS[i % 3]);
         }
 
