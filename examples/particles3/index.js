@@ -40,7 +40,7 @@ console.log(NUMPARTICLES);
 
 const instancedParticlesRenderPass = new RenderPass(vert, frag1, compute0, WORKGROUP_X, WORKGROUP_Y, WORKGROUP_Z)
 instancedParticlesRenderPass.depthWriteEnabled = false;
-instancedParticlesRenderPass.addPlane('plane', { x: 0, y: 0 }, { width: 2, height: 2 }).instanceCount = NUMPARTICLES;
+instancedParticlesRenderPass.setPlane('plane', { x: 0, y: 0 }, { width: 2, height: 2 }).instanceCount = NUMPARTICLES;
 
 const notificationMsg = `This demo uses a webcam, but it seems you don't have one, \nso we replaced it with a video.`;
 

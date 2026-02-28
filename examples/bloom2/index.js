@@ -25,9 +25,9 @@ const r1 = new RenderPass(vert1, frag1);
 const r2 = new RenderPass(vert2, frag2);
 const r3 = new RenderPass(vert3, frag3);
 
-r0.addCube('cube0');
-r0.addCube('cube1');
-r0.addCube('cube2');
+r0.setCube('cube0');
+r0.setCube('cube1');
+r0.setCube('cube2');
 
 r0.depthWriteEnabled = true;
 

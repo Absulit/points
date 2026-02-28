@@ -43,8 +43,8 @@ console.log('NUMPARTICLES: ', NUMPARTICLES);
 
 const renderPass = new RenderPass(vert, frag, null);
 renderPass.depthWriteEnabled = true;
-renderPass.addMesh('base_mesh', positions, colors, colorSize, uvs, normals, indices)
-renderPass.addSphere('instance_mesh', { x: 0, y: 0, z: 0 }, { r: 0, g: 0, b: 0, a: 0 }, .01).instanceCount = NUMPARTICLES;
+renderPass.setMesh('base_mesh', positions, colors, colorSize, uvs, normals, indices)
+renderPass.setSphere('instance_mesh', { x: 0, y: 0, z: 0 }, { r: 0, g: 0, b: 0, a: 0 }, .01).instanceCount = NUMPARTICLES;
 
 const vertex_data = positions.reduce((acc, val, idx) => {
     if (idx % 3 === 0) acc.push([]);

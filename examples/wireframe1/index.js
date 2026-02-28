@@ -15,16 +15,16 @@ const r0 = new RenderPass(vert0, frag0);
 r0.depthWriteEnabled = true;
 r0.cullMode = CullMode.NONE
 // r0.topology = PrimitiveTopology.LINE_STRIP
-r0.addCube('cube0');
-r0.addCylinder('cylinder0');
-r0.addPlane('plane0')
-r0.addSphere('sphere0')
-r0.addTorus('torus0')
+r0.setCube('cube0');
+r0.setCylinder('cylinder0');
+r0.setPlane('plane0')
+r0.setSphere('sphere0')
+r0.setTorus('torus0')
 
 const url = '../models/monkey_subdivide.glb'; // or remote URL (CORS must allow)
 const data = await loadAndExtract(url);
 const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0]
-r0.addMesh('monkey', positions, colors, colorSize, uvs, normals, indices)
+r0.setMesh('monkey', positions, colors, colorSize, uvs, normals, indices)
 
 const base = {
     renderPasses: [

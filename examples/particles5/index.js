@@ -41,14 +41,14 @@ const cube_renderpass = new RenderPass(vert, frag, compute, WORKGROUP_X, WORKGRO
 cube_renderpass.clearValue = { r: 0, g: 0, b: 0, a: 0 };
 cube_renderpass.loadOp = LoadOp.CLEAR;
 cube_renderpass.depthWriteEnabled = true;
-cube_renderpass.addPlane(
+cube_renderpass.setPlane(
     'base_cube',
     { x: 0, y: 0, z: 0 },
     { width: 1., height: 1., depth: 1. }
 ).instanceCount = NUMPARTICLES;
 
 
-// cube_renderpass.addSphere('sphere').instanceCount = 100;
+// cube_renderpass.setSphere('sphere').instanceCount = 100;
 
 const near = 0.1, far = 100;
 const f = 1.0 / Math.tan(Math.PI / 8); // ≈ 2.414

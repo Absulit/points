@@ -11,9 +11,9 @@ const options = {
 const r0 = new RenderPass(vert, frag, compute);
 r0.depthWriteEnabled = true;
 // r0.cullMode = CullMode.NONE;
-r0.addCube('cube0', { x: 0, y: 0, z: 0 }, { width: 1, height: 1, depth: 1 }, { r: .1, g: .5, b: 1 });
-r0.addSphere('sphere0', { x: 0, y: 1.1, z: 0 }, { r: 1, g: 1, b: 0 }, .5);
-r0.addPlane('plane0', { x: 0, y: 0, z: 0 }, { width: 2, height: 2 }, { r: 1, g: 0, b: 0 })
+r0.setCube('cube0', { x: 0, y: 0, z: 0 }, { width: 1, height: 1, depth: 1 }, { r: .1, g: .5, b: 1 });
+r0.setSphere('sphere0', { x: 0, y: 1.1, z: 0 }, { r: 1, g: 1, b: 0 }, .5);
+r0.setPlane('plane0', { x: 0, y: 0, z: 0 }, { width: 2, height: 2 }, { r: 1, g: 0, b: 0 })
 
 const camera = {
     position: [0, 0, 5],

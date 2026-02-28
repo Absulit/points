@@ -1178,7 +1178,7 @@ class RenderPass {
      *
      * @example
      *
-     * renderPass.addSphere('sphere').instanceCount = 100;
+     * renderPass.setSphere('sphere').instanceCount = 100;
      */
     setSphere(
         name,

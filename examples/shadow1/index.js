@@ -45,15 +45,15 @@ const camera = {
 const r0 = new RenderPass(vert, frag);
 r0.depthWriteEnabled = true;
 // r0.cullMode = CullMode.NONE;
-r0.addSphere('sphere0', spherePosition);
-r0.addPlane('plane0', planePosition, planeDimensions, planeColor, planeSegments);
+r0.setSphere('sphere0', spherePosition);
+r0.setPlane('plane0', planePosition, planeDimensions, planeColor, planeSegments);
 
 
 const r1 = new RenderPass(vert1, frag1);
 r1.depthWriteEnabled = true;
 r1.cullMode = CullMode.NONE;
-r1.addSphere('sphere1', spherePosition, sphereColor);
-r1.addPlane('plane1', planePosition, planeDimensions, planeColor, planeSegments);
+r1.setSphere('sphere1', spherePosition, sphereColor);
+r1.setPlane('plane1', planePosition, planeDimensions, planeColor, planeSegments);
 
 const base = {
     renderPasses: [
