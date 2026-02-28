@@ -2602,7 +2602,7 @@ class Points {
             // texturesExternal means there's a video
             // if there's a video it needs to be updated no matter what.
             // Also, it needs to be updated if the screen size changes
-            const updateBundle = !isSameDevice || !renderPass.bundle || this.#texturesExternal.length || this.#screenResized || this.#textureUpdated || renderPass.MESH_UPDATED;
+            const updateBundle = !isSameDevice || !renderPass.bundle || this.#texturesExternal.length || this.#screenResized || this.#textureUpdated || renderPass.meshUpdated;
 
             if (renderPass.hasVertexAndFragmentShader) {
                 renderPass.descriptor.colorAttachments[0].view = swapChainTexture.createView();
@@ -2633,18 +2633,11 @@ class Points {
                         bundleEncoder.setBindGroup(1, renderPass.fragmentBindGroup);
                     }
 
-
-                    if (renderPass.MESH_UPDATED) {
-                        renderPass.vertexBufferInfo = new VertexBufferInfo(renderPass.vertexArray);
-                        renderPass.vertexBuffer = this.#createAndMapBuffer(renderPass.vertexArray, GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST);
-                        // this.#compileRenderPass(renderPass, renderPass.index);
-                        // this.#generateDataSize();
-                        // this.#createBuffers();
-                        // this.#createPipeline();
-                        console.log(3);
-
-                        renderPass.MESH_UPDATED = false;
-                    }
+                    // IF renderPass.meshUpdated
+                    renderPass.vertexBufferInfo = new VertexBufferInfo(renderPass.vertexArray);
+                    renderPass.vertexBuffer = this.#createAndMapBuffer(renderPass.vertexArray, GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST);
+                    renderPass.meshUpdated = false;
+                    // END IF renderPass.meshUpdated
 
                     bundleEncoder.setVertexBuffer(0, renderPass.vertexBuffer);
 

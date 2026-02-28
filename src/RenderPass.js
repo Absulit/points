@@ -167,6 +167,8 @@ class RenderPass {
     #cullMode = CullMode.BACK;
     #frontFace = FrontFace.CCW;
 
+    #meshUpdated = CSSFontFeatureValuesRule;
+
     #descriptor = {
         colorAttachments: [
             {
@@ -234,7 +236,7 @@ class RenderPass {
         this.#workgroupCountX = workgroupCountX || 8;
         this.#workgroupCountY = workgroupCountY || 8;
         this.#workgroupCountZ = workgroupCountZ || 1;
-        // Object.seal(this);
+        Object.seal(this);
     }
 
     /**
@@ -637,6 +639,18 @@ class RenderPass {
         this.#enabled = val;
     }
 
+    get meshUpdated() {
+        return this.#meshUpdated;
+    }
+
+    /**
+     * To notify the RenderPass if a mesh has changed to update the vertexBuffer
+     * @param {Boolean} val
+     */
+    set meshUpdated(val) {
+        this.#meshUpdated = val;
+    }
+
     /**
      * - **currently for internal use**<br>
      * - **might be private in the future**<br>
@@ -840,7 +854,7 @@ class RenderPass {
             meshExists.vertexArray = vertexArray;
             meshExists.verticesCount = sx * sy * 6;
             this.#updateVertexArray();
-            this.MESH_UPDATED = true;
+            this.#meshUpdated = true;
             return meshExists;
         }
 
@@ -1021,7 +1035,7 @@ class RenderPass {
 
         const vertexArray = [];
         let meshCounter = this.#meshCounter;
-        if(meshExists){
+        if (meshExists) {
             meshCounter = meshExists.id;
         }
         for (let i = 0; i < 6; i++) {
@@ -1051,7 +1065,7 @@ class RenderPass {
             meshExists.vertexArray = vertexArray;
             meshExists.verticesCount = 36;
             this.#updateVertexArray();
-            this.MESH_UPDATED = true;
+            this.#meshUpdated = true;
             return meshExists;
         }
 
@@ -1187,7 +1201,7 @@ class RenderPass {
         // generate vertices
         let k = 0;
         let meshCounter = this.#meshCounter;
-        if(meshExists){
+        if (meshExists) {
             meshCounter = meshExists.id;
         }
         for (let lat = 0; lat <= rings; lat++) {
@@ -1240,7 +1254,7 @@ class RenderPass {
             meshExists.vertexArray = vertexArray;
             meshExists.verticesCount = rings * segments * 6;
             this.#updateVertexArray();
-            this.MESH_UPDATED = true;
+            this.#meshUpdated = true;
             return meshExists;
         }
 
@@ -1555,7 +1569,7 @@ class RenderPass {
 
         const vertexArray = [];
         let meshCounter = this.#meshCounter;
-        if(meshExists){
+        if (meshExists) {
             meshCounter = meshExists.id;
         }
         for (let i = 0; i < verticesCount; i++) {
@@ -1576,7 +1590,7 @@ class RenderPass {
             meshExists.vertexArray = vertexArray;
             meshExists.verticesCount = verticesCount;
             this.#updateVertexArray();
-            this.MESH_UPDATED = true;
+            this.#meshUpdated = true;
             return meshExists;
         }
 
