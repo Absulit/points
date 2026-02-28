@@ -1034,10 +1034,7 @@ class RenderPass {
         ];
 
         const vertexArray = [];
-        let meshCounter = this.#meshCounter;
-        if (meshExists) {
-            meshCounter = meshExists.id;
-        }
+        const meshCounter = meshExists ? meshExists.id : this.#meshCounter;
         for (let i = 0; i < 6; i++) {
             const [i0, i1, i2, i3] = faces[i];
             // const color = faceColors[i];
@@ -1200,10 +1197,7 @@ class RenderPass {
 
         // generate vertices
         let k = 0;
-        let meshCounter = this.#meshCounter;
-        if (meshExists) {
-            meshCounter = meshExists.id;
-        }
+        const meshCounter = meshExists ? meshExists.id : this.#meshCounter;
         for (let lat = 0; lat <= rings; lat++) {
             const theta = (lat * Math.PI) / rings;
             const sinTheta = Math.sin(theta);
@@ -1434,10 +1428,7 @@ class RenderPass {
         }
 
         const vertexArray = [];
-        let meshCounter = this.#meshCounter;
-        if (meshExists) {
-            meshCounter = meshExists.id;
-        }
+        const meshCounter = meshExists ? meshExists.id : this.#meshCounter;
         for (const [i0, i1, i2] of indices) {
             for (const i of [i0, i1, i2]) {
                 const [vx, vy, vz] = vertices[i];
@@ -1675,10 +1666,7 @@ class RenderPass {
         const verticesCount = indices.length;
 
         const vertexArray = [];
-        let meshCounter = this.#meshCounter;
-        if (meshExists) {
-            meshCounter = meshExists.id;
-        }
+        const meshCounter = meshExists ? meshExists.id : this.#meshCounter;
         for (let i = 0; i < verticesCount; i++) {
             const index = indices[i];
             const vertex = vertices.slice(index * 3, index * 3 + 3);
