@@ -198,7 +198,7 @@ class Points {
         this.#canvas.height = this.#canvas.clientHeight;
         this.#screen[0] = this.#canvas.width;
         this.#screen[1] = this.#canvas.height;
-        this.setUniform(UniformKeys.SCREEN, this.#screen);
+        this.#params.screen.value = this.#screen
 
         this.#presentationSize = [
             this.#canvas.clientWidth,
@@ -265,7 +265,7 @@ class Points {
         this.#ratio[0] = ratio[0];
         this.#ratio[1] = ratio[1];
 
-        this.setUniform(UniformKeys.RATIO, this.#ratio);
+        this.#params.ratio.value = this.#ratio;
     }
 
     #onMouseMove = e => {
@@ -278,8 +278,9 @@ class Points {
         this.#mouseNormalized[0] = this.#mouse[0] / this.#screen[0];
         this.#mouseNormalized[1] = this.#mouse[1] / this.#screen[1];
         this.#mouseNormalized[1] = (this.#mouseNormalized[1] * - 1) - -1; // flip and move up
-        this.setUniform(UniformKeys.MOUSE, this.#mouse);
-        this.setUniform('_mouse_normalized', this.#mouseNormalized);
+
+        this.#params.mouse.value = this.#mouse;
+        this.#params._mouse_normalized.value = this.#mouseNormalized;
     }
 
     /**
@@ -387,7 +388,7 @@ class Points {
      */
     updateUniforms(arr) {
         arr.forEach(uniform => {
-            const variable = this.#uniforms.find(v => v.name === uniform.name);
+            const variable = this.#params[uniform.name];
             if (!variable) {
                 throw '`updateUniform()` can\'t be called without first `setUniform()`.';
             }
@@ -2567,9 +2568,10 @@ class Points {
         this.#delta = this.#clock.getDelta();
         this.#time = this.#clock.time;
         this.#epoch = +new Date() / 1000;
-        this.setUniform(UniformKeys.TIME, this.#time);
-        this.setUniform(UniformKeys.DELTA, this.#delta);
-        this.setUniform(UniformKeys.EPOCH, this.#epoch);
+
+        this.#params.delta.value = this.#delta;
+        this.#params.time.value = this.#time;
+        this.#params.epoch.value = this.#epoch;
         //--------------------------------------------
         this.#writeParametersUniforms();
         this.#writeStorages();
@@ -2770,9 +2772,10 @@ class Points {
         this.#mouseWheel = false;
         this.#mouseDelta[0] = 0;
         this.#mouseDelta[1] = 0;
-        this.setUniform(UniformKeys.MOUSE_CLICK, this.#mouseClick);
-        this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
-        this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta);
+
+        this.#params.mouseClick.value = this.#mouseClick;
+        this.#params.mouseWheel.value = this.#mouseWheel;
+        this.#params.mouseDelta.value = this.#mouseDelta;
         await this.read();
     }
     async read() {
