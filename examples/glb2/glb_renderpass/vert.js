@@ -10,7 +10,7 @@ ${rotZAxis}
 fn main(in: VertexIn) -> FragmentIn {
     let particle = particles[in.instanceIndex];
     // var angleZ = params.time * 0.9854;
-    var angleY = params.time * 0.094222;
+    let angleY = params.angleY;
     // var angleX = params.time * 0.865;
 
     let rotX = rotXAxis(0);

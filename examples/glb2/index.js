@@ -111,17 +111,19 @@ const base = {
 
         points.setCameraPerspective('camera');
 
+        points.setUniform('angleY', 0);
 
         folder.open();
     },
     /**
      * @param {Points} points
      */
-    update: points => {
+    update: (points, t, dt) => {
 
         points.setCameraPerspective('camera', [0, 0, 5], [0, 0, -1000]);
 
         points.setUniform('dof', options.dof);
+        points.params.angleY.value += dt * 0.094222;
     }
 }
 
