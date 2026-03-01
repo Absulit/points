@@ -279,8 +279,9 @@ class Points {
         this.#mouseNormalized[1] = this.#mouse[1] / this.#screen[1];
         this.#mouseNormalized[1] = (this.#mouseNormalized[1] * - 1) - -1; // flip and move up
 
-        this.#params.mouse.value = this.#mouse;
-        this.#params._mouse_normalized.value = this.#mouseNormalized;
+        const { mouse, _mouse_normalized } = this.#params
+        mouse.value = this.#mouse;
+        _mouse_normalized.value = this.#mouseNormalized;
     }
 
     /**
@@ -2569,9 +2570,10 @@ class Points {
         this.#time = this.#clock.time;
         this.#epoch = +new Date() / 1000;
 
-        this.#params.delta.value = this.#delta;
-        this.#params.time.value = this.#time;
-        this.#params.epoch.value = this.#epoch;
+        const { delta, time, epoch } = this.#params;
+        delta.value = this.#delta;
+        time.value = this.#time;
+        epoch.value = this.#epoch;
         //--------------------------------------------
         this.#writeParametersUniforms();
         this.#writeStorages();
@@ -2773,9 +2775,10 @@ class Points {
         this.#mouseDelta[0] = 0;
         this.#mouseDelta[1] = 0;
 
-        this.#params.mouseClick.value = this.#mouseClick;
-        this.#params.mouseWheel.value = this.#mouseWheel;
-        this.#params.mouseDelta.value = this.#mouseDelta;
+        const {mouseClick, mouseWheel, mouseDelta} = this.#params;
+        mouseClick.value = this.#mouseClick;
+        mouseWheel.value = this.#mouseWheel;
+        mouseDelta.value = this.#mouseDelta;
         await this.read();
     }
     async read() {
@@ -2954,6 +2957,31 @@ class Points {
     set scaleMode(val) {
         this.#scaleMode = +val;
         this.#setRatio();
+    }
+
+    /**
+     * Get the list of added uniforms, same as {@link uniforms}
+     * @example
+     *
+     * points.setUniform('myuniform', 10);
+     *
+     * // later
+     * points.params.myuniform.value = 12;
+     */
+    get params() {
+        return this.#params;
+    }
+    /**
+     * Get the list of added uniforms, same as {@link params}
+     * @example
+     *
+     * points.setUniform('myuniform', 10);
+     *
+     * // later
+     * points.uniforms.myuniform.value = 12;
+     */
+    get uniforms() {
+        return this.#params;
     }
 
     /**
