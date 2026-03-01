@@ -12,12 +12,12 @@ const options = {
 // a solution would be to call a remove (like init, update) and delete the RenderPass
 
 staticcube_renderpass.depthWriteEnabled = true;
-staticcube_renderpass.addCube('cube_behind');
+staticcube_renderpass.setCube('cube_behind');
 
 cube_renderpass.loadOp = LoadOp.CLEAR;
 cube_renderpass.depthWriteEnabled = true;
-cube_renderpass.addCube('cube0');
-cube_renderpass.addCube('cube1', { x: 0, y: 1, z: 0 });
+cube_renderpass.setCube('cube0');
+cube_renderpass.setCube('cube1', { x: 0, y: 1, z: 0 });
 
 
 const base = {

@@ -45,8 +45,8 @@ A RenderPass takes charge by default of a quad mesh to display graphics, so you 
 
 ```js
 renderpass.depthWriteEnabled = true;
-renderpass.addCube('cube0');
-renderpass.addCube('cube1', { x: 0, y: 1, z: 0 });
+renderpass.setCube('cube0');
+renderpass.setCube('cube1', { x: 0, y: 1, z: 0 });
 ```
 
 Adding a custom mesh is a bit more complicated. Currently the POINTS library doesn't have a built in method to load any file formats, this will go on your side. Currently I don't want to maintain something as huge as file format parsers, but you can use third parties as shown in the GLB demos in the examples page like the [GLB1](https://absulit.github.io/points/apidocs/RenderPass.html#glb1) which uses Don McCurdy [glTF-Transform](https://github.com/donmccurdy/glTF-Transform), which has a lot more than just parsing gltf/glb files. I use a `loadAndExtract` utilitarian method located in the `util.js` file in the repo, which is not included in the library, but can be used for the same purpose if required.
@@ -59,7 +59,7 @@ The method RenderPass#addMesh has a lot of parameters (vertices, colors, uvs, no
 const url = '../models/monkey.glb';
 const data = await loadAndExtract(url);
 const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0]
-renderPass.addMesh('monkey', positions, colors, colorSize, uvs, normals, indices)
+renderPass.setMesh('monkey', positions, colors, colorSize, uvs, normals, indices)
 renderPass.depthWriteEnabled = true;
 ```
 
@@ -94,7 +94,7 @@ That being said, the PrimitiveTopology only works as expected or intended, if th
 If you plan to work with multiple items of the same mesh, you can use instances. By default, adding a new mesh sets its instance amount as `1`, and this is new draw call, so a good management of the instances is required for performance. Each method to add a mesh (plane, sphere, cube, torus, cylinder) and the same `addMesh` methods, return an object with a few properties but the most important is `instanceCount`, you can increase this value along with the amount of threads to be used in a Compute Shader (review the Particles examples) so each instance goes in par with the amount of threads available, this way a single process can run a mesh characteristics like rotation, position, color, etc.
 
 ```js
-renderPass.addPlane(
+renderPass.setPlane(
     'plane',
     { x: 0, y: 0, z: 0 },
     { width: 2, height: 2 }

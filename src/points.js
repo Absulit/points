@@ -552,7 +552,8 @@ class Points {
             array: arrayData,
             buffer: null,
             read,
-            internal: false
+            size: null, // TODO: document this: to force allocate more space in case an update is greater than the default array size
+            internal: false,
         }
         this.#storage.push(storage);
         return storage;
@@ -1844,7 +1845,7 @@ class Points {
             storageItem.usage = usage;
             if (storageItem.mapped) {
                 const values = new Float32Array(storageItem.array);
-                storageItem.buffer = this.#createAndMapBuffer(values, usage);
+                storageItem.buffer = this.#createAndMapBuffer(values, usage, true, storageItem.size);
             } else {
                 storageItem.buffer = this.#createBuffer(storageItem.structSize, usage);
             }
@@ -2601,7 +2602,7 @@ class Points {
             // texturesExternal means there's a video
             // if there's a video it needs to be updated no matter what.
             // Also, it needs to be updated if the screen size changes
-            const updateBundle = !isSameDevice || !renderPass.bundle || this.#texturesExternal.length || this.#screenResized || this.#textureUpdated;
+            const updateBundle = !isSameDevice || !renderPass.bundle || this.#texturesExternal.length || this.#screenResized || this.#textureUpdated || renderPass.meshUpdated;
 
             if (renderPass.hasVertexAndFragmentShader) {
                 renderPass.descriptor.colorAttachments[0].view = swapChainTexture.createView();
@@ -2631,6 +2632,13 @@ class Points {
                         bundleEncoder.setBindGroup(0, renderPass.vertexBindGroup);
                         bundleEncoder.setBindGroup(1, renderPass.fragmentBindGroup);
                     }
+
+                    // IF renderPass.meshUpdated
+                    renderPass.vertexBufferInfo = new VertexBufferInfo(renderPass.vertexArray);
+                    renderPass.vertexBuffer = this.#createAndMapBuffer(renderPass.vertexArray, GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST);
+                    renderPass.meshUpdated = false;
+                    // END IF renderPass.meshUpdated
+
                     bundleEncoder.setVertexBuffer(0, renderPass.vertexBuffer);
 
                     // TODO: move this to renderPass because we can ask this just one time and have it as property

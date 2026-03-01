@@ -56,7 +56,7 @@ const url = '../models/lucy.glb'; // or remote URL (CORS must allow)
 const data = await loadAndExtract(url);
 const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0];
 glb_renderpass
-    .addMesh('lucy', positions, colors, colorSize, uvs, normals, indices)
+    .setMesh('lucy', positions, colors, colorSize, uvs, normals, indices)
     .instanceCount = NUMPARTICLES;
 glb_renderpass.depthWriteEnabled = true;
 

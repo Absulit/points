@@ -31,9 +31,9 @@ console.log('NUMPARTICLES: ', NUMPARTICLES);
 
 const cube_renderpass = new RenderPass(vert, frag, compute, WORKGROUP_X, WORKGROUP_Y, WORKGROUP_Z);
 cube_renderpass.depthWriteEnabled = true;
-cube_renderpass.addCube('base_cube').instanceCount = NUMPARTICLES;
+cube_renderpass.setCube('base_cube').instanceCount = NUMPARTICLES;
 if (!options.isMobile) {
-    cube_renderpass.addSphere('sphere').instanceCount = 100;
+    cube_renderpass.setSphere('sphere').instanceCount = 100;
 }
 
 const base = {
