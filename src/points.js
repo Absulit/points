@@ -98,6 +98,8 @@ class Points {
     #canvasWidth = null;
     #canvasHeight = null;
 
+    #params = {}
+
     /**
      * Constructor of `Points`.
      * Set a width and height to be used if no `fitWindow` is called, and also
@@ -196,7 +198,7 @@ class Points {
         this.#canvas.height = this.#canvas.clientHeight;
         this.#screen[0] = this.#canvas.width;
         this.#screen[1] = this.#canvas.height;
-        this.setUniform(UniformKeys.SCREEN, this.#screen);
+        this.#params.screen.value = this.#screen
 
         this.#presentationSize = [
             this.#canvas.clientWidth,
@@ -263,7 +265,7 @@ class Points {
         this.#ratio[0] = ratio[0];
         this.#ratio[1] = ratio[1];
 
-        this.setUniform(UniformKeys.RATIO, this.#ratio);
+        this.#params.ratio.value = this.#ratio;
     }
 
     #onMouseMove = e => {
@@ -276,8 +278,10 @@ class Points {
         this.#mouseNormalized[0] = this.#mouse[0] / this.#screen[0];
         this.#mouseNormalized[1] = this.#mouse[1] / this.#screen[1];
         this.#mouseNormalized[1] = (this.#mouseNormalized[1] * - 1) - -1; // flip and move up
-        this.setUniform(UniformKeys.MOUSE, this.#mouse);
-        this.setUniform('_mouse_normalized', this.#mouseNormalized);
+
+        const { mouse, _mouse_normalized } = this.#params
+        mouse.value = this.#mouse;
+        _mouse_normalized.value = this.#mouseNormalized;
     }
 
     /**
@@ -320,12 +324,13 @@ class Points {
             throw `${structName} is an array, which is currently not supported for Uniforms.`;
         }
         const uniform = {
-            name: name,
-            value: value,
+            name,
+            value,
             type: structName,
             size: null
         }
         Object.seal(uniform);
+        this.#params[name] = uniform;
         this.#uniforms.push(uniform);
         return uniform;
     }
@@ -384,7 +389,7 @@ class Points {
      */
     updateUniforms(arr) {
         arr.forEach(uniform => {
-            const variable = this.#uniforms.find(v => v.name === uniform.name);
+            const variable = this.#params[uniform.name];
             if (!variable) {
                 throw '`updateUniform()` can\'t be called without first `setUniform()`.';
             }
@@ -2564,9 +2569,11 @@ class Points {
         this.#delta = this.#clock.getDelta();
         this.#time = this.#clock.time;
         this.#epoch = +new Date() / 1000;
-        this.setUniform(UniformKeys.TIME, this.#time);
-        this.setUniform(UniformKeys.DELTA, this.#delta);
-        this.setUniform(UniformKeys.EPOCH, this.#epoch);
+
+        const { delta, time, epoch } = this.#params;
+        delta.value = this.#delta;
+        time.value = this.#time;
+        epoch.value = this.#epoch;
         //--------------------------------------------
         this.#writeParametersUniforms();
         this.#writeStorages();
@@ -2767,9 +2774,11 @@ class Points {
         this.#mouseWheel = false;
         this.#mouseDelta[0] = 0;
         this.#mouseDelta[1] = 0;
-        this.setUniform(UniformKeys.MOUSE_CLICK, this.#mouseClick);
-        this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
-        this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta);
+
+        const {mouseClick, mouseWheel, mouseDelta} = this.#params;
+        mouseClick.value = this.#mouseClick;
+        mouseWheel.value = this.#mouseWheel;
+        mouseDelta.value = this.#mouseDelta;
         await this.read();
     }
     async read() {
@@ -2948,6 +2957,31 @@ class Points {
     set scaleMode(val) {
         this.#scaleMode = +val;
         this.#setRatio();
+    }
+
+    /**
+     * Get the list of added uniforms, same as {@link uniforms}
+     * @example
+     *
+     * points.setUniform('myuniform', 10);
+     *
+     * // later
+     * points.params.myuniform.value = 12;
+     */
+    get params() {
+        return this.#params;
+    }
+    /**
+     * Get the list of added uniforms, same as {@link params}
+     * @example
+     *
+     * points.setUniform('myuniform', 10);
+     *
+     * // later
+     * points.uniforms.myuniform.value = 12;
+     */
+    get uniforms() {
+        return this.#params;
     }
 
     /**
