@@ -98,6 +98,8 @@ class Points {
     #canvasWidth = null;
     #canvasHeight = null;
 
+    #params = {}
+
     /**
      * Constructor of `Points`.
      * Set a width and height to be used if no `fitWindow` is called, and also
@@ -320,12 +322,13 @@ class Points {
             throw `${structName} is an array, which is currently not supported for Uniforms.`;
         }
         const uniform = {
-            name: name,
-            value: value,
+            name,
+            value,
             type: structName,
             size: null
         }
         Object.seal(uniform);
+        this.#params[name] = uniform;
         this.#uniforms.push(uniform);
         return uniform;
     }
