@@ -308,7 +308,7 @@ class Points {
      * let finalColor:vec4f = mix(color0, color1, params.scale);
      */
     setUniform(name, value, structName = null) {
-        const uniformToUpdate = this.#nameExists(this.#uniforms, name);
+        const uniformToUpdate = this.#params[name];
 
         if (!uniformToUpdate && this.#initialized) {
             console.error(`'${name}' uniform needs to be declared before the init() prior to call it in update().`);
@@ -329,7 +329,7 @@ class Points {
             name,
             value,
             structName,
-        })
+        });
 
         this.#params[name] = uniform;
         this.#uniforms.push(uniform);
@@ -349,13 +349,13 @@ class Points {
         if (structName && isArray(structName)) {
             throw `${structName} is an array, which is currently not supported for Uniforms.`;
         }
-        const uniform = {
-            name: name,
-            value: value,
-            type: structName,
-            size: null
-        }
-        Object.seal(uniform);
+
+        const uniform = new Buffer({
+            name,
+            value,
+            structName,
+        });
+
         this.#meshUniforms.push(uniform);
         return uniform;
     }
@@ -373,13 +373,13 @@ class Points {
         if (structName && isArray(structName)) {
             throw `${structName} is an array, which is currently not supported for Uniforms.`;
         }
-        const uniform = {
-            name: name,
-            value: value,
-            type: structName,
-            size: null
-        }
-        Object.seal(uniform);
+
+        const uniform = new Buffer({
+            name,
+            value,
+            structName,
+        });
+
         this.#cameraUniforms.push(uniform);
         return uniform;
     }
