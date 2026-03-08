@@ -61,7 +61,31 @@ export default class Buffer {
         };
     }
 
+    /**
+     * Sets or updates the value of the Buffer.
+     * @param {Number|Boolean|Array<Number>} value
+     */
+    setValue(value){
+        this.#value = value;
+        return this;
+    }
 
+    /**
+     * Sets or updates the type (or struct) of the Buffer.
+     * @param {Number|Boolean|Array<Number>} value
+     */
+    setType(value){
+        this.#type = value;
+        return this;
+    }
 
+    /**
+     * Sets or updates the size in bytes of the Buffer.
+     * @param {Number|Boolean|Array<Number>} value
+     */
+    setSize(value){
+        this.#size = value;
+        return this;
+    }
 
 }

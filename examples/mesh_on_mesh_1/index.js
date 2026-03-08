@@ -78,8 +78,11 @@ const base = {
 
         points.setStorageMap('vertex_data', vertex_data.flat(), `array<vec4f, ${vertex_data.length}>`);
 
-        points.setUniform('visibility', options.visibility);
-        folder.add(options, 'visibility').name('visibility');
+        points.setUniform('visibility', options.visibility).setType('u32');
+        folder.add(options, 'visibility').name('visibility').onChange(value => {
+            const { visibility } = points.params;
+            visibility.value = value;
+        });
 
         points.setCameraPerspective('camera');
 
@@ -90,8 +93,6 @@ const base = {
      */
     update: points => {
         points.setCameraPerspective('camera', [0, 0, 5], [0, 0, -1000]);
-
-        points.setUniform('visibility', options.visibility);
     }
 }
 
