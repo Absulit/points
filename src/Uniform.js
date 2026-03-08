@@ -1,8 +1,7 @@
 /**
- * The Buffer class represents a generalized container for:
- * Uniforms, Storage, StorageMap.
+ * Uniform class is a container for uniform related data and actions.
  */
-export default class Buffer {
+export default class Uniform {
     #name
     #value
     #type
@@ -62,7 +61,7 @@ export default class Buffer {
     }
 
     /**
-     * Sets or updates the value of the Buffer.
+     * Sets or updates the value of the Uniform.
      * @param {Number|Boolean|Array<Number>} value
      */
     setValue(value){
@@ -71,20 +70,11 @@ export default class Buffer {
     }
 
     /**
-     * Sets or updates the type (or struct) of the Buffer.
+     * Sets or updates the type (or struct) of the Uniform.
      * @param {Number|Boolean|Array<Number>} value
      */
     setType(value){
         this.#type = value;
-        return this;
-    }
-
-    /**
-     * Sets or updates the size in bytes of the Buffer.
-     * @param {Number|Boolean|Array<Number>} value
-     */
-    setSize(value){
-        this.#size = value;
         return this;
     }
 

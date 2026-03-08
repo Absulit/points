@@ -16,7 +16,7 @@ import { cross, dot, normalize, sub } from './matrix.js';
 import { clearCache, elToImage, getCSS } from './texture-element.js';
 import PresentationFormat from './PresentationFormat.js';
 import ScaleMode from './ScaleMode.js';
-import Buffer from './Buffer.js';
+import Uniform from './Uniform.js';
 
 /**
  * Main class Points, this is the entry point of an application with this library.
@@ -325,7 +325,7 @@ class Points {
             throw `${structName} is an array, which is currently not supported for Uniforms.`;
         }
 
-        const uniform = new Buffer({
+        const uniform = new Uniform({
             name,
             value,
             type: structName,
@@ -350,7 +350,7 @@ class Points {
             throw `${structName} is an array, which is currently not supported for Uniforms.`;
         }
 
-        const uniform = new Buffer({
+        const uniform = new Uniform({
             name,
             value,
             type: structName,
@@ -374,7 +374,7 @@ class Points {
             throw `${structName} is an array, which is currently not supported for Uniforms.`;
         }
 
-        const uniform = new Buffer({
+        const uniform = new Uniform({
             name,
             value,
             type: structName,
