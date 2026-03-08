@@ -17,6 +17,7 @@ import { clearCache, elToImage, getCSS } from './texture-element.js';
 import PresentationFormat from './PresentationFormat.js';
 import ScaleMode from './ScaleMode.js';
 import Uniform from './Uniform.js';
+import Storage from './Storage.js';
 
 /**
  * Main class Points, this is the entry point of an application with this library.
@@ -470,16 +471,15 @@ class Points {
         if (this.#nameExists(this.#storage, name)) {
             throw `\`setStorage()\` You have already defined \`${name}\``;
         }
-        const storage = {
-            mapped: !!arrayData,
+
+        const storage = new Storage({
             name,
+            arrayData,
             structName,
-            // structSize: null,
             shaderType,
             read,
-            buffer: null,
-            internal: false
-        }
+        });
+
         this.#storage.push(storage);
         return storage;
     }
@@ -1573,13 +1573,13 @@ class Points {
             if (!s.mapped) {
                 if (isArray(s.structName)) {
                     const typeData = getArrayTypeData(s.structName, this.#dataSize);
-                    s.structSize = typeData.size;
+                    s.size = typeData.size;
                 } else {
                     const d = this.#dataSize.get(s.structName) || typeSizes[s.structName];
                     if (!d) {
                         throw `${s.structName} has not been defined.`
                     }
-                    s.structSize = d.bytes || d.size;
+                    s.size = d.bytes || d.size;
                 }
             }
         });
@@ -1838,7 +1838,7 @@ class Points {
             if (storageItem.read) {
                 let readStorageItem = {
                     name: storageItem.name,
-                    size: storageItem.structSize
+                    size: storageItem.size
                 }
                 if (storageItem.mapped) {
                     readStorageItem = {
@@ -1849,12 +1849,12 @@ class Points {
                 this.#readStorage.push(readStorageItem);
                 usage = usage | GPUBufferUsage.COPY_SRC;
             }
-            storageItem.usage = usage;
+
             if (storageItem.mapped) {
                 const values = new Float32Array(storageItem.array);
                 storageItem.buffer = this.#createAndMapBuffer(values, usage, true, storageItem.size);
             } else {
-                storageItem.buffer = this.#createBuffer(storageItem.structSize, usage);
+                storageItem.buffer = this.#createBuffer(storageItem.size, usage);
             }
             storageItem.buffer.label = storageItem.name;
         });
