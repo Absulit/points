@@ -625,7 +625,7 @@ class Points {
     }
 
     #nameExists(arrayOfObjects, name) {
-        return arrayOfObjects.find(obj => obj.name == name);
+        return arrayOfObjects.find(obj => obj.name === name);
     }
 
     /**
@@ -3048,6 +3048,8 @@ class Points {
         this.#meshUniforms = new UniformsArray();
         this.#cameraUniforms = new UniformsArray();
 
+        this.#params = {};
+
         this.#texturesExternal?.forEach(textureExternal => {
             const stream = textureExternal?.video.srcObject;
             stream?.getTracks().forEach(track => track.stop());
@@ -3120,6 +3122,8 @@ class Points {
         this.#uniforms = null;
         this.#meshUniforms = null;
         this.#cameraUniforms = null;
+
+        this.#params = null;
 
         this.#texturesExternal.forEach(textureExternal => {
             const stream = textureExternal?.video.srcObject;
