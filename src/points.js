@@ -16,6 +16,7 @@ import { cross, dot, normalize, sub } from './matrix.js';
 import { clearCache, elToImage, getCSS } from './texture-element.js';
 import PresentationFormat from './PresentationFormat.js';
 import ScaleMode from './ScaleMode.js';
+import Buffer from './Buffer.js';
 
 /**
  * Main class Points, this is the entry point of an application with this library.
@@ -323,13 +324,13 @@ class Points {
         if (structName && isArray(structName)) {
             throw `${structName} is an array, which is currently not supported for Uniforms.`;
         }
-        const uniform = {
+
+        const uniform = new Buffer({
             name,
             value,
-            type: structName,
-            size: null
-        }
-        Object.seal(uniform);
+            structName,
+        })
+
         this.#params[name] = uniform;
         this.#uniforms.push(uniform);
         return uniform;
@@ -1754,8 +1755,9 @@ class Points {
         const paramsDataSize = this.#dataSize.get(structName)
         const paddings = paramsDataSize.paddings;
         // we check the paddings list and add 0's to just the ones that need it
-        const uniformsClone = structuredClone(uniformsArray);
-        let arrayValues = uniformsClone.map(v => {
+        const arrayValues = uniformsArray.map(u => {
+            const v = u.serialize(); // clone the item to not modify the original
+
             const padding = paddings[v.name] / 4;
             if (padding) {
                 if (v.value.constructor !== Array) {
@@ -2775,7 +2777,7 @@ class Points {
         this.#mouseDelta[0] = 0;
         this.#mouseDelta[1] = 0;
 
-        const {mouseClick, mouseWheel, mouseDelta} = this.#params;
+        const { mouseClick, mouseWheel, mouseDelta } = this.#params;
         mouseClick.value = this.#mouseClick;
         mouseWheel.value = this.#mouseWheel;
         mouseDelta.value = this.#mouseDelta;
