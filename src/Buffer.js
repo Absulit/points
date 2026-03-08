@@ -1,12 +1,20 @@
+/**
+ * The Buffer class represents a generalized container for:
+ * Uniforms, Storage, StorageMap.
+ */
 export default class Buffer {
     #name
     #value
     #type
     #size
-    constructor({ name, value, structName = null, size = null }) {
+    /**
+     *
+     * @param {{name:String, value:Number|Boolean|Array<Number>, type:string, size:Number}} param0
+     */
+    constructor({ name, value, type = null, size = null }) {
         this.#name = name;
         this.#value = value;
-        this.#type = structName;
+        this.#type = type;
         this.#size = size;
 
         Object.seal(this);

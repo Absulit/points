@@ -328,7 +328,7 @@ class Points {
         const uniform = new Buffer({
             name,
             value,
-            structName,
+            type: structName,
         });
 
         this.#params[name] = uniform;
@@ -353,7 +353,7 @@ class Points {
         const uniform = new Buffer({
             name,
             value,
-            structName,
+            type: structName,
         });
 
         this.#meshUniforms.push(uniform);
@@ -377,7 +377,7 @@ class Points {
         const uniform = new Buffer({
             name,
             value,
-            structName,
+            type: structName,
         });
 
         this.#cameraUniforms.push(uniform);
