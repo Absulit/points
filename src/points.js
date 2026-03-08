@@ -1572,8 +1572,8 @@ class Points {
         this.#storage.forEach(s => {
             if (!s.mapped) {
                 if (isArray(s.structName)) {
-                    const typeData = getArrayTypeData(s.structName, this.#dataSize);
-                    s.size = typeData.size;
+                    const { size } = getArrayTypeData(s.structName, this.#dataSize);
+                    s.size = size;
                 } else {
                     const d = this.#dataSize.get(s.structName) || typeSizes[s.structName];
                     if (!d) {
