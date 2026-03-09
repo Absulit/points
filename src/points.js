@@ -541,26 +541,17 @@ class Points {
             storageToUpdate.updated = true;
             return storageToUpdate;
         }
-        // TODO document the stream feature
-        /**
-         * `updated` is set to true in data updates, but this is not true in
-         * something like audio, where the data streams and needs to be updated
-         * constantly, so if the storage map needs to be updated constantly then
-         * `stream` needs to be set to true.
-         */
-        const storage = {
-            stream: false, // permanently updated as true
+
+        const storage = new Storage({
             updated: true,
             mapped: true,
             name,
             structName,
             shaderType,
-            array: arrayData,
-            buffer: null,
+            arrayData,
             read,
-            size: null, // TODO: document this: to force allocate more space in case an update is greater than the default array size
-            internal: false,
-        }
+        });
+
         this.#storage.push(storage);
         return storage;
     }

@@ -6,18 +6,29 @@ export default class Storage {
     #read
     #buffer = null
     #internal = false
-
+    // TODO document the stream feature
+    /**
+     * `updated` is set to true in data updates, but this is not true in
+     * something like audio, where the data streams and needs to be updated
+     * constantly, so if the storage map needs to be updated constantly then
+     * `stream` needs to be set to true.
+     */
     #stream = false
-    #updated = true
+    #updated = false
     #array
     #size = null // TODO: document this: to force allocate more space in case an update is greater than the default array size
-    constructor({ name, arrayData, structName, read, shaderType }) {
+    constructor({ name, arrayData, structName, read, shaderType,
+        stream = false, updated = false, size = null }) {
         this.#name = name;
         this.#mapped = !!arrayData;
         this.#structName = structName;
         this.#read = read;
         this.#shaderType = shaderType;
         this.#array = arrayData;
+
+        this.#stream = stream;
+        this.#updated = updated;
+        this.#size = size;
 
         Object.seal(this);
     }
@@ -76,12 +87,37 @@ export default class Storage {
     set internal(value) {
         this.#internal = value;
     }
+
     get size() {
         return this.#size;
     }
 
     set size(value) {
         this.#size = value;
+    }
+
+    get stream() {
+        return this.#stream;
+    }
+
+    set stream(value) {
+        this.#stream = value;
+    }
+
+    get updated() {
+        return this.#updated;
+    }
+
+    set updated(value) {
+        this.#updated = value;
+    }
+
+    get array() {
+        return this.#array;
+    }
+
+    set array(value) {
+        this.#array = value;
     }
 
 }
