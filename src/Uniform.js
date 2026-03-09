@@ -52,10 +52,14 @@ export default class Uniform {
     }
 
     serialize() {
+        // we check if array and spread
+        // because structuredClone is slower
+        const isArray = Array.isArray(this.#value);
+        const value = isArray ? [...this.#value] : this.#value;
         return {
             name: this.#name,
-            value: this.#value,
-            structName: this.#type,
+            value,
+            type: this.#type,
             size: this.#size
         };
     }
@@ -64,7 +68,7 @@ export default class Uniform {
      * Sets or updates the value of the Uniform.
      * @param {Number|Boolean|Array<Number>} value
      */
-    setValue(value){
+    setValue(value) {
         this.#value = value;
         return this;
     }
@@ -73,7 +77,7 @@ export default class Uniform {
      * Sets or updates the type (or struct) of the Uniform.
      * @param {Number|Boolean|Array<Number>} value
      */
-    setType(value){
+    setType(value) {
         this.#type = value;
         return this;
     }
