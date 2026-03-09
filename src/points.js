@@ -1835,28 +1835,26 @@ class Points {
         //--------------------------------------------
         this.#storage.forEach(storageItem => {
             let usage = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST;
-            if (storageItem.read) {
+            const { read, name, size, mapped } = storageItem;
+            if (read) {
                 let readStorageItem = {
-                    name: storageItem.name,
-                    size: storageItem.size
+                    name,
+                    size
                 }
-                if (storageItem.mapped) {
-                    readStorageItem = {
-                        name: storageItem.name,
-                        size: storageItem.array.length,
-                    }
+                if (mapped) {
+                    readStorageItem.size = storageItem.array.length;
                 }
                 this.#readStorage.push(readStorageItem);
                 usage = usage | GPUBufferUsage.COPY_SRC;
             }
 
-            if (storageItem.mapped) {
+            if (mapped) {
                 const values = new Float32Array(storageItem.array);
-                storageItem.buffer = this.#createAndMapBuffer(values, usage, true, storageItem.size);
+                storageItem.buffer = this.#createAndMapBuffer(values, usage, true, size);
             } else {
-                storageItem.buffer = this.#createBuffer(storageItem.size, usage);
+                storageItem.buffer = this.#createBuffer(size, usage);
             }
-            storageItem.buffer.label = storageItem.name;
+            storageItem.buffer.label = name;
         });
         //--------------------------------------------
         this.#readStorage.forEach(readStorageItem => {
