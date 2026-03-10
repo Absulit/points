@@ -17,14 +17,14 @@ export default class Storage {
     #updated = false
     #array
     #size = null // TODO: document this: to force allocate more space in case an update is greater than the default array size
-    constructor({ name, arrayData, structName, read, shaderType,
+    constructor({ name, value, structName, read, shaderType,
         stream = false, updated = false, size = null }) {
         this.#name = name;
-        this.#mapped = !!arrayData;
+        this.#mapped = !!value;
         this.#structName = structName;
         this.#read = read;
         this.#shaderType = shaderType;
-        this.#array = arrayData;
+        this.#array = value;
 
         this.#stream = stream;
         this.#updated = updated;
