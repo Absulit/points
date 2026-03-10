@@ -446,6 +446,8 @@ class Points {
      * Meaning it can be updated in the shaders across the execution of every frame.
      * <br>
      * It can have almost any type, like `f32` or `vec2f` or even array<f32>.
+     * <br>
+     * It can also be initialized with data with the {@link Storage#setValue} method
      * @param {string} name Name that the Storage will have in the shader
      * @param {string} structName Name of the struct already existing on the
      * shader. This will be the type of the Storage.
@@ -466,6 +468,12 @@ class Points {
      *
      * // wgsl string
      * colors[index] = vec3f(248, 208, 146) / 255;
+     *
+     * @example
+     * // add data from initialization
+     * // js
+     * points.setStorage('vertex_data', `array<vec4f, ${vertex_data.length}>`)
+        .setValue(vertex_data.flat());
      */
     setStorage(name, structName, read, shaderType = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE, arrayData = null) {
         const storageToUpdate = this.#nameExists(this.#storage, name);
