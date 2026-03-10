@@ -275,7 +275,7 @@ let b = value_noise_data[0];
 variables.isCreated = 1;
 ```
 
-You can also add a default type instead of a custom struct in `structName`:
+You can also add a default type instead of a custom struct with the `type` parameter:
 
 ```js
 points.setStorage('myVar', 'f32');
