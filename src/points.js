@@ -475,22 +475,22 @@ class Points {
      * points.setStorage('vertex_data', `array<vec4f, ${vertex_data.length}>`)
         .setValue(vertex_data.flat());
      */
-    setStorage(name, type, read, shaderType = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE, arrayData = null) {
+    setStorage(name, type, read, shaderType = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE, value = null) {
         const storageToUpdate = this.#nameExists(this.#storage, name);
 
-        // if (!Array.isArray(arrayData) && arrayData?.constructor !== Uint8Array) {
-        //     arrayData = new Uint8Array([arrayData]);
+        // if (!Array.isArray(value) && value?.constructor !== Uint8Array) {
+        //     value = new Uint8Array([value]);
         // }
 
         if (storageToUpdate) {
-            storageToUpdate.value = arrayData;
+            storageToUpdate.value = value;
             storageToUpdate.updated = true;
             return storageToUpdate;
         }
 
         const storage = new Storage({
             name,
-            value: arrayData,
+            value,
             type,
             shaderType,
             read,
@@ -512,7 +512,7 @@ class Points {
      * The difference with {@link Points#setStorage|setStorage} is that this can be initialized
      * with data.
      * @param {string} name Name that the Storage will have in the shader.
-     * @param {Uint8Array<ArrayBuffer>|Array<Number>|Number} arrayData array with the data that must match the struct.
+     * @param {Uint8Array<ArrayBuffer>|Array<Number>|Number} value array with the data that must match the struct.
      * @param {string} type Name of the struct already existing on the
      * shader. This will be the type of the Storage.
      * @param {boolean} read if this is going to be used to read data back.
@@ -546,15 +546,15 @@ class Points {
      *
      * resultMatrix.size = vec2(firstMatrix.size.x, secondMatrix.size.y);
      */
-    setStorageMap(name, arrayData, type, read = false, shaderType = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE) {
+    setStorageMap(name, value, type, read = false, shaderType = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE) {
         const storageToUpdate = this.#nameExists(this.#storage, name);
 
-        if (!Array.isArray(arrayData) && arrayData.constructor !== Uint8Array) {
-            arrayData = new Uint8Array([arrayData]);
+        if (!Array.isArray(value) && value.constructor !== Uint8Array) {
+            value = new Uint8Array([value]);
         }
 
         if (storageToUpdate) {
-            storageToUpdate.value = arrayData;
+            storageToUpdate.value = value;
             storageToUpdate.updated = true;
             return storageToUpdate;
         }
@@ -565,7 +565,7 @@ class Points {
             name,
             type,
             shaderType,
-            value: arrayData,
+            value,
             read,
         });
 
