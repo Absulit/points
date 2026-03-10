@@ -120,7 +120,20 @@ export default class Storage {
     }
 
     set array(value) {
+        this.#mapped = !!value;
         this.#array = value;
+    }
+
+    /**
+     *
+     * @param {Array<Number>} value
+     * @returns
+     */
+    setValue(value) {
+        this.#mapped = true;
+        this.#updated = true;
+        this.#array = value;
+        return this;
     }
 
 }
