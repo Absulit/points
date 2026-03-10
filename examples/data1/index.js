@@ -20,7 +20,7 @@ const data1 = {
             5, 6, 7, 8
         ];
 
-        points.setStorageMap('firstMatrix', firstMatrix, 'Matrix');
+        points.setStorage('firstMatrix', 'Matrix').setValue(firstMatrix);
 
         const secondMatrix = [
             4 /* rows */, 2 /* columns */,
@@ -30,7 +30,7 @@ const data1 = {
             7, 8
         ];
 
-        points.setStorageMap('secondMatrix', secondMatrix, 'Matrix');
+        points.setStorage('secondMatrix', 'Matrix').setValue(secondMatrix);
 
         // original lines as reference:
         // let resultMatrixBufferSize = 2 + firstMatrix[0] * secondMatrix[1];

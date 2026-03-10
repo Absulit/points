@@ -4,6 +4,7 @@ import frag from './frag.js';
 import { RenderPass } from 'points';
 
 let data = [];
+let rands;
 
 const random2 = {
     renderPasses: [
@@ -13,25 +14,28 @@ const random2 = {
         points.setUniform('randNumber', 0);
         points.setUniform('randNumber2', 0);
         // let data = [];
-        for (let k = 0; k < 800*800; k++) {
+        for (let k = 0; k < 800 * 800; k++) {
             data.push(Math.random());
         }
         // .stream if the data is going to be updated constantly
-        // points.setStorageMap('rands', data, 'array<f32>').stream = true;
-        points.setStorageMap('rands', data, 'array<f32>');
+        rands = points.setStorage('rands', 'array<f32>')
+            .setValue(data).stream = true;
         points.setSampler('feedbackSampler');
         points.setTexture2d('feedbackTexture', true);
         points.setBindingTexture('outputTex', 'computeTexture');
     },
     update: points => {
-        points.setUniform('randNumber', Math.random());
-        points.setUniform('randNumber2', Math.random());
-        // data = [];
-        for (let k = 0; k < 800*800; k++) {
+        const { randNumber, randNumber2 } = points.params;
+        randNumber.value = Math.random();
+        randNumber2.value = Math.random();
+
+        for (let k = 0; k < 800 * 800; k++) {
             data[k] = Math.random();
         }
         // alternative to update use .stream
-        points.setStorageMap('rands', data);
+        // it seems this call is not necessary because
+        // `data` already updates the value 🤷‍♂️
+        // rands.setValue(data)
     }
 }
 

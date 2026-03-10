@@ -451,7 +451,7 @@ class Points {
      * shader. This will be the type of the Storage.
      * @param {boolean} read if this is going to be used to read data back
      * @param {GPUShaderStage} shaderType this tells to what shader the storage is bound
-     * @returns {Object}
+     * @returns {Storage}
      *
      * @example
      * // js

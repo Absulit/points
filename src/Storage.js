@@ -127,12 +127,31 @@ export default class Storage {
     /**
      *
      * @param {Array<Number>} value
-     * @returns
+     * @returns {Storage}
      */
     setValue(value) {
+        if (!Array.isArray(value) && value.constructor !== Uint8Array) {
+            value = new Uint8Array([value]);
+        }
         this.#mapped = true;
         this.#updated = true;
         this.#value = value;
+        return this;
+    }
+
+    setRead(value) {
+        this.#read = value;
+        return this;
+    }
+
+    // TODO: rename to setStage? setShaderStage?
+    /**
+     *
+     * @param {GPUShaderStage} value
+     * @returns {Storage}
+     */
+    setShaderType(value) {
+        this.#shaderType = value;
         return this;
     }
 

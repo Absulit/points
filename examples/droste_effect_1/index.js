@@ -16,7 +16,7 @@ import { RenderPass } from 'points';
 
 // TODO: do colors requires a 0 at the end? (padding)
 const colors = [
-    248,208,146, 0,
+    248, 208, 146, 0,
     21, 144, 151, 0,
     56, 164, 140, 0,
     26, 86, 120, 0,
@@ -36,7 +36,8 @@ const base = {
     init: async (points, folder) => {
         points.setSampler('imageSampler', null, GPUShaderStage.FRAGMENT);
         points.setTexture2d('feedbackTexture', true);
-        points.setStorageMap('colors', colors, 'array<vec3f, 6>');
+        points.setStorage('colors', 'array<vec3f, 6>')
+            .setValue(colors);
     },
     update: points => {
     }
