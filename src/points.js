@@ -294,7 +294,7 @@ class Points {
      * and unless changed it remains consistent.
      * @param {string} name name of the Param, you can invoke it later in shaders as `Params.[name]`
      * @param {Number|Boolean|Array<Number>} value Single number or a list of numbers. Boolean is converted to Number.
-     * @param {string} structName type as `f32` or a custom struct. Default `f32`.
+     * @param {string} type type as `f32` or a custom struct. Default `f32`.
      * @return {Uniform}
      *
      * @example
@@ -308,28 +308,28 @@ class Points {
      * let color1 = vec4(params.color1/255, 1.);
      * let finalColor:vec4f = mix(color0, color1, params.scale);
      */
-    setUniform(name, value, structName = null) {
+    setUniform(name, value, type = null) {
         const uniformToUpdate = this.#params[name];
 
         if (!uniformToUpdate && this.#initialized) {
             console.error(`'${name}' uniform needs to be declared before the init() prior to call it in update().`);
         }
-        if (uniformToUpdate && structName) {
+        if (uniformToUpdate && type) {
             // if name exists is an update
-            this.#debug && console.warn(`setUniform(${name}, [${value}], ${structName}) can't set the structName of an already defined uniform.`);
+            this.#debug && console.warn(`setUniform(${name}, [${value}], ${type}) can't set the structName of an already defined uniform.`);
         }
         if (uniformToUpdate) {
             uniformToUpdate.value = value;
             return uniformToUpdate;
         }
-        if (structName && isArray(structName)) {
-            throw `${structName} is an array, which is currently not supported for Uniforms.`;
+        if (type && isArray(type)) {
+            throw `${type} is an array, which is currently not supported for Uniforms.`;
         }
 
         const uniform = new Uniform({
             name,
             value,
-            type: structName,
+            type,
         });
 
         this.#params[name] = uniform;
