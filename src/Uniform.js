@@ -76,6 +76,9 @@ export default class Uniform {
     /**
      * Sets or updates the type (or struct) of the Uniform.
      * @param {Number|Boolean|Array<Number>} value
+     *
+     * @example
+     * myUniform.setType('u32')
      */
     setType(value) {
         this.#type = value;
