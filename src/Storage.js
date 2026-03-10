@@ -1,7 +1,7 @@
 export default class Storage {
     #name
     #mapped
-    #structName
+    #type
     #shaderType
     #read
     #buffer = null
@@ -24,7 +24,7 @@ export default class Storage {
         stream = false, updated = false, size = null }) {
         this.#name = name;
         this.#mapped = !!value;
-        this.#structName = structName;
+        this.#type = structName;
         this.#read = read;
         this.#shaderType = shaderType;
         this.#value = value;
@@ -52,12 +52,12 @@ export default class Storage {
         this.#mapped = value;
     }
 
-    get structName() {
-        return this.#structName;
+    get type() {
+        return this.#type;
     }
 
-    set structName(value) {
-        this.#structName = value;
+    set type(value) {
+        this.#type = value;
     }
 
     get shaderType() {

@@ -563,7 +563,7 @@ class Points {
             updated: true,
             mapped: true,
             name,
-            structName,
+            value: structName,
             shaderType,
             value: arrayData,
             read,
@@ -1340,7 +1340,7 @@ class Points {
         this.#storage.forEach(storageItem => {
             const isInternal = internal === storageItem.internal;
             if (isInternal && (!storageItem.shaderType || storageItem.shaderType & shaderType)) {
-                const T = storageItem.structName;
+                const T = storageItem.type;
 
                 // note:
                 // shaderType means: this is the current GPUShaderStage we are at
@@ -1580,13 +1580,13 @@ class Points {
         // this is only required for storage
         this.#storage.forEach(s => {
             if (!s.mapped) {
-                if (isArray(s.structName)) {
-                    const { size } = getArrayTypeData(s.structName, this.#dataSize);
+                if (isArray(s.type)) {
+                    const { size } = getArrayTypeData(s.type, this.#dataSize);
                     s.size = size;
                 } else {
-                    const d = this.#dataSize.get(s.structName) || typeSizes[s.structName];
+                    const d = this.#dataSize.get(s.type) || typeSizes[s.type];
                     if (!d) {
-                        throw `${s.structName} has not been defined.`
+                        throw `${s.type} has not been defined.`
                     }
                     s.size = d.bytes || d.size;
                 }
