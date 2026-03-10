@@ -501,7 +501,7 @@ class Points {
     }
 
     /**
-     * @deprecated Since v0.8.0 use {@link setStorageMap}
+     * @deprecated Since v0.8.0 use {@link setStorage}
      * Creates a persistent memory buffer across every frame call that can be updated.
      * See [GPUBuffer](https://www.w3.org/TR/webgpu/#gpubuffer)
      * <br>
