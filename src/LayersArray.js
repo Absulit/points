@@ -4,7 +4,7 @@
  */
 class LayersArray extends Array {
     #buffer = null;
-    #shaderType = null;
+    #shaderStage = null;
     constructor(...elements) {
         super(...elements);
     }
@@ -17,15 +17,15 @@ class LayersArray extends Array {
         this.#buffer = v;
     }
 
-    get shaderType() {
-        return this.#shaderType;
+    get shaderStage() {
+        return this.#shaderStage;
     }
 
     /**
      * @param {GPUShaderStage} v
      */
-    set shaderType(v) {
-        this.#shaderType = v;
+    set shaderStage(v) {
+        this.#shaderStage = v;
     }
 }
 

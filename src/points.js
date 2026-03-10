@@ -452,7 +452,7 @@ class Points {
      * @param {string} type Name of the struct already existing on the
      * shader. This will be the type of the Storage.
      * @param {boolean} read if this is going to be used to read data back
-     * @param {GPUShaderStage} shaderType this tells to what shader the storage is bound
+     * @param {GPUShaderStage} shaderStage this tells to what shader the storage is bound
      * @returns {Storage}
      *
      * @example
@@ -475,7 +475,7 @@ class Points {
      * points.setStorage('vertex_data', `array<vec4f, ${vertex_data.length}>`)
         .setValue(vertex_data.flat());
      */
-    setStorage(name, type, read, shaderType = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE, value = null) {
+    setStorage(name, type, read, shaderStage = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE, value = null) {
         const storageToUpdate = this.#nameExists(this.#storage, name);
 
         // if (!Array.isArray(value) && value?.constructor !== Uint8Array) {
@@ -492,7 +492,7 @@ class Points {
             name,
             value,
             type,
-            shaderType,
+            shaderStage,
             read,
         });
 
@@ -516,7 +516,7 @@ class Points {
      * @param {string} type Name of the struct already existing on the
      * shader. This will be the type of the Storage.
      * @param {boolean} read if this is going to be used to read data back.
-     * @param {GPUShaderStage} shaderType this tells to what shader the storage is bound
+     * @param {GPUShaderStage} shaderStage this tells to what shader the storage is bound
      *
      * @example
      * // js examples/data1
@@ -546,7 +546,7 @@ class Points {
      *
      * resultMatrix.size = vec2(firstMatrix.size.x, secondMatrix.size.y);
      */
-    setStorageMap(name, value, type, read = false, shaderType = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE) {
+    setStorageMap(name, value, type, read = false, shaderStage = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE) {
         const storageToUpdate = this.#nameExists(this.#storage, name);
 
         if (!Array.isArray(value) && value.constructor !== Uint8Array) {
@@ -564,7 +564,7 @@ class Points {
             mapped: true,
             name,
             type,
-            shaderType,
+            shaderStage,
             value,
             read,
         });
@@ -605,7 +605,7 @@ class Points {
      * This creates a storage array named `layers` of the size
      * of the screen in pixels;
      * @param {Number} numLayers
-     * @param {GPUShaderStage} shaderType
+     * @param {GPUShaderStage} shaderStage
      *
      * @example
      * // js
@@ -616,11 +616,11 @@ class Points {
      * layers[0][pointIndex] = point;
      * layers[1][pointIndex] = point;
      */
-    setLayers(numLayers, shaderType) {
+    setLayers(numLayers, shaderStage) {
         // TODO: check what data to return
         // TODO: improve jsdoc because the array definition is confusing
         for (let layerIndex = 0; layerIndex < numLayers; layerIndex++) {
-            this.#layers.shaderType = shaderType;
+            this.#layers.shaderStage = shaderStage;
             this.#layers.push({
                 name: `layer${layerIndex}`,
                 size: this.#canvas.width * this.#canvas.height,
@@ -659,7 +659,7 @@ class Points {
      * let value = texturePosition(image, imageSampler, position, in.uvr, true);
      */
 
-    setSampler(name, descriptor, shaderType) {
+    setSampler(name, descriptor, shaderStage) {
         if ('sampler' == name) {
             throw 'setSampler: `name` can not be sampler since is a WebGPU keyword.';
         }
@@ -680,7 +680,7 @@ class Points {
         const sampler = {
             name: name,
             descriptor: descriptor,
-            shaderType: shaderType,
+            shaderStage: shaderStage,
             resource: null,
             internal: false
         };
@@ -697,7 +697,7 @@ class Points {
      *
      * @param {String} name Name to call the texture in the shaders.
      * @param {boolean} copyCurrentTexture If you want the fragment output to be copied here.
-     * @param {GPUShaderStage} shaderType To what {@link GPUShaderStage} you want to exclusively use this variable.
+     * @param {GPUShaderStage} shaderStage To what {@link GPUShaderStage} you want to exclusively use this variable.
      * @param {Number} renderPassIndex If using `copyCurrentTexture`
      * this tells which RenderPass it should get the data from. If not set then it will grab the last pass.
      * @returns {Object}
@@ -714,7 +714,7 @@ class Points {
      * );
      *
      */
-    setTexture2d(name, copyCurrentTexture, shaderType, renderPassIndex) {
+    setTexture2d(name, copyCurrentTexture, shaderStage, renderPassIndex) {
         const exists = this.#nameExists(this.#textures2d, name);
         if (exists) {
             this.#debug && console.warn(`setTexture2d: \`${name}\` already exists.`);
@@ -723,7 +723,7 @@ class Points {
         const texture2d = {
             name,
             copyCurrentTexture,
-            shaderType,
+            shaderStage,
             texture: null,
             renderPassIndex,
             internal: false
@@ -735,11 +735,11 @@ class Points {
     /**
      * Creates a depth map from the selected `renderPassIndex`
      * @param {String} name
-     * @param {GPUShaderStage} shaderType
+     * @param {GPUShaderStage} shaderStage
      * @param {Number} renderPassIndex
      * @returns {Object}
      */
-    setTextureDepth2d(name, shaderType, renderPassIndex) {
+    setTextureDepth2d(name, shaderStage, renderPassIndex) {
         const exists = this.#nameExists(this.#texturesDepth2d, name);
         if (exists) {
             this.#debug && console.warn(`setTextureDepth2d: \`${name}\` already exists.`);
@@ -748,7 +748,7 @@ class Points {
         renderPassIndex ||= 0;
         const textureDepth2d = {
             name,
-            shaderType,
+            shaderStage,
             texture: null,
             renderPassIndex,
             internal: false,
@@ -783,7 +783,7 @@ class Points {
      * Supports web formats like JPG, PNG.
      * @param {string} name identifier it will have in the shaders
      * @param {string} path image address in a web server
-     * @param {GPUShaderStage} shaderType in what shader type it will exist only
+     * @param {GPUShaderStage} shaderStage in what shader type it will exist only
      * @returns {Object}
      *
      * @example
@@ -793,14 +793,14 @@ class Points {
      * // wgsl string
      * let rgba = texturePosition(image, imageSampler, position, in.uvr, true);
      */
-    async setTextureImage(name, path, shaderType = null) {
+    async setTextureImage(name, path, shaderStage = null) {
         const texture2dToUpdate = this.#nameExists(this.#textures2d, name);
         const response = await fetch(path);
         const blob = await response.blob();
         const imageBitmap = await createImageBitmap(blob);
         if (texture2dToUpdate) {
-            if (shaderType) {
-                throw '`setTextureImage()` the param `shaderType` should not be updated after its creation.';
+            if (shaderStage) {
+                throw '`setTextureImage()` the param `shaderStage` should not be updated after its creation.';
             }
             this.#textureUpdated = true;
             texture2dToUpdate.imageTexture.bitmap = imageBitmap;
@@ -825,7 +825,7 @@ class Points {
         const texture2d = {
             name: name,
             copyCurrentTexture: false,
-            shaderType: shaderType,
+            shaderStage: shaderStage,
             texture: null,
             renderPassIndex: null,
             imageTexture: {
@@ -844,7 +844,7 @@ class Points {
      * This will only generate an image, so animations will not work.
      * @param {String} name identifier it will have in the shaders
      * @param {HTMLElement} element element loaded in the DOM or dynamically
-     * @param {GPUShaderStage} shaderType in what shader type it will exist only
+     * @param {GPUShaderStage} shaderStage in what shader type it will exist only
      * @returns {Object}
      *
      * @example
@@ -855,11 +855,11 @@ class Points {
      * // wgsl string
      * let color = texture(image, imageSampler, in.uvr, true);
      */
-    async setTextureElement(name, element, shaderType = null) {
+    async setTextureElement(name, element, shaderStage = null) {
         const styles = getCSS(element);
         const cssText = styles.map(style => style.cssText).join('\n');
         const path = await elToImage(element, cssText);
-        return await this.setTextureImage(name, path, shaderType);
+        return await this.setTextureImage(name, path, shaderStage);
     }
 
     /**
@@ -874,7 +874,7 @@ class Points {
      * @param {String} path atlas to grab characters from, image address in a web server
      * @param {{x: number, y: number}} size size of a individual character e.g.: `{x:10, y:20}`
      * @param {Number} offset how many characters back or forward it must move to start
-     * @param {GPUShaderStage} shaderType To what {@link GPUShaderStage} you want to exclusively use this variable.
+     * @param {GPUShaderStage} shaderStage To what {@link GPUShaderStage} you want to exclusively use this variable.
      * @returns {Object}
      *
      * @example
@@ -891,21 +891,21 @@ class Points {
      * let textColors = texture(textImg, imageSampler, in.uvr, true);
      *
      */
-    async setTextureString(name, text, path, size, offset = 0, shaderType = null) {
+    async setTextureString(name, text, path, size, offset = 0, shaderStage = null) {
         const atlas = await loadImage(path);
         const textImg = strToImage(text, atlas, size, offset);
-        return this.setTextureImage(name, textImg, shaderType);
+        return this.setTextureImage(name, textImg, shaderStage);
     }
 
     /**
      * Load images as texture_2d_array
      * @param {string} name id of the wgsl variable in the shader
      * @param {Array} paths image addresses in a web server
-     * @param {GPUShaderStage} shaderType
+     * @param {GPUShaderStage} shaderStage
      */
     // TODO: verify if this can be updated after creation
     // TODO: return texture2dArray object
-    async setTextureImageArray(name, paths, shaderType) {
+    async setTextureImageArray(name, paths, shaderStage) {
         if (this.#nameExists(this.#textures2dArray, name)) {
             // TODO: throw exception here
             return;
@@ -920,7 +920,7 @@ class Points {
         const texture2dArrayItem = {
             name: name,
             copyCurrentTexture: false,
-            shaderType: shaderType,
+            shaderStage: shaderStage,
             texture: null,
             imageTextures: {
                 bitmaps: imageBitmaps
@@ -938,7 +938,7 @@ class Points {
      * Supports web formats like mp4 and webm.
      * @param {string} name id of the wgsl variable in the shader
      * @param {string} path video address in a web server
-     * @param {GPUShaderStage} shaderType
+     * @param {GPUShaderStage} shaderStage
      * @returns {Object}
      *
      * @example
@@ -948,7 +948,7 @@ class Points {
      * // wgsl string
      * let rgba = textureExternalPosition(video, imageSampler, position, in.uvr, true);
      */
-    async setTextureVideo(name, path, shaderType) {
+    async setTextureVideo(name, path, shaderStage) {
         if (this.#nameExists(this.#texturesExternal, name)) {
             throw `setTextureVideo: ${name} already exists.`;
         }
@@ -960,7 +960,7 @@ class Points {
         await video.play();
         const textureExternal = {
             name: name,
-            shaderType: shaderType,
+            shaderStage: shaderStage,
             video: video,
             internal: false
         };
@@ -973,7 +973,7 @@ class Points {
      * it will be available to read data from in the shaders.
      * @param {String} name id of the wgsl variable in the shader
      * @param {{width:Number, height:Number}} size to crop the video. WebGPU might throw an error if size does not match.
-     * @param {GPUShaderStage} shaderType
+     * @param {GPUShaderStage} shaderStage
      * @returns {Object}
      * @throws a WGSL error if the size doesn't match possible crop size
      * @example
@@ -983,7 +983,7 @@ class Points {
      * // wgsl string
      * et rgba = textureExternalPosition(video, imageSampler, position, in.uvr, true);
      */
-    async setTextureWebcam(name, size = { width: 1080, height: 1080 }, shaderType) {
+    async setTextureWebcam(name, size = { width: 1080, height: 1080 }, shaderStage) {
         if (this.#nameExists(this.#texturesExternal, name)) {
             throw `setTextureWebcam: ${name} already exists.`;
         }
@@ -999,7 +999,7 @@ class Points {
         }
         const textureExternal = {
             name,
-            shaderType,
+            shaderStage,
             video,
             size,
             internal: false
@@ -1078,13 +1078,13 @@ class Points {
 
 
     // TODO: verify this method
-    setTextureStorage2d(name, shaderType) {
+    setTextureStorage2d(name, shaderStage) {
         if (this.#nameExists(this.#texturesStorage2d, name)) {
             throw `setTextureStorage2d: ${name} already exists.`
         }
         const texturesStorage2d = {
             name: name,
-            shaderType: shaderType,
+            shaderStage: shaderStage,
             texture: null,
             internal: false
         };
@@ -1127,12 +1127,12 @@ class Points {
         const bindingTexture = {
             write: {
                 name: writeName,
-                shaderType: GPUShaderStage.COMPUTE,
+                shaderStage: GPUShaderStage.COMPUTE,
                 renderPassIndex: writeIndex
             },
             read: {
                 name: readName,
-                shaderType: GPUShaderStage.FRAGMENT,
+                shaderStage: GPUShaderStage.FRAGMENT,
                 renderPassIndex: readIndex
             },
             texture: null,
@@ -1314,12 +1314,12 @@ class Points {
     }
 
     /**
-     * @param {GPUShaderStage} shaderType
+     * @param {GPUShaderStage} shaderStage
      * @param {RenderPass} renderPass
      * @returns {String} string with bindings
      */
-    #createDynamicGroupBindings(shaderType, { index: renderPassIndex, internal }, groupId = 0) {
-        if (!shaderType) {
+    #createDynamicGroupBindings(shaderStage, { index: renderPassIndex, internal }, groupId = 0) {
+        if (!shaderStage) {
             throw '`GPUShaderStage` is required';
         }
         // const groupId = 0;
@@ -1339,14 +1339,14 @@ class Points {
         }
         this.#storage.forEach(storageItem => {
             const isInternal = internal === storageItem.internal;
-            if (isInternal && (!storageItem.shaderType || storageItem.shaderType & shaderType)) {
+            if (isInternal && (!storageItem.shaderStage || storageItem.shaderStage & shaderStage)) {
                 const T = storageItem.type;
 
                 // note:
-                // shaderType means: this is the current GPUShaderStage we are at
-                // and storageItem.shaderType is the stage required by the buffer in setStorage
+                // shaderStage means: this is the current GPUShaderStage we are at
+                // and storageItem.shaderStage is the stage required by the buffer in setStorage
 
-                let accessMode = getStorageAccessMode(shaderType, storageItem.shaderType);
+                let accessMode = getStorageAccessMode(shaderStage, storageItem.shaderStage);
                 accessMode = bindingModes[accessMode];
 
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, ${accessMode}> ${storageItem.name}: ${T};\n`
@@ -1354,7 +1354,7 @@ class Points {
             }
         });
         if (this.#layers.length) {
-            if (!this.#layers.shaderType || this.#layers.shaderType & shaderType) {
+            if (!this.#layers.shaderStage || this.#layers.shaderStage & shaderStage) {
                 let totalSize = 0;
                 this.#layers.forEach(layerItem => totalSize += layerItem.size);
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, read_write> layers: array<array<vec4f, ${totalSize}>>;\n`
@@ -1363,7 +1363,7 @@ class Points {
         }
         this.#samplers.forEach(sampler => {
             const isInternal = internal === sampler.internal;
-            if (isInternal && (!sampler.shaderType || sampler.shaderType & shaderType)) {
+            if (isInternal && (!sampler.shaderStage || sampler.shaderStage & shaderStage)) {
                 const T = sampler.descriptor.compare ? 'sampler_comparison' : 'sampler';
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${sampler.name}: ${T};\n`;
                 bindingIndex += 1;
@@ -1371,21 +1371,21 @@ class Points {
         });
         this.#texturesStorage2d.forEach(texture => {
             const isInternal = internal === texture.internal;
-            if (isInternal && (!texture.shaderType || texture.shaderType & shaderType)) {
+            if (isInternal && (!texture.shaderStage || texture.shaderStage & shaderStage)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_storage_2d<rgba8unorm, write>;\n`;
                 bindingIndex += 1;
             }
         });
         this.#textures2d.forEach(texture => {
             const isInternal = internal === texture.internal;
-            if (isInternal && (!texture.shaderType || texture.shaderType & shaderType)) {
+            if (isInternal && (!texture.shaderStage || texture.shaderStage & shaderStage)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d<f32>;\n`;
                 bindingIndex += 1;
             }
         });
         this.#texturesDepth2d.forEach(texture => {
             const isInternal = internal === texture.internal;
-            if (isInternal && (!texture.shaderType || texture.shaderType & shaderType)) {
+            if (isInternal && (!texture.shaderStage || texture.shaderStage & shaderStage)) {
                 if (texture.renderPassIndex !== renderPassIndex) {
                     dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_depth_2d;\n`;
                     bindingIndex += 1;
@@ -1394,14 +1394,14 @@ class Points {
         });
         this.#textures2dArray.forEach(texture => {
             const isInternal = internal === texture.internal;
-            if (isInternal && (!texture.shaderType || texture.shaderType & shaderType)) {
+            if (isInternal && (!texture.shaderStage || texture.shaderStage & shaderStage)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d_array<f32>;\n`;
                 bindingIndex += 1;
             }
         });
         this.#texturesExternal.forEach(externalTexture => {
             const isInternal = internal === externalTexture.internal;
-            if (isInternal && (!externalTexture.shaderType || externalTexture.shaderType & shaderType)) {
+            if (isInternal && (!externalTexture.shaderStage || externalTexture.shaderStage & shaderStage)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${externalTexture.name}: texture_external;\n`;
                 bindingIndex += 1;
             }
@@ -1409,7 +1409,7 @@ class Points {
         this.#bindingTextures.forEach(bindingTexture => {
             const { usesRenderPass } = bindingTexture;
             if (usesRenderPass) {
-                if (GPUShaderStage.VERTEX === shaderType) { // to avoid binding texture in vertex
+                if (GPUShaderStage.VERTEX === shaderStage) { // to avoid binding texture in vertex
                     return;
                 }
                 if (renderPassIndex === bindingTexture.write.renderPassIndex) {
@@ -1425,11 +1425,11 @@ class Points {
             }
 
             const isInternal = internal === bindingTexture.internal;
-            if (isInternal && (bindingTexture.write.shaderType & shaderType)) {
+            if (isInternal && (bindingTexture.write.shaderStage & shaderStage)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.write.name}: texture_storage_2d<rgba8unorm, write>;\n`;
                 bindingIndex += 1;
             }
-            if (isInternal && (bindingTexture.read.shaderType & shaderType)) {
+            if (isInternal && (bindingTexture.read.shaderStage & shaderStage)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.read.name}: texture_2d<f32>;\n`;
                 bindingIndex += 1;
             }
@@ -1437,8 +1437,8 @@ class Points {
         return dynamicGroupBindings;
     }
 
-    #createDynamicGroupBindingsUpdate(shaderType, { index: renderPassIndex, internal }, groupId = 0) {
-        if (!shaderType) {
+    #createDynamicGroupBindingsUpdate(shaderStage, { index: renderPassIndex, internal }, groupId = 0) {
+        if (!shaderStage) {
             throw '`GPUShaderStage` is required';
         }
         // const groupId = 0;
@@ -1447,7 +1447,7 @@ class Points {
 
         this.#texturesExternal.forEach(externalTexture => {
             const isInternal = internal === externalTexture.internal;
-            if (isInternal && (!externalTexture.shaderType || externalTexture.shaderType & shaderType)) {
+            if (isInternal && (!externalTexture.shaderStage || externalTexture.shaderStage & shaderStage)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${externalTexture.name}: texture_external;\n`;
                 bindingIndex += 1;
             }
@@ -2117,7 +2117,7 @@ class Points {
      * Creates the entries for the pipeline
      * @returns an array with the entries
      */
-    #createEntries(shaderType, { index: renderPassIndex, internal }) {
+    #createEntries(shaderStage, { index: renderPassIndex, internal }) {
         let entries = [];
         let bindingIndex = 0;
         if (this.#uniforms.length) {
@@ -2132,7 +2132,7 @@ class Points {
             //     entry.visibility = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT
             // }
             // the call is split here and at the end of the method with the foreach |= assignment
-            // const visibility = shaderType === GPUShaderStage.FRAGMENT ? GPUShaderStage.VERTEX : null;
+            // const visibility = shaderStage === GPUShaderStage.FRAGMENT ? GPUShaderStage.VERTEX : null;
             entries.push(
                 {
                     binding: bindingIndex++,
@@ -2179,9 +2179,9 @@ class Points {
         }
         this.#storage.forEach(storageItem => {
             const isInternal = internal === storageItem.internal;
-            if (isInternal && (!storageItem.shaderType || storageItem.shaderType & shaderType)) {
+            if (isInternal && (!storageItem.shaderStage || storageItem.shaderStage & shaderStage)) {
 
-                let type = getStorageAccessMode(shaderType, storageItem.shaderType);
+                let type = getStorageAccessMode(shaderStage, storageItem.shaderStage);
                 type = entriesModes[type];
 
                 entries.push(
@@ -2200,7 +2200,7 @@ class Points {
             }
         });
         if (this.#layers.length) {
-            if (!this.#layers.shaderType || this.#layers.shaderType & shaderType) {
+            if (!this.#layers.shaderStage || this.#layers.shaderStage & shaderStage) {
                 entries.push(
                     {
                         binding: bindingIndex++,
@@ -2217,7 +2217,7 @@ class Points {
         }
         this.#samplers.forEach(sampler => {
             const isInternal = internal === sampler.internal;
-            if (isInternal && (!sampler.shaderType || sampler.shaderType & shaderType)) {
+            if (isInternal && (!sampler.shaderStage || sampler.shaderStage & shaderStage)) {
                 entries.push(
                     {
                         binding: bindingIndex++,
@@ -2231,7 +2231,7 @@ class Points {
         });
         this.#texturesStorage2d.forEach(textureStorage2d => {
             const isInternal = internal === textureStorage2d.internal;
-            if (isInternal && (!textureStorage2d.shaderType || textureStorage2d.shaderType & shaderType)) {
+            if (isInternal && (!textureStorage2d.shaderStage || textureStorage2d.shaderStage & shaderStage)) {
                 entries.push(
                     {
                         label: 'texture storage 2d',
@@ -2246,7 +2246,7 @@ class Points {
         });
         this.#textures2d.forEach(texture2d => {
             const isInternal = internal === texture2d.internal;
-            if (isInternal && (!texture2d.shaderType || texture2d.shaderType & shaderType)) {
+            if (isInternal && (!texture2d.shaderStage || texture2d.shaderStage & shaderStage)) {
                 entries.push(
                     {
                         label: 'texture 2d',
@@ -2262,7 +2262,7 @@ class Points {
         this.#texturesDepth2d.forEach(texture2d => {
             if (texture2d.renderPassIndex !== renderPassIndex) {
                 const isInternal = internal === texture2d.internal;
-                if (isInternal && (!texture2d.shaderType || texture2d.shaderType & shaderType)) {
+                if (isInternal && (!texture2d.shaderStage || texture2d.shaderStage & shaderStage)) {
                     const renderPass = this.#renderPasses.find(renderPass => renderPass.index === texture2d.renderPassIndex)
                     texture2d.texture = renderPass.textureDepth;
                     entries.push(
@@ -2282,7 +2282,7 @@ class Points {
         });
         this.#textures2dArray.forEach(texture2dArray => {
             const isInternal = internal === texture2dArray.internal;
-            if (isInternal && (!texture2dArray.shaderType || texture2dArray.shaderType & shaderType)) {
+            if (isInternal && (!texture2dArray.shaderStage || texture2dArray.shaderStage & shaderStage)) {
                 entries.push(
                     {
                         label: 'texture 2d array',
@@ -2302,7 +2302,7 @@ class Points {
         });
         this.#texturesExternal.forEach(externalTexture => {
             const isInternal = internal === externalTexture.internal;
-            if (isInternal && (!externalTexture.shaderType || externalTexture.shaderType & shaderType)) {
+            if (isInternal && (!externalTexture.shaderStage || externalTexture.shaderStage & shaderStage)) {
                 entries.push(
                     {
                         label: 'external texture',
@@ -2319,7 +2319,7 @@ class Points {
         this.#bindingTextures.forEach(bindingTexture => {
             const { usesRenderPass } = bindingTexture;
             if (usesRenderPass) {
-                if (GPUShaderStage.VERTEX === shaderType) { // to avoid binding texture in vertex
+                if (GPUShaderStage.VERTEX === shaderStage) { // to avoid binding texture in vertex
                     return;
                 }
                 if (bindingTexture.read.renderPassIndex === renderPassIndex) {
@@ -2351,7 +2351,7 @@ class Points {
             }
 
             const isInternal = internal === bindingTexture.internal;
-            if (isInternal && (bindingTexture.read.shaderType & shaderType)) {
+            if (isInternal && (bindingTexture.read.shaderStage & shaderStage)) {
                 entries.push(
                     {
                         label: `binding texture 2: name: ${bindingTexture.read.name}`,
@@ -2364,7 +2364,7 @@ class Points {
                 );
             }
 
-            if (isInternal && (bindingTexture.write.shaderType & shaderType)) {
+            if (isInternal && (bindingTexture.write.shaderStage & shaderStage)) {
                 entries.push(
                     {
                         label: `binding texture: name: ${bindingTexture.write.name}`,
@@ -2379,17 +2379,17 @@ class Points {
             }
         });
 
-        entries.forEach(entry => entry.visibility = shaderType);
+        entries.forEach(entry => entry.visibility = shaderStage);
 
         return entries;
     }
 
-    #createEntriesUpdate(shaderType, { index: renderPassIndex, internal }) {
+    #createEntriesUpdate(shaderStage, { index: renderPassIndex, internal }) {
         let entries = [];
         let bindingIndex = 0;
         this.#texturesExternal.forEach(externalTexture => {
             const isInternal = internal === externalTexture.internal;
-            if (isInternal && (!externalTexture.shaderType || externalTexture.shaderType & shaderType)) {
+            if (isInternal && (!externalTexture.shaderStage || externalTexture.shaderStage & shaderStage)) {
                 entries.push(
                     {
                         label: 'external texture',
@@ -2402,7 +2402,7 @@ class Points {
                 );
             }
         });
-        entries.forEach(entry => entry.visibility = shaderType);
+        entries.forEach(entry => entry.visibility = shaderStage);
 
         return entries;
     }
@@ -2413,19 +2413,19 @@ class Points {
      * in a single method to avoid duplication and possible bifurcations without
      * me knowing.
      * @param {RenderPass} renderPass
-     * @param {GPUShaderStage} shaderType
+     * @param {GPUShaderStage} shaderStage
      */
-    #createBindGroup(renderPass, shaderType) {
-        const hasComputeShader = (shaderType === GPUShaderStage.COMPUTE) && renderPass.hasComputeShader;
-        const hasVertexShader = (shaderType === GPUShaderStage.VERTEX) && renderPass.hasVertexShader;
-        const hasFragmentShader = (shaderType === GPUShaderStage.FRAGMENT) && renderPass.hasFragmentShader;
+    #createBindGroup(renderPass, shaderStage) {
+        const hasComputeShader = (shaderStage === GPUShaderStage.COMPUTE) && renderPass.hasComputeShader;
+        const hasVertexShader = (shaderStage === GPUShaderStage.VERTEX) && renderPass.hasVertexShader;
+        const hasFragmentShader = (shaderStage === GPUShaderStage.FRAGMENT) && renderPass.hasFragmentShader;
 
-        const entries = this.#createEntries(shaderType, renderPass);
+        const entries = this.#createEntries(shaderStage, renderPass);
 
         if (entries.length) {
             const bindGroupLayout = this.#device.createBindGroupLayout({ entries });
             const bindGroup = this.#device.createBindGroup({
-                label: `_createBindGroup a ${shaderType} - ${renderPass.name}`,
+                label: `_createBindGroup a ${shaderStage} - ${renderPass.name}`,
                 layout: bindGroupLayout,
                 entries
             });
@@ -2443,9 +2443,9 @@ class Points {
                 renderPass.fragmentBindGroup = bindGroup
             }
 
-            // const entriesUpdate = this.#createEntriesUpdate(shaderType, renderPass);
+            // const entriesUpdate = this.#createEntriesUpdate(shaderStage, renderPass);
             // const bindGroup2 = this.#device.createBindGroup({
-            //     label: `_createBindGroup b ${shaderType} - ${renderPass.name}`,
+            //     label: `_createBindGroup b ${shaderStage} - ${renderPass.name}`,
             //     layout: bindGroupLayout,
             //     entries: entriesUpdate
             // });
@@ -2464,14 +2464,14 @@ class Points {
      * is not being updated at all. I have to make the createBindGroup call
      * only if the texture is updated.
      * @param {RenderPass} renderPass
-     * @param {GPUShaderStage} shaderType
+     * @param {GPUShaderStage} shaderStage
      */
-    #passBindGroup(renderPass, shaderType) {
-        const hasComputeShader = (shaderType === GPUShaderStage.COMPUTE) && renderPass.hasComputeShader;
-        const hasVertexShader = (shaderType === GPUShaderStage.VERTEX) && renderPass.hasVertexShader;
-        const hasFragmentShader = (shaderType === GPUShaderStage.FRAGMENT) && renderPass.hasFragmentShader;
+    #passBindGroup(renderPass, shaderStage) {
+        const hasComputeShader = (shaderStage === GPUShaderStage.COMPUTE) && renderPass.hasComputeShader;
+        const hasVertexShader = (shaderStage === GPUShaderStage.VERTEX) && renderPass.hasVertexShader;
+        const hasFragmentShader = (shaderStage === GPUShaderStage.FRAGMENT) && renderPass.hasFragmentShader;
 
-        const entries = this.#createEntries(shaderType, renderPass);
+        const entries = this.#createEntries(shaderStage, renderPass);
 
         if (entries.length) {
             let bindGroupLayout = null;
@@ -2503,10 +2503,10 @@ class Points {
             }
 
 
-            // const entriesUpdate = this.#createEntriesUpdate(shaderType, renderPass);
+            // const entriesUpdate = this.#createEntriesUpdate(shaderStage, renderPass);
             // if (entriesUpdate.length) {
             //     const bindGroup = this.#device.createBindGroup({
-            //         label: `passBindGroup ${shaderType} - ${renderPass.name}`,
+            //         label: `passBindGroup ${shaderStage} - ${renderPass.name}`,
             //         layout: bindGroupLayout,
             //         entries: entriesUpdate
             //     });
