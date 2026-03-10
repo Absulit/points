@@ -491,7 +491,7 @@ class Points {
         const storage = new Storage({
             name,
             value: arrayData,
-            structName,
+            type: structName,
             shaderType,
             read,
         });
@@ -563,7 +563,7 @@ class Points {
             updated: true,
             mapped: true,
             name,
-            value: structName,
+            type: structName,
             shaderType,
             value: arrayData,
             read,

@@ -76,10 +76,13 @@ const base = {
         points.setConstant('THREADS_Z', THREADS_Z, 'u32');
         points.setStorage('particles', `array<Particle, ${NUMPARTICLES}>`);
 
-        points.setStorage('vertex_data', `array<vec4f, ${vertex_data.length}>`)
+        points.setStorage('vertex_data')
+            .setType(`array<vec4f, ${vertex_data.length}>`)
             .setValue(vertex_data.flat());
 
-        points.setUniform('visibility', options.visibility).setType('u32');
+        points.setUniform('visibility', options.visibility)
+            .setType('u32');
+
         folder.add(options, 'visibility').name('visibility').onChange(value => {
             const { visibility } = points.params;
             visibility.value = value;
