@@ -468,8 +468,16 @@ class Points {
      * colors[index] = vec3f(248, 208, 146) / 255;
      */
     setStorage(name, structName, read, shaderType = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE, arrayData = null) {
-        if (this.#nameExists(this.#storage, name)) {
-            throw `\`setStorage()\` You have already defined \`${name}\``;
+        const storageToUpdate = this.#nameExists(this.#storage, name);
+
+        // if (!Array.isArray(arrayData) && arrayData?.constructor !== Uint8Array) {
+        //     arrayData = new Uint8Array([arrayData]);
+        // }
+
+        if (storageToUpdate) {
+            storageToUpdate.value = arrayData;
+            storageToUpdate.updated = true;
+            return storageToUpdate;
         }
 
         const storage = new Storage({
@@ -485,6 +493,7 @@ class Points {
     }
 
     /**
+     * @deprecated Since v0.8.0 use {@link setStorageMap}
      * Creates a persistent memory buffer across every frame call that can be updated.
      * See [GPUBuffer](https://www.w3.org/TR/webgpu/#gpubuffer)
      * <br>
@@ -537,7 +546,7 @@ class Points {
         }
 
         if (storageToUpdate) {
-            storageToUpdate.array = arrayData;
+            storageToUpdate.value = arrayData;
             storageToUpdate.updated = true;
             return storageToUpdate;
         }
@@ -1047,10 +1056,10 @@ class Points {
         // analyser.getByteTimeDomainData(data);
         analyser.getByteFrequencyData(data);
         // storage that will have the data on WGSL
-        this.setStorageMap(name, data,
+        this.setStorage(name,
             // `array<f32, ${bufferLength}>`
             'Sound' // custom struct in defaultStructs.js
-        ).stream = true;
+        ).setValue(data).stream = true;
         // uniform that will have the data length as a quick reference
         this.setUniform(`${name}Length`, analyser.frequencyBinCount);
         sound.analyser = analyser;
@@ -1283,7 +1292,8 @@ class Points {
         // TODO: remove structSize
         // this extra 1 is for the boolean flag in the Event struct
         const data = Array(4).fill(0);
-        this.setStorageMap(name, data, 'Event', true, GPUShaderStage.COMPUTE | GPUShaderStage.FRAGMENT);
+        this.setStorage(name, 'Event', true, GPUShaderStage.COMPUTE | GPUShaderStage.FRAGMENT)
+            .setValue(data);
         this.setStorage(`${name}_data`, `array<f32, ${structSize}>`, true, GPUShaderStage.COMPUTE | GPUShaderStage.FRAGMENT);
         this.#events.set(this.#events_ids,
             {
@@ -1807,7 +1817,7 @@ class Points {
             // the stream flag allows to keep this write open
             const { updated, stream } = storageItem;
             if (storageItem.mapped && (updated || stream)) {
-                const values = new Float32Array(storageItem.array);
+                const values = new Float32Array(storageItem.value);
                 this.#writeBuffer(storageItem.buffer, values);
                 if (!stream) {
                     storageItem.updated = false;
@@ -1833,14 +1843,14 @@ class Points {
                     size
                 }
                 if (mapped) {
-                    readStorageItem.size = storageItem.array.length;
+                    readStorageItem.size = storageItem.value.length;
                 }
                 this.#readStorage.push(readStorageItem);
                 usage = usage | GPUBufferUsage.COPY_SRC;
             }
 
             if (mapped) {
-                const values = new Float32Array(storageItem.array);
+                const values = new Float32Array(storageItem.value);
                 storageItem.buffer = this.#createAndMapBuffer(values, usage, true, size);
             } else {
                 storageItem.buffer = this.#createBuffer(size, usage);
@@ -2782,9 +2792,9 @@ class Points {
                     const dataRead = await this.readStorage(`${name}_data`)
                     event?.callback(dataRead);
                     const storageToUpdate = this.#nameExists(this.#storage, name);
-                    const data = storageToUpdate.array;
+                    const data = storageToUpdate.value;
                     data[0] = 0;
-                    this.setStorageMap(name, data);
+                    this.setStorage(name).setValue(data);
                 }
             }
         }

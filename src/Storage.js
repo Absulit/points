@@ -15,7 +15,7 @@ export default class Storage {
      */
     #stream = false
     #updated = false
-    #array
+    #value
     #size = null // TODO: document this: to force allocate more space in case an update is greater than the default array size
     /**
      * @param {{name:String, value:Array<Number>, structName:String, read:bool, shaderType:GPUShaderStage, stream:bool, updated:bool, size:Number}} config
@@ -27,7 +27,7 @@ export default class Storage {
         this.#structName = structName;
         this.#read = read;
         this.#shaderType = shaderType;
-        this.#array = value;
+        this.#value = value;
 
         this.#stream = stream;
         this.#updated = updated;
@@ -115,13 +115,13 @@ export default class Storage {
         this.#updated = value;
     }
 
-    get array() {
-        return this.#array;
+    get value() {
+        return this.#value;
     }
 
-    set array(value) {
+    set value(value) {
         this.#mapped = !!value;
-        this.#array = value;
+        this.#value = value;
     }
 
     /**
@@ -132,7 +132,7 @@ export default class Storage {
     setValue(value) {
         this.#mapped = true;
         this.#updated = true;
-        this.#array = value;
+        this.#value = value;
         return this;
     }
 
