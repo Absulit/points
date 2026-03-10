@@ -295,7 +295,7 @@ class Points {
      * @param {string} name name of the Param, you can invoke it later in shaders as `Params.[name]`
      * @param {Number|Boolean|Array<Number>} value Single number or a list of numbers. Boolean is converted to Number.
      * @param {string} structName type as `f32` or a custom struct. Default `f32`.
-     * @return {Object}
+     * @return {Uniform}
      *
      * @example
      * // js
