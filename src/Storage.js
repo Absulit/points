@@ -149,7 +149,6 @@ export default class Storage {
         return this;
     }
 
-    // TODO: rename to setStage? setShaderStage?
     /**
      *
      * @param {GPUShaderStage} value
