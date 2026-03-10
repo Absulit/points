@@ -26,7 +26,7 @@ const base = {
         }, 4);
 
         points.setStorage('showMessage', 'f32')
-            .setShaderType(GPUShaderStage.FRAGMENT);
+            .setShaderStage(GPUShaderStage.FRAGMENT);
 
         const size = { x: 8, y: 22 };
         await points.setTextureString(

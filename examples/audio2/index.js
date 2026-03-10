@@ -27,14 +27,14 @@ const base = {
         }, 4);
 
         points.setStorage('result', 'array<f32, 10>')
-            .setShaderType(GPUShaderStage.FRAGMENT);
+            .setShaderStage(GPUShaderStage.FRAGMENT);
         points.setSampler('imageSampler', null);
         points.setTexture2d('feedbackTexture', true);
 
 
         points.setStorage('showMessage', 'f32')
             .setValue(1)
-            .setShaderType(GPUShaderStage.FRAGMENT);
+            .setShaderStage(GPUShaderStage.FRAGMENT);
 
         const size = { x: 8, y: 22 };
         await points.setTextureString(

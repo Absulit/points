@@ -155,7 +155,7 @@ export default class Storage {
      * @param {GPUShaderStage} value
      * @returns {Storage}
      */
-    setShaderType(value) {
+    setShaderStage(value) {
         this.#shaderStage = value;
         return this;
     }
