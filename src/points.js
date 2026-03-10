@@ -337,48 +337,48 @@ class Points {
         return uniform;
     }
 
-    #setMeshUniform(name, value, structName = null) {
+    #setMeshUniform(name, value, type = null) {
         const uniformToUpdate = this.#nameExists(this.#meshUniforms, name);
-        if (uniformToUpdate && structName) {
+        if (uniformToUpdate && type) {
             // if name exists is an update
-            this.#debug && console.warn(`#setMeshUniform(${name}, [${value}], ${structName}) can't set the structName of an already defined uniform.`);
+            this.#debug && console.warn(`#setMeshUniform(${name}, [${value}], ${type}) can't set the type of an already defined uniform.`);
         }
         if (uniformToUpdate) {
             uniformToUpdate.value = value;
             return uniformToUpdate;
         }
-        if (structName && isArray(structName)) {
-            throw `${structName} is an array, which is currently not supported for Uniforms.`;
+        if (type && isArray(type)) {
+            throw `${type} is an array, which is currently not supported for Uniforms.`;
         }
 
         const uniform = new Uniform({
             name,
             value,
-            type: structName,
+            type,
         });
 
         this.#meshUniforms.push(uniform);
         return uniform;
     }
 
-    #setCameraUniform(name, value, structName = null) {
+    #setCameraUniform(name, value, type = null) {
         const uniformToUpdate = this.#nameExists(this.#cameraUniforms, name);
-        if (uniformToUpdate && structName) {
+        if (uniformToUpdate && type) {
             // if name exists is an update
-            // console.warn(`#setCameraUniform(${name}, [${value}], ${structName}) can't set the structName of an already defined uniform.`);
+            // console.warn(`#setCameraUniform(${name}, [${value}], ${type}) can't set the type of an already defined uniform.`);
         }
         if (uniformToUpdate) {
             uniformToUpdate.value = value;
             return uniformToUpdate;
         }
-        if (structName && isArray(structName)) {
-            throw `${structName} is an array, which is currently not supported for Uniforms.`;
+        if (type && isArray(type)) {
+            throw `${type} is an array, which is currently not supported for Uniforms.`;
         }
 
         const uniform = new Uniform({
             name,
             value,
-            type: structName,
+            type,
         });
 
         this.#cameraUniforms.push(uniform);
