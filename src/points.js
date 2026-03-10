@@ -316,7 +316,7 @@ class Points {
         }
         if (uniformToUpdate && type) {
             // if name exists is an update
-            this.#debug && console.warn(`setUniform(${name}, [${value}], ${type}) can't set the structName of an already defined uniform.`);
+            this.#debug && console.warn(`setUniform(${name}, [${value}], ${type}) can't set the type of an already defined uniform.`);
         }
         if (uniformToUpdate) {
             uniformToUpdate.value = value;
@@ -406,7 +406,7 @@ class Points {
      * The constant will be ready to use on the WGSL shder string.
      * @param {String} name
      * @param {string|Number} value
-     * @param {String} structName
+     * @param {String} type
      * @returns {Object}
      *
      * @example
@@ -421,7 +421,7 @@ class Points {
      * // your code:
      * const particles = array<Particle, NUMPARTICLES>();
      */
-    setConstant(name, value, structName) {
+    setConstant(name, value, type) {
         const constantToUpdate = this.#nameExists(this.#constants, name);
 
         if (constantToUpdate) {
@@ -432,7 +432,7 @@ class Points {
         const constant = {
             name,
             value,
-            structName,
+            type,
         }
 
         this.#constants.push(constant);
@@ -1522,7 +1522,7 @@ class Points {
             dynamicStructCamera = /*wgsl*/`struct Camera {\n\t${dynamicStructCamera}\n}\n`;
         }
         this.#constants.forEach(c => {
-            dynamicStructParams += /*wgsl*/`const ${c.name}:${c.structName} = ${c.value};\n`;
+            dynamicStructParams += /*wgsl*/`const ${c.name}:${c.type} = ${c.value};\n`;
         })
         dynamicStructParams += dynamicStructMesh;
         dynamicStructParams += dynamicStructCamera;
