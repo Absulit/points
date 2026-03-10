@@ -55,7 +55,8 @@ const base = {
         points.setSampler('imageSampler', descriptor);
         await points.setTextureImage('image', './../img/pexels-philippedonn-1169754.jpg');
         await points.setTextureImage('diskTexture', './../img/000.png');
-        points.setStorageMap('colors', colors, 'array<vec4f, 6>');
+        points.setStorage('colors', 'array<vec4f, 6>')
+            .setValue(colors);
 
         points.setUniform('enabled', options.enabled);
         points.setUniform('mass', options.mass);
