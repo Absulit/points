@@ -449,7 +449,7 @@ class Points {
      * <br>
      * It can also be initialized with data with the {@link Storage#setValue} method
      * @param {string} name Name that the Storage will have in the shader
-     * @param {string} structName Name of the struct already existing on the
+     * @param {string} type Name of the struct already existing on the
      * shader. This will be the type of the Storage.
      * @param {boolean} read if this is going to be used to read data back
      * @param {GPUShaderStage} shaderType this tells to what shader the storage is bound
@@ -475,7 +475,7 @@ class Points {
      * points.setStorage('vertex_data', `array<vec4f, ${vertex_data.length}>`)
         .setValue(vertex_data.flat());
      */
-    setStorage(name, structName, read, shaderType = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE, arrayData = null) {
+    setStorage(name, type, read, shaderType = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE, arrayData = null) {
         const storageToUpdate = this.#nameExists(this.#storage, name);
 
         // if (!Array.isArray(arrayData) && arrayData?.constructor !== Uint8Array) {
@@ -491,7 +491,7 @@ class Points {
         const storage = new Storage({
             name,
             value: arrayData,
-            type: structName,
+            type,
             shaderType,
             read,
         });
@@ -513,7 +513,7 @@ class Points {
      * with data.
      * @param {string} name Name that the Storage will have in the shader.
      * @param {Uint8Array<ArrayBuffer>|Array<Number>|Number} arrayData array with the data that must match the struct.
-     * @param {string} structName Name of the struct already existing on the
+     * @param {string} type Name of the struct already existing on the
      * shader. This will be the type of the Storage.
      * @param {boolean} read if this is going to be used to read data back.
      * @param {GPUShaderStage} shaderType this tells to what shader the storage is bound
@@ -546,7 +546,7 @@ class Points {
      *
      * resultMatrix.size = vec2(firstMatrix.size.x, secondMatrix.size.y);
      */
-    setStorageMap(name, arrayData, structName, read = false, shaderType = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE) {
+    setStorageMap(name, arrayData, type, read = false, shaderType = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE) {
         const storageToUpdate = this.#nameExists(this.#storage, name);
 
         if (!Array.isArray(arrayData) && arrayData.constructor !== Uint8Array) {
@@ -563,7 +563,7 @@ class Points {
             updated: true,
             mapped: true,
             name,
-            type: structName,
+            type,
             shaderType,
             value: arrayData,
             read,
@@ -1756,7 +1756,7 @@ class Points {
 
     /**
      *
-     * @param {Array} uniformsArray
+     * @param {Array<Uniform>} uniformsArray
      * @param {String} structName
      * @returns {{values:Float32Array, paramsDataSize:Object}}
      */
@@ -1820,7 +1820,7 @@ class Points {
      * Updates all the storages (for the update function)
      */
     #writeStorages() {
-        this.#storage.forEach(({ updated, stream, mapped, value, buffer })  => {
+        this.#storage.forEach(({ updated, stream, mapped, value, buffer }) => {
             // since audio is something constant
             // the stream flag allows to keep this write open
             if (mapped && (updated || stream)) {
