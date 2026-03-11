@@ -1,3 +1,5 @@
+import { isArray } from './data-size.js';
+
 /**
  * Uniform class is a container for uniform related data and actions.
  */
@@ -11,6 +13,11 @@ export default class Uniform {
      * @param {{name:String, value:Number|Boolean|Array<Number>, type:string, size:Number}} config
      */
     constructor({ name, value, type = null, size = null }) {
+
+        if (type && isArray(type)) {
+            throw `${type} is an array, which is currently not supported for Uniforms.`;
+        }
+
         this.#name = name;
         this.#value = value;
         this.#type = type || 'f32';
@@ -40,6 +47,11 @@ export default class Uniform {
     }
 
     set type(value) {
+
+        if (isArray(value)) {
+            throw `${value} is an array, which is currently not supported for Uniforms.`;
+        }
+
         this.#type = value || 'f32';
     }
 
@@ -86,6 +98,10 @@ export default class Uniform {
      * myUniform.setType('u32')
      */
     setType(value) {
+        if (isArray(value)) {
+            throw `${value} is an array, which is currently not supported for Uniforms.`;
+        }
+
         this.#type = value || 'f32';
         return this;
     }

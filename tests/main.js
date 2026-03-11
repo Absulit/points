@@ -28,7 +28,7 @@ QUnit.module('Uniforms', hooks => {
 
     //----
 
-    QUnit.test('Uniform should throw error if not number', assert => {
+    QUnit.test('Uniform should throw error if not number or null', assert => {
 
         assert.throws(() => {
             points.setUniform('a', {})
@@ -41,6 +41,22 @@ QUnit.module('Uniforms', hooks => {
         assert.throws(() => {
             points.setUniform('c', [0, 0, 0, 0, 0], 'array<f32, 5>');
         }, 'Should throw an error when passed an array');
+
+        assert.throws(() => {
+            points.setUniform('d')
+                .setValue('')
+        }, 'Should throw an error when passed a string in setValue')
+
+        assert.throws(() => {
+            points.setUniform('e')
+                .setValue({})
+        }, 'Should throw an error when passed an object in setValue')
+
+        assert.throws(() => {
+            points.setUniform('e')
+                .setValue([])
+        }, 'Should throw an error when passed an array in setValue')
+
     })
 
 });
