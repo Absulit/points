@@ -1,4 +1,4 @@
-import Points, {Uniform} from 'points';
+import Points, { Uniform } from 'points';
 
 const points = new Points();
 
@@ -23,7 +23,20 @@ QUnit.module('Uniforms', hooks => {
 
     QUnit.test('myUniform.value has the value set with setValue', assert => {
         myUniform.setValue(10);
-        assert.equal(myUniform.value, '10', 'value is 10')
+        assert.equal(myUniform.value, 10, 'value is 10')
+    })
+
+    //----
+
+    QUnit.test('Uniform should throw error if not number or array', assert => {
+
+        assert.throws(() => {
+            points.setUniform('u', {})
+        }, 'Should throw an error when passed an object');
+
+        assert.throws(() => {
+            points.setUniform('u', '')
+        }, 'Should throw an error when passed an string');
     })
 
 });
