@@ -344,9 +344,6 @@ class Points {
             uniformToUpdate.value = value;
             return uniformToUpdate;
         }
-        if (type && isArray(type)) {
-            throw `${type} is an array, which is currently not supported for Uniforms.`;
-        }
 
         const uniform = new Uniform({
             name,
@@ -367,9 +364,6 @@ class Points {
         if (uniformToUpdate) {
             uniformToUpdate.value = value;
             return uniformToUpdate;
-        }
-        if (type && isArray(type)) {
-            throw `${type} is an array, which is currently not supported for Uniforms.`;
         }
 
         const uniform = new Uniform({
