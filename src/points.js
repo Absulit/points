@@ -441,9 +441,8 @@ class Points {
      * It can also be initialized with data with the {@link Storage#setValue} method
      * @param {string} name Name that the Storage will have in the shader
      * @param {string} type Name of the struct already existing on the
+     * @param {Uint8Array<ArrayBuffer>|Array<Number>|Number} value array with the data that must match the struct.
      * shader. This will be the type of the Storage.
-     * @param {boolean} read if this is going to be used to read data back
-     * @param {GPUShaderStage} shaderStage this tells to what shader the storage is bound
      * @returns {Storage}
      *
      * @example
@@ -466,7 +465,7 @@ class Points {
      * points.setStorage('vertex_data', `array<vec4f, ${vertex_data.length}>`)
         .setValue(vertex_data.flat());
      */
-    setStorage(name, type, read, shaderStage = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE, value = null) {
+    setStorage(name, type = null, value = null) {
         const storageToUpdate = this.#nameExists(this.#storage, name);
 
         // if (!Array.isArray(value) && value?.constructor !== Uint8Array) {
@@ -483,8 +482,6 @@ class Points {
             name,
             value,
             type,
-            shaderStage,
-            read,
         });
 
         this.#storage.push(storage);

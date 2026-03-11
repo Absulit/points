@@ -2,7 +2,7 @@ export default class Storage {
     #name
     #mapped
     #type
-    #shaderStage
+    #shaderStage = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE
     #read
     #buffer = null
     #internal = false
@@ -31,7 +31,7 @@ export default class Storage {
         this.#mapped = !!value;
         this.#type = type || 'f32';
         this.#read = read;
-        this.#shaderStage = shaderStage;
+        this.#shaderStage = shaderStage || this.#shaderStage;
         this.#value = value;
 
         this.#stream = stream;
@@ -69,13 +69,22 @@ export default class Storage {
         return this.#shaderStage;
     }
 
+    /**
+     * this tells to what shader the storage is bound
+     * @param {GPUShaderStage} value
+     */
     set shaderStage(value) {
         this.#shaderStage = value;
     }
+
     get read() {
         return this.#read;
     }
 
+    /**
+     * if this is going to be used to read data back
+     * @param {bool} value
+     */
     set read(value) {
         this.#read = value;
     }
@@ -149,7 +158,7 @@ export default class Storage {
     }
 
     /**
-     *
+     * if this is going to be used to read data back
      * @param {bool} value
      * @returns {Storage}
      */
@@ -159,7 +168,7 @@ export default class Storage {
     }
 
     /**
-     *
+     * this tells to what shader the storage is bound
      * @param {GPUShaderStage} value
      * @returns {Storage}
      */
