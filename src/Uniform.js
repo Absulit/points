@@ -51,6 +51,11 @@ export default class Uniform {
         this.#size = value;
     }
 
+    /**
+     * Clone of the Uniform data as a plain object to avoid modifications on
+     * the original data.
+     * @returns {Object}
+     */
     serialize() {
         // we check if array and spread
         // because structuredClone is slower
