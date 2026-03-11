@@ -13,7 +13,7 @@ export default class Uniform {
     constructor({ name, value, type = null, size = null }) {
         this.#name = name;
         this.#value = value;
-        this.#type = type;
+        this.#type = type || 'f32';
         this.#size = size;
 
         Object.seal(this);
@@ -40,7 +40,7 @@ export default class Uniform {
     }
 
     set type(value) {
-        this.#type = value;
+        this.#type = value || 'f32';
     }
 
     get size() {
@@ -81,7 +81,7 @@ export default class Uniform {
      * myUniform.setType('u32')
      */
     setType(value) {
-        this.#type = value;
+        this.#type = value || 'f32';
         return this;
     }
 

@@ -1501,21 +1501,18 @@ class Points {
         let dynamicStructMesh = '';
         let dynamicStructCamera = '';
         this.#uniforms.forEach(u => {
-            u.type = u.type || 'f32';
             dynamicStructParams += /*wgsl*/`${u.name}:${u.type}, \n\t`;
         });
         if (this.#uniforms.length) {
             dynamicStructParams = /*wgsl*/`struct Params {\n\t${dynamicStructParams}\n}\n`;
         }
         this.#meshUniforms.forEach(u => {
-            u.type = u.type || 'f32';
             dynamicStructMesh += /*wgsl*/`${u.name}:${u.type}, \n\t`;
         });
         if (this.#meshUniforms.length) {
             dynamicStructMesh = /*wgsl*/`struct Mesh {\n\t${dynamicStructMesh}\n}\n`;
         }
         this.#cameraUniforms.forEach(u => {
-            u.type = u.type || 'f32';
             dynamicStructCamera += /*wgsl*/`${u.name}:${u.type}, \n\t`;
         });
         if (this.#cameraUniforms.length) {
