@@ -22,6 +22,11 @@ export default class Storage {
      */
     constructor({ name, value, type, read, shaderStage,
         stream = false, updated = false, size = null }) {
+
+        if (value && !Array.isArray(value) && value.constructor !== Uint8Array) {
+            value = new Uint8Array([value]);
+        }
+
         this.#name = name;
         this.#mapped = !!value;
         this.#type = type || 'f32';
@@ -120,6 +125,10 @@ export default class Storage {
     }
 
     set value(value) {
+        if (!Array.isArray(value) && value.constructor !== Uint8Array) {
+            value = new Uint8Array([value]);
+        }
+
         this.#mapped = !!value;
         this.#value = value;
     }
