@@ -134,7 +134,7 @@ export default class Storage {
     }
 
     set value(value) {
-        if (!Array.isArray(value) && value.constructor !== Uint8Array) {
+        if (value && !Array.isArray(value) && value.constructor !== Uint8Array) {
             value = new Uint8Array([value]);
         }
 
