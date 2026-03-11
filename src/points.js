@@ -3147,4 +3147,4 @@ class Points {
 }
 
 export default Points;
-export { RenderPass, RenderPasses, PrimitiveTopology, CullMode, LoadOp, PresentationFormat, FrontFace, ScaleMode };
+export { RenderPass, RenderPasses, PrimitiveTopology, CullMode, LoadOp, PresentationFormat, FrontFace, ScaleMode, Uniform, Storage };
