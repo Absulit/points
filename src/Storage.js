@@ -24,7 +24,7 @@ export default class Storage {
         stream = false, updated = false, size = null }) {
         this.#name = name;
         this.#mapped = !!value;
-        this.#type = type;
+        this.#type = type || 'f32';
         this.#read = read;
         this.#shaderStage = shaderStage;
         this.#value = value;
@@ -57,7 +57,7 @@ export default class Storage {
     }
 
     set type(value) {
-        this.#type = value;
+        this.#type = value || 'f32';
     }
 
     get shaderStage() {
@@ -165,7 +165,7 @@ export default class Storage {
      * @returns {Storage}
      */
     setType(value) {
-        this.#type = value;
+        this.#type = value || 'f32';
         return this;
     }
 

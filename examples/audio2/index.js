@@ -32,7 +32,7 @@ const base = {
         points.setTexture2d('feedbackTexture', true);
 
 
-        points.setStorage('showMessage', 'f32')
+        points.setStorage('showMessage')
             .setValue(1)
             .setShaderStage(GPUShaderStage.FRAGMENT);
 

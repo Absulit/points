@@ -25,7 +25,7 @@ const base = {
             audio.play();
         }, 4);
 
-        points.setStorage('showMessage', 'f32')
+        points.setStorage('showMessage')
             .setShaderStage(GPUShaderStage.FRAGMENT);
 
         const size = { x: 8, y: 22 };
