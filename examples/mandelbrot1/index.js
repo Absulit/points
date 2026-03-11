@@ -17,7 +17,8 @@ const base = {
         points.scaleMode = ScaleMode.FIT;
         points.setUniform('scale', options.scale);
         points.setUniform('numIterations', options.numIterations);
-        points.setStorage('variables', 'Variable', false, GPUShaderStage.FRAGMENT);
+        points.setStorage('variables', 'Variable')
+            .setShaderStage(GPUShaderStage.FRAGMENT);
         // folder.add(options, 'numIterations', 1, 1024, .0001).name('numIterations');
         folder.open();
 
