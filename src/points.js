@@ -1810,14 +1810,15 @@ class Points {
      * Updates all the storages (for the update function)
      */
     #writeStorages() {
-        this.#storage.forEach(({ updated, stream, mapped, value, buffer }) => {
+        this.#storage.forEach(storageItem => {
             // since audio is something constant
             // the stream flag allows to keep this write open
-            if (mapped && (updated || stream)) {
-                const values = new Float32Array(value);
-                this.#writeBuffer(buffer, values);
+            const { updated, stream } = storageItem;
+            if (storageItem.mapped && (updated || stream)) {
+                const values = new Float32Array(storageItem.value);
+                this.#writeBuffer(storageItem.buffer, values);
                 if (!stream) {
-                    updated = false;
+                    storageItem.updated = false;
                 }
             }
         });
