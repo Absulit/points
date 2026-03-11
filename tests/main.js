@@ -59,4 +59,13 @@ QUnit.module('Uniforms', hooks => {
 
     })
 
+    QUnit.test('Uniform name should not be a number even if string', assert => {
+        assert.throws(() => {
+            points.setUniform(123)
+        }, 'Should throw an error when passed a number')
+        assert.throws(() => {
+            points.setUniform('123')
+        }, 'Should throw an error when passed a number as string')
+    })
+
 });
