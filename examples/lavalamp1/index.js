@@ -19,9 +19,12 @@ const base = {
      * @param {Points} points
      */
     init: async points => {
+        const { FRAGMENT } = GPUShaderStage;
         const numObjects = 20;
-        points.setStorage('variables', 'Variables', false, GPUShaderStage.FRAGMENT);
-        points.setStorage('objects', `array<Object, ${numObjects}>`, false, GPUShaderStage.FRAGMENT);
+        points.setStorage('variables', 'Variables')
+            .setShaderStage(FRAGMENT);
+        points.setStorage('objects', `array<Object, ${numObjects}>`)
+            .setShaderStage(FRAGMENT);
     },
     update: points => {
 
