@@ -3,7 +3,7 @@ export default class Storage {
     #mapped
     #type
     #shaderStage = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE
-    #read
+    #read = false
     #buffer = null
     #internal = false
     // TODO document the stream feature
@@ -30,7 +30,7 @@ export default class Storage {
         this.#name = name;
         this.#mapped = !!value;
         this.#type = type || 'f32';
-        this.#read = read;
+        this.#read = read || this.#read;
         this.#shaderStage = shaderStage || this.#shaderStage;
         this.#value = value;
 
@@ -154,6 +154,8 @@ export default class Storage {
         this.#mapped = true;
         this.#updated = true;
         this.#value = value;
+        // console.trace('set value');
+
         return this;
     }
 
