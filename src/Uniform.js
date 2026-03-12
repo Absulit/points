@@ -18,6 +18,8 @@ export default class Uniform {
             throw `${type} is an array, which is currently not supported for Uniforms.`;
         }
 
+        this.#validateValue(value);
+
         this.#name = name;
         this.#value = value;
         this.#type = type || 'f32';
@@ -39,6 +41,7 @@ export default class Uniform {
     }
 
     set value(value) {
+        this.#validateValue(value);
         this.#value = value;
     }
 
@@ -86,6 +89,7 @@ export default class Uniform {
      * @param {Number|Boolean|Array<Number>} value
      */
     setValue(value) {
+        this.#validateValue(value);
         this.#value = value;
         return this;
     }
@@ -106,4 +110,9 @@ export default class Uniform {
         return this;
     }
 
+    #validateValue(value) {
+        if (typeof value === 'object' && !Array.isArray(value)) {
+            throw `${value} can't be an Object.`
+        }
+    }
 }
