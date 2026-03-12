@@ -112,7 +112,11 @@ export default class Uniform {
 
     #validateValue(value) {
         if (typeof value === 'object' && !Array.isArray(value)) {
-            throw `${value} can't be an Object.`
+            throw `Uniform '${this.#name}' value:'${value}' can't be an Object.`
+        }
+
+        if (typeof value === 'string') {
+            throw `Uniform '${this.#name}' value:'${value}' can't be an String.`
         }
     }
 }
