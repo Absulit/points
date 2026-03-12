@@ -33,7 +33,7 @@ QUnit.module('Uniforms', hooks => {
         }, 'Should throw an error when passed an object in function call');
 
         assert.throws(() => {
-            points.setUniform('e')
+            points.setUniform('b')
                 .setValue({})
         }, 'Should throw an error when passed an object in setValue')
 
@@ -45,7 +45,7 @@ QUnit.module('Uniforms', hooks => {
 
     QUnit.test('Uniform should throw error if a string is passed as value', assert => {
         assert.throws(() => {
-            points.setUniform('b', '')
+            points.setUniform('c', '')
         }, 'Should throw an error when passed a string in function call');
 
         assert.throws(() => {
@@ -61,34 +61,35 @@ QUnit.module('Uniforms', hooks => {
     QUnit.test('Uniform should throw error if value is array', assert => {
 
         assert.throws(() => {
-            points.setUniform('c', [0, 0, 0, 0, 0], 'array<f32, 5>');
+            points.setUniform('e', [0, 0, 0, 0, 0], 'array<f32, 5>');
         }, 'Should throw an error when passed an array in function call');
 
         assert.throws(() => {
             points.setUniform('f')
-                .setValue([])
+                .setValue([0, 0, 0, 0, 0])
         }, 'Should throw an error when passed an array in setValue')
 
         assert.throws(() => {
-            points.setUniform('f')
-                .value = []
+            points.setUniform('g')
+                .value = [0, 0, 0, 0, 0]
         }, 'Should throw an error when passed an array in value attribute')
 
     })
 
+
     QUnit.test('Uniform should throw error if type is array', assert => {
 
-
-        assert.throws(() => {
-            points.setUniform('c', [0, 0, 0, 0, 0], 'array<f32, 5>');
+       assert.throws(() => {
+            points.setUniform('h', [0, 0, 0, 0, 0], 'array<f32, 5>');
         }, 'Should throw an error when passed an array in function call');
 
         assert.throws(() => {
-            points.setUniform('f')
+            points.setUniform('i')
                 .setType('array<f32, 5>')
         }, 'Should throw an error when passed an array in setValue')
+
         assert.throws(() => {
-            points.setUniform('f')
+            points.setUniform('j')
                 .type = 'array<f32, 5>'
         }, 'Should throw an error when passed an array in type attribute')
 

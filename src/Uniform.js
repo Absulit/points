@@ -112,6 +112,10 @@ export default class Uniform {
         if (typeof value === 'string') {
             throw `Uniform '${this.#name}' value: '${value}' can't be an String.`
         }
+
+        if (Array.isArray(value) && (value.length > 4)) {
+            throw `Uniform '${this.#name}' value: '${value}' can't be an Array greater than 4.`
+        }
     }
 
     #validateName(value) {
