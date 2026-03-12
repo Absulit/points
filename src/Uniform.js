@@ -14,10 +14,7 @@ export default class Uniform {
      */
     constructor({ name, value, type = null, size = null }) {
 
-        if (type && isArray(type)) {
-            throw `${type} is an array, which is currently not supported for Uniforms.`;
-        }
-
+        this.#validateType(value);
         this.#validateValue(value);
 
         this.#name = name;
@@ -50,10 +47,7 @@ export default class Uniform {
     }
 
     set type(value) {
-
-        if (isArray(value)) {
-            throw `${value} is an array, which is currently not supported for Uniforms.`;
-        }
+        this.#validateType(value);
 
         this.#type = value || 'f32';
     }
@@ -102,9 +96,7 @@ export default class Uniform {
      * myUniform.setType('u32')
      */
     setType(value) {
-        if (isArray(value)) {
-            throw `${value} is an array, which is currently not supported for Uniforms.`;
-        }
+        this.#validateType(value);
 
         this.#type = value || 'f32';
         return this;
@@ -116,7 +108,17 @@ export default class Uniform {
         }
 
         if (typeof value === 'string') {
-            throw `Uniform '${this.#name}' value:'${value}' can't be an String.`
+            throw `Uniform '${this.#name}' value: '${value}' can't be an String.`
+        }
+    }
+
+    #validateName(value){
+
+    }
+
+    #validateType(value){
+        if (value && isArray(value)) {
+            throw `Uniform '${this.#name}' type: '${value}' is an array, which is currently not supported for Uniforms.`;
         }
     }
 }
