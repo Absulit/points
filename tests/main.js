@@ -18,7 +18,6 @@ QUnit.module('Uniforms', hooks => {
 
     QUnit.test('myUniform is instance of Uniform', assert => {
         assert.true(myUniform instanceof Uniform, 'myUniform is of type Uniform');
-        console.log(myUniform.value);
     })
 
     QUnit.test('myUniform.value has the value set with setValue', assert => {
@@ -28,11 +27,25 @@ QUnit.module('Uniforms', hooks => {
 
     //----
 
-    QUnit.test('Uniform should throw error if not number or null', assert => {
-
+    QUnit.test('Uniform should throw error if object is passed as value', assert => {
         assert.throws(() => {
             points.setUniform('a', {})
-        }, 'Should throw an error when passed an object');
+        }, 'Should throw an error when passed an object in function call');
+
+        assert.throws(() => {
+            points.setUniform('e')
+                .setValue({})
+        }, 'Should throw an error when passed an object in setValue')
+
+        assert.throws(() => {
+            myUniform.value = {}
+        }, 'Should throw an error when passed an object in value attribute')
+
+    })
+
+    QUnit.test('Uniform should throw error if not number or null', assert => {
+
+        // TODO: split
 
         assert.throws(() => {
             points.setUniform('b', '')
@@ -47,13 +60,10 @@ QUnit.module('Uniforms', hooks => {
                 .setValue('')
         }, 'Should throw an error when passed a string in setValue')
 
-        assert.throws(() => {
-            points.setUniform('e')
-                .setValue({})
-        }, 'Should throw an error when passed an object in setValue')
+
 
         assert.throws(() => {
-            points.setUniform('e')
+            points.setUniform('f')
                 .setValue([])
         }, 'Should throw an error when passed an array in setValue')
 
