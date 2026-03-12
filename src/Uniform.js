@@ -14,6 +14,7 @@ export default class Uniform {
      */
     constructor({ name, value, type = null, size = null }) {
 
+        this.#validateName(name);
         this.#validateType(value);
         this.#validateValue(value);
 
@@ -30,6 +31,7 @@ export default class Uniform {
     }
 
     set name(value) {
+        this.#validateName(value);
         this.#name = value;
     }
 
@@ -112,11 +114,21 @@ export default class Uniform {
         }
     }
 
-    #validateName(value){
+    #validateName(value) {
+        if (typeof value === 'number') {
+            throw `Uniform name '${this.#name}' can't be an Number.`
+        }
 
+        if (typeof value === 'string') {
+            const valNumber = +value;
+
+            if (!Number.isNaN(valNumber) && typeof valNumber === 'number') {
+                throw `Uniform name '${this.#name}' can't be an Number.`
+            }
+        }
     }
 
-    #validateType(value){
+    #validateType(value) {
         if (value && isArray(value)) {
             throw `Uniform '${this.#name}' type: '${value}' is an array, which is currently not supported for Uniforms.`;
         }
