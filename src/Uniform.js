@@ -15,7 +15,7 @@ export default class Uniform {
     constructor({ name, value, type = null, size = null }) {
 
         this.#validateName(name);
-        this.#validateType(value);
+        this.#validateType(type);
         this.#validateValue(value);
 
         this.#name = name;
