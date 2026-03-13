@@ -30,6 +30,16 @@ export default class Uniform {
         return this.#name;
     }
 
+    /**
+     * @param {String} value name of the Uniform. The name is used in the WGSL
+     * shader.
+     * @example
+     * // js
+     * myUniform.name = 'myUniformName';
+     *
+     * // wgsl
+     * myUniformName = 13.0;
+     */
     set name(value) {
         this.#validateName(value);
         this.#name = value;
@@ -39,6 +49,9 @@ export default class Uniform {
         return this.#value;
     }
 
+    /**
+     * @param {Number|Boolean|Array<Number>} value The uniform value
+     */
     set value(value) {
         this.#validateValue(value);
         this.#value = value;
@@ -48,9 +61,13 @@ export default class Uniform {
         return this.#type
     }
 
+    /**
+     * @param {String} value WGSL data type of the uniform
+     * @example
+     * myUniform.type = 'u32';
+     */
     set type(value) {
         this.#validateType(value);
-
         this.#type = value || 'f32';
     }
 
@@ -58,6 +75,9 @@ export default class Uniform {
         return this.#size;
     }
 
+    /**
+     * For internal use mostly. Size in bytes.
+     */
     set size(value) {
         this.#size = value;
     }
@@ -91,15 +111,12 @@ export default class Uniform {
     }
 
     /**
-     * Sets or updates the type (or struct) of the Uniform.
-     * @param {Number|Boolean|Array<Number>} value
-     *
+     * @param {String} value WGSL data type of the uniform
      * @example
      * myUniform.setType('u32')
      */
     setType(value) {
         this.#validateType(value);
-
         this.#type = value || 'f32';
         return this;
     }
