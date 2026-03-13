@@ -146,33 +146,14 @@ QUnit.module('Storage', hooks => {
         }, 'Should throw an error when passed an string in value attribute')
     })
 
-    // QUnit.test('Uniform should throw error if type is array', assert => {
-
-    //    assert.throws(() => {
-    //         points.setUniform('h', [0, 0, 0, 0, 0], 'array<f32, 5>');
-    //     }, 'Should throw an error when passed an array in function call');
-
-    //     assert.throws(() => {
-    //         points.setUniform('i')
-    //             .setType('array<f32, 5>')
-    //     }, 'Should throw an error when passed an array in setValue')
-
-    //     assert.throws(() => {
-    //         points.setUniform('j')
-    //             .type = 'array<f32, 5>'
-    //     }, 'Should throw an error when passed an array in type attribute')
-
-    // })
-
-
-    // QUnit.test('Uniform name should not be a number even if string', assert => {
-    //     assert.throws(() => {
-    //         points.setUniform(123)
-    //     }, 'Should throw an error when passed a number')
-    //     assert.throws(() => {
-    //         points.setUniform('123')
-    //     }, 'Should throw an error when passed a number as string')
-    // })
+    QUnit.test('Storage name should not be a number even if string', assert => {
+        assert.throws(() => {
+            points.setStorage(123)
+        }, 'Should throw an error when passed a number')
+        assert.throws(() => {
+            points.setStorage('123')
+        }, 'Should throw an error when passed a number as string')
+    })
 
 
 })

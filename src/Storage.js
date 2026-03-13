@@ -1,3 +1,5 @@
+import { isArray } from "./data-size.js"
+
 export default class Storage {
     #name
     #mapped
@@ -23,8 +25,8 @@ export default class Storage {
     constructor({ name, value, type, read, shaderStage,
         stream = false, updated = false, size = null }) {
 
-        // this.#validateName(name);
-        // this.#validateType(type);
+        this.#validateName(name);
+        this.#validateType(type);
         this.#validateValue(value);
 
         if (value && !Array.isArray(value) && value.constructor !== Uint8Array) {
@@ -51,6 +53,7 @@ export default class Storage {
     }
 
     set name(value) {
+        this.#validateName(value);
         this.#name = value;
     }
 
@@ -67,6 +70,7 @@ export default class Storage {
     }
 
     set type(value) {
+        this.#validateType(value);
         this.#type = value || 'f32';
     }
 
@@ -191,6 +195,7 @@ export default class Storage {
      * @returns {Storage}
      */
     setType(value) {
+        this.#validateType(value);
         this.#type = value || 'f32';
         return this;
     }
@@ -205,24 +210,22 @@ export default class Storage {
         }
     }
 
-    // #validateName(value) {
-    //     if (typeof value === 'number') {
-    //         throw `Uniform name '${this.#name}' can't be an Number.`
-    //     }
+    #validateName(value) {
+        if (typeof value === 'number') {
+            throw `Storage name '${this.#name}' can't be an Number.`
+        }
 
-    //     if (typeof value === 'string') {
-    //         const valNumber = +value;
+        if (typeof value === 'string') {
+            const valNumber = +value;
 
-    //         if (!Number.isNaN(valNumber) && typeof valNumber === 'number') {
-    //             throw `Uniform name '${this.#name}' can't be an Number.`
-    //         }
-    //     }
-    // }
+            if (!Number.isNaN(valNumber) && typeof valNumber === 'number') {
+                throw `Storage name '${this.#name}' can't be an Number.`
+            }
+        }
+    }
 
-    // #validateType(value) {
-    //     if (value && isArray(value)) {
-    //         throw `Uniform '${this.#name}' type: '${value}' is an array, which is currently not supported for Uniforms.`;
-    //     }
-    // }
+    #validateType(value) {
+
+    }
 
 }
