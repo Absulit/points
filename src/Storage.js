@@ -231,7 +231,7 @@ export default class Storage {
     }
 
     #validateValue(value) {
-        if (value && typeof value === 'object') {
+        if (value && typeof value === 'object' && !Array.isArray(value)) {
             throw `Storage '${this.#name}' value:'${value}' can't be an Object.`
         }
 
