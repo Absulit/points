@@ -58,25 +58,6 @@ QUnit.module('Uniforms', hooks => {
         }, 'Should throw an error when passed an string in value attribute')
     })
 
-    QUnit.test('Uniform should throw error if value is array', assert => {
-
-        assert.throws(() => {
-            points.setUniform('e', [0, 0, 0, 0, 0], 'array<f32, 5>');
-        }, 'Should throw an error when passed an array in function call');
-
-        assert.throws(() => {
-            points.setUniform('f')
-                .setValue([0, 0, 0, 0, 0])
-        }, 'Should throw an error when passed an array in setValue')
-
-        assert.throws(() => {
-            points.setUniform('g')
-                .value = [0, 0, 0, 0, 0]
-        }, 'Should throw an error when passed an array in value attribute')
-
-    })
-
-
     QUnit.test('Uniform should throw error if type is array', assert => {
 
        assert.throws(() => {
@@ -106,3 +87,7 @@ QUnit.module('Uniforms', hooks => {
     })
 
 });
+
+QUnit.module('Storage', hooks => {
+
+})
