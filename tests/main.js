@@ -113,4 +113,66 @@ QUnit.module('Storage', hooks => {
         myStorage.setValue(value);
         assert.equal(myStorage.value, value, 'value should be 10')
     })
+
+    //----
+    QUnit.test('Storage should throw error if object is passed as value', assert => {
+        assert.throws(() => {
+            points.setStorage('a', 'f32', {})
+        }, 'Should throw an error when passed an object in function call');
+
+        assert.throws(() => {
+            points.setStorage('b')
+                .setValue({})
+        }, 'Should throw an error when passed an object in setValue')
+
+        assert.throws(() => {
+            myStorage.value = {}
+        }, 'Should throw an error when passed an object in value attribute')
+
+    })
+
+    // QUnit.test('Uniform should throw error if a string is passed as value', assert => {
+    //     assert.throws(() => {
+    //         points.setUniform('c', '')
+    //     }, 'Should throw an error when passed a string in function call');
+
+    //     assert.throws(() => {
+    //         points.setUniform('d')
+    //             .setValue('')
+    //     }, 'Should throw an error when passed a string in setValue')
+
+    //     assert.throws(() => {
+    //         myUniform.value = ''
+    //     }, 'Should throw an error when passed an string in value attribute')
+    // })
+
+    // QUnit.test('Uniform should throw error if type is array', assert => {
+
+    //    assert.throws(() => {
+    //         points.setUniform('h', [0, 0, 0, 0, 0], 'array<f32, 5>');
+    //     }, 'Should throw an error when passed an array in function call');
+
+    //     assert.throws(() => {
+    //         points.setUniform('i')
+    //             .setType('array<f32, 5>')
+    //     }, 'Should throw an error when passed an array in setValue')
+
+    //     assert.throws(() => {
+    //         points.setUniform('j')
+    //             .type = 'array<f32, 5>'
+    //     }, 'Should throw an error when passed an array in type attribute')
+
+    // })
+
+
+    // QUnit.test('Uniform name should not be a number even if string', assert => {
+    //     assert.throws(() => {
+    //         points.setUniform(123)
+    //     }, 'Should throw an error when passed a number')
+    //     assert.throws(() => {
+    //         points.setUniform('123')
+    //     }, 'Should throw an error when passed a number as string')
+    // })
+
+
 })
