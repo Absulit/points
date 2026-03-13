@@ -1,4 +1,4 @@
-import Points, { Uniform } from 'points';
+import Points, { Uniform, Storage } from 'points';
 
 const points = new Points();
 
@@ -13,16 +13,16 @@ QUnit.module('Uniforms', hooks => {
         assert.equal(myUniform.name, name, `name should be ${name}`);
     });
     QUnit.test('Uniform is default f32', assert => {
-        assert.equal(myUniform.type, 'f32', `type is f32`);
+        assert.equal(myUniform.type, 'f32', `type should be f32`);
     })
 
     QUnit.test('myUniform is instance of Uniform', assert => {
-        assert.true(myUniform instanceof Uniform, 'myUniform is of type Uniform');
+        assert.true(myUniform instanceof Uniform, 'myUniform should be of type Uniform');
     })
 
     QUnit.test('myUniform.value has the value set with setValue', assert => {
         myUniform.setValue(10);
-        assert.equal(myUniform.value, 10, 'value is 10')
+        assert.equal(myUniform.value, 10, 'value should be 10')
     })
 
     //----
@@ -89,5 +89,28 @@ QUnit.module('Uniforms', hooks => {
 });
 
 QUnit.module('Storage', hooks => {
+    /** @type{Storage} */
+    let myStorage;
+    const name = 'storageName';
+    hooks.before(() => {
+        myStorage = points.setStorage(name);
+    })
 
+    QUnit.test('Storage name has the same name assigned', assert => {
+        assert.equal(myStorage.name, name, 'Storage name should be the same as assigned in function')
+    })
+
+    QUnit.test('Storage is default f32', assert => {
+        assert.equal(myStorage.type, 'f32', `type should be f32`);
+    })
+
+    QUnit.test('myStorage is instance of Storage', assert => {
+        assert.true(myStorage instanceof Storage, 'myStorage should be of type Storage');
+    })
+
+    QUnit.test('myStorage.value has the value set with setValue', assert => {
+        const value = 10;
+        myStorage.setValue(value);
+        assert.equal(myStorage.value, value, 'value should be 10')
+    })
 })
