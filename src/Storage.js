@@ -8,13 +8,7 @@ export default class Storage {
     #read = false
     #buffer = null
     #internal = false
-    // TODO document the stream feature
-    /**
-     * `updated` is set to true in data updates, but this is not true in
-     * something like audio, where the data streams and needs to be updated
-     * constantly, so if the storage map needs to be updated constantly then
-     * `stream` needs to be set to true.
-     */
+
     #stream = false
     #updated = false
     #value
@@ -52,6 +46,16 @@ export default class Storage {
         return this.#name;
     }
 
+    /**
+     * @param {String} value name of the Storage. The name is used in the WGSL
+     * shader.
+     * @example
+     * // js
+     * myStorage.name = 'myStorageName';
+     *
+     * // wgsl
+     * myStorageName = 13.1;
+     */
     set name(value) {
         this.#validateName(value);
         this.#name = value;
@@ -61,6 +65,11 @@ export default class Storage {
         return this.#mapped;
     }
 
+    /**
+     * @param {Boolean} value tells WebGPU if the Storage is mapped or not. This
+     * allows for the initialization of the Storage with data, which is a
+     * different route.
+     */
     set mapped(value) {
         this.#mapped = value;
     }
@@ -69,6 +78,11 @@ export default class Storage {
         return this.#type;
     }
 
+    /**
+     * @param {String} value WGSL data type of the Storage.
+     * @example
+     * myStorage.type = 'u32'
+     */
     set type(value) {
         this.#validateType(value);
         this.#type = value || 'f32';
@@ -79,7 +93,7 @@ export default class Storage {
     }
 
     /**
-     * this tells to what shader the storage is bound
+     * Tells WebGPU to which shader it can only be used.
      * @param {GPUShaderStage} value
      */
     set shaderStage(value) {
@@ -91,7 +105,7 @@ export default class Storage {
     }
 
     /**
-     * if this is going to be used to read data back
+     * If data is read back in JS from WGSL, then set to `true`.
      * @param {Boolean} value
      */
     set read(value) {
@@ -102,6 +116,9 @@ export default class Storage {
         return this.#buffer;
     }
 
+    /**
+     * For internal use mostly. The actual GPUBuffer with the data.
+     */
     set buffer(value) {
         this.#buffer = value;
     }
@@ -125,7 +142,13 @@ export default class Storage {
     get stream() {
         return this.#stream;
     }
-
+    /**
+     * `updated` is set to true in data updates, but this is not true in
+     * something like audio, where the data streams and needs to be updated
+     * constantly, so if the storage map needs to be updated constantly then
+     * `stream` needs to be set to true.
+     * @param {boolean} value
+     */
     set stream(value) {
         this.#stream = value;
     }
@@ -134,6 +157,9 @@ export default class Storage {
         return this.#updated;
     }
 
+    /**
+     * Mostly internal. Set to `true` if a value has been updated.
+     */
     set updated(value) {
         this.#updated = value;
     }
@@ -142,6 +168,9 @@ export default class Storage {
         return this.#value;
     }
 
+    /**
+     * @param {Number|Array<Number>} value data to send to the shader
+     */
     set value(value) {
         this.#validateValue(value);
         if (value && !Array.isArray(value) && value.constructor !== Uint8Array) {
@@ -154,7 +183,7 @@ export default class Storage {
 
     /**
      *
-     * @param {Array<Number>} value
+     * @param {Number|Array<Number>} value data to send to the shader
      * @returns {Storage}
      */
     setValue(value) {
@@ -170,7 +199,7 @@ export default class Storage {
     }
 
     /**
-     * if this is going to be used to read data back
+     * if this is going to be used to read data back set to `true`
      * @param {bool} value
      * @returns {Storage}
      */
@@ -180,7 +209,7 @@ export default class Storage {
     }
 
     /**
-     * this tells to what shader the storage is bound
+     * Tells WebGPU to which shader it can only be used.
      * @param {GPUShaderStage} value
      * @returns {Storage}
      */
@@ -190,9 +219,10 @@ export default class Storage {
     }
 
     /**
-     *
-     * @param {String} value
+     * @param {String} value WGSL data type of the Storage.
      * @returns {Storage}
+     * @example
+     * myStorage.setType('u32');
      */
     setType(value) {
         this.#validateType(value);
