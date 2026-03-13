@@ -10,7 +10,7 @@ export default class Uniform {
     #size
     /**
      *
-     * @param {{name:String, value:Number|Boolean|Array<Number>, type:string, size:Number}} config
+     * @param {{name:String, value:Number|Boolean|Array<Number>, type:string, size?:Number}} config
      */
     constructor({ name, value, type = null, size = null }) {
 

@@ -20,7 +20,7 @@ export default class Storage {
     #value
     #size = null // TODO: document this: to force allocate more space in case an update is greater than the default array size
     /**
-     * @param {{name:String, value:Array<Number>, type:String, read:bool, shaderStage:GPUShaderStage, stream:bool, updated:bool, size:Number}} config
+     * @param {{name:String, value:Number|Array<Number>, type:String, read:Boolean, shaderStage:GPUShaderStage, stream:bool, updated:bool, size:Number}} config
      */
     constructor({ name, value, type, read, shaderStage,
         stream = false, updated = false, size = null }) {
@@ -92,7 +92,7 @@ export default class Storage {
 
     /**
      * if this is going to be used to read data back
-     * @param {bool} value
+     * @param {Boolean} value
      */
     set read(value) {
         this.#read = value;
