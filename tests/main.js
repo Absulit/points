@@ -3,7 +3,7 @@ import Uniforms from './../src/Uniforms.js';
 
 const points = new Points();
 
-QUnit.module('Uniforms', hooks => {
+QUnit.module('Uniform', hooks => {
     /** @type{Uniform} */
     let myUniform;
     const name = 'myUniform';
@@ -167,7 +167,7 @@ QUnit.module('Uniforms', hooks => {
     })
 
     QUnit.test('Uniforms creates an Uniform class entry by calling a property', assert => {
-        assert.equal(uniforms.a.constructor.name, 'Uniform', 'Attribute should be an Uniform class' )
+        assert.equal(uniforms.a.constructor.name, 'Uniform', 'Attribute should be an Uniform class')
     })
 
     QUnit.test('Uniform created type should be f32', assert => {
@@ -177,5 +177,34 @@ QUnit.module('Uniforms', hooks => {
     QUnit.test('Uniform default value should be undefined or null', assert => {
         assert.true(!uniforms.a.value, 'Value should be undefined or null')
     })
+
+    QUnit.test('Assigning a value directly to attribute should create Uniform and set its value', assert => {
+        const value = 14;
+        uniforms.b = value;
+        assert.equal(uniforms.b.value, value, 'Value should be the same assigned before reading')
+    })
+
+    QUnit.test('Assigning a string to attribute should throw an error', assert => {
+        assert.throws(() => {
+            uniforms.c = 'some string';
+        }, 'Should throw an error when a string is assigned')
+    })
+
+    QUnit.test('Assigning an object to attribute should throw an error', assert => {
+        assert.throws(() => {
+            uniforms.d = {};
+        }, 'Should throw an error when an object is assigned')
+    })
+
+    QUnit.test('Assigning an array to attribute should NOT throw an error', assert => {
+        try {
+            uniforms.e = [0, 0, 0];
+            console.log(uniforms.e);
+            assert.ok(true, `assignment didn't throw error`);
+        } catch (e) {
+            assert.ok(false, `assignment throw error: ${e.message}`);
+        }
+    })
+
 
 })

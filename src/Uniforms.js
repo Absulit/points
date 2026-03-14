@@ -19,13 +19,12 @@ export default class Uniforms {
 
             set(target, prop, value, receiver) {
                 const type = typeof value;
-                console.log(type);
 
                 if (type === 'string') {
                     throw `Uniform named "${prop}": No strings allowed.`;
                 }
 
-                if (type === 'object') {
+                if (type === 'object' && !Array.isArray(value)) {
                     throw `Uniform named "${prop}": No objects allowed`;
                 }
 
