@@ -1,6 +1,8 @@
-import { Uniform } from "points";
+import { Uniform } from 'points';
+import UniformsArray from './UniformsArray.js';
 
 export default class Uniforms {
+    #list = new UniformsArray();
     constructor() {
         return new Proxy(this, {
             get(target, prop, receiver) {
@@ -21,11 +23,11 @@ export default class Uniforms {
                 const type = typeof value;
 
                 if (type === 'string') {
-                    throw `Uniform named "${prop}": No strings allowed.`;
+                    throw `Uniform named '${prop}': No strings allowed.`;
                 }
 
                 if (type === 'object' && !Array.isArray(value)) {
-                    throw `Uniform named "${prop}": No objects allowed`;
+                    throw `Uniform named '${prop}': No objects allowed`;
                 }
 
                 const uniform = new Uniform({ name: prop, value });
@@ -33,6 +35,14 @@ export default class Uniforms {
                 return uniform;
             }
         });
+    }
+
+    get list() {
+        return this.#list;
+    }
+
+    set list(value) {
+        this.#list = value;
     }
 
 }
