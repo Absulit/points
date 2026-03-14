@@ -1,4 +1,5 @@
 import Points, { Uniform, Storage } from 'points';
+import Uniforms from './../src/Uniforms.js';
 
 const points = new Points();
 
@@ -155,5 +156,26 @@ QUnit.module('Storage', hooks => {
         }, 'Should throw an error when passed a number as string')
     })
 
+
+})
+
+QUnit.module('Uniforms', hooks => {
+    /** @type{Uniforms} */
+    let uniforms;
+    hooks.before(() => {
+        uniforms = new Uniforms();
+    })
+
+    QUnit.test('Uniforms creates an Uniform class entry by calling a property', assert => {
+        assert.equal(uniforms.a.constructor.name, 'Uniform', 'Attribute should be an Uniform class' )
+    })
+
+    QUnit.test('Uniform created type should be f32', assert => {
+        assert.equal(uniforms.a.type, 'f32', 'Type should be f32')
+    })
+
+    QUnit.test('Uniform default value should be undefined or null', assert => {
+        assert.true(!uniforms.a.value, 'Value should be undefined or null')
+    })
 
 })
