@@ -206,5 +206,9 @@ QUnit.module('Uniforms', hooks => {
         }
     })
 
+    QUnit.test('Uniforms.list is of type UniformsArray', assert => {
+        assert.equal(uniforms.list.constructor.name, 'UniformsArray', 'list should be of type UniformsArray')
+    })
+
 
 })
