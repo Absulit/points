@@ -25,7 +25,7 @@ export default class Uniforms {
                 }
                 // If Uniform does not exist we create it.
                 const uniform = new Uniform({ name: prop });
-
+                target.list.push(uniform);
                 Reflect.set(target, prop, uniform, target);
                 return uniform;
             },
@@ -43,7 +43,12 @@ export default class Uniforms {
                     throw `Uniform named '${prop}': No objects allowed`;
                 }
 
+                if (prop in target) {
+                    return value;
+                }
+
                 const uniform = new Uniform({ name: prop, value });
+                target.list.push(uniform);
                 return Reflect.set(target, prop, uniform, target);
             }
         });

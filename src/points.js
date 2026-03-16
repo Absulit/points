@@ -326,7 +326,6 @@ class Points {
         this.#uniforms[name] = value;
         const uniform = this.#uniforms[name];
         uniform.type = type;
-        this.#uniforms.list.push(uniform);
         return uniform;
     }
 
