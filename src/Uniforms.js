@@ -14,6 +14,12 @@ export default class Uniforms {
                     return value;
                 }
 
+                if (typeof value === 'function') {
+                    if (prop === 'find') {
+                        return value.bind(target);
+                    }
+                }
+
                 if (prop in target) {
                     return value;
                 }
@@ -50,4 +56,9 @@ export default class Uniforms {
     set list(value) {
         this.#list = value;
     }
+
+    find(name) {
+        return this[name];
+    }
+
 }

@@ -18,6 +18,7 @@ import PresentationFormat from './PresentationFormat.js';
 import ScaleMode from './ScaleMode.js';
 import Uniform from './Uniform.js';
 import Storage from './Storage.js';
+import Uniforms from './Uniforms.js';
 
 /**
  * Main class Points, this is the entry point of an application with this library.
@@ -54,7 +55,7 @@ class Points {
     #numColumns = 1;
     #numRows = 1;
     #commandsFinished = [];
-    #uniforms = new UniformsArray();
+    #uniforms = new Uniforms();
     #meshUniforms = new UniformsArray();
     #cameraUniforms = new UniformsArray();
     #constants = [];
@@ -100,7 +101,6 @@ class Points {
     #canvasWidth = null;
     #canvasHeight = null;
 
-    #params = {}
 
     /**
      * Constructor of `Points`.
@@ -200,7 +200,7 @@ class Points {
         this.#canvas.height = this.#canvas.clientHeight;
         this.#screen[0] = this.#canvas.width;
         this.#screen[1] = this.#canvas.height;
-        this.#params.screen.value = this.#screen
+        this.#uniforms.screen = this.#screen;
 
         this.#presentationSize = [
             this.#canvas.clientWidth,
@@ -267,7 +267,7 @@ class Points {
         this.#ratio[0] = ratio[0];
         this.#ratio[1] = ratio[1];
 
-        this.#params.ratio.value = this.#ratio;
+        this.#uniforms.ratio = this.#ratio;
     }
 
     #onMouseMove = e => {
@@ -281,7 +281,7 @@ class Points {
         this.#mouseNormalized[1] = this.#mouse[1] / this.#screen[1];
         this.#mouseNormalized[1] = (this.#mouseNormalized[1] * - 1) - -1; // flip and move up
 
-        const { mouse, _mouse_normalized } = this.#params
+        const { mouse, _mouse_normalized } = this.#uniforms;
         mouse.value = this.#mouse;
         _mouse_normalized.value = this.#mouseNormalized;
     }
@@ -309,7 +309,7 @@ class Points {
      * let finalColor:vec4f = mix(color0, color1, params.scale);
      */
     setUniform(name, value, type = null) {
-        const uniformToUpdate = this.#params[name];
+        const uniformToUpdate = this.#uniforms.find(name);
 
         if (!uniformToUpdate && this.#initialized) {
             console.error(`'${name}' uniform needs to be declared before the init() prior to call it in update().`);
@@ -323,14 +323,10 @@ class Points {
             return uniformToUpdate;
         }
 
-        const uniform = new Uniform({
-            name,
-            value,
-            type,
-        });
-
-        this.#params[name] = uniform;
-        this.#uniforms.push(uniform);
+        this.#uniforms[name] = value;
+        const uniform = this.#uniforms[name];
+        uniform.type = type;
+        this.#uniforms.list.push(uniform);
         return uniform;
     }
 
@@ -382,7 +378,7 @@ class Points {
      */
     updateUniforms(arr) {
         arr.forEach(uniform => {
-            const variable = this.#params[uniform.name];
+            const variable = this.#uniforms[uniform.name];
             if (!variable) {
                 throw '`updateUniform()` can\'t be called without first `setUniform()`.';
             }
@@ -1318,7 +1314,7 @@ class Points {
         // const groupId = 0;
         let dynamicGroupBindings = '';
         let bindingIndex = 0;
-        if (this.#uniforms.length) {
+        if (this.#uniforms.list.length) {
             dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <uniform> params: Params;\n`;
             bindingIndex += 1;
         }
@@ -1493,10 +1489,10 @@ class Points {
         let dynamicStructParams = '';
         let dynamicStructMesh = '';
         let dynamicStructCamera = '';
-        this.#uniforms.forEach(u => {
+        this.#uniforms.list.forEach(u => {
             dynamicStructParams += /*wgsl*/`${u.name}:${u.type}, \n\t`;
         });
-        if (this.#uniforms.length) {
+        if (this.#uniforms.list.length) {
             dynamicStructParams = /*wgsl*/`struct Params {\n\t${dynamicStructParams}\n}\n`;
         }
         this.#meshUniforms.forEach(u => {
@@ -1773,8 +1769,8 @@ class Points {
     }
 
     #createParametersUniforms() {
-        const { values, paramsDataSize } = this.#createUniformValues(this.#uniforms);
-        this.#uniforms.buffer = this.#createAndMapBuffer(values, GPUBufferUsage.UNIFORM + GPUBufferUsage.COPY_DST, true, paramsDataSize.bytes);
+        const { values, paramsDataSize } = this.#createUniformValues(this.#uniforms.list);
+        this.#uniforms.list.buffer = this.#createAndMapBuffer(values, GPUBufferUsage.UNIFORM + GPUBufferUsage.COPY_DST, true, paramsDataSize.bytes);
 
         if (this.#meshUniforms.length) {
             const { values, paramsDataSize } = this.#createUniformValues(this.#meshUniforms);
@@ -1790,11 +1786,11 @@ class Points {
      * Updates all uniforms (for the update function)
      */
     #writeParametersUniforms() {
-        if (!this.#uniforms.buffer) {
+        if (!this.#uniforms.list.buffer) {
             console.error('An attempt to create uniforms has been made but no setUniform has been called. Maybe an update was called before a setUniform.')
         }
-        const { values } = this.#createUniformValues(this.#uniforms);
-        this.#writeBuffer(this.#uniforms.buffer, values);
+        const { values } = this.#createUniformValues(this.#uniforms.list);
+        this.#writeBuffer(this.#uniforms.list.buffer, values);
 
         if (this.#meshUniforms.length) {
             const { values } = this.#createUniformValues(this.#meshUniforms);
@@ -2111,7 +2107,7 @@ class Points {
     #createEntries(shaderStage, { index: renderPassIndex, internal }) {
         let entries = [];
         let bindingIndex = 0;
-        if (this.#uniforms.length) {
+        if (this.#uniforms.list.length) {
             // TODO: 1262
             // if you remove this there's an error that I think is not explained right
             // it talks about a storage in index 1 but it was actually the 0
@@ -2129,7 +2125,7 @@ class Points {
                     binding: bindingIndex++,
                     resource: {
                         label: 'uniform',
-                        buffer: this.#uniforms.buffer
+                        buffer: this.#uniforms.list.buffer
                     },
                     buffer: {
                         type: 'uniform'
@@ -2569,7 +2565,7 @@ class Points {
         this.#time = this.#clock.time;
         this.#epoch = +new Date() / 1000;
 
-        const { delta, time, epoch } = this.#params;
+        const { delta, time, epoch } = this.#uniforms;
         delta.value = this.#delta;
         time.value = this.#time;
         epoch.value = this.#epoch;
@@ -2634,7 +2630,7 @@ class Points {
 
                     bundleEncoder.setPipeline(renderPass.renderPipeline);
 
-                    if (this.#uniforms.length) {
+                    if (this.#uniforms.list.length) {
                         bundleEncoder.setBindGroup(0, renderPass.vertexBindGroup);
                         bundleEncoder.setBindGroup(1, renderPass.fragmentBindGroup);
                     }
@@ -2706,7 +2702,7 @@ class Points {
 
                 const passEncoder = commandEncoder.beginComputePass();
                 passEncoder.setPipeline(renderPass.computePipeline);
-                if (this.#uniforms.length) {
+                if (this.#uniforms.list.length) {
                     passEncoder.setBindGroup(0, renderPass.computeBindGroup);
                 }
                 passEncoder.dispatchWorkgroups(
@@ -2774,7 +2770,7 @@ class Points {
         this.#mouseDelta[0] = 0;
         this.#mouseDelta[1] = 0;
 
-        const { mouseClick, mouseWheel, mouseDelta } = this.#params;
+        const { mouseClick, mouseWheel, mouseDelta } = this.#uniforms;
         mouseClick.value = this.#mouseClick;
         mouseWheel.value = this.#mouseWheel;
         mouseDelta.value = this.#mouseDelta;
@@ -2968,7 +2964,7 @@ class Points {
      * points.params.myuniform.value = 12;
      */
     get params() {
-        return this.#params;
+        return this.#uniforms;
     }
     /**
      * Get the list of added uniforms, same as {@link params}
@@ -2980,7 +2976,7 @@ class Points {
      * points.uniforms.myuniform.value = 12;
      */
     get uniforms() {
-        return this.#params;
+        return this.#uniforms;
     }
 
     /**
@@ -3030,7 +3026,7 @@ class Points {
         this.#storage = [];
         this.#readStorage?.forEach(s => s.buffer.destroy());
         this.#readStorage = [];
-        this.#uniforms?.buffer.destroy();
+        this.#uniforms.list?.buffer.destroy();
         this.#meshUniforms?.buffer?.destroy();
         this.#cameraUniforms?.buffer?.destroy();
         this.#samplers?.forEach(s => null);
@@ -3041,11 +3037,10 @@ class Points {
         this.#layers = new LayersArray();
 
         this.#initialized = false;
-        this.#uniforms = new UniformsArray();
+        this.#uniforms = new Uniforms();
         this.#meshUniforms = new UniformsArray();
         this.#cameraUniforms = new UniformsArray();
 
-        this.#params = {};
 
         this.#texturesExternal?.forEach(textureExternal => {
             const stream = textureExternal?.video.srcObject;
@@ -3105,7 +3100,7 @@ class Points {
         this.#storage = null;
         this.#readStorage.forEach(s => s.buffer.destroy());
         this.#readStorage = null;
-        this.#uniforms.buffer.destroy();
+        this.#uniforms.list.buffer.destroy();
         this.#meshUniforms?.buffer?.destroy();
         this.#cameraUniforms?.buffer?.destroy();
         this.#samplers.forEach(s => null);
@@ -3120,7 +3115,6 @@ class Points {
         this.#meshUniforms = null;
         this.#cameraUniforms = null;
 
-        this.#params = null;
 
         this.#texturesExternal.forEach(textureExternal => {
             const stream = textureExternal?.video.srcObject;
