@@ -21,12 +21,12 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
-
+        const { uniforms } = points;
         points.scaleMode = ScaleMode.FIT;
 
         // Add elements to dat gui
         // create an uniform and get value from options
-        points.setUniform('val', options.val);
+        uniforms.val = options.val;
 
         // https://github.com/dataarts/dat.gui/blob/master/API.md#GUI+add
         folder.add(options, 'val', -1, 1, .0001).name('Val');
@@ -45,7 +45,8 @@ const base = {
      * @param {Points} points
      */
     update: points => {
-        points.setUniform('val', options.val);
+        const { uniforms } = points;
+        uniforms.val = options.val;
     }
 }
 
