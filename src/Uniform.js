@@ -152,6 +152,10 @@ export default class Uniform {
             if (length > 4) {
                 throw `Uniform named '${this.#name}': Can't assign an Array greater than a vec4f.`
             }
+
+            if (length < 2) {
+                throw `Uniform named '${this.#name}': Can't assign an Array smaller than a vec2f. Assign the Number directly.`
+            }
         }
     }
 
