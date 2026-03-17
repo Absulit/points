@@ -211,7 +211,6 @@ QUnit.module('Uniforms', hooks => {
     QUnit.test('Assigning an array to attribute should NOT throw an error', assert => {
         try {
             uniforms.e = [0, 0, 0];
-            console.log(uniforms.e);
             assert.ok(true, `assignment didn't throw error`);
         } catch (e) {
             assert.ok(false, `assignment throw error: ${e.message}`);
@@ -220,6 +219,16 @@ QUnit.module('Uniforms', hooks => {
 
     QUnit.test('Uniforms.list is of type UniformsArray', assert => {
         assert.equal(uniforms.list.constructor.name, 'UniformsArray', 'list should be of type UniformsArray')
+    })
+
+    QUnit.test('Assigning a value to an already existing uniform should replace the value', assert => {
+        const originalValue = 10;
+        const newValue = 20;
+
+        uniforms.oldUniform = originalValue;
+        uniforms.oldUniform = newValue;
+
+        assert.equal(uniforms.oldUniform.value, newValue, 'Should have the new value assigned');
     })
 
 })

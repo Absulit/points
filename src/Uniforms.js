@@ -44,7 +44,8 @@ export default class Uniforms {
                 }
 
                 if (prop in target) {
-                    return value;
+                    target[prop].value = value;
+                    return target[prop];
                 }
 
                 // If Uniform does not exist we create it.
