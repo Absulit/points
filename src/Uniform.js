@@ -10,22 +10,6 @@ export default class Uniform {
     #size
 
     /**
-     * returns something like vec2f, vec3f
-     * @param {Array|Object} value
-     * @returns {String}
-     */
-    #getArrayType(value) {
-        const isArray = Array.isArray(value);
-        let type = null;
-        if (isArray) {
-            const { length } = value
-            if(length <= 4){
-                type = `vec${length}f`;
-            }
-        }
-        return type;
-    }
-    /**
      *
      * @param {{name:String, value:Number|Boolean|Array<Number>, type:string, size?:Number}} config
      */
@@ -156,6 +140,11 @@ export default class Uniform {
             //     console.trace(this.#name, this.#value);
             //     throw `Uniform named '${this.#name}': Can't assign an Array greater than a vec4f.`
             // }
+            if(Array.isArray(this.#value)){
+                if(length != this.#value.length){
+                    throw `Uniform named '${this.#name}': Size of the array value has changed from ${this.#value.length} to ${length}.`
+                }
+            }
 
             if (length < 2) {
                 throw `Uniform named '${this.#name}': Can't assign an Array smaller than a vec2f. Assign the Number directly.`
@@ -181,5 +170,22 @@ export default class Uniform {
         if (value && isArray(value)) {
             throw `Uniform '${this.#name}' type: '${value}' is an array, which is currently not supported for Uniforms.`;
         }
+    }
+
+    /**
+     * returns something like vec2f, vec3f
+     * @param {Array|Object} value
+     * @returns {String}
+     */
+    #getArrayType(value) {
+        const isArray = Array.isArray(value);
+        let type = null;
+        if (isArray) {
+            const { length } = value
+            if(length <= 4){
+                type = `vec${length}f`;
+            }
+        }
+        return type;
     }
 }

@@ -231,4 +231,14 @@ QUnit.module('Uniforms', hooks => {
         assert.equal(uniforms.oldUniform.value, newValue, 'Should have the new value assigned');
     })
 
+    QUnit.test('Updating array size should throw an error', assert => {
+        const originalValue = [0, 0, 0];
+        const newValue = [0, 0, 0, 0];
+
+        assert.throws(() => {
+            uniforms.oldUniform2 = originalValue;
+            uniforms.oldUniform2 = newValue;
+        }, 'Should throw an error if the array length has changed')
+    })
+
 })
