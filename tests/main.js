@@ -87,11 +87,11 @@ QUnit.module('Uniform', hooks => {
         }, 'Should throw an error when passed a number as string')
     })
 
-    QUnit.test('Uniform set an array as value should fail if greater than 4', assert => {
-        assert.throws(() => {
-            points.uniforms.k = [1, 2, 3, 4, 5];
-        }, 'Should throw an error when array passed has a length greater than 4')
-    })
+    // QUnit.test('Uniform set an array as value should fail if greater than 4', assert => {
+    //     assert.throws(() => {
+    //         points.uniforms.k = [1, 2, 3, 4, 5];
+    //     }, 'Should throw an error when array passed has a length greater than 4')
+    // })
 
     QUnit.test('Uniform set an array as value should fail if lower than 2', assert => {
         assert.throws(() => {

@@ -19,7 +19,9 @@ export default class Uniform {
         let type = null;
         if (isArray) {
             const { length } = value
-            type = `vec${length}f`;
+            if(length <= 4){
+                type = `vec${length}f`;
+            }
         }
         return type;
     }
@@ -149,9 +151,11 @@ export default class Uniform {
         const isArray = Array.isArray(value);
         if (isArray) {
             const { length } = value;
-            if (length > 4) {
-                throw `Uniform named '${this.#name}': Can't assign an Array greater than a vec4f.`
-            }
+            // TODO include mat values, e.g.: mat4x2
+            // if (length > 4) {
+            //     console.trace(this.#name, this.#value);
+            //     throw `Uniform named '${this.#name}': Can't assign an Array greater than a vec4f.`
+            // }
 
             if (length < 2) {
                 throw `Uniform named '${this.#name}': Can't assign an Array smaller than a vec2f. Assign the Number directly.`
