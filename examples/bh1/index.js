@@ -41,7 +41,7 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
-
+        const { uniforms } = points;
         points.scaleMode = ScaleMode.FIT
 
         const descriptor = {
@@ -58,23 +58,23 @@ const base = {
         points.setStorage('colors', 'array<vec4f, 6>')
             .setValue(colors);
 
-        points.setUniform('enabled', options.enabled);
-        points.setUniform('mass', options.mass);
-        points.setUniform('innerRadius', options.innerRadius);
-        points.setUniform('outerRadius', options.outerRadius);
-        // points.setUniform('mouseY', options.mouseY);
-        points.setUniform('roDistance', options.roDistance);
-        points.setUniform('diskSpeed', options.diskSpeed);
-        points.setUniform('threshold', options.threshold);
-        points.setUniform('spin', options.spin);
-        points.setUniform('hueShift', options.hueShift);
-        points.setUniform('eventHorizon', options.eventHorizon);
+        uniforms.enabled = options.enabled;
+        uniforms.mass = options.mass;
+        uniforms.innerRadius = options.innerRadius;
+        uniforms.outerRadius = options.outerRadius;
+        // uniforms.mouseY = options.mouseY;
+        uniforms.roDistance = options.roDistance;
+        uniforms.diskSpeed = options.diskSpeed;
+        uniforms.threshold = options.threshold;
+        uniforms.spin = options.spin;
+        uniforms.hueShift = options.hueShift;
+        uniforms.eventHorizon = options.eventHorizon;
 
-        points.setUniform('sliderA', options.sliderA);
-        points.setUniform('scale', options.scale);
-        points.setUniform('sliderC', options.sliderC);
-        points.setUniform('val', options.val); // to debug
-        points.setUniform('val2', options.val2); // to debug
+        uniforms.sliderA = options.sliderA;
+        uniforms.scale = options.scale;
+        uniforms.sliderC = options.sliderC;
+        uniforms.val = options.val; // to debug
+        uniforms.val2 = options.val2; // to debug
 
         folder.add(options, 'enabled').name('enable');
         folder.add(options, 'mass', 0, 5, .0001).name('mass');
@@ -99,23 +99,24 @@ const base = {
      * @param {Points} points
      */
     update: points => {
-        points.setUniform('enabled', options.enabled);
-        points.setUniform('mass', options.mass);
-        points.setUniform('innerRadius', options.innerRadius);
-        points.setUniform('outerRadius', options.outerRadius);
-        // points.setUniform('mouseY', options.mouseY);
-        points.setUniform('roDistance', options.roDistance);
-        points.setUniform('diskSpeed', options.diskSpeed);
-        points.setUniform('threshold', options.threshold);
-        points.setUniform('spin', options.spin);
-        points.setUniform('hueShift', options.hueShift);
-        points.setUniform('eventHorizon', options.eventHorizon);
+        const { uniforms } = points;
+        uniforms.enabled = options.enabled;
+        uniforms.mass = options.mass;
+        uniforms.innerRadius = options.innerRadius;
+        uniforms.outerRadius = options.outerRadius;
+        // uniforms.mouseY = options.mouseY;
+        uniforms.roDistance = options.roDistance;
+        uniforms.diskSpeed = options.diskSpeed;
+        uniforms.threshold = options.threshold;
+        uniforms.spin = options.spin;
+        uniforms.hueShift = options.hueShift;
+        uniforms.eventHorizon = options.eventHorizon;
 
-        points.setUniform('sliderA', options.sliderA);
-        points.setUniform('scale', options.scale);
-        points.setUniform('sliderC', options.sliderC);
-        points.setUniform('val', options.val); // to debug
-        points.setUniform('val2', options.val2); // to debug
+        uniforms.sliderA = options.sliderA;
+        uniforms.scale = options.scale;
+        uniforms.sliderC = options.sliderC;
+        uniforms.val = options.val; // to debug
+        uniforms.val2 = options.val2; // to debug
     }
 }
 
