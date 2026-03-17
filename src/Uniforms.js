@@ -44,8 +44,9 @@ export default class Uniforms {
                 }
 
                 if (prop in target) {
-                    target[prop].value = value;
-                    return target[prop];
+                    const uniform = Reflect.get(target, prop, target);
+                    uniform.value = value;
+                    return uniform;
                 }
 
                 // If Uniform does not exist we create it.
