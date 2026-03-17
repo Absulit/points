@@ -30,15 +30,9 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
-
-        points.setUniform('cameraPosition', camera.position);
+        const { uniforms } = points;
+        uniforms.cameraPosition = camera.position;
         points.setCameraPerspective('camera0', camera.position, camera.lookAt);
-
-        points.setUniform('val', options.val);
-        folder.add(options, 'val', -1, 1, .0001).name('Val');
-
-        folder.add(options, 'bool').name('Bool');
-
 
         folder.open();
     },
@@ -46,11 +40,11 @@ const base = {
      * @param {Points} points
      */
     update: points => {
-        points.setUniform('val', options.val);
+        const { uniforms } = points;
 
         camera.position[1] = Math.sin(time * .01);
         camera.lookAt[1] = Math.sin(time * .00133);
-        points.setUniform('cameraPosition', camera.position);
+        uniforms.cameraPosition = camera.position;
         points.setCameraPerspective('camera0', camera.position, camera.lookAt);
         time++;
     }
