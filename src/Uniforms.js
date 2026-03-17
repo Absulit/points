@@ -47,6 +47,8 @@ export default class Uniforms {
                     return value;
                 }
 
+                // If Uniform does not exist we create it.
+
                 const uniform = new Uniform({ name: prop, value });
                 target.list.push(uniform);
                 return Reflect.set(target, prop, uniform, target);
