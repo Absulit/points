@@ -65,6 +65,7 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+        const { uniforms } = points;
         points.import(structs);
 
         points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
@@ -80,11 +81,10 @@ const base = {
             .setType(`array<vec4f, ${vertex_data.length}>`)
             .setValue(vertex_data.flat());
 
-        points.setUniform('visibility', options.visibility)
-            .setType('u32');
+        uniforms.visibility = options.visibility;
 
         folder.add(options, 'visibility').name('visibility').onChange(value => {
-            const { visibility } = points.params;
+            const { visibility } = uniforms;
             visibility.value = value;
         });
 

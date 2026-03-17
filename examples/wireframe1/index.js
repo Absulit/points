@@ -34,21 +34,22 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
-
+        const { uniforms } = points;
         points.setCameraPerspective('camera');
 
-        points.setUniform('wireframeColor', options.wireframeColor, 'vec3f');
+        uniforms.wireframeColor = options.wireframeColor;
         folder.addColor(options, 'wireframeColor');
 
-        points.setUniform('fillColor', options.fillColor, 'vec3f');
+        uniforms.fillColor = options.fillColor;
         folder.addColor(options, 'fillColor');
 
-        points.setUniform('thickness', options.thickness);
+        uniforms.thickness = options.thickness;
         folder.add(options, 'thickness', 0, 5, .0001).name('thickness');
 
-        points.setUniform('opaque', options.opaque);
-        folder.add(options, 'opaque').name('opaque').onChange(val =>{
+        uniforms.opaque = options.opaque;
+        folder.add(options, 'opaque').name('opaque').onChange(val => {
             r0.depthWriteEnabled = val; // TODO: error in depth
+            uniforms.opaque = val;
         });
 
 
@@ -58,11 +59,11 @@ const base = {
      * @param {Points} points
      */
     update: points => {
+        const { uniforms } = points;
         points.setCameraPerspective('camera', [0, 0, 5]);
-        points.setUniform('thickness', options.thickness);
-        points.setUniform('wireframeColor', options.wireframeColor);
-        points.setUniform('fillColor', options.fillColor);
-        points.setUniform('opaque', options.opaque);
+        uniforms.thickness = options.thickness;
+        uniforms.wireframeColor = options.wireframeColor;
+        uniforms.fillColor = options.fillColor;
     }
 }
 
