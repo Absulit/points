@@ -37,10 +37,10 @@ export default class Uniforms {
 
                 const type = typeof value;
                 if (type === 'string') {
-                    throw `Uniform named '${prop}': No strings allowed.`;
+                    throw `Uniform named '${prop}': No strings allowed or maybe you are adding an array.`;
                 }
                 if (type === 'object' && !Array.isArray(value)) {
-                    throw `Uniform named '${prop}': No objects allowed`;
+                    throw `Uniform named '${prop}': No objects allowed.`;
                 }
 
                 if (prop in target) {

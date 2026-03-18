@@ -248,8 +248,12 @@ QUnit.module('Uniforms', hooks => {
         assert.equal(uniforms.numUniform.value, finalValue);
     })
 
-    // QUnit.test('Incrementing value directly with += should throw error if array', assert => {
-
-    // })
+    QUnit.test('Incrementing value directly with += should throw error if the types don\'t match', assert => {
+        const arrayValue = [3];
+        uniforms.numUniform2 = 0;
+        assert.throws(() => {
+            uniforms.numUniform2 += arrayValue;
+        }, 'Should throw an error if the types don\'t match')
+    })
 
 })
