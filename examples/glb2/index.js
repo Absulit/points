@@ -124,7 +124,7 @@ const base = {
         points.setCameraPerspective('camera', [0, 0, 5], [0, 0, -1000]);
 
         uniforms.dof = options.dof;
-        uniforms.angleY.value += dt * 0.094222; // TODO test to remove value
+        uniforms.angleY += dt * 0.094222;
     }
 }
 

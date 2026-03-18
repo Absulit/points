@@ -140,8 +140,8 @@ export default class Uniform {
             //     console.trace(this.#name, this.#value);
             //     throw `Uniform named '${this.#name}': Can't assign an Array greater than a vec4f.`
             // }
-            if(Array.isArray(this.#value)){
-                if(length != this.#value.length){
+            if (Array.isArray(this.#value)) {
+                if (length != this.#value.length) {
                     throw `Uniform named '${this.#name}': Size of the array value has changed from ${this.#value.length} to ${length}.`
                 }
             }
@@ -182,10 +182,18 @@ export default class Uniform {
         let type = null;
         if (isArray) {
             const { length } = value
-            if(length <= 4){
+            if (length <= 4) {
                 type = `vec${length}f`;
             }
         }
         return type;
+    }
+
+    // allows for things like:
+    // uniforms.myUniform += 10
+    // works on set, not on get
+    // on get you obtain the Uniform
+    valueOf() {
+        return this.#value;
     }
 }
