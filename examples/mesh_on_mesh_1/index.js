@@ -84,8 +84,7 @@ const base = {
         uniforms.visibility = options.visibility;
 
         folder.add(options, 'visibility').name('visibility').onChange(value => {
-            const { visibility } = uniforms;
-            visibility.value = value;
+            uniforms.visibility = value;
         });
 
         points.setCameraPerspective('camera');
