@@ -69,6 +69,7 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+        const { uniforms } = points;
         points.import(structs);
 
         // points.addRenderPass(RenderPasses.COLOR);
@@ -83,15 +84,15 @@ const base = {
         await points.setTextureImage('albedo', texture);
         points.setSampler('imageSampler', null);
 
-        points.setUniform('dof', options.dof);
+        uniforms.dof = options.dof;
         folder.add(options, 'dof', 0, 1, .0001).name('DOF');
 
         const dropdownItems = { /*'Vertex': 0,*/ 'Texture': 1, 'Shader': 2 };
 
-        points.setUniform('color_mode', options.mode);
+        uniforms.color_mode = options.mode;
         folder.add(options, 'mode', dropdownItems).name('Colors').onChange(value => {
             console.log(value);
-            points.setUniform('color_mode', value);
+            uniforms.color_mode = value;
         });
 
         points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
@@ -111,7 +112,7 @@ const base = {
 
         points.setCameraPerspective('camera');
 
-        points.setUniform('angleY', 0);
+        uniforms.angleY = 0;
 
         folder.open();
     },
@@ -119,11 +120,11 @@ const base = {
      * @param {Points} points
      */
     update: (points, t, dt) => {
-
+        const { uniforms } = points;
         points.setCameraPerspective('camera', [0, 0, 5], [0, 0, -1000]);
 
-        points.setUniform('dof', options.dof);
-        points.params.angleY.value += dt * 0.094222;
+        uniforms.dof = options.dof;
+        uniforms.angleY.value += dt * 0.094222; // TODO test to remove value
     }
 }
 

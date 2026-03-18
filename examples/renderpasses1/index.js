@@ -24,6 +24,7 @@ const renderpasses1 = {
      * @param {*} folder
      */
     init: async (points, folder) => {
+        const { uniforms } = points;
         points.scaleMode = ScaleMode.FIT;
         points.setSampler('imageSampler', null);
         // await points.setTextureImage('image', './../img/carmen_lyra_423x643.jpg');
@@ -32,12 +33,13 @@ const renderpasses1 = {
         points.setSampler('feedbackSampler', null);
         points.setTexture2d('feedbackTexture', true, 0);
 
-        points.setUniform('rotation', options.rotation, 'f32');
+        uniforms.rotation = options.rotation;
         folder.add(options, 'rotation', 0, 1, .0001).name('Rotation');
         folder.open();
     },
     update: points => {
-        points.setUniform('rotation', options.rotation);
+        const { uniforms } = points;
+        uniforms.rotation = options.rotation;
     }
 }
 

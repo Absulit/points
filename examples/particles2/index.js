@@ -22,7 +22,7 @@ let THREADS_X = 256;
 let THREADS_Y = 1;
 let THREADS_Z = 1;
 
-if(options.isMobile){
+if (options.isMobile) {
     WORKGROUP_X = 8;
     WORKGROUP_Y = 4;
     WORKGROUP_Z = 2;
@@ -51,6 +51,7 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+        const { uniforms } = points;
         points.import(structs);
 
         points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
@@ -78,16 +79,16 @@ const base = {
 
         points.setCameraOrthographic('camera');
 
-        points.setUniform('maxLife', options.maxLife);
+        uniforms.maxLife = options.maxLife;
         folder.add(options, 'maxLife', 1, 600, .0001).name('maxLife');
 
-        points.setUniform('turbulenceScale', options.turbulenceScale);
+        uniforms.turbulenceScale = options.turbulenceScale;
         folder.add(options, 'turbulenceScale', 10, 1024, .0001).name('turbulenceScale');
 
-        points.setUniform('useVideo', false);
+        uniforms.useVideo = false;
         folder.add(options, 'useVideo').name('useVideo');
 
-        points.setUniform('particleSize', options.particleSize);
+        uniforms.particleSize = options.particleSize;
         folder.add(options, 'particleSize', 1, 60, .0001).name('particleSize');
 
         folder.open();
@@ -96,10 +97,11 @@ const base = {
      * @param {Points} points
      */
     update: points => {
-        points.setUniform('useVideo', options.useVideo);
-        points.setUniform('maxLife', options.maxLife);
-        points.setUniform('turbulenceScale', options.turbulenceScale);
-        points.setUniform('particleSize', options.particleSize);
+        const { uniforms } = points;
+        uniforms.useVideo = options.useVideo;
+        uniforms.maxLife = options.maxLife;
+        uniforms.turbulenceScale = options.turbulenceScale;
+        uniforms.particleSize = options.particleSize;
     }
 }
 

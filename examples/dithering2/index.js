@@ -17,7 +17,7 @@ const dithering2 = {
      * @param {*} folder
      */
     init: async (points, folder) => {
-
+        const { uniforms } = points;
         points.scaleMode = ScaleMode.FIT;
 
         const descriptor = {
@@ -29,9 +29,9 @@ const dithering2 = {
         // await points.setTextureImage('image', './../img/old_king_600x600.jpg');
         await points.setTextureImage('image', './../img/absulit_800x800.jpg');
 
-        points.setUniform('scale', options.scale);
-        points.setUniform('depth', options.depth);
-        points.setUniform('distance', options.depth);
+        uniforms.scale = options.scale;
+        uniforms.depth = options.depth;
+        uniforms.distance = options.depth;
 
         folder.add(options, 'scale', 0, 1, .0001).name('Scale');
         folder.add(options, 'depth', -1, 1, .0001).name('Depth');
@@ -39,9 +39,10 @@ const dithering2 = {
         folder.open();
     },
     update: points => {
-        points.setUniform('scale', options.scale);
-        points.setUniform('depth', options.depth);
-        points.setUniform('distance', options.distance);
+        const { uniforms } = points;
+        uniforms.scale = options.scale;
+        uniforms.depth = options.depth;
+        uniforms.distance = options.distance;
     }
 }
 

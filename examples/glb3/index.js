@@ -24,6 +24,7 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+        const { uniforms } = points;
         points.import(structs);
 
         await points.setTextureImage('albedo', texture);
@@ -31,11 +32,11 @@ const base = {
 
         const dropdownItems = { /*'Vertex': 0,*/ 'Texture': 1, 'Shader': 2 };
 
-        points.setUniform('cameraPosition', [0, 0, 5], 'vec3f');
-        points.setUniform('color_mode', options.mode);
+        uniforms.cameraPosition = [0, 0, 5];
+        uniforms.color_mode = options.mode;
         folder.add(options, 'mode', dropdownItems).name('Colors').onChange(value => {
             console.log(value);
-            points.setUniform('color_mode', value);
+            uniforms.color_mode = value;
         });
 
 

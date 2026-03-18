@@ -52,6 +52,7 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+        const { uniforms } = points;
         points.import(structs);
 
         await points.setTextureWebcam('webcam')
@@ -89,21 +90,21 @@ const base = {
 
         points.setCameraOrthographic('camera');
 
-        points.setUniform('maxLife', options.maxLife);
+        uniforms.maxLife = options.maxLife;
         folder.add(options, 'maxLife', 1, 600, .0001).name('maxLife');
 
-        points.setUniform('turbulenceScale', options.turbulenceScale);
+        uniforms.turbulenceScale = options.turbulenceScale;
         folder.add(options, 'turbulenceScale', 10, 1024, .0001).name('turbulenceScale');
 
-        points.setUniform('particleSize', options.particleSize);
+        uniforms.particleSize = options.particleSize;
         folder.add(options, 'particleSize', 1, 10, .0001).name('particleSize');
 
 
         const dropdownItems = { 'Video': 0, 'Webcam': 1, 'Image': 2 };
-        points.setUniform('texture_mode', options.mode);
+        uniforms.texture_mode = options.mode;
         folder.add(options, 'mode', dropdownItems).name('Textures').onChange(async value => {
             console.log(value);
-            points.setUniform('texture_mode', value);
+            uniforms.texture_mode = value;
         });
 
 
@@ -114,10 +115,11 @@ const base = {
      * @param {Points} points
      */
     update: points => {
-        points.setUniform('maxLife', options.maxLife);
-        points.setUniform('turbulenceScale', options.turbulenceScale);
-        points.setUniform('particleSize', options.particleSize);
-        points.setUniform('texture_mode', options.mode);
+        const { uniforms } = points;
+        uniforms.maxLife = options.maxLife;
+        uniforms.turbulenceScale = options.turbulenceScale;
+        uniforms.particleSize = options.particleSize;
+        uniforms.texture_mode = options.mode;
     }
 }
 

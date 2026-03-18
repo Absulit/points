@@ -13,16 +13,18 @@ const random3 = {
         new RenderPass(vert, frag, compute, 800, 800)
     ],
     init: async (points, folder) => {
+        const { uniforms } = points;
         points.setSampler('feedbackSampler');
         points.setTexture2d('feedbackTexture', true);
         points.setBindingTexture('outputTex', 'computeTexture');
 
-        points.setUniform('sliderA', options.sliderA, 'f32');
+        uniforms.sliderA = options.sliderA;
         folder.add(options, 'sliderA', 0, 1, .0001).name('sliderA');
         folder.open();
     },
     update: points => {
-        points.setUniform('sliderA', options.sliderA);
+        const { uniforms } = points;
+        uniforms.sliderA = options.sliderA;
     }
 }
 

@@ -11,8 +11,6 @@ const random2 = {
         new RenderPass(vert, frag, compute, 800, 800)
     ],
     init: async points => {
-        points.setUniform('randNumber', 0);
-        points.setUniform('randNumber2', 0);
         // let data = [];
         for (let k = 0; k < 800 * 800; k++) {
             data.push(Math.random());
@@ -25,10 +23,6 @@ const random2 = {
         points.setBindingTexture('outputTex', 'computeTexture');
     },
     update: points => {
-        const { randNumber, randNumber2 } = points.params;
-        randNumber.value = Math.random();
-        randNumber2.value = Math.random();
-
         for (let k = 0; k < 800 * 800; k++) {
             data[k] = Math.random();
         }

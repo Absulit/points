@@ -17,6 +17,7 @@ const dithering3 = {
      * @param {*} folder
      */
     init: async (points, folder) => {
+        const { uniforms } = points;
         const { COMPUTE } = GPUShaderStage;
         const descriptor = {
             addressModeU: 'repeat',
@@ -35,16 +36,17 @@ const dithering3 = {
         points.setStorage('points', 'array<vec4f, 640000>')
             .setShaderStage(COMPUTE);
 
-        points.setUniform('scale', options.scale);
-        points.setUniform('quantError', options.quantError);
+        uniforms.scale = options.scale;
+        uniforms.quantError = options.quantError;
 
         folder.add(options, 'scale', 0, 1, .0001).name('Scale');
         folder.add(options, 'quantError', -1, 1, .0001).name('quantError');
         folder.open();
     },
     update: points => {
-        points.setUniform('scale', options.scale);
-        points.setUniform('quantError', options.quantError);
+        const { uniforms } = points;
+        uniforms.scale = options.scale;
+        uniforms.quantError = options.quantError;
     }
 }
 

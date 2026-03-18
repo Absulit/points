@@ -19,29 +19,36 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+        const { uniforms } = points;
+        const { FRAGMENT } = GPUShaderStage;
         points.scaleMode = ScaleMode.FIT;
         points.import(structs);
 
         // Add elements to dat gui
         // create an uniform and get value from options
-        points.setUniform('rotation', options.rotation);
-        points.setUniform('scale', options.scale);
-        points.setUniform('displace', options.displace);
+        uniforms.rotation = options.rotation;
+        uniforms.scale = options.scale;
+        uniforms.displace = options.displace;
 
         // https://github.com/dataarts/dat.gui/blob/master/API.md#GUI+add
         folder.add(options, 'rotation', -10, 10, .0001).name('rotation');
         folder.add(options, 'scale', 0, 1, .0001).name('scale');
         folder.add(options, 'displace').name('displace');
 
-        points.setStorage('variables', 'Variables', false, GPUShaderStage.FRAGMENT);
-        points.setStorage('colors', 'array<vec3f, 6>', false, GPUShaderStage.FRAGMENT);
+        points.setStorage('variables')
+            .setType('Variables')
+            .setShaderStage(FRAGMENT);
+        points.setStorage('colors')
+            .setType('array<vec3f, 6>')
+            .setShaderStage(FRAGMENT);
 
         folder.open();
     },
     update: points => {
-        points.setUniform('rotation', options.rotation);
-        points.setUniform('scale', options.scale);
-        points.setUniform('displace', options.displace);
+        const { uniforms } = points;
+        uniforms.rotation = options.rotation;
+        uniforms.scale = options.scale;
+        uniforms.displace = options.displace;
     }
 }
 

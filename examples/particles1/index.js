@@ -30,6 +30,7 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+        const { uniforms } = points;
         points.import(structs);
 
         points.setStorage('particles', `array<Particle, ${numParticles}>`);
@@ -51,13 +52,13 @@ const base = {
         }, 4);
 
 
-        points.setUniform('maxLife', options.maxLife);
+        uniforms.maxLife = options.maxLife;
         folder.add(options, 'maxLife', 1, 600, .0001).name('maxLife');
 
-        points.setUniform('turbulenceScale', options.turbulenceScale);
+        uniforms.turbulenceScale = options.turbulenceScale;
         folder.add(options, 'turbulenceScale', 10, 1024, .0001).name('turbulenceScale');
 
-        points.setUniform('useVideo', false);
+        uniforms.useVideo = false;
         folder.add(options, 'useVideo').name('useVideo');
 
         folder.open();
@@ -66,9 +67,10 @@ const base = {
      * @param {Points} points
      */
     update: points => {
-        points.setUniform('useVideo', options.useVideo);
-        points.setUniform('maxLife', options.maxLife);
-        points.setUniform('turbulenceScale', options.turbulenceScale);
+        const { uniforms } = points;
+        uniforms.useVideo = options.useVideo;
+        uniforms.maxLife = options.maxLife;
+        uniforms.turbulenceScale = options.turbulenceScale;
     }
 }
 

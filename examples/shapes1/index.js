@@ -19,14 +19,15 @@ const shapes1 = {
      * @param {*} folder
      */
     init: async (points, folder) => {
+        const { uniforms } = points;
         points.scaleMode = ScaleMode.FIT;
         const numPoints = 128;
-        points.setUniform('numPoints', numPoints);
+        uniforms.numPoints = numPoints;
         points.setStorage('points', `array<vec2f, ${numPoints}>`);
 
-        points.setUniform('squareSize', options.squareSize, 'f32');
-        points.setUniform('squareFeather', options.squareFeather, 'f32');
-        points.setUniform('lineWidth', options.lineWidth, 'f32');
+        uniforms.squareSize = options.squareSize;
+        uniforms.squareFeather = options.squareFeather;
+        uniforms.lineWidth = options.lineWidth;
 
         folder.add(options, 'squareSize', 0, 1, .0001).name('Square Size');
         folder.add(options, 'squareFeather', 0, 1, .0001).name('Square Feather');
@@ -34,9 +35,10 @@ const shapes1 = {
         folder.open();
     },
     update: points => {
-        points.setUniform('squareSize', options.squareSize);
-        points.setUniform('squareFeather', options.squareFeather);
-        points.setUniform('lineWidth', options.lineWidth);
+        const { uniforms } = points;
+        uniforms.squareSize = options.squareSize;
+        uniforms.squareFeather = options.squareFeather;
+        uniforms.lineWidth = options.lineWidth;
     }
 }
 
