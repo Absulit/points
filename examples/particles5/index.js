@@ -63,6 +63,7 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+        const { uniforms } = points;
         points.import(structs);
 
         points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
@@ -76,13 +77,12 @@ const base = {
 
         points.setCameraPerspective('camera');
 
-        points.setUniform('lambert', options.lambert);
+        uniforms.lambert = options.lambert;
+        uniforms.speed = options.speed;
+        uniforms.scale = options.scale;
+
         folder.add(options, 'lambert').name('lambert');
-
-        points.setUniform('speed', options.speed);
         folder.add(options, 'speed', 0, 1, .0001).name('speed');
-
-        points.setUniform('scale', options.scale);
         folder.add(options, 'scale', 0, 1, .0001).name('scale');
 
         folder.open();
@@ -91,10 +91,11 @@ const base = {
      * @param {Points} points
      */
     update: points => {
+        const { uniforms } = points;
         points.setCameraPerspective('camera', [0, 1.5, 5], [0, 0, -1000]);
-        points.setUniform('lambert', options.lambert);
-        points.setUniform('speed', options.speed);
-        points.setUniform('scale', options.scale);
+        uniforms.lambert = options.lambert;
+        uniforms.speed = options.speed;
+        uniforms.scale = options.scale;
     }
 }
 
