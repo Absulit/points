@@ -57,7 +57,7 @@ const base = {
 
         points.setCameraPerspective('camera');
 
-        points.setUniform('lambert', options.lambert);
+        points.uniforms.lambert = options.lambert;
         folder.add(options, 'lambert').name('lambert');
 
         folder.open();
@@ -66,9 +66,8 @@ const base = {
      * @param {Points} points
     */
     update: points => {
-
         points.setCameraPerspective('camera', [0, 1.5, 5], [0, 0, -1000]);
-        points.setUniform('lambert', options.lambert);
+        points.uniforms.lambert = options.lambert;
     }
 }
 
