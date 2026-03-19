@@ -355,5 +355,16 @@ QUnit.module('Storages', hooks => {
         }, 'Should throw an error if the types don\'t match')
     })
 
+    QUnit.test('Adding an array sets the type to corresponding vecXf form', assert => {
+        storages.vec2Storage = [0, 1];
+        assert.equal(storages.vec2Storage.type, 'vec2f', 'Type should be vec2f');
+
+        storages.vec3Storage = [0, 1, 2];
+        assert.equal(storages.vec3Storage.type, 'vec3f', 'Type should be vec3f');
+
+        storages.vec4Storage = [0, 1, 2, 3];
+        assert.equal(storages.vec4Storage.type, 'vec4f', 'Type should be vec4f');
+    });
+
 })
 
