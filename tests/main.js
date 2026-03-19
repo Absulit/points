@@ -336,13 +336,13 @@ QUnit.module('Storages', hooks => {
         assert.equal(storages.numStorage.value, finalValue);
     })
 
-    // QUnit.test('Incrementing value directly with += should throw error if the types don\'t match', assert => {
-    //     const arrayValue = [3];
-    //     uniforms.numUniform2 = 0;
-    //     assert.throws(() => {
-    //         uniforms.numUniform2 += arrayValue;
-    //     }, 'Should throw an error if the types don\'t match')
-    // })
+    QUnit.test('Incrementing value directly with += should throw error if the types don\'t match', assert => {
+        const arrayValue = [3];
+        storages.numStorage2 = 0;
+        assert.throws(() => {
+            storages.numStorage2 += arrayValue;
+        }, 'Should throw an error if the types don\'t match')
+    })
 
 })
 
