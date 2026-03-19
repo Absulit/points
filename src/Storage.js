@@ -238,6 +238,17 @@ export default class Storage {
         if (typeof value === 'string') {
             throw `Storage '${this.#name}' value: '${value}' can't be an String.`
         }
+
+        const isArray = Array.isArray(value);
+        if (isArray) {
+            const { length } = value;
+            if (Array.isArray(this.#value)) {
+                if (length != this.#value.length) {
+                    throw `Storage named '${this.#name}': Size of the array value has changed from ${this.#value.length} to ${length}.`
+                }
+            }
+
+        }
     }
 
     #validateName(value) {

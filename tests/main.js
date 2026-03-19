@@ -319,15 +319,15 @@ QUnit.module('Storages', hooks => {
         assert.equal(storages.oldStorage.value, newValue, 'Should have the new value assigned');
     })
 
-    // QUnit.test('Updating array size should throw an error', assert => {
-    //     const originalValue = [0, 0, 0];
-    //     const newValue = [0, 0, 0, 0];
+    QUnit.test('Updating array size should throw an error', assert => {
+        const originalValue = [0, 0, 0];
+        const newValue = [0, 0, 0, 0];
 
-    //     assert.throws(() => {
-    //         storages.oldStorage2 = originalValue;
-    //         storages.oldStorage2 = newValue;
-    //     }, 'Should throw an error if the array length has changed')
-    // })
+        assert.throws(() => {
+            storages.oldStorage2 = originalValue;
+            storages.oldStorage2 = newValue;
+        }, 'Should throw an error if the array length has changed')
+    })
 
     // QUnit.test('Incrementing value directly with += should increase its value', assert => {
     //     const finalValue = 3;
