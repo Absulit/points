@@ -366,5 +366,11 @@ QUnit.module('Storages', hooks => {
         assert.equal(storages.vec4Storage.type, 'vec4f', 'Type should be vec4f');
     });
 
+    QUnit.test('Adding an array greater than 4 items sets the type to corresponding array form', assert => {
+        const type = 'array<f32, 5>';
+        storages.arrayStorage = [0, 1, 2, 3, 4];
+        assert.equal(storages.arrayStorage.type, type, `Type should be ${type}`);
+    });
+
 })
 
