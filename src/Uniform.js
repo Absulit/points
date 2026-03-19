@@ -70,7 +70,7 @@ export default class Uniform {
      */
     set type(value) {
         this.#validateType(value);
-        this.#type = this.#getArrayType(this.#value) || 'f32';
+        this.#type = value || this.#getArrayType(this.#value) || 'f32';
     }
 
     get size() {
@@ -119,7 +119,7 @@ export default class Uniform {
      */
     setType(value) {
         this.#validateType(value);
-        this.#type = this.#getArrayType(this.#value) || 'f32';
+        this.#type = value || this.#getArrayType(this.#value) || 'f32';
         return this;
     }
 

@@ -85,7 +85,7 @@ export default class Storage {
      */
     set type(value) {
         this.#validateType(value);
-        this.#type = this.#getArrayType(value) || 'f32';
+        this.#type = value || this.#getArrayType(this.#value) || 'f32';
     }
 
     get shaderStage() {
@@ -226,7 +226,7 @@ export default class Storage {
      */
     setType(value) {
         this.#validateType(value);
-        this.#type = this.#getArrayType(value) || 'f32';
+        this.#type = value || this.#getArrayType(value) || 'f32';
         return this;
     }
 
