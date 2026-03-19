@@ -279,6 +279,9 @@ export default class Storage {
         let type = null;
         if (isArray) {
             const { length } = value;
+            if (length <= 4) {
+                type = `vec${length}f`;
+            }
             if (length > 4) {
                 type = `array<f32, ${length}>`;
             }
