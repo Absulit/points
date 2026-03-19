@@ -269,4 +269,11 @@ export default class Storage {
 
     }
 
+    // allows for things like:
+    // storage.myStorage += 10
+    // works on set, not on get
+    // on get you obtain the Storage
+    valueOf() {
+        return this.#value;
+    }
 }

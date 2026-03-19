@@ -329,12 +329,12 @@ QUnit.module('Storages', hooks => {
         }, 'Should throw an error if the array length has changed')
     })
 
-    // QUnit.test('Incrementing value directly with += should increase its value', assert => {
-    //     const finalValue = 3;
-    //     uniforms.numUniform = 0;
-    //     uniforms.numUniform += finalValue;
-    //     assert.equal(uniforms.numUniform.value, finalValue);
-    // })
+    QUnit.test('Incrementing value directly with += should increase its value', assert => {
+        const finalValue = 3;
+        storages.numStorage = 0;
+        storages.numStorage += finalValue;
+        assert.equal(storages.numStorage.value, finalValue);
+    })
 
     // QUnit.test('Incrementing value directly with += should throw error if the types don\'t match', assert => {
     //     const arrayValue = [3];
