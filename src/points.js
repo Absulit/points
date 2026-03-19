@@ -19,6 +19,7 @@ import ScaleMode from './ScaleMode.js';
 import Uniform from './Uniform.js';
 import Storage from './Storage.js';
 import Uniforms from './Uniforms.js';
+import Storages from './Storages.js';
 
 /**
  * Main class Points, this is the entry point of an application with this library.
@@ -59,7 +60,7 @@ class Points {
     #meshUniforms = new UniformsArray();
     #cameraUniforms = new UniformsArray();
     #constants = [];
-    #storage = [];
+    #storages = new Storages();
     #readStorage = [];
     #samplers = [];
     #textures2d = [];
@@ -461,7 +462,7 @@ class Points {
         .setValue(vertex_data.flat());
      */
     setStorage(name, type = null, value = null) {
-        const storageToUpdate = this.#nameExists(this.#storage, name);
+        const storageToUpdate = this.#storages.find(name);
 
         // if (!Array.isArray(value) && value?.constructor !== Uint8Array) {
         //     value = new Uint8Array([value]);
@@ -473,13 +474,16 @@ class Points {
             return storageToUpdate;
         }
 
-        const storage = new Storage({
-            name,
-            value,
-            type,
-        });
+        // const storage = new Storage({
+        //     name,
+        //     value,
+        //     type,
+        // });
 
-        this.#storage.push(storage);
+        this.#storages[name] = value;
+        const storage = this.#storages[name];
+        storage.type = type;
+
         return storage;
     }
 
@@ -530,7 +534,7 @@ class Points {
      * resultMatrix.size = vec2(firstMatrix.size.x, secondMatrix.size.y);
      */
     setStorageMap(name, value, type, read = false, shaderStage = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE) {
-        const storageToUpdate = this.#nameExists(this.#storage, name);
+        const storageToUpdate = this.#storages.find(name);
 
         if (!Array.isArray(value) && value.constructor !== Uint8Array) {
             value = new Uint8Array([value]);
@@ -542,17 +546,23 @@ class Points {
             return storageToUpdate;
         }
 
-        const storage = new Storage({
-            updated: true,
-            mapped: true,
-            name,
-            type,
-            shaderStage,
-            value,
-            read,
-        });
+        // const storage = new Storage({
+        //     updated: true,
+        //     mapped: true,
+        //     name,
+        //     type,
+        //     shaderStage,
+        //     value,
+        //     read,
+        // });
 
-        this.#storage.push(storage);
+        this.#storages[name] = value;
+        const storage = this.#storages[name];
+        storage.updated = true;
+        storage.mapped = true;
+        storage.type = type;
+        storage.shaderStage = shaderStage;
+        storage.read = read;
         return storage;
     }
 
@@ -1325,7 +1335,7 @@ class Points {
             dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <uniform> camera: Camera;\n`;
             bindingIndex += 1;
         }
-        this.#storage.forEach(storageItem => {
+        this.#storages.list.forEach(storageItem => {
             const isInternal = internal === storageItem.internal;
             if (isInternal && (!storageItem.shaderStage || storageItem.shaderStage & shaderStage)) {
                 const T = storageItem.type;
@@ -1563,7 +1573,7 @@ class Points {
         this.#dataSize = dataSize(allShaders);
         // since uniforms are in a sigle struct
         // this is only required for storage
-        this.#storage.forEach(s => {
+        this.#storages.list.forEach(s => {
             if (!s.mapped) {
                 if (isArray(s.type)) {
                     const { size } = getArrayTypeData(s.type, this.#dataSize);
@@ -1805,7 +1815,7 @@ class Points {
      * Updates all the storages (for the update function)
      */
     #writeStorages() {
-        this.#storage.forEach(storageItem => {
+        this.#storages.list.forEach(storageItem => {
             // since audio is something constant
             // the stream flag allows to keep this write open
             const { updated, stream } = storageItem;
@@ -1827,7 +1837,7 @@ class Points {
         //--------------------------------------------
         this.#createParametersUniforms();
         //--------------------------------------------
-        this.#storage.forEach(storageItem => {
+        this.#storages.list.forEach(storageItem => {
             let usage = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST;
             const { read, name, size, mapped } = storageItem;
             if (read) {
@@ -2163,7 +2173,7 @@ class Points {
                 }
             );
         }
-        this.#storage.forEach(storageItem => {
+        this.#storages.list.forEach(storageItem => {
             const isInternal = internal === storageItem.internal;
             if (isInternal && (!storageItem.shaderStage || storageItem.shaderStage & shaderStage)) {
 
@@ -2748,7 +2758,7 @@ class Points {
 
 
         this.#readStorage.forEach(readStorageItem => {
-            let storageItem = this.#storage.find(storageItem => storageItem.name === readStorageItem.name);
+            let storageItem = this.#storages.list.find(storageItem => storageItem.name === readStorageItem.name);
             commandEncoder.copyBufferToBuffer(
                 storageItem.buffer /* source buffer */,
                 0 /* source offset */,
@@ -2784,7 +2794,8 @@ class Points {
                 if (id != 0) {
                     const dataRead = await this.readStorage(`${name}_data`)
                     event?.callback(dataRead);
-                    const storageToUpdate = this.#nameExists(this.#storage, name);
+                    // const storageToUpdate = this.#nameExists(this.#storage, name);
+                    const storageToUpdate = this.#storages.find(name);
                     const data = storageToUpdate.value;
                     data[0] = 0;
                     this.setStorage(name).setValue(data);
@@ -2978,6 +2989,10 @@ class Points {
         return this.#uniforms;
     }
 
+    get storages() {
+        return this.#storages;
+    }
+
     /**
      * Reset memory before calling again `init()`, this without calling
      * the constructor `new Points()`.
@@ -3021,10 +3036,12 @@ class Points {
         })
         this.#postRenderPasses = [];
 
-        this.#storage?.forEach(s => s.buffer.destroy());
-        this.#storage = [];
+        // TODO: make destroy method in Storages
+        this.#storages.list?.forEach(s => s.buffer.destroy());
+        this.#storages = new Storages();
         this.#readStorage?.forEach(s => s.buffer.destroy());
         this.#readStorage = [];
+        // TODO: make destroy method in Uniforms
         this.#uniforms.list?.buffer.destroy();
         this.#meshUniforms?.buffer?.destroy();
         this.#cameraUniforms?.buffer?.destroy();
@@ -3095,8 +3112,8 @@ class Points {
         })
         this.#postRenderPasses = null;
 
-        this.#storage.forEach(s => s.buffer.destroy());
-        this.#storage = null;
+        this.#storages.list.forEach(s => s.buffer.destroy());
+        this.#storages = null;
         this.#readStorage.forEach(s => s.buffer.destroy());
         this.#readStorage = null;
         this.#uniforms.list.buffer.destroy();
