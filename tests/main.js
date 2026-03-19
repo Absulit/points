@@ -1,5 +1,6 @@
 import Points, { Uniform, Storage } from 'points';
 import Uniforms from './../src/Uniforms.js';
+import Storages from './../src/Storages.js';
 
 const points = new Points();
 
@@ -257,3 +258,91 @@ QUnit.module('Uniforms', hooks => {
     })
 
 })
+
+QUnit.module('Storages', hooks => {
+    /** @type{Uniforms} */
+    let storages;
+    hooks.before(() => {
+        storages = new Storages();
+    })
+
+    QUnit.test('Storages creates a Storage class entry by calling a property', assert => {
+        assert.equal(storages.a.constructor.name, 'Storage', 'Attribute should be an Storage class')
+    })
+
+    QUnit.test('Storage created type should be f32', assert => {
+        assert.equal(storages.a.type, 'f32', 'Type should be f32')
+    })
+
+    QUnit.test('Storage default value should be undefined or null', assert => {
+        assert.true(!storages.a.value, 'Value should be undefined or null')
+    })
+
+    QUnit.test('Assigning a value directly to attribute should create Uniform and set its value', assert => {
+        const value = 14;
+        storages.b = value;
+        assert.equal(storages.b.value, value, 'Value should be the same assigned before reading')
+    })
+
+    QUnit.test('Assigning a string to attribute should throw an error', assert => {
+        assert.throws(() => {
+            storages.c = 'some string';
+        }, 'Should throw an error when a string is assigned')
+    })
+
+    QUnit.test('Assigning an object to attribute should throw an error', assert => {
+        assert.throws(() => {
+            storages.d = {};
+        }, 'Should throw an error when an object is assigned')
+    })
+
+    QUnit.test('Assigning an array to attribute should NOT throw an error', assert => {
+        try {
+            storages.e = [0, 0, 0];
+            assert.ok(true, `assignment didn't throw error`);
+        } catch (e) {
+            assert.ok(false, `assignment throw error: ${e.message}`);
+        }
+    })
+
+    QUnit.test('Uniforms.list is of type Array', assert => {
+        assert.equal(storages.list.constructor.name, 'Array', 'list should be of type Array')
+    })
+
+    QUnit.test('Assigning a value to an already existing Storage should replace the value', assert => {
+        const originalValue = 10;
+        const newValue = 20;
+
+        storages.oldStorage = originalValue;
+        storages.oldStorage = newValue;
+
+        assert.equal(storages.oldStorage.value, newValue, 'Should have the new value assigned');
+    })
+
+    // QUnit.test('Updating array size should throw an error', assert => {
+    //     const originalValue = [0, 0, 0];
+    //     const newValue = [0, 0, 0, 0];
+
+    //     assert.throws(() => {
+    //         storages.oldStorage2 = originalValue;
+    //         storages.oldStorage2 = newValue;
+    //     }, 'Should throw an error if the array length has changed')
+    // })
+
+    // QUnit.test('Incrementing value directly with += should increase its value', assert => {
+    //     const finalValue = 3;
+    //     uniforms.numUniform = 0;
+    //     uniforms.numUniform += finalValue;
+    //     assert.equal(uniforms.numUniform.value, finalValue);
+    // })
+
+    // QUnit.test('Incrementing value directly with += should throw error if the types don\'t match', assert => {
+    //     const arrayValue = [3];
+    //     uniforms.numUniform2 = 0;
+    //     assert.throws(() => {
+    //         uniforms.numUniform2 += arrayValue;
+    //     }, 'Should throw an error if the types don\'t match')
+    // })
+
+})
+
