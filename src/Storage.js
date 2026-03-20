@@ -231,7 +231,7 @@ export default class Storage {
     }
 
     #validateValue(value) {
-        if (value && typeof value === 'object' && !Array.isArray(value)) {
+        if (value && typeof value === 'object' && !Array.isArray(value) && !(value instanceof Uint8Array)) {
             throw `Storage '${this.#name}' value:'${value}' can't be an Object.`
         }
 

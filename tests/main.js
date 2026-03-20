@@ -169,6 +169,17 @@ QUnit.module('Storage', hooks => {
         }, 'Should throw an error when passed a number as string')
     })
 
+    QUnit.test('Storage can accept Uint8Array as value', assert => {
+        try {
+            const bufferLength = 4;
+            const data = new Uint8Array(bufferLength);
+            points.setStorage('testUintArray').setValue(data);
+            assert.ok(true, `assignment didn't throw error`);
+        } catch (e) {
+            assert.ok(false, `assignment throw error: ${e.message}`);
+        }
+    })
+
 
 })
 

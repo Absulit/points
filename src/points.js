@@ -2977,6 +2977,8 @@ class Points {
         return this.#uniforms;
     }
     /**
+     * @type {Uniforms & { [key: string]: Uniform }}
+     *
      * Get the list of added uniforms, same as {@link params}
      * @example
      *
@@ -2988,7 +2990,9 @@ class Points {
     get uniforms() {
         return this.#uniforms;
     }
-
+    /**
+     * @type {Storages & { [key: string]: Storage }}
+     */
     get storages() {
         return this.#storages;
     }
