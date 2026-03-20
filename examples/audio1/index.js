@@ -12,6 +12,8 @@ const base = {
      * @param {Points} points
      */
     init: async points => {
+        const { storages } = points;
+        const { FRAGMENT } = GPUShaderStage;
         const volume = 1;
         const loop = true;
         audio = points.setAudio(
@@ -25,8 +27,8 @@ const base = {
             audio.play();
         }, 4);
 
-        points.setStorage('showMessage')
-            .setShaderStage(GPUShaderStage.FRAGMENT);
+
+        storages.showMessage.setShaderStage(FRAGMENT);
 
         const size = { x: 8, y: 22 };
         await points.setTextureString(
