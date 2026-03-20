@@ -30,10 +30,10 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
-        const { uniforms } = points;
+        const { uniforms, storages } = points;
         points.import(structs);
 
-        points.setStorage('particles', `array<Particle, ${numParticles}>`);
+        storages.particles.setType(`array<Particle, ${numParticles}>`)
         points.setConstant('NUMPARTICLES', numParticles, 'u32');
 
         points.setSampler('imageSampler', null);
