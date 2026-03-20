@@ -34,10 +34,11 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+        const { storages } = points;
         points.setSampler('imageSampler', null, GPUShaderStage.FRAGMENT);
         points.setTexture2d('feedbackTexture', true);
-        points.setStorage('colors', 'array<vec3f, 6>')
-            .setValue(colors);
+
+        storages.colors.setType('array<vec3f, 6>').setValue(colors);
     },
     update: points => {
     }

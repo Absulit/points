@@ -57,6 +57,7 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+        const { storages } = points;
         points.import(structs);
 
         points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
@@ -68,7 +69,8 @@ const base = {
         points.setConstant('THREADS_Z', THREADS_Z, 'u32');
         points.setConstant('WIDTH', WIDTH, 'i32');
         points.setConstant('HEIGHT', HEIGHT, 'i32');
-        points.setStorage('particles', `array<Particle, ${NUMPARTICLES}>`);
+
+        storages.particles.setType(`array<Particle, ${NUMPARTICLES}>`);
 
         points.addEventListener('log', data => {
             console.log('Array Max:', data[0] + 1);

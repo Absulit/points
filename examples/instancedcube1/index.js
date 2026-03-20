@@ -36,6 +36,7 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+        const { storages } = points;
         points.scaleMode = ScaleMode.HEIGHT;
         points.import(structs);
 
@@ -49,8 +50,8 @@ const base = {
         points.setConstant('THREADS_Z', THREADS_Z, 'u32');
 
         console.log(NUMPARTICLES);
-        points.setStorage('particles', `array<Particle, ${NUMPARTICLES}>`, false);
-        points.setStorage('variables', 'Variable', false);
+        storages.particles.setType(`array<Particle, ${NUMPARTICLES}>`);
+        storages.variables.setType('Variable');
 
         points.setCameraPerspective('camera', [0, 0, 0]);
 
