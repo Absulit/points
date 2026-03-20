@@ -17,7 +17,7 @@ const dithering3 = {
      * @param {*} folder
      */
     init: async (points, folder) => {
-        const { uniforms } = points;
+        const { uniforms, storages } = points;
         const { COMPUTE } = GPUShaderStage;
         const descriptor = {
             addressModeU: 'repeat',
@@ -31,10 +31,9 @@ const dithering3 = {
         // await points.setTextureImage('image', './../img/gratia_800x800.jpg');
         await points.setTextureImage('image', './../img/absulit_800x800.jpg');
         points.setBindingTexture('outputTex', 'computeTexture');
-        points.setStorage('variables', 'Variable')
-            .setShaderStage(COMPUTE);
-        points.setStorage('points', 'array<vec4f, 640000>')
-            .setShaderStage(COMPUTE);
+
+        storages.variables.setType('Variable').setShaderStage(COMPUTE);
+        storages.points.setType('array<vec4f, 640000>').setShaderStage(COMPUTE);
 
         uniforms.scale = options.scale;
         uniforms.quantError = options.quantError;

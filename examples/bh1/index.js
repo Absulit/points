@@ -41,7 +41,7 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
-        const { uniforms } = points;
+        const { uniforms, storages } = points;
         points.scaleMode = ScaleMode.FIT
 
         const descriptor = {
@@ -55,8 +55,8 @@ const base = {
         points.setSampler('imageSampler', descriptor);
         await points.setTextureImage('image', './../img/pexels-philippedonn-1169754.jpg');
         await points.setTextureImage('diskTexture', './../img/000.png');
-        points.setStorage('colors', 'array<vec4f, 6>')
-            .setValue(colors);
+
+        storages.colors.setValue(colors).setType('array<vec4f, 6>');
 
         uniforms.enabled = options.enabled;
         uniforms.mass = options.mass;
