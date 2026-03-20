@@ -69,7 +69,7 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
-        const { uniforms } = points;
+        const { uniforms, storages } = points;
         points.import(structs);
 
         // points.addRenderPass(RenderPasses.COLOR);
@@ -104,7 +104,8 @@ const base = {
         points.setConstant('THREADS_Z', THREADS_Z, 'u32');
         points.setConstant('WIDTH', WIDTH, 'i32');
         points.setConstant('HEIGHT', HEIGHT, 'i32');
-        points.setStorage('particles', `array<Particle, ${NUMPARTICLES}>`);
+
+        storages.particles.setType(`array<Particle, ${NUMPARTICLES}>`);
 
         points.addEventListener('logger', data => {
             console.log(data[0]);
