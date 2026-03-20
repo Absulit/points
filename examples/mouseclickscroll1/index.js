@@ -9,8 +9,10 @@ const mouseclickscroll1 = {
      * @param {Points} points
      */
     init: async points => {
-        points.setStorage('variables', 'Variable')
-            .setShaderStage(GPUShaderStage.FRAGMENT);
+        const { storages } = points;
+        const { FRAGMENT } = GPUShaderStage;
+
+        storages.variables.setType('Variable').setShaderStage(FRAGMENT);
 
         const size = { x: 8, y: 22 };
         await points.setTextureString(

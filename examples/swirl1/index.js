@@ -19,7 +19,7 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
-        const { uniforms } = points;
+        const { uniforms, storages } = points;
         const { FRAGMENT } = GPUShaderStage;
         points.scaleMode = ScaleMode.FIT;
         points.import(structs);
@@ -35,12 +35,8 @@ const base = {
         folder.add(options, 'scale', 0, 1, .0001).name('scale');
         folder.add(options, 'displace').name('displace');
 
-        points.setStorage('variables')
-            .setType('Variables')
-            .setShaderStage(FRAGMENT);
-        points.setStorage('colors')
-            .setType('array<vec3f, 6>')
-            .setShaderStage(FRAGMENT);
+        storages.variables.setType('Variables').setShaderStage(FRAGMENT);
+        storages.colors.setType('array<vec3f, 6>').setShaderStage(FRAGMENT);
 
         folder.open();
     },
