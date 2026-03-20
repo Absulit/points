@@ -14,16 +14,15 @@ const shapes1 = {
         new RenderPass(vert, frag, compute, 128, 1, 1)
     ],
     /**
-     *
      * @param {Points} points
      * @param {*} folder
      */
     init: async (points, folder) => {
-        const { uniforms } = points;
+        const { uniforms, storages } = points;
         points.scaleMode = ScaleMode.FIT;
         const numPoints = 128;
         uniforms.numPoints = numPoints;
-        points.setStorage('points', `array<vec2f, ${numPoints}>`);
+        storages.points.setType(`array<vec2f, ${numPoints}>`);
 
         uniforms.squareSize = options.squareSize;
         uniforms.squareFeather = options.squareFeather;

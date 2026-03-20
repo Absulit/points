@@ -27,9 +27,7 @@ const base = {
      */
     init: async (points, folder) => {
         const { uniforms } = points;
-        // points.setStorage('noise', 'f32', false, GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT);
         points.setCameraPerspective('camera');
-
 
         uniforms.val = options.val;
         folder.add(options, 'val', 0, 1, .0001).name('Val');
