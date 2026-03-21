@@ -2792,11 +2792,12 @@ class Points {
                 if (id != 0) {
                     const dataRead = await this.readStorage(`${name}_data`)
                     event?.callback(dataRead);
-                    // const storageToUpdate = this.#nameExists(this.#storage, name);
                     const storageToUpdate = this.#storages.find(name);
-                    const data = storageToUpdate.value;
-                    data[0] = 0;
-                    this.setStorage(name).setValue(data);
+                    if (storageToUpdate) {
+                        const data = storageToUpdate.value;
+                        data[0] = 0;
+                        this.setStorage(name).setValue(data);
+                    }
                 }
             }
         }
