@@ -61,7 +61,6 @@ class Points {
     #cameraUniforms = new UniformsArray();
     #constants = [];
     #storages = new Storages();
-    #readStorage = [];
     #samplers = [];
     #textures2d = [];
     #texturesDepth2d = [];
@@ -576,7 +575,7 @@ class Points {
      * @returns {Float32Array} Array with the result
      */
     async readStorage(name) {
-        let storageItem = this.#readStorage.find(storageItem => storageItem.name === name);
+        let storageItem = this.#storages.listRead.find(storageItem => storageItem.name === name);
         let arrayBuffer = null;
         let arrayBufferCopy = null;
         if (storageItem) {
@@ -1855,7 +1854,7 @@ class Points {
                     usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
                 });
 
-                this.#readStorage.push(readStorageItem);
+                this.#storages.listRead.push(readStorageItem);
                 usage = usage | GPUBufferUsage.COPY_SRC;
             }
 
@@ -2756,7 +2755,7 @@ class Points {
 
 
 
-        this.#readStorage.forEach(readStorageItem => {
+        this.#storages.listRead.forEach(readStorageItem => {
             let storageItem = this.#storages.list.find(storageItem => storageItem.name === readStorageItem.name);
             commandEncoder.copyBufferToBuffer(
                 storageItem.buffer /* source buffer */,
@@ -3042,8 +3041,9 @@ class Points {
         // TODO: make destroy method in Storages
         this.#storages.list?.forEach(s => s.buffer.destroy());
         this.#storages = new Storages();
-        this.#readStorage?.forEach(s => s.buffer.destroy());
-        this.#readStorage = [];
+        this.#storages.listRead?.forEach(s => s.buffer.destroy());
+        this.#storages.listRead = [];
+
         // TODO: make destroy method in Uniforms
         this.#uniforms.list?.buffer.destroy();
         this.#meshUniforms?.buffer?.destroy();
@@ -3117,8 +3117,8 @@ class Points {
 
         this.#storages.list.forEach(s => s.buffer.destroy());
         this.#storages = null;
-        this.#readStorage.forEach(s => s.buffer.destroy());
-        this.#readStorage = null;
+        this.#storages.listRead.forEach(s => s.buffer.destroy());
+        this.#storages.listRead = null;
         this.#uniforms.list.buffer.destroy();
         this.#meshUniforms?.buffer?.destroy();
         this.#cameraUniforms?.buffer?.destroy();
