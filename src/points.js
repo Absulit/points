@@ -575,13 +575,12 @@ class Points {
      * @returns {Float32Array} Array with the result
      */
     async readStorage(name) {
-        let storageItem = this.#storages.list.find(storageItem => (storageItem.name === name) && storageItem.read);
-        let arrayBuffer = null;
+        const storageItem = this.#storages.find(name);
         let arrayBufferCopy = null;
-        if (storageItem) {
+        if (storageItem?.read) {
             try {
                 await storageItem.bufferRead.mapAsync(GPUMapMode.READ);
-                arrayBuffer = storageItem.bufferRead.getMappedRange();
+                const arrayBuffer = storageItem.bufferRead.getMappedRange();
                 arrayBufferCopy = new Float32Array(arrayBuffer.slice(0));
                 storageItem.bufferRead.unmap();
             } catch (error) {
@@ -2749,7 +2748,6 @@ class Points {
 
 
         this.#storages.list.forEach(storageItem => {
-            // let storageItem = this.#storages.list.find(storageItem => storageItem.name === readStorageItem.name);
             if (storageItem.read) {
                 commandEncoder.copyBufferToBuffer(
                     storageItem.buffer /* source buffer */,
@@ -3035,7 +3033,7 @@ class Points {
         this.#postRenderPasses = [];
 
         // TODO: make destroy method in Storages
-        this.#storages.list?.forEach(s => s.buffer.destroy());
+        this.#storages.list?.forEach(s => {s.buffer.destroy(); s.bufferRead?.destroy();});
         this.#storages = new Storages();
 
         // TODO: make destroy method in Uniforms
@@ -3109,7 +3107,7 @@ class Points {
         })
         this.#postRenderPasses = null;
 
-        this.#storages.list.forEach(s => s.buffer.destroy());
+        this.#storages.list?.forEach(s => {s.buffer.destroy(); s.bufferRead?.destroy();});
         this.#storages = null;
         this.#uniforms.list.buffer.destroy();
         this.#meshUniforms?.buffer?.destroy();
