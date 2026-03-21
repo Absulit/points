@@ -1848,6 +1848,13 @@ class Points {
                 if (mapped) {
                     readStorageItem.size = storageItem.value.length;
                 }
+
+                readStorageItem.buffer = this.#device.createBuffer({
+                    label: readStorageItem.name,
+                    size: readStorageItem.size,
+                    usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
+                });
+
                 this.#readStorage.push(readStorageItem);
                 usage = usage | GPUBufferUsage.COPY_SRC;
             }
@@ -1859,14 +1866,6 @@ class Points {
                 storageItem.buffer = this.#createBuffer(size, usage);
             }
             storageItem.buffer.label = name;
-        });
-        //--------------------------------------------
-        this.#readStorage.forEach(readStorageItem => {
-            readStorageItem.buffer = this.#device.createBuffer({
-                label: readStorageItem.name,
-                size: readStorageItem.size,
-                usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
-            });
         });
         //--------------------------------------------
         if (this.#layers.length) {
