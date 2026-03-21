@@ -2,6 +2,7 @@ import { Storage } from 'points';
 
 export default class Storages {
     #list = [];
+    #listRead = [];
 
     constructor() {
         return new Proxy(this, {
@@ -63,6 +64,14 @@ export default class Storages {
 
     set list(value) {
         this.#list = value;
+    }
+
+    get listRead() {
+        return this.#listRead;
+    }
+
+    set listRead(value) {
+        this.#listRead = value;
     }
 
     find(name) {
