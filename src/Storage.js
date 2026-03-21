@@ -7,6 +7,7 @@ export default class Storage {
     #shaderStage = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE
     #read = false
     #buffer = null
+    #bufferRead = null
     #internal = false
 
     #stream = false
@@ -121,6 +122,18 @@ export default class Storage {
      */
     set buffer(value) {
         this.#buffer = value;
+    }
+
+    get bufferRead() {
+        return this.#bufferRead;
+    }
+
+    /**
+     * Buffer for reading back
+     * For internal use mostly. The actual GPUBufferRead with the data.
+     */
+    set bufferRead(value) {
+        this.#bufferRead = value;
     }
 
     get internal() {

@@ -575,15 +575,15 @@ class Points {
      * @returns {Float32Array} Array with the result
      */
     async readStorage(name) {
-        let storageItem = this.#storages.listRead.find(storageItem => storageItem.name === name);
+        let storageItem = this.#storages.list.find(storageItem => (storageItem.name === name) && storageItem.read);
         let arrayBuffer = null;
         let arrayBufferCopy = null;
         if (storageItem) {
             try {
-                await storageItem.buffer.mapAsync(GPUMapMode.READ);
-                arrayBuffer = storageItem.buffer.getMappedRange();
+                await storageItem.bufferRead.mapAsync(GPUMapMode.READ);
+                arrayBuffer = storageItem.bufferRead.getMappedRange();
                 arrayBufferCopy = new Float32Array(arrayBuffer.slice(0));
-                storageItem.buffer.unmap();
+                storageItem.bufferRead.unmap();
             } catch (error) {
                 // if we switch projects mapasync fails
                 // we ignore it
@@ -1840,21 +1840,14 @@ class Points {
             let usage = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST;
             const { read, name, size, mapped } = storageItem;
             if (read) {
-                let readStorageItem = {
-                    name,
-                    size
-                }
-                if (mapped) {
-                    readStorageItem.size = storageItem.value.length;
-                }
+                const readSize = mapped ? storageItem.value.length : size;
 
-                readStorageItem.buffer = this.#device.createBuffer({
-                    label: readStorageItem.name,
-                    size: readStorageItem.size,
+                storageItem.bufferRead = this.#device.createBuffer({
+                    label: name,
+                    size: readSize,
                     usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
                 });
 
-                this.#storages.listRead.push(readStorageItem);
                 usage = usage | GPUBufferUsage.COPY_SRC;
             }
 
@@ -2755,15 +2748,17 @@ class Points {
 
 
 
-        this.#storages.listRead.forEach(readStorageItem => {
-            let storageItem = this.#storages.list.find(storageItem => storageItem.name === readStorageItem.name);
-            commandEncoder.copyBufferToBuffer(
-                storageItem.buffer /* source buffer */,
-                0 /* source offset */,
-                readStorageItem.buffer /* destination buffer */,
-                0 /* destination offset */,
-                readStorageItem.buffer.size /* size */
-            );
+        this.#storages.list.forEach(storageItem => {
+            // let storageItem = this.#storages.list.find(storageItem => storageItem.name === readStorageItem.name);
+            if (storageItem.read) {
+                commandEncoder.copyBufferToBuffer(
+                    storageItem.buffer /* source buffer */,
+                    0 /* source offset */,
+                    storageItem.bufferRead /* destination buffer */,
+                    0 /* destination offset */,
+                    storageItem.bufferRead.size /* size */
+                );
+            }
         });
         // ---------------------
         this.#commandsFinished.push(commandEncoder.finish());
@@ -3042,8 +3037,6 @@ class Points {
         // TODO: make destroy method in Storages
         this.#storages.list?.forEach(s => s.buffer.destroy());
         this.#storages = new Storages();
-        this.#storages.listRead?.forEach(s => s.buffer.destroy());
-        this.#storages.listRead = [];
 
         // TODO: make destroy method in Uniforms
         this.#uniforms.list?.buffer.destroy();
@@ -3118,8 +3111,6 @@ class Points {
 
         this.#storages.list.forEach(s => s.buffer.destroy());
         this.#storages = null;
-        this.#storages.listRead.forEach(s => s.buffer.destroy());
-        this.#storages.listRead = null;
         this.#uniforms.list.buffer.destroy();
         this.#meshUniforms?.buffer?.destroy();
         this.#cameraUniforms?.buffer?.destroy();
