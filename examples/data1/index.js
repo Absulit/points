@@ -36,7 +36,7 @@ const data1 = {
         // original lines as reference:
         // let resultMatrixBufferSize = 2 + firstMatrix[0] * secondMatrix[1];
         // console.log(resultMatrixBufferSize);
-        storages.resultMatrix.setType('Matrix').setRead(true);
+        storages.resultMatrix.setType('Matrix').setReadable(true);
 
         // reading the result with an event
         points.addEventListener('result_test', data => {
@@ -50,10 +50,10 @@ const data1 = {
     },
     read: async points => {
         if (!read) {
-            const { storages } = points;
-            let [a, b, c, d] = await points.readStorage('resultMatrix');
-            console.log(a, b, c, d);
             read = true;
+            const { storages } = points;
+            let [a, b, c, d] = await storages.resultMatrix.read();
+            console.log(a, b, c, d);
         }
     }
 }
