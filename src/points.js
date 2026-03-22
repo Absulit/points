@@ -501,7 +501,7 @@ class Points {
      * @param {Uint8Array<ArrayBuffer>|Array<Number>|Number} value array with the data that must match the struct.
      * @param {string} type Name of the struct already existing on the
      * shader. This will be the type of the Storage.
-     * @param {boolean} read if this is going to be used to read data back.
+     * @param {boolean} readable if this is going to be used to read data back.
      * @param {GPUShaderStage} shaderStage this tells to what shader the storage is bound
      *
      * @example
@@ -532,7 +532,7 @@ class Points {
      *
      * resultMatrix.size = vec2(firstMatrix.size.x, secondMatrix.size.y);
      */
-    setStorageMap(name, value, type, read = false, shaderStage = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE) {
+    setStorageMap(name, value, type, readable = false, shaderStage = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE) {
         const storageToUpdate = this.#storages.find(name);
 
         if (!Array.isArray(value) && value.constructor !== Uint8Array) {
@@ -561,7 +561,7 @@ class Points {
         storage.mapped = true;
         storage.type = type;
         storage.shaderStage = shaderStage;
-        storage.read = read;
+        storage.readable = readable;
         return storage;
     }
 
@@ -577,7 +577,7 @@ class Points {
     async readStorage(name) {
         const storageItem = this.#storages.find(name);
         let arrayBufferCopy = null;
-        if (storageItem?.read) {
+        if (storageItem?.readable) {
             try {
                 await storageItem.bufferRead.mapAsync(GPUMapMode.READ);
                 const arrayBuffer = storageItem.bufferRead.getMappedRange();
@@ -1293,11 +1293,11 @@ class Points {
         // this extra 1 is for the boolean flag in the Event struct
         const data = Array(4).fill(0);
         this.setStorage(name, 'Event')
-            .setRead(true)
+            .setReadable(true)
             .setShaderStage(COMPUTE | FRAGMENT)
             .setValue(data);
         this.setStorage(`${name}_data`, `array<f32, ${structSize}>`)
-            .setRead(true)
+            .setReadable(true)
             .setShaderStage(COMPUTE | FRAGMENT);
         this.#events.set(this.#events_ids,
             {
@@ -2748,7 +2748,7 @@ class Points {
 
 
         this.#storages.list.forEach(storageItem => {
-            if (storageItem.read) {
+            if (storageItem.readable) {
                 commandEncoder.copyBufferToBuffer(
                     storageItem.buffer /* source buffer */,
                     0 /* source offset */,

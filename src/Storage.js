@@ -5,7 +5,7 @@ export default class Storage {
     #mapped
     #type
     #shaderStage = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE
-    #read = false
+    #readable = false
     #buffer = null
     #bufferRead = null
     #internal = false
@@ -15,9 +15,9 @@ export default class Storage {
     #value
     #size = null // TODO: document this: to force allocate more space in case an update is greater than the default array size
     /**
-     * @param {{name:String, value:Number|Array<Number>, type:String, read:Boolean, shaderStage:GPUShaderStage, stream:bool, updated:bool, size:Number}} config
+     * @param {{name:String, value:Number|Array<Number>, type:String, readable:Boolean, shaderStage:GPUShaderStage, stream:bool, updated:bool, size:Number}} config
      */
-    constructor({ name, value, type, read, shaderStage,
+    constructor({ name, value, type, readable, shaderStage,
         stream = false, updated = false, size = null }) {
 
         this.#validateName(name);
@@ -32,7 +32,7 @@ export default class Storage {
         this.#name = name;
         this.#mapped = !!value;
         this.#type = type || this.#getArrayType(value) || 'f32';
-        this.#read = read || this.#read;
+        this.#readable = readable || this.#readable;
         this.#shaderStage = shaderStage || this.#shaderStage;
         this.#value = value;
 
@@ -101,16 +101,16 @@ export default class Storage {
         this.#shaderStage = value;
     }
 
-    get read() {
-        return this.#read;
+    get readable() {
+        return this.#readable;
     }
 
     /**
      * If data is read back in JS from WGSL, then set to `true`.
      * @param {Boolean} value
      */
-    set read(value) {
-        this.#read = value;
+    set readable(value) {
+        this.#readable = value;
     }
 
     get buffer() {
@@ -216,8 +216,8 @@ export default class Storage {
      * @param {bool} value
      * @returns {Storage}
      */
-    setRead(value) {
-        this.#read = value;
+    setReadable(value) {
+        this.#readable = value;
         return this;
     }
 
@@ -241,6 +241,22 @@ export default class Storage {
         this.#validateType(value);
         this.#type = value || this.#getArrayType(value) || 'f32';
         return this;
+    }
+
+    async read() {
+        let arrayBufferCopy = null;
+        if (this.#readable) {
+            try {
+                await this.#bufferRead.mapAsync(GPUMapMode.READ);
+                const arrayBuffer = this.#bufferRead.getMappedRange();
+                arrayBufferCopy = new Float32Array(arrayBuffer.slice(0));
+                this.#bufferRead.unmap();
+            } catch (error) {
+                // if we switch projects mapasync fails
+                // we ignore it
+            }
+        }
+        return arrayBufferCopy;
     }
 
     #validateValue(value) {
