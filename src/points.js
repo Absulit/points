@@ -18,6 +18,7 @@ import PresentationFormat from './PresentationFormat.js';
 import ScaleMode from './ScaleMode.js';
 import Uniform from './Uniform.js';
 import Storage from './Storage.js';
+import Constant from './Constant.js';
 import Uniforms from './Uniforms.js';
 import Storages from './Storages.js';
 
@@ -415,11 +416,11 @@ class Points {
             throw '`setConstant()` can\'t update a const after it has been set.';
         }
 
-        const constant = {
+        const constant = new Constant({
             name,
             value,
             type,
-        }
+        })
 
         this.#constants.push(constant);
 
@@ -3143,4 +3144,4 @@ class Points {
 }
 
 export default Points;
-export { RenderPass, RenderPasses, PrimitiveTopology, CullMode, LoadOp, PresentationFormat, FrontFace, ScaleMode, Uniform, Storage };
+export { RenderPass, RenderPasses, PrimitiveTopology, CullMode, LoadOp, PresentationFormat, FrontFace, ScaleMode, Uniform, Storage, Constant };
