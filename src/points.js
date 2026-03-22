@@ -566,8 +566,7 @@ class Points {
     }
 
     /**
-     * To read data back from a `setStorage` with `read` param `true`
-
+     * To read data back from a `setStorage` with `readable` param `true`
      * @param {String} name name of the Storage to read data from
      * @warning If there's en error or warning here
      * `[Buffer "name"] used in submit while mapped.`

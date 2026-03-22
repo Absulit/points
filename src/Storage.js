@@ -251,6 +251,7 @@ export default class Storage {
                 const arrayBuffer = this.#bufferRead.getMappedRange();
                 arrayBufferCopy = new Float32Array(arrayBuffer.slice(0));
                 this.#bufferRead.unmap();
+                this.#value = arrayBufferCopy;
             } catch (error) {
                 // if we switch projects mapasync fails
                 // we ignore it
