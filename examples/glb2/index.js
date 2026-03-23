@@ -69,7 +69,7 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
-        const { uniforms, storages } = points;
+        const { constants, uniforms, storages } = points;
         points.import(structs);
 
         // points.addRenderPass(RenderPasses.COLOR);
@@ -95,14 +95,16 @@ const base = {
             uniforms.color_mode = value;
         });
 
-        points.setConstant('WORKGROUP_X', WORKGROUP_X, 'u32');
-        points.setConstant('WORKGROUP_Y', WORKGROUP_Y, 'u32');
-        points.setConstant('WORKGROUP_Z', WORKGROUP_Z, 'u32');
-        points.setConstant('THREADS_X', THREADS_X, 'u32');
-        points.setConstant('THREADS_Y', THREADS_Y, 'u32');
-        points.setConstant('THREADS_Z', THREADS_Z, 'u32');
-        points.setConstant('WIDTH', WIDTH, 'i32');
-        points.setConstant('HEIGHT', HEIGHT, 'i32');
+        constants.WORKGROUP_X = WORKGROUP_X;
+        constants.WORKGROUP_Y = WORKGROUP_Y;
+        constants.WORKGROUP_Z = WORKGROUP_Z;
+
+        constants.THREADS_X = THREADS_X;
+        constants.THREADS_Y = THREADS_Y;
+        constants.THREADS_Z = THREADS_Z;
+
+        constants.WIDTH = WIDTH;
+        constants.HEIGHT = HEIGHT;
 
         storages.particles.setType(`array<Particle, ${NUMPARTICLES}>`);
 

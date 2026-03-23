@@ -1,3 +1,5 @@
+import { typeFromNumber } from "./data-size.js";
+
 export default class Constant {
     #name
     #value
@@ -9,7 +11,7 @@ export default class Constant {
     constructor({ name, value, type, override = false }) {
         this.#name = name;
         this.#value = value;
-        this.#type = type;
+        this.#type = type || typeFromNumber(value);
         this.#override = override;
     }
 
@@ -26,7 +28,9 @@ export default class Constant {
     }
 
     set value(value) {
+        const type = typeFromNumber(value);
         this.#value = value;
+        this.#type = type;
     }
 
     get type() {
