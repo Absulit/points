@@ -18,6 +18,9 @@ export default class Uniforms {
                     if (prop === 'find') {
                         return value.bind(target);
                     }
+                    if (prop === 'add') {
+                        return value.bind(target);
+                    }
                 }
 
                 if (prop in target) {
@@ -70,4 +73,12 @@ export default class Uniforms {
         return this[name];
     }
 
+    /**
+     * Add a new uniform
+     * @param {Uniform} uniform
+     */
+    add(uniform) {
+        this[uniform.name] = uniform;
+        this.#list.push(uniform);
+    }
 }

@@ -324,9 +324,13 @@ class Points {
             return uniformToUpdate;
         }
 
-        this.#uniforms[name] = value;
-        const uniform = this.#uniforms[name];
-        uniform.type = type;
+        const uniform = new Uniform({
+            name,
+            value,
+            type
+        })
+
+        this.#uniforms.add(uniform);
         return uniform;
     }
 
@@ -464,25 +468,19 @@ class Points {
     setStorage(name, type = null, value = null) {
         const storageToUpdate = this.#storages.find(name);
 
-        // if (!Array.isArray(value) && value?.constructor !== Uint8Array) {
-        //     value = new Uint8Array([value]);
-        // }
-
         if (storageToUpdate) {
             storageToUpdate.value = value;
             storageToUpdate.updated = true;
             return storageToUpdate;
         }
 
-        // const storage = new Storage({
-        //     name,
-        //     value,
-        //     type,
-        // });
+        const storage = new Storage({
+            name,
+            value,
+            type,
+        });
 
-        this.#storages[name] = value;
-        const storage = this.#storages[name];
-        storage.type = type;
+        this.#storages.add(storage);
 
         return storage;
     }
@@ -3033,7 +3031,7 @@ class Points {
         this.#postRenderPasses = [];
 
         // TODO: make destroy method in Storages
-        this.#storages.list?.forEach(s => {s.buffer.destroy(); s.bufferRead?.destroy();});
+        this.#storages.list?.forEach(s => { s.buffer.destroy(); s.bufferRead?.destroy(); });
         this.#storages = new Storages();
 
         // TODO: make destroy method in Uniforms
@@ -3107,7 +3105,7 @@ class Points {
         })
         this.#postRenderPasses = null;
 
-        this.#storages.list?.forEach(s => {s.buffer.destroy(); s.bufferRead?.destroy();});
+        this.#storages.list?.forEach(s => { s.buffer.destroy(); s.bufferRead?.destroy(); });
         this.#storages = null;
         this.#uniforms.list.buffer.destroy();
         this.#meshUniforms?.buffer?.destroy();

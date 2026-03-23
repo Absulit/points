@@ -17,6 +17,9 @@ export default class Storages {
                     if (prop === 'find') {
                         return value.bind(target);
                     }
+                    if (prop === 'add') {
+                        return value.bind(target);
+                    }
                 }
 
                 if (prop in target) {
@@ -69,4 +72,12 @@ export default class Storages {
         return this[name];
     }
 
+    /**
+     * Add a new storage
+     * @param {Storage} storage
+     */
+    add(storage) {
+        this[storage.name] = storage;
+        this.#list.push(storage);
+    }
 }
