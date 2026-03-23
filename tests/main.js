@@ -385,3 +385,40 @@ QUnit.module('Storages', hooks => {
 
 })
 
+QUnit.module('Constant', hooks => {
+    let constants;
+    hooks.before(() => {
+        constants = points.constants;
+    })
+
+    QUnit.test('Constant has same name as assigned', assert => {
+        const TESTNAME = 'TESTNAME';
+        points.setConstant(TESTNAME, 10, 'u32');
+        assert.equal(constants[TESTNAME].name, TESTNAME, 'Name should be equal as assigned');
+    })
+
+    QUnit.test('Assigning value without type, sets the type automatically', assert => {
+        const type = 'u32';
+        constants.MYCONST = 10;
+        assert.equal(constants.MYCONST.type, type, 'It should have a type assigned');
+    })
+
+    QUnit.test('Assigning float should set type to f32', assert => {
+        constants.CONSTF32 = 10.1;
+        assert.equal(constants.CONSTF32.type, 'f32', 'Type should be f32')
+    })
+
+    QUnit.test('Assigning integer should set type to u32', assert => {
+        constants.CONSTU32 = 10;
+        assert.equal(constants.CONSTU32.type, 'u32', 'Type should be u32')
+
+    })
+
+    QUnit.test('Assigning negative integer should set type to i32', assert => {
+        constants.CONSTI32 = -10;
+        assert.equal(constants.CONSTI32.type, 'i32', 'Type should be i32')
+    })
+
+})
+
+
