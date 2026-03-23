@@ -429,6 +429,21 @@ QUnit.module('Constant', hooks => {
         constants.CONSTVEC4 = [0, 0, 0, 0];
         assert.equal(constants.CONSTVEC4.type, 'vec4f', 'Type should be vec4f')
     })
+
+    QUnit.test('Assigning array length < 5 should set value in form vecXf', assert => {
+        const vec2 = [0, 0]
+        constants.CONSTVEC2 = vec2;
+        assert.equal(constants.CONSTVEC2.value, `vec2f(${vec2})`, 'Type should be vec2f')
+
+        const vec3 = [0, 0, 0]
+        constants.CONSTVEC3 = vec3;
+        assert.equal(constants.CONSTVEC3.value, `vec3f(${vec3})`, 'Type should be vec3f')
+
+        const vec4 = [0, 0, 0, 0]
+        constants.CONSTVEC4 = vec4;
+        assert.equal(constants.CONSTVEC4.value, `vec4f(${vec4})`, 'Type should be vec4f')
+    })
+
 })
 
 
