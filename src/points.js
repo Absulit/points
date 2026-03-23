@@ -21,6 +21,7 @@ import Storage from './Storage.js';
 import Constant from './Constant.js';
 import Uniforms from './Uniforms.js';
 import Storages from './Storages.js';
+import Constants from './Constants.js';
 
 /**
  * Main class Points, this is the entry point of an application with this library.
@@ -60,7 +61,7 @@ class Points {
     #uniforms = new Uniforms();
     #meshUniforms = new UniformsArray();
     #cameraUniforms = new UniformsArray();
-    #constants = [];
+    #constants = new Constants();
     #storages = new Storages();
     #samplers = [];
     #textures2d = [];
@@ -426,7 +427,7 @@ class Points {
             type,
         })
 
-        this.#constants.push(constant);
+        this.#constants.add(constant);
 
         return constant;
     }
@@ -1512,7 +1513,7 @@ class Points {
         if (this.#cameraUniforms.length) {
             dynamicStructCamera = /*wgsl*/`struct Camera {\n\t${dynamicStructCamera}\n}\n`;
         }
-        this.#constants.forEach(c => {
+        this.#constants.list.forEach(c => {
             if (!c.override) {
                 dynamicStructParams += /*wgsl*/`const ${c.name}:${c.type} = ${c.value};\n`;
             }
@@ -1984,7 +1985,7 @@ class Points {
 
     #createPipeline() {
         const constants = Object.fromEntries(
-            this.#constants.filter(c => c.override).map(c => [c.name, c.value])
+            this.#constants.list.filter(c => c.override).map(c => [c.name, c.value])
         );
 
         this.#renderPasses.forEach(renderPass => {
