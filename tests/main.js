@@ -419,6 +419,16 @@ QUnit.module('Constant', hooks => {
         assert.equal(constants.CONSTI32.type, 'i32', 'Type should be i32')
     })
 
+    QUnit.test('Assigning array length < 5 should set type to vecX', assert => {
+        constants.CONSTVEC2 = [0, 0];
+        assert.equal(constants.CONSTVEC2.type, 'vec2f', 'Type should be vec2f')
+
+        constants.CONSTVEC3 = [0, 0, 0];
+        assert.equal(constants.CONSTVEC3.type, 'vec3f', 'Type should be vec3f')
+
+        constants.CONSTVEC4 = [0, 0, 0, 0];
+        assert.equal(constants.CONSTVEC4.type, 'vec4f', 'Type should be vec4f')
+    })
 })
 
 
