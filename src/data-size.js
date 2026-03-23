@@ -344,12 +344,12 @@ export const dataSize = value => {
 export function getWGSLType(value) {
     const strValue = value.toString();
 
-    if (Number.isNaN(value) || value instanceof Object || typeof value === 'string' && !(value instanceof Array)) {
+    if ((Number.isNaN(value) || value instanceof Object || typeof value === 'string') && !(value instanceof Array)) {
         return null;
     }
 
-    if(value instanceof Array){
-
+    if (value instanceof Array) {
+        return getArrayType(value);
     }
 
     const hasPeriod = strValue.indexOf('.') != -1;
@@ -363,4 +363,25 @@ export function getWGSLType(value) {
     }
 
     return 'u32';
+}
+
+/**
+ * From a JS value (number, array)
+ * returns WGSL type like vec2f, vec3f
+ * @param {Array|Object} value
+ * @returns {String}
+ */
+export function getArrayType(value) {
+    const isArray = Array.isArray(value);
+    let type = null;
+    if (isArray) {
+        const { length } = value;
+        if (length <= 4) {
+            type = `vec${length}f`;
+        }
+        if (length > 4) {
+            type = `array<f32, ${length}>`;
+        }
+    }
+    return type;
 }
