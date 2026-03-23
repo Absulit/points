@@ -60,6 +60,23 @@ export default class Constant {
         this.#override = value;
     }
 
+    setValue(value) {
+        const type = getWGSLType(value);
+        if (type.indexOf('vec') !== -1) {
+            value = `vec${value.length}f(${value})`
+        }
+        this.#value = value;
+        this.#type = type;
+    }
+
+    setType(value) {
+        this.#type = value;
+    }
+
+    setOverride(value) {
+        this.#override = value;
+    }
+
     #validateValue(value) {
         if (value && typeof value === 'object' && !Array.isArray(value) && !(value instanceof Uint8Array)) {
             throw `Constant '${this.#name}' value:'${value}' can't be an Object.`
