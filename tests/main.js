@@ -456,6 +456,13 @@ QUnit.module('Constant', hooks => {
         constants.CONSTARR = arr;
         assert.equal(constants.CONSTARR.type, `array<f32, ${arr.length}>`, 'Type should be array')
     })
+
+    QUnit.test('Changing type after value assignment should work', assert => {
+        constants.CONSTTYPECHANGE = 10;
+        assert.equal(constants.CONSTTYPECHANGE.type, 'u32', 'it first should have u32')
+        constants.CONSTTYPECHANGE.setType('f32');
+        assert.equal(constants.CONSTTYPECHANGE.type, 'f32', 'then it should have f32')
+    })
 })
 
 
