@@ -33,6 +33,7 @@ export default class Constant {
     }
 
     set name(value) {
+        this.#validateName(value);
         this.#name = value;
     }
 
@@ -41,6 +42,7 @@ export default class Constant {
     }
 
     set value(value) {
+        this.#validateValue(value);
         const type = getWGSLType(value);
         this.#value = this.#ifTypeVecGetVecValue(type, value);
         this.#type = type;
@@ -51,6 +53,7 @@ export default class Constant {
     }
 
     set type(value) {
+        this.#validateType(value);
         this.#type = value;
     }
 
@@ -63,12 +66,14 @@ export default class Constant {
     }
 
     setValue(value) {
+        this.#validateValue(value);
         const type = getWGSLType(value);
         this.#value = this.#ifTypeVecGetVecValue(type, value);
         this.#type = type;
     }
 
     setType(value) {
+        this.#validateType(value);
         this.#type = value;
     }
 
@@ -77,6 +82,10 @@ export default class Constant {
     }
 
     #validateValue(value) {
+        if(this.#value){
+            throw `Constant '${this.#name}': can't update a const after it has been set.`;
+        }
+
         if (value && typeof value === 'object' && !Array.isArray(value) && !(value instanceof Uint8Array)) {
             throw `Constant '${this.#name}' value:'${value}' can't be an Object.`
         }

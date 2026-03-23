@@ -411,7 +411,6 @@ QUnit.module('Constant', hooks => {
     QUnit.test('Assigning integer should set type to u32', assert => {
         constants.CONSTU32 = 10;
         assert.equal(constants.CONSTU32.type, 'u32', 'Type should be u32')
-
     })
 
     QUnit.test('Assigning negative integer should set type to i32', assert => {
@@ -432,15 +431,15 @@ QUnit.module('Constant', hooks => {
 
     QUnit.test('Assigning array length < 5 should set value in form vecXf', assert => {
         const vec2 = [0, 0]
-        constants.CONSTVEC2 = vec2;
+        constants.CONSTVEC22 = vec2;
         assert.equal(constants.CONSTVEC2.value, `vec2f(${vec2})`, 'Type should be vec2f')
 
         const vec3 = [0, 0, 0]
-        constants.CONSTVEC3 = vec3;
+        constants.CONSTVEC33 = vec3;
         assert.equal(constants.CONSTVEC3.value, `vec3f(${vec3})`, 'Type should be vec3f')
 
         const vec4 = [0, 0, 0, 0]
-        constants.CONSTVEC4 = vec4;
+        constants.CONSTVEC44 = vec4;
         assert.equal(constants.CONSTVEC4.value, `vec4f(${vec4})`, 'Type should be vec4f')
     })
 
@@ -462,6 +461,13 @@ QUnit.module('Constant', hooks => {
         assert.equal(constants.CONSTTYPECHANGE.type, 'u32', 'it first should have u32')
         constants.CONSTTYPECHANGE.setType('f32');
         assert.equal(constants.CONSTTYPECHANGE.type, 'f32', 'then it should have f32')
+    })
+
+    QUnit.test('Assigning value after it has been set should throw an error', assert => {
+        assert.throws(() => {
+            constants.CONSTTRYAGAIN = 10.31;
+            constants.CONSTTRYAGAIN.setValue(12);
+        }, 'This should not allow to assign again')
     })
 })
 
