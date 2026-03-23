@@ -173,6 +173,9 @@ export default class Uniform {
     }
 
     /**
+     * There's already a `getArrayType` in data-size.js
+     * but since uniforms can't accept array in wgsl,
+     * this method excludes that part
      * returns something like vec2f, vec3f
      * @param {Array|Object} value
      * @returns {String}

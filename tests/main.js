@@ -451,6 +451,11 @@ QUnit.module('Constant', hooks => {
         }, 'This should throw an error')
     })
 
+    QUnit.test('Assigning array length > 4 should set type to array', assert => {
+        const arr = [0, 0, 0, 0, 5]
+        constants.CONSTARR = arr;
+        assert.equal(constants.CONSTARR.type, `array<f32, ${arr.length}>`, 'Type should be array')
+    })
 })
 
 
