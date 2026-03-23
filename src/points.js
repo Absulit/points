@@ -1984,9 +1984,7 @@ class Points {
     }
 
     #createPipeline() {
-        const constants = Object.fromEntries(
-            this.#constants.list.filter(c => c.override).map(c => [c.name, c.value])
-        );
+        const constants = this.#constants.listOfOverrides();
 
         this.#renderPasses.forEach(renderPass => {
             if (renderPass.hasComputeShader) {

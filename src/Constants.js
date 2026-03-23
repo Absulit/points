@@ -14,11 +14,11 @@ export default class Constants {
                 }
 
                 if (typeof value === 'function') {
-                    if (prop === 'find') {
-                        return value.bind(target);
-                    }
-                    if (prop === 'add') {
-                        return value.bind(target);
+                    switch (prop) {
+                        case 'find':
+                        case 'add':
+                        case 'listOfOverrides':
+                            return value.bind(target);
                     }
                 }
 
@@ -79,5 +79,16 @@ export default class Constants {
     add(constant) {
         this[constant.name] = constant;
         this.#list.push(constant);
+    }
+
+    /**
+     * Object list with the constants that are overridable.
+     * This object will be passed into the pipeline.
+     * @returns {Object}
+     */
+    listOfOverrides(){
+        return Object.fromEntries(
+            this.#list.filter(c => c.override).map(c => [c.name, c.value])
+        );
     }
 }
