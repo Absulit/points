@@ -337,15 +337,19 @@ export const dataSize = value => {
 }
 
 /**
- * Takes a number and infers the WGSL type
- * @param {Number} value
+ * Takes a number or array and infers the WGSL type
+ * @param {Number|Array<Number>} value
  * @returns {String} WGSL equivalent type
  */
-export function typeFromNumber(value) {
+export function getWGSLType(value) {
     const strValue = value.toString();
 
-    if (Number.isNaN(value) || value instanceof Object || value instanceof Array || typeof value === 'string') {
+    if (Number.isNaN(value) || value instanceof Object || typeof value === 'string' && !(value instanceof Array)) {
         return null;
+    }
+
+    if(value instanceof Array){
+
     }
 
     const hasPeriod = strValue.indexOf('.') != -1;

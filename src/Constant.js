@@ -1,4 +1,4 @@
-import { typeFromNumber } from "./data-size.js";
+import { getWGSLType } from './data-size.js';
 
 export default class Constant {
     #name
@@ -11,7 +11,7 @@ export default class Constant {
     constructor({ name, value, type, override = false }) {
         this.#name = name;
         this.#value = value;
-        this.#type = type || typeFromNumber(value);
+        this.#type = type || getWGSLType(value);
         this.#override = override;
     }
 
@@ -28,7 +28,7 @@ export default class Constant {
     }
 
     set value(value) {
-        const type = typeFromNumber(value);
+        const type = getWGSLType(value);
         this.#value = value;
         this.#type = type;
     }
