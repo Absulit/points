@@ -444,6 +444,13 @@ QUnit.module('Constant', hooks => {
         assert.equal(constants.CONSTVEC4.value, `vec4f(${vec4})`, 'Type should be vec4f')
     })
 
+    QUnit.test('Assigning array length < 2 should throw an error', assert => {
+        const arr = [0];
+        assert.throws(() => {
+            constants.CONSTLOWER = arr;
+        }, 'This should throw an error')
+    })
+
 })
 
 

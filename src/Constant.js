@@ -16,11 +16,16 @@ export default class Constant {
 
         this.#name = name;
         this.#type = type || getWGSLType(value);
-        if (this.#type.indexOf('vec') !== -1) {
-            value = `vec${value.length}f(${value})`
-        }
-        this.#value = value;
+        this.#value = this.#ifTypeVecGetVecValue(this.#type, value);
         this.#override = override;
+    }
+
+    #ifTypeVecGetVecValue(type, value) {
+        let newValue = value;
+        if (type.indexOf('vec') !== -1) {
+            newValue = `vec${value.length}f(${value})`
+        }
+        return newValue;
     }
 
     get name() {
@@ -37,10 +42,7 @@ export default class Constant {
 
     set value(value) {
         const type = getWGSLType(value);
-        if (type.indexOf('vec') !== -1) {
-            value = `vec${value.length}f(${value})`
-        }
-        this.#value = value;
+        this.#value = this.#ifTypeVecGetVecValue(type, value);
         this.#type = type;
     }
 
@@ -62,10 +64,7 @@ export default class Constant {
 
     setValue(value) {
         const type = getWGSLType(value);
-        if (type.indexOf('vec') !== -1) {
-            value = `vec${value.length}f(${value})`
-        }
-        this.#value = value;
+        this.#value = this.#ifTypeVecGetVecValue(type, value);
         this.#type = type;
     }
 
@@ -89,12 +88,14 @@ export default class Constant {
         const isArray = Array.isArray(value);
         if (isArray) {
             const { length } = value;
+            if (length < 2) {
+                throw `Constant named '${this.#name}': Size of the array is lower than 2. There's no vec1`;
+            }
             if (Array.isArray(this.#value)) {
                 if (length != this.#value.length) {
                     throw `Constant named '${this.#name}': Size of the array value has changed from ${this.#value.length} to ${length}.`
                 }
             }
-
         }
     }
 
