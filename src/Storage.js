@@ -1,4 +1,4 @@
-import { isArray } from "./data-size.js"
+import { getArrayType, isArray } from './data-size.js'
 
 export default class Storage {
     #name
@@ -31,7 +31,7 @@ export default class Storage {
 
         this.#name = name;
         this.#mapped = !!value;
-        this.#type = type || this.#getArrayType(value) || 'f32';
+        this.#type = type || getArrayType(value) || 'f32';
         this.#readable = readable || this.#readable;
         this.#shaderStage = shaderStage || this.#shaderStage;
         this.#value = value;
@@ -86,7 +86,7 @@ export default class Storage {
      */
     set type(value) {
         this.#validateType(value);
-        this.#type = value || this.#getArrayType(this.#value) || 'f32';
+        this.#type = value || getArrayType(this.#value) || 'f32';
     }
 
     get shaderStage() {
@@ -239,7 +239,7 @@ export default class Storage {
      */
     setType(value) {
         this.#validateType(value);
-        this.#type = value || this.#getArrayType(value) || 'f32';
+        this.#type = value || getArrayType(value) || 'f32';
         return this;
     }
 
@@ -297,26 +297,6 @@ export default class Storage {
 
     #validateType(value) {
 
-    }
-
-    /**
-     * returns something like vec2f, vec3f
-     * @param {Array|Object} value
-     * @returns {String}
-     */
-    #getArrayType(value) {
-        const isArray = Array.isArray(value);
-        let type = null;
-        if (isArray) {
-            const { length } = value;
-            if (length <= 4) {
-                type = `vec${length}f`;
-            }
-            if (length > 4) {
-                type = `array<f32, ${length}>`;
-            }
-        }
-        return type;
     }
 
     // allows for things like:
