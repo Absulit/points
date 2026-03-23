@@ -18,6 +18,7 @@ export default class Constants {
                         case 'find':
                         case 'add':
                         case 'listOfOverrides':
+                        case 'stringOfNonOverrides':
                             return value.bind(target);
                     }
                 }
@@ -90,5 +91,20 @@ export default class Constants {
         return Object.fromEntries(
             this.#list.filter(c => c.override).map(c => [c.name, c.value])
         );
+    }
+
+    /**
+     * List of constants formatted as WGSL string to be interpolated in the
+     * shaders.
+     * @returns {String}
+     */
+    stringOfNonOverrides(){
+        let consStrings = '';
+        this.#list.forEach(c => {
+            if (!c.override) {
+                consStrings += /*wgsl*/`const ${c.name}:${c.type} = ${c.value};\n`;
+            }
+        })
+        return consStrings;
     }
 }

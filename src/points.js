@@ -1513,11 +1513,8 @@ class Points {
         if (this.#cameraUniforms.length) {
             dynamicStructCamera = /*wgsl*/`struct Camera {\n\t${dynamicStructCamera}\n}\n`;
         }
-        this.#constants.list.forEach(c => {
-            if (!c.override) {
-                dynamicStructParams += /*wgsl*/`const ${c.name}:${c.type} = ${c.value};\n`;
-            }
-        })
+
+        dynamicStructParams += this.#constants.stringOfNonOverrides();
         dynamicStructParams += dynamicStructMesh;
         dynamicStructParams += dynamicStructCamera;
 
@@ -2993,6 +2990,12 @@ class Points {
      */
     get storages() {
         return this.#storages;
+    }
+    /**
+     * @type {Constants & { [key: string]: Constant }}
+     */
+    get constants() {
+        return this.#constants;
     }
 
     /**
