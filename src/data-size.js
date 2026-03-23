@@ -288,7 +288,7 @@ export const dataSize = value => {
                         innerType.align = MAX_ROW_SIZE;
                     } else {
                         const sd = structData.get(type);
-                        if(!sd){
+                        if (!sd) {
                             throw `Type or struct ${type} doesn't exist.`;
                         }
                         typeSize = { size: sd.bytes, align: MAX_ROW_SIZE };
@@ -334,4 +334,29 @@ export const dataSize = value => {
     })
 
     return structData
+}
+
+/**
+ * Takes a number and infers the WGSL type
+ * @param {Number} value
+ * @returns {String} WGSL equivalent type
+ */
+export function typeFromNumber(value) {
+    const strValue = value.toString();
+
+    if (Number.isNaN(value) || value instanceof Object || value instanceof Array || typeof value === 'string') {
+        return null;
+    }
+
+    const hasPeriod = strValue.indexOf('.') != -1;
+    if (hasPeriod) {
+        return 'f32';
+    }
+
+    const hasSign = strValue.indexOf('-') != -1;
+    if (hasSign) {
+        return 'i32'
+    }
+
+    return 'u32';
 }
