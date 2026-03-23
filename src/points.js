@@ -412,7 +412,7 @@ class Points {
      * // your code:
      * const particles = array<Particle, NUMPARTICLES>();
      */
-    setConstant(name, value, type) {
+    setConstant(name, value, type = null) {
         const constantToUpdate = this.#nameExists(this.#constants, name);
 
         if (constantToUpdate) {
@@ -1513,7 +1513,9 @@ class Points {
             dynamicStructCamera = /*wgsl*/`struct Camera {\n\t${dynamicStructCamera}\n}\n`;
         }
         this.#constants.forEach(c => {
-            dynamicStructParams += /*wgsl*/`const ${c.name}:${c.type} = ${c.value};\n`;
+            if (!c.override) {
+                dynamicStructParams += /*wgsl*/`const ${c.name}:${c.type} = ${c.value};\n`;
+            }
         })
         dynamicStructParams += dynamicStructMesh;
         dynamicStructParams += dynamicStructCamera;
@@ -1981,6 +1983,10 @@ class Points {
     }
 
     #createPipeline() {
+        const constants = Object.fromEntries(
+            this.#constants.filter(c => c.override).map(c => [c.name, c.value])
+        );
+
         this.#renderPasses.forEach(renderPass => {
             if (renderPass.hasComputeShader) {
                 this.#createBindGroup(renderPass, GPUShaderStage.COMPUTE);
@@ -1993,7 +1999,8 @@ class Points {
                         module: this.#device.createShaderModule({
                             code: renderPass.compiledShaders.compute
                         }),
-                        entryPoint: 'main'
+                        entryPoint: 'main',
+                        constants,
                     }
                 });
             }
@@ -2068,6 +2075,7 @@ class Points {
                                 ],
                             },
                         ],
+                        constants,
                     },
                     fragment: {
                         module: this.#device.createShaderModule({
@@ -2092,6 +2100,7 @@ class Points {
                                 writeMask: GPUColorWrite.ALL,
                             },
                         ],
+                        constants,
                     },
                 });
             }

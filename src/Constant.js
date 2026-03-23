@@ -6,7 +6,7 @@ export default class Constant {
     /**
      * @param {{name:String, value:Number|Array<Number>, type:String, override:Boolean}} config
      */
-    constructor({ name, value, type, override }) {
+    constructor({ name, value, type, override = false }) {
         this.#name = name;
         this.#value = value;
         this.#type = type;

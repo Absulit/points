@@ -95,7 +95,6 @@ const base = {
             uniforms.color_mode = value;
         });
 
-        points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
         points.setConstant('WORKGROUP_X', WORKGROUP_X, 'u32');
         points.setConstant('WORKGROUP_Y', WORKGROUP_Y, 'u32');
         points.setConstant('WORKGROUP_Z', WORKGROUP_Z, 'u32');
