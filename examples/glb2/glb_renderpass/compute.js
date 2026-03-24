@@ -29,7 +29,7 @@ fn main(in: ComputeIn) {
     let Y = y * (WORKGROUP_X * THREADS_X);
     let Z = z * (WORKGROUP_X * THREADS_X) * (WORKGROUP_Y * THREADS_Y);
 
-    let index = X + Y + Z;
+    let index = i32(X + Y + Z);
 
     let particle = &particles[index];
 

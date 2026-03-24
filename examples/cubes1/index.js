@@ -57,18 +57,26 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
-        const { storages } = points;
+        const { constants, storages } = points;
+        const { COMPUTE } = GPUShaderStage;
         points.import(structs);
 
-        points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
-        points.setConstant('WORKGROUP_X', WORKGROUP_X, 'u32');
-        points.setConstant('WORKGROUP_Y', WORKGROUP_Y, 'u32');
-        points.setConstant('WORKGROUP_Z', WORKGROUP_Z, 'u32');
-        points.setConstant('THREADS_X', THREADS_X, 'u32');
-        points.setConstant('THREADS_Y', THREADS_Y, 'u32');
-        points.setConstant('THREADS_Z', THREADS_Z, 'u32');
-        points.setConstant('WIDTH', WIDTH, 'i32');
-        points.setConstant('HEIGHT', HEIGHT, 'i32');
+        const { WORKGROUP_X: WX, WORKGROUP_Y: WY, WORKGROUP_Z: WZ } = constants;
+        const { THREADS_X: TX, THREADS_Y: TY, THREADS_Z: TZ } = constants;
+
+        WX.setValue(WORKGROUP_X).setShaderStage(COMPUTE).setOverride(true);
+        WY.setValue(WORKGROUP_Y).setShaderStage(COMPUTE).setOverride(true);
+        WZ.setValue(WORKGROUP_Z).setShaderStage(COMPUTE).setOverride(true);
+
+        TX.setValue(THREADS_X).setShaderStage(COMPUTE).setOverride(true);
+        TY.setValue(THREADS_Y).setShaderStage(COMPUTE).setOverride(true);
+        TZ.setValue(THREADS_Z).setShaderStage(COMPUTE).setOverride(true);
+
+        // these can't be overrided because they are part of a const calculation
+        // in the compute shader, and if they are overridden they don't exist
+        // at that point
+        constants.WIDTH.setValue(WIDTH).setShaderStage(COMPUTE).setType('i32');
+        constants.HEIGHT.setValue(HEIGHT).setShaderStage(COMPUTE).setType('i32');
 
         storages.particles.setType(`array<Particle, ${NUMPARTICLES}>`);
 

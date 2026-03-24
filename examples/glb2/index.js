@@ -110,8 +110,8 @@ const base = {
         // these can't be overrided because they are part of a const calculation
         // in the compute shader, and if they are overridden they don't exist
         // at that point
-        constants.WIDTH.setValue(WIDTH).setShaderStage(COMPUTE);
-        constants.HEIGHT.setValue(HEIGHT).setShaderStage(COMPUTE);
+        constants.WIDTH.setValue(WIDTH).setShaderStage(COMPUTE).setType('i32');
+        constants.HEIGHT.setValue(HEIGHT).setShaderStage(COMPUTE).setType('i32');
 
 
         storages.particles.setType(`array<Particle, ${NUMPARTICLES}>`);
