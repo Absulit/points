@@ -96,27 +96,23 @@ const base = {
             uniforms.color_mode = value;
         });
 
-        constants.WORKGROUP_X = WORKGROUP_X;
-        constants.WORKGROUP_Y = WORKGROUP_Y;
-        constants.WORKGROUP_Z = WORKGROUP_Z;
+        const { WORKGROUP_X: WX, WORKGROUP_Y: WY, WORKGROUP_Z: WZ } = constants;
+        const { THREADS_X: TX, THREADS_Y: TY, THREADS_Z: TZ } = constants;
 
-        constants.WORKGROUP_X.setShaderStage(COMPUTE);
-        constants.WORKGROUP_Y.setShaderStage(COMPUTE);
-        constants.WORKGROUP_Z.setShaderStage(COMPUTE);
+        WX.setValue(WORKGROUP_X).setShaderStage(COMPUTE).setOverride(true);
+        WY.setValue(WORKGROUP_Y).setShaderStage(COMPUTE).setOverride(true);
+        WZ.setValue(WORKGROUP_Z).setShaderStage(COMPUTE).setOverride(true);
 
-        constants.THREADS_X = THREADS_X;
-        constants.THREADS_Y = THREADS_Y;
-        constants.THREADS_Z = THREADS_Z;
+        TX.setValue(THREADS_X).setShaderStage(COMPUTE).setOverride(true);
+        TY.setValue(THREADS_Y).setShaderStage(COMPUTE).setOverride(true);
+        TZ.setValue(THREADS_Z).setShaderStage(COMPUTE).setOverride(true);
 
-        constants.THREADS_X.setShaderStage(COMPUTE);
-        constants.THREADS_Y.setShaderStage(COMPUTE);
-        constants.THREADS_Z.setShaderStage(COMPUTE);
+        // these can't be overrided because they are part of a const calculation
+        // in the compute shader, and if they are overrided they don't exist
+        // at that point
+        constants.WIDTH.setValue(WIDTH).setShaderStage(COMPUTE);
+        constants.HEIGHT.setValue(HEIGHT).setShaderStage(COMPUTE);
 
-        constants.WIDTH = WIDTH;
-        constants.HEIGHT = HEIGHT;
-
-        constants.WIDTH.setShaderStage(COMPUTE);
-        constants.HEIGHT.setShaderStage(COMPUTE);
 
         storages.particles.setType(`array<Particle, ${NUMPARTICLES}>`);
 
