@@ -1984,7 +1984,9 @@ class Points {
     }
 
     #createPipeline() {
-        const constants = this.#constants.listOfOverrides();
+        const constantsCompute = this.#constants.listOfOverrides(GPUShaderStage.COMPUTE);
+        const constantsVertex = this.#constants.listOfOverrides(GPUShaderStage.VERTEX);
+        const constantsFragment = this.#constants.listOfOverrides(GPUShaderStage.FRAGMENT);
 
         this.#renderPasses.forEach(renderPass => {
             if (renderPass.hasComputeShader) {
@@ -1999,7 +2001,7 @@ class Points {
                             code: renderPass.compiledShaders.compute
                         }),
                         entryPoint: 'main',
-                        constants,
+                        constants: constantsCompute,
                     }
                 });
             }
@@ -2074,7 +2076,7 @@ class Points {
                                 ],
                             },
                         ],
-                        constants,
+                        constants: constantsVertex,
                     },
                     fragment: {
                         module: this.#device.createShaderModule({
@@ -2099,7 +2101,7 @@ class Points {
                                 writeMask: GPUColorWrite.ALL,
                             },
                         ],
-                        constants,
+                        constants: constantsFragment,
                     },
                 });
             }

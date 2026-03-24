@@ -85,11 +85,15 @@ export default class Constants {
     /**
      * Object list with the constants that are overridable.
      * This object will be passed into the pipeline.
+     * @param {GPUShaderStage|Number} filter
      * @returns {Object}
      */
-    listOfOverrides() {
+    listOfOverrides(filter) {
         return Object.fromEntries(
-            this.#list.filter(c => c.override).map(c => [c.name, c.value])
+            this.#list
+                .filter(c => ((filter & c.shaderStage) !== 0))
+                .filter(c => c.override)
+                .map(c => [c.name, c.value])
         );
     }
 
