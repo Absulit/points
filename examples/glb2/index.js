@@ -108,7 +108,7 @@ const base = {
         TZ.setValue(THREADS_Z).setShaderStage(COMPUTE).setOverride(true);
 
         // these can't be overrided because they are part of a const calculation
-        // in the compute shader, and if they are overrided they don't exist
+        // in the compute shader, and if they are overridden they don't exist
         // at that point
         constants.WIDTH.setValue(WIDTH).setShaderStage(COMPUTE);
         constants.HEIGHT.setValue(HEIGHT).setShaderStage(COMPUTE);

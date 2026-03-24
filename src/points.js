@@ -3075,7 +3075,7 @@ class Points {
         this.#texturesExternal = [];
 
         clearCache();
-        this.#constants = [];
+        this.#constants = new Constants();
         this.#imports = [];
         this.#clock = new Clock();
 
