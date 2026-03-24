@@ -70,6 +70,7 @@ const base = {
      */
     init: async (points, folder) => {
         const { constants, uniforms, storages } = points;
+        const { COMPUTE } = GPUShaderStage;
         points.import(structs);
 
         // points.addRenderPass(RenderPasses.COLOR);
@@ -99,12 +100,23 @@ const base = {
         constants.WORKGROUP_Y = WORKGROUP_Y;
         constants.WORKGROUP_Z = WORKGROUP_Z;
 
+        constants.WORKGROUP_X.setShaderStage(COMPUTE);
+        constants.WORKGROUP_Y.setShaderStage(COMPUTE);
+        constants.WORKGROUP_Z.setShaderStage(COMPUTE);
+
         constants.THREADS_X = THREADS_X;
         constants.THREADS_Y = THREADS_Y;
         constants.THREADS_Z = THREADS_Z;
 
+        constants.THREADS_X.setShaderStage(COMPUTE);
+        constants.THREADS_Y.setShaderStage(COMPUTE);
+        constants.THREADS_Z.setShaderStage(COMPUTE);
+
         constants.WIDTH = WIDTH;
         constants.HEIGHT = HEIGHT;
+
+        constants.WIDTH.setShaderStage(COMPUTE);
+        constants.HEIGHT.setShaderStage(COMPUTE);
 
         storages.particles.setType(`array<Particle, ${NUMPARTICLES}>`);
 
