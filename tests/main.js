@@ -469,6 +469,12 @@ QUnit.module('Constant', hooks => {
             constants.CONSTTRYAGAIN.setValue(12);
         }, 'This should not allow to assign again')
     })
+
+    QUnit.test('Set functions return constant object', assert => {
+        constants.TESTRETURN = 10;
+        const c = constants.TESTRETURN.setType('f32');
+        assert.equal(c.constructor.name, 'Constant');
+    })
 })
 
 

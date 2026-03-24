@@ -5,6 +5,7 @@ export default class Constant {
     #value
     #type
     #override
+    #shaderStage
     /**
      * @param {{name:String, value:Number|Array<Number>, type:String, override:Boolean}} config
      */
@@ -65,20 +66,45 @@ export default class Constant {
         this.#override = value;
     }
 
+    get shaderStage() {
+        return this.#shaderStage;
+    }
+
+    /**
+     * Tells WebGPU to which shader it can only be used.
+     * @param {GPUShaderStage} value
+     */
+    set shaderStage(value) {
+        this.#shaderStage = value;
+    }
+
     setValue(value) {
         this.#validateValue(value);
         const type = getWGSLType(value);
         this.#value = this.#ifTypeVecGetVecValue(type, value);
         this.#type = type;
+        return this;
     }
 
     setType(value) {
         this.#validateType(value);
         this.#type = value;
+        return this;
     }
 
     setOverride(value) {
         this.#override = value;
+        return this;
+    }
+
+    /**
+     * Tells WebGPU to which shader it can only be used.
+     * @param {GPUShaderStage} value
+     * @returns {Constant}
+     */
+    setShaderStage(value) {
+        this.#shaderStage = value;
+        return this;
     }
 
     #validateValue(value) {
