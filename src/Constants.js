@@ -87,7 +87,7 @@ export default class Constants {
      * This object will be passed into the pipeline.
      * @returns {Object}
      */
-    listOfOverrides(){
+    listOfOverrides() {
         return Object.fromEntries(
             this.#list.filter(c => c.override).map(c => [c.name, c.value])
         );
@@ -96,12 +96,14 @@ export default class Constants {
     /**
      * List of constants formatted as WGSL string to be interpolated in the
      * shaders.
+     * @param {GPUShaderStage|Number} filter
      * @returns {String}
      */
-    stringOfNonOverrides(){
+    stringOfNonOverrides(filter) {
         let consStrings = '';
         this.#list.forEach(c => {
-            if (!c.override) {
+            const hasOneStage = (filter & c.shaderStage) !== 0;
+            if (!c.override && hasOneStage) {
                 consStrings += /*wgsl*/`const ${c.name}:${c.type} = ${c.value};\n`;
             }
         })

@@ -5,7 +5,7 @@ export default class Constant {
     #value
     #type
     #override
-    #shaderStage
+    #shaderStage = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE
     /**
      * @param {{name:String, value:Number|Array<Number>, type:String, override:Boolean}} config
      */

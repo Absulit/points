@@ -1514,14 +1514,17 @@ class Points {
             dynamicStructCamera = /*wgsl*/`struct Camera {\n\t${dynamicStructCamera}\n}\n`;
         }
 
-        dynamicStructParams += this.#constants.stringOfNonOverrides();
         dynamicStructParams += dynamicStructMesh;
         dynamicStructParams += dynamicStructCamera;
 
+        const constantsVertex = this.#constants.stringOfNonOverrides(GPUShaderStage.VERTEX);
+        const constantsCompute = this.#constants.stringOfNonOverrides(GPUShaderStage.COMPUTE);
+        const constantsFragment = this.#constants.stringOfNonOverrides(GPUShaderStage.FRAGMENT);
+
         renderPass.index = index;
-        renderPass.hasVertexShader && (dynamicGroupBindingsVertex += dynamicStructParams);
-        renderPass.hasComputeShader && (dynamicGroupBindingsCompute += dynamicStructParams);
-        renderPass.hasFragmentShader && (dynamicGroupBindingsFragment += dynamicStructParams);
+        renderPass.hasVertexShader && (dynamicGroupBindingsVertex += dynamicStructParams + constantsVertex);
+        renderPass.hasComputeShader && (dynamicGroupBindingsCompute += dynamicStructParams + constantsCompute);
+        renderPass.hasFragmentShader && (dynamicGroupBindingsFragment += dynamicStructParams + constantsFragment);
 
         renderPass.hasVertexShader && (dynamicGroupBindingsVertex += this.#createDynamicGroupBindings(GPUShaderStage.VERTEX, renderPass));
         renderPass.hasComputeShader && (dynamicGroupBindingsCompute += this.#createDynamicGroupBindings(GPUShaderStage.COMPUTE, renderPass));
