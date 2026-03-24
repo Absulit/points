@@ -27,7 +27,7 @@ export default class Constants {
                     return value;
                 }
                 // If Constant does not exist we create it.
-                const constant = new Constant({ name: prop });
+                const constant = new Constant({ name: prop, value: 0 });
                 target.list.push(constant);
                 Reflect.set(target, prop, constant, target);
                 return constant;

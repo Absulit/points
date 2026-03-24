@@ -343,7 +343,7 @@ export const dataSize = value => {
  */
 export function getWGSLType(value) {
 
-    if (!value || (Number.isNaN(value) || value instanceof Object || typeof value === 'string') && !(value instanceof Array)) {
+    if ((!value && value !== 0) || ((Number.isNaN(value) || value instanceof Object || typeof value === 'string') && !(value instanceof Array))) {
         return '';
     }
 
