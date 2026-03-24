@@ -37,6 +37,7 @@ const base = {
      */
     init: async (points, folder) => {
         const { storages, constants } = points;
+        const { COMPUTE } = GPUShaderStage;
         points.import(structs);
         points.scaleMode = ScaleMode.HEIGHT;
 
@@ -47,6 +48,10 @@ const base = {
         constants.THREADS_X = THREADS_X;
         constants.THREADS_Y = THREADS_Y;
         constants.THREADS_Z = THREADS_Z;
+
+        constants.THREADS_X.setOverride(true).setShaderStage(COMPUTE);
+        constants.THREADS_Y.setOverride(true).setShaderStage(COMPUTE);
+        constants.THREADS_Z.setOverride(true).setShaderStage(COMPUTE);
 
         console.log(NUMPARTICLES);
         storages.particles.setType(`array<Particle, ${NUMPARTICLES}>`);

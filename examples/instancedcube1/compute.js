@@ -1,5 +1,9 @@
 const compute = /*wgsl*/`
 
+override THREADS_X:u32;
+override THREADS_Y:u32;
+override THREADS_Z:u32;
+
 @compute @workgroup_size(THREADS_X, THREADS_Y, THREADS_Z)
 fn main(in: ComputeIn) {
     let GlobalId = in.GID;
