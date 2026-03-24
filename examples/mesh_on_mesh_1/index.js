@@ -1,5 +1,4 @@
 import vert from './vert.js';
-import compute from './compute.js';
 import frag from './frag.js';
 import Points, { RenderPass } from 'points';
 import { loadAndExtract, isMobile } from 'utils';
@@ -67,14 +66,6 @@ const base = {
     init: async (points, folder) => {
         const { uniforms, storages } = points;
         points.import(structs);
-
-        points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
-        points.setConstant('WORKGROUP_X', WORKGROUP_X, 'u32');
-        points.setConstant('WORKGROUP_Y', WORKGROUP_Y, 'u32');
-        points.setConstant('WORKGROUP_Z', WORKGROUP_Z, 'u32');
-        points.setConstant('THREADS_X', THREADS_X, 'u32');
-        points.setConstant('THREADS_Y', THREADS_Y, 'u32');
-        points.setConstant('THREADS_Z', THREADS_Z, 'u32');
 
         storages.particles.setType(`array<Particle, ${NUMPARTICLES}>`);
         storages.vertex_data
