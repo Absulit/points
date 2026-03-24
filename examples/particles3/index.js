@@ -52,7 +52,7 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
-        const { uniforms, storages } = points;
+        const { uniforms, storages, constants } = points;
         const { VERTEX, COMPUTE } = GPUShaderStage;
         points.import(structs);
 
@@ -71,13 +71,13 @@ const base = {
                 await points.setTextureVideo('webcam', './../img/6982698-hd_1440_1080_25fps_800x800.mp4');
             });
 
-        points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
-        points.setConstant('WORKGROUP_X', WORKGROUP_X, 'u32');
-        points.setConstant('WORKGROUP_Y', WORKGROUP_Y, 'u32');
-        points.setConstant('WORKGROUP_Z', WORKGROUP_Z, 'u32');
-        points.setConstant('THREADS_X', THREADS_X, 'u32');
-        points.setConstant('THREADS_Y', THREADS_Y, 'u32');
-        points.setConstant('THREADS_Z', THREADS_Z, 'u32');
+        constants.NUMPARTICLES = NUMPARTICLES;
+        constants.WORKGROUP_X = WORKGROUP_X;
+        constants.WORKGROUP_Y = WORKGROUP_Y;
+        constants.WORKGROUP_Z = WORKGROUP_Z;
+        constants.THREADS_X = THREADS_X;
+        constants.THREADS_Y = THREADS_Y;
+        constants.THREADS_Z = THREADS_Z;
 
         storages.particles
             .setType(`array<Particle, ${NUMPARTICLES}>`)
