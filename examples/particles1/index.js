@@ -16,9 +16,9 @@ const WORKGROUP_Y = 1;
 
 const THREADS = 256;
 
-const numParticles = WORKGROUP_X * WORKGROUP_Y * THREADS;
+const NUMPARTICLES = WORKGROUP_X * WORKGROUP_Y * THREADS;
 
-console.log(numParticles);
+console.log(NUMPARTICLES);
 
 
 const base = {
@@ -30,11 +30,11 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
-        const { uniforms, storages } = points;
+        const { uniforms, storages, constants } = points;
         points.import(structs);
 
-        storages.particles.setType(`array<Particle, ${numParticles}>`)
-        points.setConstant('NUMPARTICLES', numParticles, 'u32');
+        storages.particles.setType(`array<Particle, ${NUMPARTICLES}>`)
+        constants.NUMPARTICLES = NUMPARTICLES;
 
         points.setSampler('imageSampler', null);
         await points.setTextureImage('image', './../img/webgpu_800x800.png');
