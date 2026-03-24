@@ -93,7 +93,7 @@ const base = {
         uniforms.color_mode = options.mode;
         folder.add(options, 'mode', dropdownItems).name('Colors').onChange(value => {
             console.log(value);
-            uniforms.color_mode = value;
+            uniforms.color_mode = +value;
         });
 
         const { WORKGROUP_X: WX, WORKGROUP_Y: WY, WORKGROUP_Z: WZ } = constants;
