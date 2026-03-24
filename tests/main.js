@@ -1,6 +1,7 @@
 import Points, { Uniform, Storage } from 'points';
 import Uniforms from './../src/Uniforms.js';
 import Storages from './../src/Storages.js';
+import { getWGSLType } from './../src/data-size.js';
 
 const points = new Points();
 
@@ -493,3 +494,22 @@ QUnit.module('Constants', hooks => {
     })
 })
 
+
+QUnit.module('getWGSLType', hooks => {
+    QUnit.test('If value is a integer it returns u32', assert => {
+        const type = getWGSLType(10);
+        assert.equal(type, 'u32', 'Type should be u32');
+    })
+
+    QUnit.test('If value is a float it returns f32', assert => {
+        const type = getWGSLType(10.1);
+        assert.equal(type, 'f32', 'Type should be f32');
+    })
+
+    QUnit.test('If value is a negative it returns i32', assert => {
+        const type = getWGSLType(-10);
+        assert.equal(type, 'i32', 'Type should be i32');
+    })
+
+
+})
