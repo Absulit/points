@@ -103,7 +103,7 @@ const base = {
         uniforms.texture_mode = options.mode;
         folder.add(options, 'mode', dropdownItems).name('Textures').onChange(async value => {
             console.log(value);
-            uniforms.texture_mode = value;
+            uniforms.texture_mode = +value;
         });
 
 
@@ -118,7 +118,6 @@ const base = {
         uniforms.maxLife = options.maxLife;
         uniforms.turbulenceScale = options.turbulenceScale;
         uniforms.particleSize = options.particleSize;
-        uniforms.texture_mode = options.mode;
     }
 }
 
