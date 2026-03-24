@@ -342,11 +342,12 @@ export const dataSize = value => {
  * @returns {String} WGSL equivalent type
  */
 export function getWGSLType(value) {
-    const strValue = value.toString();
 
-    if ((Number.isNaN(value) || value instanceof Object || typeof value === 'string') && !(value instanceof Array)) {
-        return null;
+    if (!value || (Number.isNaN(value) || value instanceof Object || typeof value === 'string') && !(value instanceof Array)) {
+        return '';
     }
+
+    const strValue = value.toString();
 
     if (value instanceof Array) {
         return getArrayType(value);

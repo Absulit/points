@@ -468,6 +468,10 @@ QUnit.module('Constant', hooks => {
             constants.CONSTTRYAGAIN = 10.31;
             constants.CONSTTRYAGAIN.setValue(12);
         }, 'This should not allow to assign again')
+
+        assert.throws(() => {
+            constants.CONSTTRYAGAIN2.setValue(10.31).setValue(12);;
+        }, 'This should not allow to assign again')
     })
 
     QUnit.test('Set functions return constant object', assert => {
@@ -477,4 +481,15 @@ QUnit.module('Constant', hooks => {
     })
 })
 
+QUnit.module('Constants', hooks => {
+    let constants;
+    hooks.before(() => {
+        constants = points.constants;
+    })
+    QUnit.test('Set value after creation', assert => {
+        const val = 10;
+        constants.CONSTSETAFTER.setValue(val);
+        assert.equal(constants.CONSTSETAFTER.value, val, 'Values should be the same');
+    })
+})
 
