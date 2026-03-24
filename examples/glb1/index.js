@@ -34,7 +34,7 @@ const base = {
         uniforms.color_mode = options.mode;
         folder.add(options, 'mode', dropdownItems).name('Colors').onChange(value => {
             console.log(value);
-            uniforms.color_mode = value;
+            uniforms.color_mode = +value;
         });
 
         points.setCameraPerspective('camera');
