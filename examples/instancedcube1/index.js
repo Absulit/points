@@ -36,18 +36,17 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
-        const { storages } = points;
-        points.scaleMode = ScaleMode.HEIGHT;
+        const { storages, constants } = points;
         points.import(structs);
+        points.scaleMode = ScaleMode.HEIGHT;
 
-        points.setConstant('UNIT', 1 / 8, 'f32');
-        points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
-        points.setConstant('SIDE', SIDE, 'u32');
-        points.setConstant('HALFSIDE', 'i32(SIDE / 2)', 'i32');
+        constants.UNIT = 1 / 8;
+        constants.SIDE = SIDE;
+        constants.HALFSIDE.setValue(SIDE / 2).setType('i32');
 
-        points.setConstant('THREADS_X', THREADS_X, 'u32');
-        points.setConstant('THREADS_Y', THREADS_Y, 'u32');
-        points.setConstant('THREADS_Z', THREADS_Z, 'u32');
+        constants.THREADS_X = THREADS_X;
+        constants.THREADS_Y = THREADS_Y;
+        constants.THREADS_Z = THREADS_Z;
 
         console.log(NUMPARTICLES);
         storages.particles.setType(`array<Particle, ${NUMPARTICLES}>`);
