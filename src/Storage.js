@@ -196,7 +196,7 @@ export default class Storage {
     set value(value) {
         this.#validateValue(value);
         this.#mapped = !!value;
-        const type = getWGSLType(value);
+        const type = this.#type || getWGSLType(value);
         this.#value = value;
         this.#type = type;
     }
@@ -211,7 +211,7 @@ export default class Storage {
 
         this.#mapped = true;
         this.#updated = true;
-        const type = getWGSLType(value);
+        const type = this.#type || getWGSLType(value);
         this.#value = value;
         this.#type = type;
 

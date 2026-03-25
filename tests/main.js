@@ -450,6 +450,12 @@ QUnit.module('Storages', hooks => {
         assert.equal(storages.arrayStorage.type, type, `Type should be ${type}`);
     });
 
+    QUnit.test('Type should be kept the same if set first before a setValue', assert => {
+        const type = 'f32';
+        storages.STOTYPEKEEP.setType(type).setValue(10);
+        assert.equal(storages.STOTYPEKEEP.type, type, `Type should be ${type}`);
+    })
+
 })
 
 QUnit.module('Constant', hooks => {
