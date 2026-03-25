@@ -103,87 +103,6 @@ QUnit.module('Uniform', hooks => {
 
 });
 
-QUnit.module('Storage', hooks => {
-    /** @type{Storage} */
-    let myStorage;
-    const name = 'storageName';
-    hooks.before(() => {
-        myStorage = points.setStorage(name);
-    })
-
-    QUnit.test('Storage name has the same name assigned', assert => {
-        assert.equal(myStorage.name, name, 'Storage name should be the same as assigned in function')
-    })
-
-    QUnit.test('Storage is default f32', assert => {
-        assert.equal(myStorage.type, 'f32', `type should be f32`);
-    })
-
-    QUnit.test('myStorage is instance of Storage', assert => {
-        assert.true(myStorage instanceof Storage, 'myStorage should be of type Storage');
-    })
-
-    QUnit.test('myStorage.value has the value set with setValue', assert => {
-        const value = 10;
-        myStorage.setValue(value);
-        assert.equal(myStorage.value, value, 'value should be 10')
-    })
-
-    //----
-    QUnit.test('Storage should throw error if object is passed as value', assert => {
-        assert.throws(() => {
-            points.setStorage('a', 'f32', {})
-        }, 'Should throw an error when passed an object in function call');
-
-        assert.throws(() => {
-            points.setStorage('b')
-                .setValue({})
-        }, 'Should throw an error when passed an object in setValue')
-
-        assert.throws(() => {
-            myStorage.value = {}
-        }, 'Should throw an error when passed an object in value attribute')
-
-    })
-
-    QUnit.test('Storage should throw error if a string is passed as value', assert => {
-        assert.throws(() => {
-            points.setStorage('c', 'f32', '')
-        }, 'Should throw an error when passed a string in function call');
-
-        assert.throws(() => {
-            points.setStorage('d')
-                .setValue('')
-        }, 'Should throw an error when passed a string in setValue')
-
-        assert.throws(() => {
-            myStorage.value = ''
-        }, 'Should throw an error when passed an string in value attribute')
-    })
-
-    QUnit.test('Storage name should not be a number even if string', assert => {
-        assert.throws(() => {
-            points.setStorage(123)
-        }, 'Should throw an error when passed a number')
-        assert.throws(() => {
-            points.setStorage('123')
-        }, 'Should throw an error when passed a number as string')
-    })
-
-    QUnit.test('Storage can accept Uint8Array as value', assert => {
-        try {
-            const bufferLength = 4;
-            const data = new Uint8Array(bufferLength);
-            points.setStorage('testUintArray').setValue(data);
-            assert.ok(true, `assignment didn't throw error`);
-        } catch (e) {
-            assert.ok(false, `assignment throw error: ${e.message}`);
-        }
-    })
-
-
-})
-
 QUnit.module('Uniforms', hooks => {
     /** @type{Uniforms} */
     let uniforms;
@@ -279,6 +198,87 @@ QUnit.module('Uniforms', hooks => {
         uniforms.vec4Uniform = [0, 1, 2, 3];
         assert.equal(uniforms.vec4Uniform.type, 'vec4f', 'Type should be vec4f');
     });
+
+})
+
+QUnit.module('Storage', hooks => {
+    /** @type{Storage} */
+    let myStorage;
+    const name = 'storageName';
+    hooks.before(() => {
+        myStorage = points.setStorage(name);
+    })
+
+    QUnit.test('Storage name has the same name assigned', assert => {
+        assert.equal(myStorage.name, name, 'Storage name should be the same as assigned in function')
+    })
+
+    QUnit.test('Storage is default f32', assert => {
+        assert.equal(myStorage.type, 'f32', `type should be f32`);
+    })
+
+    QUnit.test('myStorage is instance of Storage', assert => {
+        assert.true(myStorage instanceof Storage, 'myStorage should be of type Storage');
+    })
+
+    QUnit.test('myStorage.value has the value set with setValue', assert => {
+        const value = 10;
+        myStorage.setValue(value);
+        assert.equal(myStorage.value, value, 'value should be 10')
+    })
+
+    //----
+    QUnit.test('Storage should throw error if object is passed as value', assert => {
+        assert.throws(() => {
+            points.setStorage('a', 'f32', {})
+        }, 'Should throw an error when passed an object in function call');
+
+        assert.throws(() => {
+            points.setStorage('b')
+                .setValue({})
+        }, 'Should throw an error when passed an object in setValue')
+
+        assert.throws(() => {
+            myStorage.value = {}
+        }, 'Should throw an error when passed an object in value attribute')
+
+    })
+
+    QUnit.test('Storage should throw error if a string is passed as value', assert => {
+        assert.throws(() => {
+            points.setStorage('c', 'f32', '')
+        }, 'Should throw an error when passed a string in function call');
+
+        assert.throws(() => {
+            points.setStorage('d')
+                .setValue('')
+        }, 'Should throw an error when passed a string in setValue')
+
+        assert.throws(() => {
+            myStorage.value = ''
+        }, 'Should throw an error when passed an string in value attribute')
+    })
+
+    QUnit.test('Storage name should not be a number even if string', assert => {
+        assert.throws(() => {
+            points.setStorage(123)
+        }, 'Should throw an error when passed a number')
+        assert.throws(() => {
+            points.setStorage('123')
+        }, 'Should throw an error when passed a number as string')
+    })
+
+    QUnit.test('Storage can accept Uint8Array as value', assert => {
+        try {
+            const bufferLength = 4;
+            const data = new Uint8Array(bufferLength);
+            points.setStorage('testUintArray').setValue(data);
+            assert.ok(true, `assignment didn't throw error`);
+        } catch (e) {
+            assert.ok(false, `assignment throw error: ${e.message}`);
+        }
+    })
+
 
 })
 
@@ -493,7 +493,6 @@ QUnit.module('Constants', hooks => {
         assert.equal(constants.CONSTSETAFTER.value, val, 'Values should be the same');
     })
 })
-
 
 QUnit.module('getWGSLType', hooks => {
     QUnit.test('If value is a integer it returns u32', assert => {
