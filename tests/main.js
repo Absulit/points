@@ -413,11 +413,8 @@ QUnit.module('Storages', hooks => {
         const newValue = [0, 0, 0, 0];
 
         assert.throws(() => {
-            console.log('------------------------- 1');
             storages.oldStorage2 = originalValue;
-            console.log('------------------------- 2');
             storages.oldStorage2 = newValue;
-            console.log('------------------------- 3');
         }, 'Should throw an error if the array length has changed')
     })
 

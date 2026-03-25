@@ -282,17 +282,13 @@ export default class Storage {
 
         const isArray = Array.isArray(value);
 
-        console.log(value, isArray);
-
         if (isArray) {
             const { length } = value;
             if (length < 2) {
                 throw `Constant named '${this.#name}': Size of the array is lower than 2. There's no vec1`;
             }
-            console.log(this.#value);
 
             if (Array.isArray(this.#value)) {
-                console.log(2);
                 if (length != this.#value.length) {
                     throw `Storage named '${this.#name}': Size of the array value has changed from ${this.#value.length} to ${length}.`
                 }
