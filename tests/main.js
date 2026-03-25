@@ -394,7 +394,7 @@ QUnit.module('Storages', hooks => {
         }
     })
 
-    QUnit.test('Uniforms.list is of type Array', assert => {
+    QUnit.test('storages.list is of type Array', assert => {
         assert.equal(storages.list.constructor.name, 'Array', 'list should be of type Array')
     })
 

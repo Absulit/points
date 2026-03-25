@@ -24,9 +24,9 @@ export default class Storage {
         this.#validateType(type);
         this.#validateValue(value);
 
-        if (value && !Array.isArray(value) && value.constructor !== Uint8Array) {
-            value = new Uint8Array([value]);
-        }
+        // if (value && !Array.isArray(value) && value.constructor !== Uint8Array) {
+        //     value = new Uint8Array([value]);
+        // }
 
 
         this.#name = name;
@@ -194,12 +194,14 @@ export default class Storage {
      */
     set value(value) {
         this.#validateValue(value);
-        if (value && !Array.isArray(value) && value.constructor !== Uint8Array) {
-            value = new Uint8Array([value]);
-        }
+        // if (value && !Array.isArray(value) && value.constructor !== Uint8Array) {
+        //     value = new Uint8Array([value]);
+        // }
 
         this.#mapped = !!value;
-        this.#value = value;
+        const type = getWGSLType(value);
+        this.#value = this.#ifTypeVecGetVecValue(type, value);
+        this.#type = type;
     }
 
     /**
@@ -209,12 +211,14 @@ export default class Storage {
      */
     setValue(value) {
         this.#validateValue(value);
-        if (!Array.isArray(value) && value.constructor !== Uint8Array) {
-            value = new Uint8Array([value]);
-        }
+        // if (!Array.isArray(value) && value.constructor !== Uint8Array) {
+        //     value = new Uint8Array([value]);
+        // }
         this.#mapped = true;
         this.#updated = true;
-        this.#value = value;
+        const type = getWGSLType(value);
+        this.#value = this.#ifTypeVecGetVecValue(type, value);
+        this.#type = type;
 
         return this;
     }
@@ -278,8 +282,14 @@ export default class Storage {
         }
 
         const isArray = Array.isArray(value);
+
+
         if (isArray) {
             const { length } = value;
+            if (length < 2) {
+                throw `Constant named '${this.#name}': Size of the array is lower than 2. There's no vec1`;
+            }
+            console.log(this.#value);
             if (Array.isArray(this.#value)) {
                 if (length != this.#value.length) {
                     throw `Storage named '${this.#name}': Size of the array value has changed from ${this.#value.length} to ${length}.`
