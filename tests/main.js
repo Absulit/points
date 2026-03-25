@@ -305,7 +305,7 @@ QUnit.module('Storages', hooks => {
 
     QUnit.test('Assigning float should set type to f32', assert => {
         storages.STOF32 = 10.1;
-        assert.equal(constants.STOF32.type, 'f32', 'Type should be f32')
+        assert.equal(storages.STOF32.type, 'f32', 'Type should be f32')
     })
 
     QUnit.test('Assigning integer should set type to u32', assert => {
