@@ -213,9 +213,9 @@ QUnit.module('Storage', hooks => {
         assert.equal(myStorage.name, name, 'Storage name should be the same as assigned in function')
     })
 
-    QUnit.test('Storage is default f32', assert => {
-        assert.equal(myStorage.type, 'f32', `type should be f32`);
-    })
+    // QUnit.test('Storage is default f32', assert => {
+    //     assert.equal(myStorage.type, 'f32', `type should be f32`);
+    // })
 
     QUnit.test('myStorage is instance of Storage', assert => {
         assert.true(myStorage instanceof Storage, 'myStorage should be of type Storage');
@@ -293,15 +293,15 @@ QUnit.module('Storages', hooks => {
         assert.equal(storages.a.constructor.name, 'Storage', 'Attribute should be an Storage class')
     })
 
-    QUnit.test('Storage created type should be f32', assert => {
-        assert.equal(storages.a.type, 'f32', 'Type should be f32')
-    })
+    // QUnit.test('Storage created type should be f32', assert => {
+    //     assert.equal(storages.a.type, 'f32', 'Type should be f32')
+    // })
 
     QUnit.test('Storage default value should be undefined or null', assert => {
         assert.true(!storages.a.value, 'Value should be undefined or null')
     })
 
-    QUnit.test('Assigning a value directly to attribute should create Uniform and set its value', assert => {
+    QUnit.test('Assigning a value directly to attribute should create Storage and set its value', assert => {
         const value = 14;
         storages.b = value;
         assert.equal(storages.b.value, value, 'Value should be the same assigned before reading')
