@@ -34,7 +34,7 @@ export default class Storage {
         this.#type = type || getWGSLType(value);
         this.#readable = readable || this.#readable;
         this.#shaderStage = shaderStage || this.#shaderStage;
-        this.#value = this.#ifTypeVecGetVecValue(this.#type, value);
+        this.#value = value;
 
         this.#stream = stream;
         this.#updated = updated;
@@ -186,7 +186,7 @@ export default class Storage {
     }
 
     get value() {
-        return this.#value;
+        return this.#ifTypeVecGetVecValue(type, value);
     }
 
     /**
@@ -200,7 +200,7 @@ export default class Storage {
 
         this.#mapped = !!value;
         const type = getWGSLType(value);
-        this.#value = this.#ifTypeVecGetVecValue(type, value);
+        this.#value = value;
         this.#type = type;
     }
 
@@ -289,7 +289,7 @@ export default class Storage {
             if (length < 2) {
                 throw `Constant named '${this.#name}': Size of the array is lower than 2. There's no vec1`;
             }
-            console.log(this.#value);
+            console.log(this.#name, this.#value);
             if (Array.isArray(this.#value)) {
                 if (length != this.#value.length) {
                     throw `Storage named '${this.#name}': Size of the array value has changed from ${this.#value.length} to ${length}.`
