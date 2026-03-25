@@ -1,4 +1,4 @@
-import { getArrayType, isArray } from './data-size.js'
+import { getWGSLType } from './data-size.js'
 
 export default class Storage {
     #name
@@ -31,16 +31,24 @@ export default class Storage {
 
         this.#name = name;
         this.#mapped = !!value;
-        this.#type = type || getArrayType(value) || 'f32';
+        this.#type = type || getWGSLType(value);
         this.#readable = readable || this.#readable;
         this.#shaderStage = shaderStage || this.#shaderStage;
-        this.#value = value;
+        this.#value = this.#ifTypeVecGetVecValue(this.#type, value);
 
         this.#stream = stream;
         this.#updated = updated;
         this.#size = size;
 
         Object.seal(this);
+    }
+
+    #ifTypeVecGetVecValue(type, value) {
+        let newValue = value;
+        if (type.indexOf('vec') !== -1) {
+            newValue = `vec${value.length}f(${value})`
+        }
+        return newValue;
     }
 
     get name() {
