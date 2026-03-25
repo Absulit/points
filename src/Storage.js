@@ -24,10 +24,6 @@ export default class Storage {
         this.#validateType(type);
         this.#validateValue(value);
 
-        // if (value && !Array.isArray(value) && value.constructor !== Uint8Array) {
-        //     value = new Uint8Array([value]);
-        // }
-
         this.#name = name;
         this.#mapped = !!value;
         this.#type = type || getWGSLType(value);
@@ -185,7 +181,13 @@ export default class Storage {
     }
 
     get value() {
-        return this.#ifTypeVecGetVecValue(this.#type, this.#value);
+        let value = this.#value;
+        // Internally, what Points use to create the buffer is a Uint8Array
+        // TODO: maybe move to POINTS?
+        if (value && !Array.isArray(value) && value.constructor !== Uint8Array) {
+            value = new Uint8Array([value]);
+        }
+        return this.#ifTypeVecGetVecValue(this.#type, value);
     }
 
     /**
@@ -193,10 +195,6 @@ export default class Storage {
      */
     set value(value) {
         this.#validateValue(value);
-        // if (value && !Array.isArray(value) && value.constructor !== Uint8Array) {
-        //     value = new Uint8Array([value]);
-        // }
-
         this.#mapped = !!value;
         const type = getWGSLType(value);
         this.#value = value;
@@ -210,9 +208,7 @@ export default class Storage {
      */
     setValue(value) {
         this.#validateValue(value);
-        // if (!Array.isArray(value) && value.constructor !== Uint8Array) {
-        //     value = new Uint8Array([value]);
-        // }
+
         this.#mapped = true;
         this.#updated = true;
         const type = getWGSLType(value);
