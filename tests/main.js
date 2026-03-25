@@ -297,6 +297,72 @@ QUnit.module('Storages', hooks => {
     //     assert.equal(storages.a.type, 'f32', 'Type should be f32')
     // })
 
+    QUnit.test('Assigning value without type, sets the type automatically', assert => {
+        const type = 'u32';
+        storages.MYSTORAGE = 10;
+        assert.equal(storages.MYCONST.type, type, 'It should have a type assigned');
+    })
+
+    QUnit.test('Assigning float should set type to f32', assert => {
+        storages.STOF32 = 10.1;
+        assert.equal(constants.STOF32.type, 'f32', 'Type should be f32')
+    })
+
+    QUnit.test('Assigning integer should set type to u32', assert => {
+        storages.STOU32 = 10;
+        assert.equal(storages.STOU32.type, 'u32', 'Type should be u32')
+    })
+
+    QUnit.test('Assigning negative integer should set type to i32', assert => {
+        storages.STOI32 = -10;
+        assert.equal(storages.STOI32.type, 'i32', 'Type should be i32')
+    })
+
+    QUnit.test('Assigning array length < 5 should set type to vecX', assert => {
+        storages.STOVEC2 = [0, 0];
+        assert.equal(storages.STOVEC2.type, 'vec2f', 'Type should be vec2f')
+
+        storages.STOVEC3 = [0, 0, 0];
+        assert.equal(storages.STOVEC3.type, 'vec3f', 'Type should be vec3f')
+
+        storages.STOVEC4 = [0, 0, 0, 0];
+        assert.equal(storages.STOVEC4.type, 'vec4f', 'Type should be vec4f')
+    })
+
+    QUnit.test('Assigning array length < 5 should set value in form vecXf', assert => {
+        const vec2 = [0, 0]
+        storages.STOVEC22 = vec2;
+        assert.equal(storages.STOVEC2.value, `vec2f(${vec2})`, 'Type should be vec2f')
+
+        const vec3 = [0, 0, 0]
+        storages.STOVEC33 = vec3;
+        assert.equal(storages.STOVEC3.value, `vec3f(${vec3})`, 'Type should be vec3f')
+
+        const vec4 = [0, 0, 0, 0]
+        storages.STOVEC44 = vec4;
+        assert.equal(storages.STOVEC4.value, `vec4f(${vec4})`, 'Type should be vec4f')
+    })
+
+    QUnit.test('Assigning array length < 2 should throw an error', assert => {
+        const arr = [0];
+        assert.throws(() => {
+            storages.STOLOWER = arr;
+        }, 'This should throw an error')
+    })
+
+    QUnit.test('Assigning array length > 4 should set type to array', assert => {
+        const arr = [0, 0, 0, 0, 5]
+        storages.STOARR = arr;
+        assert.equal(storages.STOARR.type, `array<f32, ${arr.length}>`, 'Type should be array')
+    })
+
+    QUnit.test('Changing type after value assignment should work', assert => {
+        storages.STOTYPECHANGE = 10;
+        assert.equal(storages.STOTYPECHANGE.type, 'u32', 'it first should have u32')
+        storages.STOTYPECHANGE.setType('f32');
+        assert.equal(storages.STOTYPECHANGE.type, 'f32', 'then it should have f32')
+    })
+
     QUnit.test('Storage default value should be undefined or null', assert => {
         assert.true(!storages.a.value, 'Value should be undefined or null')
     })
