@@ -186,7 +186,7 @@ export default class Storage {
     }
 
     get value() {
-        return this.#ifTypeVecGetVecValue(type, value);
+        return this.#value;
     }
 
     /**
