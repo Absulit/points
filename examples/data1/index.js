@@ -52,7 +52,7 @@ const data1 = {
         if (!read) {
             read = true;
             const { storages } = points;
-            let [a, b, c, d] = await storages.resultMatrix.read();
+            const [a, b, c, d] = await storages.resultMatrix.read();
             console.log(a, b, c, d);
         }
     }

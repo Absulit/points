@@ -32,7 +32,7 @@ const base = {
         points.setTexture2d('feedbackTexture', true);
 
         storages.result.setType('array<f32, 10>').setShaderStage(FRAGMENT);
-        storages.showMessage.setValue(1).setShaderStage(FRAGMENT);
+        storages.showMessage.setValue(1).setShaderStage(FRAGMENT).setType('f32');
 
         const size = { x: 8, y: 22 };
         await points.setTextureString(

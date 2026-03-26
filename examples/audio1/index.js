@@ -28,7 +28,7 @@ const base = {
         }, 4);
 
 
-        storages.showMessage.setShaderStage(FRAGMENT);
+        storages.showMessage.setShaderStage(FRAGMENT).setType('f32');
 
         const size = { x: 8, y: 22 };
         await points.setTextureString(
