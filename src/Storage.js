@@ -199,6 +199,7 @@ export default class Storage {
         const type = this.#type || getWGSLType(value);
         this.#value = value;
         this.#type = type;
+        this.#updated = true;
     }
 
     /**

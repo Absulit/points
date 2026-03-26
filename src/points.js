@@ -471,7 +471,6 @@ class Points {
 
         if (storageToUpdate) {
             storageToUpdate.value = value;
-            storageToUpdate.updated = true;
             return storageToUpdate;
         }
 
