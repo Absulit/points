@@ -1289,14 +1289,22 @@ class Points {
         const { COMPUTE, FRAGMENT } = GPUShaderStage;
         // TODO: remove structSize
         // this extra 1 is for the boolean flag in the Event struct
-        const data = Array(4).fill(0);
-        this.setStorage(name, 'Event')
-            .setReadable(true)
-            .setShaderStage(COMPUTE | FRAGMENT)
-            .setValue(data);
-        this.setStorage(`${name}_data`, `array<f32, ${structSize}>`)
-            .setReadable(true)
-            .setShaderStage(COMPUTE | FRAGMENT);
+
+        this.#storages.add(new Storage({
+            name,
+            type: 'Event',
+            readable: true,
+            shaderStage: COMPUTE | FRAGMENT,
+            value: Array(4).fill(0)
+        }));
+
+        this.#storages.add(new Storage({
+            name: `${name}_data`,
+            type: `array<f32, ${structSize}>`,
+            readable: true,
+            shaderStage: COMPUTE | FRAGMENT
+        }));
+
         this.#events.set(this.#events_ids,
             {
                 id: this.#events_ids,
