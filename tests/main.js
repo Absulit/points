@@ -456,6 +456,17 @@ QUnit.module('Storages', hooks => {
         assert.equal(storages.STOTYPEKEEP.type, type, `Type should be ${type}`);
     })
 
+    QUnit.test('Storages.add should verify if storage exists with that name already', assert => {
+        storages.existingStorage = 10;
+        const newStorage = new Storage({
+            name: 'existingStorage'
+        })
+
+        assert.throws(() => {
+            storages.add(newStorage);
+        }, 'Should fail if new storage uses existingname')
+    })
+
 })
 
 QUnit.module('Constant', hooks => {
