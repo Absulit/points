@@ -1,4 +1,4 @@
-import Points, { Uniform, Storage } from 'points';
+import Points, { Uniform, Storage, Constant } from 'points';
 import Uniforms from './../src/Uniforms.js';
 import Storages from './../src/Storages.js';
 import { getWGSLType } from './../src/data-size.js';
@@ -198,6 +198,17 @@ QUnit.module('Uniforms', hooks => {
         uniforms.vec4Uniform = [0, 1, 2, 3];
         assert.equal(uniforms.vec4Uniform.type, 'vec4f', 'Type should be vec4f');
     });
+
+    QUnit.test('Uniforms.add should verify if uniform exists with that name already', assert => {
+        uniforms.existingUniform = 10;
+        const newUniform = new Uniform({
+            name: 'existingUniform'
+        })
+
+        assert.throws(() => {
+            uniforms.add(newUniform);
+        }, 'Should fail if new uniform uses existing name')
+    })
 
 })
 
@@ -464,7 +475,7 @@ QUnit.module('Storages', hooks => {
 
         assert.throws(() => {
             storages.add(newStorage);
-        }, 'Should fail if new storage uses existingname')
+        }, 'Should fail if new storage uses existing name')
     })
 
 })
@@ -575,6 +586,19 @@ QUnit.module('Constants', hooks => {
         constants.CONSTSETAFTER.setValue(val);
         assert.equal(constants.CONSTSETAFTER.value, val, 'Values should be the same');
     })
+
+    QUnit.test('Constants.add should verify if constant exists with that name already', assert => {
+        constants.EXISTINGCONST = 10;
+        const newConstant = new Constant({
+            name: 'EXISTINGCONST'
+        })
+
+        assert.throws(() => {
+            constants.add(newConstant);
+        }, 'Should fail if new storage uses existing name')
+    })
+
+
 })
 
 QUnit.module('getWGSLType', hooks => {

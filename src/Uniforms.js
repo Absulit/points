@@ -78,7 +78,11 @@ export default class Uniforms {
      * @param {Uniform} uniform
      */
     add(uniform) {
-        this[uniform.name] = uniform;
+        const { name } = uniform;
+        if (this[name]) {
+            throw `Uniform named ${name} already exists.`
+        }
+        this[name] = uniform;
         this.#list.push(uniform);
     }
 }

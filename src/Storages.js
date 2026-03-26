@@ -77,10 +77,11 @@ export default class Storages {
      * @param {Storage} storage
      */
     add(storage) {
-        if(this[storage.name]){
-            throw `Storage named ${storage.name} already exists.`
+        const { name } = storage;
+        if (this[name]) {
+            throw `Storage named ${name} already exists.`
         }
-        this[storage.name] = storage;
+        this[name] = storage;
         this.#list.push(storage);
     }
 }

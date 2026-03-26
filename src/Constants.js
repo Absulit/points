@@ -78,7 +78,11 @@ export default class Constants {
      * @param {Constant} constant
      */
     add(constant) {
-        this[constant.name] = constant;
+        const { name } = constant;
+        if (this[name]) {
+            throw `Constant named ${name} already exists.`
+        }
+        this[name] = constant;
         this.#list.push(constant);
     }
 
