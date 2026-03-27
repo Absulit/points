@@ -7,7 +7,7 @@ export default class Constant {
     #override
     #shaderStage = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE
     /**
-     * @param {{name:String, value:Number|Array<Number>, type:String, override:Boolean}} config
+     * @param {{name:String, value:(Number|Array<Number>), type:String, override:Boolean}} config
      */
     constructor({ name, value, type, override = false }) {
 
@@ -128,7 +128,7 @@ export default class Constant {
     /**
      * Sets the value of a Constant
      * @param {Number|Array<Number>} value
-     * @returns
+     * @returns {Constant}
      */
     setValue(value) {
         this.#validateValue(value);

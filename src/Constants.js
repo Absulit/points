@@ -76,7 +76,7 @@ export default class Constants {
     /**
      * Retrieves a {@link Constant} by its name.
      * @param {String} name
-     * @returns
+     * @returns {Constant}
      */
     find(name) {
         return this[name];
