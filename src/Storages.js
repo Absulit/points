@@ -64,16 +64,25 @@ export default class Storages {
         return this.#list;
     }
 
+    /**
+     * List of all {@link Storage}
+     * @param {Array} value
+     */
     set list(value) {
         this.#list = value;
     }
 
+    /**
+     * Retrieves a {@link Storage} by its name.
+     * @param {String} name
+     * @returns {Storage}
+     */
     find(name) {
         return this[name];
     }
 
     /**
-     * Add a new storage
+     * Add a new {@link Storage}
      * @param {Storage} storage
      */
     add(storage) {

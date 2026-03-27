@@ -51,6 +51,7 @@ export default class Storage {
     }
 
     /**
+     * The name that the Storage will have on the WGSL side.
      * @param {String} value name of the Storage. The name is used in the WGSL
      * shader.
      * @example
@@ -121,7 +122,7 @@ export default class Storage {
     }
 
     /**
-     * For internal use mostly. The actual GPUBuffer with the data.
+     * For internal use mostly. The actual {@link GPUBuffer} with the data.
      */
     set buffer(value) {
         this.#buffer = value;

@@ -65,16 +65,25 @@ export default class Uniforms {
         return this.#list;
     }
 
+    /**
+     * List of all {@link Uniform}s
+     * @param {Array} value
+     */
     set list(value) {
         this.#list = value;
     }
 
+    /**
+     * Retrieves a {@link Uniform} by its name.
+     * @param {String} name
+     * @returns {Uniform}
+     */
     find(name) {
         return this[name];
     }
 
     /**
-     * Add a new uniform
+     * Add a new {@link Uniform}
      * @param {Uniform} uniform
      */
     add(uniform) {

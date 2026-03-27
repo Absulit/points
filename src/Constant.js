@@ -33,6 +33,17 @@ export default class Constant {
         return this.#name;
     }
 
+    /**
+     * The name that the Constant will have on the WGSL side.
+     * @param {String} value name of the Constant. The name is used in the WGSL
+     * shader.
+     * @example
+     * // js
+     * myConstant.name = 'MYCONST';
+     *
+     * // wgsl
+     * let newVal = MYCONST + 3;
+     */
     set name(value) {
         this.#validateName(value);
         this.#name = value;
@@ -42,6 +53,11 @@ export default class Constant {
         return this.#value;
     }
 
+    /**
+     * Get or set the value that the constant will have on the WGSL side.
+     * @warning It can only be assigned once.
+     * @param {Number|Array<Number>} value
+     */
     set value(value) {
         this.#validateValue(value);
         const type = getWGSLType(value);
@@ -53,6 +69,14 @@ export default class Constant {
         return this.#type;
     }
 
+    /**
+     * Get or set the type of the constant.
+     * It can be inferred automatically by just passing the value, but if
+     * something more specific is required, then you should use `type`.
+     * @param {String} value WGSL data type of the constant
+     * @example
+     * myConstant.type = 'u32';
+     */
     set type(value) {
         this.#validateType(value);
         this.#type = value;
@@ -62,6 +86,29 @@ export default class Constant {
         return this.#override;
     }
 
+    /**
+     * A constant override is a constant you can change per shader.
+     * By default, POINTS interpolates constant declarations inside the WGSL
+     * string shader like this:
+     * ```wgsl
+     * const MYCONST:u32 = 10;
+     * ```
+     * These declarations are added by default to all shaders in the pipeline
+     * and in all render passes. These can not be changed.
+     *
+     * With overrides you can have the same constant in different shaders with
+     * different values. The default value is passed to each pipeline and then
+     * it can be overwritten in a specific shader by hand.
+     * @example
+     * ```js
+     * // js side
+     * constants.PI.setOverride(true).setValue(3.14);
+     * ```
+     * ```wgsl
+     * // wgsl side
+     * override MYCONST:u32 = 3.1415;
+     * ```
+     */
     set override(value) {
         this.#override = value;
     }
@@ -78,6 +125,11 @@ export default class Constant {
         this.#shaderStage = value;
     }
 
+    /**
+     * Sets the value of a Constant
+     * @param {Number|Array<Number>} value
+     * @returns
+     */
     setValue(value) {
         this.#validateValue(value);
         const type = getWGSLType(value);
@@ -86,12 +138,41 @@ export default class Constant {
         return this;
     }
 
+    /**
+     * Set the data type of the Constant.
+     * @param {String} value WGSL data type of the constant
+     * @example
+     * myUniform.setType('u32')
+     */
     setType(value) {
         this.#validateType(value);
         this.#type = value;
         return this;
     }
 
+    /**
+     * A constant override is a constant you can change per shader.
+     * By default, POINTS interpolates constant declarations inside the WGSL
+     * string shader like this:
+     * ```wgsl
+     * const MYCONST:u32 = 10;
+     * ```
+     * These declarations are added by default to all shaders in the pipeline
+     * and in all render passes. These can not be changed.
+     *
+     * With overrides you can have the same constant in different shaders with
+     * different values. The default value is passed to each pipeline and then
+     * it can be overwritten in a specific shader by hand.
+     * @example
+     * ```js
+     * // js side
+     * constants.PI.setOverride(true).setValue(3.14);
+     * ```
+     * ```wgsl
+     * // wgsl side
+     * override MYCONST:u32 = 3.1415;
+     * ```
+     */
     setOverride(value) {
         this.#override = value;
         return this;

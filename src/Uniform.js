@@ -33,6 +33,7 @@ export default class Uniform {
     }
 
     /**
+     * The name that the Uniform will have on the WGSL side.
      * @param {String} value name of the Uniform. The name is used in the WGSL
      * shader.
      * @example
@@ -52,6 +53,7 @@ export default class Uniform {
     }
 
     /**
+     * To get or set the value of the uniform from the JS side to the WGSL side.
      * @param {Number|Boolean|Array<Number>} value The uniform value
      */
     set value(value) {
@@ -64,6 +66,9 @@ export default class Uniform {
     }
 
     /**
+     * Get or set the type of the uniform.
+     * It can be inferred automatically by just passing the value, but if
+     * something more specific is required, then you should use `type`.
      * @param {String} value WGSL data type of the uniform
      * @example
      * myUniform.type = 'u32';
@@ -113,6 +118,7 @@ export default class Uniform {
     }
 
     /**
+     * Set the data type of the uniform.
      * @param {String} value WGSL data type of the uniform
      * @example
      * myUniform.setType('u32')

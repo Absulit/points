@@ -65,16 +65,25 @@ export default class Constants {
         return this.#list;
     }
 
+    /**
+     * List of all {@link Constant}s
+     * @param {Array} value
+     */
     set list(value) {
         this.#list = value;
     }
 
+    /**
+     * Retrieves a {@link Constant} by its name.
+     * @param {String} name
+     * @returns
+     */
     find(name) {
         return this[name];
     }
 
     /**
-     * Add a new storage
+     * Add a new {@link Constant}
      * @param {Constant} constant
      */
     add(constant) {
