@@ -40,7 +40,7 @@ export default class Storage {
 
     #ifTypeVecGetVecValue(type, value) {
         let newValue = value;
-        if (type.indexOf('vec') !== -1) {
+        if (type.startsWith('vec')) {
             newValue = `vec${value.length}f(${value})`
         }
         return newValue;
