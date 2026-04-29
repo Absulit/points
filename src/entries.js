@@ -1,5 +1,8 @@
-import RenderPass, { CullMode, PrimitiveTopology, LoadOp, FrontFace } from './RenderPass.js';
+import RenderPass, { CullMode, PrimitiveTopology, LoadOp, FrontFace} from './RenderPass.js';
 import ScaleMode from './ScaleMode.js';
+import Uniform from './Uniform.js';
+import Storage from './Storage.js';
+import Constant from './Constant.js';
 import PresentationFormat from './PresentationFormat.js';
 import RenderPasses from './RenderPasses.js';
 import Points from './points.js';
@@ -12,6 +15,9 @@ export {
     FrontFace,
     ScaleMode,
     PresentationFormat,
-    RenderPasses
+    RenderPasses,
+    Uniform,
+    Storage,
+    Constant,
 };
 export default Points;
