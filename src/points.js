@@ -1724,7 +1724,7 @@ class Points {
         // sometimes both arrive and we have to use the bigger one
         const buffer = this.#device.createBuffer({
             mappedAtCreation,
-            size: Math.max(size, data.byteLength),
+            size: Math.max(size || 0, data.byteLength),
             usage,
         });
         new Float32Array(buffer.getMappedRange()).set(data);
@@ -1845,8 +1845,8 @@ class Points {
         //--------------------------------------------
         this.#storages.list.forEach(storageItem => {
             let usage = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST;
-            const { read, name, size, mapped } = storageItem;
-            if (read) {
+            const { readable, name, size, mapped } = storageItem;
+            if (readable) {
                 const readSize = mapped ? storageItem.value.length : size;
 
                 storageItem.bufferRead = this.#device.createBuffer({
