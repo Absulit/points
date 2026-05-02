@@ -131,18 +131,18 @@ QUnit.module('Storages', hooks => {
         assert.equal(storages.STOVEC4.type, 'vec4f', 'Type should be vec4f')
     })
 
-    QUnit.test('Assigning array length < 5 should set value in form vecXf', assert => {
+    QUnit.test('Assigning array length < 5 should set value in form [n...]', assert => {
         const vec2 = [0, 0]
         storages.STOVEC22 = vec2;
-        assert.equal(storages.STOVEC22.value, `vec2f(${vec2})`, 'Type should be vec2f')
+        assert.equal(storages.STOVEC22.value, vec2, 'Type should be vec2f')
 
         const vec3 = [0, 0, 0]
         storages.STOVEC33 = vec3;
-        assert.equal(storages.STOVEC33.value, `vec3f(${vec3})`, 'Type should be vec3f')
+        assert.equal(storages.STOVEC33.value, vec3, 'Type should be vec3f')
 
         const vec4 = [0, 0, 0, 0]
         storages.STOVEC44 = vec4;
-        assert.equal(storages.STOVEC44.value, `vec4f(${vec4})`, 'Type should be vec4f')
+        assert.equal(storages.STOVEC44.value, vec4, 'Type should be vec4f')
     })
 
     QUnit.test('Assigning array length < 2 should throw an error', assert => {
