@@ -188,7 +188,8 @@ export default class Storage {
         if (value && !Array.isArray(value) && value.constructor !== Uint8Array) {
             value = new Uint8Array([value]);
         }
-        return this.#ifTypeVecGetVecValue(this.#type, value);
+
+        return value;
     }
 
     /**
