@@ -67,6 +67,7 @@ export default class Storages {
     /**
      * List of all {@link Storage}
      * @param {Array} value
+     * @memberof Storages
      */
     set list(value) {
         this.#list = value;
@@ -76,6 +77,7 @@ export default class Storages {
      * Retrieves a {@link Storage} by its name.
      * @param {String} name
      * @returns {Storage}
+     * @memberof Storages
      */
     find(name) {
         return this[name];
@@ -84,6 +86,7 @@ export default class Storages {
     /**
      * Add a new {@link Storage}
      * @param {Storage} storage
+     * @memberof Storages
      */
     add(storage) {
         const { name } = storage;
