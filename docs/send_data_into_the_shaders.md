@@ -1,6 +1,6 @@
 # Send data into the shaders
 
-You can call one of the following methods, you pair the data with a `key` name, and this name is the one you will reference inside the shader:
+You can call one of the following methods; you pair the data with a `key` name, and this name is the one you will reference inside the shader:
 
 ---
 
@@ -56,6 +56,30 @@ let cValue2 = params.myTestStruct.another_prop; // 1, 2, 3
 // value is read the same way, but will vary per frame
 let dValue = params.valueToUpdate;
 ```
+
+## Uniforms, Storage, Constants
+
+Additionally to the set* methods, you can also use the `uniforms` attribute, `storage` and `constants` of the main `Points` class. Its purpose is to simplify the buffer assigment to look more like a regular variable assigment.
+
+In principle, they function the exact same way as the set* methods, but they avoid the parameter hell.
+
+```js
+
+const { uniforms, storages, constants } = points; // retrieve objects.
+
+// option 1: just assign a value and the type is set automatically
+uniforms.myUniform = 10; // defaults to f32
+storages.myStorage = [1, 2, 3]; // defaults to vec3f
+storages.myStorage2 = [1, 2, 3, 4, 5] // defaults to array<f32, 5>
+constants.MYCONST = 10; // defaults to u32
+
+// option 2: use auxiliary methods
+uniforms.myUniform.setValue(10).setType('u32');
+storages.myStorage.setValue([1, 2, 3]).setType('array<f32, 3>');
+
+
+```
+
 
 ## Sampler - setSampler
 
