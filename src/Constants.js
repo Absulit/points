@@ -1,5 +1,8 @@
 import { Constant } from 'points';
 
+/**
+ * @class Constants
+ */
 export default class Constants {
     #list = [];
 
@@ -68,6 +71,7 @@ export default class Constants {
     /**
      * List of all {@link Constant}s
      * @param {Array} value
+     * @memberof Constants
      */
     set list(value) {
         this.#list = value;
@@ -77,6 +81,7 @@ export default class Constants {
      * Retrieves a {@link Constant} by its name.
      * @param {String} name
      * @returns {Constant}
+     * @memberof Constants
      */
     find(name) {
         return this[name];
@@ -85,6 +90,7 @@ export default class Constants {
     /**
      * Add a new {@link Constant}
      * @param {Constant} constant
+     * @memberof Constants
      */
     add(constant) {
         const { name } = constant;
@@ -100,6 +106,7 @@ export default class Constants {
      * This object will be passed into the pipeline.
      * @param {GPUShaderStage|Number} filter
      * @returns {Object}
+     * @memberof Constants
      */
     listOfOverrides(filter) {
         return Object.fromEntries(
@@ -115,6 +122,7 @@ export default class Constants {
      * shaders.
      * @param {GPUShaderStage|Number} filter
      * @returns {String}
+     * @memberof Constants
      */
     stringOfNonOverrides(filter) {
         let consStrings = '';

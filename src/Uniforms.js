@@ -1,6 +1,9 @@
 import { Uniform } from 'points';
 import UniformsArray from './UniformsArray.js';
 
+/**
+ * @class Uniforms
+ */
 export default class Uniforms {
     #list = new UniformsArray();
 
@@ -68,6 +71,7 @@ export default class Uniforms {
     /**
      * List of all {@link Uniform}s
      * @param {Array} value
+     * @memberof Uniforms
      */
     set list(value) {
         this.#list = value;
@@ -77,6 +81,7 @@ export default class Uniforms {
      * Retrieves a {@link Uniform} by its name.
      * @param {String} name
      * @returns {Uniform}
+     * @memberof Uniforms
      */
     find(name) {
         return this[name];
@@ -85,6 +90,7 @@ export default class Uniforms {
     /**
      * Add a new {@link Uniform}
      * @param {Uniform} uniform
+     * @memberof Uniforms
      */
     add(uniform) {
         const { name } = uniform;

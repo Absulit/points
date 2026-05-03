@@ -1,5 +1,8 @@
 import { Storage } from 'points';
 
+/**
+ * @class Storages
+ */
 export default class Storages {
     #list = [];
 
