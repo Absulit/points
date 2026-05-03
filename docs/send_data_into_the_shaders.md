@@ -76,7 +76,12 @@ constants.MYCONST = 10; // defaults to u32
 // option 2: use auxiliary methods
 uniforms.myUniform.setValue(10).setType('u32');
 storages.myStorage.setValue([1, 2, 3]).setType('array<f32, 3>');
+constants.MYCONST.setValue(10).setType('f32');
 
+// auxiliary methods order is independent (calling setType first):
+uniforms.myUniform.setType('u32').setValue(10);
+storages.myStorage.setType('array<f32, 3>').setValue([1, 2, 3]);
+constants.MYCONST.setType('f32').setValue(10);
 
 ```
 
