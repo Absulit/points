@@ -2,6 +2,8 @@ import { isArray } from './data-size.js';
 
 /**
  * Uniform class is a container for uniform related data and actions.
+ *
+ * @class Uniform
  */
 export default class Uniform {
     #name
@@ -42,6 +44,7 @@ export default class Uniform {
      *
      * // wgsl
      * myUniformName = 13.0;
+     * @memberof Uniform
      */
     set name(value) {
         this.#validateName(value);
@@ -55,6 +58,7 @@ export default class Uniform {
     /**
      * To get or set the value of the uniform from the JS side to the WGSL side.
      * @param {Number|Boolean|Array<Number>} value The uniform value
+     * @memberof Uniform
      */
     set value(value) {
         this.#validateValue(value);
@@ -72,6 +76,7 @@ export default class Uniform {
      * @param {String} value WGSL data type of the uniform
      * @example
      * myUniform.type = 'u32';
+     * @memberof Uniform
      */
     set type(value) {
         this.#validateType(value);
@@ -84,6 +89,7 @@ export default class Uniform {
 
     /**
      * For internal use mostly. Size in bytes.
+     * @memberof Uniform
      */
     set size(value) {
         this.#size = value;
@@ -93,6 +99,7 @@ export default class Uniform {
      * Clone of the Uniform data as a plain object to avoid modifications on
      * the original data.
      * @returns {Object}
+     * @memberof Uniform
      */
     serialize() {
         // we check if array and spread
@@ -110,6 +117,7 @@ export default class Uniform {
     /**
      * Sets or updates the value of the Uniform.
      * @param {Number|Boolean|Array<Number>} value
+     * @memberof Uniform
      */
     setValue(value) {
         this.#validateValue(value);
@@ -122,6 +130,7 @@ export default class Uniform {
      * @param {String} value WGSL data type of the uniform
      * @example
      * myUniform.setType('u32')
+     * @memberof Uniform
      */
     setType(value) {
         this.#validateType(value);

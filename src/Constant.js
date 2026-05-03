@@ -1,5 +1,10 @@
 import { getWGSLType } from './data-size.js';
 
+/**
+ *
+ * @class Constant
+ */
+
 export default class Constant {
     #name
     #value
@@ -43,6 +48,7 @@ export default class Constant {
      *
      * // wgsl
      * let newVal = MYCONST + 3;
+     * @memberof Constant
      */
     set name(value) {
         this.#validateName(value);
@@ -57,6 +63,7 @@ export default class Constant {
      * Get or set the value that the constant will have on the WGSL side.
      * @warning It can only be assigned once.
      * @param {Number|Array<Number>} value
+     * @memberof Constant
      */
     set value(value) {
         this.#validateValue(value);
@@ -76,6 +83,7 @@ export default class Constant {
      * @param {String} value WGSL data type of the constant
      * @example
      * myConstant.type = 'u32';
+     * @memberof Constant
      */
     set type(value) {
         this.#validateType(value);
@@ -108,6 +116,7 @@ export default class Constant {
      * // wgsl side
      * override MYCONST:u32 = 3.1415;
      * ```
+     * @memberof Constant
      */
     set override(value) {
         this.#override = value;
@@ -119,7 +128,8 @@ export default class Constant {
 
     /**
      * Tells WebGPU to which shader it can only be used.
-     * @param {GPUShaderStage} value
+     * @param {GPUShaderStage}
+     * @memberof Constant
      */
     set shaderStage(value) {
         this.#shaderStage = value;
@@ -129,6 +139,7 @@ export default class Constant {
      * Sets the value of a Constant
      * @param {Number|Array<Number>} value
      * @returns {Constant}
+     * @memberof Constant
      */
     setValue(value) {
         this.#validateValue(value);
@@ -143,6 +154,7 @@ export default class Constant {
      * @param {String} value WGSL data type of the constant
      * @example
      * myUniform.setType('u32')
+     * @memberof Constant
      */
     setType(value) {
         this.#validateType(value);
@@ -172,6 +184,7 @@ export default class Constant {
      * // wgsl side
      * override MYCONST:u32 = 3.1415;
      * ```
+     * @memberof Constant
      */
     setOverride(value) {
         this.#override = value;
@@ -182,6 +195,7 @@ export default class Constant {
      * Tells WebGPU to which shader it can only be used.
      * @param {GPUShaderStage} value
      * @returns {Constant}
+     * @memberof Constant
      */
     setShaderStage(value) {
         this.#shaderStage = value;

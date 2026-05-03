@@ -1,5 +1,10 @@
 import { getWGSLType } from './data-size.js'
 
+/**
+ *
+ * @class Storage
+ */
+
 export default class Storage {
     #name
     #mapped
@@ -60,6 +65,7 @@ export default class Storage {
      *
      * // wgsl
      * myStorageName = 13.1;
+     * @memberof Storage
      */
     set name(value) {
         this.#validateName(value);
@@ -74,6 +80,7 @@ export default class Storage {
      * @param {Boolean} value tells WebGPU if the Storage is mapped or not. This
      * allows for the initialization of the Storage with data, which is a
      * different route.
+     * @memberof Storage
      */
     set mapped(value) {
         this.#mapped = value;
@@ -87,6 +94,7 @@ export default class Storage {
      * @param {String} value WGSL data type of the Storage.
      * @example
      * myStorage.type = 'u32'
+     * @memberof Storage
      */
     set type(value) {
         this.#validateType(value);
@@ -100,6 +108,7 @@ export default class Storage {
     /**
      * Tells WebGPU to which shader it can only be used.
      * @param {GPUShaderStage} value
+     * @memberof Storage
      */
     set shaderStage(value) {
         this.#shaderStage = value;
@@ -112,6 +121,7 @@ export default class Storage {
     /**
      * If data is read back in JS from WGSL, then set to `true`.
      * @param {Boolean} value
+     * @memberof Storage
      */
     set readable(value) {
         this.#readable = value;
@@ -123,6 +133,7 @@ export default class Storage {
 
     /**
      * For internal use mostly. The actual {@link GPUBuffer} with the data.
+     * @memberof Storage
      */
     set buffer(value) {
         this.#buffer = value;
@@ -135,6 +146,7 @@ export default class Storage {
     /**
      * Buffer for reading back
      * For internal use mostly. The actual GPUBufferRead with the data.
+     * @memberof Storage
      */
     set bufferRead(value) {
         this.#bufferRead = value;
@@ -165,6 +177,7 @@ export default class Storage {
      * constantly, so if the storage map needs to be updated constantly then
      * `stream` needs to be set to true.
      * @param {boolean} value
+     * @memberof Storage
      */
     set stream(value) {
         this.#stream = value;
@@ -176,6 +189,7 @@ export default class Storage {
 
     /**
      * Mostly internal. Set to `true` if a value has been updated.
+     * @memberof Storage
      */
     set updated(value) {
         this.#updated = value;
@@ -194,6 +208,7 @@ export default class Storage {
 
     /**
      * @param {Number|Array<Number>} value data to send to the shader
+     * @memberof Storage
      */
     set value(value) {
         this.#validateValue(value);
@@ -208,6 +223,7 @@ export default class Storage {
      *
      * @param {Number|Array<Number>} value data to send to the shader
      * @returns {Storage}
+     * @memberof Storage
      */
     setValue(value) {
         this.#validateValue(value);
@@ -225,6 +241,7 @@ export default class Storage {
      * if this is going to be used to read data back set to `true`
      * @param {bool} value
      * @returns {Storage}
+     * @memberof Storage
      */
     setReadable(value) {
         this.#readable = value;
@@ -235,6 +252,7 @@ export default class Storage {
      * Tells WebGPU to which shader it can only be used.
      * @param {GPUShaderStage} value
      * @returns {Storage}
+     * @memberof Storage
      */
     setShaderStage(value) {
         this.#shaderStage = value;
@@ -246,6 +264,7 @@ export default class Storage {
      * @returns {Storage}
      * @example
      * myStorage.setType('u32');
+     * @memberof Storage
      */
     setType(value) {
         this.#validateType(value);
