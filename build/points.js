@@ -1,5 +1,5 @@
 /* @ts-self-types="./points.d.ts" */
-import { RenderPass as RenderPass$1 } from 'points';
+import { RenderPass as RenderPass$1, Uniform as Uniform$1, Storage as Storage$1, Constant as Constant$1 } from 'points';
 
 function getWGSLCoordinate(value, side, invert = false) {
     const direction = invert ? -1 : 1;
@@ -164,6 +164,8 @@ class RenderPass {
     #topology = PrimitiveTopology.TRIANGLE_LIST;
     #cullMode = CullMode.BACK;
     #frontFace = FrontFace.CCW;
+
+    #meshUpdated = CSSFontFeatureValuesRule;
 
     #descriptor = {
         colorAttachments: [
@@ -635,6 +637,18 @@ class RenderPass {
         this.#enabled = val;
     }
 
+    get meshUpdated() {
+        return this.#meshUpdated;
+    }
+
+    /**
+     * To notify the RenderPass if a mesh has changed to update the vertexBuffer
+     * @param {Boolean} val
+     */
+    set meshUpdated(val) {
+        this.#meshUpdated = val;
+    }
+
     /**
      * - **currently for internal use**<br>
      * - **might be private in the future**<br>
@@ -690,6 +704,7 @@ class RenderPass {
 
     /**
      * Adds a mesh quad
+     * @deprecated Since v0.8.0 use {@link setPlane}
      * @param {String} name The name will show up in the `mesh` Uniform.
      * @param {{x:Number, y:Number, z:Number}} coordinate
      * @param {{width:Number, height:Number}} dimensions
@@ -766,7 +781,98 @@ class RenderPass {
     }
 
     /**
+     * Adds or replaces a mesh quad
+     * @param {String} name The name will show up in the `mesh` Uniform.
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {{width:Number, height:Number}} dimensions
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     * @param {{x:Number, y:Number }} segments mesh subdivisions
+     *
+     * @example
+     *
+     * renderPass.setPlane('plane', { x: 0, y: 0, z: 0 }, { width: 2, height: 2 }).instanceCount = NUMPARTICLES;
+     */
+    setPlane(
+        name,
+        coordinate = { x: 0, y: 0, z: 0 },
+        dimensions = { width: 1, height: 1 },
+        color = { r: 1, g: 0, b: 1, a: 0 },
+        segments = { x: 1, y: 1 }
+    ) {
+        const meshExists = this.#nameExists(this.#meshes, name);
+
+        const { x, y, z } = coordinate;
+        const { width, height } = dimensions;
+        const { x: sx, y: sy } = segments;
+        const hw = width / 2;
+        const hh = height / 2;
+
+        const { r, g, b, a } = color;
+        const normal = [0, 0, 1];
+
+        const id = this.#meshCounter;
+
+        const grid = [];
+        for (let iy = 0; iy <= sy; iy++) {
+            const v = iy / sy;
+            const posY = y - hh + v * height;
+
+            for (let ix = 0; ix <= sx; ix++) {
+                const u = ix / sx;
+                const posX = x - hw + u * width;
+
+                grid.push({
+                    position: [posX, posY, z],
+                    uv: [u, v]
+                });
+            }
+        }
+
+        const vertexArray = [];
+        for (let iy = 0; iy < sy; iy++) {
+            for (let ix = 0; ix < sx; ix++) {
+                const rowSize = sx + 1;
+                const i0 = iy * rowSize + ix;
+                const i1 = i0 + 1;
+                const i2 = i0 + rowSize;
+                const i3 = i2 + 1;
+
+                const quad = [
+                    grid[i0], grid[i1], grid[i3],
+                    grid[i0], grid[i3], grid[i2]
+                ];
+
+                quad.forEach(({ position: [vx, vy, vz], uv: [u, v] }, i) => {
+                    vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normal, id, ...BARYCENTRICS[i % 3]);
+                });
+            }
+        }
+
+        if (meshExists) {
+            meshExists.vertexArray = vertexArray;
+            meshExists.verticesCount = sx * sy * 6;
+            this.#updateVertexArray();
+            this.#meshUpdated = true;
+            return meshExists;
+        }
+
+        const mesh = {
+            name,
+            id,
+            instanceCount: 1,
+            verticesCount: sx * sy * 6,
+            vertexArray,
+        };
+        this.#meshes.push(mesh);
+        ++this.#meshCounter;
+        this.#updateVertexArray();
+
+        return mesh;
+    }
+
+    /**
      * Adds a mesh cube
+     * @deprecated since v0.8.0. Use {@link setCube}
      * @param {String} name The name will show up in the `mesh` Uniform.
      * @param {{x:Number, y:Number, z:Number}} coordinate
      * @param {{width:Number, height:Number, depth:Number}} dimensions
@@ -863,7 +969,118 @@ class RenderPass {
     }
 
     /**
+     * Adds or replaces a mesh cube
+     * @param {String} name The name will show up in the `mesh` Uniform.
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {{width:Number, height:Number, depth:Number}} dimensions
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     *
+     * @example
+     *
+     * renderPass.setCube('base_cube').instanceCount = NUMPARTICLES;
+     */
+    setCube(
+        name,
+        coordinate = { x: 0, y: 0, z: 0 },
+        dimensions = { width: 1, height: 1, depth: 1 },
+        color = { r: 1, g: 0, b: 1, a: 0 }
+    ) {
+        const meshExists = this.#nameExists(this.#meshes, name);
+
+        const { x, y, z } = coordinate;
+        const { width, height, depth } = dimensions;
+        const hw = width / 2;
+        const hh = height / 2;
+        const hd = depth / 2;
+
+        const corners = [
+            [x - hw, y - hh, z - hd], // 0: left-bottom-back
+            [x + hw, y - hh, z - hd], // 1: right-bottom-back
+            [x + hw, y + hh, z - hd], // 2: right-top-back
+            [x - hw, y + hh, z - hd], // 3: left-top-back
+            [x - hw, y - hh, z + hd], // 4: left-bottom-front
+            [x + hw, y - hh, z + hd], // 5: right-bottom-front
+            [x + hw, y + hh, z + hd], // 6: right-top-front
+            [x - hw, y + hh, z + hd], // 7: left-top-front
+        ];
+
+        const faceUVs = [
+            [[0, 0], [1, 0], [1, 1], [0, 1]], // back
+            [[0, 0], [1, 0], [1, 1], [0, 1]], // front
+            [[0, 0], [1, 0], [1, 1], [0, 1]], // left
+            [[0, 0], [1, 0], [1, 1], [0, 1]], // right
+            [[0, 0], [1, 0], [1, 1], [0, 1]], // top
+            [[0, 0], [1, 0], [1, 1], [0, 1]], // bottom
+        ];
+
+        const faceNormals = [
+            [0, 0, -1],  // back
+            [0, 0, 1],   // front
+            [-1, 0, 0],  // left
+            [1, 0, 0],   // right
+            [0, 1, 0],   // top
+            [0, -1, 0],  // bottom
+        ];
+
+        const faces = [
+            [0, 3, 2, 1], // back
+            [4, 5, 6, 7], // front
+            [0, 4, 7, 3], // left
+            [5, 1, 2, 6], // right
+            [3, 7, 6, 2], // top
+            [0, 1, 5, 4], // bottom
+        ];
+
+        const vertexArray = [];
+        const meshCounter = meshExists ? meshExists.id : this.#meshCounter;
+        for (let i = 0; i < 6; i++) {
+            const [i0, i1, i2, i3] = faces[i];
+            // const color = faceColors[i];
+            const { r, g, b, a } = color;
+            const normals = faceNormals[i];
+
+            const v = [corners[i0], corners[i1], corners[i2], corners[i3]];
+
+            const uv = faceUVs[i];
+            const verts = [
+                [v[0], uv[0]],
+                [v[1], uv[1]],
+                [v[2], uv[2]],
+                [v[0], uv[0]],
+                [v[2], uv[2]],
+                [v[3], uv[3]],
+            ];
+
+            verts.forEach(([[vx, vy, vz], [u, v]], i) => {
+                vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normals, meshCounter, ...BARYCENTRICS[i % 3]);
+            });
+        }
+
+        if (meshExists) {
+            meshExists.vertexArray = vertexArray;
+            meshExists.verticesCount = 36;
+            this.#updateVertexArray();
+            this.#meshUpdated = true;
+            return meshExists;
+        }
+
+        const mesh = {
+            name,
+            id: this.#meshCounter,
+            instanceCount: 1,
+            verticesCount: 36,
+            vertexArray,
+        };
+        this.#meshes.push(mesh);
+        ++this.#meshCounter;
+        this.#updateVertexArray();
+
+        return mesh;
+    }
+
+    /**
      * Adds a mesh sphere
+     * @deprecated since v0.8.0. Use {@link setSphere}
      * @param {String} name The name will show up in the `mesh` Uniform.
      * @param {{x:Number, y:Number, z:Number}} coordinate
      * @param {{r:Number, g:Number, b:Number, a:Number}} color
@@ -946,7 +1163,104 @@ class RenderPass {
     }
 
     /**
+     * Adds or replaces a mesh sphere
+     * @param {String} name The name will show up in the `mesh` Uniform.
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     * @param {Number} radius
+     * @param {Number} segments
+     * @param {Number} rings
+     *
+     * @example
+     *
+     * renderPass.setSphere('sphere').instanceCount = 100;
+     */
+    setSphere(
+        name,
+        coordinate = { x: 0, y: 0, z: 0 },
+        color = { r: 1, g: 0, b: 1, a: 0 },
+        radius = 1,
+        segments = 16,
+        rings = 12
+    ) {
+        const meshExists = this.#nameExists(this.#meshes, name);
+
+        const { x, y, z } = coordinate;
+        const { r, g, b, a } = color;
+
+        const vertexGrid = [];
+        const meshCounter = meshExists ? meshExists.id : this.#meshCounter;
+        for (let lat = 0; lat <= rings; lat++) {
+            const theta = (lat * Math.PI) / rings;
+            const sinTheta = Math.sin(theta);
+            const cosTheta = Math.cos(theta);
+
+            vertexGrid[lat] = [];
+
+            for (let lon = 0; lon <= segments; lon++) {
+                const phi = (lon * 2 * Math.PI) / segments;
+                const sinPhi = Math.sin(phi);
+                const cosPhi = Math.cos(phi);
+
+                const nx = cosPhi * sinTheta;
+                const ny = cosTheta;
+                const nz = sinPhi * sinTheta;
+
+                const vx = x + radius * nx;
+                const vy = y + radius * ny;
+                const vz = z + radius * nz;
+
+                const u = lon / segments;
+                const v = lat / rings;
+
+                vertexGrid[lat][lon] = [vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, meshCounter];
+            }
+        }
+
+        const b0 = BARYCENTRICS[0];
+        const b1 = BARYCENTRICS[1];
+        const b2 = BARYCENTRICS[2];
+        // generate triangles
+        const vertexArray = [];
+        for (let lat = 0; lat < rings; lat++) {
+            for (let lon = 0; lon < segments; lon++) {
+                const v1 = vertexGrid[lat][lon];
+                const v2 = vertexGrid[lat + 1][lon];
+                const v3 = vertexGrid[lat + 1][lon + 1];
+                const v4 = vertexGrid[lat][lon + 1];
+
+                // triangle 1
+                vertexArray.push(...v1, ...b0, ...v3, ...b1, ...v2, ...b2);
+                // triangle 2
+                vertexArray.push(...v1, ...b0, ...v4, ...b1, ...v3, ...b2);
+            }
+        }
+
+        if (meshExists) {
+            meshExists.vertexArray = vertexArray;
+            meshExists.verticesCount = rings * segments * 6;
+            this.#updateVertexArray();
+            this.#meshUpdated = true;
+            return meshExists;
+        }
+
+        const mesh = {
+            name,
+            id: this.#meshCounter,
+            instanceCount: 1,
+            verticesCount: rings * segments * 6,
+            vertexArray
+        };
+        this.#meshes.push(mesh);
+        ++this.#meshCounter;
+        this.#updateVertexArray();
+
+        return mesh;
+    }
+
+    /**
      * Adds a Torus mesh
+     * @deprecated since v0.8.0. Use {@link setTorus}
      * @param {String} name The name will show up in the `mesh` Uniform.
      * @param {{x:Number, y:Number, z:Number}} coordinate
      * @param {Number} radius
@@ -1036,7 +1350,111 @@ class RenderPass {
     }
 
     /**
+     * Adds or replaces a Torus mesh
+     * @param {String} name The name will show up in the `mesh` Uniform.
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {Number} radius
+     * @param {Number} tube
+     * @param {Number} radialSegments
+     * @param {Number} tubularSegments
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     * @returns {Object}
+     *
+     * @example
+     *
+     * renderPass.setTorus('myTorus');
+     */
+    setTorus(
+        name,
+        coordinate = { x: 0, y: 0, z: 0 },
+        radius = 1,
+        tube = .4,
+        radialSegments = 32,
+        tubularSegments = 24,
+        color = { r: 1, g: 0, b: 1, a: 1 }
+    ) {
+        const meshExists = this.#nameExists(this.#meshes, name);
+
+        const { x, y, z } = coordinate;
+        const { r, g, b, a } = color;
+
+        const vertices = [];
+        const normals = [];
+        const uvs = [];
+        const indices = [];
+
+        for (let k = 0; k <= radialSegments; k++) {
+            const v = k / radialSegments * Math.PI * 2;
+            const cosV = Math.cos(v);
+            const sinV = Math.sin(v);
+
+            for (let i = 0; i <= tubularSegments; i++) {
+                const u = i / tubularSegments * Math.PI * 2;
+                const cosU = Math.cos(u);
+                const sinU = Math.sin(u);
+
+                const tx = (radius + tube * cosV) * cosU + x;
+                const ty = (radius + tube * cosV) * sinU + y;
+                const tz = tube * sinV + z;
+
+                const nx = cosV * cosU;
+                const ny = cosV * sinU;
+                const nz = sinV;
+
+                vertices.push([tx, ty, tz]);
+                normals.push([nx, ny, nz]);
+                uvs.push([i / tubularSegments, k / radialSegments]);
+            }
+        }
+
+        for (let k = 1; k <= radialSegments; k++) {
+            for (let i = 1; i <= tubularSegments; i++) {
+                const a = (tubularSegments + 1) * k + i - 1;
+                const b = (tubularSegments + 1) * (k - 1) + i - 1;
+                const c = (tubularSegments + 1) * (k - 1) + i;
+                const d = (tubularSegments + 1) * k + i;
+
+                indices.push([a, b, d]);
+                indices.push([b, c, d]);
+            }
+        }
+
+        const vertexArray = [];
+        const meshCounter = meshExists ? meshExists.id : this.#meshCounter;
+        for (const [i0, i1, i2] of indices) {
+            for (const i of [i0, i1, i2]) {
+                const [vx, vy, vz] = vertices[i];
+                const [nx, ny, nz] = normals[i];
+                const [u, v] = uvs[i];
+                vertexArray.push(vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, meshCounter, ...BARYCENTRICS[i % 3]);
+            }
+        }
+
+        if (meshExists) {
+            meshExists.vertexArray = vertexArray;
+            meshExists.verticesCount = indices.length * 3;
+            this.#updateVertexArray();
+            this.#meshUpdated = true;
+            return meshExists;
+        }
+
+        const mesh = {
+            name,
+            id: this.#meshCounter,
+            instanceCount: 1,
+            verticesCount: indices.length * 3,
+            vertexArray,
+        };
+        this.#meshes.push(mesh);
+        ++this.#meshCounter;
+        this.#updateVertexArray();
+
+        return mesh;
+    }
+
+    /**
      * Adds a Cylinder mesh
+     * @deprecated since v0.8.0. Use {@link setCylinder}
      * @param {String} name The name will show up in the `mesh` Uniform.
      * @param {{x:Number, y:Number, z:Number}} coordinate
      * @param {Number} radius
@@ -1161,7 +1579,145 @@ class RenderPass {
     }
 
     /**
+     * Adds or replaces a Cylinder mesh
+     * @param {String} name The name will show up in the `mesh` Uniform.
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {Number} radius
+     * @param {Number} height
+     * @param {Number} radialSegments
+     * @param {Boolean} cap
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     * @returns {Object}
+     *
+     * @example
+     * renderPass.setCylinder('myCylinder');
+     */
+    setCylinder(
+        name,
+        coordinate = { x: 0, y: 0, z: 0 },
+        radius = .5,
+        height = 1,
+        radialSegments = 32,
+        cap = true,
+        color = { r: 1, g: 0, b: 1, a: 1 }
+    ) {
+        const meshExists = this.#nameExists(this.#meshes, name);
+
+        const { x: cx, y: cy, z: cz } = coordinate;
+        const { r, g, b, a } = color;
+        const halfHeight = height / 2;
+
+        const vertices = [];
+        const normals = [];
+        const uvs = [];
+        const indices = [];
+
+        // sides
+        for (let i = 0; i <= radialSegments; i++) {
+            const theta = (i / radialSegments) * Math.PI * 2;
+            const cosTheta = Math.cos(theta);
+            const sinTheta = Math.sin(theta);
+
+            const px = cx + radius * cosTheta;
+            const pz = cz + radius * sinTheta;
+
+            vertices.push([px, cy - halfHeight, pz]); // bottom
+            normals.push([cosTheta, 0, sinTheta]);
+            uvs.push([i / radialSegments, 0]);
+
+            vertices.push([px, cy + halfHeight, pz]); // top
+            normals.push([cosTheta, 0, sinTheta]);
+            uvs.push([i / radialSegments, 1]);
+        }
+
+        for (let i = 0; i < radialSegments; i++) {
+            const base = i * 2;
+            indices.push([base, base + 1, base + 3]);
+            indices.push([base, base + 3, base + 2]);
+        }
+
+        // caps
+        if (cap) {
+            const bottomCenterIndex = vertices.length;
+            vertices.push([cx, cy - halfHeight, cz]);
+            normals.push([0, -1, 0]);
+            uvs.push([.5, .5]);
+
+            const topCenterIndex = vertices.length;
+            vertices.push([cx, cy + halfHeight, cz]);
+            normals.push([0, 1, 0]);
+            uvs.push([.5, .5]);
+
+            for (let i = 0; i < radialSegments; i++) {
+                const theta = (i / radialSegments) * Math.PI * 2;
+                const nextTheta = ((i + 1) / radialSegments) * Math.PI * 2;
+
+                const x0 = cx + radius * Math.cos(theta);
+                const z0 = cz + radius * Math.sin(theta);
+                const x1 = cx + radius * Math.cos(nextTheta);
+                const z1 = cz + radius * Math.sin(nextTheta);
+
+                const bottomIdx0 = vertices.length;
+                vertices.push([x0, cy - halfHeight, z0]);
+                normals.push([0, -1, 0]);
+                uvs.push([.5 + .5 * Math.cos(theta), .5 + .5 * Math.sin(theta)]);
+
+                const bottomIdx1 = vertices.length;
+                vertices.push([x1, cy - halfHeight, z1]);
+                normals.push([0, -1, 0]);
+                uvs.push([.5 + .5 * Math.cos(nextTheta), .5 + .5 * Math.sin(nextTheta)]);
+
+                indices.push([bottomCenterIndex, bottomIdx0, bottomIdx1]);
+
+                const topIdx0 = vertices.length;
+                vertices.push([x0, cy + halfHeight, z0]);
+                normals.push([0, 1, 0]);
+                uvs.push([.5 + .5 * Math.cos(theta), .5 + .5 * Math.sin(theta)]);
+
+                const topIdx1 = vertices.length;
+                vertices.push([x1, cy + halfHeight, z1]);
+                normals.push([0, 1, 0]);
+                uvs.push([.5 + .5 * Math.cos(nextTheta), .5 + .5 * Math.sin(nextTheta)]);
+
+                indices.push([topCenterIndex, topIdx1, topIdx0]);
+            }
+        }
+        const vertexArray = [];
+        const meshCounter = meshExists ? meshExists.id : this.#meshCounter;
+        for (const ii of indices) {
+            ii.forEach((i, k) => {
+                const [vx, vy, vz] = vertices[i];
+                const [nx, ny, nz] = normals[i];
+                const [u, v] = uvs[i];
+                vertexArray.push(vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, meshCounter, ...BARYCENTRICS[k % 3]);
+            });
+        }
+
+        if (meshExists) {
+            meshExists.vertexArray = vertexArray;
+            meshExists.verticesCount = indices.length * 3;
+            this.#updateVertexArray();
+            this.#meshUpdated = true;
+            return meshExists;
+        }
+
+        const mesh = {
+            name,
+            id: this.#meshCounter,
+            instanceCount: 1,
+            verticesCount: indices.length * 3,
+            vertexArray,
+        };
+        this.#meshes.push(mesh);
+        ++this.#meshCounter;
+        this.#updateVertexArray();
+
+        return mesh;
+    }
+
+    /**
      * Add a external mesh with the provided required data.
+     * @deprecated since v0.8.0. Use {@link setMesh}
      * @param {String} name The name will show up in the `mesh` Uniform.
      * @param {Array<{x:Number, y:Number, z:Number}>} vertices
      * @param {Array<{r:Number, g:Number, b:Number, a:Number}>} colors
@@ -1202,6 +1758,77 @@ class RenderPass {
         };
         this.#meshes.push(mesh);
         ++this.#meshCounter;
+
+        return mesh;
+    }
+
+    #nameExists(arrayOfObjects, name) {
+        return arrayOfObjects.find(obj => obj.name == name);
+    }
+
+    #updateVertexArray() {
+        this.#vertexArray = [];
+        this.#meshes.forEach(mesh => {
+            mesh.vertexArray.forEach(item => this.#vertexArray.push(item));
+        });
+    }
+
+    /**
+     * Add or replace external mesh with the provided required data.
+     * @param {String} name The name will show up in the `mesh` Uniform.
+     * @param {Array<{x:Number, y:Number, z:Number}>} vertices
+     * @param {Array<{r:Number, g:Number, b:Number, a:Number}>} colors
+     * @param {Array<{u:Number, v:Number}>} uvs
+     * @param {Array<Number>} normals
+     *
+     * @example
+     *
+     * const url = '../models/monkey.glb';
+     * const data = await loadAndExtract(url);
+     * const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0]
+     * renderPass.setMesh('monkey', positions, colors, colorSize, uvs, normals, indices)
+     * renderPass.depthWriteEnabled = true;
+     *
+     */
+    setMesh(name, vertices, colors, colorSize, uvs, normals, indices) {
+        const meshExists = this.#nameExists(this.#meshes, name);
+
+        const verticesCount = indices.length;
+
+        const vertexArray = [];
+        const meshCounter = meshExists ? meshExists.id : this.#meshCounter;
+        for (let i = 0; i < verticesCount; i++) {
+            const index = indices[i];
+            const vertex = vertices.slice(index * 3, index * 3 + 3);
+
+            const color = colors?.slice(index * colorSize, index * colorSize + colorSize);
+            const uv = uvs.slice(index * 2, index * 2 + 2);
+            const normal = normals.slice(index * 3, index * 3 + 3);
+
+            const [x, y, z] = vertex;
+            const [r, g, b] = color || [1, 0, 1];
+            const [u, v] = uv;
+            vertexArray.push(+x, +y, +z, 1, r, g, b, 1, u, v, ...normal, meshCounter, ...BARYCENTRICS[i % 3]);
+        }
+
+        if (meshExists) {
+            meshExists.vertexArray = vertexArray;
+            meshExists.verticesCount = verticesCount;
+            this.#updateVertexArray();
+            this.#meshUpdated = true;
+            return meshExists;
+        }
+
+        const mesh = {
+            name,
+            id: this.#meshCounter,
+            instanceCount: 1,
+            verticesCount,
+            vertexArray,
+        };
+        this.#meshes.push(mesh);
+        ++this.#meshCounter;
+        this.#updateVertexArray();
 
         return mesh;
     }
@@ -1348,6 +1975,1189 @@ class ScaleMode {
      * @memberof ScaleMode
      */
     static HEIGHT = 8;
+}
+
+/**
+ * Utility types and methods to set wgsl types in memory.
+ * This is mainly internal.
+ * @module data-size
+ * @ignore
+ */
+
+const size_2_align_2 = { size: 2, align: 2 };
+const size_4_align_4 = { size: 4, align: 4 };
+const size_6_align_8 = { size: 6, align: 8 };
+const size_8_align_4 = { size: 8, align: 4 };
+const size_8_align_8 = { size: 8, align: 8 };
+const size_12_align_4 = { size: 12, align: 4 };
+const size_12_align_16 = { size: 12, align: 16 };
+const size_16_align_4 = { size: 16, align: 4 };
+const size_16_align_16 = { size: 16, align: 16 };
+const size_16_align_8 = { size: 16, align: 8 };
+const size_24_align_8 = { size: 24, align: 8 };
+const size_32_align_8 = { size: 32, align: 8 };
+const size_32_align_16 = { size: 32, align: 16 };
+const size_48_align_16 = { size: 48, align: 16 };
+const size_64_align_16 = { size: 64, align: 16 };
+
+const typeSizes = {
+    'bool': size_4_align_4,
+    'i32': size_4_align_4,
+    'u32': size_4_align_4,
+    'f32': size_4_align_4,
+
+    'f16': size_2_align_2,
+
+    'atomic<u32>': size_4_align_4,
+    'atomic<i32>': size_4_align_4,
+
+    'vec2<bool>': size_8_align_8,
+    'vec2<i32>': size_8_align_8,
+    'vec2<u32>': size_8_align_8,
+    'vec2<f32>': size_8_align_8,
+    // 'vec2<bool>': size_8_align_8,
+    'vec2i': size_8_align_8,
+    'vec2u': size_8_align_8,
+    'vec2f': size_8_align_8,
+
+    'vec2<f16>': size_4_align_4,
+    'vec2h': size_4_align_4,
+
+    'vec3<bool>': size_12_align_16,
+    'vec3<i32>': size_12_align_16,
+    'vec3<u32>': size_12_align_16,
+    'vec3<f32>': size_12_align_16,
+    // 'vec3<bool>': size_12_align_16,
+    'vec3i': size_12_align_16,
+    'vec3u': size_12_align_16,
+    'vec3f': size_12_align_16,
+
+    'vec3<f16>': size_6_align_8,
+    'vec3h': size_6_align_8,
+
+    'vec4<bool>': size_16_align_16,
+    'vec4<i32>': size_16_align_16,
+    'vec4<u32>': size_16_align_16,
+    'vec4<f32>': size_16_align_16,
+    // 'vec4<bool>': size_16_align_16,
+    'vec4i': size_16_align_16,
+    'vec4u': size_16_align_16,
+    'vec4f': size_16_align_16,
+
+    'vec4<f16>': size_8_align_8,
+    'vec4h': size_8_align_8,
+
+    'mat2x2<f32>': size_16_align_8,
+    'mat2x2f': size_16_align_8,
+    'mat2x2<f16>': size_8_align_4,
+    'mat2x2h': size_8_align_4,
+
+    'mat3x2<f32>': size_24_align_8,
+    'mat3x2f': size_24_align_8,
+    'mat3x2<f16>': size_12_align_4,
+    'mat3x2h': size_12_align_4,
+
+    'mat4x2<f32>': size_32_align_8,
+    'mat4x2f': size_32_align_8,
+    'mat4x2<f16>': size_16_align_4,
+    'mat4x2h': size_16_align_4,
+
+    'mat2x3<f32>': size_32_align_16,
+    'mat2x3f': size_32_align_16,
+    'mat2x3<f16>': size_16_align_8,
+    'mat2x3h': size_16_align_8,
+
+    'mat3x3<f32>': size_48_align_16,
+    'mat3x3f': size_48_align_16,
+    'mat3x3<f16>': size_24_align_8,
+    'mat3x3h': size_24_align_8,
+
+    'mat4x3<f32>': size_64_align_16,
+    'mat4x3f': size_64_align_16,
+    'mat4x3<f16>': size_32_align_8,
+    'mat4x3h': size_32_align_8,
+
+    'mat2x4<f32>': size_32_align_16,
+    'mat2x4f': size_32_align_16,
+    'mat2x4<f16>': size_16_align_8,
+    'mat2x4h': size_16_align_8,
+
+    'mat3x4<f32>': size_48_align_16,
+    'mat3x4f': size_48_align_16,
+    'mat3x4<f16>': size_24_align_8,
+    'mat3x4h': size_24_align_8,
+
+    'mat4x4<f32>': size_64_align_16,
+    'mat4x4f': size_64_align_16,
+    'mat4x4<f16>': size_32_align_8,
+    'mat4x4h': size_32_align_8,
+};
+
+
+// ignore comments
+const removeCommentsRE = /\/\*[\s\S]*?\*\/|\/\/.*/gim;
+
+// struct name:
+const getStructNameRE = /struct\s+?(\w+)\s*{[^}]+}\n?/g;
+
+// what's inside a struct:
+const insideStructRE = /struct\s+?\w+\s*{([^}]+)}\n?/g;
+
+const arrayTypeAndAmountRE = /\s*<\s*([^,]+)\s*,?\s*(\d+)?\s*>/g;
+
+const arrayIntegrityRE = /\s*(array\s*<\s*\w+\s*(?:,\s*\d+)?\s*>)\s*,?/g;
+
+// you have to separete the result by splitting new lines
+
+function removeComments(value) {
+    const matches = value.matchAll(removeCommentsRE);
+    for (const match of matches) {
+        const captured = match[0];
+        value = value.replace(captured, '');
+    }
+    return value;
+}
+
+function getInsideStruct(value) {
+    const matches = value.matchAll(insideStructRE);
+    let lines = null;
+    for (const match of matches) {
+        lines = match[1].split('\n');
+        lines = lines.map(element => element.trim())
+            .filter(e => e !== '');
+    }
+    return lines;
+}
+
+function getStructDataByName(value) {
+    const matches = value.matchAll(getStructNameRE);
+    let result = new Map();
+    for (const match of matches) {
+        const captured = match[0];
+        const name = match[1];
+        const lines = getInsideStruct(captured);
+        const types = lines.map(l => {
+            const right = l.split(':')[1];
+            let type = '';
+            if (isArray(right)) {
+                const arrayMatch = right.matchAll(arrayIntegrityRE);
+                type = arrayMatch.next().value[1];
+            } else {
+                type = right.split(',')[0].trim();
+            }
+            return type;
+        });
+
+        const names = lines.map(l => {
+            const left = l.split(':')[0];
+            let name = '';
+            name = left.split(',')[0].trim();
+            return name;
+        });
+
+        result.set(name, {
+            captured,
+            lines,
+            types,
+            unique_types: [...new Set(types)],
+            names,
+        });
+    }
+    return result;
+}
+
+function getArrayTypeAndAmount(value) {
+    const matches = value.matchAll(arrayTypeAndAmountRE);
+    let result = [];
+    for (const match of matches) {
+        const type = match[1];
+        const amount = match[2];
+        result.push({ type, amount: Number(amount) });
+    }
+    return result;
+}
+
+/**
+ * Check if string has 'array' in it
+ * @param {String} value
+ * @returns {boolean}
+ */
+function isArray(value) {
+    return value.indexOf('array') != -1;
+}
+
+function getArrayTypeData(currentType, structData) {
+    const [d] = getArrayTypeAndAmount(currentType);
+    if (!d) {
+        throw `${currentType} seems to have an error, maybe a wrong amount?`;
+    }
+    if (d.amount == 0) {
+        throw new Error(`${currentType} has an amount of 0`);
+    }
+    let currentTypeData = typeSizes[d.type] || structData.get(d.type);
+    if (!currentTypeData) {
+        throw `Struct or type '${d.type}' in ${currentType} is not defined.`
+    }
+    if (d.amount) {
+        const t = typeSizes[d.type];
+        if (t) {
+            // if array, the size is equal to the align
+            currentTypeData = { size: t.align * d.amount, align: t.align };
+        } else {
+            const sd = structData.get(d.type);
+            if (sd) {
+                currentTypeData = { size: sd.bytes * d.amount, align: sd.maxAlign };
+            }
+        }
+    }
+    return currentTypeData;
+}
+
+
+/**
+ * Calculates if there's a space of bytes left in the row
+ * @param {Number} bytes current bytes size
+ * @param {Number} maxSize max size of row, in this case probably 16
+ * @returns remaining bytes if any
+ */
+function getPadding(bytes, maxSize) {
+    const remainder = bytes % maxSize;
+    let remainingBytes = 0;
+    if (remainder) {
+        remainingBytes = maxSize - remainder;
+    }
+    return remainingBytes
+}
+
+const MAX_ROW_SIZE = 16;
+const HALF = 2;
+const dataSize = value => {
+    const noCommentsValue = removeComments(value);
+    const structData = getStructDataByName(noCommentsValue);
+
+    structData.forEach(sd => {
+        let bytes = 0;
+        let remainingBytes = 0;
+        sd.paddings = {};
+        sd.names.forEach((name, i) => {
+            const type = sd.types[i];
+            let typeSize = typeSizes[type];
+            let repeat = 0;
+
+            // if no typeSize is an array or struct
+            if (!typeSize) {
+                if (type) {
+                    if (isArray(type)) {
+                        const [innerType] = getArrayTypeAndAmount(type);
+
+                        typeSize = typeSizes[innerType.type];
+                        repeat = innerType.amount; // check comment on top of do while
+                        innerType.align = MAX_ROW_SIZE;
+                    } else {
+                        const sd = structData.get(type);
+                        if (!sd) {
+                            throw `Type or struct ${type} doesn't exist.`;
+                        }
+                        typeSize = { size: sd.bytes, align: MAX_ROW_SIZE };
+                    }
+                }
+            }
+
+            const { size, align } = typeSize;
+            const prevName = sd.names[i - 1];
+
+            /**
+             * The idea with the repeat and the do while is that, if there's an
+             * array, the subtype will be added `type.amount` times with the
+             * same rules. That's it.
+             */
+            do {
+                let aligned = bytes % align === 0;
+
+                while (!aligned) {
+                    remainingBytes -= HALF;
+                    bytes += HALF;
+                    sd.paddings[prevName] ||= 0;
+                    sd.paddings[prevName] += HALF;
+                    aligned = bytes % align === 0;
+                }
+
+                if (remainingBytes && size > remainingBytes) {
+                    bytes += remainingBytes;
+                    sd.paddings[prevName] = remainingBytes;
+                    remainingBytes = 0;
+                }
+
+                bytes += size;
+
+                repeat--;
+            } while (repeat > 0)
+
+            remainingBytes = getPadding(bytes, MAX_ROW_SIZE);
+        });
+        remainingBytes = getPadding(bytes, MAX_ROW_SIZE);
+        bytes += remainingBytes;
+        sd.bytes = bytes;
+    });
+
+    return structData
+};
+
+/**
+ * Takes a number or array and infers the WGSL type
+ * @param {Number|Array<Number>} value
+ * @returns {String} WGSL equivalent type
+ */
+function getWGSLType(value) {
+
+    if ((!value && value !== 0) || ((Number.isNaN(value) || value instanceof Object || typeof value === 'string') && !(value instanceof Array))) {
+        return '';
+    }
+
+    const strValue = value.toString();
+
+    if (value instanceof Array) {
+        return getArrayType$1(value);
+    }
+
+    const hasPeriod = strValue.indexOf('.') != -1;
+    if (hasPeriod) {
+        return 'f32';
+    }
+
+    const hasSign = strValue.indexOf('-') != -1;
+    if (hasSign) {
+        return 'i32'
+    }
+
+    return 'u32';
+}
+
+/**
+ * From a JS value (number, array)
+ * returns WGSL type like vec2f, vec3f
+ * @param {Array|Object} value
+ * @returns {String}
+ */
+function getArrayType$1(value) {
+    const isArray = Array.isArray(value);
+    let type = null;
+    if (isArray) {
+        const { length } = value;
+        if (length <= 4) {
+            type = `vec${length}f`;
+        }
+        if (length > 4) {
+            type = `array<f32, ${length}>`;
+        }
+    }
+    return type;
+}
+
+/**
+ * Uniform class is a container for uniform related data and actions.
+ *
+ * @class Uniform
+ */
+class Uniform {
+    #name
+    #value
+    #type
+    #size
+
+    /**
+     *
+     * @param {{name:String, value:(Number|Boolean|Array<Number>), type:string, size:Number=}} config
+     */
+    constructor({ name, value, type = null, size = null }) {
+
+        this.#validateName(name);
+        this.#validateType(type);
+        this.#validateValue(value);
+
+        this.#name = name;
+
+        this.#value = value;
+        this.#type = type || this.#getArrayType(value) || 'f32';
+        this.#size = size;
+
+        Object.seal(this);
+    }
+
+    get name() {
+        return this.#name;
+    }
+
+    /**
+     * The name that the Uniform will have on the WGSL side.
+     * @param {String} value name of the Uniform. The name is used in the WGSL
+     * shader.
+     * @example
+     * // js
+     * myUniform.name = 'myUniformName';
+     *
+     * // wgsl
+     * myUniformName = 13.0;
+     * @memberof Uniform
+     */
+    set name(value) {
+        this.#validateName(value);
+        this.#name = value;
+    }
+
+    get value() {
+        return this.#value;
+    }
+
+    /**
+     * To get or set the value of the uniform from the JS side to the WGSL side.
+     * @param {Number|Boolean|Array<Number>} value The uniform value
+     * @memberof Uniform
+     */
+    set value(value) {
+        this.#validateValue(value);
+        this.#value = value;
+    }
+
+    get type() {
+        return this.#type
+    }
+
+    /**
+     * Get or set the type of the uniform.
+     * It can be inferred automatically by just passing the value, but if
+     * something more specific is required, then you should use `type`.
+     * @param {String} value WGSL data type of the uniform
+     * @example
+     * myUniform.type = 'u32';
+     * @memberof Uniform
+     */
+    set type(value) {
+        this.#validateType(value);
+        this.#type = value || this.#getArrayType(this.#value) || 'f32';
+    }
+
+    get size() {
+        return this.#size;
+    }
+
+    /**
+     * For internal use mostly. Size in bytes.
+     * @memberof Uniform
+     */
+    set size(value) {
+        this.#size = value;
+    }
+
+    /**
+     * Clone of the Uniform data as a plain object to avoid modifications on
+     * the original data.
+     * @returns {Object}
+     * @memberof Uniform
+     */
+    serialize() {
+        // we check if array and spread
+        // because structuredClone is slower
+        const isArray = Array.isArray(this.#value);
+        const value = isArray ? [...this.#value] : this.#value;
+        return {
+            name: this.#name,
+            value,
+            type: this.#type,
+            size: this.#size
+        };
+    }
+
+    /**
+     * Sets or updates the value of the Uniform.
+     * @param {Number|Boolean|Array<Number>} value
+     * @memberof Uniform
+     */
+    setValue(value) {
+        this.#validateValue(value);
+        this.#value = value;
+        return this;
+    }
+
+    /**
+     * Set the data type of the uniform.
+     * @param {String} value WGSL data type of the uniform
+     * @example
+     * myUniform.setType('u32')
+     * @memberof Uniform
+     */
+    setType(value) {
+        this.#validateType(value);
+        this.#type = value || this.#getArrayType(this.#value) || 'f32';
+        return this;
+    }
+
+    #validateValue(value) {
+        if (typeof value === 'object' && !Array.isArray(value)) {
+            throw `Uniform '${this.#name}' value:'${value}' can't be an Object.`
+        }
+
+        if (typeof value === 'string') {
+            throw `Uniform '${this.#name}' value: '${value}' can't be an String.`
+        }
+
+        const isArray = Array.isArray(value);
+        if (isArray) {
+            const { length } = value;
+            // TODO include mat values, e.g.: mat4x2
+            // if (length > 4) {
+            //     console.trace(this.#name, this.#value);
+            //     throw `Uniform named '${this.#name}': Can't assign an Array greater than a vec4f.`
+            // }
+            if (Array.isArray(this.#value)) {
+                if (length != this.#value.length) {
+                    throw `Uniform named '${this.#name}': Size of the array value has changed from ${this.#value.length} to ${length}.`
+                }
+            }
+
+            if (length < 2) {
+                throw `Uniform named '${this.#name}': Can't assign an Array smaller than a vec2f. Assign the Number directly.`
+            }
+        }
+    }
+
+    #validateName(value) {
+        if (typeof value === 'number') {
+            throw `Uniform name '${this.#name}' can't be an Number.`
+        }
+
+        if (typeof value === 'string') {
+            const valNumber = +value;
+
+            if (!Number.isNaN(valNumber) && typeof valNumber === 'number') {
+                throw `Uniform name '${this.#name}' can't be an Number.`
+            }
+        }
+    }
+
+    #validateType(value) {
+        if (value && isArray(value)) {
+            throw `Uniform '${this.#name}' type: '${value}' is an array, which is currently not supported for Uniforms.`;
+        }
+    }
+
+    /**
+     * There's already a `getArrayType` in data-size.js
+     * but since uniforms can't accept array in wgsl,
+     * this method excludes that part
+     * returns something like vec2f, vec3f
+     * @param {Array|Object} value
+     * @returns {String}
+     */
+    #getArrayType(value) {
+        const isArray = Array.isArray(value);
+        let type = null;
+        if (isArray) {
+            const { length } = value;
+            if (length <= 4) {
+                type = `vec${length}f`;
+            }
+        }
+        return type;
+    }
+
+    // allows for things like:
+    // uniforms.myUniform += 10
+    // works on set, not on get
+    // on get you obtain the Uniform
+    valueOf() {
+        return this.#value;
+    }
+}
+
+/**
+ *
+ * @class Storage
+ */
+
+class Storage {
+    #name
+    #mapped
+    #type
+    #shaderStage = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE
+    #readable = false
+    #buffer = null
+    #bufferRead = null
+    #internal = false
+
+    #stream = false
+    #updated = false
+    #value
+    #size = null // TODO: document this: to force allocate more space in case an update is greater than the default array size
+    /**
+     * @param {{name:String, value:(Number|Array<Number>), type:String, readable:Boolean, shaderStage:GPUShaderStage, stream:bool, updated:bool, size:Number}} config
+     */
+    constructor({ name, value, type, readable, shaderStage,
+        stream = false, updated = false, size = null }) {
+
+        this.#validateName(name);
+        this.#validateType(type);
+        this.#validateValue(value);
+
+        this.#name = name;
+        this.#mapped = !!value;
+        this.#type = type || getWGSLType(value);
+        this.#readable = readable || this.#readable;
+        this.#shaderStage = shaderStage || this.#shaderStage;
+        this.#value = value;
+
+        this.#stream = stream;
+        this.#updated = updated;
+        this.#size = size;
+
+        Object.seal(this);
+    }
+
+    #ifTypeVecGetVecValue(type, value) {
+        let newValue = value;
+        if (type.startsWith('vec')) {
+            newValue = `vec${value.length}f(${value})`;
+        }
+        return newValue;
+    }
+
+    get name() {
+        return this.#name;
+    }
+
+    /**
+     * The name that the Storage will have on the WGSL side.
+     * @param {String} value name of the Storage. The name is used in the WGSL
+     * shader.
+     * @example
+     * // js
+     * myStorage.name = 'myStorageName';
+     *
+     * // wgsl
+     * myStorageName = 13.1;
+     * @memberof Storage
+     */
+    set name(value) {
+        this.#validateName(value);
+        this.#name = value;
+    }
+
+    get mapped() {
+        return this.#mapped;
+    }
+
+    /**
+     * @param {Boolean} value tells WebGPU if the Storage is mapped or not. This
+     * allows for the initialization of the Storage with data, which is a
+     * different route.
+     * @memberof Storage
+     */
+    set mapped(value) {
+        this.#mapped = value;
+    }
+
+    get type() {
+        return this.#type;
+    }
+
+    /**
+     * @param {String} value WGSL data type of the Storage.
+     * @example
+     * myStorage.type = 'u32'
+     * @memberof Storage
+     */
+    set type(value) {
+        this.#validateType(value);
+        this.#type = value || getArrayType(this.#value) || 'f32';
+    }
+
+    get shaderStage() {
+        return this.#shaderStage;
+    }
+
+    /**
+     * Tells WebGPU to which shader it can only be used.
+     * @param {GPUShaderStage} value
+     * @memberof Storage
+     */
+    set shaderStage(value) {
+        this.#shaderStage = value;
+    }
+
+    get readable() {
+        return this.#readable;
+    }
+
+    /**
+     * If data is read back in JS from WGSL, then set to `true`.
+     * @param {Boolean} value
+     * @memberof Storage
+     */
+    set readable(value) {
+        this.#readable = value;
+    }
+
+    get buffer() {
+        return this.#buffer;
+    }
+
+    /**
+     * For internal use mostly. The actual {@link GPUBuffer} with the data.
+     * @memberof Storage
+     */
+    set buffer(value) {
+        this.#buffer = value;
+    }
+
+    get bufferRead() {
+        return this.#bufferRead;
+    }
+
+    /**
+     * Buffer for reading back
+     * For internal use mostly. The actual GPUBufferRead with the data.
+     * @memberof Storage
+     */
+    set bufferRead(value) {
+        this.#bufferRead = value;
+    }
+
+    get internal() {
+        return this.#internal;
+    }
+
+    set internal(value) {
+        this.#internal = value;
+    }
+
+    get size() {
+        return this.#size;
+    }
+
+    set size(value) {
+        this.#size = value;
+    }
+
+    get stream() {
+        return this.#stream;
+    }
+    /**
+     * `updated` is set to true in data updates, but this is not true in
+     * something like audio, where the data streams and needs to be updated
+     * constantly, so if the storage map needs to be updated constantly then
+     * `stream` needs to be set to true.
+     * @param {boolean} value
+     * @memberof Storage
+     */
+    set stream(value) {
+        this.#stream = value;
+    }
+
+    get updated() {
+        return this.#updated;
+    }
+
+    /**
+     * Mostly internal. Set to `true` if a value has been updated.
+     * @memberof Storage
+     */
+    set updated(value) {
+        this.#updated = value;
+    }
+
+    get value() {
+        let value = this.#value;
+        // Internally, what Points use to create the buffer is a Uint8Array
+        // TODO: maybe move to POINTS?
+        if (value && !Array.isArray(value) && value.constructor !== Uint8Array) {
+            value = new Uint8Array([value]);
+        }
+
+        return value;
+    }
+
+    /**
+     * @param {Number|Array<Number>} value data to send to the shader
+     * @memberof Storage
+     */
+    set value(value) {
+        this.#validateValue(value);
+        this.#mapped = !!value;
+        const type = this.#type || getWGSLType(value);
+        this.#value = value;
+        this.#type = type;
+        this.#updated = true;
+    }
+
+    /**
+     *
+     * @param {Number|Array<Number>} value data to send to the shader
+     * @returns {Storage}
+     * @memberof Storage
+     */
+    setValue(value) {
+        this.#validateValue(value);
+
+        this.#mapped = true;
+        this.#updated = true;
+        const type = this.#type || getWGSLType(value);
+        this.#value = value;
+        this.#type = type;
+
+        return this;
+    }
+
+    /**
+     * if this is going to be used to read data back set to `true`
+     * @param {bool} value
+     * @returns {Storage}
+     * @memberof Storage
+     */
+    setReadable(value) {
+        this.#readable = value;
+        return this;
+    }
+
+    /**
+     * Tells WebGPU to which shader it can only be used.
+     * @param {GPUShaderStage} value
+     * @returns {Storage}
+     * @memberof Storage
+     */
+    setShaderStage(value) {
+        this.#shaderStage = value;
+        return this;
+    }
+
+    /**
+     * @param {String} value WGSL data type of the Storage.
+     * @returns {Storage}
+     * @example
+     * myStorage.setType('u32');
+     * @memberof Storage
+     */
+    setType(value) {
+        this.#validateType(value);
+        this.#type = value || getArrayType(value) || 'f32';
+        return this;
+    }
+
+    async read() {
+        let arrayBufferCopy = null;
+        if (this.#readable) {
+            try {
+                await this.#bufferRead.mapAsync(GPUMapMode.READ);
+                const arrayBuffer = this.#bufferRead.getMappedRange();
+                arrayBufferCopy = new Float32Array(arrayBuffer.slice(0));
+                this.#bufferRead.unmap();
+                this.#value = arrayBufferCopy;
+            } catch (error) {
+                // if we switch projects mapasync fails
+                // we ignore it
+            }
+        }
+        return arrayBufferCopy;
+    }
+
+    #validateValue(value) {
+        if (value && typeof value === 'object' && !Array.isArray(value) && !(value instanceof Uint8Array)) {
+            throw `Storage '${this.#name}' value:'${value}' can't be an Object.`
+        }
+
+        if (typeof value === 'string') {
+            throw `Storage '${this.#name}' value: '${value}' can't be an String.`
+        }
+
+        const isArray = Array.isArray(value);
+
+        if (isArray) {
+            const { length } = value;
+            if (length < 2) {
+                throw `Constant named '${this.#name}': Size of the array is lower than 2. There's no vec1`;
+            }
+
+            if (Array.isArray(this.#value)) {
+                if (length != this.#value.length) {
+                    throw `Storage named '${this.#name}': Size of the array value has changed from ${this.#value.length} to ${length}.`
+                }
+            }
+        }
+    }
+
+    #validateName(value) {
+        if (typeof value === 'number') {
+            throw `Storage name '${this.#name}' can't be an Number.`
+        }
+
+        if (typeof value === 'string') {
+            const valNumber = +value;
+
+            if (!Number.isNaN(valNumber) && typeof valNumber === 'number') {
+                throw `Storage name '${this.#name}' can't be an Number.`
+            }
+        }
+    }
+
+    #validateType(value) {
+
+    }
+
+    // allows for things like:
+    // storage.myStorage += 10
+    // works on set, not on get
+    // on get you obtain the Storage
+    valueOf() {
+        return this.#value;
+    }
+}
+
+/**
+ *
+ * @class Constant
+ */
+
+class Constant {
+    #name
+    #value
+    #type
+    #override
+    #shaderStage = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE
+    /**
+     * @param {{name:String, value:(Number|Array<Number>), type:String, override:Boolean}} config
+     */
+    constructor({ name, value, type, override = false }) {
+
+        this.#validateName(name);
+        this.#validateType(type);
+        this.#validateValue(value);
+
+        this.#name = name;
+        this.#type = type || getWGSLType(value);
+        this.#value = this.#ifTypeVecGetVecValue(this.#type, value);
+        this.#override = override;
+    }
+
+    #ifTypeVecGetVecValue(type, value) {
+        let newValue = value;
+        if (type.indexOf('vec') !== -1) {
+            newValue = `vec${value.length}f(${value})`;
+        }
+        return newValue;
+    }
+
+    get name() {
+        return this.#name;
+    }
+
+    /**
+     * The name that the Constant will have on the WGSL side.
+     * @param {String} value name of the Constant. The name is used in the WGSL
+     * shader.
+     * @example
+     * // js
+     * myConstant.name = 'MYCONST';
+     *
+     * // wgsl
+     * let newVal = MYCONST + 3;
+     * @memberof Constant
+     */
+    set name(value) {
+        this.#validateName(value);
+        this.#name = value;
+    }
+
+    get value() {
+        return this.#value;
+    }
+
+    /**
+     * Get or set the value that the constant will have on the WGSL side.
+     * @warning It can only be assigned once.
+     * @param {Number|Array<Number>} value
+     * @memberof Constant
+     */
+    set value(value) {
+        this.#validateValue(value);
+        const type = getWGSLType(value);
+        this.#value = this.#ifTypeVecGetVecValue(type, value);
+        this.#type = type;
+    }
+
+    get type() {
+        return this.#type;
+    }
+
+    /**
+     * Get or set the type of the constant.
+     * It can be inferred automatically by just passing the value, but if
+     * something more specific is required, then you should use `type`.
+     * @param {String} value WGSL data type of the constant
+     * @example
+     * myConstant.type = 'u32';
+     * @memberof Constant
+     */
+    set type(value) {
+        this.#validateType(value);
+        this.#type = value;
+    }
+
+    get override() {
+        return this.#override;
+    }
+
+    /**
+     * A constant override is a constant you can change per shader.
+     * By default, POINTS interpolates constant declarations inside the WGSL
+     * string shader like this:
+     * ```wgsl
+     * const MYCONST:u32 = 10;
+     * ```
+     * These declarations are added by default to all shaders in the pipeline
+     * and in all render passes. These can not be changed.
+     *
+     * With overrides you can have the same constant in different shaders with
+     * different values. The default value is passed to each pipeline and then
+     * it can be overwritten in a specific shader by hand.
+     * @example
+     * ```js
+     * // js side
+     * constants.PI.setOverride(true).setValue(3.14);
+     * ```
+     * ```wgsl
+     * // wgsl side
+     * override MYCONST:u32 = 3.1415;
+     * ```
+     * @memberof Constant
+     */
+    set override(value) {
+        this.#override = value;
+    }
+
+    get shaderStage() {
+        return this.#shaderStage;
+    }
+
+    /**
+     * Tells WebGPU to which shader it can only be used.
+     * @param {GPUShaderStage}
+     * @memberof Constant
+     */
+    set shaderStage(value) {
+        this.#shaderStage = value;
+    }
+
+    /**
+     * Sets the value of a Constant
+     * @param {Number|Array<Number>} value
+     * @returns {Constant}
+     * @memberof Constant
+     */
+    setValue(value) {
+        this.#validateValue(value);
+        const type = getWGSLType(value);
+        this.#value = this.#ifTypeVecGetVecValue(type, value);
+        this.#type = type;
+        return this;
+    }
+
+    /**
+     * Set the data type of the Constant.
+     * @param {String} value WGSL data type of the constant
+     * @example
+     * myUniform.setType('u32')
+     * @memberof Constant
+     */
+    setType(value) {
+        this.#validateType(value);
+        this.#type = value;
+        return this;
+    }
+
+    /**
+     * A constant override is a constant you can change per shader.
+     * By default, POINTS interpolates constant declarations inside the WGSL
+     * string shader like this:
+     * ```wgsl
+     * const MYCONST:u32 = 10;
+     * ```
+     * These declarations are added by default to all shaders in the pipeline
+     * and in all render passes. These can not be changed.
+     *
+     * With overrides you can have the same constant in different shaders with
+     * different values. The default value is passed to each pipeline and then
+     * it can be overwritten in a specific shader by hand.
+     * @example
+     * ```js
+     * // js side
+     * constants.PI.setOverride(true).setValue(3.14);
+     * ```
+     * ```wgsl
+     * // wgsl side
+     * override MYCONST:u32 = 3.1415;
+     * ```
+     * @memberof Constant
+     */
+    setOverride(value) {
+        this.#override = value;
+        return this;
+    }
+
+    /**
+     * Tells WebGPU to which shader it can only be used.
+     * @param {GPUShaderStage} value
+     * @returns {Constant}
+     * @memberof Constant
+     */
+    setShaderStage(value) {
+        this.#shaderStage = value;
+        return this;
+    }
+
+    #validateValue(value) {
+        if(this.#value){
+            throw `Constant '${this.#name}': can't update a const after it has been set.`;
+        }
+
+        if (value && typeof value === 'object' && !Array.isArray(value) && !(value instanceof Uint8Array)) {
+            throw `Constant '${this.#name}' value:'${value}' can't be an Object.`
+        }
+
+        if (typeof value === 'string') {
+            throw `Constant '${this.#name}' value: '${value}' can't be an String.`
+        }
+
+        const isArray = Array.isArray(value);
+        if (isArray) {
+            const { length } = value;
+            if (length < 2) {
+                throw `Constant named '${this.#name}': Size of the array is lower than 2. There's no vec1`;
+            }
+            if (Array.isArray(this.#value)) {
+                if (length != this.#value.length) {
+                    throw `Constant named '${this.#name}': Size of the array value has changed from ${this.#value.length} to ${length}.`
+                }
+            }
+        }
+    }
+
+    #validateName(value) {
+        if (typeof value === 'number') {
+            throw `Constant name '${this.#name}' can't be an Number.`
+        }
+
+        if (typeof value === 'string') {
+            const valNumber = +value;
+
+            if (!Number.isNaN(valNumber) && typeof valNumber === 'number') {
+                throw `Constant name '${this.#name}' can't be an Number.`
+            }
+        }
+    }
+
+    #validateType(value) {
+
+    }
+
 }
 
 /**
@@ -3050,332 +4860,6 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) ->
 `;
 
 /**
- * Utility types and methods to set wgsl types in memory.
- * This is mainly internal.
- * @module data-size
- * @ignore
- */
-
-const size_2_align_2 = { size: 2, align: 2 };
-const size_4_align_4 = { size: 4, align: 4 };
-const size_6_align_8 = { size: 6, align: 8 };
-const size_8_align_4 = { size: 8, align: 4 };
-const size_8_align_8 = { size: 8, align: 8 };
-const size_12_align_4 = { size: 12, align: 4 };
-const size_12_align_16 = { size: 12, align: 16 };
-const size_16_align_4 = { size: 16, align: 4 };
-const size_16_align_16 = { size: 16, align: 16 };
-const size_16_align_8 = { size: 16, align: 8 };
-const size_24_align_8 = { size: 24, align: 8 };
-const size_32_align_8 = { size: 32, align: 8 };
-const size_32_align_16 = { size: 32, align: 16 };
-const size_48_align_16 = { size: 48, align: 16 };
-const size_64_align_16 = { size: 64, align: 16 };
-
-const typeSizes = {
-    'bool': size_4_align_4,
-    'i32': size_4_align_4,
-    'u32': size_4_align_4,
-    'f32': size_4_align_4,
-
-    'f16': size_2_align_2,
-
-    'atomic<u32>': size_4_align_4,
-    'atomic<i32>': size_4_align_4,
-
-    'vec2<bool>': size_8_align_8,
-    'vec2<i32>': size_8_align_8,
-    'vec2<u32>': size_8_align_8,
-    'vec2<f32>': size_8_align_8,
-    // 'vec2<bool>': size_8_align_8,
-    'vec2i': size_8_align_8,
-    'vec2u': size_8_align_8,
-    'vec2f': size_8_align_8,
-
-    'vec2<f16>': size_4_align_4,
-    'vec2h': size_4_align_4,
-
-    'vec3<bool>': size_12_align_16,
-    'vec3<i32>': size_12_align_16,
-    'vec3<u32>': size_12_align_16,
-    'vec3<f32>': size_12_align_16,
-    // 'vec3<bool>': size_12_align_16,
-    'vec3i': size_12_align_16,
-    'vec3u': size_12_align_16,
-    'vec3f': size_12_align_16,
-
-    'vec3<f16>': size_6_align_8,
-    'vec3h': size_6_align_8,
-
-    'vec4<bool>': size_16_align_16,
-    'vec4<i32>': size_16_align_16,
-    'vec4<u32>': size_16_align_16,
-    'vec4<f32>': size_16_align_16,
-    // 'vec4<bool>': size_16_align_16,
-    'vec4i': size_16_align_16,
-    'vec4u': size_16_align_16,
-    'vec4f': size_16_align_16,
-
-    'vec4<f16>': size_8_align_8,
-    'vec4h': size_8_align_8,
-
-    'mat2x2<f32>': size_16_align_8,
-    'mat2x2f': size_16_align_8,
-    'mat2x2<f16>': size_8_align_4,
-    'mat2x2h': size_8_align_4,
-
-    'mat3x2<f32>': size_24_align_8,
-    'mat3x2f': size_24_align_8,
-    'mat3x2<f16>': size_12_align_4,
-    'mat3x2h': size_12_align_4,
-
-    'mat4x2<f32>': size_32_align_8,
-    'mat4x2f': size_32_align_8,
-    'mat4x2<f16>': size_16_align_4,
-    'mat4x2h': size_16_align_4,
-
-    'mat2x3<f32>': size_32_align_16,
-    'mat2x3f': size_32_align_16,
-    'mat2x3<f16>': size_16_align_8,
-    'mat2x3h': size_16_align_8,
-
-    'mat3x3<f32>': size_48_align_16,
-    'mat3x3f': size_48_align_16,
-    'mat3x3<f16>': size_24_align_8,
-    'mat3x3h': size_24_align_8,
-
-    'mat4x3<f32>': size_64_align_16,
-    'mat4x3f': size_64_align_16,
-    'mat4x3<f16>': size_32_align_8,
-    'mat4x3h': size_32_align_8,
-
-    'mat2x4<f32>': size_32_align_16,
-    'mat2x4f': size_32_align_16,
-    'mat2x4<f16>': size_16_align_8,
-    'mat2x4h': size_16_align_8,
-
-    'mat3x4<f32>': size_48_align_16,
-    'mat3x4f': size_48_align_16,
-    'mat3x4<f16>': size_24_align_8,
-    'mat3x4h': size_24_align_8,
-
-    'mat4x4<f32>': size_64_align_16,
-    'mat4x4f': size_64_align_16,
-    'mat4x4<f16>': size_32_align_8,
-    'mat4x4h': size_32_align_8,
-};
-
-
-// ignore comments
-const removeCommentsRE = /\/\*[\s\S]*?\*\/|\/\/.*/gim;
-
-// struct name:
-const getStructNameRE = /struct\s+?(\w+)\s*{[^}]+}\n?/g;
-
-// what's inside a struct:
-const insideStructRE = /struct\s+?\w+\s*{([^}]+)}\n?/g;
-
-const arrayTypeAndAmountRE = /\s*<\s*([^,]+)\s*,?\s*(\d+)?\s*>/g;
-
-const arrayIntegrityRE = /\s*(array\s*<\s*\w+\s*(?:,\s*\d+)?\s*>)\s*,?/g;
-
-// you have to separete the result by splitting new lines
-
-function removeComments(value) {
-    const matches = value.matchAll(removeCommentsRE);
-    for (const match of matches) {
-        const captured = match[0];
-        value = value.replace(captured, '');
-    }
-    return value;
-}
-
-function getInsideStruct(value) {
-    const matches = value.matchAll(insideStructRE);
-    let lines = null;
-    for (const match of matches) {
-        lines = match[1].split('\n');
-        lines = lines.map(element => element.trim())
-            .filter(e => e !== '');
-    }
-    return lines;
-}
-
-function getStructDataByName(value) {
-    const matches = value.matchAll(getStructNameRE);
-    let result = new Map();
-    for (const match of matches) {
-        const captured = match[0];
-        const name = match[1];
-        const lines = getInsideStruct(captured);
-        const types = lines.map(l => {
-            const right = l.split(':')[1];
-            let type = '';
-            if (isArray(right)) {
-                const arrayMatch = right.matchAll(arrayIntegrityRE);
-                type = arrayMatch.next().value[1];
-            } else {
-                type = right.split(',')[0].trim();
-            }
-            return type;
-        });
-
-        const names = lines.map(l => {
-            const left = l.split(':')[0];
-            let name = '';
-            name = left.split(',')[0].trim();
-            return name;
-        });
-
-        result.set(name, {
-            captured,
-            lines,
-            types,
-            unique_types: [...new Set(types)],
-            names,
-        });
-    }
-    return result;
-}
-
-function getArrayTypeAndAmount(value) {
-    const matches = value.matchAll(arrayTypeAndAmountRE);
-    let result = [];
-    for (const match of matches) {
-        const type = match[1];
-        const amount = match[2];
-        result.push({ type, amount: Number(amount) });
-    }
-    return result;
-}
-
-/**
- * Check if string has 'array' in it
- * @param {String} value
- * @returns {boolean}
- */
-function isArray(value) {
-    return value.indexOf('array') != -1;
-}
-
-function getArrayTypeData(currentType, structData) {
-    const [d] = getArrayTypeAndAmount(currentType);
-    if (!d) {
-        throw `${currentType} seems to have an error, maybe a wrong amount?`;
-    }
-    if (d.amount == 0) {
-        throw new Error(`${currentType} has an amount of 0`);
-    }
-    let currentTypeData = typeSizes[d.type] || structData.get(d.type);
-    if (!currentTypeData) {
-        throw `Struct or type '${d.type}' in ${currentType} is not defined.`
-    }
-    if (d.amount) {
-        const t = typeSizes[d.type];
-        if (t) {
-            // if array, the size is equal to the align
-            currentTypeData = { size: t.align * d.amount, align: t.align };
-        } else {
-            const sd = structData.get(d.type);
-            if (sd) {
-                currentTypeData = { size: sd.bytes * d.amount, align: sd.maxAlign };
-            }
-        }
-    }
-    return currentTypeData;
-}
-
-
-/**
- * Calculates if there's a space of bytes left in the row
- * @param {Number} bytes current bytes size
- * @param {Number} maxSize max size of row, in this case probably 16
- * @returns remaining bytes if any
- */
-function getPadding(bytes, maxSize) {
-    const remainder = bytes % maxSize;
-    let remainingBytes = 0;
-    if (remainder) {
-        remainingBytes = maxSize - remainder;
-    }
-    return remainingBytes
-}
-
-const MAX_ROW_SIZE = 16;
-const HALF = 2;
-const dataSize = value => {
-    const noCommentsValue = removeComments(value);
-    const structData = getStructDataByName(noCommentsValue);
-
-    structData.forEach(sd => {
-        let bytes = 0;
-        let remainingBytes = 0;
-        sd.paddings = {};
-        sd.names.forEach((name, i) => {
-            const type = sd.types[i];
-            let typeSize = typeSizes[type];
-            let repeat = 0;
-
-            // if no typeSize is an array or struct
-            if (!typeSize) {
-                if (type) {
-                    if (isArray(type)) {
-                        const [innerType] = getArrayTypeAndAmount(type);
-
-                        typeSize = typeSizes[innerType.type];
-                        repeat = innerType.amount; // check comment on top of do while
-                        innerType.align = MAX_ROW_SIZE;
-                    } else {
-                        const sd = structData.get(type);
-                        if(!sd){
-                            throw `Type or struct ${type} doesn't exist.`;
-                        }
-                        typeSize = { size: sd.bytes, align: MAX_ROW_SIZE };
-                    }
-                }
-            }
-
-            const { size, align } = typeSize;
-            const prevName = sd.names[i - 1];
-
-            /**
-             * The idea with the repeat and the do while is that, if there's an
-             * array, the subtype will be added `type.amount` times with the
-             * same rules. That's it.
-             */
-            do {
-                let aligned = bytes % align === 0;
-
-                while (!aligned) {
-                    remainingBytes -= HALF;
-                    bytes += HALF;
-                    sd.paddings[prevName] ||= 0;
-                    sd.paddings[prevName] += HALF;
-                    aligned = bytes % align === 0;
-                }
-
-                if (remainingBytes && size > remainingBytes) {
-                    bytes += remainingBytes;
-                    sd.paddings[prevName] = remainingBytes;
-                    remainingBytes = 0;
-                }
-
-                bytes += size;
-
-                repeat--;
-            } while (repeat > 0)
-
-            remainingBytes = getPadding(bytes, MAX_ROW_SIZE);
-        });
-        remainingBytes = getPadding(bytes, MAX_ROW_SIZE);
-        bytes += remainingBytes;
-        sd.bytes = bytes;
-    });
-
-    return structData
-};
-
-/**
  * Utility methods to for the {@link Points#setTextureString | setTextureString()}
  * @module texture-string
  * @ignore
@@ -3465,7 +4949,7 @@ function strToImage(str, atlasImg, size, offset = 0) {
  */
 class LayersArray extends Array {
     #buffer = null;
-    #shaderType = null;
+    #shaderStage = null;
     constructor(...elements) {
         super(...elements);
     }
@@ -3478,15 +4962,15 @@ class LayersArray extends Array {
         this.#buffer = v;
     }
 
-    get shaderType() {
-        return this.#shaderType;
+    get shaderStage() {
+        return this.#shaderStage;
     }
 
     /**
      * @param {GPUShaderStage} v
      */
-    set shaderType(v) {
-        this.#shaderType = v;
+    set shaderStage(v) {
+        this.#shaderStage = v;
     }
 }
 
@@ -3541,41 +5025,43 @@ read_write. Compute is always read_write.
 const R = 'r';
 const RW = 'rw';
 
+const { COMPUTE, VERTEX, FRAGMENT } = GPUShaderStage;
+
 const cache$1 = {
-    [GPUShaderStage.COMPUTE | GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT]: {
-        [GPUShaderStage.COMPUTE]: RW,
-        [GPUShaderStage.VERTEX]: R,
-        [GPUShaderStage.FRAGMENT]: R
+    [COMPUTE | VERTEX | FRAGMENT]: {
+        [COMPUTE]: RW,
+        [VERTEX]: R,
+        [FRAGMENT]: R
     },//
-    [GPUShaderStage.COMPUTE]: {
-        [GPUShaderStage.COMPUTE]: RW,
-        [GPUShaderStage.VERTEX]: null,
-        [GPUShaderStage.FRAGMENT]: null
+    [COMPUTE]: {
+        [COMPUTE]: RW,
+        [VERTEX]: null,
+        [FRAGMENT]: null
     },
-    [GPUShaderStage.VERTEX]: {
-        [GPUShaderStage.COMPUTE]: null,
-        [GPUShaderStage.VERTEX]: R,
-        [GPUShaderStage.FRAGMENT]: null
+    [VERTEX]: {
+        [COMPUTE]: null,
+        [VERTEX]: R,
+        [FRAGMENT]: null
     },
-    [GPUShaderStage.FRAGMENT]: {
-        [GPUShaderStage.COMPUTE]: null,
-        [GPUShaderStage.VERTEX]: null,
-        [GPUShaderStage.FRAGMENT]: RW
+    [FRAGMENT]: {
+        [COMPUTE]: null,
+        [VERTEX]: null,
+        [FRAGMENT]: RW
     },//
-    [GPUShaderStage.COMPUTE | GPUShaderStage.VERTEX]: {
-        [GPUShaderStage.COMPUTE]: RW,
-        [GPUShaderStage.VERTEX]: R,
-        [GPUShaderStage.FRAGMENT]: null
+    [COMPUTE | VERTEX]: {
+        [COMPUTE]: RW,
+        [VERTEX]: R,
+        [FRAGMENT]: null
     },
-    [GPUShaderStage.COMPUTE | GPUShaderStage.FRAGMENT]: {
-        [GPUShaderStage.COMPUTE]: RW,
-        [GPUShaderStage.VERTEX]: null,
-        [GPUShaderStage.FRAGMENT]: RW
+    [COMPUTE | FRAGMENT]: {
+        [COMPUTE]: RW,
+        [VERTEX]: null,
+        [FRAGMENT]: RW
     },//
-    [GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT]: {
-        [GPUShaderStage.COMPUTE]: null,
-        [GPUShaderStage.VERTEX]: R,
-        [GPUShaderStage.FRAGMENT]: R
+    [VERTEX | FRAGMENT]: {
+        [COMPUTE]: null,
+        [VERTEX]: R,
+        [FRAGMENT]: R
     },
 };
 
@@ -3834,6 +5320,358 @@ function clearCache() {
 }
 
 /**
+ * Class that handles the creation of new {@link Uniform}s in Points.
+ * @example
+ * // js side
+ * points.uniforms.myUniform = 10
+ *
+ * // wgsl side
+ * let val = params.myUniform; // value is 10.0 f32
+ * @class Uniforms
+ */
+class Uniforms {
+    #list = new UniformsArray();
+
+    constructor() {
+        return new Proxy(this, {
+            get(target, prop, receiver) {
+
+                const value = Reflect.get(target, prop, target);
+
+                if (prop === 'list') {
+                    return value;
+                }
+
+                if (typeof value === 'function') {
+                    if (prop === 'find') {
+                        return value.bind(target);
+                    }
+                    if (prop === 'add') {
+                        return value.bind(target);
+                    }
+                }
+
+                if (prop in target) {
+                    return value;
+                }
+                // If Uniform does not exist we create it.
+                const uniform = new Uniform$1({ name: prop });
+                target.list.push(uniform);
+                Reflect.set(target, prop, uniform, target);
+                return uniform;
+            },
+
+            set(target, prop, value, receiver) {
+                if (prop === 'list') {
+                    return Reflect.set(target, prop, value, target);
+                }
+
+                const type = typeof value;
+                if (type === 'string') {
+                    throw `Uniform named '${prop}': No strings allowed or maybe you are adding an array.`;
+                }
+                if (type === 'object' && !Array.isArray(value)) {
+                    throw `Uniform named '${prop}': No objects allowed.`;
+                }
+
+                if (prop in target) {
+                    const uniform = Reflect.get(target, prop, target);
+                    uniform.value = value;
+                    return uniform;
+                }
+
+                // If Uniform does not exist we create it.
+
+                const uniform = new Uniform$1({ name: prop, value });
+                target.list.push(uniform);
+                return Reflect.set(target, prop, uniform, target);
+            }
+        });
+    }
+
+    get list() {
+        return this.#list;
+    }
+
+    /**
+     * List of all {@link Uniform}s
+     * @param {Array} value
+     * @memberof Uniforms
+     */
+    set list(value) {
+        this.#list = value;
+    }
+
+    /**
+     * Retrieves a {@link Uniform} by its name.
+     * @param {String} name
+     * @returns {Uniform}
+     * @memberof Uniforms
+     */
+    find(name) {
+        return this[name];
+    }
+
+    /**
+     * Add a new {@link Uniform}
+     * @param {Uniform} uniform
+     * @memberof Uniforms
+     */
+    add(uniform) {
+        const { name } = uniform;
+        if (this[name]) {
+            throw `Uniform named ${name} already exists.`
+        }
+        this[name] = uniform;
+        this.#list.push(uniform);
+    }
+}
+
+/**
+ * Class that handles the creation of new {@link Storage}s in Points.
+ * @example
+ * // js side
+ * points.storages.myStorage = [1, 2, 3]
+ *
+ * // wgsl side
+ * let val = params.myStorage; // value is vec3f(1, 2, 3)
+ * @class Storages
+ */
+class Storages {
+    #list = [];
+
+    constructor() {
+        return new Proxy(this, {
+            get(target, prop, receiver) {
+
+                const value = Reflect.get(target, prop, target);
+
+                if (prop === 'list') {
+                    return value;
+                }
+
+                if (typeof value === 'function') {
+                    if (prop === 'find') {
+                        return value.bind(target);
+                    }
+                    if (prop === 'add') {
+                        return value.bind(target);
+                    }
+                }
+
+                if (prop in target) {
+                    return value;
+                }
+                // If Storage does not exist we create it.
+                const storage = new Storage$1({ name: prop, value: 0 });
+                target.list.push(storage);
+                Reflect.set(target, prop, storage, target);
+                return storage;
+            },
+
+            set(target, prop, value, receiver) {
+                if (prop === 'list') {
+                    return Reflect.set(target, prop, value, target);
+                }
+
+                const type = typeof value;
+                if (type === 'string') {
+                    throw `Storage named '${prop}': No strings allowed or maybe you are adding an array.`;
+                }
+                if (!type && type === 'object' && !Array.isArray(value)) {
+                    throw `Storage named '${prop}': No objects allowed.`;
+                }
+
+                if (prop in target) {
+                    const storage = Reflect.get(target, prop, target);
+                    storage.value = value;
+                    return storage;
+                }
+
+                // If Storage does not exist we create it.
+
+                const storage = new Storage$1({ name: prop, value });
+                target.list.push(storage);
+                return Reflect.set(target, prop, storage, target);
+            }
+        });
+    }
+
+    get list() {
+        return this.#list;
+    }
+
+    /**
+     * List of all {@link Storage}
+     * @param {Array} value
+     * @memberof Storages
+     */
+    set list(value) {
+        this.#list = value;
+    }
+
+    /**
+     * Retrieves a {@link Storage} by its name.
+     * @param {String} name
+     * @returns {Storage}
+     * @memberof Storages
+     */
+    find(name) {
+        return this[name];
+    }
+
+    /**
+     * Add a new {@link Storage}
+     * @param {Storage} storage
+     * @memberof Storages
+     */
+    add(storage) {
+        const { name } = storage;
+        if (this[name]) {
+            throw `Storage named ${name} already exists.`
+        }
+        this[name] = storage;
+        this.#list.push(storage);
+    }
+}
+
+/**
+ * @class Constants
+ */
+class Constants {
+    #list = [];
+
+    constructor() {
+        return new Proxy(this, {
+            get(target, prop, receiver) {
+
+                const value = Reflect.get(target, prop, target);
+
+                if (prop === 'list') {
+                    return value;
+                }
+
+                if (typeof value === 'function') {
+                    switch (prop) {
+                        case 'find':
+                        case 'add':
+                        case 'listOfOverrides':
+                        case 'stringOfNonOverrides':
+                            return value.bind(target);
+                    }
+                }
+
+                if (prop in target) {
+                    return value;
+                }
+                // If Constant does not exist we create it.
+                const constant = new Constant$1({ name: prop, value: 0 });
+                target.list.push(constant);
+                Reflect.set(target, prop, constant, target);
+                return constant;
+            },
+
+            set(target, prop, value, receiver) {
+                if (prop === 'list') {
+                    return Reflect.set(target, prop, value, target);
+                }
+
+                const type = typeof value;
+                if (type === 'string') {
+                    throw `Constant named '${prop}': No strings allowed or maybe you are adding an array.`;
+                }
+                if (!type && type === 'object' && !Array.isArray(value)) {
+                    throw `Constant named '${prop}': No objects allowed.`;
+                }
+
+                if (prop in target) {
+                    const constant = Reflect.get(target, prop, target);
+                    constant.value = value;
+                    return constant;
+                }
+
+                // If Constant does not exist we create it.
+
+                const constant = new Constant$1({ name: prop, value });
+                target.list.push(constant);
+                return Reflect.set(target, prop, constant, target);
+            }
+        });
+    }
+
+    get list() {
+        return this.#list;
+    }
+
+    /**
+     * List of all {@link Constant}s
+     * @param {Array} value
+     * @memberof Constants
+     */
+    set list(value) {
+        this.#list = value;
+    }
+
+    /**
+     * Retrieves a {@link Constant} by its name.
+     * @param {String} name
+     * @returns {Constant}
+     * @memberof Constants
+     */
+    find(name) {
+        return this[name];
+    }
+
+    /**
+     * Add a new {@link Constant}
+     * @param {Constant} constant
+     * @memberof Constants
+     */
+    add(constant) {
+        const { name } = constant;
+        if (this[name]) {
+            throw `Constant named ${name} already exists.`
+        }
+        this[name] = constant;
+        this.#list.push(constant);
+    }
+
+    /**
+     * Object list with the constants that are overridable.
+     * This object will be passed into the pipeline.
+     * @param {GPUShaderStage|Number} filter
+     * @returns {Object}
+     * @memberof Constants
+     */
+    listOfOverrides(filter) {
+        return Object.fromEntries(
+            this.#list
+                .filter(c => ((filter & c.shaderStage) !== 0))
+                .filter(c => c.override)
+                .map(c => [c.name, c.value])
+        );
+    }
+
+    /**
+     * List of constants formatted as WGSL string to be interpolated in the
+     * shaders.
+     * @param {GPUShaderStage|Number} filter
+     * @returns {String}
+     * @memberof Constants
+     */
+    stringOfNonOverrides(filter) {
+        let consStrings = '';
+        this.#list.forEach(c => {
+            const hasOneStage = (filter & c.shaderStage) !== 0;
+            if (!c.override && hasOneStage) {
+                consStrings += /*wgsl*/`const ${c.name}:${c.type} = ${c.value};\n`;
+            }
+        });
+        return consStrings;
+    }
+}
+
+/**
  * Main class Points, this is the entry point of an application with this library.
  * @example
  * import Points from 'points';
@@ -3868,12 +5706,11 @@ class Points {
     #numColumns = 1;
     #numRows = 1;
     #commandsFinished = [];
-    #uniforms = new UniformsArray();
+    #uniforms = new Uniforms();
     #meshUniforms = new UniformsArray();
     #cameraUniforms = new UniformsArray();
-    #constants = [];
-    #storage = [];
-    #readStorage = [];
+    #constants = new Constants();
+    #storages = new Storages();
     #samplers = [];
     #textures2d = [];
     #texturesDepth2d = [];
@@ -3913,6 +5750,7 @@ class Points {
     #abortController = null;
     #canvasWidth = null;
     #canvasHeight = null;
+
 
     /**
      * Constructor of `Points`.
@@ -4012,7 +5850,7 @@ class Points {
         this.#canvas.height = this.#canvas.clientHeight;
         this.#screen[0] = this.#canvas.width;
         this.#screen[1] = this.#canvas.height;
-        this.setUniform(UniformKeys.SCREEN, this.#screen);
+        this.#uniforms.screen = this.#screen;
 
         this.#presentationSize = [
             this.#canvas.clientWidth,
@@ -4079,7 +5917,7 @@ class Points {
         this.#ratio[0] = ratio[0];
         this.#ratio[1] = ratio[1];
 
-        this.setUniform(UniformKeys.RATIO, this.#ratio);
+        this.#uniforms.ratio = this.#ratio;
     }
 
     #onMouseMove = e => {
@@ -4092,8 +5930,10 @@ class Points {
         this.#mouseNormalized[0] = this.#mouse[0] / this.#screen[0];
         this.#mouseNormalized[1] = this.#mouse[1] / this.#screen[1];
         this.#mouseNormalized[1] = (this.#mouseNormalized[1] * -1) - -1; // flip and move up
-        this.setUniform(UniformKeys.MOUSE, this.#mouse);
-        this.setUniform('_mouse_normalized', this.#mouseNormalized);
+
+        const { mouse, _mouse_normalized } = this.#uniforms;
+        mouse.value = this.#mouse;
+        _mouse_normalized.value = this.#mouseNormalized;
     }
 
     /**
@@ -4104,8 +5944,8 @@ class Points {
      * and unless changed it remains consistent.
      * @param {string} name name of the Param, you can invoke it later in shaders as `Params.[name]`
      * @param {Number|Boolean|Array<Number>} value Single number or a list of numbers. Boolean is converted to Number.
-     * @param {string} structName type as `f32` or a custom struct. Default `f32`.
-     * @return {Object}
+     * @param {string} type type as `f32` or a custom struct. Default `f32`.
+     * @return {Uniform}
      *
      * @example
      * // js
@@ -4118,74 +5958,65 @@ class Points {
      * let color1 = vec4(params.color1/255, 1.);
      * let finalColor:vec4f = mix(color0, color1, params.scale);
      */
-    setUniform(name, value, structName = null) {
-        const uniformToUpdate = this.#nameExists(this.#uniforms, name);
+    setUniform(name, value, type = null) {
+        const uniformToUpdate = this.#uniforms.find(name);
 
         if (!uniformToUpdate && this.#initialized) {
             console.error(`'${name}' uniform needs to be declared before the init() prior to call it in update().`);
         }
-        if (uniformToUpdate && structName) {
+        if (uniformToUpdate && type) {
             // if name exists is an update
-            this.#debug && console.warn(`setUniform(${name}, [${value}], ${structName}) can't set the structName of an already defined uniform.`);
+            this.#debug && console.warn(`setUniform(${name}, [${value}], ${type}) can't set the type of an already defined uniform.`);
         }
         if (uniformToUpdate) {
             uniformToUpdate.value = value;
             return uniformToUpdate;
         }
-        if (structName && isArray(structName)) {
-            throw `${structName} is an array, which is currently not supported for Uniforms.`;
-        }
-        const uniform = {
-            name: name,
-            value: value,
-            type: structName,
-            size: null
-        };
-        Object.seal(uniform);
-        this.#uniforms.push(uniform);
+
+        const uniform = new Uniform({
+            name,
+            value,
+            type
+        });
+
+        this.#uniforms.add(uniform);
         return uniform;
     }
 
-    #setMeshUniform(name, value, structName = null) {
+    #setMeshUniform(name, value, type = null) {
         const uniformToUpdate = this.#nameExists(this.#meshUniforms, name);
-        if (uniformToUpdate && structName) {
+        if (uniformToUpdate && type) {
             // if name exists is an update
-            this.#debug && console.warn(`#setMeshUniform(${name}, [${value}], ${structName}) can't set the structName of an already defined uniform.`);
+            this.#debug && console.warn(`#setMeshUniform(${name}, [${value}], ${type}) can't set the type of an already defined uniform.`);
         }
         if (uniformToUpdate) {
             uniformToUpdate.value = value;
             return uniformToUpdate;
         }
-        if (structName && isArray(structName)) {
-            throw `${structName} is an array, which is currently not supported for Uniforms.`;
-        }
-        const uniform = {
-            name: name,
-            value: value,
-            type: structName,
-            size: null
-        };
-        Object.seal(uniform);
+
+        const uniform = new Uniform({
+            name,
+            value,
+            type,
+        });
+
         this.#meshUniforms.push(uniform);
         return uniform;
     }
 
-    #setCameraUniform(name, value, structName = null) {
+    #setCameraUniform(name, value, type = null) {
         const uniformToUpdate = this.#nameExists(this.#cameraUniforms, name);
         if (uniformToUpdate) {
             uniformToUpdate.value = value;
             return uniformToUpdate;
         }
-        if (structName && isArray(structName)) {
-            throw `${structName} is an array, which is currently not supported for Uniforms.`;
-        }
-        const uniform = {
-            name: name,
-            value: value,
-            type: structName,
-            size: null
-        };
-        Object.seal(uniform);
+
+        const uniform = new Uniform({
+            name,
+            value,
+            type,
+        });
+
         this.#cameraUniforms.push(uniform);
         return uniform;
     }
@@ -4196,7 +6027,7 @@ class Points {
      */
     updateUniforms(arr) {
         arr.forEach(uniform => {
-            const variable = this.#uniforms.find(v => v.name === uniform.name);
+            const variable = this.#uniforms[uniform.name];
             if (!variable) {
                 throw '`updateUniform()` can\'t be called without first `setUniform()`.';
             }
@@ -4211,7 +6042,7 @@ class Points {
      * The constant will be ready to use on the WGSL shder string.
      * @param {String} name
      * @param {string|Number} value
-     * @param {String} structName
+     * @param {String} type
      * @returns {Object}
      *
      * @example
@@ -4226,7 +6057,7 @@ class Points {
      * // your code:
      * const particles = array<Particle, NUMPARTICLES>();
      */
-    setConstant(name, value, structName) {
+    setConstant(name, value, type = null) {
         const constantToUpdate = this.#nameExists(this.#constants, name);
 
         if (constantToUpdate) {
@@ -4234,13 +6065,13 @@ class Points {
             throw '`setConstant()` can\'t update a const after it has been set.';
         }
 
-        const constant = {
+        const constant = new Constant({
             name,
             value,
-            structName,
-        };
+            type,
+        });
 
-        this.#constants.push(constant);
+        this.#constants.add(constant);
 
         return constant;
     }
@@ -4251,12 +6082,13 @@ class Points {
      * Meaning it can be updated in the shaders across the execution of every frame.
      * <br>
      * It can have almost any type, like `f32` or `vec2f` or even array<f32>.
+     * <br>
+     * It can also be initialized with data with the {@link Storage#setValue} method
      * @param {string} name Name that the Storage will have in the shader
-     * @param {string} structName Name of the struct already existing on the
+     * @param {string} type Name of the struct already existing on the
+     * @param {Uint8Array<ArrayBuffer>|Array<Number>|Number} value array with the data that must match the struct.
      * shader. This will be the type of the Storage.
-     * @param {boolean} read if this is going to be used to read data back
-     * @param {GPUShaderStage} shaderType this tells to what shader the storage is bound
-     * @returns {Object}
+     * @returns {Storage}
      *
      * @example
      * // js
@@ -4271,26 +6103,34 @@ class Points {
      *
      * // wgsl string
      * colors[index] = vec3f(248, 208, 146) / 255;
+     *
+     * @example
+     * // add data from initialization
+     * // js
+     * points.setStorage('vertex_data', `array<vec4f, ${vertex_data.length}>`)
+        .setValue(vertex_data.flat());
      */
-    setStorage(name, structName, read, shaderType = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE, arrayData = null) {
-        if (this.#nameExists(this.#storage, name)) {
-            throw `\`setStorage()\` You have already defined \`${name}\``;
+    setStorage(name, type = null, value = null) {
+        const storageToUpdate = this.#storages.find(name);
+
+        if (storageToUpdate) {
+            storageToUpdate.value = value;
+            return storageToUpdate;
         }
-        const storage = {
-            mapped: !!arrayData,
+
+        const storage = new Storage({
             name,
-            structName,
-            // structSize: null,
-            shaderType,
-            read,
-            buffer: null,
-            internal: false
-        };
-        this.#storage.push(storage);
+            value,
+            type,
+        });
+
+        this.#storages.add(storage);
+
         return storage;
     }
 
     /**
+     * @deprecated Since v0.8.0 use {@link setStorage}
      * Creates a persistent memory buffer across every frame call that can be updated.
      * See [GPUBuffer](https://www.w3.org/TR/webgpu/#gpubuffer)
      * <br>
@@ -4301,11 +6141,11 @@ class Points {
      * The difference with {@link Points#setStorage|setStorage} is that this can be initialized
      * with data.
      * @param {string} name Name that the Storage will have in the shader.
-     * @param {Uint8Array<ArrayBuffer>|Array<Number>|Number} arrayData array with the data that must match the struct.
-     * @param {string} structName Name of the struct already existing on the
+     * @param {Uint8Array<ArrayBuffer>|Array<Number>|Number} value array with the data that must match the struct.
+     * @param {string} type Name of the struct already existing on the
      * shader. This will be the type of the Storage.
-     * @param {boolean} read if this is going to be used to read data back.
-     * @param {GPUShaderStage} shaderType this tells to what shader the storage is bound
+     * @param {boolean} readable if this is going to be used to read data back.
+     * @param {GPUShaderStage} shaderStage this tells to what shader the storage is bound
      *
      * @example
      * // js examples/data1
@@ -4335,44 +6175,41 @@ class Points {
      *
      * resultMatrix.size = vec2(firstMatrix.size.x, secondMatrix.size.y);
      */
-    setStorageMap(name, arrayData, structName, read = false, shaderType = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE) {
-        const storageToUpdate = this.#nameExists(this.#storage, name);
+    setStorageMap(name, value, type, readable = false, shaderStage = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE) {
+        const storageToUpdate = this.#storages.find(name);
 
-        if (!Array.isArray(arrayData) && arrayData.constructor !== Uint8Array) {
-            arrayData = new Uint8Array([arrayData]);
+        if (!Array.isArray(value) && value.constructor !== Uint8Array) {
+            value = new Uint8Array([value]);
         }
 
         if (storageToUpdate) {
-            storageToUpdate.array = arrayData;
+            storageToUpdate.value = value;
             storageToUpdate.updated = true;
             return storageToUpdate;
         }
-        // TODO document the stream feature
-        /**
-         * `updated` is set to true in data updates, but this is not true in
-         * something like audio, where the data streams and needs to be updated
-         * constantly, so if the storage map needs to be updated constantly then
-         * `stream` needs to be set to true.
-         */
-        const storage = {
-            stream: false, // permanently updated as true
-            updated: true,
-            mapped: true,
-            name,
-            structName,
-            shaderType,
-            array: arrayData,
-            buffer: null,
-            read,
-            internal: false
-        };
-        this.#storage.push(storage);
+
+        // const storage = new Storage({
+        //     updated: true,
+        //     mapped: true,
+        //     name,
+        //     type,
+        //     shaderStage,
+        //     value,
+        //     read,
+        // });
+
+        this.#storages[name] = value;
+        const storage = this.#storages[name];
+        storage.updated = true;
+        storage.mapped = true;
+        storage.type = type;
+        storage.shaderStage = shaderStage;
+        storage.readable = readable;
         return storage;
     }
 
     /**
-     * To read data back from a `setStorage` with `read` param `true`
-
+     * To read data back from a `setStorage` with `readable` param `true`
      * @param {String} name name of the Storage to read data from
      * @warning If there's en error or warning here
      * `[Buffer "name"] used in submit while mapped.`
@@ -4380,15 +6217,14 @@ class Points {
      * @returns {Float32Array} Array with the result
      */
     async readStorage(name) {
-        let storageItem = this.#readStorage.find(storageItem => storageItem.name === name);
-        let arrayBuffer = null;
+        const storageItem = this.#storages.find(name);
         let arrayBufferCopy = null;
-        if (storageItem) {
+        if (storageItem?.readable) {
             try {
-                await storageItem.buffer.mapAsync(GPUMapMode.READ);
-                arrayBuffer = storageItem.buffer.getMappedRange();
+                await storageItem.bufferRead.mapAsync(GPUMapMode.READ);
+                const arrayBuffer = storageItem.bufferRead.getMappedRange();
                 arrayBufferCopy = new Float32Array(arrayBuffer.slice(0));
-                storageItem.buffer.unmap();
+                storageItem.bufferRead.unmap();
             } catch (error) {
                 // if we switch projects mapasync fails
                 // we ignore it
@@ -4402,7 +6238,7 @@ class Points {
      * This creates a storage array named `layers` of the size
      * of the screen in pixels;
      * @param {Number} numLayers
-     * @param {GPUShaderStage} shaderType
+     * @param {GPUShaderStage} shaderStage
      *
      * @example
      * // js
@@ -4413,11 +6249,11 @@ class Points {
      * layers[0][pointIndex] = point;
      * layers[1][pointIndex] = point;
      */
-    setLayers(numLayers, shaderType) {
+    setLayers(numLayers, shaderStage) {
         // TODO: check what data to return
         // TODO: improve jsdoc because the array definition is confusing
         for (let layerIndex = 0; layerIndex < numLayers; layerIndex++) {
-            this.#layers.shaderType = shaderType;
+            this.#layers.shaderStage = shaderStage;
             this.#layers.push({
                 name: `layer${layerIndex}`,
                 size: this.#canvas.width * this.#canvas.height,
@@ -4430,7 +6266,7 @@ class Points {
     }
 
     #nameExists(arrayOfObjects, name) {
-        return arrayOfObjects.find(obj => obj.name == name);
+        return arrayOfObjects.find(obj => obj.name === name);
     }
 
     /**
@@ -4456,7 +6292,7 @@ class Points {
      * let value = texturePosition(image, imageSampler, position, in.uvr, true);
      */
 
-    setSampler(name, descriptor, shaderType) {
+    setSampler(name, descriptor, shaderStage) {
         if ('sampler' == name) {
             throw 'setSampler: `name` can not be sampler since is a WebGPU keyword.';
         }
@@ -4477,7 +6313,7 @@ class Points {
         const sampler = {
             name: name,
             descriptor: descriptor,
-            shaderType: shaderType,
+            shaderStage: shaderStage,
             resource: null,
             internal: false
         };
@@ -4494,7 +6330,7 @@ class Points {
      *
      * @param {String} name Name to call the texture in the shaders.
      * @param {boolean} copyCurrentTexture If you want the fragment output to be copied here.
-     * @param {GPUShaderStage} shaderType To what {@link GPUShaderStage} you want to exclusively use this variable.
+     * @param {GPUShaderStage} shaderStage To what {@link GPUShaderStage} you want to exclusively use this variable.
      * @param {Number} renderPassIndex If using `copyCurrentTexture`
      * this tells which RenderPass it should get the data from. If not set then it will grab the last pass.
      * @returns {Object}
@@ -4511,7 +6347,7 @@ class Points {
      * );
      *
      */
-    setTexture2d(name, copyCurrentTexture, shaderType, renderPassIndex) {
+    setTexture2d(name, copyCurrentTexture, shaderStage, renderPassIndex) {
         const exists = this.#nameExists(this.#textures2d, name);
         if (exists) {
             this.#debug && console.warn(`setTexture2d: \`${name}\` already exists.`);
@@ -4520,7 +6356,7 @@ class Points {
         const texture2d = {
             name,
             copyCurrentTexture,
-            shaderType,
+            shaderStage,
             texture: null,
             renderPassIndex,
             internal: false
@@ -4532,11 +6368,11 @@ class Points {
     /**
      * Creates a depth map from the selected `renderPassIndex`
      * @param {String} name
-     * @param {GPUShaderStage} shaderType
+     * @param {GPUShaderStage} shaderStage
      * @param {Number} renderPassIndex
      * @returns {Object}
      */
-    setTextureDepth2d(name, shaderType, renderPassIndex) {
+    setTextureDepth2d(name, shaderStage, renderPassIndex) {
         const exists = this.#nameExists(this.#texturesDepth2d, name);
         if (exists) {
             this.#debug && console.warn(`setTextureDepth2d: \`${name}\` already exists.`);
@@ -4545,7 +6381,7 @@ class Points {
         renderPassIndex ||= 0;
         const textureDepth2d = {
             name,
-            shaderType,
+            shaderStage,
             texture: null,
             renderPassIndex,
             internal: false,
@@ -4580,7 +6416,7 @@ class Points {
      * Supports web formats like JPG, PNG.
      * @param {string} name identifier it will have in the shaders
      * @param {string} path image address in a web server
-     * @param {GPUShaderStage} shaderType in what shader type it will exist only
+     * @param {GPUShaderStage} shaderStage in what shader type it will exist only
      * @returns {Object}
      *
      * @example
@@ -4590,14 +6426,14 @@ class Points {
      * // wgsl string
      * let rgba = texturePosition(image, imageSampler, position, in.uvr, true);
      */
-    async setTextureImage(name, path, shaderType = null) {
+    async setTextureImage(name, path, shaderStage = null) {
         const texture2dToUpdate = this.#nameExists(this.#textures2d, name);
         const response = await fetch(path);
         const blob = await response.blob();
         const imageBitmap = await createImageBitmap(blob);
         if (texture2dToUpdate) {
-            if (shaderType) {
-                throw '`setTextureImage()` the param `shaderType` should not be updated after its creation.';
+            if (shaderStage) {
+                throw '`setTextureImage()` the param `shaderStage` should not be updated after its creation.';
             }
             this.#textureUpdated = true;
             texture2dToUpdate.imageTexture.bitmap = imageBitmap;
@@ -4622,7 +6458,7 @@ class Points {
         const texture2d = {
             name: name,
             copyCurrentTexture: false,
-            shaderType: shaderType,
+            shaderStage: shaderStage,
             texture: null,
             renderPassIndex: null,
             imageTexture: {
@@ -4641,7 +6477,7 @@ class Points {
      * This will only generate an image, so animations will not work.
      * @param {String} name identifier it will have in the shaders
      * @param {HTMLElement} element element loaded in the DOM or dynamically
-     * @param {GPUShaderStage} shaderType in what shader type it will exist only
+     * @param {GPUShaderStage} shaderStage in what shader type it will exist only
      * @returns {Object}
      *
      * @example
@@ -4652,11 +6488,11 @@ class Points {
      * // wgsl string
      * let color = texture(image, imageSampler, in.uvr, true);
      */
-    async setTextureElement(name, element, shaderType = null) {
+    async setTextureElement(name, element, shaderStage = null) {
         const styles = getCSS(element);
         const cssText = styles.map(style => style.cssText).join('\n');
         const path = await elToImage(element, cssText);
-        return await this.setTextureImage(name, path, shaderType);
+        return await this.setTextureImage(name, path, shaderStage);
     }
 
     /**
@@ -4671,7 +6507,7 @@ class Points {
      * @param {String} path atlas to grab characters from, image address in a web server
      * @param {{x: number, y: number}} size size of a individual character e.g.: `{x:10, y:20}`
      * @param {Number} offset how many characters back or forward it must move to start
-     * @param {GPUShaderStage} shaderType To what {@link GPUShaderStage} you want to exclusively use this variable.
+     * @param {GPUShaderStage} shaderStage To what {@link GPUShaderStage} you want to exclusively use this variable.
      * @returns {Object}
      *
      * @example
@@ -4688,21 +6524,21 @@ class Points {
      * let textColors = texture(textImg, imageSampler, in.uvr, true);
      *
      */
-    async setTextureString(name, text, path, size, offset = 0, shaderType = null) {
+    async setTextureString(name, text, path, size, offset = 0, shaderStage = null) {
         const atlas = await loadImage(path);
         const textImg = strToImage(text, atlas, size, offset);
-        return this.setTextureImage(name, textImg, shaderType);
+        return this.setTextureImage(name, textImg, shaderStage);
     }
 
     /**
      * Load images as texture_2d_array
      * @param {string} name id of the wgsl variable in the shader
      * @param {Array} paths image addresses in a web server
-     * @param {GPUShaderStage} shaderType
+     * @param {GPUShaderStage} shaderStage
      */
     // TODO: verify if this can be updated after creation
     // TODO: return texture2dArray object
-    async setTextureImageArray(name, paths, shaderType) {
+    async setTextureImageArray(name, paths, shaderStage) {
         if (this.#nameExists(this.#textures2dArray, name)) {
             // TODO: throw exception here
             return;
@@ -4717,7 +6553,7 @@ class Points {
         const texture2dArrayItem = {
             name: name,
             copyCurrentTexture: false,
-            shaderType: shaderType,
+            shaderStage: shaderStage,
             texture: null,
             imageTextures: {
                 bitmaps: imageBitmaps
@@ -4735,7 +6571,7 @@ class Points {
      * Supports web formats like mp4 and webm.
      * @param {string} name id of the wgsl variable in the shader
      * @param {string} path video address in a web server
-     * @param {GPUShaderStage} shaderType
+     * @param {GPUShaderStage} shaderStage
      * @returns {Object}
      *
      * @example
@@ -4745,7 +6581,7 @@ class Points {
      * // wgsl string
      * let rgba = textureExternalPosition(video, imageSampler, position, in.uvr, true);
      */
-    async setTextureVideo(name, path, shaderType) {
+    async setTextureVideo(name, path, shaderStage) {
         if (this.#nameExists(this.#texturesExternal, name)) {
             throw `setTextureVideo: ${name} already exists.`;
         }
@@ -4757,7 +6593,7 @@ class Points {
         await video.play();
         const textureExternal = {
             name: name,
-            shaderType: shaderType,
+            shaderStage: shaderStage,
             video: video,
             internal: false
         };
@@ -4770,7 +6606,7 @@ class Points {
      * it will be available to read data from in the shaders.
      * @param {String} name id of the wgsl variable in the shader
      * @param {{width:Number, height:Number}} size to crop the video. WebGPU might throw an error if size does not match.
-     * @param {GPUShaderStage} shaderType
+     * @param {GPUShaderStage} shaderStage
      * @returns {Object}
      * @throws a WGSL error if the size doesn't match possible crop size
      * @example
@@ -4780,7 +6616,7 @@ class Points {
      * // wgsl string
      * et rgba = textureExternalPosition(video, imageSampler, position, in.uvr, true);
      */
-    async setTextureWebcam(name, size = { width: 1080, height: 1080 }, shaderType) {
+    async setTextureWebcam(name, size = { width: 1080, height: 1080 }, shaderStage) {
         if (this.#nameExists(this.#texturesExternal, name)) {
             throw `setTextureWebcam: ${name} already exists.`;
         }
@@ -4796,7 +6632,7 @@ class Points {
         }
         const textureExternal = {
             name,
-            shaderType,
+            shaderStage,
             video,
             size,
             internal: false
@@ -4861,10 +6697,10 @@ class Points {
         // analyser.getByteTimeDomainData(data);
         analyser.getByteFrequencyData(data);
         // storage that will have the data on WGSL
-        this.setStorageMap(name, data,
+        this.setStorage(name,
             // `array<f32, ${bufferLength}>`
             'Sound' // custom struct in defaultStructs.js
-        ).stream = true;
+        ).setValue(data).stream = true;
         // uniform that will have the data length as a quick reference
         this.setUniform(`${name}Length`, analyser.frequencyBinCount);
         sound.analyser = analyser;
@@ -4875,13 +6711,13 @@ class Points {
 
 
     // TODO: verify this method
-    setTextureStorage2d(name, shaderType) {
+    setTextureStorage2d(name, shaderStage) {
         if (this.#nameExists(this.#texturesStorage2d, name)) {
             throw `setTextureStorage2d: ${name} already exists.`
         }
         const texturesStorage2d = {
             name: name,
-            shaderType: shaderType,
+            shaderStage: shaderStage,
             texture: null,
             internal: false
         };
@@ -4924,12 +6760,12 @@ class Points {
         const bindingTexture = {
             write: {
                 name: writeName,
-                shaderType: GPUShaderStage.COMPUTE,
+                shaderStage: GPUShaderStage.COMPUTE,
                 renderPassIndex: writeIndex
             },
             read: {
                 name: readName,
-                shaderType: GPUShaderStage.FRAGMENT,
+                shaderStage: GPUShaderStage.FRAGMENT,
                 renderPassIndex: readIndex
             },
             texture: null,
@@ -5094,11 +6930,25 @@ class Points {
      *
      */
     addEventListener(name, callback, structSize = 1) {
+        const { COMPUTE, FRAGMENT } = GPUShaderStage;
         // TODO: remove structSize
         // this extra 1 is for the boolean flag in the Event struct
-        const data = Array(4).fill(0);
-        this.setStorageMap(name, data, 'Event', true, GPUShaderStage.COMPUTE | GPUShaderStage.FRAGMENT);
-        this.setStorage(`${name}_data`, `array<f32, ${structSize}>`, true, GPUShaderStage.COMPUTE | GPUShaderStage.FRAGMENT);
+
+        this.#storages.add(new Storage({
+            name,
+            type: 'Event',
+            readable: true,
+            shaderStage: COMPUTE | FRAGMENT,
+            value: Array(4).fill(0)
+        }));
+
+        this.#storages.add(new Storage({
+            name: `${name}_data`,
+            type: `array<f32, ${structSize}>`,
+            readable: true,
+            shaderStage: COMPUTE | FRAGMENT
+        }));
+
         this.#events.set(this.#events_ids,
             {
                 id: this.#events_ids,
@@ -5110,18 +6960,18 @@ class Points {
     }
 
     /**
-     * @param {GPUShaderStage} shaderType
+     * @param {GPUShaderStage} shaderStage
      * @param {RenderPass} renderPass
      * @returns {String} string with bindings
      */
-    #createDynamicGroupBindings(shaderType, { index: renderPassIndex, internal }, groupId = 0) {
-        if (!shaderType) {
+    #createDynamicGroupBindings(shaderStage, { index: renderPassIndex, internal }, groupId = 0) {
+        if (!shaderStage) {
             throw '`GPUShaderStage` is required';
         }
         // const groupId = 0;
         let dynamicGroupBindings = '';
         let bindingIndex = 0;
-        if (this.#uniforms.length) {
+        if (this.#uniforms.list.length) {
             dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <uniform> params: Params;\n`;
             bindingIndex += 1;
         }
@@ -5133,16 +6983,16 @@ class Points {
             dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <uniform> camera: Camera;\n`;
             bindingIndex += 1;
         }
-        this.#storage.forEach(storageItem => {
+        this.#storages.list.forEach(storageItem => {
             const isInternal = internal === storageItem.internal;
-            if (isInternal && (!storageItem.shaderType || storageItem.shaderType & shaderType)) {
-                const T = storageItem.structName;
+            if (isInternal && (!storageItem.shaderStage || storageItem.shaderStage & shaderStage)) {
+                const T = storageItem.type;
 
                 // note:
-                // shaderType means: this is the current GPUShaderStage we are at
-                // and storageItem.shaderType is the stage required by the buffer in setStorage
+                // shaderStage means: this is the current GPUShaderStage we are at
+                // and storageItem.shaderStage is the stage required by the buffer in setStorage
 
-                let accessMode = getStorageAccessMode(shaderType, storageItem.shaderType);
+                let accessMode = getStorageAccessMode(shaderStage, storageItem.shaderStage);
                 accessMode = bindingModes[accessMode];
 
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, ${accessMode}> ${storageItem.name}: ${T};\n`;
@@ -5150,7 +7000,7 @@ class Points {
             }
         });
         if (this.#layers.length) {
-            if (!this.#layers.shaderType || this.#layers.shaderType & shaderType) {
+            if (!this.#layers.shaderStage || this.#layers.shaderStage & shaderStage) {
                 let totalSize = 0;
                 this.#layers.forEach(layerItem => totalSize += layerItem.size);
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, read_write> layers: array<array<vec4f, ${totalSize}>>;\n`;
@@ -5159,7 +7009,7 @@ class Points {
         }
         this.#samplers.forEach(sampler => {
             const isInternal = internal === sampler.internal;
-            if (isInternal && (!sampler.shaderType || sampler.shaderType & shaderType)) {
+            if (isInternal && (!sampler.shaderStage || sampler.shaderStage & shaderStage)) {
                 const T = sampler.descriptor.compare ? 'sampler_comparison' : 'sampler';
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${sampler.name}: ${T};\n`;
                 bindingIndex += 1;
@@ -5167,21 +7017,21 @@ class Points {
         });
         this.#texturesStorage2d.forEach(texture => {
             const isInternal = internal === texture.internal;
-            if (isInternal && (!texture.shaderType || texture.shaderType & shaderType)) {
+            if (isInternal && (!texture.shaderStage || texture.shaderStage & shaderStage)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_storage_2d<rgba8unorm, write>;\n`;
                 bindingIndex += 1;
             }
         });
         this.#textures2d.forEach(texture => {
             const isInternal = internal === texture.internal;
-            if (isInternal && (!texture.shaderType || texture.shaderType & shaderType)) {
+            if (isInternal && (!texture.shaderStage || texture.shaderStage & shaderStage)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d<f32>;\n`;
                 bindingIndex += 1;
             }
         });
         this.#texturesDepth2d.forEach(texture => {
             const isInternal = internal === texture.internal;
-            if (isInternal && (!texture.shaderType || texture.shaderType & shaderType)) {
+            if (isInternal && (!texture.shaderStage || texture.shaderStage & shaderStage)) {
                 if (texture.renderPassIndex !== renderPassIndex) {
                     dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_depth_2d;\n`;
                     bindingIndex += 1;
@@ -5190,14 +7040,14 @@ class Points {
         });
         this.#textures2dArray.forEach(texture => {
             const isInternal = internal === texture.internal;
-            if (isInternal && (!texture.shaderType || texture.shaderType & shaderType)) {
+            if (isInternal && (!texture.shaderStage || texture.shaderStage & shaderStage)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d_array<f32>;\n`;
                 bindingIndex += 1;
             }
         });
         this.#texturesExternal.forEach(externalTexture => {
             const isInternal = internal === externalTexture.internal;
-            if (isInternal && (!externalTexture.shaderType || externalTexture.shaderType & shaderType)) {
+            if (isInternal && (!externalTexture.shaderStage || externalTexture.shaderStage & shaderStage)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${externalTexture.name}: texture_external;\n`;
                 bindingIndex += 1;
             }
@@ -5205,7 +7055,7 @@ class Points {
         this.#bindingTextures.forEach(bindingTexture => {
             const { usesRenderPass } = bindingTexture;
             if (usesRenderPass) {
-                if (GPUShaderStage.VERTEX === shaderType) { // to avoid binding texture in vertex
+                if (GPUShaderStage.VERTEX === shaderStage) { // to avoid binding texture in vertex
                     return;
                 }
                 if (renderPassIndex === bindingTexture.write.renderPassIndex) {
@@ -5221,11 +7071,11 @@ class Points {
             }
 
             const isInternal = internal === bindingTexture.internal;
-            if (isInternal && (bindingTexture.write.shaderType & shaderType)) {
+            if (isInternal && (bindingTexture.write.shaderStage & shaderStage)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.write.name}: texture_storage_2d<rgba8unorm, write>;\n`;
                 bindingIndex += 1;
             }
-            if (isInternal && (bindingTexture.read.shaderType & shaderType)) {
+            if (isInternal && (bindingTexture.read.shaderStage & shaderStage)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.read.name}: texture_2d<f32>;\n`;
                 bindingIndex += 1;
             }
@@ -5233,8 +7083,8 @@ class Points {
         return dynamicGroupBindings;
     }
 
-    #createDynamicGroupBindingsUpdate(shaderType, { index: renderPassIndex, internal }, groupId = 0) {
-        if (!shaderType) {
+    #createDynamicGroupBindingsUpdate(shaderStage, { index: renderPassIndex, internal }, groupId = 0) {
+        if (!shaderStage) {
             throw '`GPUShaderStage` is required';
         }
         // const groupId = 0;
@@ -5243,7 +7093,7 @@ class Points {
 
         this.#texturesExternal.forEach(externalTexture => {
             const isInternal = internal === externalTexture.internal;
-            if (isInternal && (!externalTexture.shaderType || externalTexture.shaderType & shaderType)) {
+            if (isInternal && (!externalTexture.shaderStage || externalTexture.shaderStage & shaderStage)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${externalTexture.name}: texture_external;\n`;
                 bindingIndex += 1;
             }
@@ -5296,37 +7146,36 @@ class Points {
         let dynamicStructParams = '';
         let dynamicStructMesh = '';
         let dynamicStructCamera = '';
-        this.#uniforms.forEach(u => {
-            u.type = u.type || 'f32';
+        this.#uniforms.list.forEach(u => {
             dynamicStructParams += /*wgsl*/`${u.name}:${u.type}, \n\t`;
         });
-        if (this.#uniforms.length) {
+        if (this.#uniforms.list.length) {
             dynamicStructParams = /*wgsl*/`struct Params {\n\t${dynamicStructParams}\n}\n`;
         }
         this.#meshUniforms.forEach(u => {
-            u.type = u.type || 'f32';
             dynamicStructMesh += /*wgsl*/`${u.name}:${u.type}, \n\t`;
         });
         if (this.#meshUniforms.length) {
             dynamicStructMesh = /*wgsl*/`struct Mesh {\n\t${dynamicStructMesh}\n}\n`;
         }
         this.#cameraUniforms.forEach(u => {
-            u.type = u.type || 'f32';
             dynamicStructCamera += /*wgsl*/`${u.name}:${u.type}, \n\t`;
         });
         if (this.#cameraUniforms.length) {
             dynamicStructCamera = /*wgsl*/`struct Camera {\n\t${dynamicStructCamera}\n}\n`;
         }
-        this.#constants.forEach(c => {
-            dynamicStructParams += /*wgsl*/`const ${c.name}:${c.structName} = ${c.value};\n`;
-        });
+
         dynamicStructParams += dynamicStructMesh;
         dynamicStructParams += dynamicStructCamera;
 
+        const constantsVertex = this.#constants.stringOfNonOverrides(GPUShaderStage.VERTEX);
+        const constantsCompute = this.#constants.stringOfNonOverrides(GPUShaderStage.COMPUTE);
+        const constantsFragment = this.#constants.stringOfNonOverrides(GPUShaderStage.FRAGMENT);
+
         renderPass.index = index;
-        renderPass.hasVertexShader && (dynamicGroupBindingsVertex += dynamicStructParams);
-        renderPass.hasComputeShader && (dynamicGroupBindingsCompute += dynamicStructParams);
-        renderPass.hasFragmentShader && (dynamicGroupBindingsFragment += dynamicStructParams);
+        renderPass.hasVertexShader && (dynamicGroupBindingsVertex += dynamicStructParams + constantsVertex);
+        renderPass.hasComputeShader && (dynamicGroupBindingsCompute += dynamicStructParams + constantsCompute);
+        renderPass.hasFragmentShader && (dynamicGroupBindingsFragment += dynamicStructParams + constantsFragment);
 
         renderPass.hasVertexShader && (dynamicGroupBindingsVertex += this.#createDynamicGroupBindings(GPUShaderStage.VERTEX, renderPass));
         renderPass.hasComputeShader && (dynamicGroupBindingsCompute += this.#createDynamicGroupBindings(GPUShaderStage.COMPUTE, renderPass));
@@ -5373,17 +7222,17 @@ class Points {
         this.#dataSize = dataSize(allShaders);
         // since uniforms are in a sigle struct
         // this is only required for storage
-        this.#storage.forEach(s => {
+        this.#storages.list.forEach(s => {
             if (!s.mapped) {
-                if (isArray(s.structName)) {
-                    const typeData = getArrayTypeData(s.structName, this.#dataSize);
-                    s.structSize = typeData.size;
+                if (isArray(s.type)) {
+                    const { size } = getArrayTypeData(s.type, this.#dataSize);
+                    s.size = size;
                 } else {
-                    const d = this.#dataSize.get(s.structName) || typeSizes[s.structName];
+                    const d = this.#dataSize.get(s.type) || typeSizes[s.type];
                     if (!d) {
-                        throw `${s.structName} has not been defined.`
+                        throw `${s.type} has not been defined.`
                     }
-                    s.structSize = d.bytes || d.size;
+                    s.size = d.bytes || d.size;
                 }
             }
         });
@@ -5518,7 +7367,7 @@ class Points {
         // sometimes both arrive and we have to use the bigger one
         const buffer = this.#device.createBuffer({
             mappedAtCreation,
-            size: Math.max(size, data.byteLength),
+            size: Math.max(size || 0, data.byteLength),
             usage,
         });
         new Float32Array(buffer.getMappedRange()).set(data);
@@ -5551,7 +7400,7 @@ class Points {
 
     /**
      *
-     * @param {Array} uniformsArray
+     * @param {Array<Uniform>} uniformsArray
      * @param {String} structName
      * @returns {{values:Float32Array, paramsDataSize:Object}}
      */
@@ -5559,8 +7408,9 @@ class Points {
         const paramsDataSize = this.#dataSize.get(structName);
         const paddings = paramsDataSize.paddings;
         // we check the paddings list and add 0's to just the ones that need it
-        const uniformsClone = structuredClone(uniformsArray);
-        let arrayValues = uniformsClone.map(v => {
+        const arrayValues = uniformsArray.map(u => {
+            const v = u.serialize(); // clone the item to not modify the original
+
             const padding = paddings[v.name] / 4;
             if (padding) {
                 if (v.value.constructor !== Array) {
@@ -5577,8 +7427,8 @@ class Points {
     }
 
     #createParametersUniforms() {
-        const { values, paramsDataSize } = this.#createUniformValues(this.#uniforms);
-        this.#uniforms.buffer = this.#createAndMapBuffer(values, GPUBufferUsage.UNIFORM + GPUBufferUsage.COPY_DST, true, paramsDataSize.bytes);
+        const { values, paramsDataSize } = this.#createUniformValues(this.#uniforms.list);
+        this.#uniforms.list.buffer = this.#createAndMapBuffer(values, GPUBufferUsage.UNIFORM + GPUBufferUsage.COPY_DST, true, paramsDataSize.bytes);
 
         if (this.#meshUniforms.length) {
             const { values, paramsDataSize } = this.#createUniformValues(this.#meshUniforms);
@@ -5594,11 +7444,11 @@ class Points {
      * Updates all uniforms (for the update function)
      */
     #writeParametersUniforms() {
-        if (!this.#uniforms.buffer) {
+        if (!this.#uniforms.list.buffer) {
             console.error('An attempt to create uniforms has been made but no setUniform has been called. Maybe an update was called before a setUniform.');
         }
-        const { values } = this.#createUniformValues(this.#uniforms);
-        this.#writeBuffer(this.#uniforms.buffer, values);
+        const { values } = this.#createUniformValues(this.#uniforms.list);
+        this.#writeBuffer(this.#uniforms.list.buffer, values);
 
         if (this.#meshUniforms.length) {
             const { values } = this.#createUniformValues(this.#meshUniforms);
@@ -5614,12 +7464,12 @@ class Points {
      * Updates all the storages (for the update function)
      */
     #writeStorages() {
-        this.#storage.forEach(storageItem => {
+        this.#storages.list.forEach(storageItem => {
             // since audio is something constant
             // the stream flag allows to keep this write open
             const { updated, stream } = storageItem;
             if (storageItem.mapped && (updated || stream)) {
-                const values = new Float32Array(storageItem.array);
+                const values = new Float32Array(storageItem.value);
                 this.#writeBuffer(storageItem.buffer, values);
                 if (!stream) {
                     storageItem.updated = false;
@@ -5636,38 +7486,28 @@ class Points {
         //--------------------------------------------
         this.#createParametersUniforms();
         //--------------------------------------------
-        this.#storage.forEach(storageItem => {
+        this.#storages.list.forEach(storageItem => {
             let usage = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST;
-            if (storageItem.read) {
-                let readStorageItem = {
-                    name: storageItem.name,
-                    size: storageItem.structSize
-                };
-                if (storageItem.mapped) {
-                    readStorageItem = {
-                        name: storageItem.name,
-                        size: storageItem.array.length,
-                    };
-                }
-                this.#readStorage.push(readStorageItem);
+            const { readable, name, size, mapped } = storageItem;
+            if (readable) {
+                const readSize = mapped ? storageItem.value.length : size;
+
+                storageItem.bufferRead = this.#device.createBuffer({
+                    label: name,
+                    size: readSize,
+                    usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
+                });
+
                 usage = usage | GPUBufferUsage.COPY_SRC;
             }
-            storageItem.usage = usage;
-            if (storageItem.mapped) {
-                const values = new Float32Array(storageItem.array);
-                storageItem.buffer = this.#createAndMapBuffer(values, usage);
+
+            if (mapped) {
+                const values = new Float32Array(storageItem.value);
+                storageItem.buffer = this.#createAndMapBuffer(values, usage, true, size);
             } else {
-                storageItem.buffer = this.#createBuffer(storageItem.structSize, usage);
+                storageItem.buffer = this.#createBuffer(size, usage);
             }
-            storageItem.buffer.label = storageItem.name;
-        });
-        //--------------------------------------------
-        this.#readStorage.forEach(readStorageItem => {
-            readStorageItem.buffer = this.#device.createBuffer({
-                label: readStorageItem.name,
-                size: readStorageItem.size,
-                usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
-            });
+            storageItem.buffer.label = name;
         });
         //--------------------------------------------
         if (this.#layers.length) {
@@ -5794,6 +7634,10 @@ class Points {
     }
 
     #createPipeline() {
+        const constantsCompute = this.#constants.listOfOverrides(GPUShaderStage.COMPUTE);
+        const constantsVertex = this.#constants.listOfOverrides(GPUShaderStage.VERTEX);
+        const constantsFragment = this.#constants.listOfOverrides(GPUShaderStage.FRAGMENT);
+
         this.#renderPasses.forEach(renderPass => {
             if (renderPass.hasComputeShader) {
                 this.#createBindGroup(renderPass, GPUShaderStage.COMPUTE);
@@ -5806,7 +7650,8 @@ class Points {
                         module: this.#device.createShaderModule({
                             code: renderPass.compiledShaders.compute
                         }),
-                        entryPoint: 'main'
+                        entryPoint: 'main',
+                        constants: constantsCompute,
                     }
                 });
             }
@@ -5881,6 +7726,7 @@ class Points {
                                 ],
                             },
                         ],
+                        constants: constantsVertex,
                     },
                     fragment: {
                         module: this.#device.createShaderModule({
@@ -5905,6 +7751,7 @@ class Points {
                                 writeMask: GPUColorWrite.ALL,
                             },
                         ],
+                        constants: constantsFragment,
                     },
                 });
             }
@@ -5914,10 +7761,10 @@ class Points {
      * Creates the entries for the pipeline
      * @returns an array with the entries
      */
-    #createEntries(shaderType, { index: renderPassIndex, internal }) {
+    #createEntries(shaderStage, { index: renderPassIndex, internal }) {
         let entries = [];
         let bindingIndex = 0;
-        if (this.#uniforms.length) {
+        if (this.#uniforms.list.length) {
             // TODO: 1262
             // if you remove this there's an error that I think is not explained right
             // it talks about a storage in index 1 but it was actually the 0
@@ -5929,13 +7776,13 @@ class Points {
             //     entry.visibility = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT
             // }
             // the call is split here and at the end of the method with the foreach |= assignment
-            // const visibility = shaderType === GPUShaderStage.FRAGMENT ? GPUShaderStage.VERTEX : null;
+            // const visibility = shaderStage === GPUShaderStage.FRAGMENT ? GPUShaderStage.VERTEX : null;
             entries.push(
                 {
                     binding: bindingIndex++,
                     resource: {
                         label: 'uniform',
-                        buffer: this.#uniforms.buffer
+                        buffer: this.#uniforms.list.buffer
                     },
                     buffer: {
                         type: 'uniform'
@@ -5974,11 +7821,11 @@ class Points {
                 }
             );
         }
-        this.#storage.forEach(storageItem => {
+        this.#storages.list.forEach(storageItem => {
             const isInternal = internal === storageItem.internal;
-            if (isInternal && (!storageItem.shaderType || storageItem.shaderType & shaderType)) {
+            if (isInternal && (!storageItem.shaderStage || storageItem.shaderStage & shaderStage)) {
 
-                let type = getStorageAccessMode(shaderType, storageItem.shaderType);
+                let type = getStorageAccessMode(shaderStage, storageItem.shaderStage);
                 type = entriesModes[type];
 
                 entries.push(
@@ -5997,7 +7844,7 @@ class Points {
             }
         });
         if (this.#layers.length) {
-            if (!this.#layers.shaderType || this.#layers.shaderType & shaderType) {
+            if (!this.#layers.shaderStage || this.#layers.shaderStage & shaderStage) {
                 entries.push(
                     {
                         binding: bindingIndex++,
@@ -6014,7 +7861,7 @@ class Points {
         }
         this.#samplers.forEach(sampler => {
             const isInternal = internal === sampler.internal;
-            if (isInternal && (!sampler.shaderType || sampler.shaderType & shaderType)) {
+            if (isInternal && (!sampler.shaderStage || sampler.shaderStage & shaderStage)) {
                 entries.push(
                     {
                         binding: bindingIndex++,
@@ -6028,7 +7875,7 @@ class Points {
         });
         this.#texturesStorage2d.forEach(textureStorage2d => {
             const isInternal = internal === textureStorage2d.internal;
-            if (isInternal && (!textureStorage2d.shaderType || textureStorage2d.shaderType & shaderType)) {
+            if (isInternal && (!textureStorage2d.shaderStage || textureStorage2d.shaderStage & shaderStage)) {
                 entries.push(
                     {
                         label: 'texture storage 2d',
@@ -6043,7 +7890,7 @@ class Points {
         });
         this.#textures2d.forEach(texture2d => {
             const isInternal = internal === texture2d.internal;
-            if (isInternal && (!texture2d.shaderType || texture2d.shaderType & shaderType)) {
+            if (isInternal && (!texture2d.shaderStage || texture2d.shaderStage & shaderStage)) {
                 entries.push(
                     {
                         label: 'texture 2d',
@@ -6059,7 +7906,7 @@ class Points {
         this.#texturesDepth2d.forEach(texture2d => {
             if (texture2d.renderPassIndex !== renderPassIndex) {
                 const isInternal = internal === texture2d.internal;
-                if (isInternal && (!texture2d.shaderType || texture2d.shaderType & shaderType)) {
+                if (isInternal && (!texture2d.shaderStage || texture2d.shaderStage & shaderStage)) {
                     const renderPass = this.#renderPasses.find(renderPass => renderPass.index === texture2d.renderPassIndex);
                     texture2d.texture = renderPass.textureDepth;
                     entries.push(
@@ -6079,7 +7926,7 @@ class Points {
         });
         this.#textures2dArray.forEach(texture2dArray => {
             const isInternal = internal === texture2dArray.internal;
-            if (isInternal && (!texture2dArray.shaderType || texture2dArray.shaderType & shaderType)) {
+            if (isInternal && (!texture2dArray.shaderStage || texture2dArray.shaderStage & shaderStage)) {
                 entries.push(
                     {
                         label: 'texture 2d array',
@@ -6099,7 +7946,7 @@ class Points {
         });
         this.#texturesExternal.forEach(externalTexture => {
             const isInternal = internal === externalTexture.internal;
-            if (isInternal && (!externalTexture.shaderType || externalTexture.shaderType & shaderType)) {
+            if (isInternal && (!externalTexture.shaderStage || externalTexture.shaderStage & shaderStage)) {
                 entries.push(
                     {
                         label: 'external texture',
@@ -6116,7 +7963,7 @@ class Points {
         this.#bindingTextures.forEach(bindingTexture => {
             const { usesRenderPass } = bindingTexture;
             if (usesRenderPass) {
-                if (GPUShaderStage.VERTEX === shaderType) { // to avoid binding texture in vertex
+                if (GPUShaderStage.VERTEX === shaderStage) { // to avoid binding texture in vertex
                     return;
                 }
                 if (bindingTexture.read.renderPassIndex === renderPassIndex) {
@@ -6148,7 +7995,7 @@ class Points {
             }
 
             const isInternal = internal === bindingTexture.internal;
-            if (isInternal && (bindingTexture.read.shaderType & shaderType)) {
+            if (isInternal && (bindingTexture.read.shaderStage & shaderStage)) {
                 entries.push(
                     {
                         label: `binding texture 2: name: ${bindingTexture.read.name}`,
@@ -6161,7 +8008,7 @@ class Points {
                 );
             }
 
-            if (isInternal && (bindingTexture.write.shaderType & shaderType)) {
+            if (isInternal && (bindingTexture.write.shaderStage & shaderStage)) {
                 entries.push(
                     {
                         label: `binding texture: name: ${bindingTexture.write.name}`,
@@ -6176,17 +8023,17 @@ class Points {
             }
         });
 
-        entries.forEach(entry => entry.visibility = shaderType);
+        entries.forEach(entry => entry.visibility = shaderStage);
 
         return entries;
     }
 
-    #createEntriesUpdate(shaderType, { index: renderPassIndex, internal }) {
+    #createEntriesUpdate(shaderStage, { index: renderPassIndex, internal }) {
         let entries = [];
         let bindingIndex = 0;
         this.#texturesExternal.forEach(externalTexture => {
             const isInternal = internal === externalTexture.internal;
-            if (isInternal && (!externalTexture.shaderType || externalTexture.shaderType & shaderType)) {
+            if (isInternal && (!externalTexture.shaderStage || externalTexture.shaderStage & shaderStage)) {
                 entries.push(
                     {
                         label: 'external texture',
@@ -6199,7 +8046,7 @@ class Points {
                 );
             }
         });
-        entries.forEach(entry => entry.visibility = shaderType);
+        entries.forEach(entry => entry.visibility = shaderStage);
 
         return entries;
     }
@@ -6210,19 +8057,19 @@ class Points {
      * in a single method to avoid duplication and possible bifurcations without
      * me knowing.
      * @param {RenderPass} renderPass
-     * @param {GPUShaderStage} shaderType
+     * @param {GPUShaderStage} shaderStage
      */
-    #createBindGroup(renderPass, shaderType) {
-        const hasComputeShader = (shaderType === GPUShaderStage.COMPUTE) && renderPass.hasComputeShader;
-        const hasVertexShader = (shaderType === GPUShaderStage.VERTEX) && renderPass.hasVertexShader;
-        const hasFragmentShader = (shaderType === GPUShaderStage.FRAGMENT) && renderPass.hasFragmentShader;
+    #createBindGroup(renderPass, shaderStage) {
+        const hasComputeShader = (shaderStage === GPUShaderStage.COMPUTE) && renderPass.hasComputeShader;
+        const hasVertexShader = (shaderStage === GPUShaderStage.VERTEX) && renderPass.hasVertexShader;
+        const hasFragmentShader = (shaderStage === GPUShaderStage.FRAGMENT) && renderPass.hasFragmentShader;
 
-        const entries = this.#createEntries(shaderType, renderPass);
+        const entries = this.#createEntries(shaderStage, renderPass);
 
         if (entries.length) {
             const bindGroupLayout = this.#device.createBindGroupLayout({ entries });
             const bindGroup = this.#device.createBindGroup({
-                label: `_createBindGroup a ${shaderType} - ${renderPass.name}`,
+                label: `_createBindGroup a ${shaderStage} - ${renderPass.name}`,
                 layout: bindGroupLayout,
                 entries
             });
@@ -6240,9 +8087,9 @@ class Points {
                 renderPass.fragmentBindGroup = bindGroup;
             }
 
-            // const entriesUpdate = this.#createEntriesUpdate(shaderType, renderPass);
+            // const entriesUpdate = this.#createEntriesUpdate(shaderStage, renderPass);
             // const bindGroup2 = this.#device.createBindGroup({
-            //     label: `_createBindGroup b ${shaderType} - ${renderPass.name}`,
+            //     label: `_createBindGroup b ${shaderStage} - ${renderPass.name}`,
             //     layout: bindGroupLayout,
             //     entries: entriesUpdate
             // });
@@ -6261,14 +8108,14 @@ class Points {
      * is not being updated at all. I have to make the createBindGroup call
      * only if the texture is updated.
      * @param {RenderPass} renderPass
-     * @param {GPUShaderStage} shaderType
+     * @param {GPUShaderStage} shaderStage
      */
-    #passBindGroup(renderPass, shaderType) {
-        const hasComputeShader = (shaderType === GPUShaderStage.COMPUTE) && renderPass.hasComputeShader;
-        const hasVertexShader = (shaderType === GPUShaderStage.VERTEX) && renderPass.hasVertexShader;
-        const hasFragmentShader = (shaderType === GPUShaderStage.FRAGMENT) && renderPass.hasFragmentShader;
+    #passBindGroup(renderPass, shaderStage) {
+        const hasComputeShader = (shaderStage === GPUShaderStage.COMPUTE) && renderPass.hasComputeShader;
+        const hasVertexShader = (shaderStage === GPUShaderStage.VERTEX) && renderPass.hasVertexShader;
+        const hasFragmentShader = (shaderStage === GPUShaderStage.FRAGMENT) && renderPass.hasFragmentShader;
 
-        const entries = this.#createEntries(shaderType, renderPass);
+        const entries = this.#createEntries(shaderStage, renderPass);
 
         if (entries.length) {
             let bindGroupLayout = null;
@@ -6300,10 +8147,10 @@ class Points {
             }
 
 
-            // const entriesUpdate = this.#createEntriesUpdate(shaderType, renderPass);
+            // const entriesUpdate = this.#createEntriesUpdate(shaderStage, renderPass);
             // if (entriesUpdate.length) {
             //     const bindGroup = this.#device.createBindGroup({
-            //         label: `passBindGroup ${shaderType} - ${renderPass.name}`,
+            //         label: `passBindGroup ${shaderStage} - ${renderPass.name}`,
             //         layout: bindGroupLayout,
             //         entries: entriesUpdate
             //     });
@@ -6374,9 +8221,11 @@ class Points {
         this.#delta = this.#clock.getDelta();
         this.#time = this.#clock.time;
         this.#epoch = +new Date() / 1000;
-        this.setUniform(UniformKeys.TIME, this.#time);
-        this.setUniform(UniformKeys.DELTA, this.#delta);
-        this.setUniform(UniformKeys.EPOCH, this.#epoch);
+
+        const { delta, time, epoch } = this.#uniforms;
+        delta.value = this.#delta;
+        time.value = this.#time;
+        epoch.value = this.#epoch;
         //--------------------------------------------
         this.#writeParametersUniforms();
         this.#writeStorages();
@@ -6412,7 +8261,7 @@ class Points {
             // texturesExternal means there's a video
             // if there's a video it needs to be updated no matter what.
             // Also, it needs to be updated if the screen size changes
-            const updateBundle = !isSameDevice || !renderPass.bundle || this.#texturesExternal.length || this.#screenResized || this.#textureUpdated;
+            const updateBundle = !isSameDevice || !renderPass.bundle || this.#texturesExternal.length || this.#screenResized || this.#textureUpdated || renderPass.meshUpdated;
 
             if (renderPass.hasVertexAndFragmentShader) {
                 renderPass.descriptor.colorAttachments[0].view = swapChainTexture.createView();
@@ -6438,10 +8287,17 @@ class Points {
 
                     bundleEncoder.setPipeline(renderPass.renderPipeline);
 
-                    if (this.#uniforms.length) {
+                    if (this.#uniforms.list.length) {
                         bundleEncoder.setBindGroup(0, renderPass.vertexBindGroup);
                         bundleEncoder.setBindGroup(1, renderPass.fragmentBindGroup);
                     }
+
+                    // IF renderPass.meshUpdated
+                    renderPass.vertexBufferInfo = new VertexBufferInfo(renderPass.vertexArray);
+                    renderPass.vertexBuffer = this.#createAndMapBuffer(renderPass.vertexArray, GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST);
+                    renderPass.meshUpdated = false;
+                    // END IF renderPass.meshUpdated
+
                     bundleEncoder.setVertexBuffer(0, renderPass.vertexBuffer);
 
                     // TODO: move this to renderPass because we can ask this just one time and have it as property
@@ -6503,7 +8359,7 @@ class Points {
 
                 const passEncoder = commandEncoder.beginComputePass();
                 passEncoder.setPipeline(renderPass.computePipeline);
-                if (this.#uniforms.length) {
+                if (this.#uniforms.list.length) {
                     passEncoder.setBindGroup(0, renderPass.computeBindGroup);
                 }
                 passEncoder.dispatchWorkgroups(
@@ -6549,15 +8405,16 @@ class Points {
 
 
 
-        this.#readStorage.forEach(readStorageItem => {
-            let storageItem = this.#storage.find(storageItem => storageItem.name === readStorageItem.name);
-            commandEncoder.copyBufferToBuffer(
-                storageItem.buffer /* source buffer */,
-                0 /* source offset */,
-                readStorageItem.buffer /* destination buffer */,
-                0 /* destination offset */,
-                readStorageItem.buffer.size /* size */
-            );
+        this.#storages.list.forEach(storageItem => {
+            if (storageItem.readable) {
+                commandEncoder.copyBufferToBuffer(
+                    storageItem.buffer /* source buffer */,
+                    0 /* source offset */,
+                    storageItem.bufferRead /* destination buffer */,
+                    0 /* destination offset */,
+                    storageItem.bufferRead.size /* size */
+                );
+            }
         });
         // ---------------------
         this.#commandsFinished.push(commandEncoder.finish());
@@ -6570,9 +8427,11 @@ class Points {
         this.#mouseWheel = false;
         this.#mouseDelta[0] = 0;
         this.#mouseDelta[1] = 0;
-        this.setUniform(UniformKeys.MOUSE_CLICK, this.#mouseClick);
-        this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
-        this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta);
+
+        const { mouseClick, mouseWheel, mouseDelta } = this.#uniforms;
+        mouseClick.value = this.#mouseClick;
+        mouseWheel.value = this.#mouseWheel;
+        mouseDelta.value = this.#mouseDelta;
         await this.read();
     }
     async read() {
@@ -6584,10 +8443,12 @@ class Points {
                 if (id != 0) {
                     const dataRead = await this.readStorage(`${name}_data`);
                     event?.callback(dataRead);
-                    const storageToUpdate = this.#nameExists(this.#storage, name);
-                    const data = storageToUpdate.array;
-                    data[0] = 0;
-                    this.setStorageMap(name, data);
+                    const storageToUpdate = this.#storages.find(name);
+                    if (storageToUpdate) {
+                        const data = storageToUpdate.value;
+                        data[0] = 0;
+                        this.setStorage(name).setValue(data);
+                    }
                 }
             }
         }
@@ -6754,6 +8615,45 @@ class Points {
     }
 
     /**
+     * Get the list of added uniforms, same as {@link uniforms}
+     * @example
+     *
+     * points.setUniform('myuniform', 10);
+     *
+     * // later
+     * points.params.myuniform.value = 12;
+     */
+    get params() {
+        return this.#uniforms;
+    }
+    /**
+     * @type {Uniforms & { [key: string]: Uniform }}
+     *
+     * Get the list of added uniforms, same as {@link params}
+     * @example
+     *
+     * points.setUniform('myuniform', 10);
+     *
+     * // later
+     * points.uniforms.myuniform.value = 12;
+     */
+    get uniforms() {
+        return this.#uniforms;
+    }
+    /**
+     * @type {Storages & { [key: string]: Storage }}
+     */
+    get storages() {
+        return this.#storages;
+    }
+    /**
+     * @type {Constants & { [key: string]: Constant }}
+     */
+    get constants() {
+        return this.#constants;
+    }
+
+    /**
      * Reset memory before calling again `init()`, this without calling
      * the constructor `new Points()`.
      * Useful to switch to a new set of shaders and erase internal references,
@@ -6796,11 +8696,12 @@ class Points {
         });
         this.#postRenderPasses = [];
 
-        this.#storage?.forEach(s => s.buffer.destroy());
-        this.#storage = [];
-        this.#readStorage?.forEach(s => s.buffer.destroy());
-        this.#readStorage = [];
-        this.#uniforms?.buffer.destroy();
+        // TODO: make destroy method in Storages
+        this.#storages.list?.forEach(s => { s.buffer.destroy(); s.bufferRead?.destroy(); });
+        this.#storages = new Storages();
+
+        // TODO: make destroy method in Uniforms
+        this.#uniforms.list?.buffer.destroy();
         this.#meshUniforms?.buffer?.destroy();
         this.#cameraUniforms?.buffer?.destroy();
         this.#samplers?.forEach(s => null);
@@ -6811,9 +8712,10 @@ class Points {
         this.#layers = new LayersArray();
 
         this.#initialized = false;
-        this.#uniforms = new UniformsArray();
+        this.#uniforms = new Uniforms();
         this.#meshUniforms = new UniformsArray();
         this.#cameraUniforms = new UniformsArray();
+
 
         this.#texturesExternal?.forEach(textureExternal => {
             const stream = textureExternal?.video.srcObject;
@@ -6823,7 +8725,7 @@ class Points {
         this.#texturesExternal = [];
 
         clearCache();
-        this.#constants = [];
+        this.#constants = new Constants();
         this.#imports = [];
         this.#clock = new Clock();
 
@@ -6869,11 +8771,9 @@ class Points {
         });
         this.#postRenderPasses = null;
 
-        this.#storage.forEach(s => s.buffer.destroy());
-        this.#storage = null;
-        this.#readStorage.forEach(s => s.buffer.destroy());
-        this.#readStorage = null;
-        this.#uniforms.buffer.destroy();
+        this.#storages.list?.forEach(s => { s.buffer.destroy(); s.bufferRead?.destroy(); });
+        this.#storages = null;
+        this.#uniforms.list.buffer.destroy();
         this.#meshUniforms?.buffer?.destroy();
         this.#cameraUniforms?.buffer?.destroy();
         this.#samplers.forEach(s => null);
@@ -6887,6 +8787,7 @@ class Points {
         this.#uniforms = null;
         this.#meshUniforms = null;
         this.#cameraUniforms = null;
+
 
         this.#texturesExternal.forEach(textureExternal => {
             const stream = textureExternal?.video.srcObject;
@@ -6906,4 +8807,4 @@ class Points {
     }
 }
 
-export { CullMode, FrontFace, LoadOp, PresentationFormat, PrimitiveTopology, RenderPass, RenderPasses, ScaleMode, Points as default };
+export { Constant, CullMode, FrontFace, LoadOp, PresentationFormat, PrimitiveTopology, RenderPass, RenderPasses, ScaleMode, Storage, Uniform, Points as default };

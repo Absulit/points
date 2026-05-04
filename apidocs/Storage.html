@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Class: ScaleMode | Points</title>
+    <title>Class: Storage | Points</title>
     <meta name="description" content="A Generative Art library made in WebGPU"><meta name="keywords" content="javascript, webgl, crative-coding, shaders, generative-art, webgpu, genart, wgsl">
     <link rel="icon" title="dummy" href="data:image/x-icon;base64,AA">
     <script src="scripts/docolatte.min.js"></script>
@@ -22,7 +22,7 @@
         </div>
         <div class="topbar">
             <h1 class="page-title">
-                <a href="#">Class: ScaleMode</a>
+                <a href="#">Class: Storage</a>
             </h1>
             <a class="light-switch" title="Switch light/dark mode" href="#"><i class="label auto">
 <svg  class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -42,7 +42,7 @@
 <article class="doc">
     <header>
         
-            <h2 class="name"><span class="attribs"><span class="attributes"></span></span>ScaleMode<span class="signature">()</span><span class="type-signature"></span></h2>
+            <h2 class="name"><span class="attribs"><span class="attributes"></span></span>Storage<span class="signature">()</span><span class="type-signature"></span></h2>
             
         
     </header>
@@ -54,22 +54,12 @@
     
 
     
-    <h4 class="name" id="ScaleMode"><span class="attributes"></span>new ScaleMode<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="Storage"><span class="attributes"></span>new Storage<span class="signature">()</span><span class="type-signature"></span></h4>
     
 
     
 
 
-
-<div class="description">
-    <p>Class to be used to select how the content should be displayed on different
-screen sizes.</p>
-<pre class="prettyprint source lang-text"><code>FIT: Preserves both, but might show black bars or extend empty content. All content is visible.
-COVER: Preserves both, but might crop width or height. All screen is covered.
-WIDTH: Preserves the visibility of the width, but might crop the height.
-HEIGHT: Preserves the visibility of the height, but might crop the width.
-</code></pre>
-</div>
 
 
 
@@ -86,7 +76,7 @@ HEIGHT: Preserves the visibility of the height, but might crop the width.
 <dl class="details">
 <dt class="tag-source">Source:</dt>
 <dd class="tag-source">
-    <a href="ScaleMode.js.html">ScaleMode.js</a>, <a href="ScaleMode.js.html#line1">line 1</a>
+    <a href="Storage.js.html">Storage.js</a>, <a href="Storage.js.html#line3">line 3</a>
 </dd>
 </dl>
 
@@ -105,13 +95,6 @@ HEIGHT: Preserves the visibility of the height, but might crop the width.
 
 
 
-
-
-
-    <h5>Example</h5>
-    
-
-    <pre class="prettyprint lang-js"><code>points.scaleMode = ScaleMode.COVER;</code></pre>
 
 
 
@@ -136,29 +119,13 @@ HEIGHT: Preserves the visibility of the height, but might crop the width.
 
         
             
-<h4 class="name" id=".COVER"><span class="attributes"><span class="attribute">static</span></span>COVER<span class="type-signature"></span></h4>
+<h4 class="name" id=".buffer"><span class="attributes"><span class="attribute">static</span></span>buffer<span class="type-signature"></span></h4>
 
 
 
 
 <div class="description">
-    <pre class="prettyprint source lang-text"><code>Not all content is visible.
-No black bars shown.
-Content is cropped on the sides.
-`
-PORTRAIT            LANDSCAPE
-▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-</code></pre>
+    <p>For internal use mostly. The actual GPUBuffer with the data.</p>
 </div>
 
 
@@ -168,7 +135,7 @@ PORTRAIT            LANDSCAPE
 <dl class="details">
 <dt class="tag-source">Source:</dt>
 <dd class="tag-source">
-    <a href="ScaleMode.js.html">ScaleMode.js</a>, <a href="ScaleMode.js.html#line62">line 62</a>
+    <a href="Storage.js.html">Storage.js</a>, <a href="Storage.js.html#line138">line 138</a>
 </dd>
 </dl>
 
@@ -179,29 +146,14 @@ PORTRAIT            LANDSCAPE
 
         
             
-<h4 class="name" id=".FIT"><span class="attributes"><span class="attribute">static</span></span>FIT<span class="type-signature"></span></h4>
+<h4 class="name" id=".bufferRead"><span class="attributes"><span class="attribute">static</span></span>bufferRead<span class="type-signature"></span></h4>
 
 
 
 
 <div class="description">
-    <pre class="prettyprint source lang-text"><code>All content is visible.
-Black bars shown to compensate.
-No content is cropped.
-
-PORTRAIT        LANDSCAPE
-░░░░░░░░░░░░░░░ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-░░░░░░░░░░░░░░░ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-░░░░░░░░░░░░░░░
-░░░░░░░░░░░░░░░
-</code></pre>
+    <p>Buffer for reading back
+For internal use mostly. The actual GPUBufferRead with the data.</p>
 </div>
 
 
@@ -211,7 +163,7 @@ PORTRAIT        LANDSCAPE
 <dl class="details">
 <dt class="tag-source">Source:</dt>
 <dd class="tag-source">
-    <a href="ScaleMode.js.html">ScaleMode.js</a>, <a href="ScaleMode.js.html#line40">line 40</a>
+    <a href="Storage.js.html">Storage.js</a>, <a href="Storage.js.html#line151">line 151</a>
 </dd>
 </dl>
 
@@ -222,30 +174,10 @@ PORTRAIT        LANDSCAPE
 
         
             
-<h4 class="name" id=".HEIGHT"><span class="attributes"><span class="attribute">static</span></span>HEIGHT<span class="type-signature"></span></h4>
+<h4 class="name" id=".mapped"><span class="attributes"><span class="attribute">static</span></span>mapped<span class="type-signature"></span></h4>
 
 
 
-
-<div class="description">
-    <pre class="prettyprint source lang-text"><code>Not all content is visible.
-Black bars shown to compensate in landscape.
-Content is cropped in portrait.
-
-PORTRAIT            LANDSCAPE
-▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
-▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
-▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
-▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
-▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
-▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
-</code></pre>
-</div>
 
 
 
@@ -254,7 +186,7 @@ PORTRAIT            LANDSCAPE
 <dl class="details">
 <dt class="tag-source">Source:</dt>
 <dd class="tag-source">
-    <a href="ScaleMode.js.html">ScaleMode.js</a>, <a href="ScaleMode.js.html#line106">line 106</a>
+    <a href="Storage.js.html">Storage.js</a>, <a href="Storage.js.html#line85">line 85</a>
 </dd>
 </dl>
 
@@ -265,29 +197,13 @@ PORTRAIT            LANDSCAPE
 
         
             
-<h4 class="name" id=".WIDTH"><span class="attributes"><span class="attribute">static</span></span>WIDTH<span class="type-signature"></span></h4>
+<h4 class="name" id=".name"><span class="attributes"><span class="attribute">static</span></span>name<span class="type-signature"></span></h4>
 
 
 
 
 <div class="description">
-    <pre class="prettyprint source lang-text"><code>Content is visible in portrait.
-Black bars shown to compensate in portrait.
-Content is cropped in landscape.
-
-PORTRAIT        LANDSCAPE
-░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-</code></pre>
+    <p>The name that the Storage will have on the WGSL side.</p>
 </div>
 
 
@@ -297,7 +213,181 @@ PORTRAIT        LANDSCAPE
 <dl class="details">
 <dt class="tag-source">Source:</dt>
 <dd class="tag-source">
-    <a href="ScaleMode.js.html">ScaleMode.js</a>, <a href="ScaleMode.js.html#line84">line 84</a>
+    <a href="Storage.js.html">Storage.js</a>, <a href="Storage.js.html#line70">line 70</a>
+</dd>
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+
+    <pre class="prettyprint lang-js has-caption"><code>myStorage.name = 'myStorageName';
+
+// wgsl
+myStorageName = 13.1;</code><div class="code-caption hljs">js</div></pre>
+
+
+
+
+        
+            
+<h4 class="name" id=".readable"><span class="attributes"><span class="attribute">static</span></span>readable<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    <p>If data is read back in JS from WGSL, then set to <code>true</code>.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="Storage.js.html">Storage.js</a>, <a href="Storage.js.html#line126">line 126</a>
+</dd>
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id=".shaderStage"><span class="attributes"><span class="attribute">static</span></span>shaderStage<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    <p>Tells WebGPU to which shader it can only be used.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="Storage.js.html">Storage.js</a>, <a href="Storage.js.html#line113">line 113</a>
+</dd>
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id=".stream"><span class="attributes"><span class="attribute">static</span></span>stream<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    <p><code>updated</code> is set to true in data updates, but this is not true in
+something like audio, where the data streams and needs to be updated
+constantly, so if the storage map needs to be updated constantly then
+<code>stream</code> needs to be set to true.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="Storage.js.html">Storage.js</a>, <a href="Storage.js.html#line182">line 182</a>
+</dd>
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id=".type"><span class="attributes"><span class="attribute">static</span></span>type<span class="type-signature"></span></h4>
+
+
+
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="Storage.js.html">Storage.js</a>, <a href="Storage.js.html#line99">line 99</a>
+</dd>
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+
+    <pre class="prettyprint lang-js"><code>myStorage.type = 'u32'</code></pre>
+
+
+
+
+        
+            
+<h4 class="name" id=".updated"><span class="attributes"><span class="attribute">static</span></span>updated<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    <p>Mostly internal. Set to <code>true</code> if a value has been updated.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="Storage.js.html">Storage.js</a>, <a href="Storage.js.html#line194">line 194</a>
+</dd>
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id=".value"><span class="attributes"><span class="attribute">static</span></span>value<span class="type-signature"></span></h4>
+
+
+
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="Storage.js.html">Storage.js</a>, <a href="Storage.js.html#line213">line 213</a>
 </dd>
 </dl>
 
@@ -309,6 +399,489 @@ PORTRAIT        LANDSCAPE
         
     
 
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".setReadable"><span class="attributes"><span class="attribute">static</span></span>setReadable<span class="signature">(value)</span><span class="type-signature"> &rarr; <span class="type"><a href="Storage.html">Storage</a></span></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>if this is going to be used to read data back set to <code>true</code></p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<div class="table-wrap">
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>value</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">bool</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+</div>
+
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="Storage.js.html">Storage.js</a>, <a href="Storage.js.html#line246">line 246</a>
+</dd>
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+
+
+<dl>
+    <dt>
+        Type:
+    </dt>
+    <dd class="type">
+        
+<span class="param-type"><a href="Storage.html">Storage</a></span>
+
+    </dd>
+</dl>
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".setShaderStage"><span class="attributes"><span class="attribute">static</span></span>setShaderStage<span class="signature">(value)</span><span class="type-signature"> &rarr; <span class="type"><a href="Storage.html">Storage</a></span></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Tells WebGPU to which shader it can only be used.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<div class="table-wrap">
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>value</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">GPUShaderStage</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+</div>
+
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="Storage.js.html">Storage.js</a>, <a href="Storage.js.html#line257">line 257</a>
+</dd>
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+
+
+<dl>
+    <dt>
+        Type:
+    </dt>
+    <dd class="type">
+        
+<span class="param-type"><a href="Storage.html">Storage</a></span>
+
+    </dd>
+</dl>
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".setType"><span class="attributes"><span class="attribute">static</span></span>setType<span class="signature">(value)</span><span class="type-signature"> &rarr; <span class="type"><a href="Storage.html">Storage</a></span></span></h4>
+    
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<div class="table-wrap">
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>value</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+            
+            </td>
+
+            
+
+            <td class="description last"><p>WGSL data type of the Storage.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+</div>
+
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="Storage.js.html">Storage.js</a>, <a href="Storage.js.html#line269">line 269</a>
+</dd>
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+
+
+<dl>
+    <dt>
+        Type:
+    </dt>
+    <dd class="type">
+        
+<span class="param-type"><a href="Storage.html">Storage</a></span>
+
+    </dd>
+</dl>
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+
+    <pre class="prettyprint lang-js"><code>myStorage.setType('u32');</code></pre>
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".setValue"><span class="attributes"><span class="attribute">static</span></span>setValue<span class="signature">(value)</span><span class="type-signature"> &rarr; <span class="type"><a href="Storage.html">Storage</a></span></span></h4>
+    
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<div class="table-wrap">
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name">
+                    <code>value</code>
+                </td>
+            
+
+            <td class="type">
+            
+                
+<ul><li><span class="param-type">Number</span></li><li><span class="param-type">Number[]</span></li></ul>
+
+            
+            </td>
+
+            
+
+            <td class="description last"><p>data to send to the shader</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+</div>
+
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="Storage.js.html">Storage.js</a>, <a href="Storage.js.html#line228">line 228</a>
+</dd>
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+
+
+<dl>
+    <dt>
+        Type:
+    </dt>
+    <dd class="type">
+        
+<span class="param-type"><a href="Storage.html">Storage</a></span>
+
+    </dd>
+</dl>
+
+
+
+
+
+
+
+
+        
     
 
     
@@ -335,7 +908,7 @@ PORTRAIT        LANDSCAPE
                     Documentation generated by <a rel="external" href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a><wbr>
                     using <a rel="external" href="https://github.com/amekusa/docolatte">Docolatte</a> theme
                     
-                    <wbr>on <time datetime="2026-05-04T21:46:59.201Z">Mon, 04 May 2026 21:46:59 GMT</time>
+                    <wbr>on <time datetime="2026-05-04T21:46:59.203Z">Mon, 04 May 2026 21:46:59 GMT</time>
                     
                 </p>
                 
