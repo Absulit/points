@@ -2,6 +2,13 @@ import { Uniform } from 'points';
 import UniformsArray from './UniformsArray.js';
 
 /**
+ * Class that handles the creation of new {@link Uniform}s in Points.
+ * @example
+ * // js side
+ * points.uniforms.myUniform = 10
+ *
+ * // wgsl side
+ * let val = params.myUniform; // value is 10.0 f32
  * @class Uniforms
  */
 export default class Uniforms {

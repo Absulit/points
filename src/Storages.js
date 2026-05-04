@@ -1,6 +1,13 @@
 import { Storage } from 'points';
 
 /**
+ * Class that handles the creation of new {@link Storage}s in Points.
+ * @example
+ * // js side
+ * points.storages.myStorage = [1, 2, 3]
+ *
+ * // wgsl side
+ * let val = params.myStorage; // value is vec3f(1, 2, 3)
  * @class Storages
  */
 export default class Storages {
