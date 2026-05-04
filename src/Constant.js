@@ -5,7 +5,7 @@ import { getWGSLType } from './data-size.js';
  * @class Constant
  */
 
-export default class Constant {
+class Constant {
     #name
     #value
     #type
@@ -248,3 +248,5 @@ export default class Constant {
     }
 
 }
+
+export default Constant;

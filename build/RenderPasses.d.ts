@@ -93,6 +93,5 @@ declare class RenderPasses {
      * @example
      * points.addRenderPass(RenderPasses.CRT, { scale: .05 });
      */
-    static CRT: RenderPass;
+    static CRT: any;
 }
-import { RenderPass } from 'points';

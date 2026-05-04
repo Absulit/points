@@ -5,7 +5,7 @@ import { isArray } from './data-size.js';
  *
  * @class Uniform
  */
-export default class Uniform {
+class Uniform {
     #name
     #value
     #type
@@ -215,3 +215,5 @@ export default class Uniform {
         return this.#value;
     }
 }
+
+export default Uniform;

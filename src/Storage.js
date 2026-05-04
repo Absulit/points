@@ -5,7 +5,7 @@ import { getWGSLType } from './data-size.js'
  * @class Storage
  */
 
-export default class Storage {
+class Storage {
     #name
     #mapped
     #type
@@ -340,3 +340,6 @@ export default class Storage {
         return this.#value;
     }
 }
+
+export default Storage;
+

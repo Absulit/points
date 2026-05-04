@@ -11,7 +11,7 @@ import UniformsArray from './UniformsArray.js';
  * let val = params.myUniform; // value is 10.0 f32
  * @class Uniforms
  */
-export default class Uniforms {
+class Uniforms {
     #list = new UniformsArray();
 
     constructor() {
