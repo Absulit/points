@@ -108,3 +108,5 @@ class Uniforms {
         this.#list.push(uniform);
     }
 }
+
+export default Uniforms;
