@@ -7,7 +7,7 @@ import { Storage } from 'points';
  * points.storages.myStorage = [1, 2, 3]
  *
  * // wgsl side
- * let val = params.myStorage; // value is vec3f(1, 2, 3)
+ * let val = myStorage; // value is vec3f(1, 2, 3)
  * @class Storages
  */
 export default class Storages {

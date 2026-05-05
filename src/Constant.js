@@ -1,6 +1,8 @@
 import { getWGSLType } from './data-size.js';
 
 /**
+ * Constant is a container for const declarations.
+ * They work in two ways with the `override` attribute.
  *
  * @class Constant
  */

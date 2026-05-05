@@ -1,7 +1,7 @@
 import { getWGSLType } from './data-size.js'
 
 /**
- *
+ * Storage is a container for storage buffer related data and actions.
  * @class Storage
  */
 

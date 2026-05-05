@@ -1,6 +1,13 @@
 import { Constant } from 'points';
 
 /**
+ * Class that handles the creation of new {@link Constant}s in Points.
+ * @example
+ * // js side
+ * points.constants.MYCONST = 10;
+ *
+ * // wgsl side
+ * let val = MYCONST; // value is 10 u32 by default
  * @class Constants
  */
 export default class Constants {

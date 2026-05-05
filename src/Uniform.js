@@ -1,7 +1,7 @@
 import { isArray } from './data-size.js';
 
 /**
- * Uniform class is a container for uniform related data and actions.
+ * Uniform is a container for uniform buffer related data and actions.
  *
  * @class Uniform
  */
