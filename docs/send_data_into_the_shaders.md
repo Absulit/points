@@ -2,14 +2,14 @@
 
 You can call one of the following methods; you pair the data with a `key` name, and this name is the one you will reference inside the shader.
 
-First we will see the new way to use buffer objects (uniforms, storages, constants) which are an easy way to add data into the shaders; then the original way using the set* methods, that will be deprecated later.
+First we will see the new way to use buffer objects (uniforms, storages, constants) which are an easy way to add data into the shaders; then the original way using the set* methods, that will be deprecated in an upcoming version.
 
 
 ## Uniforms, Storage, Constants
 
 Additionally to the set* methods mentioned in the following sections, you can use the `uniforms` attribute, `storage` and `constants` of the main `Points` class. Its purpose is to simplify the buffer assigment to look more like a regular variable assigment.
 
-In principle, they function the exact same way as the set* methods, but they avoid the parameter hell.
+In principle, they function the exact same way as the set* methods, but they avoid the parameter hell, this because it uses method chaining, in which the instance is returned on each subsequent method call, so you can call new methods over the object.
 
 ```js
 
@@ -32,13 +32,19 @@ storages.myStorage.setType('array<f32, 3>').setValue([1, 2, 3]);
 constants.MYCONST.setType('f32').setValue(10);
 
 ```
+
+The [Uniform](https://absulit.github.io/points/apidocs/Uniform.html), [Storage](https://absulit.github.io/points/apidocs/Storage.html), and [Constant](https://absulit.github.io/points/apidocs/Constant.html), class instance returned after the creation of one these buffers, will allow for the method chaining.
+
+
 You can take a look at the full Uniform, Storage, and Constant classes in the docs:
 [🔗 see API Docs](https://absulit.github.io/points/apidocs/)
+
+A particularity of the [Storage](https://absulit.github.io/points/apidocs/Storage.html) (points.storage in the examples) is that if a Storage is created without value is as defined by the WebGPU documentation simply as `Storage`, but if you assign a value, internally it will be defined as `Storage Map`, which internally works a bit different but in the Points.storages attribute they are handled as one to avoid confusion. This is why there are two methods: `setStorage` and `setStorageMap`.
 
 
 ---
 
-> **Note:** all the `set*()` methods add the variables/buffers/data into all the shaders in all `RenderPass` passes.
+> **Note:** all the `set*()` methods and the `uniforms`, `storages`, and `constant` attributes, add the variables/buffers/data into all the shaders in all `RenderPass` passes.
 
 ---
 
