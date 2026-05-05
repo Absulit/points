@@ -2355,7 +2355,7 @@ function getArrayType$1(value) {
 }
 
 /**
- * Uniform class is a container for uniform related data and actions.
+ * Uniform is a container for uniform buffer related data and actions.
  *
  * @class Uniform
  */
@@ -2571,7 +2571,7 @@ class Uniform {
 }
 
 /**
- *
+ * Storage is a container for storage buffer related data and actions.
  * @class Storage
  */
 
@@ -2912,6 +2912,8 @@ class Storage {
 }
 
 /**
+ * Constant is a container for const declarations.
+ * They work in two ways with the `override` attribute.
  *
  * @class Constant
  */
@@ -5434,7 +5436,7 @@ class Uniforms {
  * points.storages.myStorage = [1, 2, 3]
  *
  * // wgsl side
- * let val = params.myStorage; // value is vec3f(1, 2, 3)
+ * let val = myStorage; // value is vec3f(1, 2, 3)
  * @class Storages
  */
 class Storages {
@@ -5536,6 +5538,13 @@ class Storages {
 }
 
 /**
+ * Class that handles the creation of new {@link Constant}s in Points.
+ * @example
+ * // js side
+ * points.constants.MYCONST = 10;
+ *
+ * // wgsl side
+ * let val = MYCONST; // value is 10 u32 by default
  * @class Constants
  */
 class Constants {
