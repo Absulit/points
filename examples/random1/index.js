@@ -11,17 +11,19 @@ const random1 = {
     compute,
     frag,
     init: async (points, folder) => {
-        points.setUniform('randPosition', [0, 0], 'vec2f');
+        const { uniforms } = points;
+        uniforms.randPosition = [0, 0];
         points.setSampler('computeTextureSampler');
         points.setBindingTexture('outputTex', 'computeTexture');
 
-        points.setUniform('sliderA', options.sliderA, 'f32');
+        uniforms.sliderA = options.sliderA;
         folder.add(options, 'sliderA', 0, 1, .0001).name('sliderA');
         folder.open();
     },
     update: points => {
-        points.setUniform('randPosition', [Math.random(), Math.random()]);
-        points.setUniform('sliderA', options.sliderA);
+        const { uniforms } = points;
+        uniforms.randPosition = [Math.random(), Math.random()];
+        uniforms.sliderA = options.sliderA;
     }
 }
 

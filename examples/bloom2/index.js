@@ -42,6 +42,7 @@ const bloom1 = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+        const { uniforms } = points;
         const descriptor = {
             addressModeU: 'repeat',
             addressModeV: 'repeat',
@@ -65,12 +66,12 @@ const bloom1 = {
         points.setTexture2d('feedbackTexture2', true, null, 2);
 
 
-        points.setUniform('radius', options.radius);
-        points.setUniform('bloomTextureSize', options.bloomTextureSize);
+        uniforms.radius = options.radius;
+        uniforms.bloomTextureSize = options.bloomTextureSize;
 
-        points.setUniform('threshold', options.threshold);
-        points.setUniform('intensity', options.intensity);
-        points.setUniform('bloom', options.bloom);
+        uniforms.threshold = options.threshold;
+        uniforms.intensity = options.intensity;
+        uniforms.bloom = options.bloom;
 
 
         folder.add(options, 'radius', 8, 16, .0001).name('radius');
@@ -81,11 +82,12 @@ const bloom1 = {
         folder.open();
     },
     update: points => {
-        points.setUniform('radius', options.radius);
-        points.setUniform('bloomTextureSize', options.bloomTextureSize);
-        points.setUniform('threshold', options.threshold);
-        points.setUniform('intensity', options.intensity);
-        points.setUniform('bloom', options.bloom);
+        const { uniforms } = points;
+        uniforms.radius = options.radius;
+        uniforms.bloomTextureSize = options.bloomTextureSize;
+        uniforms.threshold = options.threshold;
+        uniforms.intensity = options.intensity;
+        uniforms.bloom = options.bloom;
 
         points.setCameraPerspective('camera', [0, 0, 5]);
     }

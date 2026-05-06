@@ -69,6 +69,8 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+        const { constants, uniforms, storages } = points;
+        const { COMPUTE } = GPUShaderStage;
         points.import(structs);
 
         // points.addRenderPass(RenderPasses.COLOR);
@@ -83,27 +85,36 @@ const base = {
         await points.setTextureImage('albedo', texture);
         points.setSampler('imageSampler', null);
 
-        points.setUniform('dof', options.dof);
+        uniforms.dof = options.dof;
         folder.add(options, 'dof', 0, 1, .0001).name('DOF');
 
         const dropdownItems = { /*'Vertex': 0,*/ 'Texture': 1, 'Shader': 2 };
 
-        points.setUniform('color_mode', options.mode);
+        uniforms.color_mode = options.mode;
         folder.add(options, 'mode', dropdownItems).name('Colors').onChange(value => {
             console.log(value);
-            points.setUniform('color_mode', value);
+            uniforms.color_mode = +value;
         });
 
-        points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
-        points.setConstant('WORKGROUP_X', WORKGROUP_X, 'u32');
-        points.setConstant('WORKGROUP_Y', WORKGROUP_Y, 'u32');
-        points.setConstant('WORKGROUP_Z', WORKGROUP_Z, 'u32');
-        points.setConstant('THREADS_X', THREADS_X, 'u32');
-        points.setConstant('THREADS_Y', THREADS_Y, 'u32');
-        points.setConstant('THREADS_Z', THREADS_Z, 'u32');
-        points.setConstant('WIDTH', WIDTH, 'i32');
-        points.setConstant('HEIGHT', HEIGHT, 'i32');
-        points.setStorage('particles', `array<Particle, ${NUMPARTICLES}>`);
+        const { WORKGROUP_X: WX, WORKGROUP_Y: WY, WORKGROUP_Z: WZ } = constants;
+        const { THREADS_X: TX, THREADS_Y: TY, THREADS_Z: TZ } = constants;
+
+        WX.setValue(WORKGROUP_X).setShaderStage(COMPUTE).setOverride(true);
+        WY.setValue(WORKGROUP_Y).setShaderStage(COMPUTE).setOverride(true);
+        WZ.setValue(WORKGROUP_Z).setShaderStage(COMPUTE).setOverride(true);
+
+        TX.setValue(THREADS_X).setShaderStage(COMPUTE).setOverride(true);
+        TY.setValue(THREADS_Y).setShaderStage(COMPUTE).setOverride(true);
+        TZ.setValue(THREADS_Z).setShaderStage(COMPUTE).setOverride(true);
+
+        // these can't be overrided because they are part of a const calculation
+        // in the compute shader, and if they are overridden they don't exist
+        // at that point
+        constants.WIDTH.setValue(WIDTH).setShaderStage(COMPUTE).setType('i32');
+        constants.HEIGHT.setValue(HEIGHT).setShaderStage(COMPUTE).setType('i32');
+
+
+        storages.particles.setType(`array<Particle, ${NUMPARTICLES}>`);
 
         points.addEventListener('logger', data => {
             console.log(data[0]);
@@ -111,7 +122,7 @@ const base = {
 
         points.setCameraPerspective('camera');
 
-        points.setUniform('angleY', 0);
+        uniforms.angleY = 0;
 
         folder.open();
     },
@@ -119,11 +130,11 @@ const base = {
      * @param {Points} points
      */
     update: (points, t, dt) => {
-
+        const { uniforms } = points;
         points.setCameraPerspective('camera', [0, 0, 5], [0, 0, -1000]);
 
-        points.setUniform('dof', options.dof);
-        points.params.angleY.value += dt * 0.094222;
+        uniforms.dof = options.dof;
+        uniforms.angleY += dt * 0.094222;
     }
 }
 

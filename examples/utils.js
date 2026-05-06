@@ -54,7 +54,6 @@ export async function loadAndExtract(url) {
 
     for (const mesh of meshes) {
         for (const prim of mesh.listPrimitives()) {
-            console.log(prim);
 
             const getAttrArray = (name) => {
                 const attr = prim.getAttribute(name);

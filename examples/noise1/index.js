@@ -11,10 +11,10 @@ const noise1 = {
     vert,
     frag,
     init: async (points, folder) => {
-
-        points.setUniform('scale0', options.scale0, 'f32');
-        points.setUniform('scale1', options.scale1, 'f32');
-        points.setUniform('scale2', options.scale2, 'f32');
+        const { uniforms } = points;
+        uniforms.scale0 = options.scale0;
+        uniforms.scale1 = options.scale1;
+        uniforms.scale2 = options.scale2;
 
         folder.add(options, 'scale0', 0, 1, .0001).name('Scale 0');
         folder.add(options, 'scale1', 0, 1, .0001).name('Scale 1');
@@ -22,9 +22,10 @@ const noise1 = {
         folder.open();
     },
     update: points => {
-        points.setUniform('scale0', options.scale0);
-        points.setUniform('scale1', options.scale1);
-        points.setUniform('scale2', options.scale2);
+        const { uniforms } = points;
+        uniforms.scale0 = options.scale0;
+        uniforms.scale1 = options.scale1;
+        uniforms.scale2 = options.scale2;
     }
 }
 

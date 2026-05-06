@@ -13,6 +13,7 @@ const data1 = {
      * @param {Points} points
      */
     init: async points => {
+        const { storages } = points;
         read = false;
         const firstMatrix = [
             2 /* rows */, 4 /* columns */,
@@ -20,7 +21,7 @@ const data1 = {
             5, 6, 7, 8
         ];
 
-        points.setStorageMap('firstMatrix', firstMatrix, 'Matrix');
+        storages.firstMatrix.setType('Matrix').setValue(firstMatrix);
 
         const secondMatrix = [
             4 /* rows */, 2 /* columns */,
@@ -30,12 +31,12 @@ const data1 = {
             7, 8
         ];
 
-        points.setStorageMap('secondMatrix', secondMatrix, 'Matrix');
+        storages.secondMatrix.setType('Matrix').setValue(secondMatrix);
 
         // original lines as reference:
         // let resultMatrixBufferSize = 2 + firstMatrix[0] * secondMatrix[1];
         // console.log(resultMatrixBufferSize);
-        points.setStorage('resultMatrix', 'Matrix', true);
+        storages.resultMatrix.setType('Matrix').setReadable(true);
 
         // reading the result with an event
         points.addEventListener('result_test', data => {
@@ -49,9 +50,10 @@ const data1 = {
     },
     read: async points => {
         if (!read) {
-            let [a, b, c, d] = await points.readStorage('resultMatrix');
-            console.log(a, b, c, d);
             read = true;
+            const { storages } = points;
+            const [a, b, c, d] = await storages.resultMatrix.read();
+            console.log(a, b, c, d);
         }
     }
 }

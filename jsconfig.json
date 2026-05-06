@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "checkJs": false,  // TODO true to check types
     "target": "ES6",
     "baseUrl": "./",
     "paths": {

@@ -304,6 +304,12 @@ declare class RenderPass {
     set enabled(val: boolean);
     get enabled(): boolean;
     /**
+     * To notify the RenderPass if a mesh has changed to update the vertexBuffer
+     * @param {Boolean} val
+     */
+    set meshUpdated(val: boolean);
+    get meshUpdated(): boolean;
+    /**
      * - **currently for internal use**<br>
      * - **might be private in the future**<br>
      * Adds two triangles as a quad called Point
@@ -323,6 +329,7 @@ declare class RenderPass {
     };
     /**
      * Adds a mesh quad
+     * @deprecated Since v0.8.0 use {@link setPlane}
      * @param {String} name The name will show up in the `mesh` Uniform.
      * @param {{x:Number, y:Number, z:Number}} coordinate
      * @param {{width:Number, height:Number}} dimensions
@@ -355,7 +362,36 @@ declare class RenderPass {
         verticesCount: number;
     };
     /**
+     * Adds or replaces a mesh quad
+     * @param {String} name The name will show up in the `mesh` Uniform.
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {{width:Number, height:Number}} dimensions
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     * @param {{x:Number, y:Number }} segments mesh subdivisions
+     *
+     * @example
+     *
+     * renderPass.setPlane('plane', { x: 0, y: 0, z: 0 }, { width: 2, height: 2 }).instanceCount = NUMPARTICLES;
+     */
+    setPlane(name: string, coordinate?: {
+        x: number;
+        y: number;
+        z: number;
+    }, dimensions?: {
+        width: number;
+        height: number;
+    }, color?: {
+        r: number;
+        g: number;
+        b: number;
+        a: number;
+    }, segments?: {
+        x: number;
+        y: number;
+    }): any;
+    /**
      * Adds a mesh cube
+     * @deprecated since v0.8.0. Use {@link setCube}
      * @param {String} name The name will show up in the `mesh` Uniform.
      * @param {{x:Number, y:Number, z:Number}} coordinate
      * @param {{width:Number, height:Number, depth:Number}} dimensions
@@ -385,7 +421,33 @@ declare class RenderPass {
         verticesCount: number;
     };
     /**
+     * Adds or replaces a mesh cube
+     * @param {String} name The name will show up in the `mesh` Uniform.
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {{width:Number, height:Number, depth:Number}} dimensions
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     *
+     * @example
+     *
+     * renderPass.setCube('base_cube').instanceCount = NUMPARTICLES;
+     */
+    setCube(name: string, coordinate?: {
+        x: number;
+        y: number;
+        z: number;
+    }, dimensions?: {
+        width: number;
+        height: number;
+        depth: number;
+    }, color?: {
+        r: number;
+        g: number;
+        b: number;
+        a: number;
+    }): any;
+    /**
      * Adds a mesh sphere
+     * @deprecated since v0.8.0. Use {@link setSphere}
      * @param {String} name The name will show up in the `mesh` Uniform.
      * @param {{x:Number, y:Number, z:Number}} coordinate
      * @param {{r:Number, g:Number, b:Number, a:Number}} color
@@ -413,7 +475,31 @@ declare class RenderPass {
         verticesCount: number;
     };
     /**
+     * Adds or replaces a mesh sphere
+     * @param {String} name The name will show up in the `mesh` Uniform.
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     * @param {Number} radius
+     * @param {Number} segments
+     * @param {Number} rings
+     *
+     * @example
+     *
+     * renderPass.setSphere('sphere').instanceCount = 100;
+     */
+    setSphere(name: string, coordinate?: {
+        x: number;
+        y: number;
+        z: number;
+    }, color?: {
+        r: number;
+        g: number;
+        b: number;
+        a: number;
+    }, radius?: number, segments?: number, rings?: number): any;
+    /**
      * Adds a Torus mesh
+     * @deprecated since v0.8.0. Use {@link setTorus}
      * @param {String} name The name will show up in the `mesh` Uniform.
      * @param {{x:Number, y:Number, z:Number}} coordinate
      * @param {Number} radius
@@ -438,7 +524,33 @@ declare class RenderPass {
         a: number;
     }): any;
     /**
+     * Adds or replaces a Torus mesh
+     * @param {String} name The name will show up in the `mesh` Uniform.
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {Number} radius
+     * @param {Number} tube
+     * @param {Number} radialSegments
+     * @param {Number} tubularSegments
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     * @returns {Object}
+     *
+     * @example
+     *
+     * renderPass.setTorus('myTorus');
+     */
+    setTorus(name: string, coordinate?: {
+        x: number;
+        y: number;
+        z: number;
+    }, radius?: number, tube?: number, radialSegments?: number, tubularSegments?: number, color?: {
+        r: number;
+        g: number;
+        b: number;
+        a: number;
+    }): any;
+    /**
      * Adds a Cylinder mesh
+     * @deprecated since v0.8.0. Use {@link setCylinder}
      * @param {String} name The name will show up in the `mesh` Uniform.
      * @param {{x:Number, y:Number, z:Number}} coordinate
      * @param {Number} radius
@@ -462,7 +574,32 @@ declare class RenderPass {
         a: number;
     }): any;
     /**
+     * Adds or replaces a Cylinder mesh
+     * @param {String} name The name will show up in the `mesh` Uniform.
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {Number} radius
+     * @param {Number} height
+     * @param {Number} radialSegments
+     * @param {Boolean} cap
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     * @returns {Object}
+     *
+     * @example
+     * renderPass.setCylinder('myCylinder');
+     */
+    setCylinder(name: string, coordinate?: {
+        x: number;
+        y: number;
+        z: number;
+    }, radius?: number, height?: number, radialSegments?: number, cap?: boolean, color?: {
+        r: number;
+        g: number;
+        b: number;
+        a: number;
+    }): any;
+    /**
      * Add a external mesh with the provided required data.
+     * @deprecated since v0.8.0. Use {@link setMesh}
      * @param {String} name The name will show up in the `mesh` Uniform.
      * @param {Array<{x:Number, y:Number, z:Number}>} vertices
      * @param {Array<{r:Number, g:Number, b:Number, a:Number}>} colors
@@ -496,6 +633,36 @@ declare class RenderPass {
         instanceCount: number;
         verticesCount: any;
     };
+    /**
+     * Add or replace external mesh with the provided required data.
+     * @param {String} name The name will show up in the `mesh` Uniform.
+     * @param {Array<{x:Number, y:Number, z:Number}>} vertices
+     * @param {Array<{r:Number, g:Number, b:Number, a:Number}>} colors
+     * @param {Array<{u:Number, v:Number}>} uvs
+     * @param {Array<Number>} normals
+     *
+     * @example
+     *
+     * const url = '../models/monkey.glb';
+     * const data = await loadAndExtract(url);
+     * const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0]
+     * renderPass.setMesh('monkey', positions, colors, colorSize, uvs, normals, indices)
+     * renderPass.depthWriteEnabled = true;
+     *
+     */
+    setMesh(name: string, vertices: Array<{
+        x: number;
+        y: number;
+        z: number;
+    }>, colors: Array<{
+        r: number;
+        g: number;
+        b: number;
+        a: number;
+    }>, colorSize: any, uvs: Array<{
+        u: number;
+        v: number;
+    }>, normals: Array<number>, indices: any): any;
     /**
      * For internal purposes
      * ids and names of the meshes
