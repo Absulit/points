@@ -42,5 +42,5 @@ jobs:
 
       - name: Publish to npm
         # remove --tag alpha on final release
-        run: npm publish --provenance --access public --tag alpha
+        run: npm publish --access public --tag alpha
         working-directory: .
