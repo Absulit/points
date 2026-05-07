@@ -33,7 +33,7 @@ jobs:
           registry-url: https://registry.npmjs.org/
 
       - name: Upgrade npm
-        run: npm install -g npm@11.14.0 # Ensure you have npm v11.5+
+        run: npm install -g npm@latest # Ensure you have npm v11.5+
 
       - run: npm --version
 
