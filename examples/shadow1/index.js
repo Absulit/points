@@ -45,15 +45,15 @@ const camera = {
 const r0 = new RenderPass(vert, frag);
 r0.depthWriteEnabled = true;
 // r0.cullMode = CullMode.NONE;
-r0.addSphere('sphere0', spherePosition);
-r0.addPlane('plane0', planePosition, planeDimensions, planeColor, planeSegments);
+r0.setSphere('sphere0', spherePosition);
+r0.setPlane('plane0', planePosition, planeDimensions, planeColor, planeSegments);
 
 
 const r1 = new RenderPass(vert1, frag1);
 r1.depthWriteEnabled = true;
 r1.cullMode = CullMode.NONE;
-r1.addSphere('sphere1', spherePosition, sphereColor);
-r1.addPlane('plane1', planePosition, planeDimensions, planeColor, planeSegments);
+r1.setSphere('sphere1', spherePosition, sphereColor);
+r1.setPlane('plane1', planePosition, planeDimensions, planeColor, planeSegments);
 
 const base = {
     renderPasses: [
@@ -64,6 +64,7 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+        const { uniforms } = points;
         points.import(structs);
 
         const descriptor = {
@@ -84,16 +85,17 @@ const base = {
         points.setTextureDepth2d('depth', GPUShaderStage.FRAGMENT, 0);
         points.setSampler('shadowSampler', descriptor);
         // points.setSampler('imageSampler', null);
-        points.setUniform('lightPos', position, 'vec3f');
 
-        points.setUniform('ambientFactor', options.ambientFactor);
+        uniforms.lightPos = position;
+
+        uniforms.ambientFactor = options.ambientFactor;
+        uniforms.albedoFactor = options.albedoFactor;
+        uniforms.lambertMax = options.lambertMax;
+
         folder.add(options, 'ambientFactor', 0, 1, .0001).name('ambientFactor');
-
-        points.setUniform('albedoFactor', options.albedoFactor);
         folder.add(options, 'albedoFactor', 0, 1, .0001).name('albedoFactor');
-
-        points.setUniform('lambertMax', options.lambertMax);
         folder.add(options, 'lambertMax', 0, 1, .0001).name('lambertMax');
+
 
         folder.open();
     },
@@ -101,6 +103,7 @@ const base = {
      * @param {Points} points
      */
     update: (points, t, dt) => {
+        const { uniforms } = points;
         // const { time: t, timeDelta: td } = points;
         const { left, right, top, bottom, near, far, position, lookAt } = light;
         const p = position;
@@ -108,9 +111,9 @@ const base = {
         points.setCameraOrthographic('light', left, right, top, bottom, near, far, position, lookAt);
         points.setCameraPerspective('camera', camera.position, camera.lookAt);
 
-        points.setUniform('ambientFactor', options.ambientFactor);
-        points.setUniform('albedoFactor', options.albedoFactor);
-        points.setUniform('lambertMax', options.lambertMax);
+        uniforms.ambientFactor = options.ambientFactor;
+        uniforms.albedoFactor = options.albedoFactor;
+        uniforms.lambertMax = options.lambertMax;
     }
 }
 

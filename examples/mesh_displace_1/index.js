@@ -17,7 +17,7 @@ if (options.isMobile) {
 
 const renderPass = new RenderPass(vert, frag);
 renderPass.clearValue = { r: 61 / 255, g: 37 / 255, b: 103 / 255, a: 1 }
-renderPass.addSphere('sphere', { x: 0, y: 0, z: 0 }, { r: 1, g: 1, b: 0, a: 1 }, 1.6, segments, segments);
+renderPass.setSphere('sphere', { x: 0, y: 0, z: 0 }, { r: 1, g: 1, b: 0, a: 1 }, 1.6, segments, segments);
 renderPass.depthWriteEnabled = true;
 
 const base = {
@@ -26,11 +26,10 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
-        // points.setStorage('noise', 'f32', false, GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT);
+        const { uniforms } = points;
         points.setCameraPerspective('camera');
 
-
-        points.setUniform('val', options.val);
+        uniforms.val = options.val;
         folder.add(options, 'val', 0, 1, .0001).name('Val');
 
         folder.open();
@@ -39,8 +38,9 @@ const base = {
      * @param {Points} points
      */
     update: points => {
+        const { uniforms } = points;
         points.setCameraPerspective('camera', [0, 0, 5], [0, 0, -100]);
-        points.setUniform('val', options.val);
+        uniforms.val = options.val;
     }
 }
 

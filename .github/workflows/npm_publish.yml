@@ -1,9 +1,13 @@
+# .github/workflows/npm_publish.yml
+
 name: Publish to npmjs.com
 
 on:
-  push:
-    tags:
-      - 'v*'
+  release:
+    types: [published]
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 permissions:
   id-token: write  # Required for OIDC
@@ -12,15 +16,29 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
         with:
           node-version: '24'
-          registry-url: 'https://registry.npmjs.org'
-      - run: npm install -g npm@latest
-      - run: npm ci
-      - run: npm run build --if-present
-      - run: npm test
-      - run: npm publish --provenance
+          registry-url: https://registry.npmjs.org/
+
+      - name: Upgrade npm
+        run: npm install -g npm@latest
+
+      - run: npm --version
+
+      - name: Install dependencies
+        run: npm ci
+
+      # - name: List files
+      #   run: ls -R
+
+      - name: Publish to npm
+        # remove --tag alpha on final release
+        run: npm publish --access public
+        working-directory: .

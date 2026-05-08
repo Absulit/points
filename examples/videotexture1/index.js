@@ -27,13 +27,13 @@ const videotexture1 = {
             './../img/pexels-shubh-haque-4746616-960x540-30fps.mp4'
         );
 
-        points.setUniform('scale', options.scale, 'f32');
+        points.uniforms.scale = options.scale;
 
         folder.add(options, 'scale', 0, 1, .0001).name('Scale');
         folder.open();
     },
     update: points => {
-        points.setUniform('scale', options.scale);
+        points.uniforms.scale = options.scale;
     }
 }
 

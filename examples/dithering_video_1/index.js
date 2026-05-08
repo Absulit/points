@@ -19,6 +19,8 @@ const base = {
      * @param {*} folder
      */
     init: async (points, folder) => {
+        const { uniforms, storages } = points;
+        const { COMPUTE } = GPUShaderStage;
         const descriptor = {
             addressModeU: 'repeat',
             addressModeV: 'repeat',
@@ -26,18 +28,19 @@ const base = {
         points.setSampler('imageSampler', descriptor);
         await points.setTextureVideo('image', './../img/6982698-hd_1440_1080_25fps_800x800.mp4');
         points.setBindingTexture('outputTex', 'computeTexture');
-        points.setStorage('points', 'array<vec4f, 640000>', false, GPUShaderStage.COMPUTE);
 
-        points.setUniform('scale', options.scale);
-        points.setUniform('quantError', options.quantError);
+        storages.points.setType('array<vec4f, 640000>').setShaderStage(COMPUTE);
+
+        // all options assigned at once and it creates the uniforms
+        Object.assign(uniforms, options);
 
         folder.add(options, 'scale', 0, 1, .0001).name('Scale');
         folder.add(options, 'quantError', -1, 1, .0001).name('quantError');
         folder.open();
     },
     update: points => {
-        points.setUniform('scale', options.scale);
-        points.setUniform('quantError', options.quantError);
+        const { uniforms } = points;
+        Object.assign(uniforms, options);
     }
 }
 

@@ -19,8 +19,9 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+        const { uniforms } = points;
         options.isMobile = isMobile();
-        points.setUniform('isMobile', options.isMobile);
+        uniforms.isMobile = options.isMobile;
 
         const size = { width: 1080, height: 1080 }
         if (options.isMobile) {
@@ -45,14 +46,15 @@ const base = {
             });
 
 
-        points.setUniform('flip', options.flip);
+        uniforms.flip = options.flip;
         folder.add(options, 'flip').name('flip');
 
         folder.open();
     },
     update: points => {
-        points.setUniform('flip', options.flip);
-        points.setUniform('isMobile', options.isMobile);
+        const { uniforms } = points;
+        uniforms.flip = options.flip;
+        uniforms.isMobile = options.isMobile;
     }
 }
 
