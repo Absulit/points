@@ -10,21 +10,24 @@ const base = {
     vert,
     frag,
     /**
-     *
      * @param {Points} points
      */
     init: async (points, folder) => {
+        const { uniforms, storages } = points;
+        const { FRAGMENT } = GPUShaderStage
         points.scaleMode = ScaleMode.FIT;
-        points.setUniform('scale', options.scale);
-        points.setUniform('numIterations', options.numIterations);
-        points.setStorage('variables', 'Variable', false, GPUShaderStage.FRAGMENT);
+        uniforms.scale = options.scale;
+        uniforms.numIterations = options.numIterations;
+
+        storages.variables.setType('Variable').setShaderStage(FRAGMENT);
         // folder.add(options, 'numIterations', 1, 1024, .0001).name('numIterations');
         folder.open();
 
-        // points.setStorage('logger', 'f32', true, GPUShaderStage.FRAGMENT);
+        // storages.logger.setRead(true).setShaderStage(FRAGMENT);
     },
     update: points => {
-        // points.setUniform('numIterations', options.numIterations);
+        // const { uniforms } = points;
+        // uniforms.numIterations = options.numIterations;
     },
     read: async points => {
         // const result = await points.readStorage('logger');

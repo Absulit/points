@@ -167,6 +167,8 @@ class RenderPass {
     #cullMode = CullMode.BACK;
     #frontFace = FrontFace.CCW;
 
+    #meshUpdated = CSSFontFeatureValuesRule;
+
     #descriptor = {
         colorAttachments: [
             {
@@ -637,6 +639,18 @@ class RenderPass {
         this.#enabled = val;
     }
 
+    get meshUpdated() {
+        return this.#meshUpdated;
+    }
+
+    /**
+     * To notify the RenderPass if a mesh has changed to update the vertexBuffer
+     * @param {Boolean} val
+     */
+    set meshUpdated(val) {
+        this.#meshUpdated = val;
+    }
+
     /**
      * - **currently for internal use**<br>
      * - **might be private in the future**<br>
@@ -692,6 +706,7 @@ class RenderPass {
 
     /**
      * Adds a mesh quad
+     * @deprecated Since v0.8.0 use {@link setPlane}
      * @param {String} name The name will show up in the `mesh` Uniform.
      * @param {{x:Number, y:Number, z:Number}} coordinate
      * @param {{width:Number, height:Number}} dimensions
@@ -768,7 +783,98 @@ class RenderPass {
     }
 
     /**
+     * Adds or replaces a mesh quad
+     * @param {String} name The name will show up in the `mesh` Uniform.
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {{width:Number, height:Number}} dimensions
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     * @param {{x:Number, y:Number }} segments mesh subdivisions
+     *
+     * @example
+     *
+     * renderPass.setPlane('plane', { x: 0, y: 0, z: 0 }, { width: 2, height: 2 }).instanceCount = NUMPARTICLES;
+     */
+    setPlane(
+        name,
+        coordinate = { x: 0, y: 0, z: 0 },
+        dimensions = { width: 1, height: 1 },
+        color = { r: 1, g: 0, b: 1, a: 0 },
+        segments = { x: 1, y: 1 }
+    ) {
+        const meshExists = this.#nameExists(this.#meshes, name);
+
+        const { x, y, z } = coordinate;
+        const { width, height } = dimensions;
+        const { x: sx, y: sy } = segments;
+        const hw = width / 2;
+        const hh = height / 2;
+
+        const { r, g, b, a } = color;
+        const normal = [0, 0, 1];
+
+        const id = this.#meshCounter;
+
+        const grid = [];
+        for (let iy = 0; iy <= sy; iy++) {
+            const v = iy / sy;
+            const posY = y - hh + v * height;
+
+            for (let ix = 0; ix <= sx; ix++) {
+                const u = ix / sx;
+                const posX = x - hw + u * width;
+
+                grid.push({
+                    position: [posX, posY, z],
+                    uv: [u, v]
+                });
+            }
+        }
+
+        const vertexArray = [];
+        for (let iy = 0; iy < sy; iy++) {
+            for (let ix = 0; ix < sx; ix++) {
+                const rowSize = sx + 1;
+                const i0 = iy * rowSize + ix;
+                const i1 = i0 + 1;
+                const i2 = i0 + rowSize;
+                const i3 = i2 + 1;
+
+                const quad = [
+                    grid[i0], grid[i1], grid[i3],
+                    grid[i0], grid[i3], grid[i2]
+                ];
+
+                quad.forEach(({ position: [vx, vy, vz], uv: [u, v] }, i) => {
+                    vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normal, id, ...BARYCENTRICS[i % 3]);
+                })
+            }
+        }
+
+        if (meshExists) {
+            meshExists.vertexArray = vertexArray;
+            meshExists.verticesCount = sx * sy * 6;
+            this.#updateVertexArray();
+            this.#meshUpdated = true;
+            return meshExists;
+        }
+
+        const mesh = {
+            name,
+            id,
+            instanceCount: 1,
+            verticesCount: sx * sy * 6,
+            vertexArray,
+        };
+        this.#meshes.push(mesh);
+        ++this.#meshCounter;
+        this.#updateVertexArray();
+
+        return mesh;
+    }
+
+    /**
      * Adds a mesh cube
+     * @deprecated since v0.8.0. Use {@link setCube}
      * @param {String} name The name will show up in the `mesh` Uniform.
      * @param {{x:Number, y:Number, z:Number}} coordinate
      * @param {{width:Number, height:Number, depth:Number}} dimensions
@@ -865,7 +971,118 @@ class RenderPass {
     }
 
     /**
+     * Adds or replaces a mesh cube
+     * @param {String} name The name will show up in the `mesh` Uniform.
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {{width:Number, height:Number, depth:Number}} dimensions
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     *
+     * @example
+     *
+     * renderPass.setCube('base_cube').instanceCount = NUMPARTICLES;
+     */
+    setCube(
+        name,
+        coordinate = { x: 0, y: 0, z: 0 },
+        dimensions = { width: 1, height: 1, depth: 1 },
+        color = { r: 1, g: 0, b: 1, a: 0 }
+    ) {
+        const meshExists = this.#nameExists(this.#meshes, name);
+
+        const { x, y, z } = coordinate;
+        const { width, height, depth } = dimensions;
+        const hw = width / 2;
+        const hh = height / 2;
+        const hd = depth / 2;
+
+        const corners = [
+            [x - hw, y - hh, z - hd], // 0: left-bottom-back
+            [x + hw, y - hh, z - hd], // 1: right-bottom-back
+            [x + hw, y + hh, z - hd], // 2: right-top-back
+            [x - hw, y + hh, z - hd], // 3: left-top-back
+            [x - hw, y - hh, z + hd], // 4: left-bottom-front
+            [x + hw, y - hh, z + hd], // 5: right-bottom-front
+            [x + hw, y + hh, z + hd], // 6: right-top-front
+            [x - hw, y + hh, z + hd], // 7: left-top-front
+        ];
+
+        const faceUVs = [
+            [[0, 0], [1, 0], [1, 1], [0, 1]], // back
+            [[0, 0], [1, 0], [1, 1], [0, 1]], // front
+            [[0, 0], [1, 0], [1, 1], [0, 1]], // left
+            [[0, 0], [1, 0], [1, 1], [0, 1]], // right
+            [[0, 0], [1, 0], [1, 1], [0, 1]], // top
+            [[0, 0], [1, 0], [1, 1], [0, 1]], // bottom
+        ];
+
+        const faceNormals = [
+            [0, 0, -1],  // back
+            [0, 0, 1],   // front
+            [-1, 0, 0],  // left
+            [1, 0, 0],   // right
+            [0, 1, 0],   // top
+            [0, -1, 0],  // bottom
+        ];
+
+        const faces = [
+            [0, 3, 2, 1], // back
+            [4, 5, 6, 7], // front
+            [0, 4, 7, 3], // left
+            [5, 1, 2, 6], // right
+            [3, 7, 6, 2], // top
+            [0, 1, 5, 4], // bottom
+        ];
+
+        const vertexArray = [];
+        const meshCounter = meshExists ? meshExists.id : this.#meshCounter;
+        for (let i = 0; i < 6; i++) {
+            const [i0, i1, i2, i3] = faces[i];
+            // const color = faceColors[i];
+            const { r, g, b, a } = color;
+            const normals = faceNormals[i];
+
+            const v = [corners[i0], corners[i1], corners[i2], corners[i3]];
+
+            const uv = faceUVs[i];
+            const verts = [
+                [v[0], uv[0]],
+                [v[1], uv[1]],
+                [v[2], uv[2]],
+                [v[0], uv[0]],
+                [v[2], uv[2]],
+                [v[3], uv[3]],
+            ];
+
+            verts.forEach(([[vx, vy, vz], [u, v]], i) => {
+                vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normals, meshCounter, ...BARYCENTRICS[i % 3]);
+            })
+        }
+
+        if (meshExists) {
+            meshExists.vertexArray = vertexArray;
+            meshExists.verticesCount = 36;
+            this.#updateVertexArray();
+            this.#meshUpdated = true;
+            return meshExists;
+        }
+
+        const mesh = {
+            name,
+            id: this.#meshCounter,
+            instanceCount: 1,
+            verticesCount: 36,
+            vertexArray,
+        }
+        this.#meshes.push(mesh);
+        ++this.#meshCounter;
+        this.#updateVertexArray();
+
+        return mesh;
+    }
+
+    /**
      * Adds a mesh sphere
+     * @deprecated since v0.8.0. Use {@link setSphere}
      * @param {String} name The name will show up in the `mesh` Uniform.
      * @param {{x:Number, y:Number, z:Number}} coordinate
      * @param {{r:Number, g:Number, b:Number, a:Number}} color
@@ -951,7 +1168,107 @@ class RenderPass {
     }
 
     /**
+     * Adds or replaces a mesh sphere
+     * @param {String} name The name will show up in the `mesh` Uniform.
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     * @param {Number} radius
+     * @param {Number} segments
+     * @param {Number} rings
+     *
+     * @example
+     *
+     * renderPass.setSphere('sphere').instanceCount = 100;
+     */
+    setSphere(
+        name,
+        coordinate = { x: 0, y: 0, z: 0 },
+        color = { r: 1, g: 0, b: 1, a: 0 },
+        radius = 1,
+        segments = 16,
+        rings = 12
+    ) {
+        const meshExists = this.#nameExists(this.#meshes, name);
+
+        const { x, y, z } = coordinate;
+        const { r, g, b, a } = color;
+
+        const vertexGrid = [];
+
+        // generate vertices
+        let k = 0;
+        const meshCounter = meshExists ? meshExists.id : this.#meshCounter;
+        for (let lat = 0; lat <= rings; lat++) {
+            const theta = (lat * Math.PI) / rings;
+            const sinTheta = Math.sin(theta);
+            const cosTheta = Math.cos(theta);
+
+            vertexGrid[lat] = [];
+
+            for (let lon = 0; lon <= segments; lon++) {
+                const phi = (lon * 2 * Math.PI) / segments;
+                const sinPhi = Math.sin(phi);
+                const cosPhi = Math.cos(phi);
+
+                const nx = cosPhi * sinTheta;
+                const ny = cosTheta;
+                const nz = sinPhi * sinTheta;
+
+                const vx = x + radius * nx;
+                const vy = y + radius * ny;
+                const vz = z + radius * nz;
+
+                const u = lon / segments;
+                const v = lat / rings;
+
+                vertexGrid[lat][lon] = [vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, meshCounter];
+            }
+        }
+
+        const b0 = BARYCENTRICS[0];
+        const b1 = BARYCENTRICS[1];
+        const b2 = BARYCENTRICS[2];
+        // generate triangles
+        const vertexArray = [];
+        for (let lat = 0; lat < rings; lat++) {
+            for (let lon = 0; lon < segments; lon++) {
+                const v1 = vertexGrid[lat][lon];
+                const v2 = vertexGrid[lat + 1][lon];
+                const v3 = vertexGrid[lat + 1][lon + 1];
+                const v4 = vertexGrid[lat][lon + 1];
+
+                // triangle 1
+                vertexArray.push(...v1, ...b0, ...v3, ...b1, ...v2, ...b2);
+                // triangle 2
+                vertexArray.push(...v1, ...b0, ...v4, ...b1, ...v3, ...b2);
+            }
+        }
+
+        if (meshExists) {
+            meshExists.vertexArray = vertexArray;
+            meshExists.verticesCount = rings * segments * 6;
+            this.#updateVertexArray();
+            this.#meshUpdated = true;
+            return meshExists;
+        }
+
+        const mesh = {
+            name,
+            id: this.#meshCounter,
+            instanceCount: 1,
+            verticesCount: rings * segments * 6,
+            vertexArray
+        }
+        this.#meshes.push(mesh);
+        ++this.#meshCounter;
+        this.#updateVertexArray();
+
+        return mesh;
+    }
+
+    /**
      * Adds a Torus mesh
+     * @deprecated since v0.8.0. Use {@link setTorus}
      * @param {String} name The name will show up in the `mesh` Uniform.
      * @param {{x:Number, y:Number, z:Number}} coordinate
      * @param {Number} radius
@@ -1041,7 +1358,111 @@ class RenderPass {
     }
 
     /**
+     * Adds or replaces a Torus mesh
+     * @param {String} name The name will show up in the `mesh` Uniform.
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {Number} radius
+     * @param {Number} tube
+     * @param {Number} radialSegments
+     * @param {Number} tubularSegments
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     * @returns {Object}
+     *
+     * @example
+     *
+     * renderPass.setTorus('myTorus');
+     */
+    setTorus(
+        name,
+        coordinate = { x: 0, y: 0, z: 0 },
+        radius = 1,
+        tube = .4,
+        radialSegments = 32,
+        tubularSegments = 24,
+        color = { r: 1, g: 0, b: 1, a: 1 }
+    ) {
+        const meshExists = this.#nameExists(this.#meshes, name);
+
+        const { x, y, z } = coordinate;
+        const { r, g, b, a } = color;
+
+        const vertices = [];
+        const normals = [];
+        const uvs = [];
+        const indices = [];
+
+        for (let k = 0; k <= radialSegments; k++) {
+            const v = k / radialSegments * Math.PI * 2;
+            const cosV = Math.cos(v);
+            const sinV = Math.sin(v);
+
+            for (let i = 0; i <= tubularSegments; i++) {
+                const u = i / tubularSegments * Math.PI * 2;
+                const cosU = Math.cos(u);
+                const sinU = Math.sin(u);
+
+                const tx = (radius + tube * cosV) * cosU + x;
+                const ty = (radius + tube * cosV) * sinU + y;
+                const tz = tube * sinV + z;
+
+                const nx = cosV * cosU;
+                const ny = cosV * sinU;
+                const nz = sinV;
+
+                vertices.push([tx, ty, tz]);
+                normals.push([nx, ny, nz]);
+                uvs.push([i / tubularSegments, k / radialSegments]);
+            }
+        }
+
+        for (let k = 1; k <= radialSegments; k++) {
+            for (let i = 1; i <= tubularSegments; i++) {
+                const a = (tubularSegments + 1) * k + i - 1;
+                const b = (tubularSegments + 1) * (k - 1) + i - 1;
+                const c = (tubularSegments + 1) * (k - 1) + i;
+                const d = (tubularSegments + 1) * k + i;
+
+                indices.push([a, b, d]);
+                indices.push([b, c, d]);
+            }
+        }
+
+        const vertexArray = [];
+        const meshCounter = meshExists ? meshExists.id : this.#meshCounter;
+        for (const [i0, i1, i2] of indices) {
+            for (const i of [i0, i1, i2]) {
+                const [vx, vy, vz] = vertices[i];
+                const [nx, ny, nz] = normals[i];
+                const [u, v] = uvs[i];
+                vertexArray.push(vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, meshCounter, ...BARYCENTRICS[i % 3]);
+            }
+        }
+
+        if (meshExists) {
+            meshExists.vertexArray = vertexArray;
+            meshExists.verticesCount = indices.length * 3;
+            this.#updateVertexArray();
+            this.#meshUpdated = true;
+            return meshExists;
+        }
+
+        const mesh = {
+            name,
+            id: this.#meshCounter,
+            instanceCount: 1,
+            verticesCount: indices.length * 3,
+            vertexArray,
+        };
+        this.#meshes.push(mesh);
+        ++this.#meshCounter;
+        this.#updateVertexArray();
+
+        return mesh;
+    }
+
+    /**
      * Adds a Cylinder mesh
+     * @deprecated since v0.8.0. Use {@link setCylinder}
      * @param {String} name The name will show up in the `mesh` Uniform.
      * @param {{x:Number, y:Number, z:Number}} coordinate
      * @param {Number} radius
@@ -1166,7 +1587,145 @@ class RenderPass {
     }
 
     /**
+     * Adds or replaces a Cylinder mesh
+     * @param {String} name The name will show up in the `mesh` Uniform.
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {Number} radius
+     * @param {Number} height
+     * @param {Number} radialSegments
+     * @param {Boolean} cap
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     * @returns {Object}
+     *
+     * @example
+     * renderPass.setCylinder('myCylinder');
+     */
+    setCylinder(
+        name,
+        coordinate = { x: 0, y: 0, z: 0 },
+        radius = .5,
+        height = 1,
+        radialSegments = 32,
+        cap = true,
+        color = { r: 1, g: 0, b: 1, a: 1 }
+    ) {
+        const meshExists = this.#nameExists(this.#meshes, name);
+
+        const { x: cx, y: cy, z: cz } = coordinate;
+        const { r, g, b, a } = color;
+        const halfHeight = height / 2;
+
+        const vertices = [];
+        const normals = [];
+        const uvs = [];
+        const indices = [];
+
+        // sides
+        for (let i = 0; i <= radialSegments; i++) {
+            const theta = (i / radialSegments) * Math.PI * 2;
+            const cosTheta = Math.cos(theta);
+            const sinTheta = Math.sin(theta);
+
+            const px = cx + radius * cosTheta;
+            const pz = cz + radius * sinTheta;
+
+            vertices.push([px, cy - halfHeight, pz]); // bottom
+            normals.push([cosTheta, 0, sinTheta]);
+            uvs.push([i / radialSegments, 0]);
+
+            vertices.push([px, cy + halfHeight, pz]); // top
+            normals.push([cosTheta, 0, sinTheta]);
+            uvs.push([i / radialSegments, 1]);
+        }
+
+        for (let i = 0; i < radialSegments; i++) {
+            const base = i * 2;
+            indices.push([base, base + 1, base + 3]);
+            indices.push([base, base + 3, base + 2]);
+        }
+
+        // caps
+        if (cap) {
+            const bottomCenterIndex = vertices.length;
+            vertices.push([cx, cy - halfHeight, cz]);
+            normals.push([0, -1, 0]);
+            uvs.push([.5, .5]);
+
+            const topCenterIndex = vertices.length;
+            vertices.push([cx, cy + halfHeight, cz]);
+            normals.push([0, 1, 0]);
+            uvs.push([.5, .5]);
+
+            for (let i = 0; i < radialSegments; i++) {
+                const theta = (i / radialSegments) * Math.PI * 2;
+                const nextTheta = ((i + 1) / radialSegments) * Math.PI * 2;
+
+                const x0 = cx + radius * Math.cos(theta);
+                const z0 = cz + radius * Math.sin(theta);
+                const x1 = cx + radius * Math.cos(nextTheta);
+                const z1 = cz + radius * Math.sin(nextTheta);
+
+                const bottomIdx0 = vertices.length;
+                vertices.push([x0, cy - halfHeight, z0]);
+                normals.push([0, -1, 0]);
+                uvs.push([.5 + .5 * Math.cos(theta), .5 + .5 * Math.sin(theta)]);
+
+                const bottomIdx1 = vertices.length;
+                vertices.push([x1, cy - halfHeight, z1]);
+                normals.push([0, -1, 0]);
+                uvs.push([.5 + .5 * Math.cos(nextTheta), .5 + .5 * Math.sin(nextTheta)]);
+
+                indices.push([bottomCenterIndex, bottomIdx0, bottomIdx1]);
+
+                const topIdx0 = vertices.length;
+                vertices.push([x0, cy + halfHeight, z0]);
+                normals.push([0, 1, 0]);
+                uvs.push([.5 + .5 * Math.cos(theta), .5 + .5 * Math.sin(theta)]);
+
+                const topIdx1 = vertices.length;
+                vertices.push([x1, cy + halfHeight, z1]);
+                normals.push([0, 1, 0]);
+                uvs.push([.5 + .5 * Math.cos(nextTheta), .5 + .5 * Math.sin(nextTheta)]);
+
+                indices.push([topCenterIndex, topIdx1, topIdx0]);
+            }
+        }
+        const vertexArray = [];
+        const meshCounter = meshExists ? meshExists.id : this.#meshCounter;
+        for (const ii of indices) {
+            ii.forEach((i, k) => {
+                const [vx, vy, vz] = vertices[i];
+                const [nx, ny, nz] = normals[i];
+                const [u, v] = uvs[i];
+                vertexArray.push(vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, meshCounter, ...BARYCENTRICS[k % 3]);
+            })
+        }
+
+        if (meshExists) {
+            meshExists.vertexArray = vertexArray;
+            meshExists.verticesCount = indices.length * 3;
+            this.#updateVertexArray();
+            this.#meshUpdated = true;
+            return meshExists;
+        }
+
+        const mesh = {
+            name,
+            id: this.#meshCounter,
+            instanceCount: 1,
+            verticesCount: indices.length * 3,
+            vertexArray,
+        };
+        this.#meshes.push(mesh);
+        ++this.#meshCounter;
+        this.#updateVertexArray();
+
+        return mesh;
+    }
+
+    /**
      * Add a external mesh with the provided required data.
+     * @deprecated since v0.8.0. Use {@link setMesh}
      * @param {String} name The name will show up in the `mesh` Uniform.
      * @param {Array<{x:Number, y:Number, z:Number}>} vertices
      * @param {Array<{r:Number, g:Number, b:Number, a:Number}>} colors
@@ -1207,6 +1766,77 @@ class RenderPass {
         }
         this.#meshes.push(mesh);
         ++this.#meshCounter;
+
+        return mesh;
+    }
+
+    #nameExists(arrayOfObjects, name) {
+        return arrayOfObjects.find(obj => obj.name == name);
+    }
+
+    #updateVertexArray() {
+        this.#vertexArray = [];
+        this.#meshes.forEach(mesh => {
+            mesh.vertexArray.forEach(item => this.#vertexArray.push(item));
+        })
+    }
+
+    /**
+     * Add or replace external mesh with the provided required data.
+     * @param {String} name The name will show up in the `mesh` Uniform.
+     * @param {Array<{x:Number, y:Number, z:Number}>} vertices
+     * @param {Array<{r:Number, g:Number, b:Number, a:Number}>} colors
+     * @param {Array<{u:Number, v:Number}>} uvs
+     * @param {Array<Number>} normals
+     *
+     * @example
+     *
+     * const url = '../models/monkey.glb';
+     * const data = await loadAndExtract(url);
+     * const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0]
+     * renderPass.setMesh('monkey', positions, colors, colorSize, uvs, normals, indices)
+     * renderPass.depthWriteEnabled = true;
+     *
+     */
+    setMesh(name, vertices, colors, colorSize, uvs, normals, indices) {
+        const meshExists = this.#nameExists(this.#meshes, name);
+
+        const verticesCount = indices.length;
+
+        const vertexArray = [];
+        const meshCounter = meshExists ? meshExists.id : this.#meshCounter;
+        for (let i = 0; i < verticesCount; i++) {
+            const index = indices[i];
+            const vertex = vertices.slice(index * 3, index * 3 + 3);
+
+            const color = colors?.slice(index * colorSize, index * colorSize + colorSize);
+            const uv = uvs.slice(index * 2, index * 2 + 2);
+            const normal = normals.slice(index * 3, index * 3 + 3);
+
+            const [x, y, z] = vertex;
+            const [r, g, b] = color || [1, 0, 1];
+            const [u, v] = uv;
+            vertexArray.push(+x, +y, +z, 1, r, g, b, 1, u, v, ...normal, meshCounter, ...BARYCENTRICS[i % 3]);
+        }
+
+        if (meshExists) {
+            meshExists.vertexArray = vertexArray;
+            meshExists.verticesCount = verticesCount;
+            this.#updateVertexArray();
+            this.#meshUpdated = true;
+            return meshExists;
+        }
+
+        const mesh = {
+            name,
+            id: this.#meshCounter,
+            instanceCount: 1,
+            verticesCount,
+            vertexArray,
+        }
+        this.#meshes.push(mesh);
+        ++this.#meshCounter;
+        this.#updateVertexArray();
 
         return mesh;
     }

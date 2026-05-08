@@ -22,7 +22,7 @@ let THREADS_X = 256;
 let THREADS_Y = 1;
 let THREADS_Z = 1;
 
-if(options.isMobile){
+if (options.isMobile) {
     WORKGROUP_X = 8;
     WORKGROUP_Y = 4;
     WORKGROUP_Z = 2;
@@ -40,7 +40,7 @@ console.log(NUMPARTICLES);
 
 const instancedParticlesRenderPass = new RenderPass(vert, frag1, compute0, WORKGROUP_X, WORKGROUP_Y, WORKGROUP_Z)
 instancedParticlesRenderPass.depthWriteEnabled = false;
-instancedParticlesRenderPass.addPlane('plane', { x: 0, y: 0, z: 0 }, { width: 2, height: 2 }).instanceCount = NUMPARTICLES;
+instancedParticlesRenderPass.setPlane('plane', { x: 0, y: 0, z: 0 }, { width: 2, height: 2 }).instanceCount = NUMPARTICLES;
 
 
 const base = {
@@ -51,21 +51,21 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+        const { uniforms, storages, constants } = points;
+        const { VERTEX, COMPUTE } = GPUShaderStage;
         points.import(structs);
 
-        points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
-        points.setConstant('WORKGROUP_X', WORKGROUP_X, 'u32');
-        points.setConstant('WORKGROUP_Y', WORKGROUP_Y, 'u32');
-        points.setConstant('WORKGROUP_Z', WORKGROUP_Z, 'u32');
-        points.setConstant('THREADS_X', THREADS_X, 'u32');
-        points.setConstant('THREADS_Y', THREADS_Y, 'u32');
-        points.setConstant('THREADS_Z', THREADS_Z, 'u32');
-        points.setStorage(
-            'particles',
-            `array<Particle, ${NUMPARTICLES}>`,
-            false,
-            GPUShaderStage.VERTEX | GPUShaderStage.COMPUTE
-        );
+        constants.NUMPARTICLES = NUMPARTICLES;
+        constants.WORKGROUP_X = WORKGROUP_X;
+        constants.WORKGROUP_Y = WORKGROUP_Y;
+        constants.WORKGROUP_Z = WORKGROUP_Z;
+        constants.THREADS_X = THREADS_X;
+        constants.THREADS_Y = THREADS_Y;
+        constants.THREADS_Z = THREADS_Z;
+
+        storages.particles
+            .setType(`array<Particle, ${NUMPARTICLES}>`)
+            .setShaderStage(VERTEX | COMPUTE);
 
         points.setSampler('imageSampler', null);
         await points.setTextureImage('image', './../img/webgpu_800x800.png');
@@ -78,16 +78,16 @@ const base = {
 
         points.setCameraOrthographic('camera');
 
-        points.setUniform('maxLife', options.maxLife);
+        uniforms.maxLife = options.maxLife;
         folder.add(options, 'maxLife', 1, 600, .0001).name('maxLife');
 
-        points.setUniform('turbulenceScale', options.turbulenceScale);
+        uniforms.turbulenceScale = options.turbulenceScale;
         folder.add(options, 'turbulenceScale', 10, 1024, .0001).name('turbulenceScale');
 
-        points.setUniform('useVideo', false);
+        uniforms.useVideo = false;
         folder.add(options, 'useVideo').name('useVideo');
 
-        points.setUniform('particleSize', options.particleSize);
+        uniforms.particleSize = options.particleSize;
         folder.add(options, 'particleSize', 1, 60, .0001).name('particleSize');
 
         folder.open();
@@ -96,10 +96,11 @@ const base = {
      * @param {Points} points
      */
     update: points => {
-        points.setUniform('useVideo', options.useVideo);
-        points.setUniform('maxLife', options.maxLife);
-        points.setUniform('turbulenceScale', options.turbulenceScale);
-        points.setUniform('particleSize', options.particleSize);
+        const { uniforms } = points;
+        uniforms.useVideo = options.useVideo;
+        uniforms.maxLife = options.maxLife;
+        uniforms.turbulenceScale = options.turbulenceScale;
+        uniforms.particleSize = options.particleSize;
     }
 }
 

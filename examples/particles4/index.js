@@ -31,9 +31,9 @@ console.log('NUMPARTICLES: ', NUMPARTICLES);
 
 const cube_renderpass = new RenderPass(vert, frag, compute, WORKGROUP_X, WORKGROUP_Y, WORKGROUP_Z);
 cube_renderpass.depthWriteEnabled = true;
-cube_renderpass.addCube('base_cube').instanceCount = NUMPARTICLES;
+cube_renderpass.setCube('base_cube').instanceCount = NUMPARTICLES;
 if (!options.isMobile) {
-    cube_renderpass.addSphere('sphere').instanceCount = 100;
+    cube_renderpass.setSphere('sphere').instanceCount = 100;
 }
 
 const base = {
@@ -44,20 +44,21 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+        const { uniforms, storages, constants } = points;
         points.import(structs);
 
-        points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
-        points.setConstant('WORKGROUP_X', WORKGROUP_X, 'u32');
-        points.setConstant('WORKGROUP_Y', WORKGROUP_Y, 'u32');
-        points.setConstant('WORKGROUP_Z', WORKGROUP_Z, 'u32');
-        points.setConstant('THREADS_X', THREADS_X, 'u32');
-        points.setConstant('THREADS_Y', THREADS_Y, 'u32');
-        points.setConstant('THREADS_Z', THREADS_Z, 'u32');
-        points.setStorage('particles', `array<Particle, ${NUMPARTICLES}>`);
+        constants.NUMPARTICLES = NUMPARTICLES;
+        constants.WORKGROUP_X = WORKGROUP_X;
+        constants.WORKGROUP_Y = WORKGROUP_Y;
+        constants.WORKGROUP_Z = WORKGROUP_Z;
+        constants.THREADS_X = THREADS_X;
+        constants.THREADS_Y = THREADS_Y;
+        constants.THREADS_Z = THREADS_Z;
+        storages.particles.setType(`array<Particle, ${NUMPARTICLES}>`)
 
         points.setCameraPerspective('camera');
 
-        points.setUniform('lambert', options.lambert);
+        uniforms.lambert = options.lambert;
         folder.add(options, 'lambert').name('lambert');
 
         folder.open();
@@ -66,9 +67,8 @@ const base = {
      * @param {Points} points
     */
     update: points => {
-
         points.setCameraPerspective('camera', [0, 1.5, 5], [0, 0, -1000]);
-        points.setUniform('lambert', options.lambert);
+        points.uniforms.lambert = options.lambert;
     }
 }
 

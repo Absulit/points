@@ -1,0 +1,144 @@
+import { Constant } from 'points';
+
+/**
+ * Class that handles the creation of new {@link Constant}s in Points.
+ * @example
+ * // js side
+ * points.constants.MYCONST = 10;
+ *
+ * // wgsl side
+ * let val = MYCONST; // value is 10 u32 by default
+ * @class Constants
+ */
+export default class Constants {
+    #list = [];
+
+    constructor() {
+        return new Proxy(this, {
+            get(target, prop, receiver) {
+
+                const value = Reflect.get(target, prop, target);
+
+                if (prop === 'list') {
+                    return value;
+                }
+
+                if (typeof value === 'function') {
+                    switch (prop) {
+                        case 'find':
+                        case 'add':
+                        case 'listOfOverrides':
+                        case 'stringOfNonOverrides':
+                            return value.bind(target);
+                    }
+                }
+
+                if (prop in target) {
+                    return value;
+                }
+                // If Constant does not exist we create it.
+                const constant = new Constant({ name: prop, value: 0 });
+                target.list.push(constant);
+                Reflect.set(target, prop, constant, target);
+                return constant;
+            },
+
+            set(target, prop, value, receiver) {
+                if (prop === 'list') {
+                    return Reflect.set(target, prop, value, target);
+                }
+
+                const type = typeof value;
+                if (type === 'string') {
+                    throw `Constant named '${prop}': No strings allowed or maybe you are adding an array.`;
+                }
+                if (!type && type === 'object' && !Array.isArray(value)) {
+                    throw `Constant named '${prop}': No objects allowed.`;
+                }
+
+                if (prop in target) {
+                    const constant = Reflect.get(target, prop, target);
+                    constant.value = value;
+                    return constant;
+                }
+
+                // If Constant does not exist we create it.
+
+                const constant = new Constant({ name: prop, value });
+                target.list.push(constant);
+                return Reflect.set(target, prop, constant, target);
+            }
+        });
+    }
+
+    get list() {
+        return this.#list;
+    }
+
+    /**
+     * List of all {@link Constant}s
+     * @param {Array} value
+     * @memberof Constants
+     */
+    set list(value) {
+        this.#list = value;
+    }
+
+    /**
+     * Retrieves a {@link Constant} by its name.
+     * @param {String} name
+     * @returns {Constant}
+     * @memberof Constants
+     */
+    find(name) {
+        return this[name];
+    }
+
+    /**
+     * Add a new {@link Constant}
+     * @param {Constant} constant
+     * @memberof Constants
+     */
+    add(constant) {
+        const { name } = constant;
+        if (this[name]) {
+            throw `Constant named ${name} already exists.`
+        }
+        this[name] = constant;
+        this.#list.push(constant);
+    }
+
+    /**
+     * Object list with the constants that are overridable.
+     * This object will be passed into the pipeline.
+     * @param {GPUShaderStage|Number} filter
+     * @returns {Object}
+     * @memberof Constants
+     */
+    listOfOverrides(filter) {
+        return Object.fromEntries(
+            this.#list
+                .filter(c => ((filter & c.shaderStage) !== 0))
+                .filter(c => c.override)
+                .map(c => [c.name, c.value])
+        );
+    }
+
+    /**
+     * List of constants formatted as WGSL string to be interpolated in the
+     * shaders.
+     * @param {GPUShaderStage|Number} filter
+     * @returns {String}
+     * @memberof Constants
+     */
+    stringOfNonOverrides(filter) {
+        let consStrings = '';
+        this.#list.forEach(c => {
+            const hasOneStage = (filter & c.shaderStage) !== 0;
+            if (!c.override && hasOneStage) {
+                consStrings += /*wgsl*/`const ${c.name}:${c.type} = ${c.value};\n`;
+            }
+        })
+        return consStrings;
+    }
+}

@@ -16,6 +16,12 @@ import { cross, dot, normalize, sub } from './matrix.js';
 import { clearCache, elToImage, getCSS } from './texture-element.js';
 import PresentationFormat from './PresentationFormat.js';
 import ScaleMode from './ScaleMode.js';
+import Uniform from './Uniform.js';
+import Storage from './Storage.js';
+import Constant from './Constant.js';
+import Uniforms from './Uniforms.js';
+import Storages from './Storages.js';
+import Constants from './Constants.js';
 
 /**
  * Main class Points, this is the entry point of an application with this library.
@@ -52,12 +58,11 @@ class Points {
     #numColumns = 1;
     #numRows = 1;
     #commandsFinished = [];
-    #uniforms = new UniformsArray();
+    #uniforms = new Uniforms();
     #meshUniforms = new UniformsArray();
     #cameraUniforms = new UniformsArray();
-    #constants = [];
-    #storage = [];
-    #readStorage = [];
+    #constants = new Constants();
+    #storages = new Storages();
     #samplers = [];
     #textures2d = [];
     #texturesDepth2d = [];
@@ -97,6 +102,7 @@ class Points {
     #abortController = null;
     #canvasWidth = null;
     #canvasHeight = null;
+
 
     /**
      * Constructor of `Points`.
@@ -196,7 +202,7 @@ class Points {
         this.#canvas.height = this.#canvas.clientHeight;
         this.#screen[0] = this.#canvas.width;
         this.#screen[1] = this.#canvas.height;
-        this.setUniform(UniformKeys.SCREEN, this.#screen);
+        this.#uniforms.screen = this.#screen;
 
         this.#presentationSize = [
             this.#canvas.clientWidth,
@@ -263,7 +269,7 @@ class Points {
         this.#ratio[0] = ratio[0];
         this.#ratio[1] = ratio[1];
 
-        this.setUniform(UniformKeys.RATIO, this.#ratio);
+        this.#uniforms.ratio = this.#ratio;
     }
 
     #onMouseMove = e => {
@@ -276,8 +282,10 @@ class Points {
         this.#mouseNormalized[0] = this.#mouse[0] / this.#screen[0];
         this.#mouseNormalized[1] = this.#mouse[1] / this.#screen[1];
         this.#mouseNormalized[1] = (this.#mouseNormalized[1] * - 1) - -1; // flip and move up
-        this.setUniform(UniformKeys.MOUSE, this.#mouse);
-        this.setUniform('_mouse_normalized', this.#mouseNormalized);
+
+        const { mouse, _mouse_normalized } = this.#uniforms;
+        mouse.value = this.#mouse;
+        _mouse_normalized.value = this.#mouseNormalized;
     }
 
     /**
@@ -288,8 +296,8 @@ class Points {
      * and unless changed it remains consistent.
      * @param {string} name name of the Param, you can invoke it later in shaders as `Params.[name]`
      * @param {Number|Boolean|Array<Number>} value Single number or a list of numbers. Boolean is converted to Number.
-     * @param {string} structName type as `f32` or a custom struct. Default `f32`.
-     * @return {Object}
+     * @param {string} type type as `f32` or a custom struct. Default `f32`.
+     * @return {Uniform}
      *
      * @example
      * // js
@@ -302,78 +310,69 @@ class Points {
      * let color1 = vec4(params.color1/255, 1.);
      * let finalColor:vec4f = mix(color0, color1, params.scale);
      */
-    setUniform(name, value, structName = null) {
-        const uniformToUpdate = this.#nameExists(this.#uniforms, name);
+    setUniform(name, value, type = null) {
+        const uniformToUpdate = this.#uniforms.find(name);
 
         if (!uniformToUpdate && this.#initialized) {
             console.error(`'${name}' uniform needs to be declared before the init() prior to call it in update().`);
         }
-        if (uniformToUpdate && structName) {
+        if (uniformToUpdate && type) {
             // if name exists is an update
-            this.#debug && console.warn(`setUniform(${name}, [${value}], ${structName}) can't set the structName of an already defined uniform.`);
+            this.#debug && console.warn(`setUniform(${name}, [${value}], ${type}) can't set the type of an already defined uniform.`);
         }
         if (uniformToUpdate) {
             uniformToUpdate.value = value;
             return uniformToUpdate;
         }
-        if (structName && isArray(structName)) {
-            throw `${structName} is an array, which is currently not supported for Uniforms.`;
-        }
-        const uniform = {
-            name: name,
-            value: value,
-            type: structName,
-            size: null
-        }
-        Object.seal(uniform);
-        this.#uniforms.push(uniform);
+
+        const uniform = new Uniform({
+            name,
+            value,
+            type
+        })
+
+        this.#uniforms.add(uniform);
         return uniform;
     }
 
-    #setMeshUniform(name, value, structName = null) {
+    #setMeshUniform(name, value, type = null) {
         const uniformToUpdate = this.#nameExists(this.#meshUniforms, name);
-        if (uniformToUpdate && structName) {
+        if (uniformToUpdate && type) {
             // if name exists is an update
-            this.#debug && console.warn(`#setMeshUniform(${name}, [${value}], ${structName}) can't set the structName of an already defined uniform.`);
+            this.#debug && console.warn(`#setMeshUniform(${name}, [${value}], ${type}) can't set the type of an already defined uniform.`);
         }
         if (uniformToUpdate) {
             uniformToUpdate.value = value;
             return uniformToUpdate;
         }
-        if (structName && isArray(structName)) {
-            throw `${structName} is an array, which is currently not supported for Uniforms.`;
-        }
-        const uniform = {
-            name: name,
-            value: value,
-            type: structName,
-            size: null
-        }
-        Object.seal(uniform);
+
+        const uniform = new Uniform({
+            name,
+            value,
+            type,
+        });
+
         this.#meshUniforms.push(uniform);
         return uniform;
     }
 
-    #setCameraUniform(name, value, structName = null) {
+    #setCameraUniform(name, value, type = null) {
         const uniformToUpdate = this.#nameExists(this.#cameraUniforms, name);
-        if (uniformToUpdate && structName) {
+        if (uniformToUpdate && type) {
             // if name exists is an update
-            // console.warn(`#setCameraUniform(${name}, [${value}], ${structName}) can't set the structName of an already defined uniform.`);
+            // console.warn(`#setCameraUniform(${name}, [${value}], ${type}) can't set the type of an already defined uniform.`);
         }
         if (uniformToUpdate) {
             uniformToUpdate.value = value;
             return uniformToUpdate;
         }
-        if (structName && isArray(structName)) {
-            throw `${structName} is an array, which is currently not supported for Uniforms.`;
-        }
-        const uniform = {
-            name: name,
-            value: value,
-            type: structName,
-            size: null
-        }
-        Object.seal(uniform);
+
+        const uniform = new Uniform({
+            name,
+            value,
+            type,
+        });
+
         this.#cameraUniforms.push(uniform);
         return uniform;
     }
@@ -384,7 +383,7 @@ class Points {
      */
     updateUniforms(arr) {
         arr.forEach(uniform => {
-            const variable = this.#uniforms.find(v => v.name === uniform.name);
+            const variable = this.#uniforms[uniform.name];
             if (!variable) {
                 throw '`updateUniform()` can\'t be called without first `setUniform()`.';
             }
@@ -399,7 +398,7 @@ class Points {
      * The constant will be ready to use on the WGSL shder string.
      * @param {String} name
      * @param {string|Number} value
-     * @param {String} structName
+     * @param {String} type
      * @returns {Object}
      *
      * @example
@@ -414,7 +413,7 @@ class Points {
      * // your code:
      * const particles = array<Particle, NUMPARTICLES>();
      */
-    setConstant(name, value, structName) {
+    setConstant(name, value, type = null) {
         const constantToUpdate = this.#nameExists(this.#constants, name);
 
         if (constantToUpdate) {
@@ -422,13 +421,13 @@ class Points {
             throw '`setConstant()` can\'t update a const after it has been set.';
         }
 
-        const constant = {
+        const constant = new Constant({
             name,
             value,
-            structName,
-        }
+            type,
+        })
 
-        this.#constants.push(constant);
+        this.#constants.add(constant);
 
         return constant;
     }
@@ -439,12 +438,13 @@ class Points {
      * Meaning it can be updated in the shaders across the execution of every frame.
      * <br>
      * It can have almost any type, like `f32` or `vec2f` or even array<f32>.
+     * <br>
+     * It can also be initialized with data with the {@link Storage#setValue} method
      * @param {string} name Name that the Storage will have in the shader
-     * @param {string} structName Name of the struct already existing on the
+     * @param {string} type Name of the struct already existing on the
+     * @param {Uint8Array<ArrayBuffer>|Array<Number>|Number} value array with the data that must match the struct.
      * shader. This will be the type of the Storage.
-     * @param {boolean} read if this is going to be used to read data back
-     * @param {GPUShaderStage} shaderType this tells to what shader the storage is bound
-     * @returns {Object}
+     * @returns {Storage}
      *
      * @example
      * // js
@@ -459,26 +459,34 @@ class Points {
      *
      * // wgsl string
      * colors[index] = vec3f(248, 208, 146) / 255;
+     *
+     * @example
+     * // add data from initialization
+     * // js
+     * points.setStorage('vertex_data', `array<vec4f, ${vertex_data.length}>`)
+        .setValue(vertex_data.flat());
      */
-    setStorage(name, structName, read, shaderType = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE, arrayData = null) {
-        if (this.#nameExists(this.#storage, name)) {
-            throw `\`setStorage()\` You have already defined \`${name}\``;
+    setStorage(name, type = null, value = null) {
+        const storageToUpdate = this.#storages.find(name);
+
+        if (storageToUpdate) {
+            storageToUpdate.value = value;
+            return storageToUpdate;
         }
-        const storage = {
-            mapped: !!arrayData,
+
+        const storage = new Storage({
             name,
-            structName,
-            // structSize: null,
-            shaderType,
-            read,
-            buffer: null,
-            internal: false
-        }
-        this.#storage.push(storage);
+            value,
+            type,
+        });
+
+        this.#storages.add(storage);
+
         return storage;
     }
 
     /**
+     * @deprecated Since v0.8.0 use {@link setStorage}
      * Creates a persistent memory buffer across every frame call that can be updated.
      * See [GPUBuffer](https://www.w3.org/TR/webgpu/#gpubuffer)
      * <br>
@@ -489,11 +497,11 @@ class Points {
      * The difference with {@link Points#setStorage|setStorage} is that this can be initialized
      * with data.
      * @param {string} name Name that the Storage will have in the shader.
-     * @param {Uint8Array<ArrayBuffer>|Array<Number>|Number} arrayData array with the data that must match the struct.
-     * @param {string} structName Name of the struct already existing on the
+     * @param {Uint8Array<ArrayBuffer>|Array<Number>|Number} value array with the data that must match the struct.
+     * @param {string} type Name of the struct already existing on the
      * shader. This will be the type of the Storage.
-     * @param {boolean} read if this is going to be used to read data back.
-     * @param {GPUShaderStage} shaderType this tells to what shader the storage is bound
+     * @param {boolean} readable if this is going to be used to read data back.
+     * @param {GPUShaderStage} shaderStage this tells to what shader the storage is bound
      *
      * @example
      * // js examples/data1
@@ -523,44 +531,41 @@ class Points {
      *
      * resultMatrix.size = vec2(firstMatrix.size.x, secondMatrix.size.y);
      */
-    setStorageMap(name, arrayData, structName, read = false, shaderType = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE) {
-        const storageToUpdate = this.#nameExists(this.#storage, name);
+    setStorageMap(name, value, type, readable = false, shaderStage = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE) {
+        const storageToUpdate = this.#storages.find(name);
 
-        if (!Array.isArray(arrayData) && arrayData.constructor !== Uint8Array) {
-            arrayData = new Uint8Array([arrayData]);
+        if (!Array.isArray(value) && value.constructor !== Uint8Array) {
+            value = new Uint8Array([value]);
         }
 
         if (storageToUpdate) {
-            storageToUpdate.array = arrayData;
+            storageToUpdate.value = value;
             storageToUpdate.updated = true;
             return storageToUpdate;
         }
-        // TODO document the stream feature
-        /**
-         * `updated` is set to true in data updates, but this is not true in
-         * something like audio, where the data streams and needs to be updated
-         * constantly, so if the storage map needs to be updated constantly then
-         * `stream` needs to be set to true.
-         */
-        const storage = {
-            stream: false, // permanently updated as true
-            updated: true,
-            mapped: true,
-            name,
-            structName,
-            shaderType,
-            array: arrayData,
-            buffer: null,
-            read,
-            internal: false
-        }
-        this.#storage.push(storage);
+
+        // const storage = new Storage({
+        //     updated: true,
+        //     mapped: true,
+        //     name,
+        //     type,
+        //     shaderStage,
+        //     value,
+        //     read,
+        // });
+
+        this.#storages[name] = value;
+        const storage = this.#storages[name];
+        storage.updated = true;
+        storage.mapped = true;
+        storage.type = type;
+        storage.shaderStage = shaderStage;
+        storage.readable = readable;
         return storage;
     }
 
     /**
-     * To read data back from a `setStorage` with `read` param `true`
-
+     * To read data back from a `setStorage` with `readable` param `true`
      * @param {String} name name of the Storage to read data from
      * @warning If there's en error or warning here
      * `[Buffer "name"] used in submit while mapped.`
@@ -568,15 +573,14 @@ class Points {
      * @returns {Float32Array} Array with the result
      */
     async readStorage(name) {
-        let storageItem = this.#readStorage.find(storageItem => storageItem.name === name);
-        let arrayBuffer = null;
+        const storageItem = this.#storages.find(name);
         let arrayBufferCopy = null;
-        if (storageItem) {
+        if (storageItem?.readable) {
             try {
-                await storageItem.buffer.mapAsync(GPUMapMode.READ);
-                arrayBuffer = storageItem.buffer.getMappedRange();
+                await storageItem.bufferRead.mapAsync(GPUMapMode.READ);
+                const arrayBuffer = storageItem.bufferRead.getMappedRange();
                 arrayBufferCopy = new Float32Array(arrayBuffer.slice(0));
-                storageItem.buffer.unmap();
+                storageItem.bufferRead.unmap();
             } catch (error) {
                 // if we switch projects mapasync fails
                 // we ignore it
@@ -590,7 +594,7 @@ class Points {
      * This creates a storage array named `layers` of the size
      * of the screen in pixels;
      * @param {Number} numLayers
-     * @param {GPUShaderStage} shaderType
+     * @param {GPUShaderStage} shaderStage
      *
      * @example
      * // js
@@ -601,11 +605,11 @@ class Points {
      * layers[0][pointIndex] = point;
      * layers[1][pointIndex] = point;
      */
-    setLayers(numLayers, shaderType) {
+    setLayers(numLayers, shaderStage) {
         // TODO: check what data to return
         // TODO: improve jsdoc because the array definition is confusing
         for (let layerIndex = 0; layerIndex < numLayers; layerIndex++) {
-            this.#layers.shaderType = shaderType;
+            this.#layers.shaderStage = shaderStage;
             this.#layers.push({
                 name: `layer${layerIndex}`,
                 size: this.#canvas.width * this.#canvas.height,
@@ -618,7 +622,7 @@ class Points {
     }
 
     #nameExists(arrayOfObjects, name) {
-        return arrayOfObjects.find(obj => obj.name == name);
+        return arrayOfObjects.find(obj => obj.name === name);
     }
 
     /**
@@ -644,7 +648,7 @@ class Points {
      * let value = texturePosition(image, imageSampler, position, in.uvr, true);
      */
 
-    setSampler(name, descriptor, shaderType) {
+    setSampler(name, descriptor, shaderStage) {
         if ('sampler' == name) {
             throw 'setSampler: `name` can not be sampler since is a WebGPU keyword.';
         }
@@ -665,7 +669,7 @@ class Points {
         const sampler = {
             name: name,
             descriptor: descriptor,
-            shaderType: shaderType,
+            shaderStage: shaderStage,
             resource: null,
             internal: false
         };
@@ -682,7 +686,7 @@ class Points {
      *
      * @param {String} name Name to call the texture in the shaders.
      * @param {boolean} copyCurrentTexture If you want the fragment output to be copied here.
-     * @param {GPUShaderStage} shaderType To what {@link GPUShaderStage} you want to exclusively use this variable.
+     * @param {GPUShaderStage} shaderStage To what {@link GPUShaderStage} you want to exclusively use this variable.
      * @param {Number} renderPassIndex If using `copyCurrentTexture`
      * this tells which RenderPass it should get the data from. If not set then it will grab the last pass.
      * @returns {Object}
@@ -699,7 +703,7 @@ class Points {
      * );
      *
      */
-    setTexture2d(name, copyCurrentTexture, shaderType, renderPassIndex) {
+    setTexture2d(name, copyCurrentTexture, shaderStage, renderPassIndex) {
         const exists = this.#nameExists(this.#textures2d, name);
         if (exists) {
             this.#debug && console.warn(`setTexture2d: \`${name}\` already exists.`);
@@ -708,7 +712,7 @@ class Points {
         const texture2d = {
             name,
             copyCurrentTexture,
-            shaderType,
+            shaderStage,
             texture: null,
             renderPassIndex,
             internal: false
@@ -720,11 +724,11 @@ class Points {
     /**
      * Creates a depth map from the selected `renderPassIndex`
      * @param {String} name
-     * @param {GPUShaderStage} shaderType
+     * @param {GPUShaderStage} shaderStage
      * @param {Number} renderPassIndex
      * @returns {Object}
      */
-    setTextureDepth2d(name, shaderType, renderPassIndex) {
+    setTextureDepth2d(name, shaderStage, renderPassIndex) {
         const exists = this.#nameExists(this.#texturesDepth2d, name);
         if (exists) {
             this.#debug && console.warn(`setTextureDepth2d: \`${name}\` already exists.`);
@@ -733,7 +737,7 @@ class Points {
         renderPassIndex ||= 0;
         const textureDepth2d = {
             name,
-            shaderType,
+            shaderStage,
             texture: null,
             renderPassIndex,
             internal: false,
@@ -768,7 +772,7 @@ class Points {
      * Supports web formats like JPG, PNG.
      * @param {string} name identifier it will have in the shaders
      * @param {string} path image address in a web server
-     * @param {GPUShaderStage} shaderType in what shader type it will exist only
+     * @param {GPUShaderStage} shaderStage in what shader type it will exist only
      * @returns {Object}
      *
      * @example
@@ -778,14 +782,14 @@ class Points {
      * // wgsl string
      * let rgba = texturePosition(image, imageSampler, position, in.uvr, true);
      */
-    async setTextureImage(name, path, shaderType = null) {
+    async setTextureImage(name, path, shaderStage = null) {
         const texture2dToUpdate = this.#nameExists(this.#textures2d, name);
         const response = await fetch(path);
         const blob = await response.blob();
         const imageBitmap = await createImageBitmap(blob);
         if (texture2dToUpdate) {
-            if (shaderType) {
-                throw '`setTextureImage()` the param `shaderType` should not be updated after its creation.';
+            if (shaderStage) {
+                throw '`setTextureImage()` the param `shaderStage` should not be updated after its creation.';
             }
             this.#textureUpdated = true;
             texture2dToUpdate.imageTexture.bitmap = imageBitmap;
@@ -810,7 +814,7 @@ class Points {
         const texture2d = {
             name: name,
             copyCurrentTexture: false,
-            shaderType: shaderType,
+            shaderStage: shaderStage,
             texture: null,
             renderPassIndex: null,
             imageTexture: {
@@ -829,7 +833,7 @@ class Points {
      * This will only generate an image, so animations will not work.
      * @param {String} name identifier it will have in the shaders
      * @param {HTMLElement} element element loaded in the DOM or dynamically
-     * @param {GPUShaderStage} shaderType in what shader type it will exist only
+     * @param {GPUShaderStage} shaderStage in what shader type it will exist only
      * @returns {Object}
      *
      * @example
@@ -840,11 +844,11 @@ class Points {
      * // wgsl string
      * let color = texture(image, imageSampler, in.uvr, true);
      */
-    async setTextureElement(name, element, shaderType = null) {
+    async setTextureElement(name, element, shaderStage = null) {
         const styles = getCSS(element);
         const cssText = styles.map(style => style.cssText).join('\n');
         const path = await elToImage(element, cssText);
-        return await this.setTextureImage(name, path, shaderType);
+        return await this.setTextureImage(name, path, shaderStage);
     }
 
     /**
@@ -859,7 +863,7 @@ class Points {
      * @param {String} path atlas to grab characters from, image address in a web server
      * @param {{x: number, y: number}} size size of a individual character e.g.: `{x:10, y:20}`
      * @param {Number} offset how many characters back or forward it must move to start
-     * @param {GPUShaderStage} shaderType To what {@link GPUShaderStage} you want to exclusively use this variable.
+     * @param {GPUShaderStage} shaderStage To what {@link GPUShaderStage} you want to exclusively use this variable.
      * @returns {Object}
      *
      * @example
@@ -876,21 +880,21 @@ class Points {
      * let textColors = texture(textImg, imageSampler, in.uvr, true);
      *
      */
-    async setTextureString(name, text, path, size, offset = 0, shaderType = null) {
+    async setTextureString(name, text, path, size, offset = 0, shaderStage = null) {
         const atlas = await loadImage(path);
         const textImg = strToImage(text, atlas, size, offset);
-        return this.setTextureImage(name, textImg, shaderType);
+        return this.setTextureImage(name, textImg, shaderStage);
     }
 
     /**
      * Load images as texture_2d_array
      * @param {string} name id of the wgsl variable in the shader
      * @param {Array} paths image addresses in a web server
-     * @param {GPUShaderStage} shaderType
+     * @param {GPUShaderStage} shaderStage
      */
     // TODO: verify if this can be updated after creation
     // TODO: return texture2dArray object
-    async setTextureImageArray(name, paths, shaderType) {
+    async setTextureImageArray(name, paths, shaderStage) {
         if (this.#nameExists(this.#textures2dArray, name)) {
             // TODO: throw exception here
             return;
@@ -905,7 +909,7 @@ class Points {
         const texture2dArrayItem = {
             name: name,
             copyCurrentTexture: false,
-            shaderType: shaderType,
+            shaderStage: shaderStage,
             texture: null,
             imageTextures: {
                 bitmaps: imageBitmaps
@@ -923,7 +927,7 @@ class Points {
      * Supports web formats like mp4 and webm.
      * @param {string} name id of the wgsl variable in the shader
      * @param {string} path video address in a web server
-     * @param {GPUShaderStage} shaderType
+     * @param {GPUShaderStage} shaderStage
      * @returns {Object}
      *
      * @example
@@ -933,7 +937,7 @@ class Points {
      * // wgsl string
      * let rgba = textureExternalPosition(video, imageSampler, position, in.uvr, true);
      */
-    async setTextureVideo(name, path, shaderType) {
+    async setTextureVideo(name, path, shaderStage) {
         if (this.#nameExists(this.#texturesExternal, name)) {
             throw `setTextureVideo: ${name} already exists.`;
         }
@@ -945,7 +949,7 @@ class Points {
         await video.play();
         const textureExternal = {
             name: name,
-            shaderType: shaderType,
+            shaderStage: shaderStage,
             video: video,
             internal: false
         };
@@ -958,7 +962,7 @@ class Points {
      * it will be available to read data from in the shaders.
      * @param {String} name id of the wgsl variable in the shader
      * @param {{width:Number, height:Number}} size to crop the video. WebGPU might throw an error if size does not match.
-     * @param {GPUShaderStage} shaderType
+     * @param {GPUShaderStage} shaderStage
      * @returns {Object}
      * @throws a WGSL error if the size doesn't match possible crop size
      * @example
@@ -968,7 +972,7 @@ class Points {
      * // wgsl string
      * et rgba = textureExternalPosition(video, imageSampler, position, in.uvr, true);
      */
-    async setTextureWebcam(name, size = { width: 1080, height: 1080 }, shaderType) {
+    async setTextureWebcam(name, size = { width: 1080, height: 1080 }, shaderStage) {
         if (this.#nameExists(this.#texturesExternal, name)) {
             throw `setTextureWebcam: ${name} already exists.`;
         }
@@ -984,7 +988,7 @@ class Points {
         }
         const textureExternal = {
             name,
-            shaderType,
+            shaderStage,
             video,
             size,
             internal: false
@@ -1049,10 +1053,10 @@ class Points {
         // analyser.getByteTimeDomainData(data);
         analyser.getByteFrequencyData(data);
         // storage that will have the data on WGSL
-        this.setStorageMap(name, data,
+        this.setStorage(name,
             // `array<f32, ${bufferLength}>`
             'Sound' // custom struct in defaultStructs.js
-        ).stream = true;
+        ).setValue(data).stream = true;
         // uniform that will have the data length as a quick reference
         this.setUniform(`${name}Length`, analyser.frequencyBinCount);
         sound.analyser = analyser;
@@ -1063,13 +1067,13 @@ class Points {
 
 
     // TODO: verify this method
-    setTextureStorage2d(name, shaderType) {
+    setTextureStorage2d(name, shaderStage) {
         if (this.#nameExists(this.#texturesStorage2d, name)) {
             throw `setTextureStorage2d: ${name} already exists.`
         }
         const texturesStorage2d = {
             name: name,
-            shaderType: shaderType,
+            shaderStage: shaderStage,
             texture: null,
             internal: false
         };
@@ -1112,12 +1116,12 @@ class Points {
         const bindingTexture = {
             write: {
                 name: writeName,
-                shaderType: GPUShaderStage.COMPUTE,
+                shaderStage: GPUShaderStage.COMPUTE,
                 renderPassIndex: writeIndex
             },
             read: {
                 name: readName,
-                shaderType: GPUShaderStage.FRAGMENT,
+                shaderStage: GPUShaderStage.FRAGMENT,
                 renderPassIndex: readIndex
             },
             texture: null,
@@ -1282,11 +1286,25 @@ class Points {
      *
      */
     addEventListener(name, callback, structSize = 1) {
+        const { COMPUTE, FRAGMENT } = GPUShaderStage;
         // TODO: remove structSize
         // this extra 1 is for the boolean flag in the Event struct
-        const data = Array(4).fill(0);
-        this.setStorageMap(name, data, 'Event', true, GPUShaderStage.COMPUTE | GPUShaderStage.FRAGMENT);
-        this.setStorage(`${name}_data`, `array<f32, ${structSize}>`, true, GPUShaderStage.COMPUTE | GPUShaderStage.FRAGMENT);
+
+        this.#storages.add(new Storage({
+            name,
+            type: 'Event',
+            readable: true,
+            shaderStage: COMPUTE | FRAGMENT,
+            value: Array(4).fill(0)
+        }));
+
+        this.#storages.add(new Storage({
+            name: `${name}_data`,
+            type: `array<f32, ${structSize}>`,
+            readable: true,
+            shaderStage: COMPUTE | FRAGMENT
+        }));
+
         this.#events.set(this.#events_ids,
             {
                 id: this.#events_ids,
@@ -1298,18 +1316,18 @@ class Points {
     }
 
     /**
-     * @param {GPUShaderStage} shaderType
+     * @param {GPUShaderStage} shaderStage
      * @param {RenderPass} renderPass
      * @returns {String} string with bindings
      */
-    #createDynamicGroupBindings(shaderType, { index: renderPassIndex, internal }, groupId = 0) {
-        if (!shaderType) {
+    #createDynamicGroupBindings(shaderStage, { index: renderPassIndex, internal }, groupId = 0) {
+        if (!shaderStage) {
             throw '`GPUShaderStage` is required';
         }
         // const groupId = 0;
         let dynamicGroupBindings = '';
         let bindingIndex = 0;
-        if (this.#uniforms.length) {
+        if (this.#uniforms.list.length) {
             dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <uniform> params: Params;\n`;
             bindingIndex += 1;
         }
@@ -1321,16 +1339,16 @@ class Points {
             dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <uniform> camera: Camera;\n`;
             bindingIndex += 1;
         }
-        this.#storage.forEach(storageItem => {
+        this.#storages.list.forEach(storageItem => {
             const isInternal = internal === storageItem.internal;
-            if (isInternal && (!storageItem.shaderType || storageItem.shaderType & shaderType)) {
-                const T = storageItem.structName;
+            if (isInternal && (!storageItem.shaderStage || storageItem.shaderStage & shaderStage)) {
+                const T = storageItem.type;
 
                 // note:
-                // shaderType means: this is the current GPUShaderStage we are at
-                // and storageItem.shaderType is the stage required by the buffer in setStorage
+                // shaderStage means: this is the current GPUShaderStage we are at
+                // and storageItem.shaderStage is the stage required by the buffer in setStorage
 
-                let accessMode = getStorageAccessMode(shaderType, storageItem.shaderType);
+                let accessMode = getStorageAccessMode(shaderStage, storageItem.shaderStage);
                 accessMode = bindingModes[accessMode];
 
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, ${accessMode}> ${storageItem.name}: ${T};\n`
@@ -1338,7 +1356,7 @@ class Points {
             }
         });
         if (this.#layers.length) {
-            if (!this.#layers.shaderType || this.#layers.shaderType & shaderType) {
+            if (!this.#layers.shaderStage || this.#layers.shaderStage & shaderStage) {
                 let totalSize = 0;
                 this.#layers.forEach(layerItem => totalSize += layerItem.size);
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <storage, read_write> layers: array<array<vec4f, ${totalSize}>>;\n`
@@ -1347,7 +1365,7 @@ class Points {
         }
         this.#samplers.forEach(sampler => {
             const isInternal = internal === sampler.internal;
-            if (isInternal && (!sampler.shaderType || sampler.shaderType & shaderType)) {
+            if (isInternal && (!sampler.shaderStage || sampler.shaderStage & shaderStage)) {
                 const T = sampler.descriptor.compare ? 'sampler_comparison' : 'sampler';
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${sampler.name}: ${T};\n`;
                 bindingIndex += 1;
@@ -1355,21 +1373,21 @@ class Points {
         });
         this.#texturesStorage2d.forEach(texture => {
             const isInternal = internal === texture.internal;
-            if (isInternal && (!texture.shaderType || texture.shaderType & shaderType)) {
+            if (isInternal && (!texture.shaderStage || texture.shaderStage & shaderStage)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_storage_2d<rgba8unorm, write>;\n`;
                 bindingIndex += 1;
             }
         });
         this.#textures2d.forEach(texture => {
             const isInternal = internal === texture.internal;
-            if (isInternal && (!texture.shaderType || texture.shaderType & shaderType)) {
+            if (isInternal && (!texture.shaderStage || texture.shaderStage & shaderStage)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d<f32>;\n`;
                 bindingIndex += 1;
             }
         });
         this.#texturesDepth2d.forEach(texture => {
             const isInternal = internal === texture.internal;
-            if (isInternal && (!texture.shaderType || texture.shaderType & shaderType)) {
+            if (isInternal && (!texture.shaderStage || texture.shaderStage & shaderStage)) {
                 if (texture.renderPassIndex !== renderPassIndex) {
                     dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_depth_2d;\n`;
                     bindingIndex += 1;
@@ -1378,14 +1396,14 @@ class Points {
         });
         this.#textures2dArray.forEach(texture => {
             const isInternal = internal === texture.internal;
-            if (isInternal && (!texture.shaderType || texture.shaderType & shaderType)) {
+            if (isInternal && (!texture.shaderStage || texture.shaderStage & shaderStage)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${texture.name}: texture_2d_array<f32>;\n`;
                 bindingIndex += 1;
             }
         });
         this.#texturesExternal.forEach(externalTexture => {
             const isInternal = internal === externalTexture.internal;
-            if (isInternal && (!externalTexture.shaderType || externalTexture.shaderType & shaderType)) {
+            if (isInternal && (!externalTexture.shaderStage || externalTexture.shaderStage & shaderStage)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${externalTexture.name}: texture_external;\n`;
                 bindingIndex += 1;
             }
@@ -1393,7 +1411,7 @@ class Points {
         this.#bindingTextures.forEach(bindingTexture => {
             const { usesRenderPass } = bindingTexture;
             if (usesRenderPass) {
-                if (GPUShaderStage.VERTEX === shaderType) { // to avoid binding texture in vertex
+                if (GPUShaderStage.VERTEX === shaderStage) { // to avoid binding texture in vertex
                     return;
                 }
                 if (renderPassIndex === bindingTexture.write.renderPassIndex) {
@@ -1409,11 +1427,11 @@ class Points {
             }
 
             const isInternal = internal === bindingTexture.internal;
-            if (isInternal && (bindingTexture.write.shaderType & shaderType)) {
+            if (isInternal && (bindingTexture.write.shaderStage & shaderStage)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.write.name}: texture_storage_2d<rgba8unorm, write>;\n`;
                 bindingIndex += 1;
             }
-            if (isInternal && (bindingTexture.read.shaderType & shaderType)) {
+            if (isInternal && (bindingTexture.read.shaderStage & shaderStage)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.read.name}: texture_2d<f32>;\n`;
                 bindingIndex += 1;
             }
@@ -1421,8 +1439,8 @@ class Points {
         return dynamicGroupBindings;
     }
 
-    #createDynamicGroupBindingsUpdate(shaderType, { index: renderPassIndex, internal }, groupId = 0) {
-        if (!shaderType) {
+    #createDynamicGroupBindingsUpdate(shaderStage, { index: renderPassIndex, internal }, groupId = 0) {
+        if (!shaderStage) {
             throw '`GPUShaderStage` is required';
         }
         // const groupId = 0;
@@ -1431,7 +1449,7 @@ class Points {
 
         this.#texturesExternal.forEach(externalTexture => {
             const isInternal = internal === externalTexture.internal;
-            if (isInternal && (!externalTexture.shaderType || externalTexture.shaderType & shaderType)) {
+            if (isInternal && (!externalTexture.shaderStage || externalTexture.shaderStage & shaderStage)) {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${externalTexture.name}: texture_external;\n`;
                 bindingIndex += 1;
             }
@@ -1484,37 +1502,36 @@ class Points {
         let dynamicStructParams = '';
         let dynamicStructMesh = '';
         let dynamicStructCamera = '';
-        this.#uniforms.forEach(u => {
-            u.type = u.type || 'f32';
+        this.#uniforms.list.forEach(u => {
             dynamicStructParams += /*wgsl*/`${u.name}:${u.type}, \n\t`;
         });
-        if (this.#uniforms.length) {
+        if (this.#uniforms.list.length) {
             dynamicStructParams = /*wgsl*/`struct Params {\n\t${dynamicStructParams}\n}\n`;
         }
         this.#meshUniforms.forEach(u => {
-            u.type = u.type || 'f32';
             dynamicStructMesh += /*wgsl*/`${u.name}:${u.type}, \n\t`;
         });
         if (this.#meshUniforms.length) {
             dynamicStructMesh = /*wgsl*/`struct Mesh {\n\t${dynamicStructMesh}\n}\n`;
         }
         this.#cameraUniforms.forEach(u => {
-            u.type = u.type || 'f32';
             dynamicStructCamera += /*wgsl*/`${u.name}:${u.type}, \n\t`;
         });
         if (this.#cameraUniforms.length) {
             dynamicStructCamera = /*wgsl*/`struct Camera {\n\t${dynamicStructCamera}\n}\n`;
         }
-        this.#constants.forEach(c => {
-            dynamicStructParams += /*wgsl*/`const ${c.name}:${c.structName} = ${c.value};\n`;
-        })
+
         dynamicStructParams += dynamicStructMesh;
         dynamicStructParams += dynamicStructCamera;
 
+        const constantsVertex = this.#constants.stringOfNonOverrides(GPUShaderStage.VERTEX);
+        const constantsCompute = this.#constants.stringOfNonOverrides(GPUShaderStage.COMPUTE);
+        const constantsFragment = this.#constants.stringOfNonOverrides(GPUShaderStage.FRAGMENT);
+
         renderPass.index = index;
-        renderPass.hasVertexShader && (dynamicGroupBindingsVertex += dynamicStructParams);
-        renderPass.hasComputeShader && (dynamicGroupBindingsCompute += dynamicStructParams);
-        renderPass.hasFragmentShader && (dynamicGroupBindingsFragment += dynamicStructParams);
+        renderPass.hasVertexShader && (dynamicGroupBindingsVertex += dynamicStructParams + constantsVertex);
+        renderPass.hasComputeShader && (dynamicGroupBindingsCompute += dynamicStructParams + constantsCompute);
+        renderPass.hasFragmentShader && (dynamicGroupBindingsFragment += dynamicStructParams + constantsFragment);
 
         renderPass.hasVertexShader && (dynamicGroupBindingsVertex += this.#createDynamicGroupBindings(GPUShaderStage.VERTEX, renderPass));
         renderPass.hasComputeShader && (dynamicGroupBindingsCompute += this.#createDynamicGroupBindings(GPUShaderStage.COMPUTE, renderPass));
@@ -1562,17 +1579,17 @@ class Points {
         this.#dataSize = dataSize(allShaders);
         // since uniforms are in a sigle struct
         // this is only required for storage
-        this.#storage.forEach(s => {
+        this.#storages.list.forEach(s => {
             if (!s.mapped) {
-                if (isArray(s.structName)) {
-                    const typeData = getArrayTypeData(s.structName, this.#dataSize);
-                    s.structSize = typeData.size;
+                if (isArray(s.type)) {
+                    const { size } = getArrayTypeData(s.type, this.#dataSize);
+                    s.size = size;
                 } else {
-                    const d = this.#dataSize.get(s.structName) || typeSizes[s.structName];
+                    const d = this.#dataSize.get(s.type) || typeSizes[s.type];
                     if (!d) {
-                        throw `${s.structName} has not been defined.`
+                        throw `${s.type} has not been defined.`
                     }
-                    s.structSize = d.bytes || d.size;
+                    s.size = d.bytes || d.size;
                 }
             }
         });
@@ -1707,7 +1724,7 @@ class Points {
         // sometimes both arrive and we have to use the bigger one
         const buffer = this.#device.createBuffer({
             mappedAtCreation,
-            size: Math.max(size, data.byteLength),
+            size: Math.max(size || 0, data.byteLength),
             usage,
         });
         new Float32Array(buffer.getMappedRange()).set(data);
@@ -1740,7 +1757,7 @@ class Points {
 
     /**
      *
-     * @param {Array} uniformsArray
+     * @param {Array<Uniform>} uniformsArray
      * @param {String} structName
      * @returns {{values:Float32Array, paramsDataSize:Object}}
      */
@@ -1748,8 +1765,9 @@ class Points {
         const paramsDataSize = this.#dataSize.get(structName)
         const paddings = paramsDataSize.paddings;
         // we check the paddings list and add 0's to just the ones that need it
-        const uniformsClone = structuredClone(uniformsArray);
-        let arrayValues = uniformsClone.map(v => {
+        const arrayValues = uniformsArray.map(u => {
+            const v = u.serialize(); // clone the item to not modify the original
+
             const padding = paddings[v.name] / 4;
             if (padding) {
                 if (v.value.constructor !== Array) {
@@ -1766,8 +1784,8 @@ class Points {
     }
 
     #createParametersUniforms() {
-        const { values, paramsDataSize } = this.#createUniformValues(this.#uniforms);
-        this.#uniforms.buffer = this.#createAndMapBuffer(values, GPUBufferUsage.UNIFORM + GPUBufferUsage.COPY_DST, true, paramsDataSize.bytes);
+        const { values, paramsDataSize } = this.#createUniformValues(this.#uniforms.list);
+        this.#uniforms.list.buffer = this.#createAndMapBuffer(values, GPUBufferUsage.UNIFORM + GPUBufferUsage.COPY_DST, true, paramsDataSize.bytes);
 
         if (this.#meshUniforms.length) {
             const { values, paramsDataSize } = this.#createUniformValues(this.#meshUniforms);
@@ -1783,11 +1801,11 @@ class Points {
      * Updates all uniforms (for the update function)
      */
     #writeParametersUniforms() {
-        if (!this.#uniforms.buffer) {
+        if (!this.#uniforms.list.buffer) {
             console.error('An attempt to create uniforms has been made but no setUniform has been called. Maybe an update was called before a setUniform.')
         }
-        const { values } = this.#createUniformValues(this.#uniforms);
-        this.#writeBuffer(this.#uniforms.buffer, values);
+        const { values } = this.#createUniformValues(this.#uniforms.list);
+        this.#writeBuffer(this.#uniforms.list.buffer, values);
 
         if (this.#meshUniforms.length) {
             const { values } = this.#createUniformValues(this.#meshUniforms);
@@ -1803,12 +1821,12 @@ class Points {
      * Updates all the storages (for the update function)
      */
     #writeStorages() {
-        this.#storage.forEach(storageItem => {
+        this.#storages.list.forEach(storageItem => {
             // since audio is something constant
             // the stream flag allows to keep this write open
             const { updated, stream } = storageItem;
             if (storageItem.mapped && (updated || stream)) {
-                const values = new Float32Array(storageItem.array);
+                const values = new Float32Array(storageItem.value);
                 this.#writeBuffer(storageItem.buffer, values);
                 if (!stream) {
                     storageItem.updated = false;
@@ -1825,38 +1843,28 @@ class Points {
         //--------------------------------------------
         this.#createParametersUniforms();
         //--------------------------------------------
-        this.#storage.forEach(storageItem => {
+        this.#storages.list.forEach(storageItem => {
             let usage = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST;
-            if (storageItem.read) {
-                let readStorageItem = {
-                    name: storageItem.name,
-                    size: storageItem.structSize
-                }
-                if (storageItem.mapped) {
-                    readStorageItem = {
-                        name: storageItem.name,
-                        size: storageItem.array.length,
-                    }
-                }
-                this.#readStorage.push(readStorageItem);
+            const { readable, name, size, mapped } = storageItem;
+            if (readable) {
+                const readSize = mapped ? storageItem.value.length : size;
+
+                storageItem.bufferRead = this.#device.createBuffer({
+                    label: name,
+                    size: readSize,
+                    usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
+                });
+
                 usage = usage | GPUBufferUsage.COPY_SRC;
             }
-            storageItem.usage = usage;
-            if (storageItem.mapped) {
-                const values = new Float32Array(storageItem.array);
-                storageItem.buffer = this.#createAndMapBuffer(values, usage);
+
+            if (mapped) {
+                const values = new Float32Array(storageItem.value);
+                storageItem.buffer = this.#createAndMapBuffer(values, usage, true, size);
             } else {
-                storageItem.buffer = this.#createBuffer(storageItem.structSize, usage);
+                storageItem.buffer = this.#createBuffer(size, usage);
             }
-            storageItem.buffer.label = storageItem.name;
-        });
-        //--------------------------------------------
-        this.#readStorage.forEach(readStorageItem => {
-            readStorageItem.buffer = this.#device.createBuffer({
-                label: readStorageItem.name,
-                size: readStorageItem.size,
-                usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
-            });
+            storageItem.buffer.label = name;
         });
         //--------------------------------------------
         if (this.#layers.length) {
@@ -1983,6 +1991,10 @@ class Points {
     }
 
     #createPipeline() {
+        const constantsCompute = this.#constants.listOfOverrides(GPUShaderStage.COMPUTE);
+        const constantsVertex = this.#constants.listOfOverrides(GPUShaderStage.VERTEX);
+        const constantsFragment = this.#constants.listOfOverrides(GPUShaderStage.FRAGMENT);
+
         this.#renderPasses.forEach(renderPass => {
             if (renderPass.hasComputeShader) {
                 this.#createBindGroup(renderPass, GPUShaderStage.COMPUTE);
@@ -1995,7 +2007,8 @@ class Points {
                         module: this.#device.createShaderModule({
                             code: renderPass.compiledShaders.compute
                         }),
-                        entryPoint: 'main'
+                        entryPoint: 'main',
+                        constants: constantsCompute,
                     }
                 });
             }
@@ -2070,6 +2083,7 @@ class Points {
                                 ],
                             },
                         ],
+                        constants: constantsVertex,
                     },
                     fragment: {
                         module: this.#device.createShaderModule({
@@ -2094,6 +2108,7 @@ class Points {
                                 writeMask: GPUColorWrite.ALL,
                             },
                         ],
+                        constants: constantsFragment,
                     },
                 });
             }
@@ -2103,10 +2118,10 @@ class Points {
      * Creates the entries for the pipeline
      * @returns an array with the entries
      */
-    #createEntries(shaderType, { index: renderPassIndex, internal }) {
+    #createEntries(shaderStage, { index: renderPassIndex, internal }) {
         let entries = [];
         let bindingIndex = 0;
-        if (this.#uniforms.length) {
+        if (this.#uniforms.list.length) {
             // TODO: 1262
             // if you remove this there's an error that I think is not explained right
             // it talks about a storage in index 1 but it was actually the 0
@@ -2118,13 +2133,13 @@ class Points {
             //     entry.visibility = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT
             // }
             // the call is split here and at the end of the method with the foreach |= assignment
-            // const visibility = shaderType === GPUShaderStage.FRAGMENT ? GPUShaderStage.VERTEX : null;
+            // const visibility = shaderStage === GPUShaderStage.FRAGMENT ? GPUShaderStage.VERTEX : null;
             entries.push(
                 {
                     binding: bindingIndex++,
                     resource: {
                         label: 'uniform',
-                        buffer: this.#uniforms.buffer
+                        buffer: this.#uniforms.list.buffer
                     },
                     buffer: {
                         type: 'uniform'
@@ -2163,11 +2178,11 @@ class Points {
                 }
             );
         }
-        this.#storage.forEach(storageItem => {
+        this.#storages.list.forEach(storageItem => {
             const isInternal = internal === storageItem.internal;
-            if (isInternal && (!storageItem.shaderType || storageItem.shaderType & shaderType)) {
+            if (isInternal && (!storageItem.shaderStage || storageItem.shaderStage & shaderStage)) {
 
-                let type = getStorageAccessMode(shaderType, storageItem.shaderType);
+                let type = getStorageAccessMode(shaderStage, storageItem.shaderStage);
                 type = entriesModes[type];
 
                 entries.push(
@@ -2186,7 +2201,7 @@ class Points {
             }
         });
         if (this.#layers.length) {
-            if (!this.#layers.shaderType || this.#layers.shaderType & shaderType) {
+            if (!this.#layers.shaderStage || this.#layers.shaderStage & shaderStage) {
                 entries.push(
                     {
                         binding: bindingIndex++,
@@ -2203,7 +2218,7 @@ class Points {
         }
         this.#samplers.forEach(sampler => {
             const isInternal = internal === sampler.internal;
-            if (isInternal && (!sampler.shaderType || sampler.shaderType & shaderType)) {
+            if (isInternal && (!sampler.shaderStage || sampler.shaderStage & shaderStage)) {
                 entries.push(
                     {
                         binding: bindingIndex++,
@@ -2217,7 +2232,7 @@ class Points {
         });
         this.#texturesStorage2d.forEach(textureStorage2d => {
             const isInternal = internal === textureStorage2d.internal;
-            if (isInternal && (!textureStorage2d.shaderType || textureStorage2d.shaderType & shaderType)) {
+            if (isInternal && (!textureStorage2d.shaderStage || textureStorage2d.shaderStage & shaderStage)) {
                 entries.push(
                     {
                         label: 'texture storage 2d',
@@ -2232,7 +2247,7 @@ class Points {
         });
         this.#textures2d.forEach(texture2d => {
             const isInternal = internal === texture2d.internal;
-            if (isInternal && (!texture2d.shaderType || texture2d.shaderType & shaderType)) {
+            if (isInternal && (!texture2d.shaderStage || texture2d.shaderStage & shaderStage)) {
                 entries.push(
                     {
                         label: 'texture 2d',
@@ -2248,7 +2263,7 @@ class Points {
         this.#texturesDepth2d.forEach(texture2d => {
             if (texture2d.renderPassIndex !== renderPassIndex) {
                 const isInternal = internal === texture2d.internal;
-                if (isInternal && (!texture2d.shaderType || texture2d.shaderType & shaderType)) {
+                if (isInternal && (!texture2d.shaderStage || texture2d.shaderStage & shaderStage)) {
                     const renderPass = this.#renderPasses.find(renderPass => renderPass.index === texture2d.renderPassIndex)
                     texture2d.texture = renderPass.textureDepth;
                     entries.push(
@@ -2268,7 +2283,7 @@ class Points {
         });
         this.#textures2dArray.forEach(texture2dArray => {
             const isInternal = internal === texture2dArray.internal;
-            if (isInternal && (!texture2dArray.shaderType || texture2dArray.shaderType & shaderType)) {
+            if (isInternal && (!texture2dArray.shaderStage || texture2dArray.shaderStage & shaderStage)) {
                 entries.push(
                     {
                         label: 'texture 2d array',
@@ -2288,7 +2303,7 @@ class Points {
         });
         this.#texturesExternal.forEach(externalTexture => {
             const isInternal = internal === externalTexture.internal;
-            if (isInternal && (!externalTexture.shaderType || externalTexture.shaderType & shaderType)) {
+            if (isInternal && (!externalTexture.shaderStage || externalTexture.shaderStage & shaderStage)) {
                 entries.push(
                     {
                         label: 'external texture',
@@ -2305,7 +2320,7 @@ class Points {
         this.#bindingTextures.forEach(bindingTexture => {
             const { usesRenderPass } = bindingTexture;
             if (usesRenderPass) {
-                if (GPUShaderStage.VERTEX === shaderType) { // to avoid binding texture in vertex
+                if (GPUShaderStage.VERTEX === shaderStage) { // to avoid binding texture in vertex
                     return;
                 }
                 if (bindingTexture.read.renderPassIndex === renderPassIndex) {
@@ -2337,7 +2352,7 @@ class Points {
             }
 
             const isInternal = internal === bindingTexture.internal;
-            if (isInternal && (bindingTexture.read.shaderType & shaderType)) {
+            if (isInternal && (bindingTexture.read.shaderStage & shaderStage)) {
                 entries.push(
                     {
                         label: `binding texture 2: name: ${bindingTexture.read.name}`,
@@ -2350,7 +2365,7 @@ class Points {
                 );
             }
 
-            if (isInternal && (bindingTexture.write.shaderType & shaderType)) {
+            if (isInternal && (bindingTexture.write.shaderStage & shaderStage)) {
                 entries.push(
                     {
                         label: `binding texture: name: ${bindingTexture.write.name}`,
@@ -2365,17 +2380,17 @@ class Points {
             }
         });
 
-        entries.forEach(entry => entry.visibility = shaderType);
+        entries.forEach(entry => entry.visibility = shaderStage);
 
         return entries;
     }
 
-    #createEntriesUpdate(shaderType, { index: renderPassIndex, internal }) {
+    #createEntriesUpdate(shaderStage, { index: renderPassIndex, internal }) {
         let entries = [];
         let bindingIndex = 0;
         this.#texturesExternal.forEach(externalTexture => {
             const isInternal = internal === externalTexture.internal;
-            if (isInternal && (!externalTexture.shaderType || externalTexture.shaderType & shaderType)) {
+            if (isInternal && (!externalTexture.shaderStage || externalTexture.shaderStage & shaderStage)) {
                 entries.push(
                     {
                         label: 'external texture',
@@ -2388,7 +2403,7 @@ class Points {
                 );
             }
         });
-        entries.forEach(entry => entry.visibility = shaderType);
+        entries.forEach(entry => entry.visibility = shaderStage);
 
         return entries;
     }
@@ -2399,19 +2414,19 @@ class Points {
      * in a single method to avoid duplication and possible bifurcations without
      * me knowing.
      * @param {RenderPass} renderPass
-     * @param {GPUShaderStage} shaderType
+     * @param {GPUShaderStage} shaderStage
      */
-    #createBindGroup(renderPass, shaderType) {
-        const hasComputeShader = (shaderType === GPUShaderStage.COMPUTE) && renderPass.hasComputeShader;
-        const hasVertexShader = (shaderType === GPUShaderStage.VERTEX) && renderPass.hasVertexShader;
-        const hasFragmentShader = (shaderType === GPUShaderStage.FRAGMENT) && renderPass.hasFragmentShader;
+    #createBindGroup(renderPass, shaderStage) {
+        const hasComputeShader = (shaderStage === GPUShaderStage.COMPUTE) && renderPass.hasComputeShader;
+        const hasVertexShader = (shaderStage === GPUShaderStage.VERTEX) && renderPass.hasVertexShader;
+        const hasFragmentShader = (shaderStage === GPUShaderStage.FRAGMENT) && renderPass.hasFragmentShader;
 
-        const entries = this.#createEntries(shaderType, renderPass);
+        const entries = this.#createEntries(shaderStage, renderPass);
 
         if (entries.length) {
             const bindGroupLayout = this.#device.createBindGroupLayout({ entries });
             const bindGroup = this.#device.createBindGroup({
-                label: `_createBindGroup a ${shaderType} - ${renderPass.name}`,
+                label: `_createBindGroup a ${shaderStage} - ${renderPass.name}`,
                 layout: bindGroupLayout,
                 entries
             });
@@ -2429,9 +2444,9 @@ class Points {
                 renderPass.fragmentBindGroup = bindGroup
             }
 
-            // const entriesUpdate = this.#createEntriesUpdate(shaderType, renderPass);
+            // const entriesUpdate = this.#createEntriesUpdate(shaderStage, renderPass);
             // const bindGroup2 = this.#device.createBindGroup({
-            //     label: `_createBindGroup b ${shaderType} - ${renderPass.name}`,
+            //     label: `_createBindGroup b ${shaderStage} - ${renderPass.name}`,
             //     layout: bindGroupLayout,
             //     entries: entriesUpdate
             // });
@@ -2450,14 +2465,14 @@ class Points {
      * is not being updated at all. I have to make the createBindGroup call
      * only if the texture is updated.
      * @param {RenderPass} renderPass
-     * @param {GPUShaderStage} shaderType
+     * @param {GPUShaderStage} shaderStage
      */
-    #passBindGroup(renderPass, shaderType) {
-        const hasComputeShader = (shaderType === GPUShaderStage.COMPUTE) && renderPass.hasComputeShader;
-        const hasVertexShader = (shaderType === GPUShaderStage.VERTEX) && renderPass.hasVertexShader;
-        const hasFragmentShader = (shaderType === GPUShaderStage.FRAGMENT) && renderPass.hasFragmentShader;
+    #passBindGroup(renderPass, shaderStage) {
+        const hasComputeShader = (shaderStage === GPUShaderStage.COMPUTE) && renderPass.hasComputeShader;
+        const hasVertexShader = (shaderStage === GPUShaderStage.VERTEX) && renderPass.hasVertexShader;
+        const hasFragmentShader = (shaderStage === GPUShaderStage.FRAGMENT) && renderPass.hasFragmentShader;
 
-        const entries = this.#createEntries(shaderType, renderPass);
+        const entries = this.#createEntries(shaderStage, renderPass);
 
         if (entries.length) {
             let bindGroupLayout = null;
@@ -2489,10 +2504,10 @@ class Points {
             }
 
 
-            // const entriesUpdate = this.#createEntriesUpdate(shaderType, renderPass);
+            // const entriesUpdate = this.#createEntriesUpdate(shaderStage, renderPass);
             // if (entriesUpdate.length) {
             //     const bindGroup = this.#device.createBindGroup({
-            //         label: `passBindGroup ${shaderType} - ${renderPass.name}`,
+            //         label: `passBindGroup ${shaderStage} - ${renderPass.name}`,
             //         layout: bindGroupLayout,
             //         entries: entriesUpdate
             //     });
@@ -2563,9 +2578,11 @@ class Points {
         this.#delta = this.#clock.getDelta();
         this.#time = this.#clock.time;
         this.#epoch = +new Date() / 1000;
-        this.setUniform(UniformKeys.TIME, this.#time);
-        this.setUniform(UniformKeys.DELTA, this.#delta);
-        this.setUniform(UniformKeys.EPOCH, this.#epoch);
+
+        const { delta, time, epoch } = this.#uniforms;
+        delta.value = this.#delta;
+        time.value = this.#time;
+        epoch.value = this.#epoch;
         //--------------------------------------------
         this.#writeParametersUniforms();
         this.#writeStorages();
@@ -2601,7 +2618,7 @@ class Points {
             // texturesExternal means there's a video
             // if there's a video it needs to be updated no matter what.
             // Also, it needs to be updated if the screen size changes
-            const updateBundle = !isSameDevice || !renderPass.bundle || this.#texturesExternal.length || this.#screenResized || this.#textureUpdated;
+            const updateBundle = !isSameDevice || !renderPass.bundle || this.#texturesExternal.length || this.#screenResized || this.#textureUpdated || renderPass.meshUpdated;
 
             if (renderPass.hasVertexAndFragmentShader) {
                 renderPass.descriptor.colorAttachments[0].view = swapChainTexture.createView();
@@ -2627,10 +2644,17 @@ class Points {
 
                     bundleEncoder.setPipeline(renderPass.renderPipeline);
 
-                    if (this.#uniforms.length) {
+                    if (this.#uniforms.list.length) {
                         bundleEncoder.setBindGroup(0, renderPass.vertexBindGroup);
                         bundleEncoder.setBindGroup(1, renderPass.fragmentBindGroup);
                     }
+
+                    // IF renderPass.meshUpdated
+                    renderPass.vertexBufferInfo = new VertexBufferInfo(renderPass.vertexArray);
+                    renderPass.vertexBuffer = this.#createAndMapBuffer(renderPass.vertexArray, GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST);
+                    renderPass.meshUpdated = false;
+                    // END IF renderPass.meshUpdated
+
                     bundleEncoder.setVertexBuffer(0, renderPass.vertexBuffer);
 
                     // TODO: move this to renderPass because we can ask this just one time and have it as property
@@ -2692,7 +2716,7 @@ class Points {
 
                 const passEncoder = commandEncoder.beginComputePass();
                 passEncoder.setPipeline(renderPass.computePipeline);
-                if (this.#uniforms.length) {
+                if (this.#uniforms.list.length) {
                     passEncoder.setBindGroup(0, renderPass.computeBindGroup);
                 }
                 passEncoder.dispatchWorkgroups(
@@ -2738,15 +2762,16 @@ class Points {
 
 
 
-        this.#readStorage.forEach(readStorageItem => {
-            let storageItem = this.#storage.find(storageItem => storageItem.name === readStorageItem.name);
-            commandEncoder.copyBufferToBuffer(
-                storageItem.buffer /* source buffer */,
-                0 /* source offset */,
-                readStorageItem.buffer /* destination buffer */,
-                0 /* destination offset */,
-                readStorageItem.buffer.size /* size */
-            );
+        this.#storages.list.forEach(storageItem => {
+            if (storageItem.readable) {
+                commandEncoder.copyBufferToBuffer(
+                    storageItem.buffer /* source buffer */,
+                    0 /* source offset */,
+                    storageItem.bufferRead /* destination buffer */,
+                    0 /* destination offset */,
+                    storageItem.bufferRead.size /* size */
+                );
+            }
         });
         // ---------------------
         this.#commandsFinished.push(commandEncoder.finish());
@@ -2759,9 +2784,11 @@ class Points {
         this.#mouseWheel = false;
         this.#mouseDelta[0] = 0;
         this.#mouseDelta[1] = 0;
-        this.setUniform(UniformKeys.MOUSE_CLICK, this.#mouseClick);
-        this.setUniform(UniformKeys.MOUSE_WHEEL, this.#mouseWheel);
-        this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta);
+
+        const { mouseClick, mouseWheel, mouseDelta } = this.#uniforms;
+        mouseClick.value = this.#mouseClick;
+        mouseWheel.value = this.#mouseWheel;
+        mouseDelta.value = this.#mouseDelta;
         await this.read();
     }
     async read() {
@@ -2773,10 +2800,12 @@ class Points {
                 if (id != 0) {
                     const dataRead = await this.readStorage(`${name}_data`)
                     event?.callback(dataRead);
-                    const storageToUpdate = this.#nameExists(this.#storage, name);
-                    const data = storageToUpdate.array;
-                    data[0] = 0;
-                    this.setStorageMap(name, data);
+                    const storageToUpdate = this.#storages.find(name);
+                    if (storageToUpdate) {
+                        const data = storageToUpdate.value;
+                        data[0] = 0;
+                        this.setStorage(name).setValue(data);
+                    }
                 }
             }
         }
@@ -2943,6 +2972,45 @@ class Points {
     }
 
     /**
+     * Get the list of added uniforms, same as {@link uniforms}
+     * @example
+     *
+     * points.setUniform('myuniform', 10);
+     *
+     * // later
+     * points.params.myuniform.value = 12;
+     */
+    get params() {
+        return this.#uniforms;
+    }
+    /**
+     * @type {Uniforms & { [key: string]: Uniform }}
+     *
+     * Get the list of added uniforms, same as {@link params}
+     * @example
+     *
+     * points.setUniform('myuniform', 10);
+     *
+     * // later
+     * points.uniforms.myuniform.value = 12;
+     */
+    get uniforms() {
+        return this.#uniforms;
+    }
+    /**
+     * @type {Storages & { [key: string]: Storage }}
+     */
+    get storages() {
+        return this.#storages;
+    }
+    /**
+     * @type {Constants & { [key: string]: Constant }}
+     */
+    get constants() {
+        return this.#constants;
+    }
+
+    /**
      * Reset memory before calling again `init()`, this without calling
      * the constructor `new Points()`.
      * Useful to switch to a new set of shaders and erase internal references,
@@ -2985,11 +3053,12 @@ class Points {
         })
         this.#postRenderPasses = [];
 
-        this.#storage?.forEach(s => s.buffer.destroy());
-        this.#storage = [];
-        this.#readStorage?.forEach(s => s.buffer.destroy());
-        this.#readStorage = [];
-        this.#uniforms?.buffer.destroy();
+        // TODO: make destroy method in Storages
+        this.#storages.list?.forEach(s => { s.buffer.destroy(); s.bufferRead?.destroy(); });
+        this.#storages = new Storages();
+
+        // TODO: make destroy method in Uniforms
+        this.#uniforms.list?.buffer.destroy();
         this.#meshUniforms?.buffer?.destroy();
         this.#cameraUniforms?.buffer?.destroy();
         this.#samplers?.forEach(s => null);
@@ -3000,9 +3069,10 @@ class Points {
         this.#layers = new LayersArray();
 
         this.#initialized = false;
-        this.#uniforms = new UniformsArray();
+        this.#uniforms = new Uniforms();
         this.#meshUniforms = new UniformsArray();
         this.#cameraUniforms = new UniformsArray();
+
 
         this.#texturesExternal?.forEach(textureExternal => {
             const stream = textureExternal?.video.srcObject;
@@ -3012,7 +3082,7 @@ class Points {
         this.#texturesExternal = [];
 
         clearCache();
-        this.#constants = [];
+        this.#constants = new Constants();
         this.#imports = [];
         this.#clock = new Clock();
 
@@ -3058,11 +3128,9 @@ class Points {
         })
         this.#postRenderPasses = null;
 
-        this.#storage.forEach(s => s.buffer.destroy());
-        this.#storage = null;
-        this.#readStorage.forEach(s => s.buffer.destroy());
-        this.#readStorage = null;
-        this.#uniforms.buffer.destroy();
+        this.#storages.list?.forEach(s => { s.buffer.destroy(); s.bufferRead?.destroy(); });
+        this.#storages = null;
+        this.#uniforms.list.buffer.destroy();
         this.#meshUniforms?.buffer?.destroy();
         this.#cameraUniforms?.buffer?.destroy();
         this.#samplers.forEach(s => null);
@@ -3076,6 +3144,7 @@ class Points {
         this.#uniforms = null;
         this.#meshUniforms = null;
         this.#cameraUniforms = null;
+
 
         this.#texturesExternal.forEach(textureExternal => {
             const stream = textureExternal?.video.srcObject;
@@ -3096,4 +3165,4 @@ class Points {
 }
 
 export default Points;
-export { RenderPass, RenderPasses, PrimitiveTopology, CullMode, LoadOp, PresentationFormat, FrontFace, ScaleMode };
+export { RenderPass, RenderPasses, PrimitiveTopology, CullMode, LoadOp, PresentationFormat, FrontFace, ScaleMode, Uniform, Storage, Constant };

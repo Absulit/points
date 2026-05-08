@@ -40,7 +40,7 @@ console.log(NUMPARTICLES);
 
 const instancedParticlesRenderPass = new RenderPass(vert, frag1, compute0, WORKGROUP_X, WORKGROUP_Y, WORKGROUP_Z)
 instancedParticlesRenderPass.depthWriteEnabled = false;
-instancedParticlesRenderPass.addPlane('plane', { x: 0, y: 0 }, { width: 2, height: 2 }).instanceCount = NUMPARTICLES;
+instancedParticlesRenderPass.setPlane('plane', { x: 0, y: 0 }, { width: 2, height: 2 }).instanceCount = NUMPARTICLES;
 
 const notificationMsg = `This demo uses a webcam, but it seems you don't have one, \nso we replaced it with a video.`;
 
@@ -52,6 +52,8 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
+        const { uniforms, storages, constants } = points;
+        const { VERTEX, COMPUTE } = GPUShaderStage;
         points.import(structs);
 
         await points.setTextureWebcam('webcam')
@@ -69,19 +71,17 @@ const base = {
                 await points.setTextureVideo('webcam', './../img/6982698-hd_1440_1080_25fps_800x800.mp4');
             });
 
-        points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
-        points.setConstant('WORKGROUP_X', WORKGROUP_X, 'u32');
-        points.setConstant('WORKGROUP_Y', WORKGROUP_Y, 'u32');
-        points.setConstant('WORKGROUP_Z', WORKGROUP_Z, 'u32');
-        points.setConstant('THREADS_X', THREADS_X, 'u32');
-        points.setConstant('THREADS_Y', THREADS_Y, 'u32');
-        points.setConstant('THREADS_Z', THREADS_Z, 'u32');
-        points.setStorage(
-            'particles',
-            `array<Particle, ${NUMPARTICLES}>`,
-            false,
-            GPUShaderStage.VERTEX | GPUShaderStage.COMPUTE
-        );
+        constants.NUMPARTICLES = NUMPARTICLES;
+        constants.WORKGROUP_X = WORKGROUP_X;
+        constants.WORKGROUP_Y = WORKGROUP_Y;
+        constants.WORKGROUP_Z = WORKGROUP_Z;
+        constants.THREADS_X = THREADS_X;
+        constants.THREADS_Y = THREADS_Y;
+        constants.THREADS_Z = THREADS_Z;
+
+        storages.particles
+            .setType(`array<Particle, ${NUMPARTICLES}>`)
+            .setShaderStage(VERTEX | COMPUTE);
 
         points.setSampler('imageSampler', null);
         await points.setTextureImage('image', './../img/absulit_800x800.jpg');
@@ -89,21 +89,21 @@ const base = {
 
         points.setCameraOrthographic('camera');
 
-        points.setUniform('maxLife', options.maxLife);
+        uniforms.maxLife = options.maxLife;
         folder.add(options, 'maxLife', 1, 600, .0001).name('maxLife');
 
-        points.setUniform('turbulenceScale', options.turbulenceScale);
+        uniforms.turbulenceScale = options.turbulenceScale;
         folder.add(options, 'turbulenceScale', 10, 1024, .0001).name('turbulenceScale');
 
-        points.setUniform('particleSize', options.particleSize);
+        uniforms.particleSize = options.particleSize;
         folder.add(options, 'particleSize', 1, 10, .0001).name('particleSize');
 
 
         const dropdownItems = { 'Video': 0, 'Webcam': 1, 'Image': 2 };
-        points.setUniform('texture_mode', options.mode);
+        uniforms.texture_mode = options.mode;
         folder.add(options, 'mode', dropdownItems).name('Textures').onChange(async value => {
             console.log(value);
-            points.setUniform('texture_mode', value);
+            uniforms.texture_mode = +value;
         });
 
 
@@ -114,10 +114,10 @@ const base = {
      * @param {Points} points
      */
     update: points => {
-        points.setUniform('maxLife', options.maxLife);
-        points.setUniform('turbulenceScale', options.turbulenceScale);
-        points.setUniform('particleSize', options.particleSize);
-        points.setUniform('texture_mode', options.mode);
+        const { uniforms } = points;
+        uniforms.maxLife = options.maxLife;
+        uniforms.turbulenceScale = options.turbulenceScale;
+        uniforms.particleSize = options.particleSize;
     }
 }
 

@@ -25,7 +25,7 @@ const NUMPARTICLES = WORKGROUPS_X * WORKGROUPS_Y * WORKGROUPS_Z * THREADS_X * TH
 
 const renderPass0 = new RenderPass(vert, frag, compute, WORKGROUPS_X, WORKGROUPS_Y, WORKGROUPS_Z);
 renderPass0.name = 'Main Application';
-renderPass0.addPlane('plane', { x: 0, y: 0, z: 0 }, { width: 2, height: 2 }).instanceCount = NUMPARTICLES;
+renderPass0.setPlane('plane', { x: 0, y: 0, z: 0 }, { width: 2, height: 2 }).instanceCount = NUMPARTICLES;
 
 const base = {
     renderPasses: [
@@ -36,21 +36,26 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
-        points.scaleMode = ScaleMode.HEIGHT;
+        const { storages, constants } = points;
+        const { COMPUTE } = GPUShaderStage;
         points.import(structs);
+        points.scaleMode = ScaleMode.HEIGHT;
 
-        points.setConstant('UNIT', 1 / 8, 'f32');
-        points.setConstant('NUMPARTICLES', NUMPARTICLES, 'u32');
-        points.setConstant('SIDE', SIDE, 'u32');
-        points.setConstant('HALFSIDE', 'i32(SIDE / 2)', 'i32');
+        constants.UNIT = 1 / 8;
+        constants.SIDE = SIDE;
+        constants.HALFSIDE.setValue(SIDE / 2).setType('i32');
 
-        points.setConstant('THREADS_X', THREADS_X, 'u32');
-        points.setConstant('THREADS_Y', THREADS_Y, 'u32');
-        points.setConstant('THREADS_Z', THREADS_Z, 'u32');
+        constants.THREADS_X = THREADS_X;
+        constants.THREADS_Y = THREADS_Y;
+        constants.THREADS_Z = THREADS_Z;
+
+        constants.THREADS_X.setOverride(true).setShaderStage(COMPUTE);
+        constants.THREADS_Y.setOverride(true).setShaderStage(COMPUTE);
+        constants.THREADS_Z.setOverride(true).setShaderStage(COMPUTE);
 
         console.log(NUMPARTICLES);
-        points.setStorage('particles', `array<Particle, ${NUMPARTICLES}>`, false);
-        points.setStorage('variables', 'Variable', false);
+        storages.particles.setType(`array<Particle, ${NUMPARTICLES}>`);
+        storages.variables.setType('Variable');
 
         points.setCameraPerspective('camera', [0, 0, 0]);
 

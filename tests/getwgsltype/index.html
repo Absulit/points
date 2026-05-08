@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POINTS - TESTS</title>
+    <link rel="stylesheet" href="./../qunit-2.25.0.css">
+</head>
+
+<body>
+    <div id="qunit"></div>
+    <div id="qunit-fixture"></div>
+    <script src="./../qunit-2.25.0.js"></script>
+
+
+    <script type="importmap">
+        {
+            "imports": {
+            "points": "../../src/points.js",
+
+            "points/animation": "../../src/core/animation.js",
+            "points/audio": "../../src/core/audio.js",
+            "points/color": "../../src/core/color.js",
+            "points/debug": "../../src/core/debug.js",
+            "points/effects": "../../src/core/effects.js",
+            "points/image": "../../src/core/image.js",
+            "points/math": "../../src/core/math.js",
+            "points/noise2d": "../../src/core/noise2d.js",
+            "points/classicnoise2d": "../../src/core/classicnoise2d.js",
+            "points/classicnoise3d": "../../src/core/classicnoise3d.js",
+            "points/random": "../../src/core/random.js",
+            "points/sdf": "../../src/core/sdf.js",
+
+            "datgui": "https://cdn.jsdelivr.net/gh/dataarts/dat.gui@0.7.9/build/dat.gui.module.js",
+            "utils": "../../utils.js"
+            }
+        }
+    </script>
+
+    <script type="module" src="main.js"></script>
+
+</body>
+
+</html>

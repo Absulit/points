@@ -13,6 +13,7 @@ const bloom1 = {
      * @param {*} folder
      */
     init: async (points, folder) => {
+        const { uniforms } = points;
         points.scaleMode = ScaleMode.FIT;
 
         const descriptor = {
@@ -25,15 +26,17 @@ const bloom1 = {
         // await points.setTextureImage('image', './../img/old_king_600x600.jpg');
         await points.setTextureImage('image', './../img/absulit_800x800.jpg');
 
-        points.setUniform('scale', options.scale);
-        points.setUniform('bloom', options.bloom);
+
+        uniforms.scale = options.scale;
+        uniforms.bloom = options.bloom;
         folder.add(options, 'scale', 0, 1, .0001).name('scale');
         folder.add(options, 'bloom', -1, 1, .0001).name('bloom');
         folder.open();
     },
     update: points => {
-        points.setUniform('scale', options.scale);
-        points.setUniform('bloom', options.bloom);
+        const { uniforms } = points;
+        uniforms.scale = options.scale;
+        uniforms.bloom = options.bloom;
     }
 }
 

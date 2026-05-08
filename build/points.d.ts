@@ -3,6 +3,137 @@
  */
 export type SignedNumber = number;
 /**
+ * Constant is a container for const declarations.
+ * They work in two ways with the `override` attribute.
+ *
+ * @class Constant
+ */
+export class Constant {
+    /**
+     * @param {{name:String, value:(Number|Array<Number>), type:String, override:Boolean}} config
+     */
+    constructor({ name, value, type, override }: {
+        name: string;
+        value: (number | Array<number>);
+        type: string;
+        override: boolean;
+    });
+    /**
+     * The name that the Constant will have on the WGSL side.
+     * @param {String} value name of the Constant. The name is used in the WGSL
+     * shader.
+     * @example
+     * // js
+     * myConstant.name = 'MYCONST';
+     *
+     * // wgsl
+     * let newVal = MYCONST + 3;
+     * @memberof Constant
+     */
+    set name(value: string);
+    get name(): string;
+    /**
+     * Get or set the value that the constant will have on the WGSL side.
+     * @warning It can only be assigned once.
+     * @param {Number|Array<Number>} value
+     * @memberof Constant
+     */
+    set value(value: number | Array<number>);
+    get value(): number | Array<number>;
+    /**
+     * Get or set the type of the constant.
+     * It can be inferred automatically by just passing the value, but if
+     * something more specific is required, then you should use `type`.
+     * @param {String} value WGSL data type of the constant
+     * @example
+     * myConstant.type = 'u32';
+     * @memberof Constant
+     */
+    set type(value: string);
+    get type(): string;
+    /**
+     * A constant override is a constant you can change per shader.
+     * By default, POINTS interpolates constant declarations inside the WGSL
+     * string shader like this:
+     * ```wgsl
+     * const MYCONST:u32 = 10;
+     * ```
+     * These declarations are added by default to all shaders in the pipeline
+     * and in all render passes. These can not be changed.
+     *
+     * With overrides you can have the same constant in different shaders with
+     * different values. The default value is passed to each pipeline and then
+     * it can be overwritten in a specific shader by hand.
+     * @example
+     * ```js
+     * // js side
+     * constants.PI.setOverride(true).setValue(3.14);
+     * ```
+     * ```wgsl
+     * // wgsl side
+     * override MYCONST:u32 = 3.1415;
+     * ```
+     * @memberof Constant
+     */
+    set override(value: boolean);
+    get override(): boolean;
+    /**
+     * Tells WebGPU to which shader it can only be used.
+     * @param {GPUShaderStage}
+     * @memberof Constant
+     */
+    set shaderStage(value: number);
+    get shaderStage(): number;
+    /**
+     * Sets the value of a Constant
+     * @param {Number|Array<Number>} value
+     * @returns {Constant}
+     * @memberof Constant
+     */
+    setValue(value: number | Array<number>): Constant;
+    /**
+     * Set the data type of the Constant.
+     * @param {String} value WGSL data type of the constant
+     * @example
+     * myUniform.setType('u32')
+     * @memberof Constant
+     */
+    setType(value: string): this;
+    /**
+     * A constant override is a constant you can change per shader.
+     * By default, POINTS interpolates constant declarations inside the WGSL
+     * string shader like this:
+     * ```wgsl
+     * const MYCONST:u32 = 10;
+     * ```
+     * These declarations are added by default to all shaders in the pipeline
+     * and in all render passes. These can not be changed.
+     *
+     * With overrides you can have the same constant in different shaders with
+     * different values. The default value is passed to each pipeline and then
+     * it can be overwritten in a specific shader by hand.
+     * @example
+     * ```js
+     * // js side
+     * constants.PI.setOverride(true).setValue(3.14);
+     * ```
+     * ```wgsl
+     * // wgsl side
+     * override MYCONST:u32 = 3.1415;
+     * ```
+     * @memberof Constant
+     */
+    setOverride(value: any): this;
+    /**
+     * Tells WebGPU to which shader it can only be used.
+     * @param {GPUShaderStage} value
+     * @returns {Constant}
+     * @memberof Constant
+     */
+    setShaderStage(value: GPUShaderStage): Constant;
+    #private;
+}
+/**
  * To tell the {@link RenderPass} what polygons should be discarded
  * Default `BACK`
  * @example
@@ -335,6 +466,12 @@ export class RenderPass {
     set enabled(val: boolean);
     get enabled(): boolean;
     /**
+     * To notify the RenderPass if a mesh has changed to update the vertexBuffer
+     * @param {Boolean} val
+     */
+    set meshUpdated(val: boolean);
+    get meshUpdated(): boolean;
+    /**
      * - **currently for internal use**<br>
      * - **might be private in the future**<br>
      * Adds two triangles as a quad called Point
@@ -354,6 +491,7 @@ export class RenderPass {
     };
     /**
      * Adds a mesh quad
+     * @deprecated Since v0.8.0 use {@link setPlane}
      * @param {String} name The name will show up in the `mesh` Uniform.
      * @param {{x:Number, y:Number, z:Number}} coordinate
      * @param {{width:Number, height:Number}} dimensions
@@ -386,7 +524,36 @@ export class RenderPass {
         verticesCount: number;
     };
     /**
+     * Adds or replaces a mesh quad
+     * @param {String} name The name will show up in the `mesh` Uniform.
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {{width:Number, height:Number}} dimensions
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     * @param {{x:Number, y:Number }} segments mesh subdivisions
+     *
+     * @example
+     *
+     * renderPass.setPlane('plane', { x: 0, y: 0, z: 0 }, { width: 2, height: 2 }).instanceCount = NUMPARTICLES;
+     */
+    setPlane(name: string, coordinate?: {
+        x: number;
+        y: number;
+        z: number;
+    }, dimensions?: {
+        width: number;
+        height: number;
+    }, color?: {
+        r: number;
+        g: number;
+        b: number;
+        a: number;
+    }, segments?: {
+        x: number;
+        y: number;
+    }): any;
+    /**
      * Adds a mesh cube
+     * @deprecated since v0.8.0. Use {@link setCube}
      * @param {String} name The name will show up in the `mesh` Uniform.
      * @param {{x:Number, y:Number, z:Number}} coordinate
      * @param {{width:Number, height:Number, depth:Number}} dimensions
@@ -416,7 +583,33 @@ export class RenderPass {
         verticesCount: number;
     };
     /**
+     * Adds or replaces a mesh cube
+     * @param {String} name The name will show up in the `mesh` Uniform.
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {{width:Number, height:Number, depth:Number}} dimensions
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     *
+     * @example
+     *
+     * renderPass.setCube('base_cube').instanceCount = NUMPARTICLES;
+     */
+    setCube(name: string, coordinate?: {
+        x: number;
+        y: number;
+        z: number;
+    }, dimensions?: {
+        width: number;
+        height: number;
+        depth: number;
+    }, color?: {
+        r: number;
+        g: number;
+        b: number;
+        a: number;
+    }): any;
+    /**
      * Adds a mesh sphere
+     * @deprecated since v0.8.0. Use {@link setSphere}
      * @param {String} name The name will show up in the `mesh` Uniform.
      * @param {{x:Number, y:Number, z:Number}} coordinate
      * @param {{r:Number, g:Number, b:Number, a:Number}} color
@@ -444,7 +637,31 @@ export class RenderPass {
         verticesCount: number;
     };
     /**
+     * Adds or replaces a mesh sphere
+     * @param {String} name The name will show up in the `mesh` Uniform.
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     * @param {Number} radius
+     * @param {Number} segments
+     * @param {Number} rings
+     *
+     * @example
+     *
+     * renderPass.setSphere('sphere').instanceCount = 100;
+     */
+    setSphere(name: string, coordinate?: {
+        x: number;
+        y: number;
+        z: number;
+    }, color?: {
+        r: number;
+        g: number;
+        b: number;
+        a: number;
+    }, radius?: number, segments?: number, rings?: number): any;
+    /**
      * Adds a Torus mesh
+     * @deprecated since v0.8.0. Use {@link setTorus}
      * @param {String} name The name will show up in the `mesh` Uniform.
      * @param {{x:Number, y:Number, z:Number}} coordinate
      * @param {Number} radius
@@ -469,7 +686,33 @@ export class RenderPass {
         a: number;
     }): any;
     /**
+     * Adds or replaces a Torus mesh
+     * @param {String} name The name will show up in the `mesh` Uniform.
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {Number} radius
+     * @param {Number} tube
+     * @param {Number} radialSegments
+     * @param {Number} tubularSegments
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     * @returns {Object}
+     *
+     * @example
+     *
+     * renderPass.setTorus('myTorus');
+     */
+    setTorus(name: string, coordinate?: {
+        x: number;
+        y: number;
+        z: number;
+    }, radius?: number, tube?: number, radialSegments?: number, tubularSegments?: number, color?: {
+        r: number;
+        g: number;
+        b: number;
+        a: number;
+    }): any;
+    /**
      * Adds a Cylinder mesh
+     * @deprecated since v0.8.0. Use {@link setCylinder}
      * @param {String} name The name will show up in the `mesh` Uniform.
      * @param {{x:Number, y:Number, z:Number}} coordinate
      * @param {Number} radius
@@ -493,7 +736,32 @@ export class RenderPass {
         a: number;
     }): any;
     /**
+     * Adds or replaces a Cylinder mesh
+     * @param {String} name The name will show up in the `mesh` Uniform.
+     * @param {{x:Number, y:Number, z:Number}} coordinate
+     * @param {Number} radius
+     * @param {Number} height
+     * @param {Number} radialSegments
+     * @param {Boolean} cap
+     * @param {{r:Number, g:Number, b:Number, a:Number}} color
+     * @returns {Object}
+     *
+     * @example
+     * renderPass.setCylinder('myCylinder');
+     */
+    setCylinder(name: string, coordinate?: {
+        x: number;
+        y: number;
+        z: number;
+    }, radius?: number, height?: number, radialSegments?: number, cap?: boolean, color?: {
+        r: number;
+        g: number;
+        b: number;
+        a: number;
+    }): any;
+    /**
      * Add a external mesh with the provided required data.
+     * @deprecated since v0.8.0. Use {@link setMesh}
      * @param {String} name The name will show up in the `mesh` Uniform.
      * @param {Array<{x:Number, y:Number, z:Number}>} vertices
      * @param {Array<{r:Number, g:Number, b:Number, a:Number}>} colors
@@ -527,6 +795,36 @@ export class RenderPass {
         instanceCount: number;
         verticesCount: any;
     };
+    /**
+     * Add or replace external mesh with the provided required data.
+     * @param {String} name The name will show up in the `mesh` Uniform.
+     * @param {Array<{x:Number, y:Number, z:Number}>} vertices
+     * @param {Array<{r:Number, g:Number, b:Number, a:Number}>} colors
+     * @param {Array<{u:Number, v:Number}>} uvs
+     * @param {Array<Number>} normals
+     *
+     * @example
+     *
+     * const url = '../models/monkey.glb';
+     * const data = await loadAndExtract(url);
+     * const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0]
+     * renderPass.setMesh('monkey', positions, colors, colorSize, uvs, normals, indices)
+     * renderPass.depthWriteEnabled = true;
+     *
+     */
+    setMesh(name: string, vertices: Array<{
+        x: number;
+        y: number;
+        z: number;
+    }>, colors: Array<{
+        r: number;
+        g: number;
+        b: number;
+        a: number;
+    }>, colorSize: any, uvs: Array<{
+        u: number;
+        v: number;
+    }>, normals: Array<number>, indices: any): any;
     /**
      * For internal purposes
      * ids and names of the meshes
@@ -737,6 +1035,218 @@ export class ScaleMode {
     static HEIGHT: number;
 }
 /**
+ * Storage is a container for storage buffer related data and actions.
+ * @class Storage
+ */
+export class Storage {
+    /**
+     * @param {{name:String, value:(Number|Array<Number>), type:String, readable:Boolean, shaderStage:GPUShaderStage, stream:bool, updated:bool, size:Number}} config
+     */
+    constructor({ name, value, type, readable, shaderStage, stream, updated, size }: {
+        name: string;
+        value: (number | Array<number>);
+        type: string;
+        readable: boolean;
+        shaderStage: GPUShaderStage;
+        stream: bool;
+        updated: bool;
+        size: number;
+    });
+    /**
+     * The name that the Storage will have on the WGSL side.
+     * @param {String} value name of the Storage. The name is used in the WGSL
+     * shader.
+     * @example
+     * // js
+     * myStorage.name = 'myStorageName';
+     *
+     * // wgsl
+     * myStorageName = 13.1;
+     * @memberof Storage
+     */
+    set name(value: string);
+    get name(): string;
+    /**
+     * @param {Boolean} value tells WebGPU if the Storage is mapped or not. This
+     * allows for the initialization of the Storage with data, which is a
+     * different route.
+     * @memberof Storage
+     */
+    set mapped(value: boolean);
+    get mapped(): boolean;
+    /**
+     * @param {String} value WGSL data type of the Storage.
+     * @example
+     * myStorage.type = 'u32'
+     * @memberof Storage
+     */
+    set type(value: string);
+    get type(): string;
+    /**
+     * Tells WebGPU to which shader it can only be used.
+     * @param {GPUShaderStage} value
+     * @memberof Storage
+     */
+    set shaderStage(value: GPUShaderStage);
+    get shaderStage(): GPUShaderStage;
+    /**
+     * If data is read back in JS from WGSL, then set to `true`.
+     * @param {Boolean} value
+     * @memberof Storage
+     */
+    set readable(value: boolean);
+    get readable(): boolean;
+    /**
+     * For internal use mostly. The actual {@link GPUBuffer} with the data.
+     * @memberof Storage
+     */
+    set buffer(value: any);
+    get buffer(): any;
+    /**
+     * Buffer for reading back
+     * For internal use mostly. The actual GPUBufferRead with the data.
+     * @memberof Storage
+     */
+    set bufferRead(value: any);
+    get bufferRead(): any;
+    set internal(value: boolean);
+    get internal(): boolean;
+    set size(value: any);
+    get size(): any;
+    /**
+     * `updated` is set to true in data updates, but this is not true in
+     * something like audio, where the data streams and needs to be updated
+     * constantly, so if the storage map needs to be updated constantly then
+     * `stream` needs to be set to true.
+     * @param {boolean} value
+     * @memberof Storage
+     */
+    set stream(value: boolean);
+    get stream(): boolean;
+    /**
+     * Mostly internal. Set to `true` if a value has been updated.
+     * @memberof Storage
+     */
+    set updated(value: boolean);
+    get updated(): boolean;
+    /**
+     * @param {Number|Array<Number>} value data to send to the shader
+     * @memberof Storage
+     */
+    set value(value: number | Array<number>);
+    get value(): number | Array<number>;
+    /**
+     *
+     * @param {Number|Array<Number>} value data to send to the shader
+     * @returns {Storage}
+     * @memberof Storage
+     */
+    setValue(value: number | Array<number>): Storage;
+    /**
+     * if this is going to be used to read data back set to `true`
+     * @param {bool} value
+     * @returns {Storage}
+     * @memberof Storage
+     */
+    setReadable(value: bool): Storage;
+    /**
+     * Tells WebGPU to which shader it can only be used.
+     * @param {GPUShaderStage} value
+     * @returns {Storage}
+     * @memberof Storage
+     */
+    setShaderStage(value: GPUShaderStage): Storage;
+    /**
+     * @param {String} value WGSL data type of the Storage.
+     * @returns {Storage}
+     * @example
+     * myStorage.setType('u32');
+     * @memberof Storage
+     */
+    setType(value: string): Storage;
+    read(): Promise<Float32Array<any>>;
+    valueOf(): number | number[];
+    #private;
+}
+/**
+ * Uniform is a container for uniform buffer related data and actions.
+ *
+ * @class Uniform
+ */
+export class Uniform {
+    /**
+     *
+     * @param {{name:String, value:(Number|Boolean|Array<Number>), type:string, size:Number=}} config
+     */
+    constructor({ name, value, type, size }: {
+        name: string;
+        value: (number | boolean | Array<number>);
+        type: string;
+        size: number;
+    });
+    /**
+     * The name that the Uniform will have on the WGSL side.
+     * @param {String} value name of the Uniform. The name is used in the WGSL
+     * shader.
+     * @example
+     * // js
+     * myUniform.name = 'myUniformName';
+     *
+     * // wgsl
+     * myUniformName = 13.0;
+     * @memberof Uniform
+     */
+    set name(value: string);
+    get name(): string;
+    /**
+     * To get or set the value of the uniform from the JS side to the WGSL side.
+     * @param {Number|Boolean|Array<Number>} value The uniform value
+     * @memberof Uniform
+     */
+    set value(value: number | boolean | Array<number>);
+    get value(): number | boolean | Array<number>;
+    /**
+     * Get or set the type of the uniform.
+     * It can be inferred automatically by just passing the value, but if
+     * something more specific is required, then you should use `type`.
+     * @param {String} value WGSL data type of the uniform
+     * @example
+     * myUniform.type = 'u32';
+     * @memberof Uniform
+     */
+    set type(value: string);
+    get type(): string;
+    /**
+     * For internal use mostly. Size in bytes.
+     * @memberof Uniform
+     */
+    set size(value: number);
+    get size(): number;
+    /**
+     * Clone of the Uniform data as a plain object to avoid modifications on
+     * the original data.
+     * @returns {Object}
+     * @memberof Uniform
+     */
+    serialize(): any;
+    /**
+     * Sets or updates the value of the Uniform.
+     * @param {Number|Boolean|Array<Number>} value
+     * @memberof Uniform
+     */
+    setValue(value: number | boolean | Array<number>): this;
+    /**
+     * Set the data type of the uniform.
+     * @param {String} value WGSL data type of the uniform
+     * @example
+     * myUniform.setType('u32')
+     * @memberof Uniform
+     */
+    setType(value: string): this;
+    valueOf(): number | boolean | number[];
+    #private;
+}
+/**
  * Main class Points, this is the entry point of an application with this library.
  * @example
  * import Points from 'points';
@@ -786,8 +1296,8 @@ declare class Points {
      * and unless changed it remains consistent.
      * @param {string} name name of the Param, you can invoke it later in shaders as `Params.[name]`
      * @param {Number|Boolean|Array<Number>} value Single number or a list of numbers. Boolean is converted to Number.
-     * @param {string} structName type as `f32` or a custom struct. Default `f32`.
-     * @return {Object}
+     * @param {string} type type as `f32` or a custom struct. Default `f32`.
+     * @return {Uniform}
      *
      * @example
      * // js
@@ -800,7 +1310,7 @@ declare class Points {
      * let color1 = vec4(params.color1/255, 1.);
      * let finalColor:vec4f = mix(color0, color1, params.scale);
      */
-    setUniform(name: string, value: number | boolean | Array<number>, structName?: string): any;
+    setUniform(name: string, value: number | boolean | Array<number>, type?: string): Uniform;
     /**
      * Updates a list of uniforms
      * @param {Array<{name:String, value:Number}>} arr object array of the type: `{name, value}`
@@ -816,7 +1326,7 @@ declare class Points {
      * The constant will be ready to use on the WGSL shder string.
      * @param {String} name
      * @param {string|Number} value
-     * @param {String} structName
+     * @param {String} type
      * @returns {Object}
      *
      * @example
@@ -831,19 +1341,20 @@ declare class Points {
      * // your code:
      * const particles = array<Particle, NUMPARTICLES>();
      */
-    setConstant(name: string, value: string | number, structName: string): any;
+    setConstant(name: string, value: string | number, type?: string): any;
     /**
      * Creates a persistent memory buffer across every frame call. See [GPUBuffer](https://www.w3.org/TR/webgpu/#gpubuffer)
      * <br>
      * Meaning it can be updated in the shaders across the execution of every frame.
      * <br>
      * It can have almost any type, like `f32` or `vec2f` or even array<f32>.
+     * <br>
+     * It can also be initialized with data with the {@link Storage#setValue} method
      * @param {string} name Name that the Storage will have in the shader
-     * @param {string} structName Name of the struct already existing on the
+     * @param {string} type Name of the struct already existing on the
+     * @param {Uint8Array<ArrayBuffer>|Array<Number>|Number} value array with the data that must match the struct.
      * shader. This will be the type of the Storage.
-     * @param {boolean} read if this is going to be used to read data back
-     * @param {GPUShaderStage} shaderType this tells to what shader the storage is bound
-     * @returns {Object}
+     * @returns {Storage}
      *
      * @example
      * // js
@@ -858,9 +1369,16 @@ declare class Points {
      *
      * // wgsl string
      * colors[index] = vec3f(248, 208, 146) / 255;
+     *
+     * @example
+     * // add data from initialization
+     * // js
+     * points.setStorage('vertex_data', `array<vec4f, ${vertex_data.length}>`)
+        .setValue(vertex_data.flat());
      */
-    setStorage(name: string, structName: string, read: boolean, shaderType?: GPUShaderStage, arrayData?: any): any;
+    setStorage(name: string, type?: string, value?: Uint8Array<ArrayBuffer> | Array<number> | number): Storage;
     /**
+     * @deprecated Since v0.8.0 use {@link setStorage}
      * Creates a persistent memory buffer across every frame call that can be updated.
      * See [GPUBuffer](https://www.w3.org/TR/webgpu/#gpubuffer)
      * <br>
@@ -871,11 +1389,11 @@ declare class Points {
      * The difference with {@link Points#setStorage|setStorage} is that this can be initialized
      * with data.
      * @param {string} name Name that the Storage will have in the shader.
-     * @param {Uint8Array<ArrayBuffer>|Array<Number>|Number} arrayData array with the data that must match the struct.
-     * @param {string} structName Name of the struct already existing on the
+     * @param {Uint8Array<ArrayBuffer>|Array<Number>|Number} value array with the data that must match the struct.
+     * @param {string} type Name of the struct already existing on the
      * shader. This will be the type of the Storage.
-     * @param {boolean} read if this is going to be used to read data back.
-     * @param {GPUShaderStage} shaderType this tells to what shader the storage is bound
+     * @param {boolean} readable if this is going to be used to read data back.
+     * @param {GPUShaderStage} shaderStage this tells to what shader the storage is bound
      *
      * @example
      * // js examples/data1
@@ -905,10 +1423,9 @@ declare class Points {
      *
      * resultMatrix.size = vec2(firstMatrix.size.x, secondMatrix.size.y);
      */
-    setStorageMap(name: string, arrayData: Uint8Array<ArrayBuffer> | Array<number> | number, structName: string, read?: boolean, shaderType?: GPUShaderStage): any;
+    setStorageMap(name: string, value: Uint8Array<ArrayBuffer> | Array<number> | number, type: string, readable?: boolean, shaderStage?: GPUShaderStage): any;
     /**
-     * To read data back from a `setStorage` with `read` param `true`
-
+     * To read data back from a `setStorage` with `readable` param `true`
      * @param {String} name name of the Storage to read data from
      * @warning If there's en error or warning here
      * `[Buffer "name"] used in submit while mapped.`
@@ -921,7 +1438,7 @@ declare class Points {
      * This creates a storage array named `layers` of the size
      * of the screen in pixels;
      * @param {Number} numLayers
-     * @param {GPUShaderStage} shaderType
+     * @param {GPUShaderStage} shaderStage
      *
      * @example
      * // js
@@ -932,7 +1449,7 @@ declare class Points {
      * layers[0][pointIndex] = point;
      * layers[1][pointIndex] = point;
      */
-    setLayers(numLayers: number, shaderType: GPUShaderStage): void;
+    setLayers(numLayers: number, shaderStage: GPUShaderStage): void;
     /**
      * Creates a `sampler` to be sent to the shaders. Internally it will be a {@link GPUSampler}
      * @param {string} name Name of the `sampler` to be called in the shaders.
@@ -955,7 +1472,7 @@ declare class Points {
      * // wgsl string
      * let value = texturePosition(image, imageSampler, position, in.uvr, true);
      */
-    setSampler(name: string, descriptor: GPUSamplerDescriptor, shaderType: any): any;
+    setSampler(name: string, descriptor: GPUSamplerDescriptor, shaderStage: any): any;
     /**
      * Creates a `texture_2d` in the shaders.<br>
      * Used to write data and then print to screen.<br>
@@ -965,7 +1482,7 @@ declare class Points {
      *
      * @param {String} name Name to call the texture in the shaders.
      * @param {boolean} copyCurrentTexture If you want the fragment output to be copied here.
-     * @param {GPUShaderStage} shaderType To what {@link GPUShaderStage} you want to exclusively use this variable.
+     * @param {GPUShaderStage} shaderStage To what {@link GPUShaderStage} you want to exclusively use this variable.
      * @param {Number} renderPassIndex If using `copyCurrentTexture`
      * this tells which RenderPass it should get the data from. If not set then it will grab the last pass.
      * @returns {Object}
@@ -982,15 +1499,15 @@ declare class Points {
      * );
      *
      */
-    setTexture2d(name: string, copyCurrentTexture: boolean, shaderType: GPUShaderStage, renderPassIndex: number): any;
+    setTexture2d(name: string, copyCurrentTexture: boolean, shaderStage: GPUShaderStage, renderPassIndex: number): any;
     /**
      * Creates a depth map from the selected `renderPassIndex`
      * @param {String} name
-     * @param {GPUShaderStage} shaderType
+     * @param {GPUShaderStage} shaderStage
      * @param {Number} renderPassIndex
      * @returns {Object}
      */
-    setTextureDepth2d(name: string, shaderType: GPUShaderStage, renderPassIndex: number): any;
+    setTextureDepth2d(name: string, shaderStage: GPUShaderStage, renderPassIndex: number): any;
     copyTexture(nameTextureA: any, nameTextureB: any): void;
     /**
      * Loads an image as `texture_2d` and then it will be available to read
@@ -998,7 +1515,7 @@ declare class Points {
      * Supports web formats like JPG, PNG.
      * @param {string} name identifier it will have in the shaders
      * @param {string} path image address in a web server
-     * @param {GPUShaderStage} shaderType in what shader type it will exist only
+     * @param {GPUShaderStage} shaderStage in what shader type it will exist only
      * @returns {Object}
      *
      * @example
@@ -1008,7 +1525,7 @@ declare class Points {
      * // wgsl string
      * let rgba = texturePosition(image, imageSampler, position, in.uvr, true);
      */
-    setTextureImage(name: string, path: string, shaderType?: GPUShaderStage): any;
+    setTextureImage(name: string, path: string, shaderStage?: GPUShaderStage): any;
     /**
      * Loads a `HTMLElement` as `texture_2d`. It will automatically interpret
      * the CSS associated with the element to render it.
@@ -1016,7 +1533,7 @@ declare class Points {
      * This will only generate an image, so animations will not work.
      * @param {String} name identifier it will have in the shaders
      * @param {HTMLElement} element element loaded in the DOM or dynamically
-     * @param {GPUShaderStage} shaderType in what shader type it will exist only
+     * @param {GPUShaderStage} shaderStage in what shader type it will exist only
      * @returns {Object}
      *
      * @example
@@ -1027,7 +1544,7 @@ declare class Points {
      * // wgsl string
      * let color = texture(image, imageSampler, in.uvr, true);
      */
-    setTextureElement(name: string, element: HTMLElement, shaderType?: GPUShaderStage): any;
+    setTextureElement(name: string, element: HTMLElement, shaderStage?: GPUShaderStage): any;
     /**
      * Loads a text string as a texture.<br>
      * Using an Atlas or a Spritesheet with UTF-16 chars (`path`) it will create a new texture
@@ -1040,7 +1557,7 @@ declare class Points {
      * @param {String} path atlas to grab characters from, image address in a web server
      * @param {{x: number, y: number}} size size of a individual character e.g.: `{x:10, y:20}`
      * @param {Number} offset how many characters back or forward it must move to start
-     * @param {GPUShaderStage} shaderType To what {@link GPUShaderStage} you want to exclusively use this variable.
+     * @param {GPUShaderStage} shaderStage To what {@link GPUShaderStage} you want to exclusively use this variable.
      * @returns {Object}
      *
      * @example
@@ -1060,17 +1577,17 @@ declare class Points {
     setTextureString(name: string, text: string, path: string, size: {
         x: number;
         y: number;
-    }, offset?: number, shaderType?: GPUShaderStage): any;
+    }, offset?: number, shaderStage?: GPUShaderStage): any;
     /**
      * Load images as texture_2d_array
      * @param {string} name id of the wgsl variable in the shader
      * @param {Array} paths image addresses in a web server
-     * @param {GPUShaderStage} shaderType
+     * @param {GPUShaderStage} shaderStage
      */
-    setTextureImageArray(name: string, paths: any[], shaderType: GPUShaderStage): Promise<{
+    setTextureImageArray(name: string, paths: any[], shaderStage: GPUShaderStage): Promise<{
         name: string;
         copyCurrentTexture: boolean;
-        shaderType: GPUShaderStage;
+        shaderStage: GPUShaderStage;
         texture: any;
         imageTextures: {
             bitmaps: ImageBitmap[];
@@ -1083,7 +1600,7 @@ declare class Points {
      * Supports web formats like mp4 and webm.
      * @param {string} name id of the wgsl variable in the shader
      * @param {string} path video address in a web server
-     * @param {GPUShaderStage} shaderType
+     * @param {GPUShaderStage} shaderStage
      * @returns {Object}
      *
      * @example
@@ -1093,13 +1610,13 @@ declare class Points {
      * // wgsl string
      * let rgba = textureExternalPosition(video, imageSampler, position, in.uvr, true);
      */
-    setTextureVideo(name: string, path: string, shaderType: GPUShaderStage): any;
+    setTextureVideo(name: string, path: string, shaderStage: GPUShaderStage): any;
     /**
      * Loads webcam as `texture_external`and then
      * it will be available to read data from in the shaders.
      * @param {String} name id of the wgsl variable in the shader
      * @param {{width:Number, height:Number}} size to crop the video. WebGPU might throw an error if size does not match.
-     * @param {GPUShaderStage} shaderType
+     * @param {GPUShaderStage} shaderStage
      * @returns {Object}
      * @throws a WGSL error if the size doesn't match possible crop size
      * @example
@@ -1112,7 +1629,7 @@ declare class Points {
     setTextureWebcam(name: string, size: {
         width: number;
         height: number;
-    }, shaderType: GPUShaderStage): any;
+    }, shaderStage: GPUShaderStage): any;
     /**
      * Assigns an audio FrequencyData to a StorageMap.<br>
      * Calling setAudio creates a Storage with `name` in the wgsl shaders.<br>
@@ -1132,9 +1649,9 @@ declare class Points {
      * let audioX = audio.data[ u32(in.uvr.x * params.audioLength)] / 256;
      */
     setAudio(name: string, path: string, volume: number, loop: boolean, autoplay: boolean): HTMLAudioElement;
-    setTextureStorage2d(name: any, shaderType: any): {
+    setTextureStorage2d(name: any, shaderStage: any): {
         name: any;
-        shaderType: any;
+        shaderStage: any;
         texture: any;
         internal: boolean;
     };
@@ -1395,6 +1912,42 @@ declare class Points {
     set scaleMode(val: ScaleMode | number);
     get scaleMode(): ScaleMode | number;
     /**
+     * Get the list of added uniforms, same as {@link uniforms}
+     * @example
+     *
+     * points.setUniform('myuniform', 10);
+     *
+     * // later
+     * points.params.myuniform.value = 12;
+     */
+    get params(): Uniforms;
+    /**
+     * @type {Uniforms & { [key: string]: Uniform }}
+     *
+     * Get the list of added uniforms, same as {@link params}
+     * @example
+     *
+     * points.setUniform('myuniform', 10);
+     *
+     * // later
+     * points.uniforms.myuniform.value = 12;
+     */
+    get uniforms(): Uniforms & {
+        [key: string]: Uniform;
+    };
+    /**
+     * @type {Storages & { [key: string]: Storage }}
+     */
+    get storages(): Storages & {
+        [key: string]: Storage;
+    };
+    /**
+     * @type {Constants & { [key: string]: Constant }}
+     */
+    get constants(): Constants & {
+        [key: string]: Constant;
+    };
+    /**
      * Reset memory before calling again `init()`, this without calling
      * the constructor `new Points()`.
      * Useful to switch to a new set of shaders and erase internal references,
@@ -1463,6 +2016,121 @@ declare class RGBAColor {
      * @returns Number distace up to `1.42` I think...
      */
     euclideanDistance(color: RGBAColor): number;
+    #private;
+}
+/**
+ * Class that handles the creation of new {@link Uniform}s in Points.
+ * @example
+ * // js side
+ * points.uniforms.myUniform = 10
+ *
+ * // wgsl side
+ * let val = params.myUniform; // value is 10.0 f32
+ * @class Uniforms
+ */
+declare class Uniforms {
+    /**
+     * List of all {@link Uniform}s
+     * @param {Array} value
+     * @memberof Uniforms
+     */
+    set list(value: any[]);
+    get list(): any[];
+    /**
+     * Retrieves a {@link Uniform} by its name.
+     * @param {String} name
+     * @returns {Uniform}
+     * @memberof Uniforms
+     */
+    find(name: string): Uniform;
+    /**
+     * Add a new {@link Uniform}
+     * @param {Uniform} uniform
+     * @memberof Uniforms
+     */
+    add(uniform: Uniform): void;
+    #private;
+}
+/**
+ * Class that handles the creation of new {@link Storage}s in Points.
+ * @example
+ * // js side
+ * points.storages.myStorage = [1, 2, 3]
+ *
+ * // wgsl side
+ * let val = myStorage; // value is vec3f(1, 2, 3)
+ * @class Storages
+ */
+declare class Storages {
+    /**
+     * List of all {@link Storage}
+     * @param {Array} value
+     * @memberof Storages
+     */
+    set list(value: any[]);
+    get list(): any[];
+    /**
+     * Retrieves a {@link Storage} by its name.
+     * @param {String} name
+     * @returns {Storage}
+     * @memberof Storages
+     */
+    find(name: string): Storage;
+    /**
+     * Add a new {@link Storage}
+     * @param {Storage} storage
+     * @memberof Storages
+     */
+    add(storage: Storage): void;
+    #private;
+}
+/**
+ * Class that handles the creation of new {@link Constant}s in Points.
+ * @example
+ * // js side
+ * points.constants.MYCONST = 10;
+ *
+ * // wgsl side
+ * let val = MYCONST; // value is 10 u32 by default
+ * @class Constants
+ */
+declare class Constants {
+    /**
+     * List of all {@link Constant}s
+     * @param {Array} value
+     * @memberof Constants
+     */
+    set list(value: any[]);
+    get list(): any[];
+    /**
+     * Retrieves a {@link Constant} by its name.
+     * @param {String} name
+     * @returns {Constant}
+     * @memberof Constants
+     */
+    find(name: string): Constant;
+    /**
+     * Add a new {@link Constant}
+     * @param {Constant} constant
+     * @memberof Constants
+     */
+    add(constant: Constant): void;
+    /**
+     * Object list with the constants that are overridable.
+     * This object will be passed into the pipeline.
+     * @param {GPUShaderStage|Number} filter
+     * @returns {Object}
+     * @memberof Constants
+     */
+    listOfOverrides(filter: GPUShaderStage | number): any;
+    /**
+     * List of constants formatted as WGSL string to be interpolated in the
+     * shaders.
+     * @param {GPUShaderStage|Number} filter
+     * @returns {String}
+     * @memberof Constants
+     */
+    stringOfNonOverrides(filter: GPUShaderStage | number): string;
     #private;
 }
 export { Points as default };

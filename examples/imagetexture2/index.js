@@ -17,15 +17,16 @@ const imagetexture2 = {
      * @param {*} folder
      */
     init: async (points, folder) => {
+        const { uniforms } = points;
         points.scaleMode = ScaleMode.FIT;
         points.setSampler('feedbackSampler', null);
         // await points.setTextureImage('image', './../img/carmen_lyra_423x643.jpg');
         // await points.setTextureImage('image', './../img/old_king_600x600.jpg');
         await points.setTextureImage('image', './../img/absulit_800x800.jpg');
 
-        points.setUniform('color0', options.color0, 'vec3f');
-        points.setUniform('color1', options.color1, 'vec3f');
-        points.setUniform('scale', options.scale, 'f32');
+        uniforms.color0 = options.color0;
+        uniforms.color1 = options.color1;
+        uniforms.scale = options.scale;
 
         folder.add(options, 'scale', 0, 1, .0001).name('Scale');
         folder.addColor(options, 'color0');
@@ -33,9 +34,10 @@ const imagetexture2 = {
         folder.open();
     },
     update: points => {
-        points.setUniform('scale', options.scale);
-        points.setUniform('color0', options.color0);
-        points.setUniform('color1', options.color1);
+        const { uniforms } = points;
+        uniforms.scale = options.scale;
+        uniforms.color0 = options.color0;
+        uniforms.color1 = options.color1;
     }
 }
 

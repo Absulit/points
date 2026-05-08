@@ -1,7 +1,7 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
-import { RenderPass } from 'points';
+import Points, { RenderPass } from 'points';
 
 let data = [];
 
@@ -9,29 +9,30 @@ const random2 = {
     renderPasses: [
         new RenderPass(vert, frag, compute, 800, 800)
     ],
+    /**
+     * @param {Points} points
+     */
     init: async points => {
-        points.setUniform('randNumber', 0);
-        points.setUniform('randNumber2', 0);
+        const { storages } = points;
         // let data = [];
-        for (let k = 0; k < 800*800; k++) {
+        for (let k = 0; k < 800 * 800; k++) {
             data.push(Math.random());
         }
         // .stream if the data is going to be updated constantly
-        // points.setStorageMap('rands', data, 'array<f32>').stream = true;
-        points.setStorageMap('rands', data, 'array<f32>');
+        storages.rands.setType('array<f32>').setValue(data).stream = true;
+
         points.setSampler('feedbackSampler');
         points.setTexture2d('feedbackTexture', true);
         points.setBindingTexture('outputTex', 'computeTexture');
     },
     update: points => {
-        points.setUniform('randNumber', Math.random());
-        points.setUniform('randNumber2', Math.random());
-        // data = [];
-        for (let k = 0; k < 800*800; k++) {
+        for (let k = 0; k < 800 * 800; k++) {
             data[k] = Math.random();
         }
         // alternative to update use .stream
-        points.setStorageMap('rands', data);
+        // it seems this call is not necessary because
+        // `data` already updates the value 🤷‍♂️
+        // storages.rands.setValue(data)
     }
 }
 

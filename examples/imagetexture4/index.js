@@ -15,6 +15,7 @@ const imagetexture4 = {
      * @param {*} folder
      */
     init: async (points, folder) => {
+        const { uniforms } = points;
         points.scaleMode = ScaleMode.FIT;
         /**
          * @type {GPUSamplerDescriptor}
@@ -31,13 +32,14 @@ const imagetexture4 = {
         points.setSampler('imageSampler', descriptor);
         await points.setTextureImage('image', './../img/old_king_600x600.jpg');
 
-        points.setUniform('scale', options.scale, 'f32');
+        uniforms.scale = options.scale;
 
         folder.add(options, 'scale', 0, 1, .0001).name('Scale');
         folder.open();
     },
     update: points => {
-        points.setUniform('scale', options.scale);
+        const { uniforms } = points;
+        uniforms.scale = options.scale;
     }
 }
 

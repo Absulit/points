@@ -288,7 +288,7 @@ export const dataSize = value => {
                         innerType.align = MAX_ROW_SIZE;
                     } else {
                         const sd = structData.get(type);
-                        if(!sd){
+                        if (!sd) {
                             throw `Type or struct ${type} doesn't exist.`;
                         }
                         typeSize = { size: sd.bytes, align: MAX_ROW_SIZE };
@@ -334,4 +334,55 @@ export const dataSize = value => {
     })
 
     return structData
+}
+
+/**
+ * Takes a number or array and infers the WGSL type
+ * @param {Number|Array<Number>} value
+ * @returns {String} WGSL equivalent type
+ */
+export function getWGSLType(value) {
+
+    if ((!value && value !== 0) || ((Number.isNaN(value) || value instanceof Object || typeof value === 'string') && !(value instanceof Array))) {
+        return '';
+    }
+
+    const strValue = value.toString();
+
+    if (value instanceof Array) {
+        return getArrayType(value);
+    }
+
+    const hasPeriod = strValue.indexOf('.') != -1;
+    if (hasPeriod) {
+        return 'f32';
+    }
+
+    const hasSign = strValue.indexOf('-') != -1;
+    if (hasSign) {
+        return 'i32'
+    }
+
+    return 'u32';
+}
+
+/**
+ * From a JS value (number, array)
+ * returns WGSL type like vec2f, vec3f
+ * @param {Array|Object} value
+ * @returns {String}
+ */
+export function getArrayType(value) {
+    const isArray = Array.isArray(value);
+    let type = null;
+    if (isArray) {
+        const { length } = value;
+        if (length <= 4) {
+            type = `vec${length}f`;
+        }
+        if (length > 4) {
+            type = `array<f32, ${length}>`;
+        }
+    }
+    return type;
 }

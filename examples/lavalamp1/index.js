@@ -15,13 +15,16 @@ const base = {
         new RenderPass(vert1, frag1),
     ],
     /**
-     *
      * @param {Points} points
      */
     init: async points => {
+        const { storages } = points;
+        const { FRAGMENT } = GPUShaderStage;
         const numObjects = 20;
-        points.setStorage('variables', 'Variables', false, GPUShaderStage.FRAGMENT);
-        points.setStorage('objects', `array<Object, ${numObjects}>`, false, GPUShaderStage.FRAGMENT);
+
+        storages.variables.setType('Variables').setShaderStage(FRAGMENT);
+        storages.objects.setType(`array<Object, ${numObjects}>`)
+            .setShaderStage(FRAGMENT);
     },
     update: points => {
 

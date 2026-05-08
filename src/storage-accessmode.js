@@ -26,41 +26,43 @@ read_write. Compute is always read_write.
 const R = 'r';
 const RW = 'rw';
 
+const { COMPUTE, VERTEX, FRAGMENT } = GPUShaderStage;
+
 const cache = {
-    [GPUShaderStage.COMPUTE | GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT]: {
-        [GPUShaderStage.COMPUTE]: RW,
-        [GPUShaderStage.VERTEX]: R,
-        [GPUShaderStage.FRAGMENT]: R
+    [COMPUTE | VERTEX | FRAGMENT]: {
+        [COMPUTE]: RW,
+        [VERTEX]: R,
+        [FRAGMENT]: R
     },//
-    [GPUShaderStage.COMPUTE]: {
-        [GPUShaderStage.COMPUTE]: RW,
-        [GPUShaderStage.VERTEX]: null,
-        [GPUShaderStage.FRAGMENT]: null
+    [COMPUTE]: {
+        [COMPUTE]: RW,
+        [VERTEX]: null,
+        [FRAGMENT]: null
     },
-    [GPUShaderStage.VERTEX]: {
-        [GPUShaderStage.COMPUTE]: null,
-        [GPUShaderStage.VERTEX]: R,
-        [GPUShaderStage.FRAGMENT]: null
+    [VERTEX]: {
+        [COMPUTE]: null,
+        [VERTEX]: R,
+        [FRAGMENT]: null
     },
-    [GPUShaderStage.FRAGMENT]: {
-        [GPUShaderStage.COMPUTE]: null,
-        [GPUShaderStage.VERTEX]: null,
-        [GPUShaderStage.FRAGMENT]: RW
+    [FRAGMENT]: {
+        [COMPUTE]: null,
+        [VERTEX]: null,
+        [FRAGMENT]: RW
     },//
-    [GPUShaderStage.COMPUTE | GPUShaderStage.VERTEX]: {
-        [GPUShaderStage.COMPUTE]: RW,
-        [GPUShaderStage.VERTEX]: R,
-        [GPUShaderStage.FRAGMENT]: null
+    [COMPUTE | VERTEX]: {
+        [COMPUTE]: RW,
+        [VERTEX]: R,
+        [FRAGMENT]: null
     },
-    [GPUShaderStage.COMPUTE | GPUShaderStage.FRAGMENT]: {
-        [GPUShaderStage.COMPUTE]: RW,
-        [GPUShaderStage.VERTEX]: null,
-        [GPUShaderStage.FRAGMENT]: RW
+    [COMPUTE | FRAGMENT]: {
+        [COMPUTE]: RW,
+        [VERTEX]: null,
+        [FRAGMENT]: RW
     },//
-    [GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT]: {
-        [GPUShaderStage.COMPUTE]: null,
-        [GPUShaderStage.VERTEX]: R,
-        [GPUShaderStage.FRAGMENT]: R
+    [VERTEX | FRAGMENT]: {
+        [COMPUTE]: null,
+        [VERTEX]: R,
+        [FRAGMENT]: R
     },
 }
 
