@@ -5,71 +5,64 @@ const compute = /*wgsl*/`
 // @builtin(global_invocation_id) GID: vec3u,
 // @builtin(workgroup_id)  in.WID: vec3u,
 // @builtin(local_invocation_id) LID: vec3u
-@compute @workgroup_size(64)
+@compute @workgroup_size(THREADS_X, THREADS_Y, THREADS_Z)
 fn main(in: ComputeIn) {
-    var index = in.GID.x;
+    let index = in.GID.x;
+    if (index >= u32(NUMPARTICLES)) { return; }
 
     var vPos = particlesA[index].pos;
     var vVel = particlesA[index].vel;
-    var cMass = vec2(0.0);
-    var cVel = vec2(0.0);
-    var colVel = vec2(0.0);
+
+    var cMass = vec2f(0.0);
+    var cVel = vec2f(0.0);
+    var colVel = vec2f(0.0);
     var cMassCount = 0u;
     var cVelCount = 0u;
-    var pos:vec2f;
-    var vel:vec2f;
 
-    for (var i = 0u; i < 1024; i++) {
-        if (i == index) {
-            continue;
-        }
+    for (var i = 0u; i < u32(NUMPARTICLES); i++) {
+        if (i == index) { continue; }
 
-        pos = particlesA[i].pos.xy;
-        vel = particlesA[i].vel.xy;
-        if (distance(pos, vPos) < params.rule1Distance) {
+        let pos = particlesA[i].pos;
+        let vel = particlesA[i].vel;
+        let dist = distance(pos, vPos);
+
+        // Rule 1: Cohesion
+        if (dist < params.rule1Distance) {
             cMass += pos;
             cMassCount++;
         }
-        if (distance(pos, vPos) < params.rule2Distance) {
-            colVel -= pos - vPos;
+        // Rule 2: Separation
+        if (dist < params.rule2Distance) {
+            colVel -= (pos - vPos);
         }
-        if (distance(pos, vPos) < params.rule3Distance) {
+        // Rule 3: Alignment
+        if (dist < params.rule3Distance) {
             cVel += vel;
             cVelCount++;
         }
     }
 
     if (cMassCount > 0) {
-        cMass = (cMass / vec2(f32(cMassCount))) - vPos;
+        cMass = (cMass / f32(cMassCount)) - vPos;
     }
     if (cVelCount > 0) {
         cVel /= f32(cVelCount);
     }
+
     vVel += (cMass * params.rule1Scale) + (colVel * params.rule2Scale) + (cVel * params.rule3Scale);
 
-    // clamp velocity for a more pleasing simulation
-    vVel = normalize(vVel) * clamp(length(vVel), 0.0, 0.1);
+    // Clamp and update
+    vVel = normalize(vVel) * clamp(length(vVel), 0.001, 0.1);
+    vPos += vVel * params.deltaT;
 
-    // kinematic update
-    vPos = vPos + (vVel * params.time);
+    // Boundary Wrap
+    if (vPos.x < -1.0) { vPos.x = 1.0; } else if (vPos.x > 1.0) { vPos.x = -1.0; }
+    if (vPos.y < -1.0) { vPos.y = 1.0; } else if (vPos.y > 1.0) { vPos.y = -1.0; }
 
-    // Wrap around boundary
-    if (vPos.x < -1.0) {
-        vPos.x = 1.0;
-    }
-    if (vPos.x > 1.0) {
-        vPos.x = -1.0;
-    }
-    if (vPos.y < -1.0) {
-        vPos.y = 1.0;
-    }
-    if (vPos.y > 1.0) {
-        vPos.y = -1.0;
-    }
-
-    // Write back
+    // Write to the output buffer
     particlesB[index].pos = vPos;
     particlesB[index].vel = vVel;
+
 }
 `;
 

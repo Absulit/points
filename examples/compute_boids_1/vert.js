@@ -13,26 +13,20 @@ const vert = /*wgsl*/`
 @vertex
 fn main(in: VertexIn) -> FragmentIn {
 
-    let a_particleVel = vec2f();
-    let a_particlePos = vec2f();
-    let a_pos = vec2f();
+    let boid = particlesB[in.instanceIndex];
+    let angle = -atan2(boid.vel.x, boid.vel.y);
 
-    let angle = -atan2(a_particleVel.x, a_particleVel.y);
-    let pos = vec2(
-        (a_pos.x * cos(angle)) - (a_pos.y * sin(angle)),
-        (a_pos.x * sin(angle)) + (a_pos.y * cos(angle))
+    // Rotate the local geometry (the plane)
+    let pos = vec2f(
+        (in.position.x * cos(angle)) - (in.position.y * sin(angle)),
+        (in.position.x * sin(angle)) + (in.position.y * cos(angle))
     );
 
-    var output : FragmentIn;
-    output.position = vec4(pos + a_particlePos, 0.0, 1.0);
-    output.color = vec4(
-        1.0 - sin(angle + 1.0) - a_particleVel.y,
-        pos.x * 100.0 - a_particleVel.y + 0.1,
-        a_particleVel.x + cos(angle + 0.5),
-        1.0);
-
-
-    return defaultVertexBody(in.position, in.color, in.uv, in.normal);
+    var out: FragmentIn;
+    out.position = vec4f(pos + boid.pos, 0.0, 1.0);
+    // Color based on velocity direction
+    out.color = vec4f(0.5 + boid.vel.x * 5.0, 0.5 + boid.vel.y * 5.0, 1.0, 1.0);
+    return out;
 }
 `;
 

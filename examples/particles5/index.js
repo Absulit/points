@@ -50,11 +50,6 @@ cube_renderpass.setPlane(
 
 // cube_renderpass.setSphere('sphere').instanceCount = 100;
 
-const near = 0.1, far = 100;
-const f = 1.0 / Math.tan(Math.PI / 8); // ≈ 2.414
-let aspect = null
-const nf = 1 / (near - far);
-
 const base = {
     renderPasses: [
         cube_renderpass,
