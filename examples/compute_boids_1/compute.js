@@ -5,7 +5,7 @@ const compute = /*wgsl*/`
 // @builtin(global_invocation_id) GID: vec3u,
 // @builtin(workgroup_id)  in.WID: vec3u,
 // @builtin(local_invocation_id) LID: vec3u
-@compute @workgroup_size(8,8,1)
+@compute @workgroup_size(64)
 fn main(in: ComputeIn) {
     var index = in.GID.x;
 

@@ -13,6 +13,10 @@ const vert = /*wgsl*/`
 @vertex
 fn main(in: VertexIn) -> FragmentIn {
 
+    let a_particleVel = vec2f();
+    let a_particlePos = vec2f();
+    let a_pos = vec2f();
+
     let angle = -atan2(a_particleVel.x, a_particleVel.y);
     let pos = vec2(
         (a_pos.x * cos(angle)) - (a_pos.y * sin(angle)),
