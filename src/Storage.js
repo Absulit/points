@@ -331,6 +331,9 @@ class Storage {
     }
 
     #validateType(value) {
+        if (!value) {
+            return;
+        }
         if (typeof value !== 'string') {
             throw `Storage type '${value}' must be a String.`;
         }
@@ -341,7 +344,7 @@ class Storage {
             }
             const regex = /,\s*(\d+)\s*>/
             const match = value.match(regex);
-            if(!match){
+            if (!match) {
                 throw `Storage type '${value}' size must be an Number.`
             }
         }
