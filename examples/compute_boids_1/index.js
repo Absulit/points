@@ -45,6 +45,8 @@ r0.setPlane(
     { width: .1, height: .1, depth: 1. }
 ).instanceCount = NUMPARTICLES;
 
+
+let frameCount = 0;
 const base = {
     renderPasses: [
         r0
@@ -91,8 +93,13 @@ const base = {
      * @param {Points} points
      */
     update: points => {
-        const { uniforms } = points;
+        const { uniforms, storages } = points;
         uniforms.val = options.val;
+
+        // implement copyBufferToBuffer ?
+        // storages.particlesA.copy(storages.particlesB);
+        // points.copy(storages.particlesB, storages.particlesA);
+        // storages.particlesA = storages.particlesB.value
     }
 }
 
