@@ -39,8 +39,6 @@ class Storage {
         this.#stream = stream;
         this.#updated = updated;
         this.#size = size;
-        console.log(size);
-
 
         Object.seal(this);
     }
