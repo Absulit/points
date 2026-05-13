@@ -90,7 +90,7 @@ const base = {
 
         const dropdownItems = { /*'Vertex': 0,*/ 'Texture': 1, 'Shader': 2 };
 
-        uniforms.color_mode = options.mode;
+        uniforms.color_mode = +options.mode;
         folder.add(options, 'mode', dropdownItems).name('Colors').onChange(value => {
             console.log(value);
             uniforms.color_mode = +value;

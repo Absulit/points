@@ -269,4 +269,22 @@ QUnit.module('Storages', hooks => {
         }, 'Should fail if new storage uses existing name')
     })
 
+    QUnit.test('If type is array, should have size', assert => {
+        assert.throws(() => {
+            storages.testTypeSize.setType('array<f32>');
+        }, 'Should fail if array has no size')
+    })
+
+    QUnit.test('If type is array, should have size and size is a number', assert => {
+        assert.throws(() => {
+            storages.testTypeSize.setType('array<f32, q>');
+        }, 'Should fail if array size is not a number')
+    })
+
+    QUnit.test('Type definition should be a string', assert => {
+        assert.throws(() => {
+            storages.testNoStringType.setType({});
+        }, 'Should fail if type is no string')
+    })
+
 })
