@@ -3,6 +3,16 @@ import Storages from './../../src/Storages.js';
 
 const points = new Points();
 
+points.import(`
+    struct Node {
+        b:vec3f,
+    }
+
+    struct Test {
+        c:array<Node>,
+    }
+`)
+
 QUnit.module('Storage', hooks => {
     /** @type{Storage} */
     let myStorage;
@@ -279,6 +289,18 @@ QUnit.module('Storages', hooks => {
         assert.throws(() => {
             storages.testNoStringType.setType({});
         }, 'Should fail if type is no string')
+    })
+
+    QUnit.test('Struct with array prop works correctly', assert => {
+
+        assert.ok((function () {
+            const type = 'Test';
+            storages.testStruct
+                .setType('Test')
+                .setValue([0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+            return 1;
+        })(), "Code runs without error");
+
     })
 
 })
