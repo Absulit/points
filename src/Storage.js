@@ -336,10 +336,8 @@ class Storage {
             throw `Storage type '${value}' must be a String.`;
         }
         const isValueArray = isArray(value);
-        if (isValueArray) {
-            if (!value.includes(',')) {
-                throw `The type '${value}' requires a size, e.g.: array<T, N>`
-            }
+        const hasComma = value.includes(',');
+        if (isValueArray && hasComma) {
             const regex = /,\s*(\d+)\s*>/
             const match = value.match(regex);
             if (!match) {
