@@ -293,13 +293,12 @@ QUnit.module('Storages', hooks => {
 
     QUnit.test('Struct with array prop works correctly', assert => {
 
-        assert.ok((function () {
-            const type = 'Test';
+        assert.ok((() => {
             storages.testStruct
                 .setType('Test')
                 .setValue([0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
             return 1;
-        })(), "Code runs without error");
+        })(), 'Code runs without error');
 
     })
 
