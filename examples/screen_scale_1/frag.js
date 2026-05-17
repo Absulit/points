@@ -1,3 +1,5 @@
+import { layer } from "points/color";
+import { texture } from "points/image";
 import { sdfCircle, sdfLine, sdfRect, sdfSegment } from "points/sdf";
 
 const frag = /*wgsl*/`
@@ -6,6 +8,8 @@ ${sdfRect}
 ${sdfCircle}
 ${sdfLine}
 ${sdfSegment}
+${texture}
+${layer}
 
 const CIRCLERADIUS = .06;
 
@@ -45,7 +49,21 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
 
     let lineColor = vec4f(line);
 
-    return rectColor + lineColor + circleTopRightColor + circleBottomRightColor + circleBottomLeftColor + circleTopLeftColor;
+    //-----
+    // note: I don't fully understand why to center the image is required to use
+    // params.screen.yy (mainly for COVER) but it works
+    // my guess is that because the ratio swaps in COVER, you can't use
+    //  params.screen * in.ratio
+    // because it would work in one (portrait), but not in the other (landscape)
+
+    let dims = vec2f(textureDimensions(imgTexture)) / params.screen.yy;
+    let dimsh = dims * .5;
+    let imgColor = texture(imgTexture, imageSampler, in.uvr - center + dimsh, true);
+
+    return layer(rectColor + lineColor + circleTopRightColor +
+        circleBottomRightColor + circleBottomLeftColor + circleTopLeftColor,
+        imgColor
+    );
 }
 `;
 

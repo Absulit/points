@@ -20,6 +20,9 @@ const base = {
     init: async (points, folder) => {
         points.scaleMode = ScaleMode.HEIGHT;
 
+        points.setSampler('imageSampler', null);
+        await points.setTextureImage('imgTexture', './../../img/house_512x512.jpg');
+
         folder.add({ default: ScaleMode.HEIGHT }, 'default', dropdown)
             .onChange(value => points.scaleMode = value)
             .name('ScaleMode');
