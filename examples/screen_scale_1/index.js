@@ -10,6 +10,10 @@ const dropdown = {
     'HEIGHT': ScaleMode.HEIGHT
 };
 
+const options = {
+    showImage: false
+}
+
 const base = {
     vert,
     compute,
@@ -26,6 +30,10 @@ const base = {
         folder.add({ default: ScaleMode.HEIGHT }, 'default', dropdown)
             .onChange(value => points.scaleMode = value)
             .name('ScaleMode');
+
+        folder.add(options, 'showImage').name('showImage')
+            .onChange(value => points.uniforms.showImage = +value );
+        points.uniforms.showImage = options.showImage;
 
         folder.open();
     },

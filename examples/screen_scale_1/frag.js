@@ -58,7 +58,8 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
 
     let dims = vec2f(textureDimensions(imgTexture)) / params.screen.yy;
     let dimsh = dims * .5;
-    let imgColor = texture(imgTexture, imageSampler, in.uvr - center + dimsh, true);
+    let imgColor = texture(imgTexture, imageSampler, in.uvr - center + dimsh, true)
+        * params.showImage;
 
     return layer(rectColor + lineColor + circleTopRightColor +
         circleBottomRightColor + circleBottomLeftColor + circleTopLeftColor,
