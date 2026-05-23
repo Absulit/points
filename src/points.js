@@ -1295,14 +1295,7 @@ class Points {
             type: 'Event',
             readable: true,
             shaderStage: COMPUTE | FRAGMENT,
-            value: Array(4).fill(0)
-        }));
-
-        this.#storages.add(new Storage({
-            name: `${name}_data`,
-            type: `array<f32, ${structSize}>`,
-            readable: true,
-            shaderStage: COMPUTE | FRAGMENT
+            value: Array(4 + structSize * 4).fill(0)
         }));
 
         this.#events.set(this.#events_ids,
@@ -2798,8 +2791,8 @@ class Points {
             if (eventRead) {
                 const id = eventRead[0];
                 if (id != 0) {
-                    const dataRead = await this.readStorage(`${name}_data`)
-                    event?.callback(dataRead);
+                    const [a, ...b] = eventRead;
+                    event?.callback(b);
                     const storageToUpdate = this.#storages.find(name);
                     if (storageToUpdate) {
                         const data = storageToUpdate.value;
