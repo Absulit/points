@@ -49,7 +49,7 @@ struct Event {
 }
 ```
 
-To actully fire an event you have to do as follows:
+To actually fire an event you have to do as follows:
 
 ```rust
 right_blink.data[0] = 2; // some data
