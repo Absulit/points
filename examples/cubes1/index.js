@@ -82,7 +82,7 @@ const base = {
 
         points.addEventListener('log', data => {
             console.log('Array Max:', data[0] + 1);
-        }, 1)
+        })
 
         points.setCameraPerspective('camera');
 

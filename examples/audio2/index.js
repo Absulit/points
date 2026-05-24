@@ -13,7 +13,7 @@ const base = {
      */
     init: async points => {
         const { storages } = points;
-        const {FRAGMENT} = GPUShaderStage;
+        const { FRAGMENT } = GPUShaderStage;
         let volume = 1;
         let loop = true;
         audio = points.setAudio(
@@ -24,9 +24,7 @@ const base = {
             false
         );
 
-        points.addEventListener('click_event', data => {
-            audio.play();
-        }, 4);
+        points.addEventListener('click_event', _ => audio.play());
 
         points.setSampler('imageSampler', null);
         points.setTexture2d('feedbackTexture', true);

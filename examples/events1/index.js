@@ -20,7 +20,7 @@ const base = {
             console.log('---- Left Circle', data);
             const [a, b] = data;
             output.text += `\nLeft: ${a} ${b}`;
-        }, 2);
+        });
 
         points.addEventListener(
             'right_blink', // name of the event (and name of a storage)
@@ -28,8 +28,7 @@ const base = {
                 console.log('---- Right Circle', data);
                 const [a, b, c, d] = data;
                 output.text += `\nRight: ${a} ${b} ${c} ${d}`;
-            },
-            4 // size of the data to return
+            }
         );
     },
     /**
