@@ -1512,7 +1512,6 @@ class Points {
 
             let structSizeEvents = 0;
             for (const [key, event] of this.#events) {
-                console.log(key, event);
                 dynamicStructEvents += /*wgsl*/`${event.name}: Event, \n\t`;
                 structSizeEvents += 20; //(4 + 4 * 4)
             }
@@ -2803,11 +2802,11 @@ class Points {
 
         const eventRead = await this.readStorage('events');
         for (const [key, event] of this.#events) {
-            const { id, name } = event;
-
+            const { id } = event;
             const eventId = id * 5
             const updated = eventRead[eventId]; // 5 is the length of each event data + id
-            if (updated != 0) {
+
+            if (!!updated) {
                 const a = eventRead[eventId + 1];
                 const b = eventRead[eventId + 2];
                 const c = eventRead[eventId + 3];
