@@ -33,9 +33,9 @@ fn main(in: ComputeIn) {
 
     let particle = &particles[index];
 
-    // if(f32(index) > logger.data[0]){
-    //     logger.data[0] = f32(index);
-    //     logger.updated = 1;
+    // if(f32(index) > events.logger.data[0]){
+    //     events.logger.data[0] = f32(index);
+    //     events.logger.updated = 1;
     // }
     if(particle.init == 0){
         rand_seed.x = f32(index);

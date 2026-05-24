@@ -118,7 +118,7 @@ const base = {
 
         points.addEventListener('logger', data => {
             console.log(data[0]);
-        }, 4)
+        })
 
         points.setCameraPerspective('camera');
 
