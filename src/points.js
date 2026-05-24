@@ -1260,7 +1260,6 @@ class Points {
      * Listens for an event dispatched from WGSL code
      * @param {String} name Number that represents an event Id
      * @param {Function} callback function to be called when the event occurs
-     * @param {Number} structSize size of the array data to be returned
      *
      * @example
      * // js
@@ -1268,15 +1267,15 @@ class Points {
      * // and a data variable that starts with the name
      * points.addEventListener('click_event', data => {
      *     // response action in JS
-     *      const [a, b, c, d] = data;
+     *      const [a, b, c, d] = data; // data will have 4 items by default
      *      console.log({a, b, c, d});
-     * }, 4); // data will have 4 items
+     * });
      *
      * // wgsl string
      *  if(params.mouseClick == 1.){
      *      // we update our event response data with something we need
      *      // on the js side
-     *      // click_event_data has 4 items to fill
+     *      // click_event.data has 4 items to fill
      *      click_event_data[0] = params.time;
      *      // Same name of the Event
      *      // we fire the event with a 1
@@ -1285,18 +1284,8 @@ class Points {
      *  }
      *
      */
-    addEventListener(name, callback, structSize = 1) {
+    addEventListener(name, callback) {
         const { COMPUTE, FRAGMENT } = GPUShaderStage;
-        // TODO: remove structSize
-        // this extra 1 is for the boolean flag in the Event struct
-
-        this.#storages.add(new Storage({
-            name,
-            type: 'Event',
-            readable: true,
-            shaderStage: COMPUTE | FRAGMENT,
-            value: Array(4 + structSize * 4).fill(0)
-        }));
 
         this.#events.set(this.#events_ids,
             {
@@ -1517,6 +1506,29 @@ class Points {
         dynamicStructParams += dynamicStructMesh;
         dynamicStructParams += dynamicStructCamera;
 
+        // start events: We add the events Storage. It will hold all the events
+        let dynamicStructEvents = '';
+        if (this.#events.size > 0) {
+
+            let structSizeEvents = 0;
+            for (const [key, event] of this.#events) {
+                console.log(key, event);
+                dynamicStructEvents += /*wgsl*/`${event.name}: Event, \n\t`;
+                structSizeEvents += 20; //(4 + 4 * 4)
+            }
+
+            dynamicStructEvents = /*wgsl*/`struct Events {\n\t${dynamicStructEvents}\n}\n`;
+
+            this.#storages.add(new Storage({
+                name: 'events',
+                type: 'Events',
+                readable: true,
+                shaderStage: GPUShaderStage.COMPUTE | GPUShaderStage.FRAGMENT,
+                value: Array(structSizeEvents).fill(0)
+            }));
+        }
+        // end events
+
         const constantsVertex = this.#constants.stringOfNonOverrides(GPUShaderStage.VERTEX);
         const constantsCompute = this.#constants.stringOfNonOverrides(GPUShaderStage.COMPUTE);
         const constantsFragment = this.#constants.stringOfNonOverrides(GPUShaderStage.FRAGMENT);
@@ -1540,9 +1552,9 @@ class Points {
             dynamicGroupBindingsFragment = i + dynamicGroupBindingsFragment;
         })
 
-        renderPass.hasVertexShader && (colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + defaultVertexBody + colorsVertWGSL);
-        renderPass.hasComputeShader && (colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + colorsComputeWGSL);
-        renderPass.hasFragmentShader && (colorsFragWGSL = dynamicGroupBindingsFragment + defaultStructs + colorsFragWGSL);
+        renderPass.hasVertexShader && (colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + dynamicStructEvents + defaultVertexBody + colorsVertWGSL);
+        renderPass.hasComputeShader && (colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + dynamicStructEvents + colorsComputeWGSL);
+        renderPass.hasFragmentShader && (colorsFragWGSL = dynamicGroupBindingsFragment + defaultStructs + dynamicStructEvents + colorsFragWGSL);
 
         if (this.#debug) {
             console.groupCollapsed(`Render Pass ${index}: (${renderPass.name})`);
@@ -2785,20 +2797,27 @@ class Points {
         await this.read();
     }
     async read() {
+        if (this.#events.size === 0) {
+            return;
+        }
+
+        const eventRead = await this.readStorage('events');
         for (const [key, event] of this.#events) {
-            const { name } = event;
-            const eventRead = await this.readStorage(name);
-            if (eventRead) {
-                const id = eventRead[0];
-                if (id != 0) {
-                    const [a, ...b] = eventRead;
-                    event?.callback(b);
-                    const storageToUpdate = this.#storages.find(name);
-                    if (storageToUpdate) {
-                        const data = storageToUpdate.value;
-                        data[0] = 0;
-                        this.setStorage(name).setValue(data);
-                    }
+            const { id, name } = event;
+
+            const eventId = id * 5
+            const updated = eventRead[eventId]; // 5 is the length of each event data + id
+            if (updated != 0) {
+                const a = eventRead[eventId + 1];
+                const b = eventRead[eventId + 2];
+                const c = eventRead[eventId + 3];
+                const d = eventRead[eventId + 4];
+                event?.callback([a, b, c, d]);
+                const storageToUpdate = this.#storages.find('events');
+                if (storageToUpdate) {
+                    const data = storageToUpdate.value;
+                    data[id * 5] = 0;
+                    this.setStorage('events').setValue(data);
                 }
             }
         }
