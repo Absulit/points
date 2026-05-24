@@ -2799,8 +2799,8 @@ class Points {
         if (this.#events.size === 0) {
             return;
         }
-
-        const eventRead = await this.readStorage('events');
+        const events = 'events';
+        const eventRead = await this.readStorage(events);
         for (const [key, event] of this.#events) {
             const { id } = event;
             const eventId = id * 5
@@ -2812,11 +2812,11 @@ class Points {
                 const c = eventRead[eventId + 3];
                 const d = eventRead[eventId + 4];
                 event?.callback([a, b, c, d]);
-                const storageToUpdate = this.#storages.find('events');
+                const storageToUpdate = this.#storages.find(events);
                 if (storageToUpdate) {
                     const data = storageToUpdate.value;
                     data[id * 5] = 0;
-                    this.setStorage('events').setValue(data);
+                    this.setStorage(events).setValue(data);
                 }
             }
         }
