@@ -5,13 +5,8 @@ import frag1 from './r1/frag.js';
 import Points, { LoadOp, RenderPass, ScaleMode } from 'points';
 
 const options = {
-    val: 0,
-    bool: false,
-    color1: '#FF0000', // CSS string
-    color2: [0, 128, 255], // RGB array
-    color3: [0, 128, 255, 0.3], // RGB with alpha
-    color4: { h: 350, s: 0.9, v: 0.3 }, // Hue, saturation, value
-    color5: { r: 115, g: 50.9, b: 20.3, a: .1 }, // r, g, b object
+    scaleX: 1,
+    scaleY: 1,
 }
 
 const r0 = new RenderPass(vert0, frag0);
@@ -37,16 +32,11 @@ const base = {
 
         points.setCameraPerspective('camera', [0,0,5], [0,0,0])
 
-        // uniforms.val = options.val;
+        uniforms.scaleX = options.scaleX;
+        uniforms.scaleY = options.scaleY;
 
-        folder.add(options, 'val', -1, 1, .0001).name('Val');
-        folder.add(options, 'bool').name('Bool');
-
-        folder.addColor(options, 'color1');
-        folder.addColor(options, 'color2');
-        folder.addColor(options, 'color3');
-        folder.addColor(options, 'color4');
-        folder.addColor(options, 'color5');
+        folder.add(options, 'scaleX', 0, 2, .0001).name('scaleX');
+        folder.add(options, 'scaleY', 0, 2, .0001).name('scaleY');
 
         folder.open();
     },
@@ -54,8 +44,9 @@ const base = {
      * @param {Points} points
      */
     update: points => {
-        // const { uniforms } = points;
-        // uniforms.val = options.val;
+        const { uniforms } = points;
+        uniforms.scaleX = options.scaleX;
+        uniforms.scaleY = options.scaleY;
         points.setCameraPerspective('camera', [0,0,5], [0,0,0])
     }
 }
