@@ -8,9 +8,9 @@ ${texture}
 @fragment
 fn main(in: FragmentIn) -> @location(0) vec4f {
 
-    let bg = texture(bgTexture, imageSampler, in.uvr * .75, true);
+    let image = texture(bgTexture, imageSampler, in.uvr * .75, true);
 
-    return bg;
+    return image;
 }
 `;
 
