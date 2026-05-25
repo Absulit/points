@@ -55,6 +55,13 @@ struct Event {
     updated: u32,
     data: array<f32, 4>
 }
+
+struct Immediates {
+    mouse: vec2f,
+};
+
+var<immediate> immediates: Immediates;
+
 `;
 
 export default defaultStructs;

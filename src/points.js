@@ -77,6 +77,7 @@ class Points {
     #delta = 0;
     #epoch = 0;
     #mouse = [0, 0];
+    #mouseMoved = false;
     #mouseNormalized = [0, 0];
     #mouseDown = false;
     #mouseClick = false;
@@ -273,6 +274,7 @@ class Points {
     }
 
     #onMouseMove = e => {
+        this.#mouseMoved = true;
         // get position relative to canvas
         const rect = this.#canvas.getBoundingClientRect();
         this.#mouse[0] = e.clientX - rect.left;
@@ -2004,7 +2006,7 @@ class Points {
                 this.#createBindGroup(renderPass, GPUShaderStage.COMPUTE);
                 renderPass.computePipeline = this.#device.createComputePipeline({
                     layout: this.#device.createPipelineLayout({
-                        bindGroupLayouts: [renderPass.bindGroupLayoutCompute]
+                        bindGroupLayouts: [renderPass.bindGroupLayoutCompute],
                     }),
                     label: `_createPipeline() - ${renderPass.index}`,
                     compute: {
@@ -2034,7 +2036,8 @@ class Points {
                     label: `render pipeline: renderPass ${renderPass.index} (${renderPass.name})`,
                     // layout: 'auto',
                     layout: this.#device.createPipelineLayout({
-                        bindGroupLayouts: [renderPass.bindGroupLayoutVertex, renderPass.bindGroupLayoutFragment]
+                        bindGroupLayouts: [renderPass.bindGroupLayoutVertex, renderPass.bindGroupLayoutFragment],
+                        immediateSize: 32
                     }),
                     //primitive: { topology: 'triangle-strip' },
                     primitive: { topology: renderPass.topology, cullMode: renderPass.cullMode, frontFace: renderPass.frontFace },
@@ -2622,7 +2625,7 @@ class Points {
             // texturesExternal means there's a video
             // if there's a video it needs to be updated no matter what.
             // Also, it needs to be updated if the screen size changes
-            const updateBundle = !isSameDevice || !renderPass.bundle || this.#texturesExternal.length || this.#screenResized || this.#textureUpdated || renderPass.meshUpdated;
+            const updateBundle = !isSameDevice || !renderPass.bundle || this.#texturesExternal.length || this.#screenResized || this.#textureUpdated || renderPass.meshUpdated || this.#mouseMoved;
 
             if (renderPass.hasVertexAndFragmentShader) {
                 renderPass.descriptor.colorAttachments[0].view = swapChainTexture.createView();
@@ -2645,6 +2648,15 @@ class Points {
 
                     /** @type {GPURenderBundleEncoder} */
                     const bundleEncoder = this.#device.createRenderBundleEncoder(bundleEncoderDescriptor);
+
+                    // console.log(this.#mouseNormalized);
+
+                    bundleEncoder.setImmediates(0, new Float32Array([
+                        this.#mouseNormalized[0], this.#mouseNormalized[1],   // mouse
+                        0.0, 0.0,   // 8-byte padding to align the vec4 color to a 16-byte boundary
+                        .154, .499, 0.0, 1.0, // color
+                    ]));
+                    this.#mouseMoved = false;
 
                     bundleEncoder.setPipeline(renderPass.renderPipeline);
 
