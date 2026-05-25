@@ -1410,15 +1410,15 @@ class Points {
                 bindingIndex += 1;
             }
 
-            if (this.#meshUniforms.length) {
-                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <uniform> mesh: Mesh;\n`;
-                bindingIndex += 1;
-            }
-            if (this.#cameraUniforms.length) {
-                dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <uniform> camera: Camera;\n`;
-                bindingIndex += 1;
-            }
         });
+        if (this.#meshUniforms.length) {
+            dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <uniform> mesh: Mesh;\n`;
+            bindingIndex += 1;
+        }
+        if (this.#cameraUniforms.length) {
+            dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <uniform> camera: Camera;\n`;
+            bindingIndex += 1;
+        }
         return dynamicGroupBindings;
     }
 
