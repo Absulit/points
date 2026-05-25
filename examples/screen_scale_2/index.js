@@ -17,7 +17,7 @@ const options = {
 const r0 = new RenderPass(vert0, frag0);
 const r1 = new RenderPass(vert1, frag1);
 r1.loadOp = LoadOp.LOAD;
-r1.setPlane('mesh', { x: 0, y: 0, z: 0 }, { width: 1, height: 1, depth: 0 });
+r1.setPlane('mesh', { x: 0, y: 0, z: 0 }, { width: 1, height: 1, depth: 1 });
 
 const base = {
     renderPasses: [
@@ -35,7 +35,9 @@ const base = {
         await points.setTextureImage('bgTexture', './../../img/angel_600x600.jpg');
         await points.setTextureImage('meshTexture', './../../img/house_512x512.jpg');
 
-        uniforms.val = options.val;
+        points.setCameraPerspective('camera', [0,0,5], [0,0,0])
+
+        // uniforms.val = options.val;
 
         folder.add(options, 'val', -1, 1, .0001).name('Val');
         folder.add(options, 'bool').name('Bool');
@@ -52,8 +54,9 @@ const base = {
      * @param {Points} points
      */
     update: points => {
-        const { uniforms } = points;
-        uniforms.val = options.val;
+        // const { uniforms } = points;
+        // uniforms.val = options.val;
+        points.setCameraPerspective('camera', [0,0,5], [0,0,0])
     }
 }
 

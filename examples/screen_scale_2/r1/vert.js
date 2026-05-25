@@ -1,4 +1,9 @@
+import { rotXAxis, rotYAxis, rotZAxis } from "points/math";
+
 const vert = /*wgsl*/`
+${rotXAxis}
+${rotYAxis}
+${rotZAxis}
 
 /**
  * VertexIn
@@ -12,7 +17,21 @@ const vert = /*wgsl*/`
  */
 @vertex
 fn main(in: VertexIn) -> FragmentIn {
-    return defaultVertexBody(in.position, in.color, in.uv, in.normal);
+
+    let rotX = rotXAxis(0);
+    let rotY = rotYAxis(0);
+    let rotZ = rotZAxis(0);
+    let model = rotX * rotY * rotZ;
+
+    let world = (model * vec4f(in.position.xyz, 1.)).xyz;
+    let clip = camera.camera_projection * camera.camera_view * vec4f(world, 1.);
+
+    let newNormal = normalize((model * vec4f(in.normal, 0.)).xyz);
+
+    var dvb = defaultVertexBody(clip, in.color, in.uv, newNormal);
+    dvb.world = world;
+
+    return dvb;
 }
 `;
 
