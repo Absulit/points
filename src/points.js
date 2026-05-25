@@ -1519,13 +1519,20 @@ class Points {
 
             dynamicStructEvents = /*wgsl*/`struct Events {\n\t${dynamicStructEvents}\n}\n`;
 
-            this.#storages.add(new Storage({
-                name: 'events',
-                type: 'Events',
-                readable: true,
-                shaderStage: GPUShaderStage.COMPUTE | GPUShaderStage.FRAGMENT,
-                value: Array(structSizeEvents).fill(0)
-            }));
+            // this.#storages.add(new Storage({
+            //     name: 'events',
+            //     type: 'Events',
+            //     readable: true,
+            //     shaderStage: GPUShaderStage.COMPUTE | GPUShaderStage.FRAGMENT,
+            //     value: Array(structSizeEvents).fill(0)
+            // }));
+
+            // TODO: the add call produces an duplicate exception
+            // code below to temporarily fix it
+            this.#storages.events.setType('Events')
+                .setReadable(true)
+                .setShaderStage(GPUShaderStage.COMPUTE | GPUShaderStage.FRAGMENT)
+                .setValue(Array(structSizeEvents).fill(0))
         }
         // end events
 
