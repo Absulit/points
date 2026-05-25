@@ -18,10 +18,17 @@ ${rotZAxis}
 @vertex
 fn main(in: VertexIn) -> FragmentIn {
 
+    let scale = mat4x4f(
+        vec4f(params.scale.x, 0.0, 0.0, 0.0),
+        vec4f(0.0, params.scale.y, 0.0, 0.0),
+        vec4f(0.0, 0.0, params.scale.z, 0.0),
+        vec4f(0.0, 0.0, 0.0, 1.0)
+    );
+
     let rotX = rotXAxis(0);
     let rotY = rotYAxis(0);
     let rotZ = rotZAxis(0);
-    let model = rotX * rotY * rotZ;
+    let model = rotX * rotY * rotZ * scale;
 
     let world = (model * vec4f(in.position.xyz, 1.)).xyz;
     let clip = camera.camera_projection * camera.camera_view * vec4f(world, 1.);

@@ -30,10 +30,9 @@ const base = {
         await points.setTextureImage('bgTexture', './../../img/angel_600x600.jpg');
         await points.setTextureImage('meshTexture', './../../img/house_512x512.jpg');
 
-        points.setCameraPerspective('camera', [0,0,5], [0,0,0])
+        points.setCameraPerspective('camera', [0, 0, 5], [0, 0, 0])
 
-        uniforms.scaleX = options.scaleX;
-        uniforms.scaleY = options.scaleY;
+        uniforms.scale.setType('vec3f').setValue([options.scaleX, options.scaleY, 1]);
 
         folder.add(options, 'scaleX', 0, 2, .0001).name('scaleX');
         folder.add(options, 'scaleY', 0, 2, .0001).name('scaleY');
@@ -45,9 +44,8 @@ const base = {
      */
     update: points => {
         const { uniforms } = points;
-        uniforms.scaleX = options.scaleX;
-        uniforms.scaleY = options.scaleY;
-        points.setCameraPerspective('camera', [0,0,5], [0,0,0])
+        uniforms.scale.setValue([options.scaleX, options.scaleY, 1]);
+        points.setCameraPerspective('camera', [0, 0, 5], [0, 0, 0]);
     }
 }
 
