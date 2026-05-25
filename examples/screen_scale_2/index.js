@@ -1,6 +1,8 @@
 import vert0 from './r0/vert.js';
 import frag0 from './r0/frag.js';
-import Points, { RenderPass, ScaleMode } from 'points';
+import vert1 from './r1/vert.js';
+import frag1 from './r1/frag.js';
+import Points, { LoadOp, RenderPass, ScaleMode } from 'points';
 
 const options = {
     val: 0,
@@ -13,27 +15,31 @@ const options = {
 }
 
 const r0 = new RenderPass(vert0, frag0);
+const r1 = new RenderPass(vert1, frag1);
+r1.loadOp = LoadOp.LOAD;
+r1.setPlane('mesh', { x: 0, y: 0, z: 0 }, { width: 1, height: 1, depth: 0 });
 
 const base = {
     renderPasses: [
-        r0
+        r0,
+        r1
     ],
     /**
      * @param {Points} points
      */
     init: async (points, folder) => {
         const { uniforms } = points;
-        points.scaleMode = ScaleMode.FIT;
+        points.scaleMode = ScaleMode.COVER;
 
-        // Add elements to dat gui
-        // create an uniform and get value from options
+        points.setSampler('imageSampler', null);
+        await points.setTextureImage('bgTexture', './../../img/angel_600x600.jpg');
+        await points.setTextureImage('meshTexture', './../../img/house_512x512.jpg');
+
         uniforms.val = options.val;
 
-        // https://github.com/dataarts/dat.gui/blob/master/API.md#GUI+add
         folder.add(options, 'val', -1, 1, .0001).name('Val');
         folder.add(options, 'bool').name('Bool');
 
-        // https://github.com/dataarts/dat.gui/blob/master/API.md#GUI+addColor
         folder.addColor(options, 'color1');
         folder.addColor(options, 'color2');
         folder.addColor(options, 'color3');
