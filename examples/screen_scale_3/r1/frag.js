@@ -9,10 +9,12 @@ ${layer}
 
 @fragment
 fn main(in: FragmentIn) -> @location(0) vec4f {
-    let image = texture(fgTexture, imageSampler, in.uvr, true);
-    let bgColor = vec4f(.5, 1, 0, 1);
+    let center = vec2f(.5) * in.ratio;
+    let dims = vec2f(textureDimensions(fgTexture)) / params.screen.yy;
+    let dimsh = dims * .5;
+    let image = texture(fgTexture, imageSampler, in.uvr - center + dimsh, true);
 
-    return layer(bgColor, image);
+    return image;
 }
 `;
 

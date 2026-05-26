@@ -10,9 +10,11 @@ const options = {
 }
 
 const r0 = new RenderPass(vert0, frag0);
+r0.scaleMode = ScaleMode.COVER;
+
 const r1 = new RenderPass(vert1, frag1);
 r1.loadOp = LoadOp.LOAD;
-r1.setPlane('mesh', { x: 0, y: 0, z: 0 }, { width: 1, height: 1, depth: 1 });
+r1.scaleMode = ScaleMode.FIT;
 
 const base = {
     renderPasses: [
@@ -28,9 +30,8 @@ const base = {
 
         points.setSampler('imageSampler', null);
         await points.setTextureImage('bgTexture', './../../img/angel_600x600.jpg');
-        await points.setTextureImage('meshTexture', './../../img/house_512x512.jpg');
+        await points.setTextureImage('fgTexture', './../../img/pexels-kindel-media-7149147.jpg');
 
-        points.setCameraPerspective('camera', [0, 0, 5], [0, 0, 0])
 
         uniforms.scale.setType('vec3f').setValue([options.scaleX, options.scaleY, 1]);
 
@@ -45,7 +46,6 @@ const base = {
     update: points => {
         const { uniforms } = points;
         uniforms.scale.setValue([options.scaleX, options.scaleY, 1]);
-        points.setCameraPerspective('camera', [0, 0, 5], [0, 0, 0]);
     }
 }
 
