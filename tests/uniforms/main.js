@@ -77,6 +77,23 @@ QUnit.module('Uniform', hooks => {
         }, 'Should throw an error when passed an array with no size in type attribute')
 
     })
+    QUnit.test('Uniform should throw error if type is array size is not a number', assert => {
+
+        assert.throws(() => {
+            points.setUniform('h', [0, 0, 0, 0, 0], 'array<f32, n>');
+        }, 'Should throw an error when passed an array with not a number size');
+
+        assert.throws(() => {
+            points.setUniform('i')
+                .setType('array<f32, n>')
+        }, 'Should throw an error when passed an array with not a number size')
+
+        assert.throws(() => {
+            points.setUniform('j')
+                .type = 'array<f32, >'
+        }, 'Should throw an error when passed an array with not a number size')
+
+    })
 
 
     QUnit.test('Uniform name should not be a number even if string', assert => {
