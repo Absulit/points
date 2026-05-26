@@ -1313,14 +1313,6 @@ class Points {
             dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <uniform> params: Params;\n`;
             bindingIndex += 1;
         }
-        if (this.#meshUniforms.length) {
-            dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <uniform> mesh: Mesh;\n`;
-            bindingIndex += 1;
-        }
-        if (this.#cameraUniforms.length) {
-            dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <uniform> camera: Camera;\n`;
-            bindingIndex += 1;
-        }
         this.#storages.list.forEach(storageItem => {
             const isInternal = internal === storageItem.internal;
             if (isInternal && (!storageItem.shaderStage || storageItem.shaderStage & shaderStage)) {
@@ -1417,7 +1409,16 @@ class Points {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.read.name}: texture_2d<f32>;\n`;
                 bindingIndex += 1;
             }
+
         });
+        if (this.#meshUniforms.length) {
+            dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <uniform> mesh: Mesh;\n`;
+            bindingIndex += 1;
+        }
+        if (this.#cameraUniforms.length) {
+            dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <uniform> camera: Camera;\n`;
+            bindingIndex += 1;
+        }
         return dynamicGroupBindings;
     }
 
@@ -1518,13 +1519,20 @@ class Points {
 
             dynamicStructEvents = /*wgsl*/`struct Events {\n\t${dynamicStructEvents}\n}\n`;
 
-            this.#storages.add(new Storage({
-                name: 'events',
-                type: 'Events',
-                readable: true,
-                shaderStage: GPUShaderStage.COMPUTE | GPUShaderStage.FRAGMENT,
-                value: Array(structSizeEvents).fill(0)
-            }));
+            // this.#storages.add(new Storage({
+            //     name: 'events',
+            //     type: 'Events',
+            //     readable: true,
+            //     shaderStage: GPUShaderStage.COMPUTE | GPUShaderStage.FRAGMENT,
+            //     value: Array(structSizeEvents).fill(0)
+            // }));
+
+            // TODO: the add call produces an duplicate exception
+            // code below to temporarily fix it
+            this.#storages.events.setType('Events')
+                .setReadable(true)
+                .setShaderStage(GPUShaderStage.COMPUTE | GPUShaderStage.FRAGMENT)
+                .setValue(Array(structSizeEvents).fill(0))
         }
         // end events
 
@@ -2152,36 +2160,6 @@ class Points {
                 }
             );
         }
-        if (this.#meshUniforms.length) {
-            entries.push(
-                {
-                    binding: bindingIndex++,
-                    resource: {
-                        label: 'uniform',
-                        buffer: this.#meshUniforms.buffer
-                    },
-                    buffer: {
-                        type: 'uniform'
-                    },
-                    // visibility
-                }
-            );
-        }
-        if (this.#cameraUniforms.length) {
-            entries.push(
-                {
-                    binding: bindingIndex++,
-                    resource: {
-                        label: 'uniform',
-                        buffer: this.#cameraUniforms.buffer
-                    },
-                    buffer: {
-                        type: 'uniform'
-                    },
-                    // visibility
-                }
-            );
-        }
         this.#storages.list.forEach(storageItem => {
             const isInternal = internal === storageItem.internal;
             if (isInternal && (!storageItem.shaderStage || storageItem.shaderStage & shaderStage)) {
@@ -2383,6 +2361,36 @@ class Points {
                 );
             }
         });
+        if (this.#meshUniforms.length) {
+            entries.push(
+                {
+                    binding: bindingIndex++,
+                    resource: {
+                        label: 'uniform',
+                        buffer: this.#meshUniforms.buffer
+                    },
+                    buffer: {
+                        type: 'uniform'
+                    },
+                    // visibility
+                }
+            );
+        }
+        if (this.#cameraUniforms.length) {
+            entries.push(
+                {
+                    binding: bindingIndex++,
+                    resource: {
+                        label: 'uniform',
+                        buffer: this.#cameraUniforms.buffer
+                    },
+                    buffer: {
+                        type: 'uniform'
+                    },
+                    // visibility
+                }
+            );
+        }
 
         entries.forEach(entry => entry.visibility = shaderStage);
 
