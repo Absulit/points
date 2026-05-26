@@ -1,7 +1,5 @@
 import UniformKeys from './UniformKeys.js';
 import VertexBufferInfo from './VertexBufferInfo.js';
-import RenderPass, { PrimitiveTopology, LoadOp, CullMode, FrontFace } from './RenderPass.js';
-import RenderPasses from './RenderPasses.js';
 import Coordinate from './coordinate.js';
 import RGBAColor from './color.js';
 import Clock from './clock.js';
@@ -22,6 +20,8 @@ import Constant from './Constant.js';
 import Uniforms from './Uniforms.js';
 import Storages from './Storages.js';
 import Constants from './Constants.js';
+import RenderPass, { PrimitiveTopology, LoadOp, CullMode, FrontFace } from './RenderPass.js';
+import RenderPasses from './RenderPasses.js';
 
 /**
  * Main class Points, this is the entry point of an application with this library.
