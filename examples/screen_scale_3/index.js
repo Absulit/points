@@ -38,6 +38,13 @@ const base = {
         folder.add(options, 'scaleX', 0, 2, .0001).name('scaleX');
         folder.add(options, 'scaleY', 0, 2, .0001).name('scaleY');
 
+        folder.add({
+            change: _ => {
+                console.log('change');
+                r1.scaleMode = ScaleMode.COVER
+            }
+        }, 'change')
+
         folder.open();
     },
     /**
