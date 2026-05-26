@@ -34,11 +34,13 @@ export const defaultVertexBody = /*wgsl*/`
 fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) -> FragmentIn {
     var result: FragmentIn;
 
-    result.ratio = params.ratio;
+    let ratio = params.ratios[RENDERPASSINDEX];
+
+    result.ratio = ratio;
     result.position = position;
     result.color = color;
     result.uv = uv;
-    result.uvr = uv * params.ratio;
+    result.uvr = uv * ratio;
     result.mouse = params._mouse_normalized;
     result.normal = normal;
 

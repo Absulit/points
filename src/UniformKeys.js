@@ -67,6 +67,7 @@ class UniformKeys {
      * @static
      */
     static RATIO = 'ratio';
+    static RATIOS = 'ratios';
 }
 
 export default UniformKeys;

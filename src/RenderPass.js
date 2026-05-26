@@ -115,7 +115,6 @@ class RenderPass extends EventTarget {
     #computePipeline = null;
     #renderPipeline = null;
     #name = null;
-    #scaleMode = ScaleMode.HEIGHT;
     /**
      * @type {GPUBindGroup}
      */
@@ -200,6 +199,9 @@ class RenderPass extends EventTarget {
     #device = null;
 
     #enabled = true;
+
+    #scaleMode = ScaleMode.HEIGHT;
+    #ratio = [0, 0];
 
     /**
      * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
@@ -1875,6 +1877,14 @@ class RenderPass extends EventTarget {
     set scaleMode(val) {
         this.#scaleMode = +val;
         this.dispatchEvent(new Event(RenderPass.SCALE_MODE_UPDATED));
+    }
+
+    get ratio() {
+        return this.#ratio;
+    }
+
+    set ratio(val) {
+        this.#ratio = val;
     }
 
     destroy() {

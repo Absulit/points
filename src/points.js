@@ -83,7 +83,7 @@ class Points {
     #mouseWheel = false;
     #mouseDelta = [0, 0];
     #screen = [0, 0];
-    #ratio = [0, 0];
+    #ratios;
     #fullscreen = false;
     #fitWindow = false;
     #lastFitWindow = false;
@@ -174,7 +174,6 @@ class Points {
         this.setUniform(UniformKeys.SCREEN, this.#screen, 'vec2f');
         this.setUniform(UniformKeys.MOUSE, this.#mouse, 'vec2f');
         this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta, 'vec2f');
-        this.setUniform(UniformKeys.RATIO, this.#ratio, 'vec2f');
         this.setUniform('_mouse_normalized', [0, 0], 'vec2f');
     }
 
@@ -243,6 +242,9 @@ class Points {
      * `ScaleMode`
      */
     #setRatio = () => {
+        if (!this.#renderPasses?.length) {
+            return;
+        }
         // https://github.com/Absulit/points/blob/ca942574c8d72176d7ef5f4d738419aa54c555ab/src/core/defaultFunctions.js
         const ratio_from_x = this.#canvas.width / this.#canvas.height;
         const ratio_from_y = 1 / ratio_from_x; // this.#canvas.height / this.#canvas.width;
@@ -252,24 +254,33 @@ class Points {
 
         const is_landscape = this.#canvas.height < this.#canvas.width;
 
-        let ratio;
+        this.#renderPasses.forEach(renderPass => {
 
-        if (this.#scaleMode === ScaleMode.FIT) {
-            ratio = is_landscape ? ratio_landscape : ratio_portrait;
-        } else if (this.#scaleMode === ScaleMode.COVER) {
-            ratio = is_landscape ? ratio_portrait : ratio_landscape;
-        } else if (this.#scaleMode === ScaleMode.HEIGHT) {
-            ratio = ratio_landscape;
-        } else {
-            ratio = ratio_portrait;
-        }
+            const { scaleMode, index } = renderPass;
+            let ratio;
+            if (scaleMode === ScaleMode.FIT) {
+                ratio = is_landscape ? ratio_landscape : ratio_portrait;
+            } else if (scaleMode === ScaleMode.COVER) {
+                ratio = is_landscape ? ratio_portrait : ratio_landscape;
+            } else if (scaleMode === ScaleMode.HEIGHT) {
+                ratio = ratio_landscape;
+            } else {
+                ratio = ratio_portrait;
+            }
+            // to avoid creating new object, we just overwrite/copy the data.
+            // meaning we use the same reference of #ratio
+            renderPass.ratio[0] = ratio[0];
+            renderPass.ratio[1] = ratio[1];
 
-        // to avoid creating new object, we just overwrite/copy the data.
-        // meaning we use the same reference of #ratio
-        this.#ratio[0] = ratio[0];
-        this.#ratio[1] = ratio[1];
+            const ratioIndex = index * 2;
+            this.#ratios[ratioIndex + 0] = ratio[0];
+            this.#ratios[ratioIndex + 1] = ratio[1];
+        })
 
-        this.#uniforms.ratio = this.#ratio;
+        this.#uniforms.ratios
+            .setType(`array<vec2f,${this.#renderPasses.length}>`)
+            .setValue(this.#ratios);
+        // this.#uniforms.ratio = this.#ratio;
     }
 
     #onMouseMove = e => {
@@ -1536,6 +1547,8 @@ class Points {
         }
         // end events
 
+        dynamicStructParams += /*wgsl*/`const RENDERPASSINDEX:u32 = ${index}u;\n`;
+
         const constantsVertex = this.#constants.stringOfNonOverrides(GPUShaderStage.VERTEX);
         const constantsCompute = this.#constants.stringOfNonOverrides(GPUShaderStage.COMPUTE);
         const constantsFragment = this.#constants.stringOfNonOverrides(GPUShaderStage.FRAGMENT);
@@ -1616,6 +1629,12 @@ class Points {
      */
     async init(renderPasses) {
         this.#renderPasses = renderPasses.concat(this.#postRenderPasses);
+
+        // this uniform has to be initialized here because we need to know the size of #renderPasses
+        this.#ratios = Array(this.#renderPasses.length * 2).fill(0);
+        this.setUniform(UniformKeys.RATIOS, this.#ratios, `array<vec2f, ${renderPasses.length}>`);
+        //
+
         let hasComputeShaders = this.#renderPasses.some(renderPass => renderPass.hasComputeShader);
         if (!hasComputeShaders && this.#bindingTextures.length) {
             throw ' `setBindingTexture` requires at least one Compute Shader in a `RenderPass`'
