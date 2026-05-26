@@ -60,21 +60,21 @@ QUnit.module('Uniform', hooks => {
         }, 'Should throw an error when passed an string in value attribute')
     })
 
-    QUnit.test('Uniform should throw error if type is array', assert => {
+    QUnit.test('Uniform should throw error if type is array and has no size', assert => {
 
         assert.throws(() => {
-            points.setUniform('h', [0, 0, 0, 0, 0], 'array<f32, 5>');
-        }, 'Should throw an error when passed an array in function call');
+            points.setUniform('h', [0, 0, 0, 0, 0], 'array<f32>');
+        }, 'Should throw an error when passed an array with no size in function call');
 
         assert.throws(() => {
             points.setUniform('i')
-                .setType('array<f32, 5>')
-        }, 'Should throw an error when passed an array in setValue')
+                .setType('array<f32>')
+        }, 'Should throw an error when passed an array with no size in setType')
 
         assert.throws(() => {
             points.setUniform('j')
-                .type = 'array<f32, 5>'
-        }, 'Should throw an error when passed an array in type attribute')
+                .type = 'array<f32>'
+        }, 'Should throw an error when passed an array with no size in type attribute')
 
     })
 
