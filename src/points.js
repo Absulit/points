@@ -235,14 +235,14 @@ class Points {
             }
         })
 
-        this.#setRatio();
+        this.#setRatios();
     }
 
     /**
      * Calculates the ratio that the screen should have depending on the
      * `ScaleMode`
      */
-    #setRatio = () => {
+    #setRatios = () => {
         if (!this.#renderPasses?.length) {
             return;
         }
@@ -282,6 +282,42 @@ class Points {
             .setType(`array<vec2f,${this.#renderPasses.length}>`)
             .setValue(this.#ratios);
         // this.#uniforms.ratio = this.#ratio;
+    }
+
+    #onScaleModeUpdated = e => {
+        // https://github.com/Absulit/points/blob/ca942574c8d72176d7ef5f4d738419aa54c555ab/src/core/defaultFunctions.js
+        const ratio_from_x = this.#canvas.width / this.#canvas.height;
+        const ratio_from_y = 1 / ratio_from_x; // this.#canvas.height / this.#canvas.width;
+
+        const ratio_landscape = [ratio_from_x, 1];
+        const ratio_portrait = [1, ratio_from_y];
+
+        const is_landscape = this.#canvas.height < this.#canvas.width;
+        /** @type{RenderPass} */
+        const renderPass = e.currentTarget;
+
+        const { scaleMode, index } = renderPass;
+        let ratio;
+        if (scaleMode === ScaleMode.FIT) {
+            ratio = is_landscape ? ratio_landscape : ratio_portrait;
+        } else if (scaleMode === ScaleMode.COVER) {
+            ratio = is_landscape ? ratio_portrait : ratio_landscape;
+        } else if (scaleMode === ScaleMode.HEIGHT) {
+            ratio = ratio_landscape;
+        } else {
+            ratio = ratio_portrait;
+        }
+        // to avoid creating new object, we just overwrite/copy the data.
+        // meaning we use the same reference of #ratio
+        renderPass.ratio[0] = ratio[0];
+        renderPass.ratio[1] = ratio[1];
+
+        const ratioIndex = index * 2;
+        this.#ratios[ratioIndex + 0] = ratio[0];
+        this.#ratios[ratioIndex + 1] = ratio[1];
+
+
+
     }
 
     #onMouseMove = e => {
@@ -1634,7 +1670,7 @@ class Points {
         // this uniform has to be initialized here because we need to know the size of #renderPasses
         this.#ratios = Array(this.#renderPasses.length * 2).fill(0);
         this.setUniform(UniformKeys.RATIOS, this.#ratios, `array<vec2f, ${renderPasses.length}>`);
-        this.#renderPasses.forEach(rp => rp.addEventListener(RenderPass.SCALE_MODE_UPDATED, this.#setRatio))
+        this.#renderPasses.forEach(rp => rp.addEventListener(RenderPass.SCALE_MODE_UPDATED, this.#onScaleModeUpdated))
         //
 
         let hasComputeShaders = this.#renderPasses.some(renderPass => renderPass.hasComputeShader);
