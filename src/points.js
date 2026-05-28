@@ -238,14 +238,7 @@ class Points {
         this.#setRatios();
     }
 
-    /**
-     * Calculates the ratio that the screen should have depending on the
-     * `ScaleMode`
-     */
-    #setRatios = () => {
-        if (!this.#renderPasses?.length) {
-            return;
-        }
+    #computeRatioData() {
         // https://github.com/Absulit/points/blob/ca942574c8d72176d7ef5f4d738419aa54c555ab/src/core/defaultFunctions.js
         const ratio_from_x = this.#canvas.width / this.#canvas.height;
         const ratio_from_y = 1 / ratio_from_x; // this.#canvas.height / this.#canvas.width;
@@ -255,57 +248,24 @@ class Points {
 
         const is_landscape = this.#canvas.height < this.#canvas.width;
 
-        this.#renderPasses.forEach(renderPass => {
-
-            const { scaleMode, index } = renderPass;
-            let ratio;
-            if (scaleMode === ScaleMode.FIT) {
-                ratio = is_landscape ? ratio_landscape : ratio_portrait;
-            } else if (scaleMode === ScaleMode.COVER) {
-                ratio = is_landscape ? ratio_portrait : ratio_landscape;
-            } else if (scaleMode === ScaleMode.HEIGHT) {
-                ratio = ratio_landscape;
-            } else {
-                ratio = ratio_portrait;
-            }
-            // to avoid creating new object, we just overwrite/copy the data.
-            // meaning we use the same reference of #ratio
-            renderPass.ratio[0] = ratio[0];
-            renderPass.ratio[1] = ratio[1];
-
-            const ratioIndex = index * 2;
-            this.#ratios[ratioIndex + 0] = ratio[0];
-            this.#ratios[ratioIndex + 1] = ratio[1];
-        })
-
-        this.#uniforms.ratios
-            .setType(`array<vec2f,${this.#renderPasses.length}>`)
-            .setValue(this.#ratios);
-        // this.#uniforms.ratio = this.#ratio;
+        const ratioData = {
+            ratio_landscape,
+            ratio_portrait,
+            is_landscape
+        };
+        return ratioData;
     }
 
-    #onScaleModeUpdated = e => {
-        // https://github.com/Absulit/points/blob/ca942574c8d72176d7ef5f4d738419aa54c555ab/src/core/defaultFunctions.js
-        const ratio_from_x = this.#canvas.width / this.#canvas.height;
-        const ratio_from_y = 1 / ratio_from_x; // this.#canvas.height / this.#canvas.width;
-
-        const ratio_landscape = [ratio_from_x, 1];
-        const ratio_portrait = [1, ratio_from_y];
-
-        const is_landscape = this.#canvas.height < this.#canvas.width;
-        /** @type{RenderPass} */
-        const renderPass = e.currentTarget;
-
+    #setRenderPassRatio = (renderPass, ratioData) => {
         const { scaleMode, index } = renderPass;
-        let ratio;
+        const { ratio_landscape, ratio_portrait, is_landscape } = ratioData;
+        let ratio = ratio_portrait;
         if (scaleMode === ScaleMode.FIT) {
             ratio = is_landscape ? ratio_landscape : ratio_portrait;
         } else if (scaleMode === ScaleMode.COVER) {
             ratio = is_landscape ? ratio_portrait : ratio_landscape;
         } else if (scaleMode === ScaleMode.HEIGHT) {
             ratio = ratio_landscape;
-        } else {
-            ratio = ratio_portrait;
         }
         // to avoid creating new object, we just overwrite/copy the data.
         // meaning we use the same reference of #ratio
@@ -315,9 +275,33 @@ class Points {
         const ratioIndex = index * 2;
         this.#ratios[ratioIndex + 0] = ratio[0];
         this.#ratios[ratioIndex + 1] = ratio[1];
+    }
 
+    /**
+     * Calculates the ratio that the screen should have depending on the
+     * `ScaleMode`
+     */
+    #setRatios = () => {
+        if (!this.#renderPasses?.length) {
+            return;
+        }
 
+        const ratioData = this.#computeRatioData();
+        this.#renderPasses.forEach(renderPass =>
+            this.#setRenderPassRatio(renderPass, ratioData)
+        )
 
+        this.#uniforms.ratios
+            .setType(`array<vec2f,${this.#renderPasses.length}>`)
+            .setValue(this.#ratios);
+        // this.#uniforms.ratio = this.#ratio;
+    }
+
+    #onScaleModeUpdated = e => {
+        /** @type{RenderPass} */
+        const renderPass = e.currentTarget;
+        const ratioData = this.#computeRatioData();
+        this.#setRenderPassRatio(renderPass, ratioData);
     }
 
     #onMouseMove = e => {
