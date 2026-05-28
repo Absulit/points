@@ -17,15 +17,15 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     // < ------------ TWO PULSATING CIRCLES
 
     if(f0 >= .9999){
-        left_blink_data[0] = 11.;
-        left_blink_data[1] = 22.;
-        left_blink.updated = 1u;
+        events.left_blink.data[0] = 11.;
+        events.left_blink.data[1] = 22.;
+        events.left_blink.updated = 1u;
     }
 
     if(f1 >= .9999){
-        right_blink_data[0] = 33.;
-        right_blink_data[1] = params.time;
-        right_blink.updated = 1u;
+        events.right_blink.data[0] = 33.;
+        events.right_blink.data[1] = params.time;
+        events.right_blink.updated = 1u;
     }
 
     let circleValue1 = sdfCircle(vec2f(.2,.5) * in.ratio, .01 + f0 * .09, 0., in.uvr);

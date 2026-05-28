@@ -1,4 +1,4 @@
-import { getWGSLType } from './data-size.js'
+import { getWGSLType, isArray } from './data-size.js'
 
 /**
  * Storage is a container for storage buffer related data and actions.
@@ -329,7 +329,21 @@ class Storage {
     }
 
     #validateType(value) {
-
+        if (!value) {
+            return;
+        }
+        if (typeof value !== 'string') {
+            throw `Storage type '${value}' must be a String.`;
+        }
+        const isValueArray = isArray(value);
+        const hasComma = value.includes(',');
+        if (isValueArray && hasComma) {
+            const regex = /,\s*(\d+)\s*>/
+            const match = value.match(regex);
+            if (!match) {
+                throw `Storage type '${value}' size must be an Number.`
+            }
+        }
     }
 
     // allows for things like:

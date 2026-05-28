@@ -12,7 +12,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     let audioX = audio.data[u32(in.uvr.x * params.audioLength)] / 256;
 
     if(params.mouseClick == 1.){
-        click_event.updated = 1;
+        events.click_event.updated = 1;
         // other actions
         showMessage = 1.;
     }

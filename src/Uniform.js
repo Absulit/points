@@ -182,9 +182,26 @@ class Uniform {
     }
 
     #validateType(value) {
-        if (value && isArray(value)) {
-            throw `Uniform '${this.#name}' type: '${value}' is an array, which is currently not supported for Uniforms.`;
+
+        if (!value) {
+            return;
         }
+        if (typeof value !== 'string') {
+            throw `Uniform type '${value}' must be a String.`;
+        }
+        const isValueArray = isArray(value);
+        const hasComma = value.includes(',');
+        if(isValueArray && !hasComma){
+            throw `Uniform type '${value}' must have a size.`
+        }
+        if (isValueArray && hasComma) {
+            const regex = /,\s*(\d+)\s*>/
+            const match = value.match(regex);
+            if (!match) {
+                throw `Uniform type '${value}' size must be an Number.`
+            }
+        }
+
     }
 
     /**

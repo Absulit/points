@@ -34,6 +34,11 @@ import Points {
 {@link FrontFace|FrontFace}<br>
 {@link ScaleMode|ScaleMode}<br>
 
+## Important data buffer attributes:
+{@link Points#uniforms|uniforms}<br>
+{@link Points#storages|storages}<br>
+{@link Points#constants|constants}<br>
+
 ## Submodules with helper wgsl functions:
 
 ```js
