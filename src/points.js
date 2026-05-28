@@ -1,7 +1,5 @@
 import UniformKeys from './UniformKeys.js';
 import VertexBufferInfo from './VertexBufferInfo.js';
-import RenderPass, { PrimitiveTopology, LoadOp, CullMode, FrontFace } from './RenderPass.js';
-import RenderPasses from './RenderPasses.js';
 import Coordinate from './coordinate.js';
 import RGBAColor from './color.js';
 import Clock from './clock.js';
@@ -22,6 +20,8 @@ import Constant from './Constant.js';
 import Uniforms from './Uniforms.js';
 import Storages from './Storages.js';
 import Constants from './Constants.js';
+import RenderPass, { PrimitiveTopology, LoadOp, CullMode, FrontFace } from './RenderPass.js';
+import RenderPasses from './RenderPasses.js';
 
 /**
  * Main class Points, this is the entry point of an application with this library.
@@ -83,7 +83,7 @@ class Points {
     #mouseWheel = false;
     #mouseDelta = [0, 0];
     #screen = [0, 0];
-    #ratio = [0, 0];
+    #ratios;
     #fullscreen = false;
     #fitWindow = false;
     #lastFitWindow = false;
@@ -118,6 +118,7 @@ class Points {
         this.#canvasId = canvasId;
         this.#canvas = document.getElementById(this.#canvasId);
         this.#baseInit();
+        Object.seal(this);
     }
 
     #baseInit() {
@@ -174,7 +175,6 @@ class Points {
         this.setUniform(UniformKeys.SCREEN, this.#screen, 'vec2f');
         this.setUniform(UniformKeys.MOUSE, this.#mouse, 'vec2f');
         this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta, 'vec2f');
-        this.setUniform(UniformKeys.RATIO, this.#ratio, 'vec2f');
         this.setUniform('_mouse_normalized', [0, 0], 'vec2f');
     }
 
@@ -235,14 +235,10 @@ class Points {
             }
         })
 
-        this.#setRatio();
+        this.#setRatios();
     }
 
-    /**
-     * Calculates the ratio that the screen should have depending on the
-     * `ScaleMode`
-     */
-    #setRatio = () => {
+    #computeRatioData() {
         // https://github.com/Absulit/points/blob/ca942574c8d72176d7ef5f4d738419aa54c555ab/src/core/defaultFunctions.js
         const ratio_from_x = this.#canvas.width / this.#canvas.height;
         const ratio_from_y = 1 / ratio_from_x; // this.#canvas.height / this.#canvas.width;
@@ -252,24 +248,62 @@ class Points {
 
         const is_landscape = this.#canvas.height < this.#canvas.width;
 
-        let ratio;
+        const ratioData = {
+            ratio_landscape,
+            ratio_portrait,
+            is_landscape
+        };
+        return ratioData;
+    }
 
-        if (this.#scaleMode === ScaleMode.FIT) {
+    /**
+     * Updates the ratios array for the ratios uniform, based on the ScaleMode
+     * @param {RenderPass} renderPass pass to get ScaleMode from to update
+     * @param {*} ratioData {@link #computeRatioData }
+     */
+    #setRenderPassRatio(renderPass, ratioData) {
+        const { scaleMode, index } = renderPass;
+        const { ratio_landscape, ratio_portrait, is_landscape } = ratioData;
+        let ratio = ratio_portrait;
+        if (scaleMode === ScaleMode.FIT) {
             ratio = is_landscape ? ratio_landscape : ratio_portrait;
-        } else if (this.#scaleMode === ScaleMode.COVER) {
+        } else if (scaleMode === ScaleMode.COVER) {
             ratio = is_landscape ? ratio_portrait : ratio_landscape;
-        } else if (this.#scaleMode === ScaleMode.HEIGHT) {
+        } else if (scaleMode === ScaleMode.HEIGHT) {
             ratio = ratio_landscape;
-        } else {
-            ratio = ratio_portrait;
         }
 
         // to avoid creating new object, we just overwrite/copy the data.
-        // meaning we use the same reference of #ratio
-        this.#ratio[0] = ratio[0];
-        this.#ratio[1] = ratio[1];
+        // meaning we use the same reference of #ratios
+        const ratioIndex = index * 2;
+        this.#ratios[ratioIndex] = ratio[0];
+        this.#ratios[ratioIndex + 1] = ratio[1];
+    }
 
-        this.#uniforms.ratio = this.#ratio;
+    /**
+     * Calculates the ratio that the screen should have depending on the
+     * `ScaleMode`
+     */
+    #setRatios() {
+        if (!this.#renderPasses?.length) {
+            return;
+        }
+
+        const ratioData = this.#computeRatioData();
+        this.#renderPasses.forEach(renderPass =>
+            this.#setRenderPassRatio(renderPass, ratioData)
+        )
+
+        this.#uniforms.ratios
+            .setType(`array<vec2f,${this.#renderPasses.length}>`)
+            .setValue(this.#ratios);
+    }
+
+    #onScaleModeUpdated = e => {
+        /** @type {RenderPass} */
+        const renderPass = e.currentTarget;
+        const ratioData = this.#computeRatioData();
+        this.#setRenderPassRatio(renderPass, ratioData);
     }
 
     #onMouseMove = e => {
@@ -1536,6 +1570,8 @@ class Points {
         }
         // end events
 
+        dynamicStructParams += /*wgsl*/`const RENDERPASSINDEX:u32 = ${index}u;\n`;
+
         const constantsVertex = this.#constants.stringOfNonOverrides(GPUShaderStage.VERTEX);
         const constantsCompute = this.#constants.stringOfNonOverrides(GPUShaderStage.COMPUTE);
         const constantsFragment = this.#constants.stringOfNonOverrides(GPUShaderStage.FRAGMENT);
@@ -1616,6 +1652,13 @@ class Points {
      */
     async init(renderPasses) {
         this.#renderPasses = renderPasses.concat(this.#postRenderPasses);
+
+        // this uniform has to be initialized here because we need to know the size of #renderPasses
+        this.#ratios = Array(this.#renderPasses.length * 2).fill(0);
+        this.setUniform(UniformKeys.RATIOS, this.#ratios, `array<vec2f, ${renderPasses.length}>`);
+        this.#renderPasses.forEach(rp => rp.addEventListener(RenderPass.SCALE_MODE_UPDATED, this.#onScaleModeUpdated))
+        //
+
         let hasComputeShaders = this.#renderPasses.some(renderPass => renderPass.hasComputeShader);
         if (!hasComputeShaders && this.#bindingTextures.length) {
             throw ' `setBindingTexture` requires at least one Compute Shader in a `RenderPass`'
@@ -2973,6 +3016,7 @@ class Points {
     /**
      * Select how the content should be displayed on different
      * screen sizes.
+     * **This overrules each {@link RenderPass#scaleMode} assigned previously.**
      * ```text
      * FIT: Preserves both, but might show black bars or extend empty content. All content is visible.
      * COVER: Preserves both, but might crop width or height. All screen is covered.
@@ -2987,7 +3031,7 @@ class Points {
      */
     set scaleMode(val) {
         this.#scaleMode = +val;
-        this.#setRatio();
+        this.#renderPasses?.forEach(renderPass => renderPass.scaleMode = this.#scaleMode)
     }
 
     /**
@@ -3005,25 +3049,50 @@ class Points {
     /**
      * @type {Uniforms & { [key: string]: Uniform }}
      *
-     * Get the list of added uniforms, same as {@link params}
+     * Get the list of added uniforms, same as {@link params}, and also
+     * you can add new uniforms directly to it.
      * @example
      *
-     * points.setUniform('myuniform', 10);
+     * // js
+     * points.uniforms.myUniform = 12;
      *
-     * // later
-     * points.uniforms.myuniform.value = 12;
+     * // wgsl
+     * let a = params.myUniform;
+     * @see Uniforms
      */
     get uniforms() {
         return this.#uniforms;
     }
     /**
      * @type {Storages & { [key: string]: Storage }}
+     *
+     * Get the list of added storages and also
+     * you can add new storages directly to it.
+     * @example
+     *
+     * // js
+     * points.storages.myStorage = 12;
+     *
+     * // wgsl
+     * let a = myStorage;
+     * @see Storages
      */
     get storages() {
         return this.#storages;
     }
     /**
      * @type {Constants & { [key: string]: Constant }}
+     *
+     * Get the list of added constants and also
+     * you can add new constants directly to it.
+     * @example
+     *
+     * // js
+     * points.constants.MYCONST = 12;
+     *
+     * // wgsl
+     * let a = myStorage;
+     * @see Constants
      */
     get constants() {
         return this.#constants;
