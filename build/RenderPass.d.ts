@@ -84,7 +84,8 @@ export class PrimitiveTopology {
  * });
  * waves.required = ['scale', 'intensity'];
  */
-declare class RenderPass {
+declare class RenderPass extends EventTarget {
+    static SCALE_MODE_UPDATED: string;
     /**
      * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
      * This is useful for PostProcessing.
@@ -668,7 +669,25 @@ declare class RenderPass {
      * ids and names of the meshes
      */
     get meshes(): any[];
+    /**
+     * Select how the content should be displayed on different
+     * screen sizes.
+     * ```text
+     * FIT: Preserves both, but might show black bars or extend empty content. All content is visible.
+     * COVER: Preserves both, but might crop width or height. All screen is covered.
+     * WIDTH: Preserves the visibility of the width, but might crop the height.
+     * HEIGHT: Preserves the visibility of the height, but might crop the width.
+     * ```
+     * @param {ScaleMode|Number} val
+     * @default ScaleMode.HEIGHT
+     * @example
+     *
+     * renderPass.scaleMode = ScaleMode.COVER;
+     */
+    set scaleMode(val: ScaleMode | number);
+    get scaleMode(): ScaleMode | number;
     destroy(): void;
     #private;
 }
+import { ScaleMode } from 'points';
 export { RenderPass as default };
