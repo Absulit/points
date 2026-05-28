@@ -294,7 +294,6 @@ class Points {
             this.#setRenderPassRatio(renderPass, ratioData)
         )
 
-        // This is somehow not needed. Updating the #rations updates the uniform
         this.#uniforms.ratios
             .setType(`array<vec2f,${this.#renderPasses.length}>`)
             .setValue(this.#ratios);
