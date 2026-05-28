@@ -273,10 +273,10 @@ class Points {
             ratio = ratio_landscape;
         }
         // to avoid creating new object, we just overwrite/copy the data.
-        // meaning we use the same reference of #ratio
+        // meaning we use the same reference of #ratios
 
         const ratioIndex = index * 2;
-        this.#ratios[ratioIndex + 0] = ratio[0];
+        this.#ratios[ratioIndex] = ratio[0];
         this.#ratios[ratioIndex + 1] = ratio[1];
     }
 
