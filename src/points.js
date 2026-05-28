@@ -3053,7 +3053,7 @@ class Points {
      * Get the list of added uniforms, same as {@link params}, and also
      * you can add new uniforms directly to it.
      * @example
-     *     *
+     *
      * // js
      * points.uniforms.myUniform = 12;
      *
@@ -3070,7 +3070,7 @@ class Points {
      * Get the list of added storages and also
      * you can add new storages directly to it.
      * @example
-     *     *
+     *
      * // js
      * points.storages.myStorage = 12;
      *
@@ -3087,7 +3087,7 @@ class Points {
      * Get the list of added constants and also
      * you can add new constants directly to it.
      * @example
-     *     *
+     *
      * // js
      * points.constants.MYCONST = 12;
      *
