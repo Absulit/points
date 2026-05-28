@@ -3050,25 +3050,50 @@ class Points {
     /**
      * @type {Uniforms & { [key: string]: Uniform }}
      *
-     * Get the list of added uniforms, same as {@link params}
+     * Get the list of added uniforms, same as {@link params}, and also
+     * you can add new uniforms directly to it.
      * @example
+     *     *
+     * // js
+     * points.uniforms.myUniform = 12;
      *
-     * points.setUniform('myuniform', 10);
-     *
-     * // later
-     * points.uniforms.myuniform.value = 12;
+     * // wgsl
+     * let a = params.myUniform;
+     * @see Uniforms
      */
     get uniforms() {
         return this.#uniforms;
     }
     /**
      * @type {Storages & { [key: string]: Storage }}
+     *
+     * Get the list of added storages and also
+     * you can add new storages directly to it.
+     * @example
+     *     *
+     * // js
+     * points.storages.myStorage = 12;
+     *
+     * // wgsl
+     * let a = myStorage;
+     * @see Storages
      */
     get storages() {
         return this.#storages;
     }
     /**
      * @type {Constants & { [key: string]: Constant }}
+     *
+     * Get the list of added constants and also
+     * you can add new constants directly to it.
+     * @example
+     *     *
+     * // js
+     * points.constants.MYCONST = 12;
+     *
+     * // wgsl
+     * let a = myStorage;
+     * @see Constants
      */
     get constants() {
         return this.#constants;
