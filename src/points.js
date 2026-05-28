@@ -261,7 +261,7 @@ class Points {
      * @param {RenderPass} renderPass pass to get ScaleMode from to update
      * @param {*} ratioData {@link #computeRatioData }
      */
-    #setRenderPassRatio = (renderPass, ratioData) => {
+    #setRenderPassRatio(renderPass, ratioData) {
         const { scaleMode, index } = renderPass;
         const { ratio_landscape, ratio_portrait, is_landscape } = ratioData;
         let ratio = ratio_portrait;
@@ -272,9 +272,9 @@ class Points {
         } else if (scaleMode === ScaleMode.HEIGHT) {
             ratio = ratio_landscape;
         }
+
         // to avoid creating new object, we just overwrite/copy the data.
         // meaning we use the same reference of #ratios
-
         const ratioIndex = index * 2;
         this.#ratios[ratioIndex] = ratio[0];
         this.#ratios[ratioIndex + 1] = ratio[1];
@@ -284,7 +284,7 @@ class Points {
      * Calculates the ratio that the screen should have depending on the
      * `ScaleMode`
      */
-    #setRatios = () => {
+    #setRatios() {
         if (!this.#renderPasses?.length) {
             return;
         }
@@ -294,14 +294,14 @@ class Points {
             this.#setRenderPassRatio(renderPass, ratioData)
         )
 
-        this.#uniforms.ratios
-            .setType(`array<vec2f,${this.#renderPasses.length}>`)
-            .setValue(this.#ratios);
-        // this.#uniforms.ratio = this.#ratio;
+        // This is somehow not needed. Updating the #rations updates the uniform
+        // this.#uniforms.ratios
+        //     .setType(`array<vec2f,${this.#renderPasses.length}>`)
+        //     .setValue(this.#ratios);
     }
 
     #onScaleModeUpdated = e => {
-        /** @type{RenderPass} */
+        /** @type {RenderPass} */
         const renderPass = e.currentTarget;
         const ratioData = this.#computeRatioData();
         this.#setRenderPassRatio(renderPass, ratioData);

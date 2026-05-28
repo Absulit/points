@@ -9,6 +9,13 @@ const options = {
     scaleY: 1,
 }
 
+const dropdown = {
+    'FIT': ScaleMode.FIT,
+    'COVER': ScaleMode.COVER,
+    'WIDTH': ScaleMode.WIDTH,
+    'HEIGHT': ScaleMode.HEIGHT
+};
+
 const r0 = new RenderPass(vert0, frag0);
 r0.scaleMode = ScaleMode.COVER;
 
@@ -26,7 +33,6 @@ const base = {
      */
     init: async (points, folder) => {
         const { uniforms } = points;
-        points.scaleMode = ScaleMode.COVER;
 
         points.setSampler('imageSampler', null);
         await points.setTextureImage('bgTexture', './../../img/angel_600x600.jpg');
@@ -38,12 +44,9 @@ const base = {
         folder.add(options, 'scaleX', 0, 2, .0001).name('scaleX');
         folder.add(options, 'scaleY', 0, 2, .0001).name('scaleY');
 
-        folder.add({
-            change: _ => {
-                console.log('change');
-                r1.scaleMode = ScaleMode.COVER
-            }
-        }, 'change')
+        folder.add({ default: ScaleMode.FIT }, 'default', dropdown)
+            .onChange(value => r1.scaleMode = value)
+            .name('ScaleMode');
 
         folder.open();
     },
