@@ -23,9 +23,7 @@ const base = {
             loop,
             false
         );
-        points.addEventListener('click_event', data => {
-            audio.play();
-        }, 4);
+        points.addEventListener('click_event', _ => audio.play());
 
 
         storages.showMessage.setShaderStage(FRAGMENT).setType('f32');

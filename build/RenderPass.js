@@ -1,4 +1,6 @@
 /* @ts-self-types="./RenderPass.d.ts" */
+import { ScaleMode } from 'points';
+
 function getWGSLCoordinate(value, side, invert = false) {
     const direction = invert ? -1 : 1;
     const p = value / side;
@@ -100,7 +102,8 @@ class CullMode {
  * waves.required = ['scale', 'intensity'];
  */
 
-class RenderPass {
+class RenderPass extends EventTarget {
+    static SCALE_MODE_UPDATED = 'scale_mode_updated';
     #index = null;
     #vertexShader;
     #computeShader;
@@ -194,6 +197,8 @@ class RenderPass {
 
     #enabled = true;
 
+    #scaleMode = ScaleMode.HEIGHT;
+
     /**
      * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
      * This is useful for PostProcessing.
@@ -210,6 +215,7 @@ class RenderPass {
      *
      */
     constructor(vertexShader, fragmentShader, computeShader, workgroupCountX, workgroupCountY, workgroupCountZ, init) {
+        super();
         this.#vertexShader = vertexShader;
         this.#computeShader = computeShader;
         this.#fragmentShader = fragmentShader;
@@ -1837,6 +1843,30 @@ class RenderPass {
      */
     get meshes() {
         return this.#meshes;
+    }
+
+    get scaleMode() {
+        return this.#scaleMode;
+    }
+
+    /**
+     * Select how the content should be displayed on different
+     * screen sizes.
+     * ```text
+     * FIT: Preserves both, but might show black bars or extend empty content. All content is visible.
+     * COVER: Preserves both, but might crop width or height. All screen is covered.
+     * WIDTH: Preserves the visibility of the width, but might crop the height.
+     * HEIGHT: Preserves the visibility of the height, but might crop the width.
+     * ```
+     * @param {ScaleMode|Number} val
+     * @default ScaleMode.HEIGHT
+     * @example
+     *
+     * renderPass.scaleMode = ScaleMode.COVER;
+     */
+    set scaleMode(val) {
+        this.#scaleMode = +val;
+        this.dispatchEvent(new Event(RenderPass.SCALE_MODE_UPDATED));
     }
 
     destroy() {

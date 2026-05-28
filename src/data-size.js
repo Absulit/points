@@ -192,7 +192,7 @@ export function getArrayTypeAndAmount(value) {
     let result = [];
     for (const match of matches) {
         const type = match[1];
-        const amount = match[2];
+        const amount = match[2]; // || 5
         result.push({ type, amount: Number(amount) });
     }
     return result;
@@ -284,8 +284,14 @@ export const dataSize = value => {
                         const [innerType] = getArrayTypeAndAmount(type);
 
                         typeSize = typeSizes[innerType.type];
-                        repeat = innerType.amount; // check comment on top of do while
-                        innerType.align = MAX_ROW_SIZE;
+                        if (typeSize) {
+                            repeat = innerType.amount; // check comment on top of do while
+                            innerType.align = MAX_ROW_SIZE;
+                        } else {
+                            const sd = structData.get(innerType.type);
+                            typeSize = { size: sd.bytes, align: MAX_ROW_SIZE };
+                        }
+
                     } else {
                         const sd = structData.get(type);
                         if (!sd) {

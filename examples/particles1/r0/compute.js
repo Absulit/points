@@ -70,11 +70,11 @@ fn main(in: ComputeIn) {
     textureStore(writeTexture, particle_position_i, (*particle).color);
 
     // debug
-    // log_data[0] = (*particle).position.x;
-    // log_data[1] = (*particle).position.y;
-    // log_data[2] = f32(any(particle_position >= SIZE));
-    // log_data[3] = f32(any(particle_position <= vec2f()));
-    // log.updated = 1;
+    // events.log.data[0] = (*particle).position.x;
+    // events.log.data[1] = (*particle).position.y;
+    // events.log.data[2] = f32(any(particle_position >= SIZE));
+    // events.log.data[3] = f32(any(particle_position <= vec2f()));
+    // events.log.updated = 1;
 }
 `;
 

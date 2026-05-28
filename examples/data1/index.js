@@ -42,7 +42,7 @@ const data1 = {
         points.addEventListener('result_test', data => {
             // const [a, b, c, d] = data;
             // console.log('---- result', a, b, c, d);
-        }, 4);
+        });
 
     },
     update: async points => {

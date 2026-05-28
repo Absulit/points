@@ -246,7 +246,8 @@ export class PrimitiveTopology {
  * });
  * waves.required = ['scale', 'intensity'];
  */
-export class RenderPass {
+export class RenderPass extends EventTarget {
+    static SCALE_MODE_UPDATED: string;
     /**
      * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
      * This is useful for PostProcessing.
@@ -830,6 +831,23 @@ export class RenderPass {
      * ids and names of the meshes
      */
     get meshes(): any[];
+    /**
+     * Select how the content should be displayed on different
+     * screen sizes.
+     * ```text
+     * FIT: Preserves both, but might show black bars or extend empty content. All content is visible.
+     * COVER: Preserves both, but might crop width or height. All screen is covered.
+     * WIDTH: Preserves the visibility of the width, but might crop the height.
+     * HEIGHT: Preserves the visibility of the height, but might crop the width.
+     * ```
+     * @param {ScaleMode|Number} val
+     * @default ScaleMode.HEIGHT
+     * @example
+     *
+     * renderPass.scaleMode = ScaleMode.COVER;
+     */
+    set scaleMode(val: ScaleMode | number);
+    get scaleMode(): ScaleMode | number;
     destroy(): void;
     #private;
 }
@@ -1741,7 +1759,6 @@ declare class Points {
      * Listens for an event dispatched from WGSL code
      * @param {String} name Number that represents an event Id
      * @param {Function} callback function to be called when the event occurs
-     * @param {Number} structSize size of the array data to be returned
      *
      * @example
      * // js
@@ -1749,15 +1766,15 @@ declare class Points {
      * // and a data variable that starts with the name
      * points.addEventListener('click_event', data => {
      *     // response action in JS
-     *      const [a, b, c, d] = data;
+     *      const [a, b, c, d] = data; // data will have 4 items by default
      *      console.log({a, b, c, d});
-     * }, 4); // data will have 4 items
+     * });
      *
      * // wgsl string
      *  if(params.mouseClick == 1.){
      *      // we update our event response data with something we need
      *      // on the js side
-     *      // click_event_data has 4 items to fill
+     *      // click_event.data has 4 items to fill
      *      click_event_data[0] = params.time;
      *      // Same name of the Event
      *      // we fire the event with a 1
@@ -1766,7 +1783,7 @@ declare class Points {
      *  }
      *
      */
-    addEventListener(name: string, callback: Function, structSize?: number): void;
+    addEventListener(name: string, callback: Function): void;
     /**
      * Establishes the density of the base mesh, by default 1x1, meaning two triangles.
      * The final number of triangles is `numColumns` * `numRows` * `2` ( 2 being the triangles )
@@ -1897,6 +1914,7 @@ declare class Points {
     /**
      * Select how the content should be displayed on different
      * screen sizes.
+     * **This overrules each {@link RenderPass#scaleMode} assigned previously.**
      * ```text
      * FIT: Preserves both, but might show black bars or extend empty content. All content is visible.
      * COVER: Preserves both, but might crop width or height. All screen is covered.
@@ -1924,25 +1942,50 @@ declare class Points {
     /**
      * @type {Uniforms & { [key: string]: Uniform }}
      *
-     * Get the list of added uniforms, same as {@link params}
+     * Get the list of added uniforms, same as {@link params}, and also
+     * you can add new uniforms directly to it.
      * @example
      *
-     * points.setUniform('myuniform', 10);
+     * // js
+     * points.uniforms.myUniform = 12;
      *
-     * // later
-     * points.uniforms.myuniform.value = 12;
+     * // wgsl
+     * let a = params.myUniform;
+     * @see Uniforms
      */
     get uniforms(): Uniforms & {
         [key: string]: Uniform;
     };
     /**
      * @type {Storages & { [key: string]: Storage }}
+     *
+     * Get the list of added storages and also
+     * you can add new storages directly to it.
+     * @example
+     *
+     * // js
+     * points.storages.myStorage = 12;
+     *
+     * // wgsl
+     * let a = myStorage;
+     * @see Storages
      */
     get storages(): Storages & {
         [key: string]: Storage;
     };
     /**
      * @type {Constants & { [key: string]: Constant }}
+     *
+     * Get the list of added constants and also
+     * you can add new constants directly to it.
+     * @example
+     *
+     * // js
+     * points.constants.MYCONST = 12;
+     *
+     * // wgsl
+     * let a = myStorage;
+     * @see Constants
      */
     get constants(): Constants & {
         [key: string]: Constant;

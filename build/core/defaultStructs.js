@@ -54,7 +54,7 @@ struct Sound {
 
 struct Event {
     updated: u32,
-    // data: array<f32>
+    data: array<f32, 4>
 }
 `;
 

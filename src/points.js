@@ -1,7 +1,5 @@
 import UniformKeys from './UniformKeys.js';
 import VertexBufferInfo from './VertexBufferInfo.js';
-import RenderPass, { PrimitiveTopology, LoadOp, CullMode, FrontFace } from './RenderPass.js';
-import RenderPasses from './RenderPasses.js';
 import Coordinate from './coordinate.js';
 import RGBAColor from './color.js';
 import Clock from './clock.js';
@@ -22,6 +20,8 @@ import Constant from './Constant.js';
 import Uniforms from './Uniforms.js';
 import Storages from './Storages.js';
 import Constants from './Constants.js';
+import RenderPass, { PrimitiveTopology, LoadOp, CullMode, FrontFace } from './RenderPass.js';
+import RenderPasses from './RenderPasses.js';
 
 /**
  * Main class Points, this is the entry point of an application with this library.
@@ -83,7 +83,7 @@ class Points {
     #mouseWheel = false;
     #mouseDelta = [0, 0];
     #screen = [0, 0];
-    #ratio = [0, 0];
+    #ratios;
     #fullscreen = false;
     #fitWindow = false;
     #lastFitWindow = false;
@@ -118,6 +118,7 @@ class Points {
         this.#canvasId = canvasId;
         this.#canvas = document.getElementById(this.#canvasId);
         this.#baseInit();
+        Object.seal(this);
     }
 
     #baseInit() {
@@ -174,7 +175,6 @@ class Points {
         this.setUniform(UniformKeys.SCREEN, this.#screen, 'vec2f');
         this.setUniform(UniformKeys.MOUSE, this.#mouse, 'vec2f');
         this.setUniform(UniformKeys.MOUSE_DELTA, this.#mouseDelta, 'vec2f');
-        this.setUniform(UniformKeys.RATIO, this.#ratio, 'vec2f');
         this.setUniform('_mouse_normalized', [0, 0], 'vec2f');
     }
 
@@ -235,14 +235,10 @@ class Points {
             }
         })
 
-        this.#setRatio();
+        this.#setRatios();
     }
 
-    /**
-     * Calculates the ratio that the screen should have depending on the
-     * `ScaleMode`
-     */
-    #setRatio = () => {
+    #computeRatioData() {
         // https://github.com/Absulit/points/blob/ca942574c8d72176d7ef5f4d738419aa54c555ab/src/core/defaultFunctions.js
         const ratio_from_x = this.#canvas.width / this.#canvas.height;
         const ratio_from_y = 1 / ratio_from_x; // this.#canvas.height / this.#canvas.width;
@@ -252,24 +248,62 @@ class Points {
 
         const is_landscape = this.#canvas.height < this.#canvas.width;
 
-        let ratio;
+        const ratioData = {
+            ratio_landscape,
+            ratio_portrait,
+            is_landscape
+        };
+        return ratioData;
+    }
 
-        if (this.#scaleMode === ScaleMode.FIT) {
+    /**
+     * Updates the ratios array for the ratios uniform, based on the ScaleMode
+     * @param {RenderPass} renderPass pass to get ScaleMode from to update
+     * @param {*} ratioData {@link #computeRatioData }
+     */
+    #setRenderPassRatio(renderPass, ratioData) {
+        const { scaleMode, index } = renderPass;
+        const { ratio_landscape, ratio_portrait, is_landscape } = ratioData;
+        let ratio = ratio_portrait;
+        if (scaleMode === ScaleMode.FIT) {
             ratio = is_landscape ? ratio_landscape : ratio_portrait;
-        } else if (this.#scaleMode === ScaleMode.COVER) {
+        } else if (scaleMode === ScaleMode.COVER) {
             ratio = is_landscape ? ratio_portrait : ratio_landscape;
-        } else if (this.#scaleMode === ScaleMode.HEIGHT) {
+        } else if (scaleMode === ScaleMode.HEIGHT) {
             ratio = ratio_landscape;
-        } else {
-            ratio = ratio_portrait;
         }
 
         // to avoid creating new object, we just overwrite/copy the data.
-        // meaning we use the same reference of #ratio
-        this.#ratio[0] = ratio[0];
-        this.#ratio[1] = ratio[1];
+        // meaning we use the same reference of #ratios
+        const ratioIndex = index * 2;
+        this.#ratios[ratioIndex] = ratio[0];
+        this.#ratios[ratioIndex + 1] = ratio[1];
+    }
 
-        this.#uniforms.ratio = this.#ratio;
+    /**
+     * Calculates the ratio that the screen should have depending on the
+     * `ScaleMode`
+     */
+    #setRatios() {
+        if (!this.#renderPasses?.length) {
+            return;
+        }
+
+        const ratioData = this.#computeRatioData();
+        this.#renderPasses.forEach(renderPass =>
+            this.#setRenderPassRatio(renderPass, ratioData)
+        )
+
+        this.#uniforms.ratios
+            .setType(`array<vec2f,${this.#renderPasses.length}>`)
+            .setValue(this.#ratios);
+    }
+
+    #onScaleModeUpdated = e => {
+        /** @type {RenderPass} */
+        const renderPass = e.currentTarget;
+        const ratioData = this.#computeRatioData();
+        this.#setRenderPassRatio(renderPass, ratioData);
     }
 
     #onMouseMove = e => {
@@ -1260,7 +1294,6 @@ class Points {
      * Listens for an event dispatched from WGSL code
      * @param {String} name Number that represents an event Id
      * @param {Function} callback function to be called when the event occurs
-     * @param {Number} structSize size of the array data to be returned
      *
      * @example
      * // js
@@ -1268,15 +1301,15 @@ class Points {
      * // and a data variable that starts with the name
      * points.addEventListener('click_event', data => {
      *     // response action in JS
-     *      const [a, b, c, d] = data;
+     *      const [a, b, c, d] = data; // data will have 4 items by default
      *      console.log({a, b, c, d});
-     * }, 4); // data will have 4 items
+     * });
      *
      * // wgsl string
      *  if(params.mouseClick == 1.){
      *      // we update our event response data with something we need
      *      // on the js side
-     *      // click_event_data has 4 items to fill
+     *      // click_event.data has 4 items to fill
      *      click_event_data[0] = params.time;
      *      // Same name of the Event
      *      // we fire the event with a 1
@@ -1285,25 +1318,8 @@ class Points {
      *  }
      *
      */
-    addEventListener(name, callback, structSize = 1) {
+    addEventListener(name, callback) {
         const { COMPUTE, FRAGMENT } = GPUShaderStage;
-        // TODO: remove structSize
-        // this extra 1 is for the boolean flag in the Event struct
-
-        this.#storages.add(new Storage({
-            name,
-            type: 'Event',
-            readable: true,
-            shaderStage: COMPUTE | FRAGMENT,
-            value: Array(4).fill(0)
-        }));
-
-        this.#storages.add(new Storage({
-            name: `${name}_data`,
-            type: `array<f32, ${structSize}>`,
-            readable: true,
-            shaderStage: COMPUTE | FRAGMENT
-        }));
 
         this.#events.set(this.#events_ids,
             {
@@ -1329,14 +1345,6 @@ class Points {
         let bindingIndex = 0;
         if (this.#uniforms.list.length) {
             dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <uniform> params: Params;\n`;
-            bindingIndex += 1;
-        }
-        if (this.#meshUniforms.length) {
-            dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <uniform> mesh: Mesh;\n`;
-            bindingIndex += 1;
-        }
-        if (this.#cameraUniforms.length) {
-            dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <uniform> camera: Camera;\n`;
             bindingIndex += 1;
         }
         this.#storages.list.forEach(storageItem => {
@@ -1435,7 +1443,16 @@ class Points {
                 dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var ${bindingTexture.read.name}: texture_2d<f32>;\n`;
                 bindingIndex += 1;
             }
+
         });
+        if (this.#meshUniforms.length) {
+            dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <uniform> mesh: Mesh;\n`;
+            bindingIndex += 1;
+        }
+        if (this.#cameraUniforms.length) {
+            dynamicGroupBindings += /*wgsl*/`@group(${groupId}) @binding(${bindingIndex}) var <uniform> camera: Camera;\n`;
+            bindingIndex += 1;
+        }
         return dynamicGroupBindings;
     }
 
@@ -1524,6 +1541,37 @@ class Points {
         dynamicStructParams += dynamicStructMesh;
         dynamicStructParams += dynamicStructCamera;
 
+        // start events: We add the events Storage. It will hold all the events
+        let dynamicStructEvents = '';
+        if (this.#events.size > 0) {
+
+            let structSizeEvents = 0;
+            for (const [key, event] of this.#events) {
+                dynamicStructEvents += /*wgsl*/`${event.name}: Event, \n\t`;
+                structSizeEvents += 20; //(4 + 4 * 4)
+            }
+
+            dynamicStructEvents = /*wgsl*/`struct Events {\n\t${dynamicStructEvents}\n}\n`;
+
+            // this.#storages.add(new Storage({
+            //     name: 'events',
+            //     type: 'Events',
+            //     readable: true,
+            //     shaderStage: GPUShaderStage.COMPUTE | GPUShaderStage.FRAGMENT,
+            //     value: Array(structSizeEvents).fill(0)
+            // }));
+
+            // TODO: the add call produces an duplicate exception
+            // code below to temporarily fix it
+            this.#storages.events.setType('Events')
+                .setReadable(true)
+                .setShaderStage(GPUShaderStage.COMPUTE | GPUShaderStage.FRAGMENT)
+                .setValue(Array(structSizeEvents).fill(0))
+        }
+        // end events
+
+        dynamicStructParams += /*wgsl*/`const RENDERPASSINDEX:u32 = ${index}u;\n`;
+
         const constantsVertex = this.#constants.stringOfNonOverrides(GPUShaderStage.VERTEX);
         const constantsCompute = this.#constants.stringOfNonOverrides(GPUShaderStage.COMPUTE);
         const constantsFragment = this.#constants.stringOfNonOverrides(GPUShaderStage.FRAGMENT);
@@ -1547,9 +1595,9 @@ class Points {
             dynamicGroupBindingsFragment = i + dynamicGroupBindingsFragment;
         })
 
-        renderPass.hasVertexShader && (colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + defaultVertexBody + colorsVertWGSL);
-        renderPass.hasComputeShader && (colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + colorsComputeWGSL);
-        renderPass.hasFragmentShader && (colorsFragWGSL = dynamicGroupBindingsFragment + defaultStructs + colorsFragWGSL);
+        renderPass.hasVertexShader && (colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + dynamicStructEvents + defaultVertexBody + colorsVertWGSL);
+        renderPass.hasComputeShader && (colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + dynamicStructEvents + colorsComputeWGSL);
+        renderPass.hasFragmentShader && (colorsFragWGSL = dynamicGroupBindingsFragment + defaultStructs + dynamicStructEvents + colorsFragWGSL);
 
         if (this.#debug) {
             console.groupCollapsed(`Render Pass ${index}: (${renderPass.name})`);
@@ -1604,6 +1652,13 @@ class Points {
      */
     async init(renderPasses) {
         this.#renderPasses = renderPasses.concat(this.#postRenderPasses);
+
+        // this uniform has to be initialized here because we need to know the size of #renderPasses
+        this.#ratios = Array(this.#renderPasses.length * 2).fill(0);
+        this.setUniform(UniformKeys.RATIOS, this.#ratios, `array<vec2f, ${renderPasses.length}>`);
+        this.#renderPasses.forEach(rp => rp.addEventListener(RenderPass.SCALE_MODE_UPDATED, this.#onScaleModeUpdated))
+        //
+
         let hasComputeShaders = this.#renderPasses.some(renderPass => renderPass.hasComputeShader);
         if (!hasComputeShaders && this.#bindingTextures.length) {
             throw ' `setBindingTexture` requires at least one Compute Shader in a `RenderPass`'
@@ -2148,36 +2203,6 @@ class Points {
                 }
             );
         }
-        if (this.#meshUniforms.length) {
-            entries.push(
-                {
-                    binding: bindingIndex++,
-                    resource: {
-                        label: 'uniform',
-                        buffer: this.#meshUniforms.buffer
-                    },
-                    buffer: {
-                        type: 'uniform'
-                    },
-                    // visibility
-                }
-            );
-        }
-        if (this.#cameraUniforms.length) {
-            entries.push(
-                {
-                    binding: bindingIndex++,
-                    resource: {
-                        label: 'uniform',
-                        buffer: this.#cameraUniforms.buffer
-                    },
-                    buffer: {
-                        type: 'uniform'
-                    },
-                    // visibility
-                }
-            );
-        }
         this.#storages.list.forEach(storageItem => {
             const isInternal = internal === storageItem.internal;
             if (isInternal && (!storageItem.shaderStage || storageItem.shaderStage & shaderStage)) {
@@ -2379,6 +2404,36 @@ class Points {
                 );
             }
         });
+        if (this.#meshUniforms.length) {
+            entries.push(
+                {
+                    binding: bindingIndex++,
+                    resource: {
+                        label: 'uniform',
+                        buffer: this.#meshUniforms.buffer
+                    },
+                    buffer: {
+                        type: 'uniform'
+                    },
+                    // visibility
+                }
+            );
+        }
+        if (this.#cameraUniforms.length) {
+            entries.push(
+                {
+                    binding: bindingIndex++,
+                    resource: {
+                        label: 'uniform',
+                        buffer: this.#cameraUniforms.buffer
+                    },
+                    buffer: {
+                        type: 'uniform'
+                    },
+                    // visibility
+                }
+            );
+        }
 
         entries.forEach(entry => entry.visibility = shaderStage);
 
@@ -2792,20 +2847,27 @@ class Points {
         await this.read();
     }
     async read() {
+        if (this.#events.size === 0) {
+            return;
+        }
+        const events = 'events';
+        const eventRead = await this.readStorage(events);
         for (const [key, event] of this.#events) {
-            const { name } = event;
-            const eventRead = await this.readStorage(name);
-            if (eventRead) {
-                const id = eventRead[0];
-                if (id != 0) {
-                    const dataRead = await this.readStorage(`${name}_data`)
-                    event?.callback(dataRead);
-                    const storageToUpdate = this.#storages.find(name);
-                    if (storageToUpdate) {
-                        const data = storageToUpdate.value;
-                        data[0] = 0;
-                        this.setStorage(name).setValue(data);
-                    }
+            const { id } = event;
+            const eventId = id * 5
+            const updated = eventRead[eventId]; // 5 is the length of each event data + id
+
+            if (!!updated) {
+                const a = eventRead[eventId + 1];
+                const b = eventRead[eventId + 2];
+                const c = eventRead[eventId + 3];
+                const d = eventRead[eventId + 4];
+                event?.callback([a, b, c, d]);
+                const storageToUpdate = this.#storages.find(events);
+                if (storageToUpdate) {
+                    const data = storageToUpdate.value;
+                    data[id * 5] = 0;
+                    this.setStorage(events).setValue(data);
                 }
             }
         }
@@ -2954,6 +3016,7 @@ class Points {
     /**
      * Select how the content should be displayed on different
      * screen sizes.
+     * **This overrules each {@link RenderPass#scaleMode} assigned previously.**
      * ```text
      * FIT: Preserves both, but might show black bars or extend empty content. All content is visible.
      * COVER: Preserves both, but might crop width or height. All screen is covered.
@@ -2968,7 +3031,7 @@ class Points {
      */
     set scaleMode(val) {
         this.#scaleMode = +val;
-        this.#setRatio();
+        this.#renderPasses?.forEach(renderPass => renderPass.scaleMode = this.#scaleMode)
     }
 
     /**
@@ -2986,25 +3049,50 @@ class Points {
     /**
      * @type {Uniforms & { [key: string]: Uniform }}
      *
-     * Get the list of added uniforms, same as {@link params}
+     * Get the list of added uniforms, same as {@link params}, and also
+     * you can add new uniforms directly to it.
      * @example
      *
-     * points.setUniform('myuniform', 10);
+     * // js
+     * points.uniforms.myUniform = 12;
      *
-     * // later
-     * points.uniforms.myuniform.value = 12;
+     * // wgsl
+     * let a = params.myUniform;
+     * @see Uniforms
      */
     get uniforms() {
         return this.#uniforms;
     }
     /**
      * @type {Storages & { [key: string]: Storage }}
+     *
+     * Get the list of added storages and also
+     * you can add new storages directly to it.
+     * @example
+     *
+     * // js
+     * points.storages.myStorage = 12;
+     *
+     * // wgsl
+     * let a = myStorage;
+     * @see Storages
      */
     get storages() {
         return this.#storages;
     }
     /**
      * @type {Constants & { [key: string]: Constant }}
+     *
+     * Get the list of added constants and also
+     * you can add new constants directly to it.
+     * @example
+     *
+     * // js
+     * points.constants.MYCONST = 12;
+     *
+     * // wgsl
+     * let a = myStorage;
+     * @see Constants
      */
     get constants() {
         return this.#constants;

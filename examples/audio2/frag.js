@@ -19,7 +19,7 @@ const segmentNum = 4;
 fn main(in: FragmentIn) -> @location(0) vec4f {
 
     if(params.mouseClick == 1.){
-        click_event.updated = 1;
+        events.click_event.updated = 1;
         // other actions
         showMessage = 0.;
     }

@@ -49,7 +49,7 @@ const base = {
             const [a, b, c, d] = data;
             // console.clear();
             console.log({ a, c }, { b, d });
-        }, 4);
+        });
 
 
         uniforms.maxLife = options.maxLife;

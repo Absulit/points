@@ -40,9 +40,9 @@ fn main(in: ComputeIn) {
 
     let flipTexture = vec3(1.,-1.,1);
     let flipTextureCoordinates = vec3(-.5,.5,1);
-    // if(f32(index)>log_data[0]){
-    //     log_data[0] = f32(index);
-    //     log.updated = 1;
+    // if(f32(index) > events.log.data[0]){
+    //     events.log.data[0] = f32(index);
+    //     events.log.updated = 1;
     // }
     if(particle.init == 0){
         rand_seed.x = f32(index);
