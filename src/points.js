@@ -256,6 +256,11 @@ class Points {
         return ratioData;
     }
 
+    /**
+     * Updates the ratios array for the ratios uniform, based on the ScaleMode
+     * @param {RenderPass} renderPass pass to get ScaleMode from to update
+     * @param {*} ratioData {@link #computeRatioData }
+     */
     #setRenderPassRatio = (renderPass, ratioData) => {
         const { scaleMode, index } = renderPass;
         const { ratio_landscape, ratio_portrait, is_landscape } = ratioData;
@@ -269,8 +274,6 @@ class Points {
         }
         // to avoid creating new object, we just overwrite/copy the data.
         // meaning we use the same reference of #ratio
-        renderPass.ratio[0] = ratio[0];
-        renderPass.ratio[1] = ratio[1];
 
         const ratioIndex = index * 2;
         this.#ratios[ratioIndex + 0] = ratio[0];
