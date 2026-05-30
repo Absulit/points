@@ -46,3 +46,5 @@ rm -rf ./apidocs/
 mkdir apidocs
 npx jsdoc -c jsdoc.json
 
+npm audit
+npm outdated
