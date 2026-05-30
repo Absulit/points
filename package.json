@@ -54,7 +54,7 @@
     "@webgpu/types": "0.1.70",
     "docolatte": "4.5.1",
     "jsdoc": "4.0.5",
-    "jsr": "0.13.5",
+    "jsr": "0.14.3",
     "rollup": "4.60.4",
     "typescript": "5.9.3"
   }
