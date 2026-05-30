@@ -46,16 +46,16 @@
   },
   "homepage": "https://github.com/Absulit/points#readme",
   "devDependencies": {
-    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-babel": "6.1.0",
     "@rollup/plugin-swc": "^0.4.0",
-    "@swc/cli": "^0.8.1",
-    "@swc/core": "^1.13.3",
-    "@swc/helpers": "^0.5.17",
-    "@webgpu/types": "^0.1.64",
-    "docolatte": "^4.5.1",
-    "jsdoc": "^4.0.4",
-    "jsr": "^0.13.5",
-    "rollup": "^4.46.2",
-    "typescript": "^5.9.2"
+    "@swc/cli": "0.8.1",
+    "@swc/core": "1.13.5",
+    "@swc/helpers": "0.5.17",
+    "@webgpu/types": "0.1.66",
+    "docolatte": "4.5.1",
+    "jsdoc": "4.0.5",
+    "jsr": "0.13.5",
+    "rollup": "4.60.2",
+    "typescript": "5.9.3"
   }
 }
