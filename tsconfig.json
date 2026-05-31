@@ -9,7 +9,7 @@
         "allowJs": true,
         "checkJs": false, // TODO true to check types
         "outDir": "build",
-
+        "rootDir": "build",
         "target": "ES2015",
         "module": "ESNext",
         "types": [
