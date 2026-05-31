@@ -131,13 +131,183 @@ Parameters required are shown as a warning in the JS console.</p></div>
 
         
             
-<h4 class="name" id="BLOOM"><span class="attributes"></span>BLOOM<span class="type-signature"></span></h4>
+<h4 class="name" id="BLOOM"><span class="attributes"></span>BLOOM<span class="type-signature"> <span class="type"><a href="RenderPass.html">RenderPass</a></span></span></h4>
 
 
 
 
 <div class="description">
     <p>Apply a bloom <a href="RenderPass.html">RenderPass</a></p>
+</div>
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="RenderPasses.js.html">RenderPasses.js</a>, <a href="RenderPasses.js.html#line97">line 97</a>
+</dd>
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+
+    <pre class="prettyprint lang-js"><code>points.addRenderPass(RenderPasses.BLOOM);</code></pre>
+
+
+
+
+        
+            
+<h4 class="name" id="BLUR"><span class="attributes"></span>BLUR<span class="type-signature"> <span class="type"><a href="RenderPass.html">RenderPass</a></span></span></h4>
+
+
+
+
+<div class="description">
+    <p>Apply a blur <a href="RenderPass.html">RenderPass</a></p>
+</div>
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="RenderPasses.js.html">RenderPasses.js</a>, <a href="RenderPasses.js.html#line104">line 104</a>
+</dd>
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+
+    <pre class="prettyprint lang-js"><code>points.addRenderPass(RenderPasses.BLUR, { resolution: [100, 100], direction: [.4, 0], radians: 0 });</code></pre>
+
+
+
+
+        
+            
+<h4 class="name" id="CHROMATIC_ABERRATION"><span class="attributes"></span>CHROMATIC_ABERRATION<span class="type-signature"> <span class="type"><a href="RenderPass.html">RenderPass</a></span></span></h4>
+
+
+
+
+<div class="description">
+    <p>Apply a chromatic aberration <a href="RenderPass.html">RenderPass</a></p>
+</div>
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="RenderPasses.js.html">RenderPasses.js</a>, <a href="RenderPasses.js.html#line69">line 69</a>
+</dd>
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+
+    <pre class="prettyprint lang-js"><code>points.addRenderPass(RenderPasses.CHROMATIC_ABERRATION, { distance: .02 });</code></pre>
+
+
+
+
+        
+            
+<h4 class="name" id="COLOR"><span class="attributes"></span>COLOR<span class="type-signature"> <span class="type"><a href="RenderPass.html">RenderPass</a></span></span></h4>
+
+
+
+
+<div class="description">
+    <p>Apply a color <a href="RenderPass.html">RenderPass</a></p>
+</div>
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="RenderPasses.js.html">RenderPasses.js</a>, <a href="RenderPasses.js.html#line55">line 55</a>
+</dd>
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+
+    <pre class="prettyprint lang-js"><code>points.addRenderPass(RenderPasses.COLOR, { color: [.5, 1, 0, 1], blendAmount: .5 });</code></pre>
+
+
+
+
+        
+            
+<h4 class="name" id="CRT"><span class="attributes"></span>CRT<span class="type-signature"> <span class="type"><a href="RenderPass.html">RenderPass</a></span></span></h4>
+
+
+
+
+<div class="description">
+    <p>Apply a CRT tv pixels effect <a href="RenderPass.html">RenderPass</a></p>
+</div>
+
+
+
+
+
+<dl class="details">
+<dt class="tag-source">Source:</dt>
+<dd class="tag-source">
+    <a href="RenderPasses.js.html">RenderPasses.js</a>, <a href="RenderPasses.js.html#line118">line 118</a>
+</dd>
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+
+    <pre class="prettyprint lang-js"><code>points.addRenderPass(RenderPasses.CRT, { scale: .05 });</code></pre>
+
+
+
+
+        
+            
+<h4 class="name" id="FILM_GRAIN"><span class="attributes"></span>FILM_GRAIN<span class="type-signature"> <span class="type"><a href="RenderPass.html">RenderPass</a></span></span></h4>
+
+
+
+
+<div class="description">
+    <p>Apply a film grain <a href="RenderPass.html">RenderPass</a></p>
 </div>
 
 
@@ -158,176 +328,6 @@ Parameters required are shown as a warning in the JS console.</p></div>
     <h5>Example</h5>
     
 
-    <pre class="prettyprint lang-js"><code>points.addRenderPass(RenderPasses.BLOOM);</code></pre>
-
-
-
-
-        
-            
-<h4 class="name" id="BLUR"><span class="attributes"></span>BLUR<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    <p>Apply a blur <a href="RenderPass.html">RenderPass</a></p>
-</div>
-
-
-
-
-
-<dl class="details">
-<dt class="tag-source">Source:</dt>
-<dd class="tag-source">
-    <a href="RenderPasses.js.html">RenderPasses.js</a>, <a href="RenderPasses.js.html#line96">line 96</a>
-</dd>
-</dl>
-
-
-
-
-
-    <h5>Example</h5>
-    
-
-    <pre class="prettyprint lang-js"><code>points.addRenderPass(RenderPasses.BLUR, { resolution: [100, 100], direction: [.4, 0], radians: 0 });</code></pre>
-
-
-
-
-        
-            
-<h4 class="name" id="CHROMATIC_ABERRATION"><span class="attributes"></span>CHROMATIC_ABERRATION<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    <p>Apply a chromatic aberration <a href="RenderPass.html">RenderPass</a></p>
-</div>
-
-
-
-
-
-<dl class="details">
-<dt class="tag-source">Source:</dt>
-<dd class="tag-source">
-    <a href="RenderPasses.js.html">RenderPasses.js</a>, <a href="RenderPasses.js.html#line66">line 66</a>
-</dd>
-</dl>
-
-
-
-
-
-    <h5>Example</h5>
-    
-
-    <pre class="prettyprint lang-js"><code>points.addRenderPass(RenderPasses.CHROMATIC_ABERRATION, { distance: .02 });</code></pre>
-
-
-
-
-        
-            
-<h4 class="name" id="COLOR"><span class="attributes"></span>COLOR<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    <p>Apply a color <a href="RenderPass.html">RenderPass</a></p>
-</div>
-
-
-
-
-
-<dl class="details">
-<dt class="tag-source">Source:</dt>
-<dd class="tag-source">
-    <a href="RenderPasses.js.html">RenderPasses.js</a>, <a href="RenderPasses.js.html#line54">line 54</a>
-</dd>
-</dl>
-
-
-
-
-
-    <h5>Example</h5>
-    
-
-    <pre class="prettyprint lang-js"><code>points.addRenderPass(RenderPasses.COLOR, { color: [.5, 1, 0, 1], blendAmount: .5 });</code></pre>
-
-
-
-
-        
-            
-<h4 class="name" id="CRT"><span class="attributes"></span>CRT<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    <p>Apply a CRT tv pixels effect <a href="RenderPass.html">RenderPass</a></p>
-</div>
-
-
-
-
-
-<dl class="details">
-<dt class="tag-source">Source:</dt>
-<dd class="tag-source">
-    <a href="RenderPasses.js.html">RenderPasses.js</a>, <a href="RenderPasses.js.html#line108">line 108</a>
-</dd>
-</dl>
-
-
-
-
-
-    <h5>Example</h5>
-    
-
-    <pre class="prettyprint lang-js"><code>points.addRenderPass(RenderPasses.CRT, { scale: .05 });</code></pre>
-
-
-
-
-        
-            
-<h4 class="name" id="FILM_GRAIN"><span class="attributes"></span>FILM_GRAIN<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    <p>Apply a film grain <a href="RenderPass.html">RenderPass</a></p>
-</div>
-
-
-
-
-
-<dl class="details">
-<dt class="tag-source">Source:</dt>
-<dd class="tag-source">
-    <a href="RenderPasses.js.html">RenderPasses.js</a>, <a href="RenderPasses.js.html#line84">line 84</a>
-</dd>
-</dl>
-
-
-
-
-
-    <h5>Example</h5>
-    
-
     <pre class="prettyprint lang-js"><code>points.addRenderPass(RenderPasses.FILM_GRAIN);</code></pre>
 
 
@@ -335,7 +335,7 @@ Parameters required are shown as a warning in the JS console.</p></div>
 
         
             
-<h4 class="name" id="GRAYSCALE"><span class="attributes"></span>GRAYSCALE<span class="type-signature"></span></h4>
+<h4 class="name" id="GRAYSCALE"><span class="attributes"></span>GRAYSCALE<span class="type-signature"> <span class="type"><a href="RenderPass.html">RenderPass</a></span></span></h4>
 
 
 
@@ -351,7 +351,7 @@ Parameters required are shown as a warning in the JS console.</p></div>
 <dl class="details">
 <dt class="tag-source">Source:</dt>
 <dd class="tag-source">
-    <a href="RenderPasses.js.html">RenderPasses.js</a>, <a href="RenderPasses.js.html#line60">line 60</a>
+    <a href="RenderPasses.js.html">RenderPasses.js</a>, <a href="RenderPasses.js.html#line62">line 62</a>
 </dd>
 </dl>
 
@@ -369,7 +369,7 @@ Parameters required are shown as a warning in the JS console.</p></div>
 
         
             
-<h4 class="name" id="LENS_DISTORTION"><span class="attributes"></span>LENS_DISTORTION<span class="type-signature"></span></h4>
+<h4 class="name" id="LENS_DISTORTION"><span class="attributes"></span>LENS_DISTORTION<span class="type-signature"> <span class="type"><a href="RenderPass.html">RenderPass</a></span></span></h4>
 
 
 
@@ -385,7 +385,7 @@ Parameters required are shown as a warning in the JS console.</p></div>
 <dl class="details">
 <dt class="tag-source">Source:</dt>
 <dd class="tag-source">
-    <a href="RenderPasses.js.html">RenderPasses.js</a>, <a href="RenderPasses.js.html#line78">line 78</a>
+    <a href="RenderPasses.js.html">RenderPasses.js</a>, <a href="RenderPasses.js.html#line83">line 83</a>
 </dd>
 </dl>
 
@@ -403,7 +403,7 @@ Parameters required are shown as a warning in the JS console.</p></div>
 
         
             
-<h4 class="name" id="PIXELATE"><span class="attributes"></span>PIXELATE<span class="type-signature"></span></h4>
+<h4 class="name" id="PIXELATE"><span class="attributes"></span>PIXELATE<span class="type-signature"> <span class="type"><a href="RenderPass.html">RenderPass</a></span></span></h4>
 
 
 
@@ -419,7 +419,7 @@ Parameters required are shown as a warning in the JS console.</p></div>
 <dl class="details">
 <dt class="tag-source">Source:</dt>
 <dd class="tag-source">
-    <a href="RenderPasses.js.html">RenderPasses.js</a>, <a href="RenderPasses.js.html#line72">line 72</a>
+    <a href="RenderPasses.js.html">RenderPasses.js</a>, <a href="RenderPasses.js.html#line76">line 76</a>
 </dd>
 </dl>
 
@@ -437,7 +437,7 @@ Parameters required are shown as a warning in the JS console.</p></div>
 
         
             
-<h4 class="name" id="WAVES"><span class="attributes"></span>WAVES<span class="type-signature"></span></h4>
+<h4 class="name" id="WAVES"><span class="attributes"></span>WAVES<span class="type-signature"> <span class="type"><a href="RenderPass.html">RenderPass</a></span></span></h4>
 
 
 
@@ -453,7 +453,7 @@ Parameters required are shown as a warning in the JS console.</p></div>
 <dl class="details">
 <dt class="tag-source">Source:</dt>
 <dd class="tag-source">
-    <a href="RenderPasses.js.html">RenderPasses.js</a>, <a href="RenderPasses.js.html#line102">line 102</a>
+    <a href="RenderPasses.js.html">RenderPasses.js</a>, <a href="RenderPasses.js.html#line111">line 111</a>
 </dd>
 </dl>
 
@@ -498,7 +498,7 @@ Parameters required are shown as a warning in the JS console.</p></div>
                     Documentation generated by <a rel="external" href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a><wbr>
                     using <a rel="external" href="https://github.com/amekusa/docolatte">Docolatte</a> theme
                     
-                    <wbr>on <time datetime="2026-05-28T21:21:54.924Z">Thu, 28 May 2026 21:21:54 GMT</time>
+                    <wbr>on <time datetime="2026-05-31T16:10:46.944Z">Sun, 31 May 2026 16:10:46 GMT</time>
                     
                 </p>
                 

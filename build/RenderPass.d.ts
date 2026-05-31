@@ -102,13 +102,13 @@ declare class RenderPass extends EventTarget {
      *
      */
     constructor(vertexShader: string, fragmentShader: string, computeShader: string, workgroupCountX: string, workgroupCountY: string, workgroupCountZ: string, init: any);
-    set index(value: any);
+    set index(value: null);
     /**
      * Get the current RenderPass index order in the pipeline.
      * When you add a RenderPass to the constructor or via
      * {@link Points#addRenderPass}, this is the order it receives.
      */
-    get index(): any;
+    get index(): null;
     /**
      * get the vertex shader content
      */
@@ -121,10 +121,10 @@ declare class RenderPass extends EventTarget {
      * get the fragment shader content
      */
     get fragmentShader(): string;
-    set computePipeline(value: any);
-    get computePipeline(): any;
-    set renderPipeline(value: any);
-    get renderPipeline(): any;
+    set computePipeline(value: null);
+    get computePipeline(): null;
+    set renderPipeline(value: null);
+    get renderPipeline(): null;
     set computeBindGroup(value: GPUBindGroup);
     get computeBindGroup(): GPUBindGroup;
     set fragmentBindGroup(value: GPUBindGroup);
@@ -194,24 +194,24 @@ declare class RenderPass extends EventTarget {
      * Useful for instanced particles driven by a Storage buffer.
      */
     get instanceCount(): number;
-    set name(val: any);
-    get name(): any;
+    set name(val: null);
+    get name(): null;
     get internal(): boolean;
     /**
      * @param {Object} val data that can be assigned to the RenderPass when
      * the {@link Points#addRenderPass} method is called.
      */
-    set params(val: any);
+    set params(val: Object);
     /**
      * Parameters specifically for Post RenderPass
      */
-    get params(): any;
+    get params(): Object;
     set vertexArray(val: Float32Array<ArrayBuffer>);
     get vertexArray(): Float32Array<ArrayBuffer>;
-    set vertexBufferInfo(val: any);
-    get vertexBufferInfo(): any;
-    set vertexBuffer(val: any);
-    get vertexBuffer(): any;
+    set vertexBufferInfo(val: null);
+    get vertexBufferInfo(): null;
+    set vertexBuffer(val: null);
+    get vertexBuffer(): null;
     /**
      * Controls whether your fragment shader can write to the depth buffer.
      * By default `true`.
@@ -523,7 +523,7 @@ declare class RenderPass extends EventTarget {
         g: number;
         b: number;
         a: number;
-    }): any;
+    }): Object;
     /**
      * Adds or replaces a Torus mesh
      * @param {String} name The name will show up in the `mesh` Uniform.
@@ -548,7 +548,7 @@ declare class RenderPass extends EventTarget {
         g: number;
         b: number;
         a: number;
-    }): any;
+    }): Object;
     /**
      * Adds a Cylinder mesh
      * @deprecated since v0.8.0. Use {@link setCylinder}
@@ -573,7 +573,7 @@ declare class RenderPass extends EventTarget {
         g: number;
         b: number;
         a: number;
-    }): any;
+    }): Object;
     /**
      * Adds or replaces a Cylinder mesh
      * @param {String} name The name will show up in the `mesh` Uniform.
@@ -597,7 +597,7 @@ declare class RenderPass extends EventTarget {
         g: number;
         b: number;
         a: number;
-    }): any;
+    }): Object;
     /**
      * Add a external mesh with the provided required data.
      * @deprecated since v0.8.0. Use {@link setMesh}
@@ -689,5 +689,4 @@ declare class RenderPass extends EventTarget {
     destroy(): void;
     #private;
 }
-import { ScaleMode } from 'points';
 export { RenderPass as default };
