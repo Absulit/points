@@ -827,20 +827,12 @@ class Points {
             }
             this.#textureUpdated = true;
             texture2dToUpdate.imageTexture.bitmap = imageBitmap;
-            const cubeTexture = this.#device.createTexture({
-                label: '_cubeTexture setTextureImage',
-                size: [imageBitmap.width, imageBitmap.height, 1],
-                format: 'rgba8unorm',
-                usage:
-                    GPUTextureUsage.TEXTURE_BINDING |
-                    GPUTextureUsage.COPY_SRC |
-                    GPUTextureUsage.COPY_DST |
-                    GPUTextureUsage.RENDER_ATTACHMENT,
-            });
+            const { width, height } = imageBitmap;
+            const cubeTexture = this.#createTextureForImage(width, height, 'setTextureImage');
             this.#device.queue.copyExternalImageToTexture(
                 { source: imageBitmap },
                 { texture: cubeTexture },
-                [imageBitmap.width, imageBitmap.height]
+                [width, height]
             );
             texture2dToUpdate.texture = cubeTexture;
             return texture2dToUpdate;
@@ -1997,16 +1989,8 @@ class Points {
         this.#textures2d.forEach(texture2d => {
             if (texture2d.imageTexture) {
                 const imageBitmap = texture2d.imageTexture.bitmap;
-                const cubeTexture = this.#device.createTexture({
-                    label: `_createBuffers, textures2d image: ${texture2d.name}`,
-                    size: [imageBitmap.width, imageBitmap.height, 1],
-                    format: 'rgba8unorm',
-                    usage:
-                        GPUTextureUsage.TEXTURE_BINDING |
-                        GPUTextureUsage.COPY_SRC |
-                        GPUTextureUsage.COPY_DST |
-                        GPUTextureUsage.RENDER_ATTACHMENT,
-                });
+                const { width, height } = imageBitmap;
+                const cubeTexture = this.#createTextureForImage(width, height, texture2d.name);
                 this.#device.queue.copyExternalImageToTexture(
                     { source: imageBitmap },
                     { texture: cubeTexture },
@@ -2018,34 +2002,14 @@ class Points {
                 const { element, name } = texture2d;
                 const { offsetWidth: width, offsetHeight: height } = element;
 
-                const cubeTexture = this.#device.createTexture({
-                    label: `_createBuffers, textures2d element: ${name}`,
-                    size: [width, height, 1],
-                    format: 'rgba8unorm',
-                    usage:
-                        GPUTextureUsage.TEXTURE_BINDING |
-                        GPUTextureUsage.COPY_SRC |
-                        GPUTextureUsage.COPY_DST |
-                        GPUTextureUsage.RENDER_ATTACHMENT,
-                });
+                const cubeTexture = this.#createTextureForImage(width, height, name);
 
                 this.#canvas.addEventListener('paint', e => {
                     if (e.changedElements.includes(element)) {
                         const { offsetWidth: width, offsetHeight: height } = element;
                         console.log(width, height);
 
-                        const cubeTexture = this.#device.createTexture({
-                            label: `_createBuffers, textures2d element: ${name}`,
-                            size: [width, height, 1],
-                            format: 'rgba8unorm',
-                            usage:
-                                GPUTextureUsage.TEXTURE_BINDING |
-                                GPUTextureUsage.COPY_SRC |
-                                GPUTextureUsage.COPY_DST |
-                                GPUTextureUsage.RENDER_ATTACHMENT,
-                        });
-
-
+                        const cubeTexture = this.#createTextureForImage(width, height, name);
 
                         this.#device.queue.copyElementImageToTexture(
                             { source: element },
@@ -2116,6 +2080,19 @@ class Points {
                 format: 'rgba8unorm',
                 usage: GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
             });
+        });
+    }
+
+    #createTextureForImage(width, height, labelName = '') {
+        return this.#device.createTexture({
+            label: `_#createTextureForImage: ${labelName}`,
+            size: [width, height, 1],
+            format: 'rgba8unorm',
+            usage:
+                GPUTextureUsage.TEXTURE_BINDING |
+                GPUTextureUsage.COPY_SRC |
+                GPUTextureUsage.COPY_DST |
+                GPUTextureUsage.RENDER_ATTACHMENT,
         });
     }
 
