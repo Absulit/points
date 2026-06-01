@@ -860,6 +860,51 @@ class Points {
         return texture2d;
     }
 
+
+    async setTextureElementImage(name, element, shaderStage = null) {
+        const { offsetWidth: width, offsetHeight: height } = element;
+        const texture2dToUpdate = this.#nameExists(this.#textures2d, name);
+        if (shaderStage) {
+            throw '`setTextureElementImage()` the param `shaderStage` should not be updated after its creation.';
+        }
+        this.#textureUpdated = true;
+        // // texture2dToUpdate.imageTexture.bitmap = imageBitmap;
+        // console.log(this.#device);
+
+        // const cubeTexture = this.#device.createTexture({
+        //     label: '_cubeTexture setTextureElementImage',
+        //     size: [width, height, 1],
+        //     format: 'rgba8unorm',
+        //     usage:
+        //         GPUTextureUsage.TEXTURE_BINDING |
+        //         GPUTextureUsage.COPY_SRC |
+        //         GPUTextureUsage.COPY_DST |
+        //         GPUTextureUsage.RENDER_ATTACHMENT,
+        // });
+        // this.#device.queue.copyElementImageToTexture(
+        //     element,
+        //     { texture: cubeTexture },
+        //     // [width, height]
+        // );
+        // if (texture2dToUpdate) {
+        //     texture2dToUpdate.texture = cubeTexture;
+        //     return texture2dToUpdate
+        // }
+        const texture2d = {
+            name: name,
+            copyCurrentTexture: false,
+            shaderStage: shaderStage,
+            texture: null,
+            renderPassIndex: null,
+            imageTexture: null,
+            element,
+            internal: false
+        }
+        this.#textures2d.push(texture2d);
+        return texture2d;
+    }
+
+
     /**
      * Loads a `HTMLElement` as `texture_2d`. It will automatically interpret
      * the CSS associated with the element to render it.
@@ -1946,7 +1991,7 @@ class Points {
             if (texture2d.imageTexture) {
                 const imageBitmap = texture2d.imageTexture.bitmap;
                 const cubeTexture = this.#device.createTexture({
-                    label: `_createBuffers, textures2d: ${texture2d.name}`,
+                    label: `_createBuffers, textures2d image: ${texture2d.name}`,
                     size: [imageBitmap.width, imageBitmap.height, 1],
                     format: 'rgba8unorm',
                     usage:
@@ -1962,6 +2007,39 @@ class Points {
                 );
                 texture2d.texture = cubeTexture;
                 // } else if (texture2d.copyCurrentTexture) {
+            } else if (texture2d.element) {
+                const { element, name } = texture2d;
+                const { offsetWidth: width, offsetHeight: height } = element;
+
+                const cubeTexture = this.#device.createTexture({
+                    label: `_createBuffers, textures2d element: ${name}`,
+                    size: [width, height, 1],
+                    format: 'rgba8unorm',
+                    usage:
+                        GPUTextureUsage.TEXTURE_BINDING |
+                        GPUTextureUsage.COPY_SRC |
+                        GPUTextureUsage.COPY_DST |
+                        GPUTextureUsage.RENDER_ATTACHMENT,
+                });
+
+                this.#canvas.addEventListener('paint', e => {
+                    if (e.changedElements.includes(element)) {
+                        this.#device.queue.copyElementImageToTexture(
+                            { source: element },
+                            { destination: { texture: cubeTexture } },
+                            [width, height]
+                        );
+
+                        const transform = this.#canvas.getElementTransform(element, new DOMMatrix());
+                        element.style.transform = transform.toString();
+                        texture2d.texture = cubeTexture;
+                        this.#textureUpdated = true;
+                    }
+
+                })
+                this.#canvas.requestPaint();
+                texture2d.texture = cubeTexture;
+                this.#textureUpdated = true;
             } else {
                 this.#createTextureBindingToCopy(texture2d);
             }

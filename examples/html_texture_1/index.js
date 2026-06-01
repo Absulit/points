@@ -21,21 +21,30 @@ const demo6 = {
         // </div>
 
 
-        const content = document.getElementsByClassName('content column right')[0];
+        // const content = document.getElementsByClassName('content column right')[0];
 
-        container = document.createElement('div');
-        container.id = 'test-container';
+        // container = document.createElement('div');
+        // container.id = 'test-container';
 
         const pointsEl = document.createElement('div');
         pointsEl.id = 'test';
         pointsEl.textContent = 'POINTS';
 
-        container.appendChild(pointsEl);
-        content.appendChild(container);
-        console.log(pointsEl);
+        // container.appendChild(pointsEl);
+        // content.appendChild(container);
+        // console.log(pointsEl);
 
-        await points.setTextureElement('image', pointsEl);
+        points.canvas.appendChild(pointsEl);
+
         points.setSampler('imageSampler', null);
+
+
+        // const form_element = document.getElementById('form_element');
+
+
+
+        await points.setTextureElementImage('image', pointsEl);
+        // await points.setTextureElement('image', pointsEl);
 
     },
     update: points => {
