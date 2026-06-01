@@ -2031,6 +2031,22 @@ class Points {
 
                 this.#canvas.addEventListener('paint', e => {
                     if (e.changedElements.includes(element)) {
+                        const { offsetWidth: width, offsetHeight: height } = element;
+                        console.log(width, height);
+
+                        const cubeTexture = this.#device.createTexture({
+                            label: `_createBuffers, textures2d element: ${name}`,
+                            size: [width, height, 1],
+                            format: 'rgba8unorm',
+                            usage:
+                                GPUTextureUsage.TEXTURE_BINDING |
+                                GPUTextureUsage.COPY_SRC |
+                                GPUTextureUsage.COPY_DST |
+                                GPUTextureUsage.RENDER_ATTACHMENT,
+                        });
+
+
+
                         this.#device.queue.copyElementImageToTexture(
                             { source: element },
                             { destination: { texture: cubeTexture } },
