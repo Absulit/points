@@ -861,13 +861,13 @@ class Points {
     }
 
 
-    async setTextureElementImage(name, element, shaderStage = null) {
+    async #setTextureElementImage(name, element, shaderStage = null) {
         const { offsetWidth: width, offsetHeight: height } = element;
         const texture2dToUpdate = this.#nameExists(this.#textures2d, name);
         if (shaderStage) {
             throw '`setTextureElementImage()` the param `shaderStage` should not be updated after its creation.';
         }
-        this.#textureUpdated = true;
+        // this.#textureUpdated = true;
         // // texture2dToUpdate.imageTexture.bitmap = imageBitmap;
         // console.log(this.#device);
 
@@ -924,6 +924,13 @@ class Points {
      * let color = texture(image, imageSampler, in.uvr, true);
      */
     async setTextureElement(name, element, shaderStage = null) {
+        const hasHTMLInCanvas = typeof GPUQueue !== 'undefined' && 'copyElementImageToTexture' in GPUQueue.prototype;
+
+        if (hasHTMLInCanvas) {
+            this.#canvas.appendChild(element);
+            return await this.#setTextureElementImage(name, element);
+        }
+
         const styles = getCSS(element);
         const cssText = styles.map(style => style.cssText).join('\n');
         const path = await elToImage(element, cssText);
