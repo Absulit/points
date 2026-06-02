@@ -31,10 +31,14 @@ const demo6 = {
         container.id = 'test-container';
 
         const pointsEl = document.createElement('div');
-        pointsEl.id = 'test';
+        pointsEl.classList.add('test');
         pointsEl.textContent = 'POINTS';
 
+        const formEl = document.createElement('div');
+        formEl.innerHTML = '<label for="name">Name:</label> <input id="name" type="text">';
+
         container.appendChild(pointsEl);
+        container.appendChild(formEl);
         content.appendChild(container);
 
 
@@ -43,7 +47,7 @@ const demo6 = {
 
         const form_element = document.getElementById('form_element');
 
-        await points.setTextureElement('image', pointsEl);
+        await points.setTextureElement('image', formEl);
 
     },
     update: points => {
