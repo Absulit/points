@@ -46,6 +46,13 @@ const demo6 = {
         await points.setTextureElement('pointsImage', pointsEl);
         await points.setTextureElement('webgpuImage', webgpuEl);
 
+        const hasHTMLInCanvas = typeof GPUQueue !== 'undefined' && 'copyElementImageToTexture' in GPUQueue.prototype;
+        // hide only if it has the new HTML in Canvas feature
+        if (!hasHTMLInCanvas) {
+            pointsEl.style.visibility = 'hidden';
+            webgpuEl.style.visibility = 'hidden';
+        }
+
     },
     update: points => {
 
