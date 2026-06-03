@@ -1,4 +1,5 @@
 import vert from './vert.js';
+import compute from './compute.js';
 import frag from './frag.js';
 import Points, { RenderPass } from 'points';
 import { loadAndExtract, isMobile } from 'utils';
@@ -14,12 +15,12 @@ let url = '../models/triangle.glb'; // or remote URL (CORS must allow)
 
 
 
-let WORKGROUP_X = 1;
-let WORKGROUP_Y = 1;
+let WORKGROUP_X = 8;
+let WORKGROUP_Y = 8;
 let WORKGROUP_Z = 1;
 
-let THREADS_X = 1;
-let THREADS_Y = 1;
+let THREADS_X = 4;
+let THREADS_Y = 4;
 let THREADS_Z = 1;
 
 if (options.isMobile) {
@@ -40,7 +41,7 @@ const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0]
 const NUMPARTICLES = WORKGROUP_X * WORKGROUP_Y * WORKGROUP_Z * THREADS_X * THREADS_Y * THREADS_Z;
 console.log('NUMPARTICLES:', NUMPARTICLES);
 
-const renderPass = new RenderPass(vert, frag, null);
+const renderPass = new RenderPass(vert, frag, compute);
 renderPass.depthWriteEnabled = true;
 renderPass.setMesh('base_mesh', positions, colors, colorSize, uvs, normals, indices)
 renderPass.setSphere('instance_mesh', { x: 0, y: 0, z: 0 }, { r: 0, g: 0, b: 0, a: 0 }, .01).instanceCount = NUMPARTICLES;
@@ -59,6 +60,7 @@ const vertex_data = positions.reduce((acc, val, idx) => {
 const num_triangles = vertex_data.length / 3;
 
 console.log('num_triangles:', num_triangles);
+console.log('vertex_data:', vertex_data);
 
 
 const base = {
@@ -69,8 +71,16 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
-        const { uniforms, storages } = points;
+        const { uniforms, storages, constants } = points;
         points.import(structs);
+
+        constants.NUMPARTICLES = NUMPARTICLES;
+        constants.WORKGROUP_X = WORKGROUP_X;
+        constants.WORKGROUP_Y = WORKGROUP_Y;
+        constants.WORKGROUP_Z = WORKGROUP_Z;
+        constants.THREADS_X = THREADS_X;
+        constants.THREADS_Y = THREADS_Y;
+        constants.THREADS_Z = THREADS_Z;
 
         storages.particles.setType(`array<Particle, ${NUMPARTICLES}>`);
         storages.vertex_data
@@ -84,6 +94,10 @@ const base = {
         });
 
         points.setCameraPerspective('camera');
+
+        points.addEventListener('log', ([a, b, c, d]) => {
+            console.log(a, b, c, d);
+        })
 
         folder.open();
     },
