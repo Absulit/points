@@ -10,35 +10,35 @@ const options = {
 
 options.isMobile = isMobile();
 
-let url = '../models/monkey_subdivide.glb'; // or remote URL (CORS must allow)
+let url = '../models/triangle.glb'; // or remote URL (CORS must allow)
 
 
 
-let WORKGROUP_X = 64;
+let WORKGROUP_X = 1;
 let WORKGROUP_Y = 1;
 let WORKGROUP_Z = 1;
 
-let THREADS_X = 256;
+let THREADS_X = 1;
 let THREADS_Y = 1;
 let THREADS_Z = 1;
 
 if (options.isMobile) {
-    WORKGROUP_X = 8;
-    WORKGROUP_Y = 4;
-    WORKGROUP_Z = 2;
+    WORKGROUP_X = 1;
+    WORKGROUP_Y = 1;
+    WORKGROUP_Z = 1;
 
-    THREADS_X = 4;
-    THREADS_Y = 4;
-    THREADS_Z = 2;
+    THREADS_X = 1;
+    THREADS_Y = 1;
+    THREADS_Z = 1;
 
-    url = '../models/monkey.glb';
+    url = '../models/triangle.glb';
 }
 
 const data = await loadAndExtract(url);
 const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0]
 
 const NUMPARTICLES = WORKGROUP_X * WORKGROUP_Y * WORKGROUP_Z * THREADS_X * THREADS_Y * THREADS_Z;
-console.log('NUMPARTICLES: ', NUMPARTICLES);
+console.log('NUMPARTICLES:', NUMPARTICLES);
 
 const renderPass = new RenderPass(vert, frag, null);
 renderPass.depthWriteEnabled = true;
@@ -55,6 +55,11 @@ const vertex_data = positions.reduce((acc, val, idx) => {
 
     return acc;
 }, []);
+
+const num_triangles = vertex_data.length / 3;
+
+console.log('num_triangles:', num_triangles);
+
 
 const base = {
     renderPasses: [

@@ -22,10 +22,10 @@ fn main(in: VertexIn) -> FragmentIn {
     }
 
     // let angleZ = params.time * 0.9854;
-    let angleY = params.time * 0.94222;
+    let angleY = 0.94222;
     // let angleX = params.time * 0.865;
 
-    let p = vertex_data[in.instanceIndex];
+
 
     let rotX = rotXAxis(0);
     let rotY = rotYAxis(angleY);
@@ -34,7 +34,8 @@ fn main(in: VertexIn) -> FragmentIn {
 
     var rotated = model * in.position;
     if(mesh.instance_mesh == in.id){
-        model = rotX * rotY * rotZ * translationMatrix(p.xyz);
+        let p = particles[in.instanceIndex];
+        model = rotX * rotY * rotZ * translationMatrix(p.position);
         rotated = model * in.position;
     }
 

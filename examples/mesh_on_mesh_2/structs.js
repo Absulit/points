@@ -9,5 +9,11 @@ struct Particle {
     init: u32,
 }
 
+struct Triangle {
+    a: vec4f,
+    b: vec4f,
+    c: vec4f,
+}
+
 `;
 
