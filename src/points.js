@@ -2007,7 +2007,6 @@ class Points {
                 this.#canvas.addEventListener('paint', e => {
                     if (e.changedElements.includes(element)) {
                         const { offsetWidth: width, offsetHeight: height } = element;
-                        console.log(width, height);
 
                         const cubeTexture = this.#createTextureForImage(width, height, name);
 

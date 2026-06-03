@@ -20,10 +20,6 @@ const demo6 = {
         //     </div>
         // </div>
 
-        // <div id="form_element">
-        //     <label for="name">Name:</label> <input id="name" type="text">
-        // </div>
-
 
         const content = document.getElementsByClassName('content column right')[0];
 
@@ -34,20 +30,21 @@ const demo6 = {
         pointsEl.classList.add('test');
         pointsEl.textContent = 'POINTS';
 
-        const formEl = document.createElement('div');
-        formEl.innerHTML = '<label for="name">Name:</label> <input id="name" type="text">';
+        const webgpuEl = pointsEl.cloneNode();
+        webgpuEl.textContent = 'WebGPU';
 
         container.appendChild(pointsEl);
-        container.appendChild(formEl);
+        container.appendChild(webgpuEl);
+
         content.appendChild(container);
 
 
         points.setSampler('imageSampler', null);
 
 
-        const form_element = document.getElementById('form_element');
 
-        await points.setTextureElement('image', formEl);
+        await points.setTextureElement('pointsImage', pointsEl);
+        await points.setTextureElement('webgpuImage', webgpuEl);
 
     },
     update: points => {
