@@ -11,17 +11,37 @@ const options = {
 
 options.isMobile = isMobile();
 
-let url = '../models/plane.glb'; // or remote URL (CORS must allow)
+let url = '../models/monkey.glb'; // or remote URL (CORS must allow)
 
 
+const data = await loadAndExtract(url);
 
-let WORKGROUP_X = 8;
-let WORKGROUP_Y = 8;
-let WORKGROUP_Z = 1;
+const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0]
+const num_triangles = indices.length / 3;
 
-let THREADS_X = 4;
+const vertex_data = positions.reduce((acc, val, idx) => {
+    if (idx % 3 === 0) acc.push([]);
+    acc[acc.length - 1].push(val);
+
+    if (acc[acc.length - 1].length === 3) {
+        acc[acc.length - 1].push(0);
+    }
+
+    return acc;
+}, []);
+
+console.log('num_triangles:', num_triangles);
+// console.log('vertex_data:', vertex_data);
+// console.log('indices:', indices);
+
+
+let WORKGROUP_X = 2;
+let WORKGROUP_Y = 2;
+let WORKGROUP_Z = 2;
+
+let THREADS_X = 8;
 let THREADS_Y = 4;
-let THREADS_Z = 1;
+let THREADS_Z = 4;
 
 if (options.isMobile) {
     WORKGROUP_X = 1;
@@ -35,35 +55,36 @@ if (options.isMobile) {
     url = '../models/triangle.glb';
 }
 
-const data = await loadAndExtract(url);
 
-const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0]
 console.log(data);
 
-const NUMPARTICLES = WORKGROUP_X * WORKGROUP_Y * WORKGROUP_Z * THREADS_X * THREADS_Y * THREADS_Z;
+const NUMTHREADS = WORKGROUP_X * WORKGROUP_Y * WORKGROUP_Z * THREADS_X * THREADS_Y * THREADS_Z;
+const PARTICLESPERTRIANGLE = 32;
+const NUMPARTICLES = num_triangles * PARTICLESPERTRIANGLE;
+console.log('NUMTHREADS:', NUMTHREADS);
 console.log('NUMPARTICLES:', NUMPARTICLES);
 
-const renderPass = new RenderPass(vert, frag, compute);
+const renderPass = new RenderPass(vert, frag, compute, WORKGROUP_X, WORKGROUP_Y, WORKGROUP_Z);
 renderPass.depthWriteEnabled = true;
 renderPass.setMesh('base_mesh', positions, colors, colorSize, uvs, normals, indices)
 // renderPass.setPlane('base_mesh')
 renderPass.setSphere('instance_mesh', { x: 0, y: 0, z: 0 }, { r: 0, g: 0, b: 0, a: 0 }, .01).instanceCount = NUMPARTICLES;
 
-const vertex_data = positions.reduce((acc, val, idx) => {
+
+const triangle_indices = indices.reduce((acc, val, idx) => {
     if (idx % 3 === 0) acc.push([]);
     acc[acc.length - 1].push(val);
-
-    if (acc[acc.length - 1].length === 3) {
-        acc[acc.length - 1].push(1);
-    }
-
     return acc;
 }, []);
+// console.log('triangle_indices:', triangle_indices);
 
-const num_triangles = indices.length / 3;
+const triangles = triangle_indices.map(ti => {
+    const triangle = [vertex_data[ti[0]], vertex_data[ti[1]], vertex_data[ti[2]]];
+    return triangle;
+})
 
-console.log('num_triangles:', num_triangles);
-console.log('vertex_data:', vertex_data);
+// console.log('triangles:', triangles);
+console.log('triangles:', triangles.flat(2).length);
 
 
 const base = {
@@ -86,11 +107,16 @@ const base = {
         constants.THREADS_Z = THREADS_Z;
 
         constants.NUMTRIANGLES = num_triangles;
+        constants.PARTICLESPERTRIANGLE.setValue(PARTICLESPERTRIANGLE).setType('i32');
 
         storages.particles.setType(`array<Particle, ${NUMPARTICLES}>`);
         storages.vertex_data
             .setType(`array<vec4f, ${vertex_data.length}>`)
             .setValue(vertex_data.flat());
+
+        storages.triangles
+            .setType(`array<Triangle, ${triangles.length}>`)
+            .setValue(triangles.flat(2));
 
         uniforms.visibility = options.visibility;
 
