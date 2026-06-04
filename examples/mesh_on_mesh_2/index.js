@@ -11,7 +11,7 @@ const options = {
 
 options.isMobile = isMobile();
 
-let url = '../models/triangle.glb'; // or remote URL (CORS must allow)
+let url = '../models/plane.glb'; // or remote URL (CORS must allow)
 
 
 
@@ -36,7 +36,9 @@ if (options.isMobile) {
 }
 
 const data = await loadAndExtract(url);
+
 const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0]
+console.log(data);
 
 const NUMPARTICLES = WORKGROUP_X * WORKGROUP_Y * WORKGROUP_Z * THREADS_X * THREADS_Y * THREADS_Z;
 console.log('NUMPARTICLES:', NUMPARTICLES);
@@ -44,6 +46,7 @@ console.log('NUMPARTICLES:', NUMPARTICLES);
 const renderPass = new RenderPass(vert, frag, compute);
 renderPass.depthWriteEnabled = true;
 renderPass.setMesh('base_mesh', positions, colors, colorSize, uvs, normals, indices)
+// renderPass.setPlane('base_mesh')
 renderPass.setSphere('instance_mesh', { x: 0, y: 0, z: 0 }, { r: 0, g: 0, b: 0, a: 0 }, .01).instanceCount = NUMPARTICLES;
 
 const vertex_data = positions.reduce((acc, val, idx) => {
@@ -57,7 +60,7 @@ const vertex_data = positions.reduce((acc, val, idx) => {
     return acc;
 }, []);
 
-const num_triangles = vertex_data.length / 3;
+const num_triangles = indices.length / 3;
 
 console.log('num_triangles:', num_triangles);
 console.log('vertex_data:', vertex_data);
@@ -81,6 +84,8 @@ const base = {
         constants.THREADS_X = THREADS_X;
         constants.THREADS_Y = THREADS_Y;
         constants.THREADS_Z = THREADS_Z;
+
+        constants.NUMTRIANGLES = num_triangles;
 
         storages.particles.setType(`array<Particle, ${NUMPARTICLES}>`);
         storages.vertex_data

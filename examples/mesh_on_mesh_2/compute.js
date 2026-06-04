@@ -38,10 +38,9 @@ fn main(in: ComputeIn) {
 
     if(particle.init == 0){
         rand_seed.y = indexF;
-        let m = index / i32(NUMPARTICLES);
-        let a = vertex_data[m+0].xyz;
-        let b = vertex_data[m+1].xyz;
-        let c = vertex_data[m+2].xyz;
+        let a = vertex_data[0].xyz;
+        let b = vertex_data[2].xyz;
+        let c = vertex_data[3].xyz;
 
 
         let r = randomPointTriangle(a, b, c);
