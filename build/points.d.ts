@@ -264,13 +264,13 @@ export class RenderPass extends EventTarget {
      *
      */
     constructor(vertexShader: string, fragmentShader: string, computeShader: string, workgroupCountX: string, workgroupCountY: string, workgroupCountZ: string, init: any);
-    set index(value: any);
+    set index(value: null);
     /**
      * Get the current RenderPass index order in the pipeline.
      * When you add a RenderPass to the constructor or via
      * {@link Points#addRenderPass}, this is the order it receives.
      */
-    get index(): any;
+    get index(): null;
     /**
      * get the vertex shader content
      */
@@ -283,10 +283,10 @@ export class RenderPass extends EventTarget {
      * get the fragment shader content
      */
     get fragmentShader(): string;
-    set computePipeline(value: any);
-    get computePipeline(): any;
-    set renderPipeline(value: any);
-    get renderPipeline(): any;
+    set computePipeline(value: null);
+    get computePipeline(): null;
+    set renderPipeline(value: null);
+    get renderPipeline(): null;
     set computeBindGroup(value: GPUBindGroup);
     get computeBindGroup(): GPUBindGroup;
     set fragmentBindGroup(value: GPUBindGroup);
@@ -356,24 +356,24 @@ export class RenderPass extends EventTarget {
      * Useful for instanced particles driven by a Storage buffer.
      */
     get instanceCount(): number;
-    set name(val: any);
-    get name(): any;
+    set name(val: null);
+    get name(): null;
     get internal(): boolean;
     /**
      * @param {Object} val data that can be assigned to the RenderPass when
      * the {@link Points#addRenderPass} method is called.
      */
-    set params(val: any);
+    set params(val: Object);
     /**
      * Parameters specifically for Post RenderPass
      */
-    get params(): any;
+    get params(): Object;
     set vertexArray(val: Float32Array<ArrayBuffer>);
     get vertexArray(): Float32Array<ArrayBuffer>;
-    set vertexBufferInfo(val: any);
-    get vertexBufferInfo(): any;
-    set vertexBuffer(val: any);
-    get vertexBuffer(): any;
+    set vertexBufferInfo(val: null);
+    get vertexBufferInfo(): null;
+    set vertexBuffer(val: null);
+    get vertexBuffer(): null;
     /**
      * Controls whether your fragment shader can write to the depth buffer.
      * By default `true`.
@@ -685,7 +685,7 @@ export class RenderPass extends EventTarget {
         g: number;
         b: number;
         a: number;
-    }): any;
+    }): Object;
     /**
      * Adds or replaces a Torus mesh
      * @param {String} name The name will show up in the `mesh` Uniform.
@@ -710,7 +710,7 @@ export class RenderPass extends EventTarget {
         g: number;
         b: number;
         a: number;
-    }): any;
+    }): Object;
     /**
      * Adds a Cylinder mesh
      * @deprecated since v0.8.0. Use {@link setCylinder}
@@ -735,7 +735,7 @@ export class RenderPass extends EventTarget {
         g: number;
         b: number;
         a: number;
-    }): any;
+    }): Object;
     /**
      * Adds or replaces a Cylinder mesh
      * @param {String} name The name will show up in the `mesh` Uniform.
@@ -759,7 +759,7 @@ export class RenderPass extends EventTarget {
         g: number;
         b: number;
         a: number;
-    }): any;
+    }): Object;
     /**
      * Add a external mesh with the provided required data.
      * @deprecated since v0.8.0. Use {@link setMesh}
@@ -890,60 +890,70 @@ export class RenderPasses {
      * Apply a color {@link RenderPass}
      * @example
      * points.addRenderPass(RenderPasses.COLOR, { color: [.5, 1, 0, 1], blendAmount: .5 });
+     * @type {RenderPass}
      */
     static COLOR: RenderPass;
     /**
      * Apply a grayscale {@link RenderPass}
      * @example
      * points.addRenderPass(RenderPasses.GRAYSCALE);
+     * @type {RenderPass}
      */
     static GRAYSCALE: RenderPass;
     /**
      * Apply a chromatic aberration {@link RenderPass}
      * @example
      * points.addRenderPass(RenderPasses.CHROMATIC_ABERRATION, { distance: .02 });
+     * @type {RenderPass}
      */
     static CHROMATIC_ABERRATION: RenderPass;
     /**
      * Apply a pixelation {@link RenderPass}
      * @example
      * points.addRenderPass(RenderPasses.PIXELATE);
+     * @type {RenderPass}
      */
     static PIXELATE: RenderPass;
     /**
      * Apply a lens distortion {@link RenderPass}
      * @example
      * points.addRenderPass(RenderPasses.LENS_DISTORTION);
+     * @type {RenderPass}
      */
     static LENS_DISTORTION: RenderPass;
     /**
      * Apply a film grain {@link RenderPass}
      * @example
      * points.addRenderPass(RenderPasses.FILM_GRAIN);
+     * @type {RenderPass}
      */
     static FILM_GRAIN: RenderPass;
     /**
      * Apply a bloom {@link RenderPass}
      * @example
      * points.addRenderPass(RenderPasses.BLOOM);
+     * @type {RenderPass}
      */
     static BLOOM: RenderPass;
     /**
      * Apply a blur {@link RenderPass}
      * @example
      * points.addRenderPass(RenderPasses.BLUR, { resolution: [100, 100], direction: [.4, 0], radians: 0 });
+     * @type {RenderPass}
      */
     static BLUR: RenderPass;
     /**
      * Apply a waives noise {@link RenderPass}
      * @example
      * points.addRenderPass(RenderPasses.WAVES, { scale: .05 });
+     * @type {RenderPass}
      */
     static WAVES: RenderPass;
     /**
      * Apply a CRT tv pixels effect {@link RenderPass}
      * @example
      * points.addRenderPass(RenderPasses.CRT, { scale: .05 });
+     * @type {RenderPass}
      */
     static CRT: RenderPass;
 }
@@ -1118,19 +1128,19 @@ export class Storage {
      * For internal use mostly. The actual {@link GPUBuffer} with the data.
      * @memberof Storage
      */
-    set buffer(value: any);
-    get buffer(): any;
+    set buffer(value: null);
+    get buffer(): null;
     /**
      * Buffer for reading back
      * For internal use mostly. The actual GPUBufferRead with the data.
      * @memberof Storage
      */
-    set bufferRead(value: any);
-    get bufferRead(): any;
+    set bufferRead(value: null);
+    get bufferRead(): null;
     set internal(value: boolean);
     get internal(): boolean;
-    set size(value: any);
-    get size(): any;
+    set size(value: null);
+    get size(): null;
     /**
      * `updated` is set to true in data updates, but this is not true in
      * something like audio, where the data streams and needs to be updated
@@ -1182,7 +1192,7 @@ export class Storage {
      * @memberof Storage
      */
     setType(value: string): Storage;
-    read(): Promise<Float32Array<any>>;
+    read(): Promise<Float32Array<any> | null>;
     valueOf(): number | number[];
     #private;
 }
@@ -1246,7 +1256,7 @@ export class Uniform {
      * @returns {Object}
      * @memberof Uniform
      */
-    serialize(): any;
+    serialize(): Object;
     /**
      * Sets or updates the value of the Uniform.
      * @param {Number|Boolean|Array<Number>} value
@@ -1359,7 +1369,7 @@ declare class Points {
      * // your code:
      * const particles = array<Particle, NUMPARTICLES>();
      */
-    setConstant(name: string, value: string | number, type?: string): any;
+    setConstant(name: string, value: string | number, type?: string): Object;
     /**
      * Creates a persistent memory buffer across every frame call. See [GPUBuffer](https://www.w3.org/TR/webgpu/#gpubuffer)
      * <br>
@@ -1490,7 +1500,7 @@ declare class Points {
      * // wgsl string
      * let value = texturePosition(image, imageSampler, position, in.uvr, true);
      */
-    setSampler(name: string, descriptor: GPUSamplerDescriptor, shaderStage: any): any;
+    setSampler(name: string, descriptor: GPUSamplerDescriptor, shaderStage: any): Object;
     /**
      * Creates a `texture_2d` in the shaders.<br>
      * Used to write data and then print to screen.<br>
@@ -1517,7 +1527,7 @@ declare class Points {
      * );
      *
      */
-    setTexture2d(name: string, copyCurrentTexture: boolean, shaderStage: GPUShaderStage, renderPassIndex: number): any;
+    setTexture2d(name: string, copyCurrentTexture: boolean, shaderStage: GPUShaderStage, renderPassIndex: number): Object;
     /**
      * Creates a depth map from the selected `renderPassIndex`
      * @param {String} name
@@ -1525,7 +1535,7 @@ declare class Points {
      * @param {Number} renderPassIndex
      * @returns {Object}
      */
-    setTextureDepth2d(name: string, shaderStage: GPUShaderStage, renderPassIndex: number): any;
+    setTextureDepth2d(name: string, shaderStage: GPUShaderStage, renderPassIndex: number): Object;
     copyTexture(nameTextureA: any, nameTextureB: any): void;
     /**
      * Loads an image as `texture_2d` and then it will be available to read
@@ -1543,7 +1553,7 @@ declare class Points {
      * // wgsl string
      * let rgba = texturePosition(image, imageSampler, position, in.uvr, true);
      */
-    setTextureImage(name: string, path: string, shaderStage?: GPUShaderStage): any;
+    setTextureImage(name: string, path: string, shaderStage?: GPUShaderStage): Object;
     /**
      * Loads a `HTMLElement` as `texture_2d`. It will automatically interpret
      * the CSS associated with the element to render it.
@@ -1562,7 +1572,7 @@ declare class Points {
      * // wgsl string
      * let color = texture(image, imageSampler, in.uvr, true);
      */
-    setTextureElement(name: string, element: HTMLElement, shaderStage?: GPUShaderStage): any;
+    setTextureElement(name: string, element: HTMLElement, shaderStage?: GPUShaderStage): Object;
     /**
      * Loads a text string as a texture.<br>
      * Using an Atlas or a Spritesheet with UTF-16 chars (`path`) it will create a new texture
@@ -1595,7 +1605,7 @@ declare class Points {
     setTextureString(name: string, text: string, path: string, size: {
         x: number;
         y: number;
-    }, offset?: number, shaderStage?: GPUShaderStage): any;
+    }, offset?: number, shaderStage?: GPUShaderStage): Object;
     /**
      * Load images as texture_2d_array
      * @param {string} name id of the wgsl variable in the shader
@@ -1606,12 +1616,12 @@ declare class Points {
         name: string;
         copyCurrentTexture: boolean;
         shaderStage: GPUShaderStage;
-        texture: any;
+        texture: null;
         imageTextures: {
             bitmaps: ImageBitmap[];
         };
         internal: boolean;
-    }>;
+    } | undefined>;
     /**
      * Loads a video as `texture_external`and then
      * it will be available to read data from in the shaders.
@@ -1628,7 +1638,7 @@ declare class Points {
      * // wgsl string
      * let rgba = textureExternalPosition(video, imageSampler, position, in.uvr, true);
      */
-    setTextureVideo(name: string, path: string, shaderStage: GPUShaderStage): any;
+    setTextureVideo(name: string, path: string, shaderStage: GPUShaderStage): Object;
     /**
      * Loads webcam as `texture_external`and then
      * it will be available to read data from in the shaders.
@@ -1647,7 +1657,7 @@ declare class Points {
     setTextureWebcam(name: string, size: {
         width: number;
         height: number;
-    }, shaderStage: GPUShaderStage): any;
+    } | undefined, shaderStage: GPUShaderStage): Object;
     /**
      * Assigns an audio FrequencyData to a StorageMap.<br>
      * Calling setAudio creates a Storage with `name` in the wgsl shaders.<br>
@@ -1670,7 +1680,7 @@ declare class Points {
     setTextureStorage2d(name: any, shaderStage: any): {
         name: any;
         shaderStage: any;
-        texture: any;
+        texture: null;
         internal: boolean;
     };
     /**
@@ -1699,7 +1709,7 @@ declare class Points {
      * //// fragment
      * let value = texturePosition(computeTexture, imageSampler, position, uv, false);
      */
-    setBindingTexture(writeName: string, readName: string, writeIndex: number, readIndex: number, size: Array<number, 2>): any;
+    setBindingTexture(writeName: string, readName: string, writeIndex: number, readIndex: number, size: Array<number, 2>): Object;
     /**
      * Creates a Perspective camera with a given name to be used in the shaders.
      * The name is used as identifier in the shaders for the Projection and View matrices.
@@ -1816,7 +1826,7 @@ declare class Points {
      * @param {RenderPass} renderPass
      * @param {Object} params
      */
-    addRenderPass(renderPass: RenderPass, params: any): void;
+    addRenderPass(renderPass: RenderPass, params: Object): void;
     /**
      * Get the active list of {@link RenderPass}
      */
@@ -1867,7 +1877,7 @@ declare class Points {
      * @type {GPUDevice}
      */
     get device(): GPUDevice;
-    get context(): any;
+    get context(): null;
     /**
      * Triggers the app to run in full screen mode
      * @type {Boolean}
@@ -2033,7 +2043,7 @@ declare class RGBAColor {
     static average(colors: any): RGBAColor;
     static difference(c1: any, c2: any): RGBAColor;
     static colorRGBEuclideanDistance(c1: any, c2: any): number;
-    static getClosestColorInPalette(color: any, palette: any): any;
+    static getClosestColorInPalette(color: any, palette: any): null;
     constructor(r?: number, g?: number, b?: number, a?: number);
     set r(value: number);
     get r(): number;
@@ -2165,7 +2175,7 @@ declare class Constants {
      * @returns {Object}
      * @memberof Constants
      */
-    listOfOverrides(filter: GPUShaderStage | number): any;
+    listOfOverrides(filter: GPUShaderStage | number): Object;
     /**
      * List of constants formatted as WGSL string to be interpolated in the
      * shaders.

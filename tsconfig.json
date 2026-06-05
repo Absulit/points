@@ -9,12 +9,10 @@
         "allowJs": true,
         "checkJs": false, // TODO true to check types
         "outDir": "build",
-
+        "rootDir": "build",
         "target": "ES2015",
         "module": "ESNext",
-        "types": [
-            "@webgpu/types",
-        ]
+        "types": []
     },
     "files": [
         "src/types/index.d.ts",
@@ -42,5 +40,9 @@
         "build/core/sdf.js",
         "build/core/valuenoise.js",
         "build/core/voronoi.js",
+    ],
+    "include": [
+        "src/types/index.d.ts",
+        "build/**/*"
     ]
 }

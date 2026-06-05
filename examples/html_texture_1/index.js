@@ -27,15 +27,31 @@ const demo6 = {
         container.id = 'test-container';
 
         const pointsEl = document.createElement('div');
-        pointsEl.id = 'test';
+        pointsEl.classList.add('test');
         pointsEl.textContent = 'POINTS';
 
-        container.appendChild(pointsEl);
-        content.appendChild(container);
-        console.log(pointsEl);
+        const webgpuEl = pointsEl.cloneNode();
+        webgpuEl.textContent = 'WebGPU';
 
-        await points.setTextureElement('image', pointsEl);
+        container.appendChild(pointsEl);
+        container.appendChild(webgpuEl);
+
+        content.appendChild(container);
+
+
         points.setSampler('imageSampler', null);
+
+
+
+        await points.setTextureElement('pointsImage', pointsEl);
+        await points.setTextureElement('webgpuImage', webgpuEl);
+
+        const hasHTMLInCanvas = typeof GPUQueue !== 'undefined' && 'copyElementImageToTexture' in GPUQueue.prototype;
+        // hide only if it has the new HTML in Canvas feature
+        if (!hasHTMLInCanvas) {
+            pointsEl.style.visibility = 'hidden';
+            webgpuEl.style.visibility = 'hidden';
+        }
 
     },
     update: points => {
