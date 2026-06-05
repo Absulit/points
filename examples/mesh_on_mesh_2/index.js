@@ -13,11 +13,30 @@ options.isMobile = isMobile();
 
 let url = '../models/monkey_subdivide.glb'; // or remote URL (CORS must allow)
 
+let WORKGROUP_X = 8;
+let WORKGROUP_Y = 8;
+let WORKGROUP_Z = 2;
+
+let THREADS_X = 8;
+let THREADS_Y = 4;
+let THREADS_Z = 4;
+
+if (options.isMobile) {
+    WORKGROUP_X = 4;
+    WORKGROUP_Y = 2;
+    WORKGROUP_Z = 1;
+
+    THREADS_X = 8;
+    THREADS_Y = 4;
+    THREADS_Z = 4;
+
+    url = '../models/monkey.glb';
+}
 
 const data = await loadAndExtract(url);
 
 const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0]
-const num_triangles = indices.length / 3;
+const NUMTRIANGLES = indices.length / 3;
 
 const vertex_data = positions.reduce((acc, val, idx) => {
     if (idx % 3 === 0) acc.push([]);
@@ -30,33 +49,12 @@ const vertex_data = positions.reduce((acc, val, idx) => {
     return acc;
 }, []);
 
-console.log('num_triangles:', num_triangles);
-
-
-let WORKGROUP_X = 8;
-let WORKGROUP_Y = 8;
-let WORKGROUP_Z = 2;
-
-let THREADS_X = 8;
-let THREADS_Y = 4;
-let THREADS_Z = 4;
-
-if (options.isMobile) {
-    WORKGROUP_X = 1;
-    WORKGROUP_Y = 1;
-    WORKGROUP_Z = 1;
-
-    THREADS_X = 1;
-    THREADS_Y = 1;
-    THREADS_Z = 1;
-
-    url = '../models/monkey.glb';
-}
+console.log('NUMTRIANGLES:', NUMTRIANGLES);
 
 
 const NUMTHREADS = WORKGROUP_X * WORKGROUP_Y * WORKGROUP_Z * THREADS_X * THREADS_Y * THREADS_Z;
 const PARTICLESPERTRIANGLE = 1;
-const NUMPARTICLES = num_triangles * PARTICLESPERTRIANGLE;
+const NUMPARTICLES = NUMTRIANGLES * PARTICLESPERTRIANGLE;
 console.log('NUMTHREADS:', NUMTHREADS);
 console.log('NUMPARTICLES:', NUMPARTICLES);
 
@@ -95,13 +93,10 @@ const base = {
         constants.THREADS_Y = THREADS_Y;
         constants.THREADS_Z = THREADS_Z;
 
-        constants.NUMTRIANGLES = num_triangles;
+        constants.NUMTRIANGLES = NUMTRIANGLES;
         constants.PARTICLESPERTRIANGLE.setValue(PARTICLESPERTRIANGLE).setType('i32');
 
         storages.particles.setType(`array<Particle, ${NUMPARTICLES}>`);
-        storages.vertex_data
-            .setType(`array<vec4f, ${vertex_data.length}>`)
-            .setValue(vertex_data.flat());
 
         storages.triangles
             .setType(`array<Triangle, ${triangles.length}>`)

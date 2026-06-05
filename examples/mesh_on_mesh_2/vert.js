@@ -25,8 +25,6 @@ fn main(in: VertexIn) -> FragmentIn {
     let angleY = params.time * 0.94222;
     let angleZ = params.time * 0.9854;
 
-    let p = vertex_data[in.instanceIndex];
-
     let rotX = rotXAxis(0);
     let rotY = rotYAxis(angleY);
     let rotZ = rotZAxis(0);

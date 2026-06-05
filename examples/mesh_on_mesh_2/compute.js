@@ -37,18 +37,21 @@ fn main(in: ComputeIn) {
 
     let indexF = f32(index);
 
-    let triangle = triangles[index];
+    let triangle = &triangles[index];
     let a = triangle.a.xyz;
     let b = triangle.b.xyz;
     let c = triangle.c.xyz;
-    rand_seed.y = indexF;;
-    for(var k = 0; k < PARTICLESPERTRIANGLE; k++){
-        let particle = &particles[k + index * PARTICLESPERTRIANGLE];
-        if(particle.init == 0){
-            let r = randomPointTriangle(a, b, c);
-            particle.position = r;
-            particle.init = 1;
+    if(triangle.a.w == 0){
+        rand_seed.y = indexF;
+        for(var k = 0; k < PARTICLESPERTRIANGLE; k++){
+            let particle = &particles[k + index * PARTICLESPERTRIANGLE];
+            if(particle.init == 0){
+                let r = randomPointTriangle(a, b, c);
+                particle.position = r;
+                particle.init = 1;
+            }
         }
+        triangle.a.w = 1;
     }
 
 }
