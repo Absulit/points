@@ -38,61 +38,70 @@ declare class RenderPasses {
      * Apply a color {@link RenderPass}
      * @example
      * points.addRenderPass(RenderPasses.COLOR, { color: [.5, 1, 0, 1], blendAmount: .5 });
+     * @type {RenderPass}
      */
-    static COLOR: any;
+    static COLOR: RenderPass;
     /**
      * Apply a grayscale {@link RenderPass}
      * @example
      * points.addRenderPass(RenderPasses.GRAYSCALE);
+     * @type {RenderPass}
      */
-    static GRAYSCALE: any;
+    static GRAYSCALE: RenderPass;
     /**
      * Apply a chromatic aberration {@link RenderPass}
      * @example
      * points.addRenderPass(RenderPasses.CHROMATIC_ABERRATION, { distance: .02 });
+     * @type {RenderPass}
      */
-    static CHROMATIC_ABERRATION: any;
+    static CHROMATIC_ABERRATION: RenderPass;
     /**
      * Apply a pixelation {@link RenderPass}
      * @example
      * points.addRenderPass(RenderPasses.PIXELATE);
+     * @type {RenderPass}
      */
-    static PIXELATE: any;
+    static PIXELATE: RenderPass;
     /**
      * Apply a lens distortion {@link RenderPass}
      * @example
      * points.addRenderPass(RenderPasses.LENS_DISTORTION);
+     * @type {RenderPass}
      */
-    static LENS_DISTORTION: any;
+    static LENS_DISTORTION: RenderPass;
     /**
      * Apply a film grain {@link RenderPass}
      * @example
      * points.addRenderPass(RenderPasses.FILM_GRAIN);
+     * @type {RenderPass}
      */
-    static FILM_GRAIN: any;
+    static FILM_GRAIN: RenderPass;
     /**
      * Apply a bloom {@link RenderPass}
      * @example
      * points.addRenderPass(RenderPasses.BLOOM);
+     * @type {RenderPass}
      */
-    static BLOOM: any;
+    static BLOOM: RenderPass;
     /**
      * Apply a blur {@link RenderPass}
      * @example
      * points.addRenderPass(RenderPasses.BLUR, { resolution: [100, 100], direction: [.4, 0], radians: 0 });
+     * @type {RenderPass}
      */
-    static BLUR: any;
+    static BLUR: RenderPass;
     /**
      * Apply a waives noise {@link RenderPass}
      * @example
      * points.addRenderPass(RenderPasses.WAVES, { scale: .05 });
+     * @type {RenderPass}
      */
-    static WAVES: any;
+    static WAVES: RenderPass;
     /**
      * Apply a CRT tv pixels effect {@link RenderPass}
      * @example
      * points.addRenderPass(RenderPasses.CRT, { scale: .05 });
+     * @type {RenderPass}
      */
     static CRT: RenderPass;
 }
-import { RenderPass } from 'points';

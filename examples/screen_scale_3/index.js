@@ -35,8 +35,8 @@ const base = {
         const { uniforms } = points;
 
         points.setSampler('imageSampler', null);
-        await points.setTextureImage('bgTexture', './../../img/angel_600x600.jpg');
-        await points.setTextureImage('fgTexture', './../../img/pexels-kindel-media-7149147.jpg');
+        await points.setTextureImage('bgTexture', './../img/angel_600x600.jpg');
+        await points.setTextureImage('fgTexture', './../img/pexels-kindel-media-7149147.jpg');
 
 
         uniforms.scale.setType('vec3f').setValue([options.scaleX, options.scaleY, 1]);

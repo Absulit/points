@@ -827,20 +827,12 @@ class Points {
             }
             this.#textureUpdated = true;
             texture2dToUpdate.imageTexture.bitmap = imageBitmap;
-            const cubeTexture = this.#device.createTexture({
-                label: '_cubeTexture setTextureImage',
-                size: [imageBitmap.width, imageBitmap.height, 1],
-                format: 'rgba8unorm',
-                usage:
-                    GPUTextureUsage.TEXTURE_BINDING |
-                    GPUTextureUsage.COPY_SRC |
-                    GPUTextureUsage.COPY_DST |
-                    GPUTextureUsage.RENDER_ATTACHMENT,
-            });
+            const { width, height } = imageBitmap;
+            const cubeTexture = this.#createTextureForImage(width, height, 'setTextureImage');
             this.#device.queue.copyExternalImageToTexture(
                 { source: imageBitmap },
                 { texture: cubeTexture },
-                [imageBitmap.width, imageBitmap.height]
+                [width, height]
             );
             texture2dToUpdate.texture = cubeTexture;
             return texture2dToUpdate;
@@ -859,6 +851,51 @@ class Points {
         this.#textures2d.push(texture2d);
         return texture2d;
     }
+
+
+    async #setTextureElementImage(name, element, shaderStage = null) {
+        const { offsetWidth: width, offsetHeight: height } = element;
+        const texture2dToUpdate = this.#nameExists(this.#textures2d, name);
+        if (shaderStage) {
+            throw '`setTextureElementImage()` the param `shaderStage` should not be updated after its creation.';
+        }
+        // this.#textureUpdated = true;
+        // // texture2dToUpdate.imageTexture.bitmap = imageBitmap;
+        // console.log(this.#device);
+
+        // const cubeTexture = this.#device.createTexture({
+        //     label: '_cubeTexture setTextureElementImage',
+        //     size: [width, height, 1],
+        //     format: 'rgba8unorm',
+        //     usage:
+        //         GPUTextureUsage.TEXTURE_BINDING |
+        //         GPUTextureUsage.COPY_SRC |
+        //         GPUTextureUsage.COPY_DST |
+        //         GPUTextureUsage.RENDER_ATTACHMENT,
+        // });
+        // this.#device.queue.copyElementImageToTexture(
+        //     element,
+        //     { texture: cubeTexture },
+        //     // [width, height]
+        // );
+        // if (texture2dToUpdate) {
+        //     texture2dToUpdate.texture = cubeTexture;
+        //     return texture2dToUpdate
+        // }
+        const texture2d = {
+            name: name,
+            copyCurrentTexture: false,
+            shaderStage: shaderStage,
+            texture: null,
+            renderPassIndex: null,
+            imageTexture: null,
+            element,
+            internal: false
+        }
+        this.#textures2d.push(texture2d);
+        return texture2d;
+    }
+
 
     /**
      * Loads a `HTMLElement` as `texture_2d`. It will automatically interpret
@@ -879,6 +916,13 @@ class Points {
      * let color = texture(image, imageSampler, in.uvr, true);
      */
     async setTextureElement(name, element, shaderStage = null) {
+        const hasHTMLInCanvas = typeof GPUQueue !== 'undefined' && 'copyElementImageToTexture' in GPUQueue.prototype;
+
+        if (hasHTMLInCanvas) {
+            this.#canvas.appendChild(element);
+            return await this.#setTextureElementImage(name, element);
+        }
+
         const styles = getCSS(element);
         const cssText = styles.map(style => style.cssText).join('\n');
         const path = await elToImage(element, cssText);
@@ -1945,16 +1989,8 @@ class Points {
         this.#textures2d.forEach(texture2d => {
             if (texture2d.imageTexture) {
                 const imageBitmap = texture2d.imageTexture.bitmap;
-                const cubeTexture = this.#device.createTexture({
-                    label: `_createBuffers, textures2d: ${texture2d.name}`,
-                    size: [imageBitmap.width, imageBitmap.height, 1],
-                    format: 'rgba8unorm',
-                    usage:
-                        GPUTextureUsage.TEXTURE_BINDING |
-                        GPUTextureUsage.COPY_SRC |
-                        GPUTextureUsage.COPY_DST |
-                        GPUTextureUsage.RENDER_ATTACHMENT,
-                });
+                const { width, height } = imageBitmap;
+                const cubeTexture = this.#createTextureForImage(width, height, texture2d.name);
                 this.#device.queue.copyExternalImageToTexture(
                     { source: imageBitmap },
                     { texture: cubeTexture },
@@ -1962,6 +1998,34 @@ class Points {
                 );
                 texture2d.texture = cubeTexture;
                 // } else if (texture2d.copyCurrentTexture) {
+            } else if (texture2d.element) {
+                const { element, name } = texture2d;
+                const { offsetWidth: width, offsetHeight: height } = element;
+
+                const cubeTexture = this.#createTextureForImage(width, height, name);
+
+                this.#canvas.addEventListener('paint', e => {
+                    if (e.changedElements.includes(element)) {
+                        const { offsetWidth: width, offsetHeight: height } = element;
+
+                        const cubeTexture = this.#createTextureForImage(width, height, name);
+
+                        this.#device.queue.copyElementImageToTexture(
+                            { source: element },
+                            { destination: { texture: cubeTexture } },
+                            [width, height]
+                        );
+
+                        const transform = this.#canvas.getElementTransform(element, new DOMMatrix());
+                        element.style.transform = transform.toString();
+                        texture2d.texture = cubeTexture;
+                        this.#textureUpdated = true;
+                    }
+
+                })
+                this.#canvas.requestPaint();
+                texture2d.texture = cubeTexture;
+                this.#textureUpdated = true;
             } else {
                 this.#createTextureBindingToCopy(texture2d);
             }
@@ -2015,6 +2079,19 @@ class Points {
                 format: 'rgba8unorm',
                 usage: GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
             });
+        });
+    }
+
+    #createTextureForImage(width, height, labelName = '') {
+        return this.#device.createTexture({
+            label: `_#createTextureForImage: ${labelName}`,
+            size: [width, height, 1],
+            format: 'rgba8unorm',
+            usage:
+                GPUTextureUsage.TEXTURE_BINDING |
+                GPUTextureUsage.COPY_SRC |
+                GPUTextureUsage.COPY_DST |
+                GPUTextureUsage.RENDER_ATTACHMENT,
         });
     }
 

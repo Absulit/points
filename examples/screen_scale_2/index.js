@@ -27,8 +27,8 @@ const base = {
         points.scaleMode = ScaleMode.COVER;
 
         points.setSampler('imageSampler', null);
-        await points.setTextureImage('bgTexture', './../../img/angel_600x600.jpg');
-        await points.setTextureImage('meshTexture', './../../img/house_512x512.jpg');
+        await points.setTextureImage('bgTexture', './../img/angel_600x600.jpg');
+        await points.setTextureImage('meshTexture', './../img/house_512x512.jpg');
 
         points.setCameraPerspective('camera', [0, 0, 5], [0, 0, 0])
 

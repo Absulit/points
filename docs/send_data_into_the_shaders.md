@@ -220,6 +220,9 @@ let color = texture(image, mySampler, in.uvr, true);
 ```
 [🔗 see HTML Texture 1 Example](https://absulit.github.io/points/examples/index.html#html_texture_1)
 
+With the introduction of [HTML in Canvas](https://developer.chrome.com/blog/html-in-canvas-origin-trial) this method has changed a little, if the support exists in the browser it will be used, if there's no support, it will fallback to the regular functionality described above. HTML in Canvas provides a better way to render HTML as a texture inside WebGPU, to the point you can interact with it, like selecting text and input, and changes made to the element will update the texture.
+
+
 ## TextureImage - setTextureString
 
 With the help of an associated sprite/atlas in UTF-16 chars, it will load the string of characters as a single image.
