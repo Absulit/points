@@ -11,7 +11,7 @@ const options = {
 
 options.isMobile = isMobile();
 
-let url = '../models/monkey.glb'; // or remote URL (CORS must allow)
+let url = '../models/monkey_subdivide.glb'; // or remote URL (CORS must allow)
 
 
 const data = await loadAndExtract(url);
@@ -31,12 +31,10 @@ const vertex_data = positions.reduce((acc, val, idx) => {
 }, []);
 
 console.log('num_triangles:', num_triangles);
-// console.log('vertex_data:', vertex_data);
-// console.log('indices:', indices);
 
 
-let WORKGROUP_X = 2;
-let WORKGROUP_Y = 2;
+let WORKGROUP_X = 8;
+let WORKGROUP_Y = 8;
 let WORKGROUP_Z = 2;
 
 let THREADS_X = 8;
@@ -52,14 +50,12 @@ if (options.isMobile) {
     THREADS_Y = 1;
     THREADS_Z = 1;
 
-    url = '../models/triangle.glb';
+    url = '../models/monkey.glb';
 }
 
 
-console.log(data);
-
 const NUMTHREADS = WORKGROUP_X * WORKGROUP_Y * WORKGROUP_Z * THREADS_X * THREADS_Y * THREADS_Z;
-const PARTICLESPERTRIANGLE = 32;
+const PARTICLESPERTRIANGLE = 1;
 const NUMPARTICLES = num_triangles * PARTICLESPERTRIANGLE;
 console.log('NUMTHREADS:', NUMTHREADS);
 console.log('NUMPARTICLES:', NUMPARTICLES);
@@ -67,25 +63,19 @@ console.log('NUMPARTICLES:', NUMPARTICLES);
 const renderPass = new RenderPass(vert, frag, compute, WORKGROUP_X, WORKGROUP_Y, WORKGROUP_Z);
 renderPass.depthWriteEnabled = true;
 renderPass.setMesh('base_mesh', positions, colors, colorSize, uvs, normals, indices)
-// renderPass.setPlane('base_mesh')
+// renderPass.setCube('instance_mesh', { x: 0, y: 0, z: 0 }, { width: .005, height: .005, depth: .005, }).instanceCount = NUMPARTICLES;
 renderPass.setSphere('instance_mesh', { x: 0, y: 0, z: 0 }, { r: 0, g: 0, b: 0, a: 0 }, .01).instanceCount = NUMPARTICLES;
-
 
 const triangle_indices = indices.reduce((acc, val, idx) => {
     if (idx % 3 === 0) acc.push([]);
     acc[acc.length - 1].push(val);
     return acc;
 }, []);
-// console.log('triangle_indices:', triangle_indices);
 
 const triangles = triangle_indices.map(ti => {
     const triangle = [vertex_data[ti[0]], vertex_data[ti[1]], vertex_data[ti[2]]];
     return triangle;
 })
-
-// console.log('triangles:', triangles);
-console.log('triangles:', triangles.flat(2).length);
-
 
 const base = {
     renderPasses: [
@@ -98,7 +88,6 @@ const base = {
         const { uniforms, storages, constants } = points;
         points.import(structs);
 
-        constants.NUMPARTICLES = NUMPARTICLES;
         constants.WORKGROUP_X = WORKGROUP_X;
         constants.WORKGROUP_Y = WORKGROUP_Y;
         constants.WORKGROUP_Z = WORKGROUP_Z;
@@ -120,9 +109,8 @@ const base = {
 
         uniforms.visibility = options.visibility;
 
-        folder.add(options, 'visibility').name('visibility').onChange(value => {
-            uniforms.visibility = value;
-        });
+        folder.add(options, 'visibility').name('visibility')
+            .onChange(value => uniforms.visibility = value);
 
         points.setCameraPerspective('camera');
 
