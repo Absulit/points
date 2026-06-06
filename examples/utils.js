@@ -50,6 +50,7 @@ export async function loadAndExtract(url) {
 
     const root = doc.getRoot();
     const meshes = root.listMeshes();
+    const animations = root.listAnimations();
     const results = [];
 
     for (const mesh of meshes) {
@@ -64,6 +65,9 @@ export async function loadAndExtract(url) {
             const normals = getAttrArray('NORMAL');        // Float32Array | null
             const uvs = getAttrArray('TEXCOORD_0');    // Float32Array | null
             const colors = getAttrArray('COLOR_0');       // Float32Array | null
+
+            const joints    = getAttrArray('JOINTS_0');
+            const weights   = getAttrArray('WEIGHTS_0');
 
             const indices = prim.getIndices() ? prim.getIndices().getArray() : null; // Uint16Array|Uint32Array|null
             let texture = null;
@@ -109,7 +113,10 @@ export async function loadAndExtract(url) {
                 colors,
                 indices,
                 colorSize,
-                texture
+                texture,
+                joints,
+                weights,
+                animations
             });
         }
     }
