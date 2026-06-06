@@ -12,6 +12,7 @@ const url = '../models/Soldier.glb'; // or remote URL (CORS must allow)
 const data = await loadAndExtract(url);
 const { positions, colors, uvs, normals, indices, colorSize, texture, animations, weights, joints, skins } = data[0]
 
+
 const cube_renderpass = new RenderPass(vert, frag);
 cube_renderpass.setMesh('monkey', positions, colors, colorSize, uvs, normals, indices)
 cube_renderpass.depthWriteEnabled = true;
@@ -19,7 +20,7 @@ cube_renderpass.clearValue = { r: 61 / 255, g: 37 / 255, b: 103 / 255, a: 1 }
 
 import { mat4, vec3, quat } from 'https://unpkg.com/gl-matrix@latest?module';
 
-let animationDuration = getAnimationDuration(animations[0]);
+let animationDuration = getAnimationDuration(animations[1]);
 console.log(animationDuration);
 
 
@@ -139,6 +140,14 @@ function getAnimationDuration(animation) {
     return maxTime;
 }
 
+function padUint8ArrayToU32Layout(rawJoints) {
+    const totalElements = rawJoints.length;
+    const paddedArray = new Uint8Array(totalElements * 4);
+    for (let i = 0; i < totalElements; i++) {
+        paddedArray[i * 4] = rawJoints[i];
+    }
+    return paddedArray;
+}
 
 const base = {
     renderPasses: [
@@ -160,9 +169,18 @@ const base = {
             uniforms.color_mode = +value;
         });
 
+        console.log(weights);
+        console.log(joints);
+
+        const j = padUint8ArrayToU32Layout(joints);
+
         storages.weights.setType(`array<vec4f>`).setValue(Array.from(weights));
-        storages.joints.setType('array<vec4u>').setValue(Array.from(joints));
-        storages.boneMatrices.setType('array<mat4x4f>').setValue(Array(784).fill(0))
+        storages.joints.setType('array<vec4u>').setValue(Array.from(j));
+
+        const boneData = calculateBoneMatrices(skins[0], animations[1], 0);
+        console.log(boneData);
+
+        storages.boneMatrices.setType('array<mat4x4f>').setValue(Array.from(boneData))
 
         points.setCameraPerspective('camera');
 
@@ -179,8 +197,8 @@ const base = {
         const { storages } = points;
         points.setCameraPerspective('camera', [0, 1, 5], [0, 1, 0]);
 
-        const currentTime = (t / 1000) % animationDuration;
-        const boneData = calculateBoneMatrices(skins[0], animations[0], currentTime);
+        const currentTime = t % animationDuration;
+        const boneData = calculateBoneMatrices(skins[0], animations[1], currentTime);
 
         storages.boneMatrices.setValue(Array.from(boneData));
 
