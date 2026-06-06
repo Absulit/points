@@ -8,7 +8,7 @@ const options = {
     mode: 1
 }
 
-const url = '../models/monkey.glb'; // or remote URL (CORS must allow)
+const url = '../models/Soldier.glb'; // or remote URL (CORS must allow)
 const data = await loadAndExtract(url);
 const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0]
 
@@ -49,7 +49,7 @@ const base = {
      * @param {Points} points
      */
     update: points => {
-        points.setCameraPerspective('camera', [0, 0, 5]);
+        points.setCameraPerspective('camera', [0, 1, 5], [0, 1, 0]);
     }
 }
 
