@@ -10,7 +10,7 @@ const options = {
 
 const url = '../models/Soldier.glb'; // or remote URL (CORS must allow)
 const data = await loadAndExtract(url);
-const { positions, colors, uvs, normals, indices, colorSize, texture, animations, weights, joints } = data[0]
+const { positions, colors, uvs, normals, indices, colorSize, texture, animations, weights, joints, skins } = data[0]
 
 const cube_renderpass = new RenderPass(vert, frag);
 cube_renderpass.setMesh('monkey', positions, colors, colorSize, uvs, normals, indices)
