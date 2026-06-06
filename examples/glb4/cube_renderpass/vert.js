@@ -11,8 +11,20 @@ const SCALE = .01;
 
 @vertex
 fn main(in: VertexIn) -> FragmentIn {
+
+    let joint = joints[in.vertexIndex];
+    let weight = weights[in.vertexIndex];
+
+    let skinMatrix =
+        boneMatrices[joint.x] * f32(weight.x) +
+        boneMatrices[joint.y] * f32(weight.y) +
+        boneMatrices[joint.z] * f32(weight.z) +
+        boneMatrices[joint.w] * f32(weight.w);
+
+    let skinnedPosition = skinMatrix * vec4f(in.position.xyz, 1);
+
     // var angleZ = params.time * 0.9854;
-    var angleY = params.time * 0.94222;
+    // var angleY = params.time * 0.94222;
     // var angleX = params.time * 0.865;
 
 
