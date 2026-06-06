@@ -10,7 +10,7 @@ const options = {
 
 const url = '../models/Soldier.glb'; // or remote URL (CORS must allow)
 const data = await loadAndExtract(url);
-const { positions, colors, uvs, normals, indices, colorSize, texture } = data[0]
+const { positions, colors, uvs, normals, indices, colorSize, texture, animations, weights, joints } = data[0]
 
 const cube_renderpass = new RenderPass(vert, frag);
 cube_renderpass.setMesh('monkey', positions, colors, colorSize, uvs, normals, indices)
@@ -25,7 +25,7 @@ const base = {
      * @param {Points} points
      */
     init: async (points, folder) => {
-        const { uniforms } = points;
+        const { uniforms, storages } = points;
         await points.setTextureImage('albedo', texture);
         points.setSampler('imageSampler', null);
 
@@ -36,6 +36,10 @@ const base = {
             console.log(value);
             uniforms.color_mode = +value;
         });
+
+
+        storages.weights.setType('array<vec4f>').setValue(weights);
+        storages.joints.setType('array<vec4f>').setValue(joints);
 
         points.setCameraPerspective('camera');
 
