@@ -11,28 +11,21 @@ const SCALE = .01;
 
 @vertex
 fn main(in: VertexIn) -> FragmentIn {
-    let joint = joints[in.vertexIndex];
+    let joint = vec4u(joints[in.vertexIndex]);
     let weight = weights[in.vertexIndex];
 
-    let skinMatrix =
-        boneMatrices[joint.x] * weight.x +
-        boneMatrices[joint.y] * weight.y +
-        boneMatrices[joint.z] * weight.z +
-        boneMatrices[joint.w] * weight.w;
+let skinMatrix =
+    weight.x * boneMatrices[joint.x] +
+    weight.y * boneMatrices[joint.y] +
+    weight.z * boneMatrices[joint.z] +
+    weight.w * boneMatrices[joint.w];
 
-    let skinnedPosition = skinMatrix * vec4f(in.position.xyz, 1.0);
-    let skinnedNormal   = skinMatrix * vec4f(in.normal.xyz,   0.0);
+    let skinnedPosition = skinMatrix * vec4f(in.position.xyz, 1);
+    let skinnedNormal   = mat3x3f(skinMatrix[0].xyz, skinMatrix[1].xyz, skinMatrix[2].xyz) * in.normal;
 
-    let rotX = rotXAxis(-TAU * 0.25);
-    let rotY = rotYAxis(TAU * 0.5);
-    let rotZ = rotZAxis(0.0);
-    let modelMatrix = rotX * rotY * rotZ;
+    let clip = camera.camera_projection * camera.camera_view * skinnedPosition;
 
-    let worldPosition = (modelMatrix * skinnedPosition).xyz * SCALE;
-
-    let clip = camera.camera_projection * camera.camera_view * vec4f(worldPosition, 1.0);
-
-    let newNormal = normalize((modelMatrix * skinnedNormal).xyz);
+    let newNormal = normalize(in.normal);
 
     var dvb = defaultVertexBody(clip, in.color, in.uv, newNormal);
     dvb.id = in.id;

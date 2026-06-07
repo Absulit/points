@@ -3,6 +3,7 @@ import Points, { RenderPass, RenderPasses } from 'points';
 import { loadAndExtract } from 'utils';
 import vert from './cube_renderpass/vert.js';
 import frag from './cube_renderpass/frag.js';
+import { Node } from 'https://unpkg.com/@gltf-transform/core@latest?module';
 
 const options = {
     mode: 1
@@ -21,8 +22,6 @@ cube_renderpass.clearValue = { r: 61 / 255, g: 37 / 255, b: 103 / 255, a: 1 }
 import { mat4, vec3, quat } from 'https://unpkg.com/gl-matrix@latest?module';
 
 let animationDuration = getAnimationDuration(animations[1]);
-console.log(animationDuration);
-
 
 function calculateBoneMatrices(skin, animation, currentTime) {
     const joints = skin.listJoints();
@@ -35,7 +34,8 @@ function calculateBoneMatrices(skin, animation, currentTime) {
     for (let i = 0; i < numJoints; i++) {
         const jointNode = joints[i];
         const globalMatrix = computeGlobalMatrix(jointNode, animation, currentTime, globalMatrixCache);
-        const inverseBindMatrix = ibmAccessor.getElement(i, []);
+        const ibmValues = ibmAccessor.getElement(i, []);
+        const inverseBindMatrix = mat4.clone(ibmValues);
         const finalBoneMatrix = mat4.create();
 
         mat4.multiply(finalBoneMatrix, globalMatrix, inverseBindMatrix);
@@ -54,7 +54,7 @@ function computeGlobalMatrix(node, animation, currentTime, cache) {
     const parentNode = node.listParents().find(parent => parent instanceof Node);
     let globalMatrix = mat4.create();
 
-    if (parentNode && parentNode.getType() === 'Node') {
+    if (parentNode) {
         const parentGlobal = computeGlobalMatrix(parentNode, animation, currentTime, cache);
         mat4.multiply(globalMatrix, parentGlobal, localMatrix);
     } else {
@@ -110,11 +110,11 @@ function sampleAnimationSampler(sampler, currentTime) {
 
     if (valA.length === 4) {
         const outQuat = quat.create();
-        quat.slerp(outQuat, valA, valB, t);
+        quat.slerp(outQuat, quat.clone(valA), quat.clone(valB), t);
         return outQuat;
     } else {
         const outVec = vec3.create();
-        vec3.lerp(outVec, valA, valB, t);
+        vec3.lerp(outVec, vec3.clone(valA), vec3.clone(valB), t);
         return outVec;
     }
 }
@@ -169,16 +169,13 @@ const base = {
             uniforms.color_mode = +value;
         });
 
-        console.log(weights);
-        console.log(joints);
-
-        const j = padUint8ArrayToU32Layout(joints);
 
         storages.weights.setType(`array<vec4f>`).setValue(Array.from(weights));
-        storages.joints.setType('array<vec4u>').setValue(Array.from(j));
+        // TODO: using vec4u has an issue because internally I convert all arrays to Float32Array
+        // when calling storageItem.value
+        storages.joints.setType('array<vec4f>').setValue(Array.from(joints));
 
         const boneData = calculateBoneMatrices(skins[0], animations[1], 0);
-        console.log(boneData);
 
         storages.boneMatrices.setType('array<mat4x4f>').setValue(Array.from(boneData))
 
