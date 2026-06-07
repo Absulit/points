@@ -140,15 +140,6 @@ function getAnimationDuration(animation) {
     return maxTime;
 }
 
-function padUint8ArrayToU32Layout(rawJoints) {
-    const totalElements = rawJoints.length;
-    const paddedArray = new Uint8Array(totalElements * 4);
-    for (let i = 0; i < totalElements; i++) {
-        paddedArray[i * 4] = rawJoints[i];
-    }
-    return paddedArray;
-}
-
 const base = {
     renderPasses: [
         cube_renderpass,
