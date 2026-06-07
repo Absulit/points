@@ -772,7 +772,7 @@ class RenderPass extends EventTarget {
                 ];
 
                 quad.forEach(({ position: [vx, vy, vz], uv: [u, v] }, i) => {
-                    this.#vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normal, id, ...BARYCENTRICS[i % 3]);
+                    this.#vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normal, id, ...BARYCENTRICS[i % 3], ...EMPTY, ...EMPTY);
                 })
             }
         }
@@ -852,7 +852,7 @@ class RenderPass extends EventTarget {
                 ];
 
                 quad.forEach(({ position: [vx, vy, vz], uv: [u, v] }, i) => {
-                    vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normal, id, ...BARYCENTRICS[i % 3]);
+                    vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normal, id, ...BARYCENTRICS[i % 3], ...EMPTY, ...EMPTY);
                 })
             }
         }
@@ -960,7 +960,7 @@ class RenderPass extends EventTarget {
             ];
 
             verts.forEach(([[vx, vy, vz], [u, v]], i) => {
-                this.#vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normals, this.#meshCounter, ...BARYCENTRICS[i % 3]);
+                this.#vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normals, this.#meshCounter, ...BARYCENTRICS[i % 3], ...EMPTY, ...EMPTY);
             })
         }
 
@@ -1061,7 +1061,7 @@ class RenderPass extends EventTarget {
             ];
 
             verts.forEach(([[vx, vy, vz], [u, v]], i) => {
-                vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normals, meshCounter, ...BARYCENTRICS[i % 3], [0, 0, 0, 1], [0, 0, 0, 1]);
+                vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normals, meshCounter, ...BARYCENTRICS[i % 3], ...EMPTY, ...EMPTY);
             })
         }
 
@@ -1139,7 +1139,7 @@ class RenderPass extends EventTarget {
                 const u = lon / segments;
                 const v = lat / rings;
 
-                vertexGrid[lat][lon] = [vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, this.#meshCounter];
+                vertexGrid[lat][lon] = [vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, this.#meshCounter, ...EMPTY, ...EMPTY];
             }
         }
 
@@ -1245,9 +1245,14 @@ class RenderPass extends EventTarget {
                 const v4 = vertexGrid[lat][lon + 1];
 
                 // triangle 1
-                vertexArray.push(...v1, ...b0, ...v3, ...b1, ...v2, ...b2);
+                vertexArray.push(...v1, ...b0, ...EMPTY, ...EMPTY);
+                vertexArray.push(...v3, ...b1, ...EMPTY, ...EMPTY);
+                vertexArray.push(...v2, ...b2, ...EMPTY, ...EMPTY);
+
                 // triangle 2
-                vertexArray.push(...v1, ...b0, ...v4, ...b1, ...v3, ...b2);
+                vertexArray.push(...v1, ...b0, ...EMPTY, ...EMPTY);
+                vertexArray.push(...v4, ...b1, ...EMPTY, ...EMPTY);
+                vertexArray.push(...v3, ...b2, ...EMPTY, ...EMPTY);
             }
         }
 
@@ -1347,7 +1352,7 @@ class RenderPass extends EventTarget {
                 const [vx, vy, vz] = vertices[i];
                 const [nx, ny, nz] = normals[i];
                 const [u, v] = uvs[i];
-                this.#vertexArray.push(vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, this.#meshCounter, ...BARYCENTRICS[i % 3]);
+                this.#vertexArray.push(vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, this.#meshCounter, ...BARYCENTRICS[i % 3], ...EMPTY, ...EMPTY);
             }
         }
 
@@ -1441,7 +1446,7 @@ class RenderPass extends EventTarget {
                 const [vx, vy, vz] = vertices[i];
                 const [nx, ny, nz] = normals[i];
                 const [u, v] = uvs[i];
-                vertexArray.push(vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, meshCounter, ...BARYCENTRICS[i % 3]);
+                vertexArray.push(vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, meshCounter, ...BARYCENTRICS[i % 3], ...EMPTY, ...EMPTY);
             }
         }
 
@@ -1576,7 +1581,7 @@ class RenderPass extends EventTarget {
                 const [vx, vy, vz] = vertices[i];
                 const [nx, ny, nz] = normals[i];
                 const [u, v] = uvs[i];
-                this.#vertexArray.push(vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, this.#meshCounter, ...BARYCENTRICS[k % 3]);
+                this.#vertexArray.push(vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, this.#meshCounter, ...BARYCENTRICS[k % 3], ...EMPTY, ...EMPTY);
             })
         }
 
@@ -1704,7 +1709,7 @@ class RenderPass extends EventTarget {
                 const [vx, vy, vz] = vertices[i];
                 const [nx, ny, nz] = normals[i];
                 const [u, v] = uvs[i];
-                vertexArray.push(vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, meshCounter, ...BARYCENTRICS[k % 3]);
+                vertexArray.push(vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, meshCounter, ...BARYCENTRICS[k % 3], ...EMPTY, ...EMPTY);
             })
         }
 
