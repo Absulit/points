@@ -2212,6 +2212,18 @@ class Points {
                                         offset: renderPass.vertexBufferInfo.barycentricsOffset,
                                         format: 'float32x3',
                                     },
+                                    {
+                                        // joint
+                                        shaderLocation: 6,
+                                        offset: renderPass.vertexBufferInfo.jointOffset,
+                                        format: 'uint32x4',
+                                    },
+                                    {
+                                        // weight
+                                        shaderLocation: 7,
+                                        offset: renderPass.vertexBufferInfo.weightOffset,
+                                        format: 'float32x4',
+                                    },
                                 ],
                             },
                         ],

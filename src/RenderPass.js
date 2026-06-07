@@ -1803,25 +1803,92 @@ class RenderPass extends EventTarget {
      * renderPass.depthWriteEnabled = true;
      *
      */
-    setMesh(name, vertices, colors, colorSize, uvs, normals, indices) {
+    setMesh(name, vertices, colors, colorSize, uvs, normals, indices, animData = null) {
         const meshExists = this.#nameExists(this.#meshes, name);
-
         const verticesCount = indices.length;
-
-        const vertexArray = [];
+        // let vertexArray = [];
         const meshCounter = meshExists ? meshExists.id : this.#meshCounter;
+
+        const animated = !!animData;
+        const { animations = [], joints = [], weights = [], skins = [] } = animData || {};
+
+        const FLOATS_PER_VERTEX = 25;
+        const vertexArray = new Float32Array(verticesCount * FLOATS_PER_VERTEX);
+        let offset = 0;
         for (let i = 0; i < verticesCount; i++) {
+            // const index = indices[i];
+            // const vertex = vertices.slice(index * 3, index * 3 + 3);
+
+            // const color = colors?.slice(index * colorSize, index * colorSize + colorSize);
+            // const uv = uvs.slice(index * 2, index * 2 + 2);
+            // const normal = normals.slice(index * 3, index * 3 + 3);
+            //
+
             const index = indices[i];
-            const vertex = vertices.slice(index * 3, index * 3 + 3);
 
-            const color = colors?.slice(index * colorSize, index * colorSize + colorSize);
-            const uv = uvs.slice(index * 2, index * 2 + 2);
-            const normal = normals.slice(index * 3, index * 3 + 3);
+            const idx3 = index * 3;
+            const idx2 = index * 2;
+            const idxColor = index * colorSize;
 
-            const [x, y, z] = vertex;
-            const [r, g, b] = color || [1, 0, 1];
-            const [u, v] = uv;
-            vertexArray.push(+x, +y, +z, 1, r, g, b, 1, u, v, ...normal, meshCounter, ...BARYCENTRICS[i % 3]);
+            // --- position ---
+            vertexArray[offset++] = vertices[idx3];
+            vertexArray[offset++] = vertices[idx3 + 1];
+            vertexArray[offset++] = vertices[idx3 + 2];
+            vertexArray[offset++] = 1;
+
+            if (colors) {
+                vertexArray[offset++] = colors[idxColor];
+                vertexArray[offset++] = colors[idxColor + 1];
+                vertexArray[offset++] = colors[idxColor + 2];
+                vertexArray[offset++] = colorSize === 4 ? colors[idxColor + 3] : 1.0;
+            } else {
+                vertexArray[offset++] = 1; // r
+                vertexArray[offset++] = 0; // g
+                vertexArray[offset++] = 1; // b
+                vertexArray[offset++] = 1; // a
+            }
+
+            // --- uv ---
+            vertexArray[offset++] = uvs[idx2];
+            vertexArray[offset++] = uvs[idx2 + 1];
+
+            // --- normal ---
+            vertexArray[offset++] = normals[idx3];
+            vertexArray[offset++] = normals[idx3 + 1];
+            vertexArray[offset++] = normals[idx3 + 2];
+
+            vertexArray[offset++] = meshCounter;
+
+            const bary = BARYCENTRICS[i % 3];
+            vertexArray[offset++] = bary[0];
+            vertexArray[offset++] = bary[1];
+            vertexArray[offset++] = bary[2];
+
+            // if this mesh has skinning data, read it. If not, fill with 0s.
+            if (animated) {
+            // if (false) {
+                const idx4 = index * 4;
+                // 4 Joint Indices
+                vertexArray[offset++] = joints[idx4];
+                vertexArray[offset++] = joints[idx4 + 1];
+                vertexArray[offset++] = joints[idx4 + 2];
+                vertexArray[offset++] = joints[idx4 + 3];
+                // 4 Joint Weights
+                vertexArray[offset++] = weights[idx4];
+                vertexArray[offset++] = weights[idx4 + 1];
+                vertexArray[offset++] = weights[idx4 + 2];
+                vertexArray[offset++] = weights[idx4 + 3];
+            } else {
+                // Fallback for static meshes: 4 dummy joints, 4 zeroed weights
+                vertexArray[offset++] = 0; vertexArray[offset++] = 0; vertexArray[offset++] = 0; vertexArray[offset++] = 0;
+                vertexArray[offset++] = 0; vertexArray[offset++] = 0; vertexArray[offset++] = 0; vertexArray[offset++] = 0;
+            }
+
+            // how it used to be
+            // const [x, y, z] = vertex;
+            // const [r, g, b] = color || [1, 0, 1];
+            // const [u, v] = uv;
+            // vertexArray.push(+x, +y, +z, 1, r, g, b, 1, u, v, ...normal, meshCounter, ...BARYCENTRICS[i % 3], joints[i], weights[i]);
         }
 
         if (meshExists) {
@@ -1838,6 +1905,7 @@ class RenderPass extends EventTarget {
             instanceCount: 1,
             verticesCount,
             vertexArray,
+            animated,
         }
         this.#meshes.push(mesh);
         ++this.#meshCounter;

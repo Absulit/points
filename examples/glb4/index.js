@@ -15,7 +15,7 @@ const { positions, colors, uvs, normals, indices, colorSize, texture, animations
 
 
 const cube_renderpass = new RenderPass(vert, frag);
-cube_renderpass.setMesh('monkey', positions, colors, colorSize, uvs, normals, indices)
+cube_renderpass.setMesh('animModel', positions, colors, colorSize, uvs, normals, indices, {animations, weights, joints, skins})
 cube_renderpass.depthWriteEnabled = true;
 cube_renderpass.clearValue = { r: 61 / 255, g: 37 / 255, b: 103 / 255, a: 1 }
 
@@ -161,10 +161,10 @@ const base = {
         });
 
 
-        storages.weights.setType(`array<vec4f>`).setValue(Array.from(weights));
+        // storages.weights.setType(`array<vec4f>`).setValue(Array.from(weights));
         // TODO: using vec4u has an issue because internally I convert all arrays to Float32Array
         // when calling storageItem.value
-        storages.joints.setType('array<vec4f>').setValue(Array.from(joints));
+        // storages.joints.setType('array<vec4f>').setValue(Array.from(joints));
 
         const boneData = calculateBoneMatrices(skins[0], animations[1], 0);
 
