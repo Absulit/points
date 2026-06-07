@@ -14,6 +14,8 @@ const BARYCENTRICS = [
     [0, 0, 1],
 ]
 
+const EMPTY = [0, 0, 0, 0];
+
 /**
  * To tell the {@link RenderPass} how to display the triangles.
  * Default `TRIANGLE_LIST`
@@ -686,15 +688,15 @@ class RenderPass extends EventTarget {
         const { r: r3, g: g3, b: b3, a: a3 } = colors[3]; // bottom-right
 
         this.#vertexArray.push(
-            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * 0.5, (+ny + 1) * 0.5, ...normals, id, ...BARYCENTRICS[0], // top-left
-            +nx, -nh, nz, 1, r1, g1, b1, a1, (+nx + 1) * 0.5, (-nh + 1) * 0.5, ...normals, id, ...BARYCENTRICS[1], // bottom-left
-            +nw, +ny, nz, 1, r2, g2, b2, a2, (+nw + 1) * 0.5, (+ny + 1) * 0.5, ...normals, id, ...BARYCENTRICS[2], // top-right
+            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * 0.5, (+ny + 1) * 0.5, ...normals, id, ...BARYCENTRICS[0], ...EMPTY, ...EMPTY,// top-left
+            +nx, -nh, nz, 1, r1, g1, b1, a1, (+nx + 1) * 0.5, (-nh + 1) * 0.5, ...normals, id, ...BARYCENTRICS[1], ...EMPTY, ...EMPTY,// bottom-left
+            +nw, +ny, nz, 1, r2, g2, b2, a2, (+nw + 1) * 0.5, (+ny + 1) * 0.5, ...normals, id, ...BARYCENTRICS[2], ...EMPTY, ...EMPTY,// top-right
         );
 
         this.#vertexArray.push(
-            +nx, -nh, nz, 1, r1, g1, b1, a1, (+nx + 1) * 0.5, (-nh + 1) * 0.5, ...normals, id, ...BARYCENTRICS[0], // bottom-left
-            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * 0.5, (-nh + 1) * 0.5, ...normals, id, ...BARYCENTRICS[1], // bottom-right
-            +nw, +ny, nz, 1, r2, g2, b2, a2, (+nw + 1) * 0.5, (+ny + 1) * 0.5, ...normals, id, ...BARYCENTRICS[2], // top-right
+            +nx, -nh, nz, 1, r1, g1, b1, a1, (+nx + 1) * 0.5, (-nh + 1) * 0.5, ...normals, id, ...BARYCENTRICS[0], ...EMPTY, ...EMPTY,// bottom-left
+            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * 0.5, (-nh + 1) * 0.5, ...normals, id, ...BARYCENTRICS[1], ...EMPTY, ...EMPTY,// bottom-right
+            +nw, +ny, nz, 1, r2, g2, b2, a2, (+nw + 1) * 0.5, (+ny + 1) * 0.5, ...normals, id, ...BARYCENTRICS[2], ...EMPTY, ...EMPTY,// top-right
         );
 
         const mesh = {
@@ -1059,7 +1061,7 @@ class RenderPass extends EventTarget {
             ];
 
             verts.forEach(([[vx, vy, vz], [u, v]], i) => {
-                vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normals, meshCounter, ...BARYCENTRICS[i % 3]);
+                vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normals, meshCounter, ...BARYCENTRICS[i % 3], [0, 0, 0, 1], [0, 0, 0, 1]);
             })
         }
 
@@ -1813,7 +1815,11 @@ class RenderPass extends EventTarget {
         const { animations = [], joints = [], weights = [], skins = [] } = animData || {};
 
         const FLOATS_PER_VERTEX = 25;
-        const vertexArray = new Float32Array(verticesCount * FLOATS_PER_VERTEX);
+        // raw memory container (byte size = total floats * 4 bytes per float)
+        const vertexBufferMemory = new ArrayBuffer(verticesCount * FLOATS_PER_VERTEX * 4);
+        const vertexArray = new Float32Array(vertexBufferMemory);
+        const vertexArrayUint = new Uint32Array(vertexBufferMemory);
+
         let offset = 0;
         for (let i = 0; i < verticesCount; i++) {
             // const index = indices[i];
@@ -1866,21 +1872,22 @@ class RenderPass extends EventTarget {
 
             // if this mesh has skinning data, read it. If not, fill with 0s.
             if (animated) {
-            // if (false) {
                 const idx4 = index * 4;
-                // 4 Joint Indices
-                vertexArray[offset++] = joints[idx4];
-                vertexArray[offset++] = joints[idx4 + 1];
-                vertexArray[offset++] = joints[idx4 + 2];
-                vertexArray[offset++] = joints[idx4 + 3];
-                // 4 Joint Weights
+
+                // 4 joint Indices, Uint32 view here
+                vertexArrayUint[offset++] = joints[idx4];
+                vertexArrayUint[offset++] = joints[idx4 + 1];
+                vertexArrayUint[offset++] = joints[idx4 + 2];
+                vertexArrayUint[offset++] = joints[idx4 + 3];
+
+                // 4 joint Weights, Float32 view
                 vertexArray[offset++] = weights[idx4];
                 vertexArray[offset++] = weights[idx4 + 1];
                 vertexArray[offset++] = weights[idx4 + 2];
                 vertexArray[offset++] = weights[idx4 + 3];
             } else {
-                // Fallback for static meshes: 4 dummy joints, 4 zeroed weights
-                vertexArray[offset++] = 0; vertexArray[offset++] = 0; vertexArray[offset++] = 0; vertexArray[offset++] = 0;
+                // fallback for static meshes: 4 dummy joints (uint), 4 zeroed weights (float)
+                vertexArrayUint[offset++] = 0; vertexArrayUint[offset++] = 0; vertexArrayUint[offset++] = 0; vertexArrayUint[offset++] = 0;
                 vertexArray[offset++] = 0; vertexArray[offset++] = 0; vertexArray[offset++] = 0; vertexArray[offset++] = 0;
             }
 
