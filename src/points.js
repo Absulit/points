@@ -2216,7 +2216,7 @@ class Points {
                                         // joint
                                         shaderLocation: 6,
                                         offset: renderPass.vertexBufferInfo.jointOffset,
-                                        format: 'uint32x4',
+                                        format: 'float32x4',
                                     },
                                     {
                                         // weight

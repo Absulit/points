@@ -11,7 +11,7 @@ const SCALE = .01;
 
 @vertex
 fn main(in: VertexIn) -> FragmentIn {
-    let joint = in.joint;
+    let joint = vec4u(in.joint);
     let weight = in.weight;
 
     let skinMatrix =
