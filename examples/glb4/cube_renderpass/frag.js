@@ -18,6 +18,7 @@ fn main(in: FragmentIn) -> @location(0) vec4f {
     let finalColor = albedoColor.rgb * diffuse; // how much of the color is diffused
 
     return vec4f(finalColor, in.color.a);
+    // return vec4f(in.color.rgb, in.color.a);
 }
 `;
 

@@ -6,17 +6,17 @@ import frag from './cube_renderpass/frag.js';
 
 
 const options = {
-    animation: 38
+    animation: 3
 }
 
-const url = '../models/UAL2_Standard.glb'; // or remote URL (CORS must allow)
+const url = '../models/UAL1_Standard.glb'; // or remote URL (CORS must allow)
 const data = await loadAndExtract(url);
 const { positions, colors, uvs, normals, indices, colorSize, texture, animations, weights, joints, skins } = data[0]
-console.log(texture);
+console.log(data);
 
 
 const cube_renderpass = new RenderPass(vert, frag);
-cube_renderpass.setMesh('animModel', positions, colors, colorSize, uvs, normals, indices, { animations, weights, joints, skins })
+cube_renderpass.setMesh('animModel', positions, colors, colorSize, uvs, normals, indices, { weights, joints })
 cube_renderpass.depthWriteEnabled = true;
 cube_renderpass.clearValue = { r: 61 / 255, g: 37 / 255, b: 103 / 255, a: 1 }
 
@@ -36,7 +36,7 @@ const base = {
         const { uniforms, storages } = points;
 
         let texture2 = texture;
-        if(!texture){
+        if (!texture) {
             texture2 = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAD0lEQVR4AQEEAPv/AP///wX+Av5JZm4rAAAAAElFTkSuQmCC`;
         }
 
@@ -51,6 +51,7 @@ const base = {
         folder.add(options, 'animation', dropdownItems)
             .name('Animations')
             .onChange(value => {
+                console.log(value);
                 ANIM = animations[+value];
                 animationDuration = getAnimationDuration(ANIM);
             });

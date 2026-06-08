@@ -1815,7 +1815,7 @@ class RenderPass extends EventTarget {
         const verticesCount = indices.length;
         const meshCounter = meshExists ? meshExists.id : this.#meshCounter;
 
-        const { animations, joints, weights, skins } = animData || {};
+        const { joints, weights } = animData || {};
         const animated = !!joints;
 
         const FLOATS_PER_VERTEX = 25;
