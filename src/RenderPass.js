@@ -1816,8 +1816,8 @@ class RenderPass extends EventTarget {
         // let vertexArray = [];
         const meshCounter = meshExists ? meshExists.id : this.#meshCounter;
 
-        const animated = !!animData;
-        const { animations = [], joints = [], weights = [], skins = [] } = animData || {};
+        const { animations, joints, weights, skins } = animData || {};
+        const animated = !!joints;
 
         const FLOATS_PER_VERTEX = 25;
         // raw memory container (byte size = total floats * 4 bytes per float)
