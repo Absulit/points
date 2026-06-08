@@ -1,6 +1,8 @@
 import { WebIO, Node } from 'https://unpkg.com/@gltf-transform/core@latest?module';
 import { mat4, vec3, quat } from 'https://unpkg.com/gl-matrix@latest?module';
 
+export const pixelTextureB64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAD0lEQVR4AQEEAPv/AP///wX+Av5JZm4rAAAAAElFTkSuQmCC';
+
 // original from AFrame
 // https://github.com/aframevr/aframe/blob/aa792c9/src/utils/device.js#L52
 
