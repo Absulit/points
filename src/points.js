@@ -1585,22 +1585,6 @@ class Points {
         dynamicStructParams += dynamicStructMesh;
         dynamicStructParams += dynamicStructCamera;
 
-        // start BoneMatrices
-        let dynamicStructBoneMatrices = '';
-        let animated = false;
-        renderPass.meshes.forEach(mesh => {
-            if (!mesh.animated) {
-                return;
-            }
-            dynamicStructBoneMatrices += `${mesh.name}:array<mat4x4f>,`
-            animated = true;
-        })
-        if(animated){
-            dynamicStructBoneMatrices = /*wgsl*/`struct BoneMatrices {\n\t${dynamicStructBoneMatrices}\n}\n`;
-        }
-
-        // end BoneMatrices
-        // --
         // start events: We add the events Storage. It will hold all the events
         let dynamicStructEvents = '';
         if (this.#events.size > 0) {
@@ -1655,9 +1639,9 @@ class Points {
             dynamicGroupBindingsFragment = i + dynamicGroupBindingsFragment;
         })
 
-        renderPass.hasVertexShader && (colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + dynamicStructBoneMatrices + dynamicStructEvents + defaultVertexBody + colorsVertWGSL);
-        renderPass.hasComputeShader && (colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + dynamicStructBoneMatrices + dynamicStructEvents + colorsComputeWGSL);
-        renderPass.hasFragmentShader && (colorsFragWGSL = dynamicGroupBindingsFragment + defaultStructs + dynamicStructBoneMatrices + dynamicStructEvents + colorsFragWGSL);
+        renderPass.hasVertexShader && (colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + dynamicStructEvents + defaultVertexBody + colorsVertWGSL);
+        renderPass.hasComputeShader && (colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + dynamicStructEvents + colorsComputeWGSL);
+        renderPass.hasFragmentShader && (colorsFragWGSL = dynamicGroupBindingsFragment + defaultStructs + dynamicStructEvents + colorsFragWGSL);
 
         if (this.#debug) {
             console.groupCollapsed(`Render Pass ${index}: (${renderPass.name})`);
