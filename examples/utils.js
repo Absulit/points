@@ -1,5 +1,5 @@
-import { WebIO, Node } from 'https://unpkg.com/@gltf-transform/core@latest?module';
-import { mat4, vec3, quat } from 'https://unpkg.com/gl-matrix@latest?module';
+import { WebIO, Node, Animation, Skin } from 'https://unpkg.com/@gltf-transform/core@4.4.0/dist/index.js?module';
+import { mat4, vec3, quat } from 'https://unpkg.com/gl-matrix@3.4.4/esm/index.js?module';
 
 export const pixelTextureB64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAD0lEQVR4AQEEAPv/AP///wX+Av5JZm4rAAAAAElFTkSuQmCC';
 
@@ -137,6 +137,22 @@ export function setDisabled(el, value) {
 
 // ------------ animation utilities
 
+/**
+ * To be called during the frame update. Creates the data for a `array<mat4x4f>`
+ * storage that holds the data to animate the positions of the gltf data
+ * @param {Skin} skin
+ * @param {Animation} animation
+ * @param {Number} currentTime
+ * @returns {Array<number>}
+ *
+ * @example
+ * // vert.js
+ * let skinMatrix =
+ * weight.x * boneMatrices[joint.x] +
+ * weight.y * boneMatrices[joint.y] +
+ * weight.z * boneMatrices[joint.z] +
+ * weight.w * boneMatrices[joint.w];
+ */
 export function calculateBoneMatrices(skin, animation, currentTime) {
     const joints = skin.listJoints();
     const numJoints = joints.length;
@@ -229,6 +245,12 @@ function sampleAnimationSampler(sampler, currentTime) {
         return outVec;
     }
 }
+
+/**
+ * Gets the duration in seconds of the animation channel
+ * @param {Animation} animation
+ * @returns {number}
+ */
 export function getAnimationDuration(animation) {
     const channels = animation.listChannels();
     let maxTime = 0;
