@@ -1813,7 +1813,6 @@ class RenderPass extends EventTarget {
     setMesh(name, vertices, colors, colorSize, uvs, normals, indices, animData = null) {
         const meshExists = this.#nameExists(this.#meshes, name);
         const verticesCount = indices.length;
-        // let vertexArray = [];
         const meshCounter = meshExists ? meshExists.id : this.#meshCounter;
 
         const { animations, joints, weights, skins } = animData || {};
@@ -1827,16 +1826,7 @@ class RenderPass extends EventTarget {
 
         let offset = 0;
         for (let i = 0; i < verticesCount; i++) {
-            // const index = indices[i];
-            // const vertex = vertices.slice(index * 3, index * 3 + 3);
-
-            // const color = colors?.slice(index * colorSize, index * colorSize + colorSize);
-            // const uv = uvs.slice(index * 2, index * 2 + 2);
-            // const normal = normals.slice(index * 3, index * 3 + 3);
-            //
-
             const index = indices[i];
-
             const idx3 = index * 3;
             const idx2 = index * 2;
             const idxColor = index * colorSize;
@@ -1895,12 +1885,6 @@ class RenderPass extends EventTarget {
                 vertexArrayUint[offset++] = 0; vertexArrayUint[offset++] = 0; vertexArrayUint[offset++] = 0; vertexArrayUint[offset++] = 0;
                 vertexArray[offset++] = 0; vertexArray[offset++] = 0; vertexArray[offset++] = 0; vertexArray[offset++] = 0;
             }
-
-            // how it used to be
-            // const [x, y, z] = vertex;
-            // const [r, g, b] = color || [1, 0, 1];
-            // const [u, v] = uv;
-            // vertexArray.push(+x, +y, +z, 1, r, g, b, 1, u, v, ...normal, meshCounter, ...BARYCENTRICS[i % 3], joints[i], weights[i]);
         }
 
         if (meshExists) {

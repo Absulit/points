@@ -46,7 +46,6 @@ function calculateBoneMatrices(skin, animation, currentTime) {
 
     return boneMatricesArray;
 }
-
 function computeGlobalMatrix(node, animation, currentTime, cache) {
     if (cache.has(node)) {
         return cache.get(node);
@@ -66,7 +65,6 @@ function computeGlobalMatrix(node, animation, currentTime, cache) {
     cache.set(node, globalMatrix);
     return globalMatrix;
 }
-
 function computeLocalTransform(node, animation, currentTime) {
     let translation = vec3.clone(node.getTranslation() || [0, 0, 0]);
     let rotation = quat.clone(node.getRotation() || [0, 0, 0, 1]);
@@ -89,7 +87,6 @@ function computeLocalTransform(node, animation, currentTime) {
     mat4.fromRotationTranslationScale(localMatrix, rotation, translation, scale);
     return localMatrix;
 }
-
 function sampleAnimationSampler(sampler, currentTime) {
     const times = sampler.getInput().getArray();    // e.g., Float32Array of timestamps
     const outputs = sampler.getOutput().getArray();  // e.g., Float32Array of keyframe values
