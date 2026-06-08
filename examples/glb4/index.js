@@ -41,7 +41,6 @@ const base = {
     init: async (points, folder) => {
         const { uniforms, storages } = points;
 
-
         await points.setTextureImage('albedo', data_textures[0] || pixelTextureB64);
         points.setSampler('imageSampler', null);
 
