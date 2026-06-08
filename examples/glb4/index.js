@@ -6,7 +6,7 @@ import frag from './cube_renderpass/frag.js';
 
 
 const options = {
-    mode: 1
+    animation: 1
 }
 
 const url = '../models/Soldier.glb'; // or remote URL (CORS must allow)
@@ -15,12 +15,12 @@ const { positions, colors, uvs, normals, indices, colorSize, texture, animations
 
 
 const cube_renderpass = new RenderPass(vert, frag);
-cube_renderpass.setMesh('animModel', positions, colors, colorSize, uvs, normals, indices, {animations, weights, joints, skins})
+cube_renderpass.setMesh('animModel', positions, colors, colorSize, uvs, normals, indices, { animations, weights, joints, skins })
 cube_renderpass.depthWriteEnabled = true;
 cube_renderpass.clearValue = { r: 61 / 255, g: 37 / 255, b: 103 / 255, a: 1 }
 
 const SKIN = skins[0];
-const ANIM = animations[1];
+let ANIM = animations[1];
 
 let animationDuration = getAnimationDuration(ANIM);
 
@@ -36,13 +36,17 @@ const base = {
         await points.setTextureImage('albedo', texture);
         points.setSampler('imageSampler', null);
 
-        const dropdownItems = { /*'Vertex': 0,*/ 'Texture': 1, 'Shader': 2 };
+        let dropdownItems = {};
+        animations.forEach((animation, idx) => {
+            dropdownItems[animation.getName()] = idx;
+        })
 
-        // uniforms.color_mode = options.mode;
-        // folder.add(options, 'mode', dropdownItems).name('Colors').onChange(value => {
-        //     console.log(value);
-        //     uniforms.color_mode = +value;
-        // });
+        folder.add(options, 'animation', dropdownItems)
+            .name('Animations')
+            .onChange(value => {
+                ANIM = animations[+value];
+                animationDuration = getAnimationDuration(ANIM);
+            });
 
         const boneData = calculateBoneMatrices(SKIN, ANIM, 0);
 
