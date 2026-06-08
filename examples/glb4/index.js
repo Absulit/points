@@ -6,7 +6,7 @@ import frag from './cube_renderpass/frag.js';
 
 
 const options = {
-    animation: 1
+    animation: 38
 }
 
 const url = '../models/UAL2_Standard.glb'; // or remote URL (CORS must allow)
@@ -21,7 +21,7 @@ cube_renderpass.depthWriteEnabled = true;
 cube_renderpass.clearValue = { r: 61 / 255, g: 37 / 255, b: 103 / 255, a: 1 }
 
 const SKIN = skins[0];
-let ANIM = animations[1];
+let ANIM = animations[options.animation];
 
 let animationDuration = getAnimationDuration(ANIM);
 
