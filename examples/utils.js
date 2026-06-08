@@ -43,13 +43,13 @@ export async function loadAndExtract(url) {
     const io = new WebIO();
 
     // Option A: let WebIO fetch the resource (works for .glb or .gltf with resolvable relative resources)
-    // const doc = await io.read(url);
+    const doc = await io.read(url);
 
     // Option B: fetch yourself then pass a Uint8Array to readBinary (works reliably for .glb or loaded .gltf/.bin combos)
-    const resp = await fetch(url);
-    const arrayBuffer = await resp.arrayBuffer();
-    const uint8 = new Uint8Array(arrayBuffer);
-    const doc = await io.readBinary(uint8);
+    // const resp = await fetch(url);
+    // const arrayBuffer = await resp.arrayBuffer();
+    // const uint8 = new Uint8Array(arrayBuffer);
+    // const doc = await io.readBinary(uint8);
 
     const root = doc.getRoot();
     const meshes = root.listMeshes();
@@ -80,7 +80,7 @@ export async function loadAndExtract(url) {
             // console.log(colorAccessor.getComponentType()); // Should be 5126 (FLOAT) or 5121 (UNSIGNED_BYTE)
             // console.log(colorAccessor.getNormalized());    // true or false
             const colorSize = prim.getAttribute('COLOR_0')?.getElementSize(); // 3 or 4
-
+            console.log('  Vertex Colors:', !!colors);
             const material = prim.getMaterial();
             if (!material) {
                 console.log('  No material assigned.');
