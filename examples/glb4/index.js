@@ -4,6 +4,7 @@ import { loadAndExtract } from 'utils';
 import vert from './cube_renderpass/vert.js';
 import frag from './cube_renderpass/frag.js';
 import { Node } from 'https://unpkg.com/@gltf-transform/core@latest?module';
+import { mat4, vec3, quat } from 'https://unpkg.com/gl-matrix@latest?module';
 
 const options = {
     mode: 1
@@ -19,9 +20,10 @@ cube_renderpass.setMesh('animModel', positions, colors, colorSize, uvs, normals,
 cube_renderpass.depthWriteEnabled = true;
 cube_renderpass.clearValue = { r: 61 / 255, g: 37 / 255, b: 103 / 255, a: 1 }
 
-import { mat4, vec3, quat } from 'https://unpkg.com/gl-matrix@latest?module';
+const SKIN = skins[0];
+const ANIM = animations[1];
 
-let animationDuration = getAnimationDuration(animations[1]);
+let animationDuration = getAnimationDuration(ANIM);
 
 function calculateBoneMatrices(skin, animation, currentTime) {
     const joints = skin.listJoints();
@@ -160,13 +162,7 @@ const base = {
             uniforms.color_mode = +value;
         });
 
-
-        // storages.weights.setType(`array<vec4f>`).setValue(Array.from(weights));
-        // TODO: using vec4u has an issue because internally I convert all arrays to Float32Array
-        // when calling storageItem.value
-        // storages.joints.setType('array<vec4f>').setValue(Array.from(joints));
-
-        const boneData = calculateBoneMatrices(skins[0], animations[1], 0);
+        const boneData = calculateBoneMatrices(SKIN, ANIM, 0);
 
         storages.boneMatrices.setType('array<mat4x4f>').setValue(Array.from(boneData))
 
@@ -186,7 +182,7 @@ const base = {
         points.setCameraPerspective('camera', [0, 1, 5], [0, 1, 0]);
 
         const currentTime = t % animationDuration;
-        const boneData = calculateBoneMatrices(skins[0], animations[1], currentTime);
+        const boneData = calculateBoneMatrices(SKIN, ANIM, currentTime);
 
         storages.boneMatrices.setValue(Array.from(boneData));
 
