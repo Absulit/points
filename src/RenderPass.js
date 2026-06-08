@@ -1800,6 +1800,8 @@ class RenderPass extends EventTarget {
      * @param {Array<{r:Number, g:Number, b:Number, a:Number}>} colors
      * @param {Array<{u:Number, v:Number}>} uvs
      * @param {Array<Number>} normals
+     * @param {Array<Number>} indices
+     * @param {{joints:Array<Number>, weights:Array<Number>}} animData
      *
      * @example
      *
