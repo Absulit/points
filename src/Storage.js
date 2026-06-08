@@ -290,7 +290,8 @@ class Storage {
     }
 
     #validateValue(value) {
-        if (value && typeof value === 'object' && !Array.isArray(value) && !(value instanceof Uint8Array)) {
+        const allowTheseTypes = (value instanceof Uint8Array) || (value instanceof Float32Array)
+        if (value && typeof value === 'object' && !Array.isArray(value) && !allowTheseTypes) {
             throw `Storage '${this.#name}' value:'${value}' can't be an Object.`
         }
 

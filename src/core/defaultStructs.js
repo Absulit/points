@@ -26,6 +26,8 @@ struct VertexIn {
     @location(3) normal:vec3f,
     @location(4) id:u32,       // mesh id
     @location(5) barycentrics: vec3f,
+    @location(6) joint: vec4u,
+    @location(7) weight:vec4f,
     @builtin(vertex_index) vertexIndex: u32,
     @builtin(instance_index) instanceIndex: u32
 }
