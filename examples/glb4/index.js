@@ -9,9 +9,10 @@ const options = {
     animation: 1
 }
 
-const url = '../models/Soldier.glb'; // or remote URL (CORS must allow)
+const url = '../models/UAL2_Standard.glb'; // or remote URL (CORS must allow)
 const data = await loadAndExtract(url);
 const { positions, colors, uvs, normals, indices, colorSize, texture, animations, weights, joints, skins } = data[0]
+console.log(texture);
 
 
 const cube_renderpass = new RenderPass(vert, frag);
@@ -33,7 +34,13 @@ const base = {
      */
     init: async (points, folder) => {
         const { uniforms, storages } = points;
-        await points.setTextureImage('albedo', texture);
+
+        let texture2 = texture;
+        if(!texture){
+            texture2 = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAD0lEQVR4AQEEAPv/AP///wX+Av5JZm4rAAAAAElFTkSuQmCC`;
+        }
+
+        await points.setTextureImage('albedo', texture2);
         points.setSampler('imageSampler', null);
 
         let dropdownItems = {};
