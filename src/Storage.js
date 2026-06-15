@@ -19,6 +19,9 @@ class Storage {
     #updated = false
     #value
     #size = null // TODO: document this: to force allocate more space in case an update is greater than the default array size
+
+    #clear = false
+    #clearData = null;
     /**
      * @param {{name:String, value:(Number|Array<Number>), type:String, readable:Boolean, shaderStage:GPUShaderStage, stream:bool, updated:bool, size:Number}} config
      */
@@ -219,6 +222,20 @@ class Storage {
         this.#updated = true;
     }
 
+    get clear() {
+        return this.#clear;
+    }
+
+    /**
+     * Clear the Storage buffer to its defaults.
+     * Is set to `false` after the buffer is cleared.
+     * @param {bool} value;
+     * @memberof Storage
+     */
+    set clear(value) {
+        this.#clear = value;
+    }
+
     /**
      *
      * @param {Number|Array<Number>} value data to send to the shader
@@ -270,6 +287,27 @@ class Storage {
         this.#validateType(value);
         this.#type = value || getArrayType(value) || 'f32';
         return this;
+    }
+
+    /**
+     * Clear buffer with offset and size.
+     * To clear only a section of the buffer.
+     * `clear` is set to `true` and reset after the buffer is cleared.
+     * @param {Number} offset start index
+     * @param {Number} size length to clear
+     */
+    setClear(offset, size) {
+        this.#clear = true;
+        this.#clearData = {
+            offset, size
+        }
+    }
+
+    /**
+     * Data to be used after a `setClear` is called.
+     */
+    get clearData() {
+        return this.#clearData;
     }
 
     async read() {
@@ -357,4 +395,3 @@ class Storage {
 }
 
 export default Storage;
-
