@@ -2758,8 +2758,9 @@ class Points {
             }
 
             let updateBundleClear = false;
-            this.#storages.list.filter(s => s.clear).forEach(s =>{
-                commandEncoder.clearBuffer(s.buffer)
+            this.#storages.list.filter(s => s.clear).forEach(s => {
+                const { offset, size } = s.clearData || {};
+                commandEncoder.clearBuffer(s.buffer, offset, size);
                 s.clear = false;
                 updateBundleClear = true; // update the bundle to refresh screen
             })
