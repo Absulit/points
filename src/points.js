@@ -2757,6 +2757,13 @@ class Points {
                 return; // continue
             }
 
+            let updateBundleClear = false;
+            this.#storages.list.filter(s => s.clear).forEach(s =>{
+                commandEncoder.clearBuffer(s.buffer)
+                s.clear = false;
+                updateBundleClear = true; // update the bundle to refresh screen
+            })
+
             const isSameDevice = this.#device === renderPass.device;
 
             // texturesExternal means there's a video

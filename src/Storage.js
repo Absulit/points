@@ -19,6 +19,8 @@ class Storage {
     #updated = false
     #value
     #size = null // TODO: document this: to force allocate more space in case an update is greater than the default array size
+
+    #clear = false
     /**
      * @param {{name:String, value:(Number|Array<Number>), type:String, readable:Boolean, shaderStage:GPUShaderStage, stream:bool, updated:bool, size:Number}} config
      */
@@ -219,6 +221,20 @@ class Storage {
         this.#updated = true;
     }
 
+    get clear() {
+        return this.#clear;
+    }
+
+    /**
+     * Clear the Storage buffer to its defaults.
+     * Is set to `false` after the buffer is cleared.
+     * @param {bool} value;
+     * @memberof Storage
+     */
+    set clear(value) {
+        this.#clear = value;
+    }
+
     /**
      *
      * @param {Number|Array<Number>} value data to send to the shader
@@ -357,4 +373,3 @@ class Storage {
 }
 
 export default Storage;
-
