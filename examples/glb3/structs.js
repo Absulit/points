@@ -9,7 +9,7 @@ struct FragmentCustom {
     @location(4) mouse: vec2f,
     @location(5) normal: vec3f,
     @location(6) world: vec3f,
-    @interpolate(flat) @location(7) id: u32
+    @interpolate(flat) @location(7) id: f32
 }
 
 `;

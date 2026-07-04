@@ -16,7 +16,6 @@ const base = {
         const { uniforms, storages } = points;
         const { FRAGMENT } = GPUShaderStage
         points.scaleMode = ScaleMode.FIT;
-        uniforms.scale = options.scale;
         uniforms.numIterations = options.numIterations;
 
         storages.variables.setType('Variable').setShaderStage(FRAGMENT);
