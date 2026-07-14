@@ -36,7 +36,7 @@ export default class Storages {
                     return value;
                 }
                 // If Storage does not exist we create it.
-                const storage = new Storage({ name: prop, value: 0 });
+                const storage = new Storage({ name: prop });
                 target.list.push(storage);
                 Reflect.set(target, prop, storage, target);
                 return storage;

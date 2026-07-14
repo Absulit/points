@@ -1860,6 +1860,7 @@ class RenderPass extends EventTarget {
             vertexArray[offset++] = normals[idx3 + 1];
             vertexArray[offset++] = normals[idx3 + 2];
 
+            // --- id ---
             vertexArray[offset++] = meshCounter;
 
             const bary = BARYCENTRICS[i % 3];

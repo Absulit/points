@@ -112,7 +112,7 @@ QUnit.module('Storages', hooks => {
     QUnit.test('Assigning value without type, sets the type automatically', assert => {
         const type = 'u32';
         storages.MYSTORAGE = 10;
-        assert.equal(storages.MYCONST.type, type, 'It should have a type assigned');
+        assert.equal(storages.MYSTORAGE.type, type, 'It should have a type assigned');
     })
 
     QUnit.test('Assigning float should set type to f32', assert => {

@@ -22,6 +22,7 @@ import Storages from './Storages.js';
 import Constants from './Constants.js';
 import RenderPass, { PrimitiveTopology, LoadOp, CullMode, FrontFace } from './RenderPass.js';
 import RenderPasses from './RenderPasses.js';
+import ArrayBufferWriter from './core/ArrayBufferWriter.js';
 
 /**
  * Main class Points, this is the entry point of an application with this library.
@@ -1737,7 +1738,7 @@ class Points {
         // TODO: this should be inside RenderPass, to not call vertexArray outside
         this.#renderPasses.forEach((r, i) => {
             r.init?.(this);
-            r.meshes.forEach(mesh => this.#setMeshUniform(mesh.name, mesh.id, 'u32'));
+            r.meshes.forEach(mesh => this.#setMeshUniform(mesh.name, mesh.id, 'f32'));
 
             this.createScreen(r);
             r.vertexBufferInfo = new VertexBufferInfo(r.vertexArray);
@@ -1850,7 +1851,7 @@ class Points {
         this.#device.queue.writeBuffer(
             buffer,
             0,
-            new Float32Array(values)
+            values
         );
     }
 
@@ -1861,25 +1862,31 @@ class Points {
      * @returns {{values:Float32Array, paramsDataSize:Object}}
      */
     #createUniformValues(uniformsArray, structName = 'Params') {
-        const paramsDataSize = this.#dataSize.get(structName)
+        const paramsDataSize = this.#dataSize.get(structName);
         const paddings = paramsDataSize.paddings;
-        // we check the paddings list and add 0's to just the ones that need it
-        const arrayValues = uniformsArray.map(u => {
-            const v = u.serialize(); // clone the item to not modify the original
+
+        const typedValues = uniformsArray.map(u => {
+            const v = u.serialize();
+
+            if (v.value.constructor !== Array) {
+                v.value = [v.value];
+            }
 
             const padding = paddings[v.name] / 4;
             if (padding) {
-                if (v.value.constructor !== Array) {
-                    v.value = [v.value];
-                }
                 for (let i = 0; i < padding; i++) {
                     v.value.push(0);
                 }
             }
-            return v.value;
+
+            return v.value.map(val => ({ value: val, type: v.type }));
+
         }).flat(1);
 
-        return { values: new Float32Array(arrayValues), paramsDataSize };
+        const writer = new ArrayBufferWriter(typedValues.length);
+        typedValues.forEach(t => writer.set(t.value, t.type));
+
+        return { values: writer.buffer, paramsDataSize };
     }
 
     #createParametersUniforms() {
@@ -1923,9 +1930,18 @@ class Points {
         this.#storages.list.forEach(storageItem => {
             // since audio is something constant
             // the stream flag allows to keep this write open
-            const { updated, stream } = storageItem;
+            const { updated, stream, type } = storageItem;
             if (storageItem.mapped && (updated || stream)) {
-                const values = new Float32Array(storageItem.value);
+                let value = storageItem.value;
+
+                // this is only for the audio read which is `Uint8Array`
+                if (value.constructor.name === 'Uint8Array') {
+                    value = Array.from(value);
+                }
+
+                const writer = new ArrayBufferWriter(value.length || 1);
+                writer.set(value, type)
+                const values = writer.buffer;
                 this.#writeBuffer(storageItem.buffer, values);
                 if (!stream) {
                     storageItem.updated = false;
@@ -1944,9 +1960,9 @@ class Points {
         //--------------------------------------------
         this.#storages.list.forEach(storageItem => {
             let usage = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST;
-            const { readable, name, size, mapped } = storageItem;
+            const { readable, name, size, mapped, value, type } = storageItem;
             if (readable) {
-                const readSize = mapped ? storageItem.value.length : size;
+                const readSize = mapped ? value.length : size;
 
                 storageItem.bufferRead = this.#device.createBuffer({
                     label: name,
@@ -1958,7 +1974,9 @@ class Points {
             }
 
             if (mapped) {
-                const values = new Float32Array(storageItem.value);
+                const writer = new ArrayBufferWriter(value.length || 1);
+                writer.set(value, type)
+                const values = writer.buffer;
                 storageItem.buffer = this.#createAndMapBuffer(values, usage, true, size);
             } else {
                 storageItem.buffer = this.#createBuffer(size, usage);
@@ -2204,7 +2222,7 @@ class Points {
                                         // id -> meshCounter
                                         shaderLocation: 4,
                                         offset: renderPass.vertexBufferInfo.idOffset,
-                                        format: 'uint32',
+                                        format: 'float32',
                                     },
                                     {
                                         // barycentrics

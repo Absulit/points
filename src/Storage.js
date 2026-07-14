@@ -40,7 +40,7 @@ class Storage {
         this.#value = value;
 
         this.#stream = stream;
-        this.#updated = updated;
+        this.#updated = updated || !!value; // if a value is set in constructor it should be updated
         this.#size = size;
 
         Object.seal(this);
@@ -199,14 +199,7 @@ class Storage {
     }
 
     get value() {
-        let value = this.#value;
-        // Internally, what Points use to create the buffer is a Uint8Array
-        // TODO: maybe move to POINTS?
-        if (value && !Array.isArray(value) && value.constructor !== Uint8Array) {
-            value = new Uint8Array([value]);
-        }
-
-        return value;
+        return this.#value;
     }
 
     /**
