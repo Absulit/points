@@ -40,6 +40,6 @@ for path in ${dirlist[@]}; do
 
 done
 
-printf -v json_output '[\n  %s\n]' "$json_items"
+printf -v json_output 'export const shaderProjects = [\n  %s\n]' "$json_items"
 
 echo -e "$json_output" > "shader_projects.json"
