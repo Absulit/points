@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Mesh on Mesh 1'
+uri='mesh_on_mesh_1'
+desc='Mesh placed on mesh.<br>Instanced spheres placed where vertex should be.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='showcase threed mesh color math'

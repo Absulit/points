@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='HTML Texture 1'
+uri='html_texture_1'
+desc='Use HTML element as texture.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='showcase image'

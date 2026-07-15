@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Data 1'
+uri='data1'
+desc='Compute Shader example.<br>Open JavaScript console to check the output returned as Float32Array.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='reference compute'

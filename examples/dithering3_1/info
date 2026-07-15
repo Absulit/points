@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Dithering 3 - 1'
+uri='dithering3_1'
+desc='Failed dithering that displays workgroups.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=false
+enabled=true
+tax='showcase image color compute'

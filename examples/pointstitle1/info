@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Points Title 1'
+uri='pointstitle1'
+desc='POINTS library `logo`.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='showcase sdf color debug image noise2d'

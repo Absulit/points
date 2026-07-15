@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Particles 1'
+uri='particles1'
+desc='Particles running on noise, sampling the WebGPU logo and a video.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=false
+enabled=true
+tax='showcase image math random noise2d compute'

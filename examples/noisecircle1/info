@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Sun Distortion'
+uri='noisecircle1'
+desc='Effect of the Sun distorting the atmosphere.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='noise2d sdf'

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Video Texture 1'
+uri='videotexture1'
+desc='Loads a video as a texture to read in WGSL and displays it.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='image compute'

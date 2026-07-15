@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Texture per RenderPass'
+uri='texture_renderpass_1'
+desc='Extract the result of a RenderPass and send it to the last RenderPass to print it. Originally made for Genuary 5, 2023.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=false
+enabled=true
+tax='image color math sdf renderpasses'

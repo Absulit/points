@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Shapes 2'
+uri='shapes2'
+desc=''
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=false
+enabled=false
+tax='reference'

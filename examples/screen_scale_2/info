@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Screen Scale 2'
+uri='screen_scale_2'
+desc='Scale content depending on screen size and individual mesh'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='image renderpasses reference color'

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Swirl 1'
+uri='swirl1'
+desc=''
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='math noise2d'

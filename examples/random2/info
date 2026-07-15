@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Random 2 (⚠ SLOW)'
+uri='random2'
+desc='Update a Storage with random numbers from JavaScript.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=false
+enabled=true
+tax='random compute'

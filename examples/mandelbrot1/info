@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Mandelbrot 1'
+uri='mandelbrot1'
+desc='Mandelbrot set.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='showcase animation'
