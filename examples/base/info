@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Base'
+uri='base'
+desc='Empty project to start.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='reference showcase animation'
