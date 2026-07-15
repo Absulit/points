@@ -2,7 +2,7 @@
 
 clear
 
-bash shader_projects.sh
+bash ./scripts/shader_projects.sh
 
 rm -rf ./build/
 
