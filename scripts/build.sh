@@ -2,6 +2,8 @@
 
 clear
 
+bash shader_projects.sh
+
 rm -rf ./build/
 
 npx rollup -c

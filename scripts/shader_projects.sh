@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Generates shader_projects.js from info files
+# info_generator does the opposite, generates info files from shader_projects.js
+
 json_items=""
 comma=""
 
