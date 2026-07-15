@@ -26,7 +26,7 @@ for path in ${dirlist[@]}; do
             author:'%s',
             authlink:'%s',
             fitwindow:'%s',
-            enabled:'%s',
+            enabled:%s,
             tax:'%s'
         }" "$name" "$path" "$uri" "$desc" "$author" "$authlink" "$fitwindow" "$enabled" "$tax"
 
