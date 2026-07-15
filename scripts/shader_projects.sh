@@ -42,4 +42,4 @@ done
 
 printf -v json_output 'export const shaderProjects = [\n  %s\n]' "$json_items"
 
-echo -e "$json_output" > "shader_projects.json"
+echo -e "$json_output" > "./examples/index_files/shader_projects.js"
