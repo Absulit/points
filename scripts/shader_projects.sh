@@ -16,19 +16,19 @@ for path in ${dirlist[@]}; do
     # the check is to discard index_files directory, where the shader_projects.js is at
     if [[ -e "./examples/$path" && -e $info ]]; then
         source $info
-        echo $desc
+        echo $name
 
-        printf -v item '{
-            "name":"%s",
-            "path":"%s",
-            "uri":"%s",
-            "desc":"%s",
-            "author":"%s",
-            "authlink":"%s",
-            "fitwindow":"%s",
-            "enabled":"%s",
-            "tax":"%s"
-        }' "$name" "$path" "$uri" "$desc" "$author" "$authlink" "$fitwindow" "$enabled" "$tax"
+        printf -v item $"{
+            name:'%s',
+            path:'%s',
+            uri:'%s',
+            desc:'%s',
+            author:'%s',
+            authlink:'%s',
+            fitwindow:'%s',
+            enabled:'%s',
+            tax:'%s'
+        }" "$name" "$path" "$uri" "$desc" "$author" "$authlink" "$fitwindow" "$enabled" "$tax"
 
         # remove end of lines and extra spaces
         item="${item//$'\n'/}"
