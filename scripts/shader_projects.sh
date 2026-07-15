@@ -42,4 +42,4 @@ done
 
 printf -v json_output '[\n  %s\n]' "$json_items"
 
-echo -e "$json_output" > "test.json"
+echo -e "$json_output" > "shader_projects.json"
