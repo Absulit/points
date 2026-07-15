@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Ordered Dithering'
+uri='dithering1'
+desc=''
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='showcase effects image'

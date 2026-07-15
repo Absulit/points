@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Instanced Cube 1'
+uri='instancedcube1'
+desc='Cube made out of quad instances.<br>Based on <a rel="noopener" target="_blank" href="https://youtu.be/NOWrX1ob_SA">this video</a> by <a rel="noopener" target="_blank" href="https://www.youtube.com/@Lovebytedemoparty">Lovebyte demoparty</a>'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='showcase instances compute'

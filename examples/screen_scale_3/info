@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Screen Scale 3'
+uri='screen_scale_3'
+desc='RenderPass with different ScaleMode'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='reference renderpasses color image'

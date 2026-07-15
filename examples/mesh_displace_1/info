@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Mesh Displace 1'
+uri='mesh_displace_1'
+desc='Mesh displacement based on an <a rel="noopener" target="_blank" href="https://www.clicktorelease.com/blog/vertex-displacement-noise-3d-webgl-glsl-three-js/">article</a> by <a rel="noopener" target="_blank" href="https://mastodon.social/@spite">@thespite</a> '
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='showcase classicnoise3d mesh'

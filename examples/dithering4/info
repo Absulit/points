@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Dithering 4'
+uri='dithering4'
+desc=''
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='showcase image color'

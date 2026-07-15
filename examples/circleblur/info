@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Feedback Sampling blur'
+uri='circleblur'
+desc='classicnoise1'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='animation image effects'

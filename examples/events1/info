@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Events 1'
+uri='events1'
+desc='WGSL fires an event and is read on the JavaScript side. Visible in console.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='reference'

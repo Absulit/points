@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='GLB 3 (High Poly Monkey)'
+uri='glb3'
+desc='Loading a GLB file with Phong shading.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='showcase glb mesh threed animation math'

@@ -23,7 +23,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "sh build.sh",
+    "build": "sh ./scripts/build.sh",
+    "sp": "bash ./scripts/shader_projects.sh",
     "jsdoc": "npx jsdoc -c jsdoc.json"
   },
   "repository": {

@@ -1,6 +1,8 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 clear
+
+bash ./scripts/shader_projects.sh
 
 rm -rf ./build/
 

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Render Passes 1'
+uri='renderpasses1'
+desc='Basic two render passes example with a blur.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='renderpasses image animation math effects'

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Cube 1'
+uri='cube1'
+desc='Mesh cube demo.<br>A cube is placed in the back in another pass and visible with loadOp (options).'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='showcase animation mesh threed'

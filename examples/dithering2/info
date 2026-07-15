@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Closest Color in a Palette'
+uri='dithering2'
+desc=''
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='showcase effects image color'

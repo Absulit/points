@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Dithering Video 1'
+uri='dithering_video_1'
+desc=''
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=false
+enabled=true
+tax='showcase color image compute'
