@@ -25,10 +25,10 @@ for path in ${dirlist[@]}; do
             desc:'%s',
             author:'%s',
             authlink:'%s',
-            fitwindow:%s,
+            fitWindow:%s,
             enabled:%s,
             tax:'%s'
-        }" "$name" "$path" "$uri" "$desc" "$author" "$authlink" "$fitwindow" "$enabled" "$tax"
+        }" "$name" "$path" "$uri" "$desc" "$author" "$authlink" "$fitWindow" "$enabled" "$tax"
 
         # remove end of lines and extra spaces
         item="${item//$'\n'/}"
