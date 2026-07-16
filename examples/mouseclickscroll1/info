@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Mouse Click and Scroll 1'
+uri='mouseclickscroll1'
+desc='Mouse events demo. Click and the screen and scroll the mouse wheel.<br>Events can be read from WGSL.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='sdf color image'

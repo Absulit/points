@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Image Texture 4'
+uri='imagetexture4'
+desc='Image descriptor properties `addressMode*` as `clamp-to-edge`'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='image'

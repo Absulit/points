@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Bloom 1'
+uri='bloom1'
+desc='Simple Bloom'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='color math image'

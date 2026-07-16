@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Spritesheet 1'
+uri='spritesheet1'
+desc='Move your mouse. Animated sprite sheets follows your movements.<br> Penguin by <a rel="noopener" target="_blank" href="https://opengameart.org/users/tamashihoshi">tamashihoshi</a><br>Fishing Bobbles by <a rel="noopener" target="_blank" href="https://opengameart.org/users/nelson-yiap">Nelson Yiap</a>'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='debug color image sdf math animation'

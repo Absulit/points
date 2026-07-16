@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Spritesheet External 1'
+uri='spritesheetexternal1'
+desc='Load sprite/atlas from JS, select items and send as single texture to the shader.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='image'

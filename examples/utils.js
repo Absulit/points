@@ -1,4 +1,7 @@
-import { WebIO } from 'https://unpkg.com/@gltf-transform/core@latest?module';
+import { WebIO, Node, Animation, Skin } from 'https://unpkg.com/@gltf-transform/core@4.4.0/dist/index.js?module';
+import { mat4, vec3, quat } from 'https://unpkg.com/gl-matrix@3.4.4/esm/index.js?module';
+
+export const pixelTextureB64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAD0lEQVR4AQEEAPv/AP///wX+Av5JZm4rAAAAAElFTkSuQmCC';
 
 // original from AFrame
 // https://github.com/aframevr/aframe/blob/aa792c9/src/utils/device.js#L52
@@ -40,16 +43,18 @@ export async function loadAndExtract(url) {
     const io = new WebIO();
 
     // Option A: let WebIO fetch the resource (works for .glb or .gltf with resolvable relative resources)
-    // const doc = await io.read(url);
+    const doc = await io.read(url);
 
     // Option B: fetch yourself then pass a Uint8Array to readBinary (works reliably for .glb or loaded .gltf/.bin combos)
-    const resp = await fetch(url);
-    const arrayBuffer = await resp.arrayBuffer();
-    const uint8 = new Uint8Array(arrayBuffer);
-    const doc = await io.readBinary(uint8);
+    // const resp = await fetch(url);
+    // const arrayBuffer = await resp.arrayBuffer();
+    // const uint8 = new Uint8Array(arrayBuffer);
+    // const doc = await io.readBinary(uint8);
 
     const root = doc.getRoot();
     const meshes = root.listMeshes();
+    const animations = root.listAnimations();
+    const skins = root.listSkins();
     const results = [];
 
     for (const mesh of meshes) {
@@ -65,6 +70,9 @@ export async function loadAndExtract(url) {
             const uvs = getAttrArray('TEXCOORD_0');    // Float32Array | null
             const colors = getAttrArray('COLOR_0');       // Float32Array | null
 
+            const joints = getAttrArray('JOINTS_0');
+            const weights = getAttrArray('WEIGHTS_0');
+
             const indices = prim.getIndices() ? prim.getIndices().getArray() : null; // Uint16Array|Uint32Array|null
             let texture = null;
 
@@ -72,7 +80,7 @@ export async function loadAndExtract(url) {
             // console.log(colorAccessor.getComponentType()); // Should be 5126 (FLOAT) or 5121 (UNSIGNED_BYTE)
             // console.log(colorAccessor.getNormalized());    // true or false
             const colorSize = prim.getAttribute('COLOR_0')?.getElementSize(); // 3 or 4
-
+            console.log('  Vertex Colors:', !!colors);
             const material = prim.getMaterial();
             if (!material) {
                 console.log('  No material assigned.');
@@ -109,7 +117,11 @@ export async function loadAndExtract(url) {
                 colors,
                 indices,
                 colorSize,
-                texture
+                texture,
+                joints,
+                weights,
+                animations,
+                skins
             });
         }
     }
@@ -121,3 +133,144 @@ export function setDisabled(el, value) {
     el.disabled = value;
     el.classList.toggle('disabled', value);
 }
+
+
+// ------------ animation utilities
+
+/**
+ * To be called during the frame update. Creates the data for a `array<mat4x4f>`
+ * storage that holds the data to animate the positions of the gltf data
+ * @param {Skin} skin
+ * @param {Animation} animation
+ * @param {Number} currentTime
+ * @returns {Array<number>}
+ *
+ * @example
+ * // vert.js
+ * let skinMatrix =
+ * weight.x * boneMatrices[joint.x] +
+ * weight.y * boneMatrices[joint.y] +
+ * weight.z * boneMatrices[joint.z] +
+ * weight.w * boneMatrices[joint.w];
+ */
+export function calculateBoneMatrices(skin, animation, currentTime) {
+    const joints = skin.listJoints();
+    const numJoints = joints.length;
+    const boneMatricesArray = new Float32Array(numJoints * 16);
+    const globalMatrixCache = new Map();
+    const ibmAccessor = skin.getInverseBindMatrices();
+    const ibmCount = ibmAccessor.getCount();
+
+    for (let i = 0; i < numJoints; i++) {
+        const jointNode = joints[i];
+        const globalMatrix = computeGlobalMatrix(jointNode, animation, currentTime, globalMatrixCache);
+        const ibmValues = ibmAccessor.getElement(i, []);
+        const inverseBindMatrix = mat4.clone(ibmValues);
+        const finalBoneMatrix = mat4.create();
+
+        mat4.multiply(finalBoneMatrix, globalMatrix, inverseBindMatrix);
+        boneMatricesArray.set(finalBoneMatrix, i * 16);
+    }
+
+    return boneMatricesArray;
+}
+function computeGlobalMatrix(node, animation, currentTime, cache) {
+    if (cache.has(node)) {
+        return cache.get(node);
+    }
+
+    const localMatrix = computeLocalTransform(node, animation, currentTime);
+    const parentNode = node.listParents().find(parent => parent instanceof Node);
+    let globalMatrix = mat4.create();
+
+    if (parentNode) {
+        const parentGlobal = computeGlobalMatrix(parentNode, animation, currentTime, cache);
+        mat4.multiply(globalMatrix, parentGlobal, localMatrix);
+    } else {
+        mat4.copy(globalMatrix, localMatrix);
+    }
+
+    cache.set(node, globalMatrix);
+    return globalMatrix;
+}
+function computeLocalTransform(node, animation, currentTime) {
+    let translation = vec3.clone(node.getTranslation() || [0, 0, 0]);
+    let rotation = quat.clone(node.getRotation() || [0, 0, 0, 1]);
+    let scale = vec3.clone(node.getScale() || [1, 1, 1]);
+
+    const channels = animation.listChannels().filter(c => c.getTargetNode() === node);
+
+    channels.forEach((channel) => {
+        const path = channel.getTargetPath(); // 'translation', 'rotation', or 'scale'
+        const sampler = channel.getSampler();
+
+        const sampleValue = sampleAnimationSampler(sampler, currentTime);
+
+        if (path === 'translation') translation = sampleValue;
+        if (path === 'rotation') rotation = sampleValue; // Expects a vec4 Quaternion
+        if (path === 'scale') scale = sampleValue;
+    });
+
+    const localMatrix = mat4.create();
+    mat4.fromRotationTranslationScale(localMatrix, rotation, translation, scale);
+    return localMatrix;
+}
+function sampleAnimationSampler(sampler, currentTime) {
+    const times = sampler.getInput().getArray();    // e.g., Float32Array of timestamps
+    const outputs = sampler.getOutput().getArray();  // e.g., Float32Array of keyframe values
+    const numKeys = times.length;
+
+    if (currentTime <= times[0]) return sampler.getOutput().getElement(0, []);
+    if (currentTime >= times[numKeys - 1]) return sampler.getOutput().getElement(numKeys - 1, []);
+
+    let i = 0;
+    while (i < numKeys - 1 && times[i + 1] < currentTime) {
+        i++;
+    }
+
+    const startTime = times[i];
+    const endTime = times[i + 1];
+    const t = (currentTime - startTime) / (endTime - startTime);
+
+    const valA = sampler.getOutput().getElement(i, []);
+    const valB = sampler.getOutput().getElement(i + 1, []);
+
+    if (valA.length === 4) {
+        const outQuat = quat.create();
+        quat.slerp(outQuat, quat.clone(valA), quat.clone(valB), t);
+        return outQuat;
+    } else {
+        const outVec = vec3.create();
+        vec3.lerp(outVec, vec3.clone(valA), vec3.clone(valB), t);
+        return outVec;
+    }
+}
+
+/**
+ * Gets the duration in seconds of the animation channel
+ * @param {Animation} animation
+ * @returns {number}
+ */
+export function getAnimationDuration(animation) {
+    const channels = animation.listChannels();
+    let maxTime = 0;
+
+    channels.forEach((channel) => {
+        const sampler = channel.getSampler();
+        if (!sampler) return;
+
+        const inputAccessor = sampler.getInput();
+        if (!inputAccessor) return;
+
+        const timesArray = inputAccessor.getArray();
+        const trackEndTime = timesArray[timesArray.length - 1];
+
+        if (trackEndTime > maxTime) {
+            maxTime = trackEndTime;
+        }
+    });
+
+    return maxTime;
+}
+
+// ------------ END animation utilities

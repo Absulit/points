@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Random 1'
+uri='random1'
+desc='Update uniforms with random numbers from JavaScript.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=false
+enabled=true
+tax='random compute'

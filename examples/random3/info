@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Random 3'
+uri='random3'
+desc='Update texture with random numbers from a Compute Shader.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=false
+enabled=true
+tax='random compute'

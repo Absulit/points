@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Wireframe 1'
+uri='wireframe1'
+desc='Wireframe via fragment shader.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='showcase mesh threed'

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Image Scale 1'
+uri='imagescale1'
+desc='Layering of images'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='image color'

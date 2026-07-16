@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Image Texture 2'
+uri='imagetexture2'
+desc='Distort image colors.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='image color'

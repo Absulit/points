@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='WebGPU Particles 1'
+uri='webgpu_particles_1'
+desc=''
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=false
+tax='reference'

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Audio 1'
+uri='audio1'
+desc='Audio visualization. Click to Start audio.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='audio image'

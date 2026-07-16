@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Cubes 1'
+uri='cubes1'
+desc='65K instanced cubes animated separately.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='showcase noise2d animation random math compute mesh threed'

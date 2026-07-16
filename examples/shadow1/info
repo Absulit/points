@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Shadow 1'
+uri='shadow1'
+desc='Shadowmap demo.<br>Based on the WebGPU Samples <a rel="noopener" target="_blank" href="https://webgpu.github.io/webgpu-samples/?q=shad&sample=shadowMapping">Shadow Map Demo</a>.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='showcase '

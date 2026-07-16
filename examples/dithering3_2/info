@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Dithering 3 - 2'
+uri='dithering3_2'
+desc='Better dithering that affects the entire image at once.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=false
+enabled=true
+tax='showcase color image compute'

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Particles 5'
+uri='particles5'
+desc='1 million particles (2<sup>20</sup>) in the compute shader.<br> (less on mobile)'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='showcase compute classicnoise3d random math sdf threed mesh'
