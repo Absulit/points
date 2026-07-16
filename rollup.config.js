@@ -6,7 +6,8 @@ export default [
       format: 'esm',
       banner: '/* @ts-self-types="./RenderPass.d.ts" */'
     },
-    plugins: []
+    plugins: [],
+    external: ['points']
   },
   {
     input: 'src/ScaleMode.js',
@@ -44,7 +45,8 @@ export default [
       './core/RenderPasses/blur/index.js',
       './core/RenderPasses/waves/index.js',
       './points.js',
-      './RenderPass.js',
+      './src/RenderPass.js',
+      'points',
     ],
     plugins: []
   },
@@ -55,7 +57,8 @@ export default [
       format: 'esm',
       banner: '/* @ts-self-types="./points.d.ts" */'
     },
-    plugins: []
+    plugins: [],
+    external: ['points']
   },
   {
     input: {
