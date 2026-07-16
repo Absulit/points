@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Particles 4'
+uri='particles4'
+desc='Compute shader smoke/fire particles.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='showcase compute math random mesh threed'

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Classic Noise 1'
+uri='classicnoise1'
+desc='demo using classic perlin noise'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='classicnoise2d animation math color'

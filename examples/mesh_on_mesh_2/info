@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Mesh on Mesh 2'
+uri='mesh_on_mesh_2'
+desc='Random distribution of particles on a mesh.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='showcase threed mesh color math random'

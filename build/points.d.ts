@@ -803,6 +803,8 @@ export class RenderPass extends EventTarget {
      * @param {Array<{r:Number, g:Number, b:Number, a:Number}>} colors
      * @param {Array<{u:Number, v:Number}>} uvs
      * @param {Array<Number>} normals
+     * @param {Array<Number>} indices
+     * @param {{joints:Array<Number>, weights:Array<Number>}} animData
      *
      * @example
      *
@@ -825,7 +827,10 @@ export class RenderPass extends EventTarget {
     }>, colorSize: any, uvs: Array<{
         u: number;
         v: number;
-    }>, normals: Array<number>, indices: any): any;
+    }>, normals: Array<number>, indices: Array<number>, animData?: {
+        joints: Array<number>;
+        weights: Array<number>;
+    }): any;
     /**
      * For internal purposes
      * ids and names of the meshes
@@ -1164,6 +1169,14 @@ export class Storage {
     set value(value: number | Array<number>);
     get value(): number | Array<number>;
     /**
+     * Clear the Storage buffer to its defaults.
+     * Is set to `false` after the buffer is cleared.
+     * @param {bool} value;
+     * @memberof Storage
+     */
+    set clear(value: bool);
+    get clear(): bool;
+    /**
      *
      * @param {Number|Array<Number>} value data to send to the shader
      * @returns {Storage}
@@ -1192,6 +1205,18 @@ export class Storage {
      * @memberof Storage
      */
     setType(value: string): Storage;
+    /**
+     * Clear buffer with offset and size.
+     * To clear only a section of the buffer.
+     * `clear` is set to `true` and reset after the buffer is cleared.
+     * @param {Number} offset start index
+     * @param {Number} size length to clear
+     */
+    setClear(offset: number, size: number): void;
+    /**
+     * Data to be used after a `setClear` is called.
+     */
+    get clearData(): null;
     read(): Promise<Float32Array<any> | null>;
     valueOf(): number | number[];
     #private;

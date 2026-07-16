@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Webcam Texture 1'
+uri='webcamtexture1'
+desc='Webcam as video texture'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='image'

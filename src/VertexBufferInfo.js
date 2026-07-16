@@ -11,6 +11,8 @@ class VertexBufferInfo {
     #normalOffset;
     #idOffset;
     #barycentricsOffset;
+    #jointOffset;
+    #weightOffset;
     #vertexCount;
     /**
      * Along with the vertexArray it calculates some info like offsets required for the pipeline.
@@ -21,7 +23,18 @@ class VertexBufferInfo {
      * @param {Number} uvOffset index where the uv data starts in a row of `triangleDataLength` items
      * @param {Number} barycentricsOffset index where the barycentrics data starts in a row of `triangleDataLength` items
      */
-    constructor(vertexArray, triangleDataLength = 17, vertexOffset = 0, colorOffset = 4, uvOffset = 8, normalsOffset = 10, idOffset = 13, barycentricsOffset = 14) {
+    constructor(
+        vertexArray,
+        triangleDataLength = 25,
+        vertexOffset = 0,
+        colorOffset = 4,
+        uvOffset = 8,
+        normalsOffset = 10,
+        idOffset = 13,
+        barycentricsOffset = 14,
+        jointsOffset = 17,
+        weigthsOffset = 21
+    ) {
         this.#vertexSize = vertexArray.BYTES_PER_ELEMENT * triangleDataLength; // Byte size of ONE triangle data (vertex, color, uv). (one row)
         this.#vertexOffset = vertexArray.BYTES_PER_ELEMENT * vertexOffset;
         this.#colorOffset = vertexArray.BYTES_PER_ELEMENT * colorOffset; // Byte offset of triangle vertex color attribute.
@@ -29,6 +42,12 @@ class VertexBufferInfo {
         this.#normalOffset = vertexArray.BYTES_PER_ELEMENT * normalsOffset;
         this.#idOffset = vertexArray.BYTES_PER_ELEMENT * idOffset;
         this.#barycentricsOffset = vertexArray.BYTES_PER_ELEMENT * barycentricsOffset;
+
+        // if (jointsOffset) {
+        this.#jointOffset = vertexArray.BYTES_PER_ELEMENT * jointsOffset;
+        this.#weightOffset = vertexArray.BYTES_PER_ELEMENT * weigthsOffset;
+        // }
+
         this.#vertexCount = vertexArray.byteLength / this.#vertexSize;
     }
 
@@ -58,6 +77,14 @@ class VertexBufferInfo {
 
     get barycentricsOffset() {
         return this.#barycentricsOffset;
+    }
+
+    get jointOffset() {
+        return this.#jointOffset;
+    }
+
+    get weightOffset() {
+        return this.#weightOffset;
     }
 
     get vertexCount() {

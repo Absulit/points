@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Bloom 2'
+uri='bloom2'
+desc='Multi RenderPass Bloom effect, more accurate than Bloom1'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='showcase color math image'

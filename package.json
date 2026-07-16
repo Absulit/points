@@ -1,6 +1,6 @@
 {
   "name": "@absulit/points",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "type": "module",
   "publishConfig": {
     "access": "public",
@@ -23,7 +23,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "sh build.sh",
+    "build": "sh ./scripts/build.sh",
+    "sp": "bash ./scripts/shader_projects.sh",
     "jsdoc": "npx jsdoc -c jsdoc.json"
   },
   "repository": {
@@ -46,16 +47,16 @@
   },
   "homepage": "https://github.com/Absulit/points#readme",
   "devDependencies": {
-    "@rollup/plugin-babel": "7.0.0",
-    "@rollup/plugin-swc": "0.4.0",
+    "@rollup/plugin-babel": "7.1.0",
+    "@rollup/plugin-swc": "0.4.1",
     "@swc/cli": "0.8.1",
-    "@swc/core": "1.15.40",
-    "@swc/helpers": "0.5.21",
-    "@webgpu/types": "0.1.70",
+    "@swc/core": "1.15.43",
+    "@swc/helpers": "0.5.23",
+    "@webgpu/types": "0.1.71",
     "docolatte": "4.5.1",
     "jsdoc": "4.0.5",
     "jsr": "0.14.3",
-    "rollup": "4.60.4",
+    "rollup": "4.62.2",
     "typescript": "6.0.3"
   }
 }

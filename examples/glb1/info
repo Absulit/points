@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='GLB 1 (Low Poly Monkey)'
+uri='glb1'
+desc='Loading a GLB file with Lambert shading.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='showcase glb mesh threed math animation'

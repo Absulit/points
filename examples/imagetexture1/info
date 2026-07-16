@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Image Texture 1'
+uri='imagetexture1'
+desc='How to load a texture.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='image'

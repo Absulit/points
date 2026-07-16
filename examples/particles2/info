@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Particles 2'
+uri='particles2'
+desc='Compute shader generated instanced particles.<br>Each particle is a quad that samples from a video and WebGPU logo.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='showcase sdf math random noise2d compute mesh'

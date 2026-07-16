@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Demo 6'
+uri='demo_6'
+desc='Display of the default vertex colors of the screen triangles.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='reference'

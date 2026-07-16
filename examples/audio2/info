@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Audio 2'
+uri='audio2'
+desc='Audio visualization. Click to Start audio.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='audio sdf color image'

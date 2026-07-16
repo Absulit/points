@@ -25,8 +25,10 @@ struct VertexIn {
     @location(1) color:vec4f,
     @location(2) uv:vec2f,
     @location(3) normal:vec3f,
-    @location(4) id:u32,       // mesh id
+    @location(4) id:f32,       // mesh id
     @location(5) barycentrics: vec3f,
+    @location(6) joint: vec4u,
+    @location(7) weight:vec4f,
     @builtin(vertex_index) vertexIndex: u32,
     @builtin(instance_index) instanceIndex: u32
 }
@@ -39,7 +41,7 @@ struct FragmentIn {
     @location(3) uvr: vec2f,    // uv with aspect ratio corrected
     @location(4) mouse: vec2f,
     @location(5) normal: vec3f,
-    @interpolate(flat) @location(6) id: u32, // mesh or instance id
+    @interpolate(flat) @location(6) id: f32, // mesh or instance id
     @location(7) barycentrics: vec3f,
     @location(8) world: vec3f,
 }

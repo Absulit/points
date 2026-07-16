@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Image Texture 3'
+uri='imagetexture3'
+desc='Distort image UV.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='animation color image'

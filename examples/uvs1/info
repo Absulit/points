@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='UVs 1'
+uri='uvs1'
+desc='Move your mouse. Displays two uvs at the same time.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='reference'

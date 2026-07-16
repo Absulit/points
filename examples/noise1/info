@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Noise 1'
+uri='noise1'
+desc='Noise layering.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='noise2d animation color'

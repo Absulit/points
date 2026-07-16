@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Base 3D'
+uri='base3d'
+desc='Basic 3d project.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='reference showcase threed'

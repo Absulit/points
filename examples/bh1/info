@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Black Hole 1'
+uri='bh1'
+desc='Simulation of a Kerr Black Hole with raymarching by bending the ray.<br>Accretion disk shows the bending of the light behind the Black Hole.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='showcase'

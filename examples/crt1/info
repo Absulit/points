@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='CRT 1'
+uri='crt1'
+desc='RenderPasses.CRT applied as post processing.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='renderpasses showcase image'

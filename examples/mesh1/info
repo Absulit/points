@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Mesh 1'
+uri='mesh1'
+desc='Change the amount of triangles of the base mesh.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='animation'

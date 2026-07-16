@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Random 4'
+uri='random4'
+desc='Pasting a texture in random positions.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='random color image'

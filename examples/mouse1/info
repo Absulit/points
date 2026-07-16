@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Mouse 1'
+uri='mouse1'
+desc='Mouse demo that draws a cross.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='debug sdf image color'

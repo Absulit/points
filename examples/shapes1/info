@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Shapes 1'
+uri='shapes1'
+desc='Drawing shapes example.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='animation math sdf'

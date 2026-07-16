@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Render Passes 2'
+uri='renderpasses2'
+desc='10 render passes example.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=false
+enabled=true
+tax='renderpasses image'

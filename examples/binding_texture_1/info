@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Binding Texture 1'
+uri='binding_texture_1'
+desc='The red texture is written in RenderPass 0 from compute to fragment.<br>The yellow texture is written in RenderPass 0 and passed to RenderPass 1 fragment.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=true
+tax='renderpasses image color'

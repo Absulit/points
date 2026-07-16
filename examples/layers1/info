@@ -1,0 +1,10 @@
+#!/bin/bash
+
+name='Layers 1'
+uri='layers1'
+desc='Add layers via JavaScript.'
+author='absulit'
+authlink='http://absulit.com'
+fitWindow=true
+enabled=false
+tax='reference'

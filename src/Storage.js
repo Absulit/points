@@ -19,6 +19,9 @@ class Storage {
     #updated = false
     #value
     #size = null // TODO: document this: to force allocate more space in case an update is greater than the default array size
+
+    #clear = false
+    #clearData = null;
     /**
      * @param {{name:String, value:(Number|Array<Number>), type:String, readable:Boolean, shaderStage:GPUShaderStage, stream:bool, updated:bool, size:Number}} config
      */
@@ -37,7 +40,7 @@ class Storage {
         this.#value = value;
 
         this.#stream = stream;
-        this.#updated = updated;
+        this.#updated = updated || !!value; // if a value is set in constructor it should be updated
         this.#size = size;
 
         Object.seal(this);
@@ -196,14 +199,7 @@ class Storage {
     }
 
     get value() {
-        let value = this.#value;
-        // Internally, what Points use to create the buffer is a Uint8Array
-        // TODO: maybe move to POINTS?
-        if (value && !Array.isArray(value) && value.constructor !== Uint8Array) {
-            value = new Uint8Array([value]);
-        }
-
-        return value;
+        return this.#value;
     }
 
     /**
@@ -217,6 +213,20 @@ class Storage {
         this.#value = value;
         this.#type = type;
         this.#updated = true;
+    }
+
+    get clear() {
+        return this.#clear;
+    }
+
+    /**
+     * Clear the Storage buffer to its defaults.
+     * Is set to `false` after the buffer is cleared.
+     * @param {bool} value;
+     * @memberof Storage
+     */
+    set clear(value) {
+        this.#clear = value;
     }
 
     /**
@@ -272,6 +282,27 @@ class Storage {
         return this;
     }
 
+    /**
+     * Clear buffer with offset and size.
+     * To clear only a section of the buffer.
+     * `clear` is set to `true` and reset after the buffer is cleared.
+     * @param {Number} offset start index
+     * @param {Number} size length to clear
+     */
+    setClear(offset, size) {
+        this.#clear = true;
+        this.#clearData = {
+            offset, size
+        }
+    }
+
+    /**
+     * Data to be used after a `setClear` is called.
+     */
+    get clearData() {
+        return this.#clearData;
+    }
+
     async read() {
         let arrayBufferCopy = null;
         if (this.#readable) {
@@ -290,7 +321,8 @@ class Storage {
     }
 
     #validateValue(value) {
-        if (value && typeof value === 'object' && !Array.isArray(value) && !(value instanceof Uint8Array)) {
+        const allowTheseTypes = (value instanceof Uint8Array) || (value instanceof Float32Array)
+        if (value && typeof value === 'object' && !Array.isArray(value) && !allowTheseTypes) {
             throw `Storage '${this.#name}' value:'${value}' can't be an Object.`
         }
 
@@ -356,4 +388,3 @@ class Storage {
 }
 
 export default Storage;
-
