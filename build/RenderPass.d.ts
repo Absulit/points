@@ -641,6 +641,8 @@ declare class RenderPass extends EventTarget {
      * @param {Array<{r:Number, g:Number, b:Number, a:Number}>} colors
      * @param {Array<{u:Number, v:Number}>} uvs
      * @param {Array<Number>} normals
+     * @param {Array<Number>} indices
+     * @param {{joints:Array<Number>, weights:Array<Number>}} animData
      *
      * @example
      *
@@ -663,7 +665,10 @@ declare class RenderPass extends EventTarget {
     }>, colorSize: any, uvs: Array<{
         u: number;
         v: number;
-    }>, normals: Array<number>, indices: any): any;
+    }>, normals: Array<number>, indices: Array<number>, animData?: {
+        joints: Array<number>;
+        weights: Array<number>;
+    }): any;
     /**
      * For internal purposes
      * ids and names of the meshes

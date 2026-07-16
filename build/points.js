@@ -12,6 +12,8 @@ const BARYCENTRICS = [
     [0, 0, 1],
 ];
 
+const EMPTY = [0, 0, 0, 0];
+
 /**
  * To tell the {@link RenderPass} how to display the triangles.
  * Default `TRIANGLE_LIST`
@@ -683,15 +685,15 @@ class RenderPass extends EventTarget {
         const { r: r3, g: g3, b: b3, a: a3 } = colors[3]; // bottom-right
 
         this.#vertexArray.push(
-            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * 0.5, (+ny + 1) * 0.5, ...normals, id, ...BARYCENTRICS[0], // top-left
-            +nx, -nh, nz, 1, r1, g1, b1, a1, (+nx + 1) * 0.5, (-nh + 1) * 0.5, ...normals, id, ...BARYCENTRICS[1], // bottom-left
-            +nw, +ny, nz, 1, r2, g2, b2, a2, (+nw + 1) * 0.5, (+ny + 1) * 0.5, ...normals, id, ...BARYCENTRICS[2], // top-right
+            +nx, +ny, nz, 1, r0, g0, b0, a0, (+nx + 1) * 0.5, (+ny + 1) * 0.5, ...normals, id, ...BARYCENTRICS[0], ...EMPTY, ...EMPTY,// top-left
+            +nx, -nh, nz, 1, r1, g1, b1, a1, (+nx + 1) * 0.5, (-nh + 1) * 0.5, ...normals, id, ...BARYCENTRICS[1], ...EMPTY, ...EMPTY,// bottom-left
+            +nw, +ny, nz, 1, r2, g2, b2, a2, (+nw + 1) * 0.5, (+ny + 1) * 0.5, ...normals, id, ...BARYCENTRICS[2], ...EMPTY, ...EMPTY,// top-right
         );
 
         this.#vertexArray.push(
-            +nx, -nh, nz, 1, r1, g1, b1, a1, (+nx + 1) * 0.5, (-nh + 1) * 0.5, ...normals, id, ...BARYCENTRICS[0], // bottom-left
-            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * 0.5, (-nh + 1) * 0.5, ...normals, id, ...BARYCENTRICS[1], // bottom-right
-            +nw, +ny, nz, 1, r2, g2, b2, a2, (+nw + 1) * 0.5, (+ny + 1) * 0.5, ...normals, id, ...BARYCENTRICS[2], // top-right
+            +nx, -nh, nz, 1, r1, g1, b1, a1, (+nx + 1) * 0.5, (-nh + 1) * 0.5, ...normals, id, ...BARYCENTRICS[0], ...EMPTY, ...EMPTY,// bottom-left
+            +nw, -nh, nz, 1, r3, g3, b3, a3, (+nw + 1) * 0.5, (-nh + 1) * 0.5, ...normals, id, ...BARYCENTRICS[1], ...EMPTY, ...EMPTY,// bottom-right
+            +nw, +ny, nz, 1, r2, g2, b2, a2, (+nw + 1) * 0.5, (+ny + 1) * 0.5, ...normals, id, ...BARYCENTRICS[2], ...EMPTY, ...EMPTY,// top-right
         );
 
         const mesh = {
@@ -767,7 +769,7 @@ class RenderPass extends EventTarget {
                 ];
 
                 quad.forEach(({ position: [vx, vy, vz], uv: [u, v] }, i) => {
-                    this.#vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normal, id, ...BARYCENTRICS[i % 3]);
+                    this.#vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normal, id, ...BARYCENTRICS[i % 3], ...EMPTY, ...EMPTY);
                 });
             }
         }
@@ -847,7 +849,7 @@ class RenderPass extends EventTarget {
                 ];
 
                 quad.forEach(({ position: [vx, vy, vz], uv: [u, v] }, i) => {
-                    vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normal, id, ...BARYCENTRICS[i % 3]);
+                    vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normal, id, ...BARYCENTRICS[i % 3], ...EMPTY, ...EMPTY);
                 });
             }
         }
@@ -955,7 +957,7 @@ class RenderPass extends EventTarget {
             ];
 
             verts.forEach(([[vx, vy, vz], [u, v]], i) => {
-                this.#vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normals, this.#meshCounter, ...BARYCENTRICS[i % 3]);
+                this.#vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normals, this.#meshCounter, ...BARYCENTRICS[i % 3], ...EMPTY, ...EMPTY);
             });
         }
 
@@ -1056,7 +1058,7 @@ class RenderPass extends EventTarget {
             ];
 
             verts.forEach(([[vx, vy, vz], [u, v]], i) => {
-                vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normals, meshCounter, ...BARYCENTRICS[i % 3]);
+                vertexArray.push(+vx, +vy, +vz, 1, r, g, b, a, u, v, ...normals, meshCounter, ...BARYCENTRICS[i % 3], ...EMPTY, ...EMPTY);
             });
         }
 
@@ -1131,7 +1133,7 @@ class RenderPass extends EventTarget {
                 const u = lon / segments;
                 const v = lat / rings;
 
-                vertexGrid[lat][lon] = [vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, this.#meshCounter];
+                vertexGrid[lat][lon] = [vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, this.#meshCounter, ...EMPTY, ...EMPTY];
             }
         }
 
@@ -1234,9 +1236,14 @@ class RenderPass extends EventTarget {
                 const v4 = vertexGrid[lat][lon + 1];
 
                 // triangle 1
-                vertexArray.push(...v1, ...b0, ...v3, ...b1, ...v2, ...b2);
+                vertexArray.push(...v1, ...b0, ...EMPTY, ...EMPTY);
+                vertexArray.push(...v3, ...b1, ...EMPTY, ...EMPTY);
+                vertexArray.push(...v2, ...b2, ...EMPTY, ...EMPTY);
+
                 // triangle 2
-                vertexArray.push(...v1, ...b0, ...v4, ...b1, ...v3, ...b2);
+                vertexArray.push(...v1, ...b0, ...EMPTY, ...EMPTY);
+                vertexArray.push(...v4, ...b1, ...EMPTY, ...EMPTY);
+                vertexArray.push(...v3, ...b2, ...EMPTY, ...EMPTY);
             }
         }
 
@@ -1336,7 +1343,7 @@ class RenderPass extends EventTarget {
                 const [vx, vy, vz] = vertices[i];
                 const [nx, ny, nz] = normals[i];
                 const [u, v] = uvs[i];
-                this.#vertexArray.push(vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, this.#meshCounter, ...BARYCENTRICS[i % 3]);
+                this.#vertexArray.push(vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, this.#meshCounter, ...BARYCENTRICS[i % 3], ...EMPTY, ...EMPTY);
             }
         }
 
@@ -1430,7 +1437,7 @@ class RenderPass extends EventTarget {
                 const [vx, vy, vz] = vertices[i];
                 const [nx, ny, nz] = normals[i];
                 const [u, v] = uvs[i];
-                vertexArray.push(vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, meshCounter, ...BARYCENTRICS[i % 3]);
+                vertexArray.push(vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, meshCounter, ...BARYCENTRICS[i % 3], ...EMPTY, ...EMPTY);
             }
         }
 
@@ -1565,7 +1572,7 @@ class RenderPass extends EventTarget {
                 const [vx, vy, vz] = vertices[i];
                 const [nx, ny, nz] = normals[i];
                 const [u, v] = uvs[i];
-                this.#vertexArray.push(vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, this.#meshCounter, ...BARYCENTRICS[k % 3]);
+                this.#vertexArray.push(vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, this.#meshCounter, ...BARYCENTRICS[k % 3], ...EMPTY, ...EMPTY);
             });
         }
 
@@ -1693,7 +1700,7 @@ class RenderPass extends EventTarget {
                 const [vx, vy, vz] = vertices[i];
                 const [nx, ny, nz] = normals[i];
                 const [u, v] = uvs[i];
-                vertexArray.push(vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, meshCounter, ...BARYCENTRICS[k % 3]);
+                vertexArray.push(vx, vy, vz, 1, r, g, b, a, u, v, nx, ny, nz, meshCounter, ...BARYCENTRICS[k % 3], ...EMPTY, ...EMPTY);
             });
         }
 
@@ -1784,6 +1791,8 @@ class RenderPass extends EventTarget {
      * @param {Array<{r:Number, g:Number, b:Number, a:Number}>} colors
      * @param {Array<{u:Number, v:Number}>} uvs
      * @param {Array<Number>} normals
+     * @param {Array<Number>} indices
+     * @param {{joints:Array<Number>, weights:Array<Number>}} animData
      *
      * @example
      *
@@ -1794,25 +1803,82 @@ class RenderPass extends EventTarget {
      * renderPass.depthWriteEnabled = true;
      *
      */
-    setMesh(name, vertices, colors, colorSize, uvs, normals, indices) {
+    setMesh(name, vertices, colors, colorSize, uvs, normals, indices, animData = null) {
         const meshExists = this.#nameExists(this.#meshes, name);
-
         const verticesCount = indices.length;
-
-        const vertexArray = [];
         const meshCounter = meshExists ? meshExists.id : this.#meshCounter;
+
+        const { joints, weights } = animData || {};
+        const animated = !!joints;
+
+        const FLOATS_PER_VERTEX = 25;
+        // raw memory container (byte size = total floats * 4 bytes per float)
+        const vertexBufferMemory = new ArrayBuffer(verticesCount * FLOATS_PER_VERTEX * 4);
+        const vertexArray = new Float32Array(vertexBufferMemory);
+        const vertexArrayUint = new Uint32Array(vertexBufferMemory);
+
+        let offset = 0;
         for (let i = 0; i < verticesCount; i++) {
             const index = indices[i];
-            const vertex = vertices.slice(index * 3, index * 3 + 3);
+            const idx3 = index * 3;
+            const idx2 = index * 2;
+            const idxColor = index * colorSize;
 
-            const color = colors?.slice(index * colorSize, index * colorSize + colorSize);
-            const uv = uvs.slice(index * 2, index * 2 + 2);
-            const normal = normals.slice(index * 3, index * 3 + 3);
+            // --- position ---
+            vertexArray[offset++] = vertices[idx3];
+            vertexArray[offset++] = vertices[idx3 + 1];
+            vertexArray[offset++] = vertices[idx3 + 2];
+            vertexArray[offset++] = 1;
 
-            const [x, y, z] = vertex;
-            const [r, g, b] = color || [1, 0, 1];
-            const [u, v] = uv;
-            vertexArray.push(+x, +y, +z, 1, r, g, b, 1, u, v, ...normal, meshCounter, ...BARYCENTRICS[i % 3]);
+            if (colors) {
+                vertexArray[offset++] = colors[idxColor];
+                vertexArray[offset++] = colors[idxColor + 1];
+                vertexArray[offset++] = colors[idxColor + 2];
+                vertexArray[offset++] = colorSize === 4 ? colors[idxColor + 3] : 1.0;
+            } else {
+                vertexArray[offset++] = 1; // r
+                vertexArray[offset++] = 0; // g
+                vertexArray[offset++] = 1; // b
+                vertexArray[offset++] = 1; // a
+            }
+
+            // --- uv ---
+            vertexArray[offset++] = uvs[idx2];
+            vertexArray[offset++] = uvs[idx2 + 1];
+
+            // --- normal ---
+            vertexArray[offset++] = normals[idx3];
+            vertexArray[offset++] = normals[idx3 + 1];
+            vertexArray[offset++] = normals[idx3 + 2];
+
+            // --- id ---
+            vertexArray[offset++] = meshCounter;
+
+            const bary = BARYCENTRICS[i % 3];
+            vertexArray[offset++] = bary[0];
+            vertexArray[offset++] = bary[1];
+            vertexArray[offset++] = bary[2];
+
+            // if this mesh has skinning data, read it. If not, fill with 0s.
+            if (animated) {
+                const idx4 = index * 4;
+
+                // 4 joint Indices, Uint32 view here
+                vertexArrayUint[offset++] = joints[idx4];
+                vertexArrayUint[offset++] = joints[idx4 + 1];
+                vertexArrayUint[offset++] = joints[idx4 + 2];
+                vertexArrayUint[offset++] = joints[idx4 + 3];
+
+                // 4 joint Weights, Float32 view
+                vertexArray[offset++] = weights[idx4];
+                vertexArray[offset++] = weights[idx4 + 1];
+                vertexArray[offset++] = weights[idx4 + 2];
+                vertexArray[offset++] = weights[idx4 + 3];
+            } else {
+                // fallback for static meshes: 4 dummy joints (uint), 4 zeroed weights (float)
+                vertexArrayUint[offset++] = 0; vertexArrayUint[offset++] = 0; vertexArrayUint[offset++] = 0; vertexArrayUint[offset++] = 0;
+                vertexArray[offset++] = 0; vertexArray[offset++] = 0; vertexArray[offset++] = 0; vertexArray[offset++] = 0;
+            }
         }
 
         if (meshExists) {
@@ -1829,6 +1895,7 @@ class RenderPass extends EventTarget {
             instanceCount: 1,
             verticesCount,
             vertexArray,
+            animated,
         };
         this.#meshes.push(mesh);
         ++this.#meshCounter;
@@ -2640,6 +2707,9 @@ class Storage {
     #updated = false
     #value
     #size = null // TODO: document this: to force allocate more space in case an update is greater than the default array size
+
+    #clear = false
+    #clearData = null;
     /**
      * @param {{name:String, value:(Number|Array<Number>), type:String, readable:Boolean, shaderStage:GPUShaderStage, stream:bool, updated:bool, size:Number}} config
      */
@@ -2658,7 +2728,7 @@ class Storage {
         this.#value = value;
 
         this.#stream = stream;
-        this.#updated = updated;
+        this.#updated = updated || !!value; // if a value is set in constructor it should be updated
         this.#size = size;
 
         Object.seal(this);
@@ -2817,14 +2887,7 @@ class Storage {
     }
 
     get value() {
-        let value = this.#value;
-        // Internally, what Points use to create the buffer is a Uint8Array
-        // TODO: maybe move to POINTS?
-        if (value && !Array.isArray(value) && value.constructor !== Uint8Array) {
-            value = new Uint8Array([value]);
-        }
-
-        return value;
+        return this.#value;
     }
 
     /**
@@ -2838,6 +2901,20 @@ class Storage {
         this.#value = value;
         this.#type = type;
         this.#updated = true;
+    }
+
+    get clear() {
+        return this.#clear;
+    }
+
+    /**
+     * Clear the Storage buffer to its defaults.
+     * Is set to `false` after the buffer is cleared.
+     * @param {bool} value;
+     * @memberof Storage
+     */
+    set clear(value) {
+        this.#clear = value;
     }
 
     /**
@@ -2893,6 +2970,27 @@ class Storage {
         return this;
     }
 
+    /**
+     * Clear buffer with offset and size.
+     * To clear only a section of the buffer.
+     * `clear` is set to `true` and reset after the buffer is cleared.
+     * @param {Number} offset start index
+     * @param {Number} size length to clear
+     */
+    setClear(offset, size) {
+        this.#clear = true;
+        this.#clearData = {
+            offset, size
+        };
+    }
+
+    /**
+     * Data to be used after a `setClear` is called.
+     */
+    get clearData() {
+        return this.#clearData;
+    }
+
     async read() {
         let arrayBufferCopy = null;
         if (this.#readable) {
@@ -2911,7 +3009,8 @@ class Storage {
     }
 
     #validateValue(value) {
-        if (value && typeof value === 'object' && !Array.isArray(value) && !(value instanceof Uint8Array)) {
+        const allowTheseTypes = (value instanceof Uint8Array) || (value instanceof Float32Array);
+        if (value && typeof value === 'object' && !Array.isArray(value) && !allowTheseTypes) {
             throw `Storage '${this.#name}' value:'${value}' can't be an Object.`
         }
 
@@ -4477,6 +4576,8 @@ class VertexBufferInfo {
     #normalOffset;
     #idOffset;
     #barycentricsOffset;
+    #jointOffset;
+    #weightOffset;
     #vertexCount;
     /**
      * Along with the vertexArray it calculates some info like offsets required for the pipeline.
@@ -4487,7 +4588,18 @@ class VertexBufferInfo {
      * @param {Number} uvOffset index where the uv data starts in a row of `triangleDataLength` items
      * @param {Number} barycentricsOffset index where the barycentrics data starts in a row of `triangleDataLength` items
      */
-    constructor(vertexArray, triangleDataLength = 17, vertexOffset = 0, colorOffset = 4, uvOffset = 8, normalsOffset = 10, idOffset = 13, barycentricsOffset = 14) {
+    constructor(
+        vertexArray,
+        triangleDataLength = 25,
+        vertexOffset = 0,
+        colorOffset = 4,
+        uvOffset = 8,
+        normalsOffset = 10,
+        idOffset = 13,
+        barycentricsOffset = 14,
+        jointsOffset = 17,
+        weigthsOffset = 21
+    ) {
         this.#vertexSize = vertexArray.BYTES_PER_ELEMENT * triangleDataLength; // Byte size of ONE triangle data (vertex, color, uv). (one row)
         this.#vertexOffset = vertexArray.BYTES_PER_ELEMENT * vertexOffset;
         this.#colorOffset = vertexArray.BYTES_PER_ELEMENT * colorOffset; // Byte offset of triangle vertex color attribute.
@@ -4495,6 +4607,12 @@ class VertexBufferInfo {
         this.#normalOffset = vertexArray.BYTES_PER_ELEMENT * normalsOffset;
         this.#idOffset = vertexArray.BYTES_PER_ELEMENT * idOffset;
         this.#barycentricsOffset = vertexArray.BYTES_PER_ELEMENT * barycentricsOffset;
+
+        // if (jointsOffset) {
+        this.#jointOffset = vertexArray.BYTES_PER_ELEMENT * jointsOffset;
+        this.#weightOffset = vertexArray.BYTES_PER_ELEMENT * weigthsOffset;
+        // }
+
         this.#vertexCount = vertexArray.byteLength / this.#vertexSize;
     }
 
@@ -4524,6 +4642,14 @@ class VertexBufferInfo {
 
     get barycentricsOffset() {
         return this.#barycentricsOffset;
+    }
+
+    get jointOffset() {
+        return this.#jointOffset;
+    }
+
+    get weightOffset() {
+        return this.#weightOffset;
     }
 
     get vertexCount() {
@@ -4855,8 +4981,10 @@ struct VertexIn {
     @location(1) color:vec4f,
     @location(2) uv:vec2f,
     @location(3) normal:vec3f,
-    @location(4) id:u32,       // mesh id
+    @location(4) id:f32,       // mesh id
     @location(5) barycentrics: vec3f,
+    @location(6) joint: vec4u,
+    @location(7) weight:vec4f,
     @builtin(vertex_index) vertexIndex: u32,
     @builtin(instance_index) instanceIndex: u32
 }
@@ -4869,7 +4997,7 @@ struct FragmentIn {
     @location(3) uvr: vec2f,    // uv with aspect ratio corrected
     @location(4) mouse: vec2f,
     @location(5) normal: vec3f,
-    @interpolate(flat) @location(6) id: u32, // mesh or instance id
+    @interpolate(flat) @location(6) id: f32, // mesh or instance id
     @location(7) barycentrics: vec3f,
     @location(8) world: vec3f,
 }
@@ -5542,7 +5670,7 @@ class Storages {
                     return value;
                 }
                 // If Storage does not exist we create it.
-                const storage = new Storage$1({ name: prop, value: 0 });
+                const storage = new Storage$1({ name: prop });
                 target.list.push(storage);
                 Reflect.set(target, prop, storage, target);
                 return storage;
@@ -5754,6 +5882,131 @@ class Constants {
             }
         });
         return consStrings;
+    }
+}
+
+class ArrayBufferWriter {
+    #buffer
+    #view
+    #offset = 0
+
+    #indexesAdded = [];
+
+    #vecs = {
+        'vec4f': 'f32',
+        'vec4<f32>': 'f32',
+
+        'vec4u': 'u32',
+        'vec4<u32>': 'u32',
+
+        'vec4i': 'i32',
+        'vec4<i32>': 'i32',
+
+        'vec3f': 'f32',
+        'vec3<f32>': 'f32',
+
+        'vec3u': 'u32',
+        'vec3<u32>': 'u32',
+
+        'vec3i': 'i32',
+        'vec3<i32>': 'i32',
+
+        'vec2f': 'f32',
+        'vec2<f32>': 'f32',
+
+        'vec2u': 'u32',
+        'vec2<u32>': 'u32',
+
+        'vec2i': 'i32',
+        'vec2<i32>': 'i32',
+    }
+
+    constructor(numItems) {
+        this.#buffer = new ArrayBuffer(numItems * 4);
+        this.#view = new DataView(this.#buffer);
+    }
+
+    get offset() {
+        return this.#offset
+    }
+
+    get buffer() {
+        return this.#buffer
+    }
+
+    setN32(value, type) {
+        this.#indexesAdded.push(this.#offset);
+
+        switch (type) {
+            default:
+            case 'f32':
+                this.#view.setFloat32(this.#offset, value, true);
+                break;
+            case 'u32':
+                this.#view.setUint32(this.#offset, value, true);
+                break;
+            case 'i32':
+                this.#view.setInt32(this.#offset, value, true);
+                break;
+        }
+        this.#offset += Float32Array.BYTES_PER_ELEMENT;
+    }
+
+    set(value, type) {
+        const isArray = Array.isArray(value);
+        if (isArray) {
+            const isWGSLArray = type.includes('array');
+            if (isWGSLArray) {
+                type = getArrayTypeAndAmount(type)[0].type;
+            }
+            if (type.includes('vec')) {
+                type = this.#vecs[type];
+            }
+
+            value.forEach(v => this.setN32(v, type));
+            return;
+        }
+
+        this.setN32(value, type);
+    }
+
+    hexDump() {
+        const byteView = new Uint8Array(this.#buffer);
+
+        const hexRows = Array.from(byteView).map((b, i) => {
+            return {
+                offset: `0x${i.toString(16).padStart(2, '0').toUpperCase()}`,
+                byte: b,
+                hex: `0x${b.toString(16).padStart(2, '0').toUpperCase()}`,
+                binary: b.toString(2).padStart(8, '0')
+            };
+        });
+
+        console.table(hexRows);
+    }
+
+    dump() {
+        const view = this.#view;
+        const results = [];
+
+        for (let i = 0; i < view.byteLength; i++) {
+            const isInList = this.#indexesAdded.includes(i / 4);
+            if (!isInList) {
+                continue;
+            }
+
+            const row = { byteOffset: i, uint8: view.getUint8(i) };
+
+            if (i <= view.byteLength - Int32Array.BYTES_PER_ELEMENT) {
+                row.int32_LE = view.getInt32(i, true);
+                row.uint32_LE = view.getUint32(i, true);
+                row.float32_LE = +view.getFloat32(i, true).toFixed(2);
+            }
+
+            results.push(row);
+        }
+
+        console.table(results);
     }
 }
 
@@ -7466,7 +7719,7 @@ class Points {
         // TODO: this should be inside RenderPass, to not call vertexArray outside
         this.#renderPasses.forEach((r, i) => {
             r.init?.(this);
-            r.meshes.forEach(mesh => this.#setMeshUniform(mesh.name, mesh.id, 'u32'));
+            r.meshes.forEach(mesh => this.#setMeshUniform(mesh.name, mesh.id, 'f32'));
 
             this.createScreen(r);
             r.vertexBufferInfo = new VertexBufferInfo(r.vertexArray);
@@ -7579,7 +7832,7 @@ class Points {
         this.#device.queue.writeBuffer(
             buffer,
             0,
-            new Float32Array(values)
+            values
         );
     }
 
@@ -7592,23 +7845,29 @@ class Points {
     #createUniformValues(uniformsArray, structName = 'Params') {
         const paramsDataSize = this.#dataSize.get(structName);
         const paddings = paramsDataSize.paddings;
-        // we check the paddings list and add 0's to just the ones that need it
-        const arrayValues = uniformsArray.map(u => {
-            const v = u.serialize(); // clone the item to not modify the original
+
+        const typedValues = uniformsArray.map(u => {
+            const v = u.serialize();
+
+            if (v.value.constructor !== Array) {
+                v.value = [v.value];
+            }
 
             const padding = paddings[v.name] / 4;
             if (padding) {
-                if (v.value.constructor !== Array) {
-                    v.value = [v.value];
-                }
                 for (let i = 0; i < padding; i++) {
                     v.value.push(0);
                 }
             }
-            return v.value;
+
+            return v.value.map(val => ({ value: val, type: v.type }));
+
         }).flat(1);
 
-        return { values: new Float32Array(arrayValues), paramsDataSize };
+        const writer = new ArrayBufferWriter(typedValues.length);
+        typedValues.forEach(t => writer.set(t.value, t.type));
+
+        return { values: writer.buffer, paramsDataSize };
     }
 
     #createParametersUniforms() {
@@ -7652,9 +7911,18 @@ class Points {
         this.#storages.list.forEach(storageItem => {
             // since audio is something constant
             // the stream flag allows to keep this write open
-            const { updated, stream } = storageItem;
+            const { updated, stream, type } = storageItem;
             if (storageItem.mapped && (updated || stream)) {
-                const values = new Float32Array(storageItem.value);
+                let value = storageItem.value;
+
+                // this is only for the audio read which is `Uint8Array`
+                if (value.constructor.name === 'Uint8Array') {
+                    value = Array.from(value);
+                }
+
+                const writer = new ArrayBufferWriter(value.length || 1);
+                writer.set(value, type);
+                const values = writer.buffer;
                 this.#writeBuffer(storageItem.buffer, values);
                 if (!stream) {
                     storageItem.updated = false;
@@ -7673,9 +7941,9 @@ class Points {
         //--------------------------------------------
         this.#storages.list.forEach(storageItem => {
             let usage = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST;
-            const { readable, name, size, mapped } = storageItem;
+            const { readable, name, size, mapped, value, type } = storageItem;
             if (readable) {
-                const readSize = mapped ? storageItem.value.length : size;
+                const readSize = mapped ? value.length : size;
 
                 storageItem.bufferRead = this.#device.createBuffer({
                     label: name,
@@ -7687,7 +7955,9 @@ class Points {
             }
 
             if (mapped) {
-                const values = new Float32Array(storageItem.value);
+                const writer = new ArrayBufferWriter(value.length || 1);
+                writer.set(value, type);
+                const values = writer.buffer;
                 storageItem.buffer = this.#createAndMapBuffer(values, usage, true, size);
             } else {
                 storageItem.buffer = this.#createBuffer(size, usage);
@@ -7933,13 +8203,25 @@ class Points {
                                         // id -> meshCounter
                                         shaderLocation: 4,
                                         offset: renderPass.vertexBufferInfo.idOffset,
-                                        format: 'uint32',
+                                        format: 'float32',
                                     },
                                     {
                                         // barycentrics
                                         shaderLocation: 5,
                                         offset: renderPass.vertexBufferInfo.barycentricsOffset,
                                         format: 'float32x3',
+                                    },
+                                    {
+                                        // joint
+                                        shaderLocation: 6,
+                                        offset: renderPass.vertexBufferInfo.jointOffset,
+                                        format: 'uint32x4',
+                                    },
+                                    {
+                                        // weight
+                                        shaderLocation: 7,
+                                        offset: renderPass.vertexBufferInfo.weightOffset,
+                                        format: 'float32x4',
                                     },
                                 ],
                             },
@@ -8473,6 +8755,11 @@ class Points {
             if (!renderPass.enabled) {
                 return; // continue
             }
+            this.#storages.list.filter(s => s.clear).forEach(s => {
+                const { offset, size } = s.clearData || {};
+                commandEncoder.clearBuffer(s.buffer, offset, size);
+                s.clear = false;
+            });
 
             const isSameDevice = this.#device === renderPass.device;
 
