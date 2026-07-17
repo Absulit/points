@@ -51,7 +51,7 @@ export default [
     plugins: []
   },
   {
-    input: 'src/entries.js',
+    input: 'src/points.js',
     output: {
       file: 'build/points.js',
       format: 'esm',

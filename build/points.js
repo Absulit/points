@@ -1,5 +1,2787 @@
 /* @ts-self-types="./points.d.ts" */
-import { ScaleMode as ScaleMode$1, Uniform as Uniform$1, Storage as Storage$1, Constant as Constant$1 } from 'points';
+import { Uniform as Uniform$1, Storage as Storage$1, Constant as Constant$1, ScaleMode as ScaleMode$1 } from 'points';
+
+/**
+ * Collection of Keys used for the default uniforms
+ * assigned in the {@link Points} class.
+ * This is mainly for internal purposes.
+ * @class UniformKeys
+ * @ignore
+ */
+class UniformKeys {
+    /**
+     * To set the time in milliseconds
+     * @type {string}
+     * @static
+     */
+    static TIME = 'time';
+    /**
+     * To set the time after the last frame
+     * @type {string}
+     * @static
+     */
+    static DELTA = 'delta';
+    /**
+     * To set the current date and time in seconds
+     * @type {string}
+     * @static
+     */
+    static EPOCH = 'epoch';
+    /**
+     * To set screen dimensions
+     * @type {string}
+     * @static
+     */
+    static SCREEN = 'screen';
+    /**
+     * To set mouse coordinates
+     * @type {string}
+     * @static
+     */
+    static MOUSE = 'mouse';
+    /**
+     * To set if the mouse has been clicked.
+     * @type {string}
+     * @static
+     */
+    static MOUSE_CLICK = 'mouseClick';
+    /**
+     * To set if the mouse is down.
+     * @type {string}
+     * @static
+     */
+    static MOUSE_DOWN = 'mouseDown';
+    /**
+     * To set if the wheel is moving.
+     * @type {string}
+     * @static
+     */
+    static MOUSE_WHEEL = 'mouseWheel';
+    /**
+     * To set how much the wheel has moved.
+     * @type {string}
+     * @static
+     */
+    static MOUSE_DELTA = 'mouseDelta';
+    /**
+     * To set `in.ratio` and `in.uvr`.
+     * @type {string}
+     * @static
+     */
+    static RATIOS = 'ratios';
+}
+
+/**
+ * Along with the vertexArray it calculates some info like offsets required for the pipeline.
+ * Internal use.
+ * @ignore
+ */
+class VertexBufferInfo {
+    #vertexSize
+    #vertexOffset;
+    #colorOffset;
+    #uvOffset;
+    #normalOffset;
+    #idOffset;
+    #barycentricsOffset;
+    #jointOffset;
+    #weightOffset;
+    #vertexCount;
+    /**
+     * Along with the vertexArray it calculates some info like offsets required for the pipeline.
+     * @param {Float32Array} vertexArray array with vertex, color and uv data
+     * @param {Number} triangleDataLength how many items does a triangle row has in vertexArray
+     * @param {Number} vertexOffset index where the vertex data starts in a row of `triangleDataLength` items
+     * @param {Number} colorOffset index where the color data starts in a row of `triangleDataLength` items
+     * @param {Number} uvOffset index where the uv data starts in a row of `triangleDataLength` items
+     * @param {Number} barycentricsOffset index where the barycentrics data starts in a row of `triangleDataLength` items
+     */
+    constructor(
+        vertexArray,
+        triangleDataLength = 25,
+        vertexOffset = 0,
+        colorOffset = 4,
+        uvOffset = 8,
+        normalsOffset = 10,
+        idOffset = 13,
+        barycentricsOffset = 14,
+        jointsOffset = 17,
+        weigthsOffset = 21
+    ) {
+        this.#vertexSize = vertexArray.BYTES_PER_ELEMENT * triangleDataLength; // Byte size of ONE triangle data (vertex, color, uv). (one row)
+        this.#vertexOffset = vertexArray.BYTES_PER_ELEMENT * vertexOffset;
+        this.#colorOffset = vertexArray.BYTES_PER_ELEMENT * colorOffset; // Byte offset of triangle vertex color attribute.
+        this.#uvOffset = vertexArray.BYTES_PER_ELEMENT * uvOffset;
+        this.#normalOffset = vertexArray.BYTES_PER_ELEMENT * normalsOffset;
+        this.#idOffset = vertexArray.BYTES_PER_ELEMENT * idOffset;
+        this.#barycentricsOffset = vertexArray.BYTES_PER_ELEMENT * barycentricsOffset;
+
+        // if (jointsOffset) {
+        this.#jointOffset = vertexArray.BYTES_PER_ELEMENT * jointsOffset;
+        this.#weightOffset = vertexArray.BYTES_PER_ELEMENT * weigthsOffset;
+        // }
+
+        this.#vertexCount = vertexArray.byteLength / this.#vertexSize;
+    }
+
+    get vertexSize() {
+        return this.#vertexSize;
+    }
+
+    get vertexOffset() {
+        return this.#vertexOffset;
+    }
+
+    get colorOffset() {
+        return this.#colorOffset;
+    }
+
+    get uvOffset() {
+        return this.#uvOffset;
+    }
+
+    get normalOffset() {
+        return this.#normalOffset;
+    }
+
+    get idOffset() {
+        return this.#idOffset;
+    }
+
+    get barycentricsOffset() {
+        return this.#barycentricsOffset;
+    }
+
+    get jointOffset() {
+        return this.#jointOffset;
+    }
+
+    get weightOffset() {
+        return this.#weightOffset;
+    }
+
+    get vertexCount() {
+        return this.#vertexCount;
+    }
+}
+
+class Coordinate {
+    #x;
+    #y;
+    #z;
+    #value;
+    constructor(x = 0, y = 0, z = 0) {
+        this.#x = x;
+        this.#y = y;
+        this.#z = z;
+        this.#value = [x, y, z];
+    }
+
+    set x(value) {
+        this.#x = value;
+        this.#value[0] = value;
+    }
+
+    set y(value) {
+        this.#y = value;
+        this.#value[1] = value;
+    }
+
+    set z(value) {
+        this.#z = value;
+        this.#value[2] = value;
+    }
+
+    get x() {
+        return this.#x;
+    }
+
+    get y() {
+        return this.#y;
+    }
+
+    get z() {
+        return this.#z;
+    }
+
+    get value() {
+        return this.#value;
+    }
+
+    set(x, y, z) {
+        this.#x = x;
+        this.#y = y;
+        this.#z = z;
+        this.#value[0] = x;
+        this.#value[1] = y;
+        this.#value[2] = z;
+    }
+}
+
+/**
+ * @class RGBAColor
+ * @ignore
+ */
+class RGBAColor {
+    #value;
+    constructor(r = 0, g = 0, b = 0, a = 1) {
+        if (r > 1 && g > 1 && b > 1) {
+            r /= 255;
+            g /= 255;
+            b /= 255;
+            if (a > 1) {
+                a /= 255;
+            }
+        }
+        this.#value = [r, g, b, a];
+    }
+
+    set r(value) {
+        this.#value[0] = value;
+    }
+
+    set g(value) {
+        this.#value[1] = value;
+    }
+
+    set b(value) {
+        this.#value[2] = value;
+    }
+
+    set a(value) {
+        this.#value[3] = value;
+    }
+
+    get r() {
+        return this.#value[0];
+    }
+
+    get g() {
+        return this.#value[1];
+    }
+
+    get b() {
+        return this.#value[2];
+    }
+
+    get a() {
+        return this.#value[3];
+    }
+
+    get value() {
+        return this.#value;
+    }
+
+    get brightness() {
+        // #Standard
+        // LuminanceA = (0.2126*R) + (0.7152*G) + (0.0722*B)
+        // #Percieved A
+        // LuminanceB = (0.299*R + 0.587*G + 0.114*B)
+        // #Perceived B, slower to calculate
+        // LuminanceC = sqrt(0.299*(R**2) + 0.587*(G**2) + 0.114*(B**2))
+
+
+        let [r, g, b, a] = this.#value;
+        return (0.2126 * r) + (0.7152 * g) + (0.0722 * b);
+    }
+
+    set brightness(value) {
+        this.#value = [value, value, value, 1];
+    }
+
+    set(r, g, b, a) {
+        this.#value = [r, g, b, a];
+    }
+
+    setColor(color) {
+        this.#value = [color.r, color.g, color.b, color.a];
+    }
+
+    add(color) {
+        let [r, g, b, a] = this.#value;
+        //this.#value = [(r + color.r)/2, (g + color.g)/2, (b + color.b)/2, (a + color.a)/2];
+        //this.#value = [(r*a + color.r*color.a), (g*a + color.g*color.a), (b*a + color.b*color.a), 1];
+        this.#value = [(r + color.r), (g + color.g), (b + color.b), (a + color.a)];
+
+
+    }
+
+    blend(color) {
+        let [r0, g0, b0, a0] = this.#value;
+        let [r1, b1, g1, a1] = color.value;
+
+        let a01 = (1 - a0) * a1 + a0;
+
+        let r01 = ((1 - a0) * a1 * r1 + a0 * r0) / a01;
+
+        let g01 = ((1 - a0) * a1 * g1 + a0 * g0) / a01;
+
+        let b01 = ((1 - a0) * a1 * b1 + a0 * b0) / a01;
+
+        this.#value = [r01, g01, b01, a01];
+    }
+
+
+    additive(color) {
+        // https://gist.github.com/JordanDelcros/518396da1c13f75ee057
+        let base = this.#value;
+        let added = color.value;
+
+        let mix = [];
+        mix[3] = 1 - (1 - added[3]) * (1 - base[3]); // alpha
+        mix[0] = Math.round((added[0] * added[3] / mix[3]) + (base[0] * base[3] * (1 - added[3]) / mix[3])); // red
+        mix[1] = Math.round((added[1] * added[3] / mix[3]) + (base[1] * base[3] * (1 - added[3]) / mix[3])); // green
+        mix[2] = Math.round((added[2] * added[3] / mix[3]) + (base[2] * base[3] * (1 - added[3]) / mix[3])); // blue
+
+        this.#value = mix;
+    }
+
+    equal(color) {
+        return (this.#value[0] == color.r) && (this.#value[1] == color.g) && (this.#value[2] == color.b) && (this.#value[3] == color.a);
+    }
+
+
+    static average(colors) {
+        // https://sighack.com/post/averaging-rgb-colors-the-right-way
+        let r = 0, g = 0, b = 0;
+        for (let index = 0; index < colors.length; index++) {
+            const color = colors[index];
+            //if (!color.isNull()) {
+                r += color.r * color.r;
+                g += color.g * color.g;
+                b += color.b * color.b;
+                //a += color.a * color.a;
+            //}
+        }
+        return new RGBAColor(
+            Math.sqrt(r / colors.length),
+            Math.sqrt(g / colors.length),
+            Math.sqrt(b / colors.length)
+            //Math.sqrt(a),
+        );
+    }
+
+    static difference(c1, c2) {
+        let r = 0;
+        let g = 0;
+        let b = 0;
+        if(c1 && !c1.isNull() && c2 && !c2.isNull()){
+            const { r: r1, g: g1, b: b1 } = c1;
+            const { r: r2, g: g2, b: b2 } = c2;
+            r = r1 - r2;
+            g = g1 - g2;
+            b = b1 - b2;
+        }
+
+        return new RGBAColor(r, g, b);
+    }
+
+    isNull() {
+        const [r, g, b, a] = this.#value;
+        return !(isNaN(r) && isNaN(g) && isNaN(b) && isNaN(a))
+    }
+
+    static colorRGBEuclideanDistance(c1, c2) {
+        return Math.sqrt(Math.pow(c1.r - c2.r, 2) +
+            Math.pow(c1.g - c2.g, 2) +
+            Math.pow(c1.b - c2.b, 2));
+    }
+
+    /**
+     * Checks how close two colors are. Closest is `0`.
+     * @param {RGBAColor} color : Color to check distance;
+     * @returns Number distace up to `1.42` I think...
+     */
+    euclideanDistance(color) {
+        const [r, g, b] = this.#value;
+        return Math.sqrt(Math.pow(r - color.r, 2) +
+            Math.pow(g - color.g, 2) +
+            Math.pow(b - color.b, 2));
+    }
+
+    static getClosestColorInPalette(color, palette) {
+        if(!palette){
+            throw('Palette should be an array of `RGBA`s')
+        }
+        let distance = 100;
+        let selectedColor = null;
+        palette.forEach(paletteColor => {
+            let currentDistance = color.euclideanDistance(paletteColor);
+            if (currentDistance < distance) {
+                selectedColor = paletteColor;
+                distance = currentDistance;
+            }
+        });
+        return selectedColor;
+    }
+}
+
+/**
+ * To manage time and delta time,
+ * based on https://github.com/mrdoob/three.js/blob/master/src/core/Clock.js
+ * @class Clock
+ * @ignore
+ */
+class Clock {
+    #time = 0;
+    #oldTime = 0;
+    #delta = 0;
+    constructor() {
+
+    }
+
+    /**
+     * Gets the current time, it does not calculate the time, it's calcualted
+     *  when `getDelta()` is called.
+     */
+    get time() {
+        return this.#time;
+    }
+
+    /**
+     * Gets the last delta value, it does not calculate the delta, use `getDelta()`
+     */
+    get delta() {
+        return this.#delta;
+    }
+
+    #now() {
+        return (typeof performance === 'undefined' ? Date : performance).now();
+    }
+
+    /**
+     * Calculate time since last frame
+     * It also calculates `time`
+     */
+    getDelta() {
+        this.#delta = 0;
+        const newTime = this.#now();
+        this.#delta = (newTime - this.#oldTime) / 1000;
+        this.#oldTime = newTime;
+        this.#time += this.#delta;
+        return this.#delta;
+    }
+}
+
+/**
+ * The defaultStructs are structs already incorporated onto the shaders you create,
+ * so you can call them without import.
+ * <br>
+ * Fragment, Sound, and Event structs.
+ * <br>
+ * <br>
+ * Fragment used in Vertex Shaders.<br>
+ * Sound used along with {@link Points#setAudio}<br>
+ * Event used along with {@link Points#addEventListener}<br>
+ * @module defaultStructs
+ */
+
+const defaultStructs = /*wgsl*/`
+
+struct ComputeIn {
+    @builtin(global_invocation_id) GID: vec3u,
+    @builtin(workgroup_id) WID: vec3u,
+    @builtin(local_invocation_id) LID: vec3u
+}
+
+struct VertexIn {
+    @location(0) position:vec4f,
+    @location(1) color:vec4f,
+    @location(2) uv:vec2f,
+    @location(3) normal:vec3f,
+    @location(4) id:f32,       // mesh id
+    @location(5) barycentrics: vec3f,
+    @location(6) joint: vec4u,
+    @location(7) weight:vec4f,
+    @builtin(vertex_index) vertexIndex: u32,
+    @builtin(instance_index) instanceIndex: u32
+}
+
+struct FragmentIn {
+    @builtin(position) position: vec4f,
+    @location(0) color: vec4f,
+    @location(1) uv: vec2f,
+    @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
+    @location(3) uvr: vec2f,    // uv with aspect ratio corrected
+    @location(4) mouse: vec2f,
+    @location(5) normal: vec3f,
+    @interpolate(flat) @location(6) id: f32, // mesh or instance id
+    @location(7) barycentrics: vec3f,
+    @location(8) world: vec3f,
+}
+
+struct Sound {
+    data: array<f32, 2048>,
+    //play
+    //dataLength
+    //duration
+    //currentPosition
+}
+
+struct Event {
+    updated: u32,
+    data: array<f32, 4>
+}
+`;
+
+/**
+ * The defaultFunctions are functions already incorporated onto the shaders you create,
+ * so you can call them without import.
+ * <br>
+ * <br>
+ * These are wgsl functions, not js functions.
+ * The function is enclosed in a js string constant,
+ * to be appended into the code to reference it in the string shader.
+ *
+ * Use the base example as reference: examples/base/vert.js
+ * @module defaultFunctions
+ */
+
+/**
+ * The defaultVertexBody is used as a drop-in replacement of the vertex shader content.
+ * <br>
+ * This is not required, but useful if you plan to use the default parameters of the library.
+ * <br>
+ * All the examples in the examples directory use this function in their vert.js file.
+ * <br>
+ * <br>
+ * Default function for the Vertex shader that takes charge of automating the
+ * creation of a few variables that are commonly used.
+ * @example
+ * // Inside the main vertex function add this
+ * return defaultVertexBody(in.position, in.color, in.uv, in.normal);
+ * @type {string}
+ * @param {vec4f} position
+ * @param {vec4f} color
+ * @param {vec2f} uv
+ * @return {FragmentIn}
+ */
+const defaultVertexBody = /*wgsl*/`
+fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) -> FragmentIn {
+    var result: FragmentIn;
+
+    let ratio = params.ratios[RENDERPASSINDEX];
+
+    result.ratio = ratio;
+    result.position = position;
+    result.color = color;
+    result.uv = uv;
+    result.uvr = uv * ratio;
+    result.mouse = params._mouse_normalized;
+    result.normal = normal;
+
+    return result;
+}
+`;
+
+/**
+ * Utility types and methods to set wgsl types in memory.
+ * This is mainly internal.
+ * @module data-size
+ * @ignore
+ */
+
+const size_2_align_2 = { size: 2, align: 2 };
+const size_4_align_4 = { size: 4, align: 4 };
+const size_6_align_8 = { size: 6, align: 8 };
+const size_8_align_4 = { size: 8, align: 4 };
+const size_8_align_8 = { size: 8, align: 8 };
+const size_12_align_4 = { size: 12, align: 4 };
+const size_12_align_16 = { size: 12, align: 16 };
+const size_16_align_4 = { size: 16, align: 4 };
+const size_16_align_16 = { size: 16, align: 16 };
+const size_16_align_8 = { size: 16, align: 8 };
+const size_24_align_8 = { size: 24, align: 8 };
+const size_32_align_8 = { size: 32, align: 8 };
+const size_32_align_16 = { size: 32, align: 16 };
+const size_48_align_16 = { size: 48, align: 16 };
+const size_64_align_16 = { size: 64, align: 16 };
+
+const typeSizes = {
+    'bool': size_4_align_4,
+    'i32': size_4_align_4,
+    'u32': size_4_align_4,
+    'f32': size_4_align_4,
+
+    'f16': size_2_align_2,
+
+    'atomic<u32>': size_4_align_4,
+    'atomic<i32>': size_4_align_4,
+
+    'vec2<bool>': size_8_align_8,
+    'vec2<i32>': size_8_align_8,
+    'vec2<u32>': size_8_align_8,
+    'vec2<f32>': size_8_align_8,
+    // 'vec2<bool>': size_8_align_8,
+    'vec2i': size_8_align_8,
+    'vec2u': size_8_align_8,
+    'vec2f': size_8_align_8,
+
+    'vec2<f16>': size_4_align_4,
+    'vec2h': size_4_align_4,
+
+    'vec3<bool>': size_12_align_16,
+    'vec3<i32>': size_12_align_16,
+    'vec3<u32>': size_12_align_16,
+    'vec3<f32>': size_12_align_16,
+    // 'vec3<bool>': size_12_align_16,
+    'vec3i': size_12_align_16,
+    'vec3u': size_12_align_16,
+    'vec3f': size_12_align_16,
+
+    'vec3<f16>': size_6_align_8,
+    'vec3h': size_6_align_8,
+
+    'vec4<bool>': size_16_align_16,
+    'vec4<i32>': size_16_align_16,
+    'vec4<u32>': size_16_align_16,
+    'vec4<f32>': size_16_align_16,
+    // 'vec4<bool>': size_16_align_16,
+    'vec4i': size_16_align_16,
+    'vec4u': size_16_align_16,
+    'vec4f': size_16_align_16,
+
+    'vec4<f16>': size_8_align_8,
+    'vec4h': size_8_align_8,
+
+    'mat2x2<f32>': size_16_align_8,
+    'mat2x2f': size_16_align_8,
+    'mat2x2<f16>': size_8_align_4,
+    'mat2x2h': size_8_align_4,
+
+    'mat3x2<f32>': size_24_align_8,
+    'mat3x2f': size_24_align_8,
+    'mat3x2<f16>': size_12_align_4,
+    'mat3x2h': size_12_align_4,
+
+    'mat4x2<f32>': size_32_align_8,
+    'mat4x2f': size_32_align_8,
+    'mat4x2<f16>': size_16_align_4,
+    'mat4x2h': size_16_align_4,
+
+    'mat2x3<f32>': size_32_align_16,
+    'mat2x3f': size_32_align_16,
+    'mat2x3<f16>': size_16_align_8,
+    'mat2x3h': size_16_align_8,
+
+    'mat3x3<f32>': size_48_align_16,
+    'mat3x3f': size_48_align_16,
+    'mat3x3<f16>': size_24_align_8,
+    'mat3x3h': size_24_align_8,
+
+    'mat4x3<f32>': size_64_align_16,
+    'mat4x3f': size_64_align_16,
+    'mat4x3<f16>': size_32_align_8,
+    'mat4x3h': size_32_align_8,
+
+    'mat2x4<f32>': size_32_align_16,
+    'mat2x4f': size_32_align_16,
+    'mat2x4<f16>': size_16_align_8,
+    'mat2x4h': size_16_align_8,
+
+    'mat3x4<f32>': size_48_align_16,
+    'mat3x4f': size_48_align_16,
+    'mat3x4<f16>': size_24_align_8,
+    'mat3x4h': size_24_align_8,
+
+    'mat4x4<f32>': size_64_align_16,
+    'mat4x4f': size_64_align_16,
+    'mat4x4<f16>': size_32_align_8,
+    'mat4x4h': size_32_align_8,
+};
+
+
+// ignore comments
+const removeCommentsRE = /\/\*[\s\S]*?\*\/|\/\/.*/gim;
+
+// struct name:
+const getStructNameRE = /struct\s+?(\w+)\s*{[^}]+}\n?/g;
+
+// what's inside a struct:
+const insideStructRE = /struct\s+?\w+\s*{([^}]+)}\n?/g;
+
+const arrayTypeAndAmountRE = /\s*<\s*([^,]+)\s*,?\s*(\d+)?\s*>/g;
+
+const arrayIntegrityRE = /\s*(array\s*<\s*\w+\s*(?:,\s*\d+)?\s*>)\s*,?/g;
+
+// you have to separete the result by splitting new lines
+
+function removeComments(value) {
+    const matches = value.matchAll(removeCommentsRE);
+    for (const match of matches) {
+        const captured = match[0];
+        value = value.replace(captured, '');
+    }
+    return value;
+}
+
+function getInsideStruct(value) {
+    const matches = value.matchAll(insideStructRE);
+    let lines = null;
+    for (const match of matches) {
+        lines = match[1].split('\n');
+        lines = lines.map(element => element.trim())
+            .filter(e => e !== '');
+    }
+    return lines;
+}
+
+function getStructDataByName(value) {
+    const matches = value.matchAll(getStructNameRE);
+    let result = new Map();
+    for (const match of matches) {
+        const captured = match[0];
+        const name = match[1];
+        const lines = getInsideStruct(captured);
+        const types = lines.map(l => {
+            const right = l.split(':')[1];
+            let type = '';
+            if (isArray(right)) {
+                const arrayMatch = right.matchAll(arrayIntegrityRE);
+                type = arrayMatch.next().value[1];
+            } else {
+                type = right.split(',')[0].trim();
+            }
+            return type;
+        });
+
+        const names = lines.map(l => {
+            const left = l.split(':')[0];
+            let name = '';
+            name = left.split(',')[0].trim();
+            return name;
+        });
+
+        result.set(name, {
+            captured,
+            lines,
+            types,
+            unique_types: [...new Set(types)],
+            names,
+        });
+    }
+    return result;
+}
+
+function getArrayTypeAndAmount(value) {
+    const matches = value.matchAll(arrayTypeAndAmountRE);
+    let result = [];
+    for (const match of matches) {
+        const type = match[1];
+        const amount = match[2]; // || 5
+        result.push({ type, amount: Number(amount) });
+    }
+    return result;
+}
+
+/**
+ * Check if string has 'array' in it
+ * @param {String} value
+ * @returns {boolean}
+ */
+function isArray(value) {
+    return value.indexOf('array') != -1;
+}
+
+function getArrayTypeData(currentType, structData) {
+    const [d] = getArrayTypeAndAmount(currentType);
+    if (!d) {
+        throw `${currentType} seems to have an error, maybe a wrong amount?`;
+    }
+    if (d.amount == 0) {
+        throw new Error(`${currentType} has an amount of 0`);
+    }
+    let currentTypeData = typeSizes[d.type] || structData.get(d.type);
+    if (!currentTypeData) {
+        throw `Struct or type '${d.type}' in ${currentType} is not defined.`
+    }
+    if (d.amount) {
+        const t = typeSizes[d.type];
+        if (t) {
+            // if array, the size is equal to the align
+            currentTypeData = { size: t.align * d.amount, align: t.align };
+        } else {
+            const sd = structData.get(d.type);
+            if (sd) {
+                currentTypeData = { size: sd.bytes * d.amount, align: sd.maxAlign };
+            }
+        }
+    }
+    return currentTypeData;
+}
+
+
+/**
+ * Calculates if there's a space of bytes left in the row
+ * @param {Number} bytes current bytes size
+ * @param {Number} maxSize max size of row, in this case probably 16
+ * @returns remaining bytes if any
+ */
+function getPadding(bytes, maxSize) {
+    const remainder = bytes % maxSize;
+    let remainingBytes = 0;
+    if (remainder) {
+        remainingBytes = maxSize - remainder;
+    }
+    return remainingBytes
+}
+
+const MAX_ROW_SIZE = 16;
+const HALF = 2;
+const dataSize = value => {
+    const noCommentsValue = removeComments(value);
+    const structData = getStructDataByName(noCommentsValue);
+
+    structData.forEach(sd => {
+        let bytes = 0;
+        let remainingBytes = 0;
+        sd.paddings = {};
+        sd.names.forEach((name, i) => {
+            const type = sd.types[i];
+            let typeSize = typeSizes[type];
+            let repeat = 0;
+
+            // if no typeSize is an array or struct
+            if (!typeSize) {
+                if (type) {
+                    if (isArray(type)) {
+                        const [innerType] = getArrayTypeAndAmount(type);
+
+                        typeSize = typeSizes[innerType.type];
+                        if (typeSize) {
+                            repeat = innerType.amount; // check comment on top of do while
+                            innerType.align = MAX_ROW_SIZE;
+                        } else {
+                            const sd = structData.get(innerType.type);
+                            typeSize = { size: sd.bytes, align: MAX_ROW_SIZE };
+                        }
+
+                    } else {
+                        const sd = structData.get(type);
+                        if (!sd) {
+                            throw `Type or struct ${type} doesn't exist.`;
+                        }
+                        typeSize = { size: sd.bytes, align: MAX_ROW_SIZE };
+                    }
+                }
+            }
+
+            const { size, align } = typeSize;
+            const prevName = sd.names[i - 1];
+
+            /**
+             * The idea with the repeat and the do while is that, if there's an
+             * array, the subtype will be added `type.amount` times with the
+             * same rules. That's it.
+             */
+            do {
+                let aligned = bytes % align === 0;
+
+                while (!aligned) {
+                    remainingBytes -= HALF;
+                    bytes += HALF;
+                    sd.paddings[prevName] ||= 0;
+                    sd.paddings[prevName] += HALF;
+                    aligned = bytes % align === 0;
+                }
+
+                if (remainingBytes && size > remainingBytes) {
+                    bytes += remainingBytes;
+                    sd.paddings[prevName] = remainingBytes;
+                    remainingBytes = 0;
+                }
+
+                bytes += size;
+
+                repeat--;
+            } while (repeat > 0)
+
+            remainingBytes = getPadding(bytes, MAX_ROW_SIZE);
+        });
+        remainingBytes = getPadding(bytes, MAX_ROW_SIZE);
+        bytes += remainingBytes;
+        sd.bytes = bytes;
+    });
+
+    return structData
+};
+
+/**
+ * Takes a number or array and infers the WGSL type
+ * @param {Number|Array<Number>} value
+ * @returns {String} WGSL equivalent type
+ */
+function getWGSLType(value) {
+
+    if ((!value && value !== 0) || ((Number.isNaN(value) || value instanceof Object || typeof value === 'string') && !(value instanceof Array))) {
+        return '';
+    }
+
+    const strValue = value.toString();
+
+    if (value instanceof Array) {
+        return getArrayType$1(value);
+    }
+
+    const hasPeriod = strValue.indexOf('.') != -1;
+    if (hasPeriod) {
+        return 'f32';
+    }
+
+    const hasSign = strValue.indexOf('-') != -1;
+    if (hasSign) {
+        return 'i32'
+    }
+
+    return 'u32';
+}
+
+/**
+ * From a JS value (number, array)
+ * returns WGSL type like vec2f, vec3f
+ * @param {Array|Object} value
+ * @returns {String}
+ */
+function getArrayType$1(value) {
+    const isArray = Array.isArray(value);
+    let type = null;
+    if (isArray) {
+        const { length } = value;
+        if (length <= 4) {
+            type = `vec${length}f`;
+        }
+        if (length > 4) {
+            type = `array<f32, ${length}>`;
+        }
+    }
+    return type;
+}
+
+/**
+ * Utility methods to for the {@link Points#setTextureString | setTextureString()}
+ * @module texture-string
+ * @ignore
+ */
+
+/**
+ * Method to load image with await
+ * @param {String} src
+ * @returns {Promise<void>}
+ */
+async function loadImage(src) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.src = src;
+        img.onload = () => resolve(img);
+        img.onerror = err => reject(err);
+    });
+}
+
+/**
+ * Returns UTF-16 array of each char
+ * @param {String} s
+ * @returns {Array<Number>}
+ */
+function strToCodes(s) {
+    return Array.from(s).map(c => c.charCodeAt(0))
+}
+
+/**
+ *
+ * @param {HTMLImageElement} atlas Image atlas to parse
+ * @param {CanvasRenderingContext2D} ctx Canvas context
+ * @param {Number} index index in the atlas, so 0 is the first char
+ * @param {{x: number, y: number}} size cell dimensions
+ * @param {Number} finalIndex final positional index in the canvas
+ */
+function sprite(atlas, ctx, index, size, finalIndex) {
+    const { width } = atlas;
+    const numColumns = width / size.x;
+
+    const x = index % numColumns;
+    const y = Math.floor(index / numColumns);
+
+    ctx.drawImage(
+        atlas,
+        x * size.x,
+        y * size.y,
+        size.x,
+        size.y,
+
+        size.x * finalIndex,
+        0,
+
+        size.x,
+        size.y);
+}
+
+/**
+ * @typedef {number} SignedNumber
+ * A numeric value that may be negative or positive.
+ */
+
+/**
+ * Expects an atlas/spritesheed with chars in UTF-16 order.
+ * This means `A` is expected at index `65`; if not there,
+ * use offset to move backwards (negative) or forward (positive)
+ * @param {String} str String used to extract letters from the image
+ * @param {HTMLImageElement} atlasImg image with the Atlas to extract letters from
+ * @param {{x: number, y: number}} size width and height in pixels of each letter
+ * @param {SignedNumber} offset how many chars is the atlas offset from the UTF-16
+ * @returns {string} Base64 image
+ */
+function strToImage(str, atlasImg, size, offset = 0) {
+    const chars = strToCodes(str);
+    const canvas = document.createElement('canvas');
+    canvas.width = chars.length * size.x;
+    canvas.height = size.y;
+    const ctx = canvas.getContext('2d');
+
+    chars.forEach((c, i) => sprite(atlasImg, ctx, c + offset, size, i));
+    return canvas.toDataURL('image/png');
+}
+
+/**
+ * @class LayersArray
+ * @ignore
+ */
+class LayersArray extends Array {
+    #buffer = null;
+    #shaderStage = null;
+    constructor(...elements) {
+        super(...elements);
+    }
+
+    get buffer() {
+        return this.#buffer;
+    }
+
+    set buffer(v) {
+        this.#buffer = v;
+    }
+
+    get shaderStage() {
+        return this.#shaderStage;
+    }
+
+    /**
+     * @param {GPUShaderStage} v
+     */
+    set shaderStage(v) {
+        this.#shaderStage = v;
+    }
+}
+
+/**
+ * @class UniformsArray
+ * @ignore
+ */
+class UniformsArray extends Array {
+    #buffer = null;
+    constructor(...elements) {
+        super(...elements);
+    }
+
+    get buffer() {
+        return this.#buffer;
+    }
+
+    /**
+     * set buffer
+     * @param {*} v
+     */
+    set buffer(v) {
+        this.#buffer = v;
+    }
+}
+
+/**
+
+The idea here is that the columns are the current stage of the storage
+being checked at entries and dynamic bindings, and the rows are the stage where
+the storage should show; the table then matches both.
+The thing to remember here is, if the storage is required in any combination,
+then the fragment stage (if is included) then there the storage must be
+read access mode; if there's no vertex then the storage during fragment can be
+read_write. Compute is always read_write.
+
+
+| storage      \     current| COMPUTE    | VERTEX	 | FRAGMENT
+| --------------------------|:-----------|:----------|----------:|
+| compute, vertex, fragment | read_write | read	     | read
+| compute                   | read_write |           |
+| vertex                    |            | read      |
+| fragment                  |            |           | read_write
+| compute, vertex           | read_write | read      |
+| compute, fragment         | read_write |           | read_write
+| vertex, fragment          |            | read	     | read
+
+* @module storage-accessmode
+* @ignore
+*/
+
+const R = 'r';
+const RW = 'rw';
+
+const { COMPUTE, VERTEX, FRAGMENT } = GPUShaderStage;
+
+const cache$1 = {
+    [COMPUTE | VERTEX | FRAGMENT]: {
+        [COMPUTE]: RW,
+        [VERTEX]: R,
+        [FRAGMENT]: R
+    },//
+    [COMPUTE]: {
+        [COMPUTE]: RW,
+        [VERTEX]: null,
+        [FRAGMENT]: null
+    },
+    [VERTEX]: {
+        [COMPUTE]: null,
+        [VERTEX]: R,
+        [FRAGMENT]: null
+    },
+    [FRAGMENT]: {
+        [COMPUTE]: null,
+        [VERTEX]: null,
+        [FRAGMENT]: RW
+    },//
+    [COMPUTE | VERTEX]: {
+        [COMPUTE]: RW,
+        [VERTEX]: R,
+        [FRAGMENT]: null
+    },
+    [COMPUTE | FRAGMENT]: {
+        [COMPUTE]: RW,
+        [VERTEX]: null,
+        [FRAGMENT]: RW
+    },//
+    [VERTEX | FRAGMENT]: {
+        [COMPUTE]: null,
+        [VERTEX]: R,
+        [FRAGMENT]: R
+    },
+};
+
+function getStorageAccessMode(currentStage, storageShaderTypes) {
+    return cache$1[storageShaderTypes][currentStage];
+}
+
+const bindingModes = { [R]: 'read', [RW]: 'read_write' };
+const entriesModes = { [R]: 'read-only-storage', [RW]: 'storage' };
+
+/**
+ * Just a few functions to be used with the cameras
+ *
+ * based on https://github.com/greggman/wgpu-matrix/
+ * @module data-size
+ * @ignore
+ */
+
+
+/**
+ * Divides a vector by its Euclidean length and returns the quotient.
+ *
+ * @param v - The vector.
+ * @returns The normalized vector.
+ */
+function normalize(v) {
+    const result = [0, 0, 0];
+
+    const v0 = v[0];
+    const v1 = v[1];
+    const v2 = v[2];
+    const len = Math.sqrt(v0 * v0 + v1 * v1 + v2 * v2);
+
+    if (len > 0.00001) {
+        result[0] = v0 / len;
+        result[1] = v1 / len;
+        result[2] = v2 / len;
+    }
+
+    return result;
+}
+
+/**
+ * Subtracts two vectors.
+ * @param a - Operand vector.
+ * @param b - Operand vector.
+ * @param dst - vector to hold result. If not passed in a new one is created.
+ * @returns A vector that is the difference of a and b.
+ */
+function sub(a, b) {
+    const result = [0, 0, 0];
+
+    result[0] = a[0] - b[0];
+    result[1] = a[1] - b[1];
+    result[2] = a[2] - b[2];
+
+    return result;
+}
+
+/**
+ * Computes the cross product of two vectors; assumes both vectors have
+ * three entries.
+ * @param a - Operand vector.
+ * @param b - Operand vector.
+ * @param dst - vector to hold result. If not passed in a new one is created.
+ * @returns The vector of a cross b.
+ */
+function cross(a, b) {
+    const result = [0, 0, 0];
+
+    const t1 = a[2] * b[0] - a[0] * b[2];
+    const t2 = a[0] * b[1] - a[1] * b[0];
+    result[0] = a[1] * b[2] - a[2] * b[1];
+    result[1] = t1;
+    result[2] = t2;
+
+    return result;
+}
+
+
+/**
+ * Computes the dot product of two vectors; assumes both vectors have
+ * three entries.
+ * @param a - Operand vector.
+ * @param b - Operand vector.
+ * @returns dot product
+ */
+function dot(a, b) {
+    return (a[0] * b[0]) + (a[1] * b[1]) + (a[2] * b[2]);
+}
+
+/**
+ * Utility methods to for the {@link Points#setTextureElement | setTextureElement()}
+ * https://web.archive.org/web/20181006205840/https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Drawing_DOM_objects_into_a_canvas
+ * @module texture-element
+ * @ignore
+ */
+
+const cache = new Map();
+
+/**
+ * Get the CSS associated with a specific `HTMLElement`.
+ * @param {HTMLElement} el
+ * @returns {String} All the CSS associated to the `el` `HTMLElement`.
+ */
+function getCSS(el) {
+    const sheets = document.styleSheets;
+    const matchedRules = [];
+
+    for (const sheet of sheets) {
+        try {
+            const rules = sheet.cssRules || sheet.rules;
+            for (const rule of rules) {
+                if (el.matches(rule.selectorText)) {
+                    matchedRules.push(rule);
+                }
+            }
+        } catch (e) {
+            console.warn('Could not read stylesheet: ' + sheet.href);
+        }
+    }
+    return matchedRules;
+}
+
+/**
+ * Gets the url of the font requested from the loaded CSS.
+ * @param {String} familyName
+ * @returns {{url:String, fontFace:String}|null}
+ */
+function getFontSource(familyName) {
+    let source = null;
+    for (let sheet of document.styleSheets) {
+        try {
+            for (let rule of sheet.cssRules) {
+                if (rule instanceof CSSFontFaceRule) {
+                    if (rule.style.fontFamily === familyName) {
+                        const regex = /url\(['"]?([^'"]+)['"]?\)/;
+                        const match = rule.style.src.match(regex);
+                        if (match) {
+                            const url = match[1];
+                            source = {
+                                url,
+                                fontFace: rule.cssText
+                            };
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            console.warn('Can\'t read stylesheet (CORS?): ', e);
+        }
+    }
+    return source;
+}
+
+/**
+ * From the css in the HTMLElement, get the font-family attribute value to be
+ * used later to get the source.
+ * @param {String} cssString
+ * @returns {Strng|null}
+ */
+function getFontFamily(cssString) {
+    let fontFamily = null;
+    const regex = /font-family:\s*([^;]+)/;
+    const match = cssString.match(regex);
+    if (match) {
+        fontFamily = match[1].trim();
+    }
+    return fontFamily;
+}
+
+/**
+ * Converts a font to b64 to embed in the foreingObject
+ * @param {String} url path to font file
+ * @returns {Promise<String>}
+ */
+async function fontToB64(url) {
+    const response = await fetch(url);
+    const blob = await response.blob();
+
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+    });
+}
+
+/**
+ * Renders a `HTMLElement` as image along with some CSS.
+ * @param {HTMLElement} element Element to render.
+ * @param {String} styles CSS styles to render the element with.
+ * @returns {Promise<Image>}
+ */
+async function elToImage(element, styles) {
+    const { offsetWidth: width, offsetHeight: height } = element;
+
+    styles ??= '';
+    const fontFamily = getFontFamily(styles);
+
+    let fontFace = cache.get(fontFamily) || null;
+    if (!fontFace && fontFamily) {
+        const fontSource = getFontSource(fontFamily);
+        if (fontSource) {
+            const b64 = await fontToB64(fontSource.url);
+            const regex = /url\((['"]?)[^'"]+\1\)/;
+            fontFace = fontSource.fontFace.replace(regex, `url($1${b64}$1)`);
+            cache.set(fontFamily, fontFace);
+        }
+    }
+    fontFace ??= '';
+
+    const htmlContent = new XMLSerializer().serializeToString(element);
+
+    const svgData = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+            <defs><style type="text/css">${fontFace}${styles}</style></defs>
+            <foreignObject width="100%" height="100%">
+                <div xmlns="http://www.w3.org/1999/xhtml">${htmlContent}</div>
+            </foreignObject>
+        </svg>
+    `;
+
+    const encodedData = btoa(decodeURIComponent(encodeURIComponent(svgData)));
+    const url = `data:image/svg+xml;base64,${encodedData}`;
+
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+
+            canvas.toBlob(blob => {
+                const url = URL.createObjectURL(blob);
+                resolve(url);
+            });
+        };
+
+        img.onerror = () => {
+            reject(new Error('Failed to decode SVG.'));
+        };
+
+        img.src = url;
+    });
+}
+
+/**
+ * Utilitary method to clear the cache without exposing it.
+ */
+function clearCache() {
+    cache.clear();
+}
+
+/**
+ * Class to be used to decide if the output textures can hold more data beyond
+ * the range from 0..1. Useful for HDR images.
+ *
+ * @example
+ * points.presentationFormat = PresentationFormat.RGBA16FLOAT;
+ *
+ * @class PresentationFormat
+ */
+class PresentationFormat {
+    /**
+     * @memberof PresentationFormat
+     */
+    static BGRA8UNORM = 'bgra8unorm';
+    /**
+     * @memberof PresentationFormat
+     */
+    static RGBA8UNORM = 'rgba8unorm';
+    /**
+     * @memberof PresentationFormat
+     */
+    static RGBA16FLOAT = 'rgba16float';
+    /**
+     * @memberof PresentationFormat
+     */
+    static RGBA32FLOAT = 'rgba32float';
+}
+
+/**
+ * Class to be used to select how the content should be displayed on different
+ * screen sizes.
+ * ```text
+ * FIT: Preserves both, but might show black bars or extend empty content. All content is visible.
+ * COVER: Preserves both, but might crop width or height. All screen is covered.
+ * WIDTH: Preserves the visibility of the width, but might crop the height.
+ * HEIGHT: Preserves the visibility of the height, but might crop the width.
+ * ```
+ * @example
+ *
+ * points.scaleMode = ScaleMode.COVER;
+ *
+ * @class ScaleMode
+ */
+
+class ScaleMode {
+    /**
+     * ```text
+     * All content is visible.
+     * Black bars shown to compensate.
+     * No content is cropped.
+     *
+     * PORTRAIT        LANDSCAPE
+     * ░░░░░░░░░░░░░░░ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ░░░░░░░░░░░░░░░ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ░░░░░░░░░░░░░░░
+     * ░░░░░░░░░░░░░░░
+     * ```
+     * @memberof ScaleMode
+     */
+
+    static FIT = 1;
+    /**
+     * ```text
+     * Not all content is visible.
+     * No black bars shown.
+     * Content is cropped on the sides.
+     * `
+     * PORTRAIT            LANDSCAPE
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ```
+     * @memberof ScaleMode
+     */
+    static COVER = 2;
+    /**
+     * ```text
+     * Content is visible in portrait.
+     * Black bars shown to compensate in portrait.
+     * Content is cropped in landscape.
+     *
+     * PORTRAIT        LANDSCAPE
+     * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ```
+     * @memberof ScaleMode
+     */
+    static WIDTH = 4;
+    /**
+     * ```text
+     * Not all content is visible.
+     * Black bars shown to compensate in landscape.
+     * Content is cropped in portrait.
+     *
+     * PORTRAIT            LANDSCAPE
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
+     * ```
+     * @memberof ScaleMode
+     */
+    static HEIGHT = 8;
+}
+
+/**
+ * Uniform is a container for uniform buffer related data and actions.
+ *
+ * @class Uniform
+ */
+class Uniform {
+    #name
+    #value
+    #type
+    #size
+
+    /**
+     *
+     * @param {{name:String, value:(Number|Boolean|Array<Number>), type:string, size:Number=}} config
+     */
+    constructor({ name, value, type = null, size = null }) {
+
+        this.#validateName(name);
+        this.#validateType(type);
+        this.#validateValue(value);
+
+        this.#name = name;
+
+        this.#value = value;
+        this.#type = type || this.#getArrayType(value) || 'f32';
+        this.#size = size;
+
+        Object.seal(this);
+    }
+
+    get name() {
+        return this.#name;
+    }
+
+    /**
+     * The name that the Uniform will have on the WGSL side.
+     * @param {String} value name of the Uniform. The name is used in the WGSL
+     * shader.
+     * @example
+     * // js
+     * myUniform.name = 'myUniformName';
+     *
+     * // wgsl
+     * myUniformName = 13.0;
+     * @memberof Uniform
+     */
+    set name(value) {
+        this.#validateName(value);
+        this.#name = value;
+    }
+
+    get value() {
+        return this.#value;
+    }
+
+    /**
+     * To get or set the value of the uniform from the JS side to the WGSL side.
+     * @param {Number|Boolean|Array<Number>} value The uniform value
+     * @memberof Uniform
+     */
+    set value(value) {
+        this.#validateValue(value);
+        this.#value = value;
+    }
+
+    get type() {
+        return this.#type
+    }
+
+    /**
+     * Get or set the type of the uniform.
+     * It can be inferred automatically by just passing the value, but if
+     * something more specific is required, then you should use `type`.
+     * @param {String} value WGSL data type of the uniform
+     * @example
+     * myUniform.type = 'u32';
+     * @memberof Uniform
+     */
+    set type(value) {
+        this.#validateType(value);
+        this.#type = value || this.#getArrayType(this.#value) || 'f32';
+    }
+
+    get size() {
+        return this.#size;
+    }
+
+    /**
+     * For internal use mostly. Size in bytes.
+     * @memberof Uniform
+     */
+    set size(value) {
+        this.#size = value;
+    }
+
+    /**
+     * Clone of the Uniform data as a plain object to avoid modifications on
+     * the original data.
+     * @returns {Object}
+     * @memberof Uniform
+     */
+    serialize() {
+        // we check if array and spread
+        // because structuredClone is slower
+        const isArray = Array.isArray(this.#value);
+        const value = isArray ? [...this.#value] : this.#value;
+        return {
+            name: this.#name,
+            value,
+            type: this.#type,
+            size: this.#size
+        };
+    }
+
+    /**
+     * Sets or updates the value of the Uniform.
+     * @param {Number|Boolean|Array<Number>} value
+     * @memberof Uniform
+     */
+    setValue(value) {
+        this.#validateValue(value);
+        this.#value = value;
+        return this;
+    }
+
+    /**
+     * Set the data type of the uniform.
+     * @param {String} value WGSL data type of the uniform
+     * @example
+     * myUniform.setType('u32')
+     * @memberof Uniform
+     */
+    setType(value) {
+        this.#validateType(value);
+        this.#type = value || this.#getArrayType(this.#value) || 'f32';
+        return this;
+    }
+
+    #validateValue(value) {
+        if (typeof value === 'object' && !Array.isArray(value)) {
+            throw `Uniform '${this.#name}' value:'${value}' can't be an Object.`
+        }
+
+        if (typeof value === 'string') {
+            throw `Uniform '${this.#name}' value: '${value}' can't be an String.`
+        }
+
+        const isArray = Array.isArray(value);
+        if (isArray) {
+            const { length } = value;
+            // TODO include mat values, e.g.: mat4x2
+            // if (length > 4) {
+            //     console.trace(this.#name, this.#value);
+            //     throw `Uniform named '${this.#name}': Can't assign an Array greater than a vec4f.`
+            // }
+            if (Array.isArray(this.#value)) {
+                if (length != this.#value.length) {
+                    throw `Uniform named '${this.#name}': Size of the array value has changed from ${this.#value.length} to ${length}.`
+                }
+            }
+
+            if (length < 2) {
+                throw `Uniform named '${this.#name}': Can't assign an Array smaller than a vec2f. Assign the Number directly.`
+            }
+        }
+    }
+
+    #validateName(value) {
+        if (typeof value === 'number') {
+            throw `Uniform name '${this.#name}' can't be an Number.`
+        }
+
+        if (typeof value === 'string') {
+            const valNumber = +value;
+
+            if (!Number.isNaN(valNumber) && typeof valNumber === 'number') {
+                throw `Uniform name '${this.#name}' can't be an Number.`
+            }
+        }
+    }
+
+    #validateType(value) {
+
+        if (!value) {
+            return;
+        }
+        if (typeof value !== 'string') {
+            throw `Uniform type '${value}' must be a String.`;
+        }
+        const isValueArray = isArray(value);
+        const hasComma = value.includes(',');
+        if(isValueArray && !hasComma){
+            throw `Uniform type '${value}' must have a size.`
+        }
+        if (isValueArray && hasComma) {
+            const regex = /,\s*(\d+)\s*>/;
+            const match = value.match(regex);
+            if (!match) {
+                throw `Uniform type '${value}' size must be an Number.`
+            }
+        }
+
+    }
+
+    /**
+     * There's already a `getArrayType` in data-size.js
+     * but since uniforms can't accept array in wgsl,
+     * this method excludes that part
+     * returns something like vec2f, vec3f
+     * @param {Array|Object} value
+     * @returns {String}
+     */
+    #getArrayType(value) {
+        const isArray = Array.isArray(value);
+        let type = null;
+        if (isArray) {
+            const { length } = value;
+            if (length <= 4) {
+                type = `vec${length}f`;
+            }
+        }
+        return type;
+    }
+
+    // allows for things like:
+    // uniforms.myUniform += 10
+    // works on set, not on get
+    // on get you obtain the Uniform
+    valueOf() {
+        return this.#value;
+    }
+}
+
+/**
+ * Storage is a container for storage buffer related data and actions.
+ * @class Storage
+ */
+
+class Storage {
+    #name
+    #mapped
+    #type
+    #shaderStage = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE
+    #readable = false
+    #buffer = null
+    #bufferRead = null
+    #internal = false
+
+    #stream = false
+    #updated = false
+    #value
+    #size = null // TODO: document this: to force allocate more space in case an update is greater than the default array size
+
+    #clear = false
+    #clearData = null;
+    /**
+     * @param {{name:String, value:(Number|Array<Number>), type:String, readable:Boolean, shaderStage:GPUShaderStage, stream:bool, updated:bool, size:Number}} config
+     */
+    constructor({ name, value, type, readable, shaderStage,
+        stream = false, updated = false, size = null }) {
+
+        this.#validateName(name);
+        this.#validateType(type);
+        this.#validateValue(value);
+
+        this.#name = name;
+        this.#mapped = !!value;
+        this.#type = type || getWGSLType(value);
+        this.#readable = readable || this.#readable;
+        this.#shaderStage = shaderStage || this.#shaderStage;
+        this.#value = value;
+
+        this.#stream = stream;
+        this.#updated = updated || !!value; // if a value is set in constructor it should be updated
+        this.#size = size;
+
+        Object.seal(this);
+    }
+
+    #ifTypeVecGetVecValue(type, value) {
+        let newValue = value;
+        if (type.startsWith('vec')) {
+            newValue = `vec${value.length}f(${value})`;
+        }
+        return newValue;
+    }
+
+    get name() {
+        return this.#name;
+    }
+
+    /**
+     * The name that the Storage will have on the WGSL side.
+     * @param {String} value name of the Storage. The name is used in the WGSL
+     * shader.
+     * @example
+     * // js
+     * myStorage.name = 'myStorageName';
+     *
+     * // wgsl
+     * myStorageName = 13.1;
+     * @memberof Storage
+     */
+    set name(value) {
+        this.#validateName(value);
+        this.#name = value;
+    }
+
+    get mapped() {
+        return this.#mapped;
+    }
+
+    /**
+     * @param {Boolean} value tells WebGPU if the Storage is mapped or not. This
+     * allows for the initialization of the Storage with data, which is a
+     * different route.
+     * @memberof Storage
+     */
+    set mapped(value) {
+        this.#mapped = value;
+    }
+
+    get type() {
+        return this.#type;
+    }
+
+    /**
+     * @param {String} value WGSL data type of the Storage.
+     * @example
+     * myStorage.type = 'u32'
+     * @memberof Storage
+     */
+    set type(value) {
+        this.#validateType(value);
+        this.#type = value || getArrayType(this.#value) || 'f32';
+    }
+
+    get shaderStage() {
+        return this.#shaderStage;
+    }
+
+    /**
+     * Tells WebGPU to which shader it can only be used.
+     * @param {GPUShaderStage} value
+     * @memberof Storage
+     */
+    set shaderStage(value) {
+        this.#shaderStage = value;
+    }
+
+    get readable() {
+        return this.#readable;
+    }
+
+    /**
+     * If data is read back in JS from WGSL, then set to `true`.
+     * @param {Boolean} value
+     * @memberof Storage
+     */
+    set readable(value) {
+        this.#readable = value;
+    }
+
+    get buffer() {
+        return this.#buffer;
+    }
+
+    /**
+     * For internal use mostly. The actual {@link GPUBuffer} with the data.
+     * @memberof Storage
+     */
+    set buffer(value) {
+        this.#buffer = value;
+    }
+
+    get bufferRead() {
+        return this.#bufferRead;
+    }
+
+    /**
+     * Buffer for reading back
+     * For internal use mostly. The actual GPUBufferRead with the data.
+     * @memberof Storage
+     */
+    set bufferRead(value) {
+        this.#bufferRead = value;
+    }
+
+    get internal() {
+        return this.#internal;
+    }
+
+    set internal(value) {
+        this.#internal = value;
+    }
+
+    get size() {
+        return this.#size;
+    }
+
+    set size(value) {
+        this.#size = value;
+    }
+
+    get stream() {
+        return this.#stream;
+    }
+    /**
+     * `updated` is set to true in data updates, but this is not true in
+     * something like audio, where the data streams and needs to be updated
+     * constantly, so if the storage map needs to be updated constantly then
+     * `stream` needs to be set to true.
+     * @param {boolean} value
+     * @memberof Storage
+     */
+    set stream(value) {
+        this.#stream = value;
+    }
+
+    get updated() {
+        return this.#updated;
+    }
+
+    /**
+     * Mostly internal. Set to `true` if a value has been updated.
+     * @memberof Storage
+     */
+    set updated(value) {
+        this.#updated = value;
+    }
+
+    get value() {
+        return this.#value;
+    }
+
+    /**
+     * @param {Number|Array<Number>} value data to send to the shader
+     * @memberof Storage
+     */
+    set value(value) {
+        this.#validateValue(value);
+        this.#mapped = !!value;
+        const type = this.#type || getWGSLType(value);
+        this.#value = value;
+        this.#type = type;
+        this.#updated = true;
+    }
+
+    get clear() {
+        return this.#clear;
+    }
+
+    /**
+     * Clear the Storage buffer to its defaults.
+     * Is set to `false` after the buffer is cleared.
+     * @param {bool} value;
+     * @memberof Storage
+     */
+    set clear(value) {
+        this.#clear = value;
+    }
+
+    /**
+     *
+     * @param {Number|Array<Number>} value data to send to the shader
+     * @returns {Storage}
+     * @memberof Storage
+     */
+    setValue(value) {
+        this.#validateValue(value);
+
+        this.#mapped = true;
+        this.#updated = true;
+        const type = this.#type || getWGSLType(value);
+        this.#value = value;
+        this.#type = type;
+
+        return this;
+    }
+
+    /**
+     * if this is going to be used to read data back set to `true`
+     * @param {bool} value
+     * @returns {Storage}
+     * @memberof Storage
+     */
+    setReadable(value) {
+        this.#readable = value;
+        return this;
+    }
+
+    /**
+     * Tells WebGPU to which shader it can only be used.
+     * @param {GPUShaderStage} value
+     * @returns {Storage}
+     * @memberof Storage
+     */
+    setShaderStage(value) {
+        this.#shaderStage = value;
+        return this;
+    }
+
+    /**
+     * @param {String} value WGSL data type of the Storage.
+     * @returns {Storage}
+     * @example
+     * myStorage.setType('u32');
+     * @memberof Storage
+     */
+    setType(value) {
+        this.#validateType(value);
+        this.#type = value || getArrayType(value) || 'f32';
+        return this;
+    }
+
+    /**
+     * Clear buffer with offset and size.
+     * To clear only a section of the buffer.
+     * `clear` is set to `true` and reset after the buffer is cleared.
+     * @param {Number} offset start index
+     * @param {Number} size length to clear
+     */
+    setClear(offset, size) {
+        this.#clear = true;
+        this.#clearData = {
+            offset, size
+        };
+    }
+
+    /**
+     * Data to be used after a `setClear` is called.
+     */
+    get clearData() {
+        return this.#clearData;
+    }
+
+    async read() {
+        let arrayBufferCopy = null;
+        if (this.#readable) {
+            try {
+                await this.#bufferRead.mapAsync(GPUMapMode.READ);
+                const arrayBuffer = this.#bufferRead.getMappedRange();
+                arrayBufferCopy = new Float32Array(arrayBuffer.slice(0));
+                this.#bufferRead.unmap();
+                this.#value = arrayBufferCopy;
+            } catch (error) {
+                // if we switch projects mapasync fails
+                // we ignore it
+            }
+        }
+        return arrayBufferCopy;
+    }
+
+    #validateValue(value) {
+        const allowTheseTypes = (value instanceof Uint8Array) || (value instanceof Float32Array);
+        if (value && typeof value === 'object' && !Array.isArray(value) && !allowTheseTypes) {
+            throw `Storage '${this.#name}' value:'${value}' can't be an Object.`
+        }
+
+        if (typeof value === 'string') {
+            throw `Storage '${this.#name}' value: '${value}' can't be an String.`
+        }
+
+        const isArray = Array.isArray(value);
+
+        if (isArray) {
+            const { length } = value;
+            if (length < 2) {
+                throw `Constant named '${this.#name}': Size of the array is lower than 2. There's no vec1`;
+            }
+
+            if (Array.isArray(this.#value)) {
+                if (length != this.#value.length) {
+                    throw `Storage named '${this.#name}': Size of the array value has changed from ${this.#value.length} to ${length}.`
+                }
+            }
+        }
+    }
+
+    #validateName(value) {
+        if (typeof value === 'number') {
+            throw `Storage name '${this.#name}' can't be an Number.`
+        }
+
+        if (typeof value === 'string') {
+            const valNumber = +value;
+
+            if (!Number.isNaN(valNumber) && typeof valNumber === 'number') {
+                throw `Storage name '${this.#name}' can't be an Number.`
+            }
+        }
+    }
+
+    #validateType(value) {
+        if (!value) {
+            return;
+        }
+        if (typeof value !== 'string') {
+            throw `Storage type '${value}' must be a String.`;
+        }
+        const isValueArray = isArray(value);
+        const hasComma = value.includes(',');
+        if (isValueArray && hasComma) {
+            const regex = /,\s*(\d+)\s*>/;
+            const match = value.match(regex);
+            if (!match) {
+                throw `Storage type '${value}' size must be an Number.`
+            }
+        }
+    }
+
+    // allows for things like:
+    // storage.myStorage += 10
+    // works on set, not on get
+    // on get you obtain the Storage
+    valueOf() {
+        return this.#value;
+    }
+}
+
+/**
+ * Constant is a container for const declarations.
+ * They work in two ways with the `override` attribute.
+ *
+ * @class Constant
+ */
+
+class Constant {
+    #name
+    #value
+    #type
+    #override
+    #shaderStage = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE
+    /**
+     * @param {{name:String, value:(Number|Array<Number>), type:String, override:Boolean}} config
+     */
+    constructor({ name, value, type, override = false }) {
+
+        this.#validateName(name);
+        this.#validateType(type);
+        this.#validateValue(value);
+
+        this.#name = name;
+        this.#type = type || getWGSLType(value);
+        this.#value = this.#ifTypeVecGetVecValue(this.#type, value);
+        this.#override = override;
+    }
+
+    #ifTypeVecGetVecValue(type, value) {
+        let newValue = value;
+        if (type.indexOf('vec') !== -1) {
+            newValue = `vec${value.length}f(${value})`;
+        }
+        return newValue;
+    }
+
+    get name() {
+        return this.#name;
+    }
+
+    /**
+     * The name that the Constant will have on the WGSL side.
+     * @param {String} value name of the Constant. The name is used in the WGSL
+     * shader.
+     * @example
+     * // js
+     * myConstant.name = 'MYCONST';
+     *
+     * // wgsl
+     * let newVal = MYCONST + 3;
+     * @memberof Constant
+     */
+    set name(value) {
+        this.#validateName(value);
+        this.#name = value;
+    }
+
+    get value() {
+        return this.#value;
+    }
+
+    /**
+     * Get or set the value that the constant will have on the WGSL side.
+     * @warning It can only be assigned once.
+     * @param {Number|Array<Number>} value
+     * @memberof Constant
+     */
+    set value(value) {
+        this.#validateValue(value);
+        const type = getWGSLType(value);
+        this.#value = this.#ifTypeVecGetVecValue(type, value);
+        this.#type = type;
+    }
+
+    get type() {
+        return this.#type;
+    }
+
+    /**
+     * Get or set the type of the constant.
+     * It can be inferred automatically by just passing the value, but if
+     * something more specific is required, then you should use `type`.
+     * @param {String} value WGSL data type of the constant
+     * @example
+     * myConstant.type = 'u32';
+     * @memberof Constant
+     */
+    set type(value) {
+        this.#validateType(value);
+        this.#type = value;
+    }
+
+    get override() {
+        return this.#override;
+    }
+
+    /**
+     * A constant override is a constant you can change per shader.
+     * By default, POINTS interpolates constant declarations inside the WGSL
+     * string shader like this:
+     * ```wgsl
+     * const MYCONST:u32 = 10;
+     * ```
+     * These declarations are added by default to all shaders in the pipeline
+     * and in all render passes. These can not be changed.
+     *
+     * With overrides you can have the same constant in different shaders with
+     * different values. The default value is passed to each pipeline and then
+     * it can be overwritten in a specific shader by hand.
+     * @example
+     * ```js
+     * // js side
+     * constants.PI.setOverride(true).setValue(3.14);
+     * ```
+     * ```wgsl
+     * // wgsl side
+     * override MYCONST:u32 = 3.1415;
+     * ```
+     * @memberof Constant
+     */
+    set override(value) {
+        this.#override = value;
+    }
+
+    get shaderStage() {
+        return this.#shaderStage;
+    }
+
+    /**
+     * Tells WebGPU to which shader it can only be used.
+     * @param {GPUShaderStage}
+     * @memberof Constant
+     */
+    set shaderStage(value) {
+        this.#shaderStage = value;
+    }
+
+    /**
+     * Sets the value of a Constant
+     * @param {Number|Array<Number>} value
+     * @returns {Constant}
+     * @memberof Constant
+     */
+    setValue(value) {
+        this.#validateValue(value);
+        const type = getWGSLType(value);
+        this.#value = this.#ifTypeVecGetVecValue(type, value);
+        this.#type = type;
+        return this;
+    }
+
+    /**
+     * Set the data type of the Constant.
+     * @param {String} value WGSL data type of the constant
+     * @example
+     * myUniform.setType('u32')
+     * @memberof Constant
+     */
+    setType(value) {
+        this.#validateType(value);
+        this.#type = value;
+        return this;
+    }
+
+    /**
+     * A constant override is a constant you can change per shader.
+     * By default, POINTS interpolates constant declarations inside the WGSL
+     * string shader like this:
+     * ```wgsl
+     * const MYCONST:u32 = 10;
+     * ```
+     * These declarations are added by default to all shaders in the pipeline
+     * and in all render passes. These can not be changed.
+     *
+     * With overrides you can have the same constant in different shaders with
+     * different values. The default value is passed to each pipeline and then
+     * it can be overwritten in a specific shader by hand.
+     * @example
+     * ```js
+     * // js side
+     * constants.PI.setOverride(true).setValue(3.14);
+     * ```
+     * ```wgsl
+     * // wgsl side
+     * override MYCONST:u32 = 3.1415;
+     * ```
+     * @memberof Constant
+     */
+    setOverride(value) {
+        this.#override = value;
+        return this;
+    }
+
+    /**
+     * Tells WebGPU to which shader it can only be used.
+     * @param {GPUShaderStage} value
+     * @returns {Constant}
+     * @memberof Constant
+     */
+    setShaderStage(value) {
+        this.#shaderStage = value;
+        return this;
+    }
+
+    #validateValue(value) {
+        if(this.#value){
+            throw `Constant '${this.#name}': can't update a const after it has been set.`;
+        }
+
+        if (value && typeof value === 'object' && !Array.isArray(value) && !(value instanceof Uint8Array)) {
+            throw `Constant '${this.#name}' value:'${value}' can't be an Object.`
+        }
+
+        if (typeof value === 'string') {
+            throw `Constant '${this.#name}' value: '${value}' can't be an String.`
+        }
+
+        const isArray = Array.isArray(value);
+        if (isArray) {
+            const { length } = value;
+            if (length < 2) {
+                throw `Constant named '${this.#name}': Size of the array is lower than 2. There's no vec1`;
+            }
+            if (Array.isArray(this.#value)) {
+                if (length != this.#value.length) {
+                    throw `Constant named '${this.#name}': Size of the array value has changed from ${this.#value.length} to ${length}.`
+                }
+            }
+        }
+    }
+
+    #validateName(value) {
+        if (typeof value === 'number') {
+            throw `Constant name '${this.#name}' can't be an Number.`
+        }
+
+        if (typeof value === 'string') {
+            const valNumber = +value;
+
+            if (!Number.isNaN(valNumber) && typeof valNumber === 'number') {
+                throw `Constant name '${this.#name}' can't be an Number.`
+            }
+        }
+    }
+
+    #validateType(value) {
+
+    }
+
+}
+
+/**
+ * Class that handles the creation of new {@link Uniform}s in Points.
+ * @example
+ * // js side
+ * points.uniforms.myUniform = 10
+ *
+ * // wgsl side
+ * let val = params.myUniform; // value is 10.0 f32
+ * @class Uniforms
+ */
+class Uniforms {
+    #list = new UniformsArray();
+
+    constructor() {
+        return new Proxy(this, {
+            get(target, prop, receiver) {
+
+                const value = Reflect.get(target, prop, target);
+
+                if (prop === 'list') {
+                    return value;
+                }
+
+                if (typeof value === 'function') {
+                    if (prop === 'find') {
+                        return value.bind(target);
+                    }
+                    if (prop === 'add') {
+                        return value.bind(target);
+                    }
+                }
+
+                if (prop in target) {
+                    return value;
+                }
+                // If Uniform does not exist we create it.
+                const uniform = new Uniform$1({ name: prop });
+                target.list.push(uniform);
+                Reflect.set(target, prop, uniform, target);
+                return uniform;
+            },
+
+            set(target, prop, value, receiver) {
+                if (prop === 'list') {
+                    return Reflect.set(target, prop, value, target);
+                }
+
+                const type = typeof value;
+                if (type === 'string') {
+                    throw `Uniform named '${prop}': No strings allowed or maybe you are adding an array.`;
+                }
+                if (type === 'object' && !Array.isArray(value)) {
+                    throw `Uniform named '${prop}': No objects allowed.`;
+                }
+
+                if (prop in target) {
+                    const uniform = Reflect.get(target, prop, target);
+                    uniform.value = value;
+                    return uniform;
+                }
+
+                // If Uniform does not exist we create it.
+
+                const uniform = new Uniform$1({ name: prop, value });
+                target.list.push(uniform);
+                return Reflect.set(target, prop, uniform, target);
+            }
+        });
+    }
+
+    get list() {
+        return this.#list;
+    }
+
+    /**
+     * List of all {@link Uniform}s
+     * @param {Array} value
+     * @memberof Uniforms
+     */
+    set list(value) {
+        this.#list = value;
+    }
+
+    /**
+     * Retrieves a {@link Uniform} by its name.
+     * @param {String} name
+     * @returns {Uniform}
+     * @memberof Uniforms
+     */
+    find(name) {
+        return this[name];
+    }
+
+    /**
+     * Add a new {@link Uniform}
+     * @param {Uniform} uniform
+     * @memberof Uniforms
+     */
+    add(uniform) {
+        const { name } = uniform;
+        if (this[name]) {
+            throw `Uniform named ${name} already exists.`
+        }
+        this[name] = uniform;
+        this.#list.push(uniform);
+    }
+}
+
+/**
+ * Class that handles the creation of new {@link Storage}s in Points.
+ * @example
+ * // js side
+ * points.storages.myStorage = [1, 2, 3]
+ *
+ * // wgsl side
+ * let val = myStorage; // value is vec3f(1, 2, 3)
+ * @class Storages
+ */
+class Storages {
+    #list = [];
+
+    constructor() {
+        return new Proxy(this, {
+            get(target, prop, receiver) {
+
+                const value = Reflect.get(target, prop, target);
+
+                if (prop === 'list') {
+                    return value;
+                }
+
+                if (typeof value === 'function') {
+                    if (prop === 'find') {
+                        return value.bind(target);
+                    }
+                    if (prop === 'add') {
+                        return value.bind(target);
+                    }
+                }
+
+                if (prop in target) {
+                    return value;
+                }
+                // If Storage does not exist we create it.
+                const storage = new Storage$1({ name: prop });
+                target.list.push(storage);
+                Reflect.set(target, prop, storage, target);
+                return storage;
+            },
+
+            set(target, prop, value, receiver) {
+                if (prop === 'list') {
+                    return Reflect.set(target, prop, value, target);
+                }
+
+                const type = typeof value;
+                if (type === 'string') {
+                    throw `Storage named '${prop}': No strings allowed or maybe you are adding an array.`;
+                }
+                if (!type && type === 'object' && !Array.isArray(value)) {
+                    throw `Storage named '${prop}': No objects allowed.`;
+                }
+
+                if (prop in target) {
+                    const storage = Reflect.get(target, prop, target);
+                    storage.value = value;
+                    return storage;
+                }
+
+                // If Storage does not exist we create it.
+
+                const storage = new Storage$1({ name: prop, value });
+                target.list.push(storage);
+                return Reflect.set(target, prop, storage, target);
+            }
+        });
+    }
+
+    get list() {
+        return this.#list;
+    }
+
+    /**
+     * List of all {@link Storage}
+     * @param {Array} value
+     * @memberof Storages
+     */
+    set list(value) {
+        this.#list = value;
+    }
+
+    /**
+     * Retrieves a {@link Storage} by its name.
+     * @param {String} name
+     * @returns {Storage}
+     * @memberof Storages
+     */
+    find(name) {
+        return this[name];
+    }
+
+    /**
+     * Add a new {@link Storage}
+     * @param {Storage} storage
+     * @memberof Storages
+     */
+    add(storage) {
+        const { name } = storage;
+        if (this[name]) {
+            throw `Storage named ${name} already exists.`
+        }
+        this[name] = storage;
+        this.#list.push(storage);
+    }
+}
+
+/**
+ * Class that handles the creation of new {@link Constant}s in Points.
+ * @example
+ * // js side
+ * points.constants.MYCONST = 10;
+ *
+ * // wgsl side
+ * let val = MYCONST; // value is 10 u32 by default
+ * @class Constants
+ */
+class Constants {
+    #list = [];
+
+    constructor() {
+        return new Proxy(this, {
+            get(target, prop, receiver) {
+
+                const value = Reflect.get(target, prop, target);
+
+                if (prop === 'list') {
+                    return value;
+                }
+
+                if (typeof value === 'function') {
+                    switch (prop) {
+                        case 'find':
+                        case 'add':
+                        case 'listOfOverrides':
+                        case 'stringOfNonOverrides':
+                            return value.bind(target);
+                    }
+                }
+
+                if (prop in target) {
+                    return value;
+                }
+                // If Constant does not exist we create it.
+                const constant = new Constant$1({ name: prop, value: 0 });
+                target.list.push(constant);
+                Reflect.set(target, prop, constant, target);
+                return constant;
+            },
+
+            set(target, prop, value, receiver) {
+                if (prop === 'list') {
+                    return Reflect.set(target, prop, value, target);
+                }
+
+                const type = typeof value;
+                if (type === 'string') {
+                    throw `Constant named '${prop}': No strings allowed or maybe you are adding an array.`;
+                }
+                if (!type && type === 'object' && !Array.isArray(value)) {
+                    throw `Constant named '${prop}': No objects allowed.`;
+                }
+
+                if (prop in target) {
+                    const constant = Reflect.get(target, prop, target);
+                    constant.value = value;
+                    return constant;
+                }
+
+                // If Constant does not exist we create it.
+
+                const constant = new Constant$1({ name: prop, value });
+                target.list.push(constant);
+                return Reflect.set(target, prop, constant, target);
+            }
+        });
+    }
+
+    get list() {
+        return this.#list;
+    }
+
+    /**
+     * List of all {@link Constant}s
+     * @param {Array} value
+     * @memberof Constants
+     */
+    set list(value) {
+        this.#list = value;
+    }
+
+    /**
+     * Retrieves a {@link Constant} by its name.
+     * @param {String} name
+     * @returns {Constant}
+     * @memberof Constants
+     */
+    find(name) {
+        return this[name];
+    }
+
+    /**
+     * Add a new {@link Constant}
+     * @param {Constant} constant
+     * @memberof Constants
+     */
+    add(constant) {
+        const { name } = constant;
+        if (this[name]) {
+            throw `Constant named ${name} already exists.`
+        }
+        this[name] = constant;
+        this.#list.push(constant);
+    }
+
+    /**
+     * Object list with the constants that are overridable.
+     * This object will be passed into the pipeline.
+     * @param {GPUShaderStage|Number} filter
+     * @returns {Object}
+     * @memberof Constants
+     */
+    listOfOverrides(filter) {
+        return Object.fromEntries(
+            this.#list
+                .filter(c => ((filter & c.shaderStage) !== 0))
+                .filter(c => c.override)
+                .map(c => [c.name, c.value])
+        );
+    }
+
+    /**
+     * List of constants formatted as WGSL string to be interpolated in the
+     * shaders.
+     * @param {GPUShaderStage|Number} filter
+     * @returns {String}
+     * @memberof Constants
+     */
+    stringOfNonOverrides(filter) {
+        let consStrings = '';
+        this.#list.forEach(c => {
+            const hasOneStage = (filter & c.shaderStage) !== 0;
+            if (!c.override && hasOneStage) {
+                consStrings += /*wgsl*/`const ${c.name}:${c.type} = ${c.value};\n`;
+            }
+        });
+        return consStrings;
+    }
+}
 
 function getWGSLCoordinate(value, side, invert = false) {
     const direction = invert ? -1 : 1;
@@ -1962,2788 +4744,6 @@ class RenderPass extends EventTarget {
         this.#bundle = null;
     }
 
-}
-
-/**
- * Class to be used to select how the content should be displayed on different
- * screen sizes.
- * ```text
- * FIT: Preserves both, but might show black bars or extend empty content. All content is visible.
- * COVER: Preserves both, but might crop width or height. All screen is covered.
- * WIDTH: Preserves the visibility of the width, but might crop the height.
- * HEIGHT: Preserves the visibility of the height, but might crop the width.
- * ```
- * @example
- *
- * points.scaleMode = ScaleMode.COVER;
- *
- * @class ScaleMode
- */
-
-class ScaleMode {
-    /**
-     * ```text
-     * All content is visible.
-     * Black bars shown to compensate.
-     * No content is cropped.
-     *
-     * PORTRAIT        LANDSCAPE
-     * ░░░░░░░░░░░░░░░ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ░░░░░░░░░░░░░░░ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ░░░░░░░░░░░░░░░
-     * ░░░░░░░░░░░░░░░
-     * ```
-     * @memberof ScaleMode
-     */
-
-    static FIT = 1;
-    /**
-     * ```text
-     * Not all content is visible.
-     * No black bars shown.
-     * Content is cropped on the sides.
-     * `
-     * PORTRAIT            LANDSCAPE
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ```
-     * @memberof ScaleMode
-     */
-    static COVER = 2;
-    /**
-     * ```text
-     * Content is visible in portrait.
-     * Black bars shown to compensate in portrait.
-     * Content is cropped in landscape.
-     *
-     * PORTRAIT        LANDSCAPE
-     * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ```
-     * @memberof ScaleMode
-     */
-    static WIDTH = 4;
-    /**
-     * ```text
-     * Not all content is visible.
-     * Black bars shown to compensate in landscape.
-     * Content is cropped in portrait.
-     *
-     * PORTRAIT            LANDSCAPE
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
-     * ```
-     * @memberof ScaleMode
-     */
-    static HEIGHT = 8;
-}
-
-/**
- * Utility types and methods to set wgsl types in memory.
- * This is mainly internal.
- * @module data-size
- * @ignore
- */
-
-const size_2_align_2 = { size: 2, align: 2 };
-const size_4_align_4 = { size: 4, align: 4 };
-const size_6_align_8 = { size: 6, align: 8 };
-const size_8_align_4 = { size: 8, align: 4 };
-const size_8_align_8 = { size: 8, align: 8 };
-const size_12_align_4 = { size: 12, align: 4 };
-const size_12_align_16 = { size: 12, align: 16 };
-const size_16_align_4 = { size: 16, align: 4 };
-const size_16_align_16 = { size: 16, align: 16 };
-const size_16_align_8 = { size: 16, align: 8 };
-const size_24_align_8 = { size: 24, align: 8 };
-const size_32_align_8 = { size: 32, align: 8 };
-const size_32_align_16 = { size: 32, align: 16 };
-const size_48_align_16 = { size: 48, align: 16 };
-const size_64_align_16 = { size: 64, align: 16 };
-
-const typeSizes = {
-    'bool': size_4_align_4,
-    'i32': size_4_align_4,
-    'u32': size_4_align_4,
-    'f32': size_4_align_4,
-
-    'f16': size_2_align_2,
-
-    'atomic<u32>': size_4_align_4,
-    'atomic<i32>': size_4_align_4,
-
-    'vec2<bool>': size_8_align_8,
-    'vec2<i32>': size_8_align_8,
-    'vec2<u32>': size_8_align_8,
-    'vec2<f32>': size_8_align_8,
-    // 'vec2<bool>': size_8_align_8,
-    'vec2i': size_8_align_8,
-    'vec2u': size_8_align_8,
-    'vec2f': size_8_align_8,
-
-    'vec2<f16>': size_4_align_4,
-    'vec2h': size_4_align_4,
-
-    'vec3<bool>': size_12_align_16,
-    'vec3<i32>': size_12_align_16,
-    'vec3<u32>': size_12_align_16,
-    'vec3<f32>': size_12_align_16,
-    // 'vec3<bool>': size_12_align_16,
-    'vec3i': size_12_align_16,
-    'vec3u': size_12_align_16,
-    'vec3f': size_12_align_16,
-
-    'vec3<f16>': size_6_align_8,
-    'vec3h': size_6_align_8,
-
-    'vec4<bool>': size_16_align_16,
-    'vec4<i32>': size_16_align_16,
-    'vec4<u32>': size_16_align_16,
-    'vec4<f32>': size_16_align_16,
-    // 'vec4<bool>': size_16_align_16,
-    'vec4i': size_16_align_16,
-    'vec4u': size_16_align_16,
-    'vec4f': size_16_align_16,
-
-    'vec4<f16>': size_8_align_8,
-    'vec4h': size_8_align_8,
-
-    'mat2x2<f32>': size_16_align_8,
-    'mat2x2f': size_16_align_8,
-    'mat2x2<f16>': size_8_align_4,
-    'mat2x2h': size_8_align_4,
-
-    'mat3x2<f32>': size_24_align_8,
-    'mat3x2f': size_24_align_8,
-    'mat3x2<f16>': size_12_align_4,
-    'mat3x2h': size_12_align_4,
-
-    'mat4x2<f32>': size_32_align_8,
-    'mat4x2f': size_32_align_8,
-    'mat4x2<f16>': size_16_align_4,
-    'mat4x2h': size_16_align_4,
-
-    'mat2x3<f32>': size_32_align_16,
-    'mat2x3f': size_32_align_16,
-    'mat2x3<f16>': size_16_align_8,
-    'mat2x3h': size_16_align_8,
-
-    'mat3x3<f32>': size_48_align_16,
-    'mat3x3f': size_48_align_16,
-    'mat3x3<f16>': size_24_align_8,
-    'mat3x3h': size_24_align_8,
-
-    'mat4x3<f32>': size_64_align_16,
-    'mat4x3f': size_64_align_16,
-    'mat4x3<f16>': size_32_align_8,
-    'mat4x3h': size_32_align_8,
-
-    'mat2x4<f32>': size_32_align_16,
-    'mat2x4f': size_32_align_16,
-    'mat2x4<f16>': size_16_align_8,
-    'mat2x4h': size_16_align_8,
-
-    'mat3x4<f32>': size_48_align_16,
-    'mat3x4f': size_48_align_16,
-    'mat3x4<f16>': size_24_align_8,
-    'mat3x4h': size_24_align_8,
-
-    'mat4x4<f32>': size_64_align_16,
-    'mat4x4f': size_64_align_16,
-    'mat4x4<f16>': size_32_align_8,
-    'mat4x4h': size_32_align_8,
-};
-
-
-// ignore comments
-const removeCommentsRE = /\/\*[\s\S]*?\*\/|\/\/.*/gim;
-
-// struct name:
-const getStructNameRE = /struct\s+?(\w+)\s*{[^}]+}\n?/g;
-
-// what's inside a struct:
-const insideStructRE = /struct\s+?\w+\s*{([^}]+)}\n?/g;
-
-const arrayTypeAndAmountRE = /\s*<\s*([^,]+)\s*,?\s*(\d+)?\s*>/g;
-
-const arrayIntegrityRE = /\s*(array\s*<\s*\w+\s*(?:,\s*\d+)?\s*>)\s*,?/g;
-
-// you have to separete the result by splitting new lines
-
-function removeComments(value) {
-    const matches = value.matchAll(removeCommentsRE);
-    for (const match of matches) {
-        const captured = match[0];
-        value = value.replace(captured, '');
-    }
-    return value;
-}
-
-function getInsideStruct(value) {
-    const matches = value.matchAll(insideStructRE);
-    let lines = null;
-    for (const match of matches) {
-        lines = match[1].split('\n');
-        lines = lines.map(element => element.trim())
-            .filter(e => e !== '');
-    }
-    return lines;
-}
-
-function getStructDataByName(value) {
-    const matches = value.matchAll(getStructNameRE);
-    let result = new Map();
-    for (const match of matches) {
-        const captured = match[0];
-        const name = match[1];
-        const lines = getInsideStruct(captured);
-        const types = lines.map(l => {
-            const right = l.split(':')[1];
-            let type = '';
-            if (isArray(right)) {
-                const arrayMatch = right.matchAll(arrayIntegrityRE);
-                type = arrayMatch.next().value[1];
-            } else {
-                type = right.split(',')[0].trim();
-            }
-            return type;
-        });
-
-        const names = lines.map(l => {
-            const left = l.split(':')[0];
-            let name = '';
-            name = left.split(',')[0].trim();
-            return name;
-        });
-
-        result.set(name, {
-            captured,
-            lines,
-            types,
-            unique_types: [...new Set(types)],
-            names,
-        });
-    }
-    return result;
-}
-
-function getArrayTypeAndAmount(value) {
-    const matches = value.matchAll(arrayTypeAndAmountRE);
-    let result = [];
-    for (const match of matches) {
-        const type = match[1];
-        const amount = match[2]; // || 5
-        result.push({ type, amount: Number(amount) });
-    }
-    return result;
-}
-
-/**
- * Check if string has 'array' in it
- * @param {String} value
- * @returns {boolean}
- */
-function isArray(value) {
-    return value.indexOf('array') != -1;
-}
-
-function getArrayTypeData(currentType, structData) {
-    const [d] = getArrayTypeAndAmount(currentType);
-    if (!d) {
-        throw `${currentType} seems to have an error, maybe a wrong amount?`;
-    }
-    if (d.amount == 0) {
-        throw new Error(`${currentType} has an amount of 0`);
-    }
-    let currentTypeData = typeSizes[d.type] || structData.get(d.type);
-    if (!currentTypeData) {
-        throw `Struct or type '${d.type}' in ${currentType} is not defined.`
-    }
-    if (d.amount) {
-        const t = typeSizes[d.type];
-        if (t) {
-            // if array, the size is equal to the align
-            currentTypeData = { size: t.align * d.amount, align: t.align };
-        } else {
-            const sd = structData.get(d.type);
-            if (sd) {
-                currentTypeData = { size: sd.bytes * d.amount, align: sd.maxAlign };
-            }
-        }
-    }
-    return currentTypeData;
-}
-
-
-/**
- * Calculates if there's a space of bytes left in the row
- * @param {Number} bytes current bytes size
- * @param {Number} maxSize max size of row, in this case probably 16
- * @returns remaining bytes if any
- */
-function getPadding(bytes, maxSize) {
-    const remainder = bytes % maxSize;
-    let remainingBytes = 0;
-    if (remainder) {
-        remainingBytes = maxSize - remainder;
-    }
-    return remainingBytes
-}
-
-const MAX_ROW_SIZE = 16;
-const HALF = 2;
-const dataSize = value => {
-    const noCommentsValue = removeComments(value);
-    const structData = getStructDataByName(noCommentsValue);
-
-    structData.forEach(sd => {
-        let bytes = 0;
-        let remainingBytes = 0;
-        sd.paddings = {};
-        sd.names.forEach((name, i) => {
-            const type = sd.types[i];
-            let typeSize = typeSizes[type];
-            let repeat = 0;
-
-            // if no typeSize is an array or struct
-            if (!typeSize) {
-                if (type) {
-                    if (isArray(type)) {
-                        const [innerType] = getArrayTypeAndAmount(type);
-
-                        typeSize = typeSizes[innerType.type];
-                        if (typeSize) {
-                            repeat = innerType.amount; // check comment on top of do while
-                            innerType.align = MAX_ROW_SIZE;
-                        } else {
-                            const sd = structData.get(innerType.type);
-                            typeSize = { size: sd.bytes, align: MAX_ROW_SIZE };
-                        }
-
-                    } else {
-                        const sd = structData.get(type);
-                        if (!sd) {
-                            throw `Type or struct ${type} doesn't exist.`;
-                        }
-                        typeSize = { size: sd.bytes, align: MAX_ROW_SIZE };
-                    }
-                }
-            }
-
-            const { size, align } = typeSize;
-            const prevName = sd.names[i - 1];
-
-            /**
-             * The idea with the repeat and the do while is that, if there's an
-             * array, the subtype will be added `type.amount` times with the
-             * same rules. That's it.
-             */
-            do {
-                let aligned = bytes % align === 0;
-
-                while (!aligned) {
-                    remainingBytes -= HALF;
-                    bytes += HALF;
-                    sd.paddings[prevName] ||= 0;
-                    sd.paddings[prevName] += HALF;
-                    aligned = bytes % align === 0;
-                }
-
-                if (remainingBytes && size > remainingBytes) {
-                    bytes += remainingBytes;
-                    sd.paddings[prevName] = remainingBytes;
-                    remainingBytes = 0;
-                }
-
-                bytes += size;
-
-                repeat--;
-            } while (repeat > 0)
-
-            remainingBytes = getPadding(bytes, MAX_ROW_SIZE);
-        });
-        remainingBytes = getPadding(bytes, MAX_ROW_SIZE);
-        bytes += remainingBytes;
-        sd.bytes = bytes;
-    });
-
-    return structData
-};
-
-/**
- * Takes a number or array and infers the WGSL type
- * @param {Number|Array<Number>} value
- * @returns {String} WGSL equivalent type
- */
-function getWGSLType(value) {
-
-    if ((!value && value !== 0) || ((Number.isNaN(value) || value instanceof Object || typeof value === 'string') && !(value instanceof Array))) {
-        return '';
-    }
-
-    const strValue = value.toString();
-
-    if (value instanceof Array) {
-        return getArrayType$1(value);
-    }
-
-    const hasPeriod = strValue.indexOf('.') != -1;
-    if (hasPeriod) {
-        return 'f32';
-    }
-
-    const hasSign = strValue.indexOf('-') != -1;
-    if (hasSign) {
-        return 'i32'
-    }
-
-    return 'u32';
-}
-
-/**
- * From a JS value (number, array)
- * returns WGSL type like vec2f, vec3f
- * @param {Array|Object} value
- * @returns {String}
- */
-function getArrayType$1(value) {
-    const isArray = Array.isArray(value);
-    let type = null;
-    if (isArray) {
-        const { length } = value;
-        if (length <= 4) {
-            type = `vec${length}f`;
-        }
-        if (length > 4) {
-            type = `array<f32, ${length}>`;
-        }
-    }
-    return type;
-}
-
-/**
- * Uniform is a container for uniform buffer related data and actions.
- *
- * @class Uniform
- */
-class Uniform {
-    #name
-    #value
-    #type
-    #size
-
-    /**
-     *
-     * @param {{name:String, value:(Number|Boolean|Array<Number>), type:string, size:Number=}} config
-     */
-    constructor({ name, value, type = null, size = null }) {
-
-        this.#validateName(name);
-        this.#validateType(type);
-        this.#validateValue(value);
-
-        this.#name = name;
-
-        this.#value = value;
-        this.#type = type || this.#getArrayType(value) || 'f32';
-        this.#size = size;
-
-        Object.seal(this);
-    }
-
-    get name() {
-        return this.#name;
-    }
-
-    /**
-     * The name that the Uniform will have on the WGSL side.
-     * @param {String} value name of the Uniform. The name is used in the WGSL
-     * shader.
-     * @example
-     * // js
-     * myUniform.name = 'myUniformName';
-     *
-     * // wgsl
-     * myUniformName = 13.0;
-     * @memberof Uniform
-     */
-    set name(value) {
-        this.#validateName(value);
-        this.#name = value;
-    }
-
-    get value() {
-        return this.#value;
-    }
-
-    /**
-     * To get or set the value of the uniform from the JS side to the WGSL side.
-     * @param {Number|Boolean|Array<Number>} value The uniform value
-     * @memberof Uniform
-     */
-    set value(value) {
-        this.#validateValue(value);
-        this.#value = value;
-    }
-
-    get type() {
-        return this.#type
-    }
-
-    /**
-     * Get or set the type of the uniform.
-     * It can be inferred automatically by just passing the value, but if
-     * something more specific is required, then you should use `type`.
-     * @param {String} value WGSL data type of the uniform
-     * @example
-     * myUniform.type = 'u32';
-     * @memberof Uniform
-     */
-    set type(value) {
-        this.#validateType(value);
-        this.#type = value || this.#getArrayType(this.#value) || 'f32';
-    }
-
-    get size() {
-        return this.#size;
-    }
-
-    /**
-     * For internal use mostly. Size in bytes.
-     * @memberof Uniform
-     */
-    set size(value) {
-        this.#size = value;
-    }
-
-    /**
-     * Clone of the Uniform data as a plain object to avoid modifications on
-     * the original data.
-     * @returns {Object}
-     * @memberof Uniform
-     */
-    serialize() {
-        // we check if array and spread
-        // because structuredClone is slower
-        const isArray = Array.isArray(this.#value);
-        const value = isArray ? [...this.#value] : this.#value;
-        return {
-            name: this.#name,
-            value,
-            type: this.#type,
-            size: this.#size
-        };
-    }
-
-    /**
-     * Sets or updates the value of the Uniform.
-     * @param {Number|Boolean|Array<Number>} value
-     * @memberof Uniform
-     */
-    setValue(value) {
-        this.#validateValue(value);
-        this.#value = value;
-        return this;
-    }
-
-    /**
-     * Set the data type of the uniform.
-     * @param {String} value WGSL data type of the uniform
-     * @example
-     * myUniform.setType('u32')
-     * @memberof Uniform
-     */
-    setType(value) {
-        this.#validateType(value);
-        this.#type = value || this.#getArrayType(this.#value) || 'f32';
-        return this;
-    }
-
-    #validateValue(value) {
-        if (typeof value === 'object' && !Array.isArray(value)) {
-            throw `Uniform '${this.#name}' value:'${value}' can't be an Object.`
-        }
-
-        if (typeof value === 'string') {
-            throw `Uniform '${this.#name}' value: '${value}' can't be an String.`
-        }
-
-        const isArray = Array.isArray(value);
-        if (isArray) {
-            const { length } = value;
-            // TODO include mat values, e.g.: mat4x2
-            // if (length > 4) {
-            //     console.trace(this.#name, this.#value);
-            //     throw `Uniform named '${this.#name}': Can't assign an Array greater than a vec4f.`
-            // }
-            if (Array.isArray(this.#value)) {
-                if (length != this.#value.length) {
-                    throw `Uniform named '${this.#name}': Size of the array value has changed from ${this.#value.length} to ${length}.`
-                }
-            }
-
-            if (length < 2) {
-                throw `Uniform named '${this.#name}': Can't assign an Array smaller than a vec2f. Assign the Number directly.`
-            }
-        }
-    }
-
-    #validateName(value) {
-        if (typeof value === 'number') {
-            throw `Uniform name '${this.#name}' can't be an Number.`
-        }
-
-        if (typeof value === 'string') {
-            const valNumber = +value;
-
-            if (!Number.isNaN(valNumber) && typeof valNumber === 'number') {
-                throw `Uniform name '${this.#name}' can't be an Number.`
-            }
-        }
-    }
-
-    #validateType(value) {
-
-        if (!value) {
-            return;
-        }
-        if (typeof value !== 'string') {
-            throw `Uniform type '${value}' must be a String.`;
-        }
-        const isValueArray = isArray(value);
-        const hasComma = value.includes(',');
-        if(isValueArray && !hasComma){
-            throw `Uniform type '${value}' must have a size.`
-        }
-        if (isValueArray && hasComma) {
-            const regex = /,\s*(\d+)\s*>/;
-            const match = value.match(regex);
-            if (!match) {
-                throw `Uniform type '${value}' size must be an Number.`
-            }
-        }
-
-    }
-
-    /**
-     * There's already a `getArrayType` in data-size.js
-     * but since uniforms can't accept array in wgsl,
-     * this method excludes that part
-     * returns something like vec2f, vec3f
-     * @param {Array|Object} value
-     * @returns {String}
-     */
-    #getArrayType(value) {
-        const isArray = Array.isArray(value);
-        let type = null;
-        if (isArray) {
-            const { length } = value;
-            if (length <= 4) {
-                type = `vec${length}f`;
-            }
-        }
-        return type;
-    }
-
-    // allows for things like:
-    // uniforms.myUniform += 10
-    // works on set, not on get
-    // on get you obtain the Uniform
-    valueOf() {
-        return this.#value;
-    }
-}
-
-/**
- * Storage is a container for storage buffer related data and actions.
- * @class Storage
- */
-
-class Storage {
-    #name
-    #mapped
-    #type
-    #shaderStage = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE
-    #readable = false
-    #buffer = null
-    #bufferRead = null
-    #internal = false
-
-    #stream = false
-    #updated = false
-    #value
-    #size = null // TODO: document this: to force allocate more space in case an update is greater than the default array size
-
-    #clear = false
-    #clearData = null;
-    /**
-     * @param {{name:String, value:(Number|Array<Number>), type:String, readable:Boolean, shaderStage:GPUShaderStage, stream:bool, updated:bool, size:Number}} config
-     */
-    constructor({ name, value, type, readable, shaderStage,
-        stream = false, updated = false, size = null }) {
-
-        this.#validateName(name);
-        this.#validateType(type);
-        this.#validateValue(value);
-
-        this.#name = name;
-        this.#mapped = !!value;
-        this.#type = type || getWGSLType(value);
-        this.#readable = readable || this.#readable;
-        this.#shaderStage = shaderStage || this.#shaderStage;
-        this.#value = value;
-
-        this.#stream = stream;
-        this.#updated = updated || !!value; // if a value is set in constructor it should be updated
-        this.#size = size;
-
-        Object.seal(this);
-    }
-
-    #ifTypeVecGetVecValue(type, value) {
-        let newValue = value;
-        if (type.startsWith('vec')) {
-            newValue = `vec${value.length}f(${value})`;
-        }
-        return newValue;
-    }
-
-    get name() {
-        return this.#name;
-    }
-
-    /**
-     * The name that the Storage will have on the WGSL side.
-     * @param {String} value name of the Storage. The name is used in the WGSL
-     * shader.
-     * @example
-     * // js
-     * myStorage.name = 'myStorageName';
-     *
-     * // wgsl
-     * myStorageName = 13.1;
-     * @memberof Storage
-     */
-    set name(value) {
-        this.#validateName(value);
-        this.#name = value;
-    }
-
-    get mapped() {
-        return this.#mapped;
-    }
-
-    /**
-     * @param {Boolean} value tells WebGPU if the Storage is mapped or not. This
-     * allows for the initialization of the Storage with data, which is a
-     * different route.
-     * @memberof Storage
-     */
-    set mapped(value) {
-        this.#mapped = value;
-    }
-
-    get type() {
-        return this.#type;
-    }
-
-    /**
-     * @param {String} value WGSL data type of the Storage.
-     * @example
-     * myStorage.type = 'u32'
-     * @memberof Storage
-     */
-    set type(value) {
-        this.#validateType(value);
-        this.#type = value || getArrayType(this.#value) || 'f32';
-    }
-
-    get shaderStage() {
-        return this.#shaderStage;
-    }
-
-    /**
-     * Tells WebGPU to which shader it can only be used.
-     * @param {GPUShaderStage} value
-     * @memberof Storage
-     */
-    set shaderStage(value) {
-        this.#shaderStage = value;
-    }
-
-    get readable() {
-        return this.#readable;
-    }
-
-    /**
-     * If data is read back in JS from WGSL, then set to `true`.
-     * @param {Boolean} value
-     * @memberof Storage
-     */
-    set readable(value) {
-        this.#readable = value;
-    }
-
-    get buffer() {
-        return this.#buffer;
-    }
-
-    /**
-     * For internal use mostly. The actual {@link GPUBuffer} with the data.
-     * @memberof Storage
-     */
-    set buffer(value) {
-        this.#buffer = value;
-    }
-
-    get bufferRead() {
-        return this.#bufferRead;
-    }
-
-    /**
-     * Buffer for reading back
-     * For internal use mostly. The actual GPUBufferRead with the data.
-     * @memberof Storage
-     */
-    set bufferRead(value) {
-        this.#bufferRead = value;
-    }
-
-    get internal() {
-        return this.#internal;
-    }
-
-    set internal(value) {
-        this.#internal = value;
-    }
-
-    get size() {
-        return this.#size;
-    }
-
-    set size(value) {
-        this.#size = value;
-    }
-
-    get stream() {
-        return this.#stream;
-    }
-    /**
-     * `updated` is set to true in data updates, but this is not true in
-     * something like audio, where the data streams and needs to be updated
-     * constantly, so if the storage map needs to be updated constantly then
-     * `stream` needs to be set to true.
-     * @param {boolean} value
-     * @memberof Storage
-     */
-    set stream(value) {
-        this.#stream = value;
-    }
-
-    get updated() {
-        return this.#updated;
-    }
-
-    /**
-     * Mostly internal. Set to `true` if a value has been updated.
-     * @memberof Storage
-     */
-    set updated(value) {
-        this.#updated = value;
-    }
-
-    get value() {
-        return this.#value;
-    }
-
-    /**
-     * @param {Number|Array<Number>} value data to send to the shader
-     * @memberof Storage
-     */
-    set value(value) {
-        this.#validateValue(value);
-        this.#mapped = !!value;
-        const type = this.#type || getWGSLType(value);
-        this.#value = value;
-        this.#type = type;
-        this.#updated = true;
-    }
-
-    get clear() {
-        return this.#clear;
-    }
-
-    /**
-     * Clear the Storage buffer to its defaults.
-     * Is set to `false` after the buffer is cleared.
-     * @param {bool} value;
-     * @memberof Storage
-     */
-    set clear(value) {
-        this.#clear = value;
-    }
-
-    /**
-     *
-     * @param {Number|Array<Number>} value data to send to the shader
-     * @returns {Storage}
-     * @memberof Storage
-     */
-    setValue(value) {
-        this.#validateValue(value);
-
-        this.#mapped = true;
-        this.#updated = true;
-        const type = this.#type || getWGSLType(value);
-        this.#value = value;
-        this.#type = type;
-
-        return this;
-    }
-
-    /**
-     * if this is going to be used to read data back set to `true`
-     * @param {bool} value
-     * @returns {Storage}
-     * @memberof Storage
-     */
-    setReadable(value) {
-        this.#readable = value;
-        return this;
-    }
-
-    /**
-     * Tells WebGPU to which shader it can only be used.
-     * @param {GPUShaderStage} value
-     * @returns {Storage}
-     * @memberof Storage
-     */
-    setShaderStage(value) {
-        this.#shaderStage = value;
-        return this;
-    }
-
-    /**
-     * @param {String} value WGSL data type of the Storage.
-     * @returns {Storage}
-     * @example
-     * myStorage.setType('u32');
-     * @memberof Storage
-     */
-    setType(value) {
-        this.#validateType(value);
-        this.#type = value || getArrayType(value) || 'f32';
-        return this;
-    }
-
-    /**
-     * Clear buffer with offset and size.
-     * To clear only a section of the buffer.
-     * `clear` is set to `true` and reset after the buffer is cleared.
-     * @param {Number} offset start index
-     * @param {Number} size length to clear
-     */
-    setClear(offset, size) {
-        this.#clear = true;
-        this.#clearData = {
-            offset, size
-        };
-    }
-
-    /**
-     * Data to be used after a `setClear` is called.
-     */
-    get clearData() {
-        return this.#clearData;
-    }
-
-    async read() {
-        let arrayBufferCopy = null;
-        if (this.#readable) {
-            try {
-                await this.#bufferRead.mapAsync(GPUMapMode.READ);
-                const arrayBuffer = this.#bufferRead.getMappedRange();
-                arrayBufferCopy = new Float32Array(arrayBuffer.slice(0));
-                this.#bufferRead.unmap();
-                this.#value = arrayBufferCopy;
-            } catch (error) {
-                // if we switch projects mapasync fails
-                // we ignore it
-            }
-        }
-        return arrayBufferCopy;
-    }
-
-    #validateValue(value) {
-        const allowTheseTypes = (value instanceof Uint8Array) || (value instanceof Float32Array);
-        if (value && typeof value === 'object' && !Array.isArray(value) && !allowTheseTypes) {
-            throw `Storage '${this.#name}' value:'${value}' can't be an Object.`
-        }
-
-        if (typeof value === 'string') {
-            throw `Storage '${this.#name}' value: '${value}' can't be an String.`
-        }
-
-        const isArray = Array.isArray(value);
-
-        if (isArray) {
-            const { length } = value;
-            if (length < 2) {
-                throw `Constant named '${this.#name}': Size of the array is lower than 2. There's no vec1`;
-            }
-
-            if (Array.isArray(this.#value)) {
-                if (length != this.#value.length) {
-                    throw `Storage named '${this.#name}': Size of the array value has changed from ${this.#value.length} to ${length}.`
-                }
-            }
-        }
-    }
-
-    #validateName(value) {
-        if (typeof value === 'number') {
-            throw `Storage name '${this.#name}' can't be an Number.`
-        }
-
-        if (typeof value === 'string') {
-            const valNumber = +value;
-
-            if (!Number.isNaN(valNumber) && typeof valNumber === 'number') {
-                throw `Storage name '${this.#name}' can't be an Number.`
-            }
-        }
-    }
-
-    #validateType(value) {
-        if (!value) {
-            return;
-        }
-        if (typeof value !== 'string') {
-            throw `Storage type '${value}' must be a String.`;
-        }
-        const isValueArray = isArray(value);
-        const hasComma = value.includes(',');
-        if (isValueArray && hasComma) {
-            const regex = /,\s*(\d+)\s*>/;
-            const match = value.match(regex);
-            if (!match) {
-                throw `Storage type '${value}' size must be an Number.`
-            }
-        }
-    }
-
-    // allows for things like:
-    // storage.myStorage += 10
-    // works on set, not on get
-    // on get you obtain the Storage
-    valueOf() {
-        return this.#value;
-    }
-}
-
-/**
- * Constant is a container for const declarations.
- * They work in two ways with the `override` attribute.
- *
- * @class Constant
- */
-
-class Constant {
-    #name
-    #value
-    #type
-    #override
-    #shaderStage = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE
-    /**
-     * @param {{name:String, value:(Number|Array<Number>), type:String, override:Boolean}} config
-     */
-    constructor({ name, value, type, override = false }) {
-
-        this.#validateName(name);
-        this.#validateType(type);
-        this.#validateValue(value);
-
-        this.#name = name;
-        this.#type = type || getWGSLType(value);
-        this.#value = this.#ifTypeVecGetVecValue(this.#type, value);
-        this.#override = override;
-    }
-
-    #ifTypeVecGetVecValue(type, value) {
-        let newValue = value;
-        if (type.indexOf('vec') !== -1) {
-            newValue = `vec${value.length}f(${value})`;
-        }
-        return newValue;
-    }
-
-    get name() {
-        return this.#name;
-    }
-
-    /**
-     * The name that the Constant will have on the WGSL side.
-     * @param {String} value name of the Constant. The name is used in the WGSL
-     * shader.
-     * @example
-     * // js
-     * myConstant.name = 'MYCONST';
-     *
-     * // wgsl
-     * let newVal = MYCONST + 3;
-     * @memberof Constant
-     */
-    set name(value) {
-        this.#validateName(value);
-        this.#name = value;
-    }
-
-    get value() {
-        return this.#value;
-    }
-
-    /**
-     * Get or set the value that the constant will have on the WGSL side.
-     * @warning It can only be assigned once.
-     * @param {Number|Array<Number>} value
-     * @memberof Constant
-     */
-    set value(value) {
-        this.#validateValue(value);
-        const type = getWGSLType(value);
-        this.#value = this.#ifTypeVecGetVecValue(type, value);
-        this.#type = type;
-    }
-
-    get type() {
-        return this.#type;
-    }
-
-    /**
-     * Get or set the type of the constant.
-     * It can be inferred automatically by just passing the value, but if
-     * something more specific is required, then you should use `type`.
-     * @param {String} value WGSL data type of the constant
-     * @example
-     * myConstant.type = 'u32';
-     * @memberof Constant
-     */
-    set type(value) {
-        this.#validateType(value);
-        this.#type = value;
-    }
-
-    get override() {
-        return this.#override;
-    }
-
-    /**
-     * A constant override is a constant you can change per shader.
-     * By default, POINTS interpolates constant declarations inside the WGSL
-     * string shader like this:
-     * ```wgsl
-     * const MYCONST:u32 = 10;
-     * ```
-     * These declarations are added by default to all shaders in the pipeline
-     * and in all render passes. These can not be changed.
-     *
-     * With overrides you can have the same constant in different shaders with
-     * different values. The default value is passed to each pipeline and then
-     * it can be overwritten in a specific shader by hand.
-     * @example
-     * ```js
-     * // js side
-     * constants.PI.setOverride(true).setValue(3.14);
-     * ```
-     * ```wgsl
-     * // wgsl side
-     * override MYCONST:u32 = 3.1415;
-     * ```
-     * @memberof Constant
-     */
-    set override(value) {
-        this.#override = value;
-    }
-
-    get shaderStage() {
-        return this.#shaderStage;
-    }
-
-    /**
-     * Tells WebGPU to which shader it can only be used.
-     * @param {GPUShaderStage}
-     * @memberof Constant
-     */
-    set shaderStage(value) {
-        this.#shaderStage = value;
-    }
-
-    /**
-     * Sets the value of a Constant
-     * @param {Number|Array<Number>} value
-     * @returns {Constant}
-     * @memberof Constant
-     */
-    setValue(value) {
-        this.#validateValue(value);
-        const type = getWGSLType(value);
-        this.#value = this.#ifTypeVecGetVecValue(type, value);
-        this.#type = type;
-        return this;
-    }
-
-    /**
-     * Set the data type of the Constant.
-     * @param {String} value WGSL data type of the constant
-     * @example
-     * myUniform.setType('u32')
-     * @memberof Constant
-     */
-    setType(value) {
-        this.#validateType(value);
-        this.#type = value;
-        return this;
-    }
-
-    /**
-     * A constant override is a constant you can change per shader.
-     * By default, POINTS interpolates constant declarations inside the WGSL
-     * string shader like this:
-     * ```wgsl
-     * const MYCONST:u32 = 10;
-     * ```
-     * These declarations are added by default to all shaders in the pipeline
-     * and in all render passes. These can not be changed.
-     *
-     * With overrides you can have the same constant in different shaders with
-     * different values. The default value is passed to each pipeline and then
-     * it can be overwritten in a specific shader by hand.
-     * @example
-     * ```js
-     * // js side
-     * constants.PI.setOverride(true).setValue(3.14);
-     * ```
-     * ```wgsl
-     * // wgsl side
-     * override MYCONST:u32 = 3.1415;
-     * ```
-     * @memberof Constant
-     */
-    setOverride(value) {
-        this.#override = value;
-        return this;
-    }
-
-    /**
-     * Tells WebGPU to which shader it can only be used.
-     * @param {GPUShaderStage} value
-     * @returns {Constant}
-     * @memberof Constant
-     */
-    setShaderStage(value) {
-        this.#shaderStage = value;
-        return this;
-    }
-
-    #validateValue(value) {
-        if(this.#value){
-            throw `Constant '${this.#name}': can't update a const after it has been set.`;
-        }
-
-        if (value && typeof value === 'object' && !Array.isArray(value) && !(value instanceof Uint8Array)) {
-            throw `Constant '${this.#name}' value:'${value}' can't be an Object.`
-        }
-
-        if (typeof value === 'string') {
-            throw `Constant '${this.#name}' value: '${value}' can't be an String.`
-        }
-
-        const isArray = Array.isArray(value);
-        if (isArray) {
-            const { length } = value;
-            if (length < 2) {
-                throw `Constant named '${this.#name}': Size of the array is lower than 2. There's no vec1`;
-            }
-            if (Array.isArray(this.#value)) {
-                if (length != this.#value.length) {
-                    throw `Constant named '${this.#name}': Size of the array value has changed from ${this.#value.length} to ${length}.`
-                }
-            }
-        }
-    }
-
-    #validateName(value) {
-        if (typeof value === 'number') {
-            throw `Constant name '${this.#name}' can't be an Number.`
-        }
-
-        if (typeof value === 'string') {
-            const valNumber = +value;
-
-            if (!Number.isNaN(valNumber) && typeof valNumber === 'number') {
-                throw `Constant name '${this.#name}' can't be an Number.`
-            }
-        }
-    }
-
-    #validateType(value) {
-
-    }
-
-}
-
-/**
- * Class to be used to decide if the output textures can hold more data beyond
- * the range from 0..1. Useful for HDR images.
- *
- * @example
- * points.presentationFormat = PresentationFormat.RGBA16FLOAT;
- *
- * @class PresentationFormat
- */
-class PresentationFormat {
-    /**
-     * @memberof PresentationFormat
-     */
-    static BGRA8UNORM = 'bgra8unorm';
-    /**
-     * @memberof PresentationFormat
-     */
-    static RGBA8UNORM = 'rgba8unorm';
-    /**
-     * @memberof PresentationFormat
-     */
-    static RGBA16FLOAT = 'rgba16float';
-    /**
-     * @memberof PresentationFormat
-     */
-    static RGBA32FLOAT = 'rgba32float';
-}
-
-/**
- * Collection of Keys used for the default uniforms
- * assigned in the {@link Points} class.
- * This is mainly for internal purposes.
- * @class UniformKeys
- * @ignore
- */
-class UniformKeys {
-    /**
-     * To set the time in milliseconds
-     * @type {string}
-     * @static
-     */
-    static TIME = 'time';
-    /**
-     * To set the time after the last frame
-     * @type {string}
-     * @static
-     */
-    static DELTA = 'delta';
-    /**
-     * To set the current date and time in seconds
-     * @type {string}
-     * @static
-     */
-    static EPOCH = 'epoch';
-    /**
-     * To set screen dimensions
-     * @type {string}
-     * @static
-     */
-    static SCREEN = 'screen';
-    /**
-     * To set mouse coordinates
-     * @type {string}
-     * @static
-     */
-    static MOUSE = 'mouse';
-    /**
-     * To set if the mouse has been clicked.
-     * @type {string}
-     * @static
-     */
-    static MOUSE_CLICK = 'mouseClick';
-    /**
-     * To set if the mouse is down.
-     * @type {string}
-     * @static
-     */
-    static MOUSE_DOWN = 'mouseDown';
-    /**
-     * To set if the wheel is moving.
-     * @type {string}
-     * @static
-     */
-    static MOUSE_WHEEL = 'mouseWheel';
-    /**
-     * To set how much the wheel has moved.
-     * @type {string}
-     * @static
-     */
-    static MOUSE_DELTA = 'mouseDelta';
-    /**
-     * To set `in.ratio` and `in.uvr`.
-     * @type {string}
-     * @static
-     */
-    static RATIOS = 'ratios';
-}
-
-/**
- * Along with the vertexArray it calculates some info like offsets required for the pipeline.
- * Internal use.
- * @ignore
- */
-class VertexBufferInfo {
-    #vertexSize
-    #vertexOffset;
-    #colorOffset;
-    #uvOffset;
-    #normalOffset;
-    #idOffset;
-    #barycentricsOffset;
-    #jointOffset;
-    #weightOffset;
-    #vertexCount;
-    /**
-     * Along with the vertexArray it calculates some info like offsets required for the pipeline.
-     * @param {Float32Array} vertexArray array with vertex, color and uv data
-     * @param {Number} triangleDataLength how many items does a triangle row has in vertexArray
-     * @param {Number} vertexOffset index where the vertex data starts in a row of `triangleDataLength` items
-     * @param {Number} colorOffset index where the color data starts in a row of `triangleDataLength` items
-     * @param {Number} uvOffset index where the uv data starts in a row of `triangleDataLength` items
-     * @param {Number} barycentricsOffset index where the barycentrics data starts in a row of `triangleDataLength` items
-     */
-    constructor(
-        vertexArray,
-        triangleDataLength = 25,
-        vertexOffset = 0,
-        colorOffset = 4,
-        uvOffset = 8,
-        normalsOffset = 10,
-        idOffset = 13,
-        barycentricsOffset = 14,
-        jointsOffset = 17,
-        weigthsOffset = 21
-    ) {
-        this.#vertexSize = vertexArray.BYTES_PER_ELEMENT * triangleDataLength; // Byte size of ONE triangle data (vertex, color, uv). (one row)
-        this.#vertexOffset = vertexArray.BYTES_PER_ELEMENT * vertexOffset;
-        this.#colorOffset = vertexArray.BYTES_PER_ELEMENT * colorOffset; // Byte offset of triangle vertex color attribute.
-        this.#uvOffset = vertexArray.BYTES_PER_ELEMENT * uvOffset;
-        this.#normalOffset = vertexArray.BYTES_PER_ELEMENT * normalsOffset;
-        this.#idOffset = vertexArray.BYTES_PER_ELEMENT * idOffset;
-        this.#barycentricsOffset = vertexArray.BYTES_PER_ELEMENT * barycentricsOffset;
-
-        // if (jointsOffset) {
-        this.#jointOffset = vertexArray.BYTES_PER_ELEMENT * jointsOffset;
-        this.#weightOffset = vertexArray.BYTES_PER_ELEMENT * weigthsOffset;
-        // }
-
-        this.#vertexCount = vertexArray.byteLength / this.#vertexSize;
-    }
-
-    get vertexSize() {
-        return this.#vertexSize;
-    }
-
-    get vertexOffset() {
-        return this.#vertexOffset;
-    }
-
-    get colorOffset() {
-        return this.#colorOffset;
-    }
-
-    get uvOffset() {
-        return this.#uvOffset;
-    }
-
-    get normalOffset() {
-        return this.#normalOffset;
-    }
-
-    get idOffset() {
-        return this.#idOffset;
-    }
-
-    get barycentricsOffset() {
-        return this.#barycentricsOffset;
-    }
-
-    get jointOffset() {
-        return this.#jointOffset;
-    }
-
-    get weightOffset() {
-        return this.#weightOffset;
-    }
-
-    get vertexCount() {
-        return this.#vertexCount;
-    }
-}
-
-class Coordinate {
-    #x;
-    #y;
-    #z;
-    #value;
-    constructor(x = 0, y = 0, z = 0) {
-        this.#x = x;
-        this.#y = y;
-        this.#z = z;
-        this.#value = [x, y, z];
-    }
-
-    set x(value) {
-        this.#x = value;
-        this.#value[0] = value;
-    }
-
-    set y(value) {
-        this.#y = value;
-        this.#value[1] = value;
-    }
-
-    set z(value) {
-        this.#z = value;
-        this.#value[2] = value;
-    }
-
-    get x() {
-        return this.#x;
-    }
-
-    get y() {
-        return this.#y;
-    }
-
-    get z() {
-        return this.#z;
-    }
-
-    get value() {
-        return this.#value;
-    }
-
-    set(x, y, z) {
-        this.#x = x;
-        this.#y = y;
-        this.#z = z;
-        this.#value[0] = x;
-        this.#value[1] = y;
-        this.#value[2] = z;
-    }
-}
-
-/**
- * @class RGBAColor
- * @ignore
- */
-class RGBAColor {
-    #value;
-    constructor(r = 0, g = 0, b = 0, a = 1) {
-        if (r > 1 && g > 1 && b > 1) {
-            r /= 255;
-            g /= 255;
-            b /= 255;
-            if (a > 1) {
-                a /= 255;
-            }
-        }
-        this.#value = [r, g, b, a];
-    }
-
-    set r(value) {
-        this.#value[0] = value;
-    }
-
-    set g(value) {
-        this.#value[1] = value;
-    }
-
-    set b(value) {
-        this.#value[2] = value;
-    }
-
-    set a(value) {
-        this.#value[3] = value;
-    }
-
-    get r() {
-        return this.#value[0];
-    }
-
-    get g() {
-        return this.#value[1];
-    }
-
-    get b() {
-        return this.#value[2];
-    }
-
-    get a() {
-        return this.#value[3];
-    }
-
-    get value() {
-        return this.#value;
-    }
-
-    get brightness() {
-        // #Standard
-        // LuminanceA = (0.2126*R) + (0.7152*G) + (0.0722*B)
-        // #Percieved A
-        // LuminanceB = (0.299*R + 0.587*G + 0.114*B)
-        // #Perceived B, slower to calculate
-        // LuminanceC = sqrt(0.299*(R**2) + 0.587*(G**2) + 0.114*(B**2))
-
-
-        let [r, g, b, a] = this.#value;
-        return (0.2126 * r) + (0.7152 * g) + (0.0722 * b);
-    }
-
-    set brightness(value) {
-        this.#value = [value, value, value, 1];
-    }
-
-    set(r, g, b, a) {
-        this.#value = [r, g, b, a];
-    }
-
-    setColor(color) {
-        this.#value = [color.r, color.g, color.b, color.a];
-    }
-
-    add(color) {
-        let [r, g, b, a] = this.#value;
-        //this.#value = [(r + color.r)/2, (g + color.g)/2, (b + color.b)/2, (a + color.a)/2];
-        //this.#value = [(r*a + color.r*color.a), (g*a + color.g*color.a), (b*a + color.b*color.a), 1];
-        this.#value = [(r + color.r), (g + color.g), (b + color.b), (a + color.a)];
-
-
-    }
-
-    blend(color) {
-        let [r0, g0, b0, a0] = this.#value;
-        let [r1, b1, g1, a1] = color.value;
-
-        let a01 = (1 - a0) * a1 + a0;
-
-        let r01 = ((1 - a0) * a1 * r1 + a0 * r0) / a01;
-
-        let g01 = ((1 - a0) * a1 * g1 + a0 * g0) / a01;
-
-        let b01 = ((1 - a0) * a1 * b1 + a0 * b0) / a01;
-
-        this.#value = [r01, g01, b01, a01];
-    }
-
-
-    additive(color) {
-        // https://gist.github.com/JordanDelcros/518396da1c13f75ee057
-        let base = this.#value;
-        let added = color.value;
-
-        let mix = [];
-        mix[3] = 1 - (1 - added[3]) * (1 - base[3]); // alpha
-        mix[0] = Math.round((added[0] * added[3] / mix[3]) + (base[0] * base[3] * (1 - added[3]) / mix[3])); // red
-        mix[1] = Math.round((added[1] * added[3] / mix[3]) + (base[1] * base[3] * (1 - added[3]) / mix[3])); // green
-        mix[2] = Math.round((added[2] * added[3] / mix[3]) + (base[2] * base[3] * (1 - added[3]) / mix[3])); // blue
-
-        this.#value = mix;
-    }
-
-    equal(color) {
-        return (this.#value[0] == color.r) && (this.#value[1] == color.g) && (this.#value[2] == color.b) && (this.#value[3] == color.a);
-    }
-
-
-    static average(colors) {
-        // https://sighack.com/post/averaging-rgb-colors-the-right-way
-        let r = 0, g = 0, b = 0;
-        for (let index = 0; index < colors.length; index++) {
-            const color = colors[index];
-            //if (!color.isNull()) {
-                r += color.r * color.r;
-                g += color.g * color.g;
-                b += color.b * color.b;
-                //a += color.a * color.a;
-            //}
-        }
-        return new RGBAColor(
-            Math.sqrt(r / colors.length),
-            Math.sqrt(g / colors.length),
-            Math.sqrt(b / colors.length)
-            //Math.sqrt(a),
-        );
-    }
-
-    static difference(c1, c2) {
-        let r = 0;
-        let g = 0;
-        let b = 0;
-        if(c1 && !c1.isNull() && c2 && !c2.isNull()){
-            const { r: r1, g: g1, b: b1 } = c1;
-            const { r: r2, g: g2, b: b2 } = c2;
-            r = r1 - r2;
-            g = g1 - g2;
-            b = b1 - b2;
-        }
-
-        return new RGBAColor(r, g, b);
-    }
-
-    isNull() {
-        const [r, g, b, a] = this.#value;
-        return !(isNaN(r) && isNaN(g) && isNaN(b) && isNaN(a))
-    }
-
-    static colorRGBEuclideanDistance(c1, c2) {
-        return Math.sqrt(Math.pow(c1.r - c2.r, 2) +
-            Math.pow(c1.g - c2.g, 2) +
-            Math.pow(c1.b - c2.b, 2));
-    }
-
-    /**
-     * Checks how close two colors are. Closest is `0`.
-     * @param {RGBAColor} color : Color to check distance;
-     * @returns Number distace up to `1.42` I think...
-     */
-    euclideanDistance(color) {
-        const [r, g, b] = this.#value;
-        return Math.sqrt(Math.pow(r - color.r, 2) +
-            Math.pow(g - color.g, 2) +
-            Math.pow(b - color.b, 2));
-    }
-
-    static getClosestColorInPalette(color, palette) {
-        if(!palette){
-            throw('Palette should be an array of `RGBA`s')
-        }
-        let distance = 100;
-        let selectedColor = null;
-        palette.forEach(paletteColor => {
-            let currentDistance = color.euclideanDistance(paletteColor);
-            if (currentDistance < distance) {
-                selectedColor = paletteColor;
-                distance = currentDistance;
-            }
-        });
-        return selectedColor;
-    }
-}
-
-/**
- * To manage time and delta time,
- * based on https://github.com/mrdoob/three.js/blob/master/src/core/Clock.js
- * @class Clock
- * @ignore
- */
-class Clock {
-    #time = 0;
-    #oldTime = 0;
-    #delta = 0;
-    constructor() {
-
-    }
-
-    /**
-     * Gets the current time, it does not calculate the time, it's calcualted
-     *  when `getDelta()` is called.
-     */
-    get time() {
-        return this.#time;
-    }
-
-    /**
-     * Gets the last delta value, it does not calculate the delta, use `getDelta()`
-     */
-    get delta() {
-        return this.#delta;
-    }
-
-    #now() {
-        return (typeof performance === 'undefined' ? Date : performance).now();
-    }
-
-    /**
-     * Calculate time since last frame
-     * It also calculates `time`
-     */
-    getDelta() {
-        this.#delta = 0;
-        const newTime = this.#now();
-        this.#delta = (newTime - this.#oldTime) / 1000;
-        this.#oldTime = newTime;
-        this.#time += this.#delta;
-        return this.#delta;
-    }
-}
-
-/**
- * The defaultStructs are structs already incorporated onto the shaders you create,
- * so you can call them without import.
- * <br>
- * Fragment, Sound, and Event structs.
- * <br>
- * <br>
- * Fragment used in Vertex Shaders.<br>
- * Sound used along with {@link Points#setAudio}<br>
- * Event used along with {@link Points#addEventListener}<br>
- * @module defaultStructs
- */
-
-const defaultStructs = /*wgsl*/`
-
-struct ComputeIn {
-    @builtin(global_invocation_id) GID: vec3u,
-    @builtin(workgroup_id) WID: vec3u,
-    @builtin(local_invocation_id) LID: vec3u
-}
-
-struct VertexIn {
-    @location(0) position:vec4f,
-    @location(1) color:vec4f,
-    @location(2) uv:vec2f,
-    @location(3) normal:vec3f,
-    @location(4) id:f32,       // mesh id
-    @location(5) barycentrics: vec3f,
-    @location(6) joint: vec4u,
-    @location(7) weight:vec4f,
-    @builtin(vertex_index) vertexIndex: u32,
-    @builtin(instance_index) instanceIndex: u32
-}
-
-struct FragmentIn {
-    @builtin(position) position: vec4f,
-    @location(0) color: vec4f,
-    @location(1) uv: vec2f,
-    @location(2) ratio: vec2f,  // relation between params.screen.x and params.screen.y
-    @location(3) uvr: vec2f,    // uv with aspect ratio corrected
-    @location(4) mouse: vec2f,
-    @location(5) normal: vec3f,
-    @interpolate(flat) @location(6) id: f32, // mesh or instance id
-    @location(7) barycentrics: vec3f,
-    @location(8) world: vec3f,
-}
-
-struct Sound {
-    data: array<f32, 2048>,
-    //play
-    //dataLength
-    //duration
-    //currentPosition
-}
-
-struct Event {
-    updated: u32,
-    data: array<f32, 4>
-}
-`;
-
-/**
- * The defaultFunctions are functions already incorporated onto the shaders you create,
- * so you can call them without import.
- * <br>
- * <br>
- * These are wgsl functions, not js functions.
- * The function is enclosed in a js string constant,
- * to be appended into the code to reference it in the string shader.
- *
- * Use the base example as reference: examples/base/vert.js
- * @module defaultFunctions
- */
-
-/**
- * The defaultVertexBody is used as a drop-in replacement of the vertex shader content.
- * <br>
- * This is not required, but useful if you plan to use the default parameters of the library.
- * <br>
- * All the examples in the examples directory use this function in their vert.js file.
- * <br>
- * <br>
- * Default function for the Vertex shader that takes charge of automating the
- * creation of a few variables that are commonly used.
- * @example
- * // Inside the main vertex function add this
- * return defaultVertexBody(in.position, in.color, in.uv, in.normal);
- * @type {string}
- * @param {vec4f} position
- * @param {vec4f} color
- * @param {vec2f} uv
- * @return {FragmentIn}
- */
-const defaultVertexBody = /*wgsl*/`
-fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) -> FragmentIn {
-    var result: FragmentIn;
-
-    let ratio = params.ratios[RENDERPASSINDEX];
-
-    result.ratio = ratio;
-    result.position = position;
-    result.color = color;
-    result.uv = uv;
-    result.uvr = uv * ratio;
-    result.mouse = params._mouse_normalized;
-    result.normal = normal;
-
-    return result;
-}
-`;
-
-/**
- * Utility methods to for the {@link Points#setTextureString | setTextureString()}
- * @module texture-string
- * @ignore
- */
-
-/**
- * Method to load image with await
- * @param {String} src
- * @returns {Promise<void>}
- */
-async function loadImage(src) {
-    return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.src = src;
-        img.onload = () => resolve(img);
-        img.onerror = err => reject(err);
-    });
-}
-
-/**
- * Returns UTF-16 array of each char
- * @param {String} s
- * @returns {Array<Number>}
- */
-function strToCodes(s) {
-    return Array.from(s).map(c => c.charCodeAt(0))
-}
-
-/**
- *
- * @param {HTMLImageElement} atlas Image atlas to parse
- * @param {CanvasRenderingContext2D} ctx Canvas context
- * @param {Number} index index in the atlas, so 0 is the first char
- * @param {{x: number, y: number}} size cell dimensions
- * @param {Number} finalIndex final positional index in the canvas
- */
-function sprite(atlas, ctx, index, size, finalIndex) {
-    const { width } = atlas;
-    const numColumns = width / size.x;
-
-    const x = index % numColumns;
-    const y = Math.floor(index / numColumns);
-
-    ctx.drawImage(
-        atlas,
-        x * size.x,
-        y * size.y,
-        size.x,
-        size.y,
-
-        size.x * finalIndex,
-        0,
-
-        size.x,
-        size.y);
-}
-
-/**
- * @typedef {number} SignedNumber
- * A numeric value that may be negative or positive.
- */
-
-/**
- * Expects an atlas/spritesheed with chars in UTF-16 order.
- * This means `A` is expected at index `65`; if not there,
- * use offset to move backwards (negative) or forward (positive)
- * @param {String} str String used to extract letters from the image
- * @param {HTMLImageElement} atlasImg image with the Atlas to extract letters from
- * @param {{x: number, y: number}} size width and height in pixels of each letter
- * @param {SignedNumber} offset how many chars is the atlas offset from the UTF-16
- * @returns {string} Base64 image
- */
-function strToImage(str, atlasImg, size, offset = 0) {
-    const chars = strToCodes(str);
-    const canvas = document.createElement('canvas');
-    canvas.width = chars.length * size.x;
-    canvas.height = size.y;
-    const ctx = canvas.getContext('2d');
-
-    chars.forEach((c, i) => sprite(atlasImg, ctx, c + offset, size, i));
-    return canvas.toDataURL('image/png');
-}
-
-/**
- * @class LayersArray
- * @ignore
- */
-class LayersArray extends Array {
-    #buffer = null;
-    #shaderStage = null;
-    constructor(...elements) {
-        super(...elements);
-    }
-
-    get buffer() {
-        return this.#buffer;
-    }
-
-    set buffer(v) {
-        this.#buffer = v;
-    }
-
-    get shaderStage() {
-        return this.#shaderStage;
-    }
-
-    /**
-     * @param {GPUShaderStage} v
-     */
-    set shaderStage(v) {
-        this.#shaderStage = v;
-    }
-}
-
-/**
- * @class UniformsArray
- * @ignore
- */
-class UniformsArray extends Array {
-    #buffer = null;
-    constructor(...elements) {
-        super(...elements);
-    }
-
-    get buffer() {
-        return this.#buffer;
-    }
-
-    /**
-     * set buffer
-     * @param {*} v
-     */
-    set buffer(v) {
-        this.#buffer = v;
-    }
-}
-
-/**
-
-The idea here is that the columns are the current stage of the storage
-being checked at entries and dynamic bindings, and the rows are the stage where
-the storage should show; the table then matches both.
-The thing to remember here is, if the storage is required in any combination,
-then the fragment stage (if is included) then there the storage must be
-read access mode; if there's no vertex then the storage during fragment can be
-read_write. Compute is always read_write.
-
-
-| storage      \     current| COMPUTE    | VERTEX	 | FRAGMENT
-| --------------------------|:-----------|:----------|----------:|
-| compute, vertex, fragment | read_write | read	     | read
-| compute                   | read_write |           |
-| vertex                    |            | read      |
-| fragment                  |            |           | read_write
-| compute, vertex           | read_write | read      |
-| compute, fragment         | read_write |           | read_write
-| vertex, fragment          |            | read	     | read
-
-* @module storage-accessmode
-* @ignore
-*/
-
-const R = 'r';
-const RW = 'rw';
-
-const { COMPUTE, VERTEX, FRAGMENT } = GPUShaderStage;
-
-const cache$1 = {
-    [COMPUTE | VERTEX | FRAGMENT]: {
-        [COMPUTE]: RW,
-        [VERTEX]: R,
-        [FRAGMENT]: R
-    },//
-    [COMPUTE]: {
-        [COMPUTE]: RW,
-        [VERTEX]: null,
-        [FRAGMENT]: null
-    },
-    [VERTEX]: {
-        [COMPUTE]: null,
-        [VERTEX]: R,
-        [FRAGMENT]: null
-    },
-    [FRAGMENT]: {
-        [COMPUTE]: null,
-        [VERTEX]: null,
-        [FRAGMENT]: RW
-    },//
-    [COMPUTE | VERTEX]: {
-        [COMPUTE]: RW,
-        [VERTEX]: R,
-        [FRAGMENT]: null
-    },
-    [COMPUTE | FRAGMENT]: {
-        [COMPUTE]: RW,
-        [VERTEX]: null,
-        [FRAGMENT]: RW
-    },//
-    [VERTEX | FRAGMENT]: {
-        [COMPUTE]: null,
-        [VERTEX]: R,
-        [FRAGMENT]: R
-    },
-};
-
-function getStorageAccessMode(currentStage, storageShaderTypes) {
-    return cache$1[storageShaderTypes][currentStage];
-}
-
-const bindingModes = { [R]: 'read', [RW]: 'read_write' };
-const entriesModes = { [R]: 'read-only-storage', [RW]: 'storage' };
-
-/**
- * Just a few functions to be used with the cameras
- *
- * based on https://github.com/greggman/wgpu-matrix/
- * @module data-size
- * @ignore
- */
-
-
-/**
- * Divides a vector by its Euclidean length and returns the quotient.
- *
- * @param v - The vector.
- * @returns The normalized vector.
- */
-function normalize(v) {
-    const result = [0, 0, 0];
-
-    const v0 = v[0];
-    const v1 = v[1];
-    const v2 = v[2];
-    const len = Math.sqrt(v0 * v0 + v1 * v1 + v2 * v2);
-
-    if (len > 0.00001) {
-        result[0] = v0 / len;
-        result[1] = v1 / len;
-        result[2] = v2 / len;
-    }
-
-    return result;
-}
-
-/**
- * Subtracts two vectors.
- * @param a - Operand vector.
- * @param b - Operand vector.
- * @param dst - vector to hold result. If not passed in a new one is created.
- * @returns A vector that is the difference of a and b.
- */
-function sub(a, b) {
-    const result = [0, 0, 0];
-
-    result[0] = a[0] - b[0];
-    result[1] = a[1] - b[1];
-    result[2] = a[2] - b[2];
-
-    return result;
-}
-
-/**
- * Computes the cross product of two vectors; assumes both vectors have
- * three entries.
- * @param a - Operand vector.
- * @param b - Operand vector.
- * @param dst - vector to hold result. If not passed in a new one is created.
- * @returns The vector of a cross b.
- */
-function cross(a, b) {
-    const result = [0, 0, 0];
-
-    const t1 = a[2] * b[0] - a[0] * b[2];
-    const t2 = a[0] * b[1] - a[1] * b[0];
-    result[0] = a[1] * b[2] - a[2] * b[1];
-    result[1] = t1;
-    result[2] = t2;
-
-    return result;
-}
-
-
-/**
- * Computes the dot product of two vectors; assumes both vectors have
- * three entries.
- * @param a - Operand vector.
- * @param b - Operand vector.
- * @returns dot product
- */
-function dot(a, b) {
-    return (a[0] * b[0]) + (a[1] * b[1]) + (a[2] * b[2]);
-}
-
-/**
- * Utility methods to for the {@link Points#setTextureElement | setTextureElement()}
- * https://web.archive.org/web/20181006205840/https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Drawing_DOM_objects_into_a_canvas
- * @module texture-element
- * @ignore
- */
-
-const cache = new Map();
-
-/**
- * Get the CSS associated with a specific `HTMLElement`.
- * @param {HTMLElement} el
- * @returns {String} All the CSS associated to the `el` `HTMLElement`.
- */
-function getCSS(el) {
-    const sheets = document.styleSheets;
-    const matchedRules = [];
-
-    for (const sheet of sheets) {
-        try {
-            const rules = sheet.cssRules || sheet.rules;
-            for (const rule of rules) {
-                if (el.matches(rule.selectorText)) {
-                    matchedRules.push(rule);
-                }
-            }
-        } catch (e) {
-            console.warn('Could not read stylesheet: ' + sheet.href);
-        }
-    }
-    return matchedRules;
-}
-
-/**
- * Gets the url of the font requested from the loaded CSS.
- * @param {String} familyName
- * @returns {{url:String, fontFace:String}|null}
- */
-function getFontSource(familyName) {
-    let source = null;
-    for (let sheet of document.styleSheets) {
-        try {
-            for (let rule of sheet.cssRules) {
-                if (rule instanceof CSSFontFaceRule) {
-                    if (rule.style.fontFamily === familyName) {
-                        const regex = /url\(['"]?([^'"]+)['"]?\)/;
-                        const match = rule.style.src.match(regex);
-                        if (match) {
-                            const url = match[1];
-                            source = {
-                                url,
-                                fontFace: rule.cssText
-                            };
-                        }
-                    }
-                }
-            }
-        } catch (e) {
-            console.warn('Can\'t read stylesheet (CORS?): ', e);
-        }
-    }
-    return source;
-}
-
-/**
- * From the css in the HTMLElement, get the font-family attribute value to be
- * used later to get the source.
- * @param {String} cssString
- * @returns {Strng|null}
- */
-function getFontFamily(cssString) {
-    let fontFamily = null;
-    const regex = /font-family:\s*([^;]+)/;
-    const match = cssString.match(regex);
-    if (match) {
-        fontFamily = match[1].trim();
-    }
-    return fontFamily;
-}
-
-/**
- * Converts a font to b64 to embed in the foreingObject
- * @param {String} url path to font file
- * @returns {Promise<String>}
- */
-async function fontToB64(url) {
-    const response = await fetch(url);
-    const blob = await response.blob();
-
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-    });
-}
-
-/**
- * Renders a `HTMLElement` as image along with some CSS.
- * @param {HTMLElement} element Element to render.
- * @param {String} styles CSS styles to render the element with.
- * @returns {Promise<Image>}
- */
-async function elToImage(element, styles) {
-    const { offsetWidth: width, offsetHeight: height } = element;
-
-    styles ??= '';
-    const fontFamily = getFontFamily(styles);
-
-    let fontFace = cache.get(fontFamily) || null;
-    if (!fontFace && fontFamily) {
-        const fontSource = getFontSource(fontFamily);
-        if (fontSource) {
-            const b64 = await fontToB64(fontSource.url);
-            const regex = /url\((['"]?)[^'"]+\1\)/;
-            fontFace = fontSource.fontFace.replace(regex, `url($1${b64}$1)`);
-            cache.set(fontFamily, fontFace);
-        }
-    }
-    fontFace ??= '';
-
-    const htmlContent = new XMLSerializer().serializeToString(element);
-
-    const svgData = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
-            <defs><style type="text/css">${fontFace}${styles}</style></defs>
-            <foreignObject width="100%" height="100%">
-                <div xmlns="http://www.w3.org/1999/xhtml">${htmlContent}</div>
-            </foreignObject>
-        </svg>
-    `;
-
-    const encodedData = btoa(decodeURIComponent(encodeURIComponent(svgData)));
-    const url = `data:image/svg+xml;base64,${encodedData}`;
-
-    return new Promise((resolve, reject) => {
-        const img = new Image();
-
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0);
-
-            canvas.toBlob(blob => {
-                const url = URL.createObjectURL(blob);
-                resolve(url);
-            });
-        };
-
-        img.onerror = () => {
-            reject(new Error('Failed to decode SVG.'));
-        };
-
-        img.src = url;
-    });
-}
-
-/**
- * Utilitary method to clear the cache without exposing it.
- */
-function clearCache() {
-    cache.clear();
-}
-
-/**
- * Class that handles the creation of new {@link Uniform}s in Points.
- * @example
- * // js side
- * points.uniforms.myUniform = 10
- *
- * // wgsl side
- * let val = params.myUniform; // value is 10.0 f32
- * @class Uniforms
- */
-class Uniforms {
-    #list = new UniformsArray();
-
-    constructor() {
-        return new Proxy(this, {
-            get(target, prop, receiver) {
-
-                const value = Reflect.get(target, prop, target);
-
-                if (prop === 'list') {
-                    return value;
-                }
-
-                if (typeof value === 'function') {
-                    if (prop === 'find') {
-                        return value.bind(target);
-                    }
-                    if (prop === 'add') {
-                        return value.bind(target);
-                    }
-                }
-
-                if (prop in target) {
-                    return value;
-                }
-                // If Uniform does not exist we create it.
-                const uniform = new Uniform$1({ name: prop });
-                target.list.push(uniform);
-                Reflect.set(target, prop, uniform, target);
-                return uniform;
-            },
-
-            set(target, prop, value, receiver) {
-                if (prop === 'list') {
-                    return Reflect.set(target, prop, value, target);
-                }
-
-                const type = typeof value;
-                if (type === 'string') {
-                    throw `Uniform named '${prop}': No strings allowed or maybe you are adding an array.`;
-                }
-                if (type === 'object' && !Array.isArray(value)) {
-                    throw `Uniform named '${prop}': No objects allowed.`;
-                }
-
-                if (prop in target) {
-                    const uniform = Reflect.get(target, prop, target);
-                    uniform.value = value;
-                    return uniform;
-                }
-
-                // If Uniform does not exist we create it.
-
-                const uniform = new Uniform$1({ name: prop, value });
-                target.list.push(uniform);
-                return Reflect.set(target, prop, uniform, target);
-            }
-        });
-    }
-
-    get list() {
-        return this.#list;
-    }
-
-    /**
-     * List of all {@link Uniform}s
-     * @param {Array} value
-     * @memberof Uniforms
-     */
-    set list(value) {
-        this.#list = value;
-    }
-
-    /**
-     * Retrieves a {@link Uniform} by its name.
-     * @param {String} name
-     * @returns {Uniform}
-     * @memberof Uniforms
-     */
-    find(name) {
-        return this[name];
-    }
-
-    /**
-     * Add a new {@link Uniform}
-     * @param {Uniform} uniform
-     * @memberof Uniforms
-     */
-    add(uniform) {
-        const { name } = uniform;
-        if (this[name]) {
-            throw `Uniform named ${name} already exists.`
-        }
-        this[name] = uniform;
-        this.#list.push(uniform);
-    }
-}
-
-/**
- * Class that handles the creation of new {@link Storage}s in Points.
- * @example
- * // js side
- * points.storages.myStorage = [1, 2, 3]
- *
- * // wgsl side
- * let val = myStorage; // value is vec3f(1, 2, 3)
- * @class Storages
- */
-class Storages {
-    #list = [];
-
-    constructor() {
-        return new Proxy(this, {
-            get(target, prop, receiver) {
-
-                const value = Reflect.get(target, prop, target);
-
-                if (prop === 'list') {
-                    return value;
-                }
-
-                if (typeof value === 'function') {
-                    if (prop === 'find') {
-                        return value.bind(target);
-                    }
-                    if (prop === 'add') {
-                        return value.bind(target);
-                    }
-                }
-
-                if (prop in target) {
-                    return value;
-                }
-                // If Storage does not exist we create it.
-                const storage = new Storage$1({ name: prop });
-                target.list.push(storage);
-                Reflect.set(target, prop, storage, target);
-                return storage;
-            },
-
-            set(target, prop, value, receiver) {
-                if (prop === 'list') {
-                    return Reflect.set(target, prop, value, target);
-                }
-
-                const type = typeof value;
-                if (type === 'string') {
-                    throw `Storage named '${prop}': No strings allowed or maybe you are adding an array.`;
-                }
-                if (!type && type === 'object' && !Array.isArray(value)) {
-                    throw `Storage named '${prop}': No objects allowed.`;
-                }
-
-                if (prop in target) {
-                    const storage = Reflect.get(target, prop, target);
-                    storage.value = value;
-                    return storage;
-                }
-
-                // If Storage does not exist we create it.
-
-                const storage = new Storage$1({ name: prop, value });
-                target.list.push(storage);
-                return Reflect.set(target, prop, storage, target);
-            }
-        });
-    }
-
-    get list() {
-        return this.#list;
-    }
-
-    /**
-     * List of all {@link Storage}
-     * @param {Array} value
-     * @memberof Storages
-     */
-    set list(value) {
-        this.#list = value;
-    }
-
-    /**
-     * Retrieves a {@link Storage} by its name.
-     * @param {String} name
-     * @returns {Storage}
-     * @memberof Storages
-     */
-    find(name) {
-        return this[name];
-    }
-
-    /**
-     * Add a new {@link Storage}
-     * @param {Storage} storage
-     * @memberof Storages
-     */
-    add(storage) {
-        const { name } = storage;
-        if (this[name]) {
-            throw `Storage named ${name} already exists.`
-        }
-        this[name] = storage;
-        this.#list.push(storage);
-    }
-}
-
-/**
- * Class that handles the creation of new {@link Constant}s in Points.
- * @example
- * // js side
- * points.constants.MYCONST = 10;
- *
- * // wgsl side
- * let val = MYCONST; // value is 10 u32 by default
- * @class Constants
- */
-class Constants {
-    #list = [];
-
-    constructor() {
-        return new Proxy(this, {
-            get(target, prop, receiver) {
-
-                const value = Reflect.get(target, prop, target);
-
-                if (prop === 'list') {
-                    return value;
-                }
-
-                if (typeof value === 'function') {
-                    switch (prop) {
-                        case 'find':
-                        case 'add':
-                        case 'listOfOverrides':
-                        case 'stringOfNonOverrides':
-                            return value.bind(target);
-                    }
-                }
-
-                if (prop in target) {
-                    return value;
-                }
-                // If Constant does not exist we create it.
-                const constant = new Constant$1({ name: prop, value: 0 });
-                target.list.push(constant);
-                Reflect.set(target, prop, constant, target);
-                return constant;
-            },
-
-            set(target, prop, value, receiver) {
-                if (prop === 'list') {
-                    return Reflect.set(target, prop, value, target);
-                }
-
-                const type = typeof value;
-                if (type === 'string') {
-                    throw `Constant named '${prop}': No strings allowed or maybe you are adding an array.`;
-                }
-                if (!type && type === 'object' && !Array.isArray(value)) {
-                    throw `Constant named '${prop}': No objects allowed.`;
-                }
-
-                if (prop in target) {
-                    const constant = Reflect.get(target, prop, target);
-                    constant.value = value;
-                    return constant;
-                }
-
-                // If Constant does not exist we create it.
-
-                const constant = new Constant$1({ name: prop, value });
-                target.list.push(constant);
-                return Reflect.set(target, prop, constant, target);
-            }
-        });
-    }
-
-    get list() {
-        return this.#list;
-    }
-
-    /**
-     * List of all {@link Constant}s
-     * @param {Array} value
-     * @memberof Constants
-     */
-    set list(value) {
-        this.#list = value;
-    }
-
-    /**
-     * Retrieves a {@link Constant} by its name.
-     * @param {String} name
-     * @returns {Constant}
-     * @memberof Constants
-     */
-    find(name) {
-        return this[name];
-    }
-
-    /**
-     * Add a new {@link Constant}
-     * @param {Constant} constant
-     * @memberof Constants
-     */
-    add(constant) {
-        const { name } = constant;
-        if (this[name]) {
-            throw `Constant named ${name} already exists.`
-        }
-        this[name] = constant;
-        this.#list.push(constant);
-    }
-
-    /**
-     * Object list with the constants that are overridable.
-     * This object will be passed into the pipeline.
-     * @param {GPUShaderStage|Number} filter
-     * @returns {Object}
-     * @memberof Constants
-     */
-    listOfOverrides(filter) {
-        return Object.fromEntries(
-            this.#list
-                .filter(c => ((filter & c.shaderStage) !== 0))
-                .filter(c => c.override)
-                .map(c => [c.name, c.value])
-        );
-    }
-
-    /**
-     * List of constants formatted as WGSL string to be interpolated in the
-     * shaders.
-     * @param {GPUShaderStage|Number} filter
-     * @returns {String}
-     * @memberof Constants
-     */
-    stringOfNonOverrides(filter) {
-        let consStrings = '';
-        this.#list.forEach(c => {
-            const hasOneStage = (filter & c.shaderStage) !== 0;
-            if (!c.override && hasOneStage) {
-                consStrings += /*wgsl*/`const ${c.name}:${c.type} = ${c.value};\n`;
-            }
-        });
-        return consStrings;
-    }
 }
 
 class ArrayBufferWriter {
