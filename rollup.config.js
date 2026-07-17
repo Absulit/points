@@ -30,7 +30,7 @@ export default [
   {
     input: 'src/RenderPasses.js',
     output: {
-      file: 'build/RenderPasses.js',
+      file: 'build/core/RenderPasses.js',
       format: 'esm',
       banner: '/* @ts-self-types="./RenderPasses.d.ts" */'
     },
