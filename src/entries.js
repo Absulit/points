@@ -4,7 +4,6 @@ import Uniform from './Uniform.js';
 import Storage from './Storage.js';
 import Constant from './Constant.js';
 import PresentationFormat from './PresentationFormat.js';
-import RenderPasses from './RenderPasses.js';
 import Points from './points.js';
 
 export {
@@ -15,7 +14,6 @@ export {
     FrontFace,
     ScaleMode,
     PresentationFormat,
-    RenderPasses,
     Uniform,
     Storage,
     Constant,

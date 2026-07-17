@@ -21,7 +21,6 @@ import Uniforms from './Uniforms.js';
 import Storages from './Storages.js';
 import Constants from './Constants.js';
 import RenderPass, { PrimitiveTopology, LoadOp, CullMode, FrontFace } from './RenderPass.js';
-import RenderPasses from './RenderPasses.js';
 import ArrayBufferWriter from './core/ArrayBufferWriter.js';
 
 /**
@@ -3368,4 +3367,4 @@ class Points {
 }
 
 export default Points;
-export { RenderPass, RenderPasses, PrimitiveTopology, CullMode, LoadOp, PresentationFormat, FrontFace, ScaleMode, Uniform, Storage, Constant };
+export { RenderPass, PrimitiveTopology, CullMode, LoadOp, PresentationFormat, FrontFace, ScaleMode, Uniform, Storage, Constant };
