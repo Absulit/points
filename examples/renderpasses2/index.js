@@ -1,7 +1,8 @@
 import vert1 from './renderpass1/vert.js';
 import frag1 from './renderpass1/frag.js';
 
-import { RenderPass, RenderPasses } from 'points';
+import { RenderPass } from 'points';
+import RenderPasses from 'points/renderpasses';
 
 const options = {
 }
