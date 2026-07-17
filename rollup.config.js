@@ -28,7 +28,7 @@ export default [
     plugins: []
   },
   {
-    input: 'src/RenderPasses.js',
+    input: 'src/core/RenderPasses.js',
     output: {
       file: 'build/core/RenderPasses.js',
       format: 'esm',
