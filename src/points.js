@@ -4,7 +4,7 @@ import Coordinate from './coordinate.js';
 import RGBAColor from './color.js';
 import Clock from './clock.js';
 import defaultStructs from './core/defaultStructs.js';
-import { defaultVertexBody } from './core/defaultFunctions.js';
+import defaultFunctions from './core/defaultFunctions.js';
 import { dataSize, getArrayTypeData, isArray, typeSizes } from './data-size.js';
 import { loadImage, strToImage } from './texture-string.js';
 import LayersArray from './LayersArray.js';
@@ -1639,7 +1639,7 @@ class Points {
             dynamicGroupBindingsFragment = i + dynamicGroupBindingsFragment;
         })
 
-        renderPass.hasVertexShader && (colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + dynamicStructEvents + defaultVertexBody + colorsVertWGSL);
+        renderPass.hasVertexShader && (colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + dynamicStructEvents + defaultFunctions + colorsVertWGSL);
         renderPass.hasComputeShader && (colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + dynamicStructEvents + colorsComputeWGSL);
         renderPass.hasFragmentShader && (colorsFragWGSL = dynamicGroupBindingsFragment + defaultStructs + dynamicStructEvents + colorsFragWGSL);
 
