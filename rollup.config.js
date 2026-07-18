@@ -67,7 +67,7 @@ export default [
     },
     plugins: [
       {
-        name: 'minify-foreign-code-string',
+        name: 'minify-wgsl-string',
         transform(code, id) {
 
           if (id.endsWith('defaultStructs.js')) {
@@ -82,6 +82,22 @@ export default [
 
               return {
                 code: `const defaultStructs = \`${minified}\`;export default defaultStructs;`,
+                map: null
+              };
+            }
+          }
+
+          if(id.endsWith('defaultFunctions.js')){
+            const stringRegex = /const\s+defaultFunctions\s*=\s*(?:\/\*wgsl\*\/)?`([\s\S]*?)`/;
+            const match = code.match(stringRegex);
+            console.log(match);
+
+            if (match) {
+              const rawCodeString = match[1];
+              const minified = minifyOtherLanguage(rawCodeString);
+
+              return {
+                code: `const defaultFunctions = \`${minified}\`;export default defaultFunctions;`,
                 map: null
               };
             }
