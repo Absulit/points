@@ -13,7 +13,7 @@
  * ${E}
  * let value = E - 1.3;
  */
-export const E: "const E = 2.71828182;";
+export const E: "const E=2.71828182;";
 /**
  * PHI is the Golden Ratio
  *
@@ -27,7 +27,7 @@ export const E: "const E = 2.71828182;";
  * ${PHI }
  * let value = PHI + 3;
  */
-export const PHI: "const PHI = 1.61803398;";
+export const PHI: "const PHI=1.61803398;";
 /**
  * Math utils
  *
@@ -49,7 +49,7 @@ export const PHI: "const PHI = 1.61803398;";
  * ${PI}
  * let value = PI * 3;
  */
-export const PI: "const PI = 3.14159265;";
+export const PI: "const PI=3.14159265;";
 /**
  * TAU  is the ratio of a circle's circumference to its radius.
  *
@@ -63,7 +63,7 @@ export const PI: "const PI = 3.14159265;";
  * ${TAU}
  * let value = TAU / 3.5;
  */
-export const TAU: "const TAU = 6.2831853;";
+export const TAU: "const TAU=6.2831853;";
 /**
  * Angle between two points.
  * @type {String}

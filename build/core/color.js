@@ -21,9 +21,7 @@
  * ${RED}
  * let value = RED * vec4f(.5);
  */
-const RED = /*wgsl*/`
-const RED = vec4(1.,0.,0.,1.);
-`;
+const RED = /*wgsl*/`const RED=vec4(1.,0.,0.,1.);`;
 
 /**
  * GREEN color;
@@ -37,9 +35,7 @@ const RED = vec4(1.,0.,0.,1.);
  * ${GREEN}
  * let value = GREEN * vec4f(.5);
  */
-const GREEN = /*wgsl*/`
-const GREEN = vec4(0.,1.,0.,1.);
-`;
+const GREEN = /*wgsl*/`const GREEN=vec4(0.,1.,0.,1.);`;
 
 /**
  * BLUE color;
@@ -53,9 +49,7 @@ const GREEN = vec4(0.,1.,0.,1.);
  * ${BLUE}
  * let value = BLUE * vec4f(.5);
  */
-const BLUE = /*wgsl*/`
-const BLUE = vec4(0.,0.,1.,1.);
-`;
+const BLUE = /*wgsl*/`const BLUE=vec4(0.,0.,1.,1.);`;
 
 /**
  * YELLOW color;
@@ -69,9 +63,7 @@ const BLUE = vec4(0.,0.,1.,1.);
  * ${YELLOW}
  * let value = YELLOW * vec4f(.5);
  */
-const YELLOW = /*wgsl*/`
-const YELLOW = vec4(1.,1.,0.,1.);
-`;
+const YELLOW = /*wgsl*/`const YELLOW=vec4(1.,1.,0.,1.);`;
 
 /**
  * CYAN color;
@@ -85,9 +77,7 @@ const YELLOW = vec4(1.,1.,0.,1.);
  * ${CYAN}
  * let value = CYAN * vec4f(.5);
  */
-const CYAN = /*wgsl*/`
-const CYAN = vec4(0.,1.,1.,1.);
-`;
+const CYAN = /*wgsl*/`const CYAN=vec4(0.,1.,1.,1.);`;
 
 /**
  * MAGENTA color;
@@ -101,9 +91,7 @@ const CYAN = vec4(0.,1.,1.,1.);
  * ${MAGENTA}
  * let value = MAGENTA * vec4f(.5);
  */
-const MAGENTA = /*wgsl*/`
-const MAGENTA = vec4(1.,0.,1.,1.);
-`;
+const MAGENTA = /*wgsl*/`const MAGENTA=vec4(1.,0.,1.,1.);`;
 
 /**
  * WHITE color;
@@ -117,9 +105,7 @@ const MAGENTA = vec4(1.,0.,1.,1.);
  * ${WHITE}
  * let value = WHITE * vec4f(.5);
  */
-const WHITE = /*wgsl*/`
-const WHITE = vec4(1.,1.,1.,1.);
-`;
+const WHITE = /*wgsl*/`const WHITE=vec4(1.,1.,1.,1.);`;
 
 /**
  * BLACK color;
@@ -134,9 +120,7 @@ const WHITE = vec4(1.,1.,1.,1.);
  * let value = BLACK * vec4f(.5);
  *
  */
-const BLACK = /*wgsl*/`
-const BLACK = vec4(0.,0.,0.,1.);
-`;
+const BLACK = /*wgsl*/`const BLACK=vec4(0.,0.,0.,1.);`;
 
 /**
  * Layers two colors by cropping the color in the back,
@@ -159,16 +143,7 @@ const BLACK = vec4(0.,0.,0.,1.);
  * var finalColor:vec4f = layer(rgbaImage2, rgbaImage3);
  * finalColor = layer(rgbaImage1, finalColor);
  */
-const layer = /*wgsl*/`
-// https://stackoverflow.com/a/24501192/507186
-// math has been corrected from the stackoverflow method
-// to avoid a black like/ring
-fn layer(back:vec4f, front: vec4f) -> vec4f {
-    let rgb = front.rgb * front.a + back.rgb * (1. - front.a);
-    let a = front.a + back.a * (1. - front.a);
-    return vec4f(rgb, a);
-}
-`;
+const layer = /*wgsl*/`fn layer(back:vec4f,front:vec4f)->vec4f{let rgb=front.rgb*front.a+back.rgb*(1.-front.a);let a=front.a+back.a*(1.-front.a);return vec4f(rgb,a);}`;
 
 /**
  * Same as layer but with premultiplied alpha.
@@ -193,13 +168,7 @@ fn layer(back:vec4f, front: vec4f) -> vec4f {
  * var finalColor:vec4f = layerPremultiplied(rgbaImage2, rgbaImage3);
  * finalColor = layerPremultiplied(rgbaImage1, finalColor);
  */
-const layerPremultiplied = /*wgsl*/`
-fn layerPremultiplied(back: vec4f, front: vec4f) -> vec4f {
-    let out_a = front.a + back.a * (1. - front.a);
-    let out_rgb = (front.rgb * front.a) + (back.rgb * back.a * (1. - front.a));
-    return vec4f(out_rgb, out_a);
-}
-`;
+const layerPremultiplied = /*wgsl*/`fn layerPremultiplied(back:vec4f,front:vec4f)->vec4f{let out_a=front.a+back.a*(1.-front.a);let out_rgb=(front.rgb*front.a)+(back.rgb*back.a*(1.-front.a));return vec4f(out_rgb,out_a);}`;
 
 /**
  * Creates a rgba `vec4f` from an hsv color value
@@ -217,16 +186,7 @@ fn layerPremultiplied(back: vec4f, front: vec4f) -> vec4f {
  * ${RGBAFromHSV}
  * let value = RGBAFromHSV(h,s,v,n);
  */
-const RGBAFromHSV = /*wgsl*/`
-fn hsvAux(h:f32, s:f32, v:f32, n:f32) -> f32 {
-    let k:f32 = (n + h * 6.) % 6.;
-    return v - v * s * max(min(min(k, 4. - k), 1.), 0.);
-};
-
-fn RGBAFromHSV(h:f32, s:f32, v:f32) ->  vec4f{
-    return vec4f(hsvAux(h, s, v, 5.), hsvAux(h, s, v, 3.), hsvAux(h, s, v, 1.), 1.);
-}
-`;
+const RGBAFromHSV = /*wgsl*/`fn hsvAux(h:f32,s:f32,v:f32,n:f32)->f32{let k:f32=(n+h*6.)% 6.;return v-v*s*max(min(min(k,4.-k),1.),0.);};fn RGBAFromHSV(h:f32,s:f32,v:f32)->vec4f{return vec4f(hsvAux(h,s,v,5.),hsvAux(h,s,v,3.),hsvAux(h,s,v,1.),1.);}`;
 
 /**
  * Compute the FFT (Fast Fourier Transform)
@@ -244,20 +204,7 @@ fn RGBAFromHSV(h:f32, s:f32, v:f32) ->  vec4f{
  * ${bloom}
  * let value = bloom(input, iterations, intensity);
  */
-const bloom = /*wgsl*/`
-fn bloom(input:f32, iterations:i32, intensity:f32) -> f32 {
-    var output = 0.;
-    let iterationsF32 = f32(iterations);
-    for (var k = 0; k < iterations; k++) {
-        let kf32 = f32(k);
-        for (var n = 0; n < iterations; n++) {
-            let coef = cos(2. * PI * kf32 * f32(n) / iterationsF32 );
-            output += input * coef * intensity;
-        }
-    }
-    return output;
-}
-`;
+const bloom = /*wgsl*/`fn bloom(input:f32,iterations:i32,intensity:f32)->f32{var output=0.;let iterationsF32=f32(iterations);for(var k=0;k < iterations;k++){let kf32=f32(k);for(var n=0;n < iterations;n++){let coef=cos(2.*PI*kf32*f32(n)/ iterationsF32);output+=input*coef*intensity;}}return output;}`;
 
 
 /**
@@ -275,17 +222,7 @@ fn bloom(input:f32, iterations:i32, intensity:f32) -> f32 {
  * ${brightness}
  * let value = brightness(rgba);
  */
-const brightness = /*wgsl*/`
-fn brightness(color:vec4f) -> f32 {
-    // // Standard
-    // LuminanceA = (0.2126*R) + (0.7152*G) + (0.0722*B)
-    // // Percieved A
-    // LuminanceB = (0.299*R + 0.587*G + 0.114*B)
-    // // Perceived B, slower to calculate
-    // LuminanceC = sqrt(0.299*(R**2) + 0.587*(G**2) + 0.114*(B**2))
-    return (0.2126 * color.r) + (0.7152 * color.g) + (0.0722 * color.b);
-}
-`;
+const brightness = /*wgsl*/`fn brightness(color:vec4f)->f32{return(0.2126*color.r)+(0.7152*color.g)+(0.0722*color.b);}`;
 
 /**
  * Returns the perceived brightness of a color by the eye.<br>
@@ -303,11 +240,7 @@ fn brightness(color:vec4f) -> f32 {
  * ${brightnessB}
  * let value = brightnessB(rgba);
  */
-const brightnessB = /*wgsl*/`
-fn brightnessB(color:vec4f) -> f32 {
-    return (0.299 * color.r) + (0.587 * color.g) + (0.114 * color.b);
-}
-`;
+const brightnessB = /*wgsl*/`fn brightnessB(color:vec4f)->f32{return(0.299*color.r)+(0.587*color.g)+(0.114*color.b);}`;
 
 /**
  * Returns the perceived brightness of a color by the eye.<br>
@@ -326,10 +259,6 @@ fn brightnessB(color:vec4f) -> f32 {
  * ${brightnessC}
  * let value = brightnessC(rgba);
  */
-const brightnessC = /*wgsl*/`
-fn brightnessC(color:vec4f) -> f32 {
-    return (0.2126 * pow(color.r, 2.)) + (0.7152 * pow(color.g, 2.)) + (0.0722 * pow(color.b, 2.));
-}
-`;
+const brightnessC = /*wgsl*/`fn brightnessC(color:vec4f)->f32{return(0.2126*pow(color.r,2.))+(0.7152*pow(color.g,2.))+(0.0722*pow(color.b,2.));}`;
 
 export { BLACK, BLUE, CYAN, GREEN, MAGENTA, RED, RGBAFromHSV, WHITE, YELLOW, bloom, brightness, brightnessB, brightnessC, layer, layerPremultiplied };

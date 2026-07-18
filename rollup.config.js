@@ -9,6 +9,8 @@ function minifyWGSL(rawString) {
     .replace(/\s*{\s*/g, '{')
     .replace(/\s*,\s*/g, ',')
     .replace(/\s*=\s*/g, '=')
+    .replace(/\s*-\s*/g, '-')
+    .replace(/\s*\+\s*/g, '+')
     .replace(/\s*\*\s*/g, '*')
     .replace(/\s*\)\s*/g, ')')
     .replace(/\s*\(\s*/g, '(')
@@ -84,35 +86,28 @@ export default [
 
             const stringRegex = /const\s+defaultStructs\s*=\s*(?:\/\*wgsl\*\/)?`([\s\S]*?)`/;
             const match = code.match(stringRegex);
-            console.log(match);
 
             if (match) {
               const rawCodeString = match[1];
               const minified = minifyWGSL(rawCodeString);
-
-              return {
-                code: `const defaultStructs = \`${minified}\`;export default defaultStructs;`,
-                map: null
-              };
+              code = code.replace(rawCodeString, minified);
             }
           }
 
           if (id.endsWith('defaultFunctions.js')) {
             const stringRegex = /const\s+defaultFunctions\s*=\s*(?:\/\*wgsl\*\/)?`([\s\S]*?)`/;
             const match = code.match(stringRegex);
-            console.log(match);
 
             if (match) {
               const rawCodeString = match[1];
               const minified = minifyWGSL(rawCodeString);
-
-              return {
-                code: `const defaultFunctions = \`${minified}\`;export default defaultFunctions;`,
-                map: null
-              };
+              code = code.replace(rawCodeString, minified);
             }
           }
-          return null;
+          return {
+            code,
+            map: null
+          };
         }
       }
     ],
@@ -145,7 +140,38 @@ export default [
       format: 'esm',
       entryFileNames: '[name].js',
       banner: chunk => `/* @ts-self-types="./${chunk.name}.d.ts" */`,
-    }
+    },
+    plugins: [
+      {
+        name: 'minify-wgsl-string',
+        async transform(code, id) {
+          const module = await import(id);
+          /**
+           * defaultFunctions.js is not being called here because it returns
+           * 'default' when it shouldn't
+           */
+          const list = Object.keys(module); // names of exports
+          list.forEach(name => {
+
+            const stringRegex = `const\\s+${name}\\s*=\\s*(?:\\/\\*wgsl\\*\\/)?\`([\\s\\S]*?)\``
+            const regex = new RegExp(stringRegex);
+            const match = code.match(regex);
+
+            if (match) {
+              const rawCodeString = match[1];
+              const minified = minifyWGSL(rawCodeString);
+              code = code.replace(rawCodeString, minified);
+            }
+
+          })
+          return {
+            code,
+            map: null
+          };
+        }
+      }
+
+    ]
   },
 ];
 
