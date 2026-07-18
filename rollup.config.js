@@ -1,8 +1,18 @@
 
-function minifyOtherLanguage(rawString) {
+function minifyWGSL(rawString) {
   return rawString
     .replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm, '$1')
     .replace(/\s+/g, ' ')
+    .replace(/\s*;\s*/g, ';')
+    .replace(/\s*:\s*/g, ':')
+    .replace(/\s*}\s*/g, '}')
+    .replace(/\s*{\s*/g, '{')
+    .replace(/\s*,\s*/g, ',')
+    .replace(/\s*=\s*/g, '=')
+    .replace(/\s*\*\s*/g, '*')
+    .replace(/\s*\)\s*/g, ')')
+    .replace(/\s*\(\s*/g, '(')
+    .replace(/\s*->\s*/g, '->')
     .trim();
 }
 
@@ -78,7 +88,7 @@ export default [
 
             if (match) {
               const rawCodeString = match[1];
-              const minified = minifyOtherLanguage(rawCodeString);
+              const minified = minifyWGSL(rawCodeString);
 
               return {
                 code: `const defaultStructs = \`${minified}\`;export default defaultStructs;`,
@@ -87,14 +97,14 @@ export default [
             }
           }
 
-          if(id.endsWith('defaultFunctions.js')){
+          if (id.endsWith('defaultFunctions.js')) {
             const stringRegex = /const\s+defaultFunctions\s*=\s*(?:\/\*wgsl\*\/)?`([\s\S]*?)`/;
             const match = code.match(stringRegex);
             console.log(match);
 
             if (match) {
               const rawCodeString = match[1];
-              const minified = minifyOtherLanguage(rawCodeString);
+              const minified = minifyWGSL(rawCodeString);
 
               return {
                 code: `const defaultFunctions = \`${minified}\`;export default defaultFunctions;`,
