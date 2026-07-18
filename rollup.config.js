@@ -1,3 +1,11 @@
+
+function minifyOtherLanguage(rawString) {
+  return rawString
+    .replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm, '$1')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 export default [
   {
     input: 'src/RenderPass.js',
@@ -57,7 +65,31 @@ export default [
       format: 'esm',
       banner: '/* @ts-self-types="./points.d.ts" */'
     },
-    plugins: [],
+    plugins: [
+      {
+        name: 'minify-foreign-code-string',
+        transform(code, id) {
+
+          if (id.endsWith('defaultStructs.js')) {
+
+            const stringRegex = /const\s+defaultStructs\s*=\s*(?:\/\*wgsl\*\/)?`([\s\S]*?)`/;
+            const match = code.match(stringRegex);
+            console.log(match);
+
+            if (match) {
+              const rawCodeString = match[1];
+              const minified = minifyOtherLanguage(rawCodeString);
+
+              return {
+                code: `const defaultStructs = \`${minified}\`;export default defaultStructs;`,
+                map: null
+              };
+            }
+          }
+          return null;
+        }
+      }
+    ],
     external: ['points']
   },
   {
