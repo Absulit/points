@@ -1,5 +1,5 @@
 
-import Points, { LoadOp, RenderPass, RenderPasses } from 'points';
+import Points, { LoadOp, RenderPass } from 'points';
 
 import vert from './glb_renderpass/vert.js';
 import frag from './glb_renderpass/frag.js';
