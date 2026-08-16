@@ -50,13 +50,13 @@
     "@rollup/plugin-babel": "7.1.0",
     "@rollup/plugin-swc": "0.4.1",
     "@swc/cli": "0.8.1",
-    "@swc/core": "1.15.43",
+    "@swc/core": "1.15.47",
     "@swc/helpers": "0.5.23",
     "@webgpu/types": "0.1.71",
     "docolatte": "4.5.1",
     "jsdoc": "4.0.5",
     "jsr": "0.14.3",
-    "rollup": "4.62.2",
-    "typescript": "6.0.3"
+    "rollup": "4.62.4",
+    "typescript": "7.0.2"
   }
 }
