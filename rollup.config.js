@@ -18,6 +18,17 @@ function minifyWGSL(rawString) {
     .trim();
 }
 
+function findRegexAndReplace(stringRegex, stringWhere) {
+  const match = stringWhere.match(stringRegex);
+  let result = stringWhere;
+  if (match) {
+    const rawCodeString = match[1];
+    const minified = minifyWGSL(rawCodeString);
+    result = stringWhere.replace(rawCodeString, minified);
+  }
+  return result;
+}
+
 export default [
   {
     input: 'src/RenderPass.js',
@@ -83,26 +94,11 @@ export default [
         transform(code, id) {
 
           if (id.endsWith('defaultStructs.js')) {
-
             const stringRegex = /const\s+defaultStructs\s*=\s*(?:\/\*wgsl\*\/)?`([\s\S]*?)`/;
-            const match = code.match(stringRegex);
-
-            if (match) {
-              const rawCodeString = match[1];
-              const minified = minifyWGSL(rawCodeString);
-              code = code.replace(rawCodeString, minified);
-            }
-          }
-
-          if (id.endsWith('defaultFunctions.js')) {
+            code = findRegexAndReplace(stringRegex, code);
+          } else if (id.endsWith('defaultFunctions.js')) {
             const stringRegex = /const\s+defaultFunctions\s*=\s*(?:\/\*wgsl\*\/)?`([\s\S]*?)`/;
-            const match = code.match(stringRegex);
-
-            if (match) {
-              const rawCodeString = match[1];
-              const minified = minifyWGSL(rawCodeString);
-              code = code.replace(rawCodeString, minified);
-            }
+            code = findRegexAndReplace(stringRegex, code);
           }
           return {
             code,
@@ -152,17 +148,8 @@ export default [
            */
           const list = Object.keys(module); // names of exports
           list.forEach(name => {
-
             const stringRegex = `const\\s+${name}\\s*=\\s*(?:\\/\\*wgsl\\*\\/)?\`([\\s\\S]*?)\``
-            const regex = new RegExp(stringRegex);
-            const match = code.match(regex);
-
-            if (match) {
-              const rawCodeString = match[1];
-              const minified = minifyWGSL(rawCodeString);
-              code = code.replace(rawCodeString, minified);
-            }
-
+            code = findRegexAndReplace(stringRegex, code);
           })
           return {
             code,
