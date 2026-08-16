@@ -5,7 +5,8 @@ export { RenderPasses as default };
  * @class
  *
  * @example
- * import Points, { RenderPass, RenderPasses } from 'points';
+ * import Points, { RenderPass } from 'points';
+ * import RenderPasses from 'points/renderpasses';
  * const points = new Points('canvas');
  *
  * // option 1: along with the RenderPasses pased into `Points.init()`
