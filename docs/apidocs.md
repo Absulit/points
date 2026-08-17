@@ -13,7 +13,6 @@ Looking for an explanation on how to use POINTS? follow this link:
 ```js
 import Points {
     RenderPass,
-    RenderPasses,
     PrimitiveTopology,
     CullMode,
     LoadOp,
