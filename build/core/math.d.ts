@@ -1,34 +1,4 @@
 /**
- * E is a mathematical constant approximately equal to 2.71828
- * that is the base of the natural logarithm and exponential function.
- * It is sometimes called Euler's number, after the Swiss mathematician Leonhard Euler.
- *
- * @see https://en.wikipedia.org/wiki/E_(mathematical_constant)
- *
- * @example
- * // js
- * import { E } from 'points/math';
- *
- * // wgsl string
- * ${E}
- * let value = E - 1.3;
- */
-export const E: "const E=2.71828182;";
-/**
- * PHI is the Golden Ratio
- *
- * @see https://en.wikipedia.org/wiki/Golden_ratio
- *
- * @example
- * // js
- * import { PHI } from 'points/math';
- *
- * // wgsl string
- * ${PHI }
- * let value = PHI + 3;
- */
-export const PHI: "const PHI=1.61803398;";
-/**
  * Math utils
  *
  * These are wgsl functions, not js functions.
@@ -49,7 +19,7 @@ export const PHI: "const PHI=1.61803398;";
  * ${PI}
  * let value = PI * 3;
  */
-export const PI: "const PI=3.14159265;";
+declare const PI = "const PI=3.14159265;";
 /**
  * TAU  is the ratio of a circle's circumference to its radius.
  *
@@ -63,15 +33,37 @@ export const PI: "const PI=3.14159265;";
  * ${TAU}
  * let value = TAU / 3.5;
  */
-export const TAU: "const TAU=6.2831853;";
+declare const TAU = "const TAU=6.2831853;";
 /**
- * Angle between two points.
- * @type {String}
- * @param {vec2f} p1 first point position
- * @param {vec2f} p2 second poin position
- * @returns {f32} angle in radians
+ * PHI is the Golden Ratio
+ *
+ * @see https://en.wikipedia.org/wiki/Golden_ratio
+ *
+ * @example
+ * // js
+ * import { PHI } from 'points/math';
+ *
+ * // wgsl string
+ * ${PHI }
+ * let value = PHI + 3;
  */
-export const angle: string;
+declare const PHI = "const PHI=1.61803398;";
+/**
+ * E is a mathematical constant approximately equal to 2.71828
+ * that is the base of the natural logarithm and exponential function.
+ * It is sometimes called Euler's number, after the Swiss mathematician Leonhard Euler.
+ *
+ * @see https://en.wikipedia.org/wiki/E_(mathematical_constant)
+ *
+ * @example
+ * // js
+ * import { E } from 'points/math';
+ *
+ * // wgsl string
+ * ${E}
+ * let value = E - 1.3;
+ */
+declare const E = "const E=2.71828182;";
 /**
  * Using polar coordinates, calculates the final point as `vec2f`
  * @type {String}
@@ -86,28 +78,7 @@ export const angle: string;
  * ${polar}
  * let value = polar(distance, radians);
  */
-export const polar: string;
-/**
- * Creates a Matrix rotated in the X axis by an angle in radians.
- * @type {String}
- * @param {f32} rads angle
- * @returns {mat4x4f}
- */
-export const rotXAxis: string;
-/**
- * Creates a Matrix rotated in the Y axis by an angle in radians.
- * @type {String}
- * @param {f32} rads angle
- * @returns {mat4x4f}
- */
-export const rotYAxis: string;
-/**
- * Creates a Matrix rotated in the Z axis by an angle in radians.
- * @type {String}
- * @param {f32} rads angle
- * @returns {mat4x4f}
- */
-export const rotZAxis: string;
+declare const polar: string;
 /**
  * Rotates a vector an amount of radians
  * @type {String}
@@ -122,4 +93,34 @@ export const rotZAxis: string;
  * ${rotateVector}
  * let value = rotateVector(position, radians);
  */
-export const rotateVector: string;
+declare const rotateVector: string;
+/**
+ * Angle between two points.
+ * @type {String}
+ * @param {vec2f} p1 first point position
+ * @param {vec2f} p2 second poin position
+ * @returns {f32} angle in radians
+ */
+declare const angle: string;
+/**
+ * Creates a Matrix rotated in the X axis by an angle in radians.
+ * @type {String}
+ * @param {f32} rads angle
+ * @returns {mat4x4f}
+ */
+declare const rotXAxis: string;
+/**
+ * Creates a Matrix rotated in the Y axis by an angle in radians.
+ * @type {String}
+ * @param {f32} rads angle
+ * @returns {mat4x4f}
+ */
+declare const rotYAxis: string;
+/**
+ * Creates a Matrix rotated in the Z axis by an angle in radians.
+ * @type {String}
+ * @param {f32} rads angle
+ * @returns {mat4x4f}
+ */
+declare const rotZAxis: string;
+export { E, PHI, PI, TAU, angle, polar, rotXAxis, rotYAxis, rotZAxis, rotateVector };

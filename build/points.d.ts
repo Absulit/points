@@ -1,14 +1,424 @@
+declare class Coordinate {
+    #private;
+    constructor(x?: number, y?: number, z?: number);
+    set x(value: number);
+    set y(value: number);
+    set z(value: number);
+    get x(): number;
+    get y(): number;
+    get z(): number;
+    get value(): number[];
+    set(x: any, y: any, z: any): void;
+}
 /**
- * A numeric value that may be negative or positive.
+ * @class RGBAColor
+ * @ignore
  */
+declare class RGBAColor {
+    #private;
+    constructor(r?: number, g?: number, b?: number, a?: number);
+    set r(value: number);
+    set g(value: number);
+    set b(value: number);
+    set a(value: number);
+    get r(): number;
+    get g(): number;
+    get b(): number;
+    get a(): number;
+    get value(): number[];
+    get brightness(): number;
+    set brightness(value: number);
+    set(r: any, g: any, b: any, a: any): void;
+    setColor(color: any): void;
+    add(color: any): void;
+    blend(color: any): void;
+    additive(color: any): void;
+    equal(color: any): boolean;
+    static average(colors: any): RGBAColor;
+    static difference(c1: any, c2: any): RGBAColor;
+    isNull(): boolean;
+    static colorRGBEuclideanDistance(c1: any, c2: any): number;
+    /**
+     * Checks how close two colors are. Closest is `0`.
+     * @param {RGBAColor} color : Color to check distance;
+     * @returns Number distace up to `1.42` I think...
+     */
+    euclideanDistance(color: RGBAColor): number;
+    static getClosestColorInPalette(color: any, palette: any): null;
+}
 export type SignedNumber = number;
+/**
+ * Class to be used to decide if the output textures can hold more data beyond
+ * the range from 0..1. Useful for HDR images.
+ *
+ * @example
+ * points.presentationFormat = PresentationFormat.RGBA16FLOAT;
+ *
+ * @class PresentationFormat
+ */
+declare class PresentationFormat {
+    /**
+     * @memberof PresentationFormat
+     */
+    static BGRA8UNORM: string;
+    /**
+     * @memberof PresentationFormat
+     */
+    static RGBA8UNORM: string;
+    /**
+     * @memberof PresentationFormat
+     */
+    static RGBA16FLOAT: string;
+    /**
+     * @memberof PresentationFormat
+     */
+    static RGBA32FLOAT: string;
+}
+/**
+ * Class to be used to select how the content should be displayed on different
+ * screen sizes.
+ * ```text
+ * FIT: Preserves both, but might show black bars or extend empty content. All content is visible.
+ * COVER: Preserves both, but might crop width or height. All screen is covered.
+ * WIDTH: Preserves the visibility of the width, but might crop the height.
+ * HEIGHT: Preserves the visibility of the height, but might crop the width.
+ * ```
+ * @example
+ *
+ * points.scaleMode = ScaleMode.COVER;
+ *
+ * @class ScaleMode
+ */
+declare class ScaleMode {
+    /**
+     * ```text
+     * All content is visible.
+     * Black bars shown to compensate.
+     * No content is cropped.
+     *
+     * PORTRAIT        LANDSCAPE
+     * ░░░░░░░░░░░░░░░ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ░░░░░░░░░░░░░░░ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ░░░░░░░░░░░░░░░
+     * ░░░░░░░░░░░░░░░
+     * ```
+     * @memberof ScaleMode
+     */
+    static FIT: number;
+    /**
+     * ```text
+     * Not all content is visible.
+     * No black bars shown.
+     * Content is cropped on the sides.
+     * `
+     * PORTRAIT            LANDSCAPE
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ```
+     * @memberof ScaleMode
+     */
+    static COVER: number;
+    /**
+     * ```text
+     * Content is visible in portrait.
+     * Black bars shown to compensate in portrait.
+     * Content is cropped in landscape.
+     *
+     * PORTRAIT        LANDSCAPE
+     * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+     * ```
+     * @memberof ScaleMode
+     */
+    static WIDTH: number;
+    /**
+     * ```text
+     * Not all content is visible.
+     * Black bars shown to compensate in landscape.
+     * Content is cropped in portrait.
+     *
+     * PORTRAIT            LANDSCAPE
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
+     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
+     * ```
+     * @memberof ScaleMode
+     */
+    static HEIGHT: number;
+}
+/**
+ * Uniform is a container for uniform buffer related data and actions.
+ *
+ * @class Uniform
+ */
+declare class Uniform {
+    #private;
+    /**
+     *
+     * @param {{name:String, value:(Number|Boolean|Array<Number>), type:string, size:Number=}} config
+     */
+    constructor({ name, value, type, size }: {
+        name: string;
+        value: (number | boolean | Array<number>);
+        type: string;
+        size: number;
+    });
+    get name(): string;
+    /**
+     * The name that the Uniform will have on the WGSL side.
+     * @param {String} value name of the Uniform. The name is used in the WGSL
+     * shader.
+     * @example
+     * // js
+     * myUniform.name = 'myUniformName';
+     *
+     * // wgsl
+     * myUniformName = 13.0;
+     * @memberof Uniform
+     */
+    set name(value: string);
+    get value(): number | boolean | Array<number>;
+    /**
+     * To get or set the value of the uniform from the JS side to the WGSL side.
+     * @param {Number|Boolean|Array<Number>} value The uniform value
+     * @memberof Uniform
+     */
+    set value(value: number | boolean | Array<number>);
+    get type(): string;
+    /**
+     * Get or set the type of the uniform.
+     * It can be inferred automatically by just passing the value, but if
+     * something more specific is required, then you should use `type`.
+     * @param {String} value WGSL data type of the uniform
+     * @example
+     * myUniform.type = 'u32';
+     * @memberof Uniform
+     */
+    set type(value: string);
+    get size(): number;
+    /**
+     * For internal use mostly. Size in bytes.
+     * @memberof Uniform
+     */
+    set size(value: number);
+    /**
+     * Clone of the Uniform data as a plain object to avoid modifications on
+     * the original data.
+     * @returns {Object}
+     * @memberof Uniform
+     */
+    serialize(): Object;
+    /**
+     * Sets or updates the value of the Uniform.
+     * @param {Number|Boolean|Array<Number>} value
+     * @memberof Uniform
+     */
+    setValue(value: number | boolean | Array<number>): this;
+    /**
+     * Set the data type of the uniform.
+     * @param {String} value WGSL data type of the uniform
+     * @example
+     * myUniform.setType('u32')
+     * @memberof Uniform
+     */
+    setType(value: string): this;
+    valueOf(): number | boolean | number[];
+}
+/**
+ * Storage is a container for storage buffer related data and actions.
+ * @class Storage
+ */
+declare class Storage {
+    #private;
+    /**
+     * @param {{name:String, value:(Number|Array<Number>), type:String, readable:Boolean, shaderStage:GPUShaderStage, stream:bool, updated:bool, size:Number}} config
+     */
+    constructor({ name, value, type, readable, shaderStage, stream, updated, size }: {
+        name: string;
+        value: (number | Array<number>);
+        type: string;
+        readable: boolean;
+        shaderStage: GPUShaderStage;
+        stream: bool;
+        updated: bool;
+        size: number;
+    });
+    get name(): string;
+    /**
+     * The name that the Storage will have on the WGSL side.
+     * @param {String} value name of the Storage. The name is used in the WGSL
+     * shader.
+     * @example
+     * // js
+     * myStorage.name = 'myStorageName';
+     *
+     * // wgsl
+     * myStorageName = 13.1;
+     * @memberof Storage
+     */
+    set name(value: string);
+    get mapped(): boolean;
+    /**
+     * @param {Boolean} value tells WebGPU if the Storage is mapped or not. This
+     * allows for the initialization of the Storage with data, which is a
+     * different route.
+     * @memberof Storage
+     */
+    set mapped(value: boolean);
+    get type(): string;
+    /**
+     * @param {String} value WGSL data type of the Storage.
+     * @example
+     * myStorage.type = 'u32'
+     * @memberof Storage
+     */
+    set type(value: string);
+    get shaderStage(): GPUShaderStage;
+    /**
+     * Tells WebGPU to which shader it can only be used.
+     * @param {GPUShaderStage} value
+     * @memberof Storage
+     */
+    set shaderStage(value: GPUShaderStage);
+    get readable(): boolean;
+    /**
+     * If data is read back in JS from WGSL, then set to `true`.
+     * @param {Boolean} value
+     * @memberof Storage
+     */
+    set readable(value: boolean);
+    get buffer(): null;
+    /**
+     * For internal use mostly. The actual {@link GPUBuffer} with the data.
+     * @memberof Storage
+     */
+    set buffer(value: null);
+    get bufferRead(): null;
+    /**
+     * Buffer for reading back
+     * For internal use mostly. The actual GPUBufferRead with the data.
+     * @memberof Storage
+     */
+    set bufferRead(value: null);
+    get internal(): boolean;
+    set internal(value: boolean);
+    get size(): null;
+    set size(value: null);
+    get stream(): boolean;
+    /**
+     * `updated` is set to true in data updates, but this is not true in
+     * something like audio, where the data streams and needs to be updated
+     * constantly, so if the storage map needs to be updated constantly then
+     * `stream` needs to be set to true.
+     * @param {boolean} value
+     * @memberof Storage
+     */
+    set stream(value: boolean);
+    get updated(): boolean;
+    /**
+     * Mostly internal. Set to `true` if a value has been updated.
+     * @memberof Storage
+     */
+    set updated(value: boolean);
+    get value(): number | Array<number>;
+    /**
+     * @param {Number|Array<Number>} value data to send to the shader
+     * @memberof Storage
+     */
+    set value(value: number | Array<number>);
+    get clear(): bool;
+    /**
+     * Clear the Storage buffer to its defaults.
+     * Is set to `false` after the buffer is cleared.
+     * @param {bool} value;
+     * @memberof Storage
+     */
+    set clear(value: bool);
+    /**
+     *
+     * @param {Number|Array<Number>} value data to send to the shader
+     * @returns {Storage}
+     * @memberof Storage
+     */
+    setValue(value: number | Array<number>): Storage;
+    /**
+     * if this is going to be used to read data back set to `true`
+     * @param {bool} value
+     * @returns {Storage}
+     * @memberof Storage
+     */
+    setReadable(value: bool): Storage;
+    /**
+     * Tells WebGPU to which shader it can only be used.
+     * @param {GPUShaderStage} value
+     * @returns {Storage}
+     * @memberof Storage
+     */
+    setShaderStage(value: GPUShaderStage): Storage;
+    /**
+     * @param {String} value WGSL data type of the Storage.
+     * @returns {Storage}
+     * @example
+     * myStorage.setType('u32');
+     * @memberof Storage
+     */
+    setType(value: string): Storage;
+    /**
+     * Clear buffer with offset and size.
+     * To clear only a section of the buffer.
+     * `clear` is set to `true` and reset after the buffer is cleared.
+     * @param {Number} offset start index
+     * @param {Number} size length to clear
+     */
+    setClear(offset: number, size: number): void;
+    /**
+     * Data to be used after a `setClear` is called.
+     */
+    get clearData(): null;
+    read(): Promise<Float32Array<any> | null>;
+    valueOf(): number | number[];
+}
 /**
  * Constant is a container for const declarations.
  * They work in two ways with the `override` attribute.
  *
  * @class Constant
  */
-export class Constant {
+declare class Constant {
+    #private;
     /**
      * @param {{name:String, value:(Number|Array<Number>), type:String, override:Boolean}} config
      */
@@ -18,6 +428,7 @@ export class Constant {
         type: string;
         override: boolean;
     });
+    get name(): string;
     /**
      * The name that the Constant will have on the WGSL side.
      * @param {String} value name of the Constant. The name is used in the WGSL
@@ -31,7 +442,7 @@ export class Constant {
      * @memberof Constant
      */
     set name(value: string);
-    get name(): string;
+    get value(): number | Array<number>;
     /**
      * Get or set the value that the constant will have on the WGSL side.
      * @warning It can only be assigned once.
@@ -39,7 +450,7 @@ export class Constant {
      * @memberof Constant
      */
     set value(value: number | Array<number>);
-    get value(): number | Array<number>;
+    get type(): string;
     /**
      * Get or set the type of the constant.
      * It can be inferred automatically by just passing the value, but if
@@ -50,7 +461,7 @@ export class Constant {
      * @memberof Constant
      */
     set type(value: string);
-    get type(): string;
+    get override(): boolean;
     /**
      * A constant override is a constant you can change per shader.
      * By default, POINTS interpolates constant declarations inside the WGSL
@@ -76,14 +487,13 @@ export class Constant {
      * @memberof Constant
      */
     set override(value: boolean);
-    get override(): boolean;
+    get shaderStage(): GPUShaderStage;
     /**
      * Tells WebGPU to which shader it can only be used.
      * @param {GPUShaderStage}
      * @memberof Constant
      */
-    set shaderStage(value: number);
-    get shaderStage(): number;
+    set shaderStage(value: GPUShaderStage);
     /**
      * Sets the value of a Constant
      * @param {Number|Array<Number>} value
@@ -131,76 +541,124 @@ export class Constant {
      * @memberof Constant
      */
     setShaderStage(value: GPUShaderStage): Constant;
+}
+/**
+ * Class that handles the creation of new {@link Uniform}s in Points.
+ * @example
+ * // js side
+ * points.uniforms.myUniform = 10
+ *
+ * // wgsl side
+ * let val = params.myUniform; // value is 10.0 f32
+ * @class Uniforms
+ */
+declare class Uniforms {
     #private;
+    constructor();
+    get list(): any[];
+    /**
+     * List of all {@link Uniform}s
+     * @param {Array} value
+     * @memberof Uniforms
+     */
+    set list(value: any[]);
+    /**
+     * Retrieves a {@link Uniform} by its name.
+     * @param {String} name
+     * @returns {Uniform}
+     * @memberof Uniforms
+     */
+    find(name: string): Uniform;
+    /**
+     * Add a new {@link Uniform}
+     * @param {Uniform} uniform
+     * @memberof Uniforms
+     */
+    add(uniform: Uniform): void;
 }
 /**
- * To tell the {@link RenderPass} what polygons should be discarded
- * Default `BACK`
+ * Class that handles the creation of new {@link Storage}s in Points.
  * @example
+ * // js side
+ * points.storages.myStorage = [1, 2, 3]
  *
- * renderPass.cullMode = CullMode.BACK;
+ * // wgsl side
+ * let val = myStorage; // value is vec3f(1, 2, 3)
+ * @class Storages
  */
-export class CullMode {
-    /** @type {GPUCullMode} */
-    static NONE: GPUCullMode;
-    /** @type {GPUCullMode} */
-    static FRONT: GPUCullMode;
-    /** @type {GPUCullMode} */
-    static BACK: GPUCullMode;
+declare class Storages {
+    #private;
+    constructor();
+    get list(): any[];
+    /**
+     * List of all {@link Storage}
+     * @param {Array} value
+     * @memberof Storages
+     */
+    set list(value: any[]);
+    /**
+     * Retrieves a {@link Storage} by its name.
+     * @param {String} name
+     * @returns {Storage}
+     * @memberof Storages
+     */
+    find(name: string): Storage;
+    /**
+     * Add a new {@link Storage}
+     * @param {Storage} storage
+     * @memberof Storages
+     */
+    add(storage: Storage): void;
 }
 /**
- * To tell the {@link RenderPass} what polygons are Front Facing
- * Default `CCW`
+ * Class that handles the creation of new {@link Constant}s in Points.
  * @example
+ * // js side
+ * points.constants.MYCONST = 10;
  *
- * renderPass.frontFace = FrontFace.CCW;
+ * // wgsl side
+ * let val = MYCONST; // value is 10 u32 by default
+ * @class Constants
  */
-export class FrontFace {
-    /** @type {GPUFrontFace} */
-    static CCW: GPUFrontFace;
-    /** @type {GPUFrontFace} */
-    static CW: GPUFrontFace;
-}
-/**
- * To tell the {@link RenderPass} how the data from the previous RenderPass
- * is preserved on screen or cleared.
- * Default `CLEAR`
- * @example
- *
- * renderPass.loadOp = LoadOp.LOAD;
- */
-export class LoadOp {
-    /** @type {GPULoadOp} */
-    static CLEAR: GPULoadOp;
-    /** @type {GPULoadOp} */
-    static LOAD: GPULoadOp;
-}
-/**
- * Class to be used to decide if the output textures can hold more data beyond
- * the range from 0..1. Useful for HDR images.
- *
- * @example
- * points.presentationFormat = PresentationFormat.RGBA16FLOAT;
- *
- * @class PresentationFormat
- */
-export class PresentationFormat {
+declare class Constants {
+    #private;
+    constructor();
+    get list(): any[];
     /**
-     * @memberof PresentationFormat
+     * List of all {@link Constant}s
+     * @param {Array} value
+     * @memberof Constants
      */
-    static BGRA8UNORM: string;
+    set list(value: any[]);
     /**
-     * @memberof PresentationFormat
+     * Retrieves a {@link Constant} by its name.
+     * @param {String} name
+     * @returns {Constant}
+     * @memberof Constants
      */
-    static RGBA8UNORM: string;
+    find(name: string): Constant;
     /**
-     * @memberof PresentationFormat
+     * Add a new {@link Constant}
+     * @param {Constant} constant
+     * @memberof Constants
      */
-    static RGBA16FLOAT: string;
+    add(constant: Constant): void;
     /**
-     * @memberof PresentationFormat
+     * Object list with the constants that are overridable.
+     * This object will be passed into the pipeline.
+     * @param {GPUShaderStage|Number} filter
+     * @returns {Object}
+     * @memberof Constants
      */
-    static RGBA32FLOAT: string;
+    listOfOverrides(filter: GPUShaderStage | number): Object;
+    /**
+     * List of constants formatted as WGSL string to be interpolated in the
+     * shaders.
+     * @param {GPUShaderStage|Number} filter
+     * @returns {String}
+     * @memberof Constants
+     */
+    stringOfNonOverrides(filter: GPUShaderStage | number): string;
 }
 /**
  * To tell the {@link RenderPass} how to display the triangles.
@@ -209,7 +667,7 @@ export class PresentationFormat {
  *
  * renderPass.topology = PrimitiveTopology.POINT_LIST;
  */
-export class PrimitiveTopology {
+declare class PrimitiveTopology {
     /** @type {GPUPrimitiveTopology} */
     static POINT_LIST: GPUPrimitiveTopology;
     /** @type {GPUPrimitiveTopology} */
@@ -220,6 +678,48 @@ export class PrimitiveTopology {
     static TRIANGLE_LIST: GPUPrimitiveTopology;
     /** @type {GPUPrimitiveTopology} */
     static TRIANGLE_STRIP: GPUPrimitiveTopology;
+}
+/**
+ * To tell the {@link RenderPass} how the data from the previous RenderPass
+ * is preserved on screen or cleared.
+ * Default `CLEAR`
+ * @example
+ *
+ * renderPass.loadOp = LoadOp.LOAD;
+ */
+declare class LoadOp {
+    /** @type {GPULoadOp} */
+    static CLEAR: GPULoadOp;
+    /** @type {GPULoadOp} */
+    static LOAD: GPULoadOp;
+}
+/**
+ * To tell the {@link RenderPass} what polygons are Front Facing
+ * Default `CCW`
+ * @example
+ *
+ * renderPass.frontFace = FrontFace.CCW;
+ */
+declare class FrontFace {
+    /** @type {GPUFrontFace} */
+    static CCW: GPUFrontFace;
+    /** @type {GPUFrontFace} */
+    static CW: GPUFrontFace;
+}
+/**
+ * To tell the {@link RenderPass} what polygons should be discarded
+ * Default `BACK`
+ * @example
+ *
+ * renderPass.cullMode = CullMode.BACK;
+ */
+declare class CullMode {
+    /** @type {GPUCullMode} */
+    static NONE: GPUCullMode;
+    /** @type {GPUCullMode} */
+    static FRONT: GPUCullMode;
+    /** @type {GPUCullMode} */
+    static BACK: GPUCullMode;
 }
 /**
  * A RenderPass is a way to have a block of shaders to pass to your application pipeline and
@@ -246,7 +746,8 @@ export class PrimitiveTopology {
  * });
  * waves.required = ['scale', 'intensity'];
  */
-export class RenderPass extends EventTarget {
+declare class RenderPass extends EventTarget {
+    #private;
     static SCALE_MODE_UPDATED: string;
     /**
      * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
@@ -263,14 +764,14 @@ export class RenderPass extends EventTarget {
      * The method `init` will be called to initialize the buffer parameters.
      *
      */
-    constructor(vertexShader: string, fragmentShader: string, computeShader: string, workgroupCountX: string, workgroupCountY: string, workgroupCountZ: string, init: any);
-    set index(value: null);
+    constructor(vertexShader: string, fragmentShader: string, computeShader: string, workgroupCountX: string, workgroupCountY: string, workgroupCountZ: string, init: Function);
     /**
      * Get the current RenderPass index order in the pipeline.
      * When you add a RenderPass to the constructor or via
      * {@link Points#addRenderPass}, this is the order it receives.
      */
     get index(): null;
+    set index(value: null);
     /**
      * get the vertex shader content
      */
@@ -309,17 +810,13 @@ export class RenderPass extends EventTarget {
     get hasFragmentShader(): boolean;
     get hasVertexAndFragmentShader(): boolean;
     /**
-     * @param {Number} val
-     */
-    set workgroupCountX(val: number);
-    /**
      * How many workgroups are in the X dimension.
      */
     get workgroupCountX(): number;
     /**
      * @param {Number} val
      */
-    set workgroupCountY(val: number);
+    set workgroupCountX(val: number);
     /**
      * How many workgroups are in the Y dimension.
      */
@@ -327,11 +824,15 @@ export class RenderPass extends EventTarget {
     /**
      * @param {Number} val
      */
-    set workgroupCountZ(val: number);
+    set workgroupCountY(val: number);
     /**
      * How many workgroups are in the Z dimension.
      */
     get workgroupCountZ(): number;
+    /**
+     * @param {Number} val
+     */
+    set workgroupCountZ(val: number);
     /**
      * Function where the `init` parameter (set in the constructor) is executed
      * and this call will pass the parameters that the RenderPass
@@ -340,6 +841,7 @@ export class RenderPass extends EventTarget {
      * like {@link Points#setUniform}  and others.
      */
     init(points: Points): void;
+    get required(): Array<string>;
     /**
      * List of buffer names that are required for this RenderPass so if it shows
      * them in the console.
@@ -348,7 +850,6 @@ export class RenderPass extends EventTarget {
      * This is only  used for a post processing RenderPass.
      */
     set required(val: Array<string>);
-    get required(): Array<string>;
     /**
      * Number of instances that will be created of the current mesh (Vertex Buffer)
      * in this RenderPass. This means if you have a quad, it will create
@@ -356,24 +857,25 @@ export class RenderPass extends EventTarget {
      * Useful for instanced particles driven by a Storage buffer.
      */
     get instanceCount(): number;
-    set name(val: null);
     get name(): null;
+    set name(val: null);
     get internal(): boolean;
+    /**
+     * Parameters specifically for Post RenderPass
+     */
+    get params(): Object;
     /**
      * @param {Object} val data that can be assigned to the RenderPass when
      * the {@link Points#addRenderPass} method is called.
      */
     set params(val: Object);
-    /**
-     * Parameters specifically for Post RenderPass
-     */
-    get params(): Object;
-    set vertexArray(val: Float32Array<ArrayBuffer>);
     get vertexArray(): Float32Array<ArrayBuffer>;
-    set vertexBufferInfo(val: null);
+    set vertexArray(val: Float32Array<ArrayBuffer>);
     get vertexBufferInfo(): null;
-    set vertexBuffer(val: null);
+    set vertexBufferInfo(val: null);
     get vertexBuffer(): null;
+    set vertexBuffer(val: null);
+    get depthWriteEnabled(): boolean;
     /**
      * Controls whether your fragment shader can write to the depth buffer.
      * By default `true`.
@@ -381,20 +883,25 @@ export class RenderPass extends EventTarget {
      * @param {Boolean} val
      */
     set depthWriteEnabled(val: boolean);
-    get depthWriteEnabled(): boolean;
+    get textureDepth(): GPUTexture;
     /**
      * Holder for the depth map for this RenderPass only
      * @param {GPUTexture} val
      */
     set textureDepth(val: GPUTexture);
-    get textureDepth(): GPUTexture;
+    get loadOp(): LoadOp | GPULoadOp;
     /**
      * Controls if the last RenderPass data is preserved on screen or cleared.
      * Default {@link LoadOp#CLEAR}
      * @param {LoadOp | GPULoadOp} val
      */
     set loadOp(val: LoadOp | GPULoadOp);
-    get loadOp(): LoadOp | GPULoadOp;
+    get clearValue(): {
+        r: number;
+        g: number;
+        b: number;
+        a: number;
+    };
     /**
      * Sets the color used to clear the RenderPass before drawing.
      * (only if {@link RenderPass#loadOp | loadOp} is set to `clear`)
@@ -407,23 +914,18 @@ export class RenderPass extends EventTarget {
         b: number;
         a: number;
     });
-    get clearValue(): {
-        r: number;
-        g: number;
-        b: number;
-        a: number;
-    };
     /**
      * @type {GPURenderPassDescriptor}
      */
     get descriptor(): GPURenderPassDescriptor;
+    get topology(): GPUPrimitiveTopology;
     /**
      * To render as Triangles, lines or points.
      * Use class {@link PrimitiveTopology}
      * @param {GPUPrimitiveTopology} val
      */
     set topology(val: GPUPrimitiveTopology);
-    get topology(): GPUPrimitiveTopology;
+    get cullMode(): CullMode | GPUCullMode;
     /**
      * Triangles to discard.
      * Default `BACK`.
@@ -431,7 +933,7 @@ export class RenderPass extends EventTarget {
      * @param {CullMode | GPUCullMode} val
      */
     set cullMode(val: CullMode | GPUCullMode);
-    get cullMode(): CullMode | GPUCullMode;
+    get frontFace(): FrontFace | GPUFrontFace;
     /**
      * Direction of the triangles.
      * Counter Clockwise (CCW) or Clockwise (CW)
@@ -440,19 +942,19 @@ export class RenderPass extends EventTarget {
      * @param {FrontFace | GPUFrontFace} val
      */
     set frontFace(val: FrontFace | GPUFrontFace);
-    get frontFace(): FrontFace | GPUFrontFace;
+    get bundle(): GPURenderBundle;
     /**
      * Render Bundle for performance
      * @param {GPURenderBundle} val
      */
     set bundle(val: GPURenderBundle);
-    get bundle(): GPURenderBundle;
+    get device(): GPUDevice;
     /**
      * Device reference to check if RenderBundle needs to be rebuilt
      * @param {GPUDevice} val
      */
     set device(val: GPUDevice);
-    get device(): GPUDevice;
+    get enabled(): boolean;
     /**
      * Disable the current RenderPass during runtime if the pass has
      * no other passes dependencies like sharing a texture.
@@ -465,13 +967,12 @@ export class RenderPass extends EventTarget {
      * renderPass.enabled = false;
      */
     set enabled(val: boolean);
-    get enabled(): boolean;
+    get meshUpdated(): boolean;
     /**
      * To notify the RenderPass if a mesh has changed to update the vertexBuffer
      * @param {Boolean} val
      */
     set meshUpdated(val: boolean);
-    get meshUpdated(): boolean;
     /**
      * - **currently for internal use**<br>
      * - **might be private in the future**<br>
@@ -836,6 +1337,7 @@ export class RenderPass extends EventTarget {
      * ids and names of the meshes
      */
     get meshes(): any[];
+    get scaleMode(): ScaleMode | number;
     /**
      * Select how the content should be displayed on different
      * screen sizes.
@@ -852,346 +1354,7 @@ export class RenderPass extends EventTarget {
      * renderPass.scaleMode = ScaleMode.COVER;
      */
     set scaleMode(val: ScaleMode | number);
-    get scaleMode(): ScaleMode | number;
     destroy(): void;
-    #private;
-}
-/**
- * Class to be used to select how the content should be displayed on different
- * screen sizes.
- * ```text
- * FIT: Preserves both, but might show black bars or extend empty content. All content is visible.
- * COVER: Preserves both, but might crop width or height. All screen is covered.
- * WIDTH: Preserves the visibility of the width, but might crop the height.
- * HEIGHT: Preserves the visibility of the height, but might crop the width.
- * ```
- * @example
- *
- * points.scaleMode = ScaleMode.COVER;
- *
- * @class ScaleMode
- */
-export class ScaleMode {
-    /**
-     * ```text
-     * All content is visible.
-     * Black bars shown to compensate.
-     * No content is cropped.
-     *
-     * PORTRAIT        LANDSCAPE
-     * ░░░░░░░░░░░░░░░ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ░░░░░░░░░░░░░░░ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ░░░░░░░░░░░░░░░
-     * ░░░░░░░░░░░░░░░
-     * ```
-     * @memberof ScaleMode
-     */
-    static FIT: number;
-    /**
-     * ```text
-     * Not all content is visible.
-     * No black bars shown.
-     * Content is cropped on the sides.
-     * `
-     * PORTRAIT            LANDSCAPE
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ```
-     * @memberof ScaleMode
-     */
-    static COVER: number;
-    /**
-     * ```text
-     * Content is visible in portrait.
-     * Black bars shown to compensate in portrait.
-     * Content is cropped in landscape.
-     *
-     * PORTRAIT        LANDSCAPE
-     * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-     * ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ░░░░░░░░░░░░░░░ ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-     * ```
-     * @memberof ScaleMode
-     */
-    static WIDTH: number;
-    /**
-     * ```text
-     * Not all content is visible.
-     * Black bars shown to compensate in landscape.
-     * Content is cropped in portrait.
-     *
-     * PORTRAIT            LANDSCAPE
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ ░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
-     * ▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒
-     * ```
-     * @memberof ScaleMode
-     */
-    static HEIGHT: number;
-}
-/**
- * Storage is a container for storage buffer related data and actions.
- * @class Storage
- */
-export class Storage {
-    /**
-     * @param {{name:String, value:(Number|Array<Number>), type:String, readable:Boolean, shaderStage:GPUShaderStage, stream:bool, updated:bool, size:Number}} config
-     */
-    constructor({ name, value, type, readable, shaderStage, stream, updated, size }: {
-        name: string;
-        value: (number | Array<number>);
-        type: string;
-        readable: boolean;
-        shaderStage: GPUShaderStage;
-        stream: bool;
-        updated: bool;
-        size: number;
-    });
-    /**
-     * The name that the Storage will have on the WGSL side.
-     * @param {String} value name of the Storage. The name is used in the WGSL
-     * shader.
-     * @example
-     * // js
-     * myStorage.name = 'myStorageName';
-     *
-     * // wgsl
-     * myStorageName = 13.1;
-     * @memberof Storage
-     */
-    set name(value: string);
-    get name(): string;
-    /**
-     * @param {Boolean} value tells WebGPU if the Storage is mapped or not. This
-     * allows for the initialization of the Storage with data, which is a
-     * different route.
-     * @memberof Storage
-     */
-    set mapped(value: boolean);
-    get mapped(): boolean;
-    /**
-     * @param {String} value WGSL data type of the Storage.
-     * @example
-     * myStorage.type = 'u32'
-     * @memberof Storage
-     */
-    set type(value: string);
-    get type(): string;
-    /**
-     * Tells WebGPU to which shader it can only be used.
-     * @param {GPUShaderStage} value
-     * @memberof Storage
-     */
-    set shaderStage(value: GPUShaderStage);
-    get shaderStage(): GPUShaderStage;
-    /**
-     * If data is read back in JS from WGSL, then set to `true`.
-     * @param {Boolean} value
-     * @memberof Storage
-     */
-    set readable(value: boolean);
-    get readable(): boolean;
-    /**
-     * For internal use mostly. The actual {@link GPUBuffer} with the data.
-     * @memberof Storage
-     */
-    set buffer(value: null);
-    get buffer(): null;
-    /**
-     * Buffer for reading back
-     * For internal use mostly. The actual GPUBufferRead with the data.
-     * @memberof Storage
-     */
-    set bufferRead(value: null);
-    get bufferRead(): null;
-    set internal(value: boolean);
-    get internal(): boolean;
-    set size(value: null);
-    get size(): null;
-    /**
-     * `updated` is set to true in data updates, but this is not true in
-     * something like audio, where the data streams and needs to be updated
-     * constantly, so if the storage map needs to be updated constantly then
-     * `stream` needs to be set to true.
-     * @param {boolean} value
-     * @memberof Storage
-     */
-    set stream(value: boolean);
-    get stream(): boolean;
-    /**
-     * Mostly internal. Set to `true` if a value has been updated.
-     * @memberof Storage
-     */
-    set updated(value: boolean);
-    get updated(): boolean;
-    /**
-     * @param {Number|Array<Number>} value data to send to the shader
-     * @memberof Storage
-     */
-    set value(value: number | Array<number>);
-    get value(): number | Array<number>;
-    /**
-     * Clear the Storage buffer to its defaults.
-     * Is set to `false` after the buffer is cleared.
-     * @param {bool} value;
-     * @memberof Storage
-     */
-    set clear(value: bool);
-    get clear(): bool;
-    /**
-     *
-     * @param {Number|Array<Number>} value data to send to the shader
-     * @returns {Storage}
-     * @memberof Storage
-     */
-    setValue(value: number | Array<number>): Storage;
-    /**
-     * if this is going to be used to read data back set to `true`
-     * @param {bool} value
-     * @returns {Storage}
-     * @memberof Storage
-     */
-    setReadable(value: bool): Storage;
-    /**
-     * Tells WebGPU to which shader it can only be used.
-     * @param {GPUShaderStage} value
-     * @returns {Storage}
-     * @memberof Storage
-     */
-    setShaderStage(value: GPUShaderStage): Storage;
-    /**
-     * @param {String} value WGSL data type of the Storage.
-     * @returns {Storage}
-     * @example
-     * myStorage.setType('u32');
-     * @memberof Storage
-     */
-    setType(value: string): Storage;
-    /**
-     * Clear buffer with offset and size.
-     * To clear only a section of the buffer.
-     * `clear` is set to `true` and reset after the buffer is cleared.
-     * @param {Number} offset start index
-     * @param {Number} size length to clear
-     */
-    setClear(offset: number, size: number): void;
-    /**
-     * Data to be used after a `setClear` is called.
-     */
-    get clearData(): null;
-    read(): Promise<Float32Array<any> | null>;
-    valueOf(): number | number[];
-    #private;
-}
-/**
- * Uniform is a container for uniform buffer related data and actions.
- *
- * @class Uniform
- */
-export class Uniform {
-    /**
-     *
-     * @param {{name:String, value:(Number|Boolean|Array<Number>), type:string, size:Number=}} config
-     */
-    constructor({ name, value, type, size }: {
-        name: string;
-        value: (number | boolean | Array<number>);
-        type: string;
-        size: number;
-    });
-    /**
-     * The name that the Uniform will have on the WGSL side.
-     * @param {String} value name of the Uniform. The name is used in the WGSL
-     * shader.
-     * @example
-     * // js
-     * myUniform.name = 'myUniformName';
-     *
-     * // wgsl
-     * myUniformName = 13.0;
-     * @memberof Uniform
-     */
-    set name(value: string);
-    get name(): string;
-    /**
-     * To get or set the value of the uniform from the JS side to the WGSL side.
-     * @param {Number|Boolean|Array<Number>} value The uniform value
-     * @memberof Uniform
-     */
-    set value(value: number | boolean | Array<number>);
-    get value(): number | boolean | Array<number>;
-    /**
-     * Get or set the type of the uniform.
-     * It can be inferred automatically by just passing the value, but if
-     * something more specific is required, then you should use `type`.
-     * @param {String} value WGSL data type of the uniform
-     * @example
-     * myUniform.type = 'u32';
-     * @memberof Uniform
-     */
-    set type(value: string);
-    get type(): string;
-    /**
-     * For internal use mostly. Size in bytes.
-     * @memberof Uniform
-     */
-    set size(value: number);
-    get size(): number;
-    /**
-     * Clone of the Uniform data as a plain object to avoid modifications on
-     * the original data.
-     * @returns {Object}
-     * @memberof Uniform
-     */
-    serialize(): Object;
-    /**
-     * Sets or updates the value of the Uniform.
-     * @param {Number|Boolean|Array<Number>} value
-     * @memberof Uniform
-     */
-    setValue(value: number | boolean | Array<number>): this;
-    /**
-     * Set the data type of the uniform.
-     * @param {String} value WGSL data type of the uniform
-     * @example
-     * myUniform.setType('u32')
-     * @memberof Uniform
-     */
-    setType(value: string): this;
-    valueOf(): number | boolean | number[];
-    #private;
 }
 /**
  * Main class Points, this is the entry point of an application with this library.
@@ -1213,6 +1376,7 @@ export class Uniform {
  *
  */
 declare class Points {
+    #private;
     /**
      * Constructor of `Points`.
      * Set a width and height to be used if no `fitWindow` is called, and also
@@ -1222,19 +1386,6 @@ declare class Points {
      * @param {Number} height default height
      */
     constructor(canvasId: string, width?: number, height?: number);
-    /**
-     * If the canvas has a fixed size e.g. `800x800`, `fitWindow` will fill
-     * the available window space.
-     * @param {Boolean} value
-     * @throws {String} {@link Points#init} has not been called
-     *
-     * @example
-     *  if (await points.init(renderPasses)) {
-     *      points.fitWindow = isFitWindowData.isFitWindow;
-     *      update();
-     *  }
-     */
-    set fitWindow(value: boolean);
     /**
      * Sets a `param` (predefined struct already in all shaders)
      * as uniform to send to all shaders.
@@ -1773,7 +1924,7 @@ declare class Points {
      *     points.setUniform('myvar', 3); // already existing uniform to update
      * }
      */
-    update(updateCallback: any): void;
+    update(updateCallback: Function): void;
     read(): Promise<void>;
     /**
      * Import and prepend a common string to all RenderPass shaders.
@@ -1797,14 +1948,6 @@ declare class Points {
      */
     get device(): GPUDevice;
     get context(): null;
-    /**
-     * Triggers the app to run in full screen mode
-     * @type {Boolean}
-     *
-     * @example
-     * points.fullscreen = true
-     */
-    set fullscreen(value: boolean);
     get fullscreen(): boolean;
     /**
      * Gets the current time elapsed in milliseconds.
@@ -1814,6 +1957,28 @@ declare class Points {
      * Get the time elapsed since the last frame was renderd, in milliseconds.
      */
     get deltaTime(): number;
+    /**
+     * Triggers the app to run in full screen mode
+     * @type {Boolean}
+     *
+     * @example
+     * points.fullscreen = true
+     */
+    set fullscreen(value: boolean);
+    /**
+     * If the canvas has a fixed size e.g. `800x800`, `fitWindow` will fill
+     * the available window space.
+     * @param {Boolean} value
+     * @throws {String} {@link Points#init} has not been called
+     *
+     * @example
+     *  if (await points.init(renderPasses)) {
+     *      points.fitWindow = isFitWindowData.isFitWindow;
+     *      update();
+     *  }
+     */
+    set fitWindow(value: boolean);
+    get presentationFormat(): PresentationFormat | string | GPUTextureFormat;
     /**
      * Set the maximum range the render textures can hold.
      * If you need HDR values use `16` or `32` float formats.
@@ -1827,7 +1992,7 @@ declare class Points {
      * @param {PresentationFormat|String|GPUTextureFormat} value
      */
     set presentationFormat(value: PresentationFormat | string | GPUTextureFormat);
-    get presentationFormat(): PresentationFormat | string | GPUTextureFormat;
+    get debug(): boolean;
     /**
      * Shows or hides all the logs and warnings from the library.
      * Meant to be set as false in production environment.
@@ -1839,7 +2004,7 @@ declare class Points {
      * points.debug = false;
      */
     set debug(val: boolean);
-    get debug(): boolean;
+    get scaleMode(): ScaleMode | number;
     /**
      * Select how the content should be displayed on different
      * screen sizes.
@@ -1857,7 +2022,6 @@ declare class Points {
      * points.scaleMode = ScaleMode.COVER;
      */
     set scaleMode(val: ScaleMode | number);
-    get scaleMode(): ScaleMode | number;
     /**
      * Get the list of added uniforms, same as {@link uniforms}
      * @example
@@ -1940,169 +2104,5 @@ declare class Points {
      * there's no need to call `destroy()`.
      */
     destroy(): void;
-    #private;
 }
-declare class Coordinate {
-    constructor(x?: number, y?: number, z?: number);
-    set x(value: number);
-    get x(): number;
-    set y(value: number);
-    get y(): number;
-    set z(value: number);
-    get z(): number;
-    get value(): number[];
-    set(x: any, y: any, z: any): void;
-    #private;
-}
-/**
- * @class RGBAColor
- * @ignore
- */
-declare class RGBAColor {
-    static average(colors: any): RGBAColor;
-    static difference(c1: any, c2: any): RGBAColor;
-    static colorRGBEuclideanDistance(c1: any, c2: any): number;
-    static getClosestColorInPalette(color: any, palette: any): null;
-    constructor(r?: number, g?: number, b?: number, a?: number);
-    set r(value: number);
-    get r(): number;
-    set g(value: number);
-    get g(): number;
-    set b(value: number);
-    get b(): number;
-    set a(value: number);
-    get a(): number;
-    get value(): number[];
-    set brightness(value: number);
-    get brightness(): number;
-    set(r: any, g: any, b: any, a: any): void;
-    setColor(color: any): void;
-    add(color: any): void;
-    blend(color: any): void;
-    additive(color: any): void;
-    equal(color: any): boolean;
-    isNull(): boolean;
-    /**
-     * Checks how close two colors are. Closest is `0`.
-     * @param {RGBAColor} color : Color to check distance;
-     * @returns Number distace up to `1.42` I think...
-     */
-    euclideanDistance(color: RGBAColor): number;
-    #private;
-}
-/**
- * Class that handles the creation of new {@link Uniform}s in Points.
- * @example
- * // js side
- * points.uniforms.myUniform = 10
- *
- * // wgsl side
- * let val = params.myUniform; // value is 10.0 f32
- * @class Uniforms
- */
-declare class Uniforms {
-    /**
-     * List of all {@link Uniform}s
-     * @param {Array} value
-     * @memberof Uniforms
-     */
-    set list(value: any[]);
-    get list(): any[];
-    /**
-     * Retrieves a {@link Uniform} by its name.
-     * @param {String} name
-     * @returns {Uniform}
-     * @memberof Uniforms
-     */
-    find(name: string): Uniform;
-    /**
-     * Add a new {@link Uniform}
-     * @param {Uniform} uniform
-     * @memberof Uniforms
-     */
-    add(uniform: Uniform): void;
-    #private;
-}
-/**
- * Class that handles the creation of new {@link Storage}s in Points.
- * @example
- * // js side
- * points.storages.myStorage = [1, 2, 3]
- *
- * // wgsl side
- * let val = myStorage; // value is vec3f(1, 2, 3)
- * @class Storages
- */
-declare class Storages {
-    /**
-     * List of all {@link Storage}
-     * @param {Array} value
-     * @memberof Storages
-     */
-    set list(value: any[]);
-    get list(): any[];
-    /**
-     * Retrieves a {@link Storage} by its name.
-     * @param {String} name
-     * @returns {Storage}
-     * @memberof Storages
-     */
-    find(name: string): Storage;
-    /**
-     * Add a new {@link Storage}
-     * @param {Storage} storage
-     * @memberof Storages
-     */
-    add(storage: Storage): void;
-    #private;
-}
-/**
- * Class that handles the creation of new {@link Constant}s in Points.
- * @example
- * // js side
- * points.constants.MYCONST = 10;
- *
- * // wgsl side
- * let val = MYCONST; // value is 10 u32 by default
- * @class Constants
- */
-declare class Constants {
-    /**
-     * List of all {@link Constant}s
-     * @param {Array} value
-     * @memberof Constants
-     */
-    set list(value: any[]);
-    get list(): any[];
-    /**
-     * Retrieves a {@link Constant} by its name.
-     * @param {String} name
-     * @returns {Constant}
-     * @memberof Constants
-     */
-    find(name: string): Constant;
-    /**
-     * Add a new {@link Constant}
-     * @param {Constant} constant
-     * @memberof Constants
-     */
-    add(constant: Constant): void;
-    /**
-     * Object list with the constants that are overridable.
-     * This object will be passed into the pipeline.
-     * @param {GPUShaderStage|Number} filter
-     * @returns {Object}
-     * @memberof Constants
-     */
-    listOfOverrides(filter: GPUShaderStage | number): Object;
-    /**
-     * List of constants formatted as WGSL string to be interpolated in the
-     * shaders.
-     * @param {GPUShaderStage|Number} filter
-     * @returns {String}
-     * @memberof Constants
-     */
-    stringOfNonOverrides(filter: GPUShaderStage | number): string;
-    #private;
-}
-export { Points as default };
+export { Constant, CullMode, FrontFace, LoadOp, PresentationFormat, PrimitiveTopology, RenderPass, ScaleMode, Storage, Uniform, Points as default };

@@ -23,4 +23,5 @@
  * ${voronoi}
  * let value = voronoi(uvr, numPoints);
  */
-export const voronoi: string;
+declare const voronoi: string;
+export { voronoi };

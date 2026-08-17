@@ -1,72 +1,4 @@
 /**
- * Creates a circle
- * @type {String}
- * @param {vec2f} position center of the circle
- * @param {f32} radius how big the circle is
- * @param {f32} feather how soft the edges are
- * @param {vec2f} uv uv coordinates
- * @return {f32}
- *
- * @example
- * // js
- * import { sdfCircle } from 'points/sdf';
- *
- * // wgsl string
- * ${sdfCircle}
- * let value = sdfCircle(position, radius, feather, uvr);
- */
-export const sdfCircle: string;
-/**
- * Creates a line with a pixel stroke.
- * @type {String}
- * @param {vec2f} p1 start of the line
- * @param {vec2f} p2 end of the line
- * @param {f32} pixelStroke width in pixels with an 800 base
- * @param {vec2f} uv uv coordinates
- * @return {f32}
- *
- * @example
- * // js
- * import { sdfLine } from 'points/sdf';
- *
- * // wgsl string
- * ${sdfLine}
- * let value = sdfLine(p1, p2, pixeStroke, uvr);
- */
-export const sdfLine: string;
-/**
- * Better than sdfLine to create lines
- * @type {String}
- * @param {vec2f} p1 start of the line
- * @param {vec2f} p2 end of the line
- * @param {f32} feather how soft the edges are
- * @param {vec2f} uv uv coordinates
- * @return {f32}
- *
- * @example
- * // js
- * import { sdfLine2 } from 'points/sdf';
- *
- * // wgsl string
- * ${sdfLine2}
- * let value = sdfLine2(p1, p2, feather, uvr);
- */
-export const sdfLine2: string;
-/**
- * Create a rectangle with two coordinates.
- * @type {String}
- * @param {vec2f} startPoint first coordinate, one corner of the rectangle
- * @param {vec2f} endPoint second coordinate, opposite corner of the rectangle
- * @param {vec2f} uv
- * @return {f32}
- *
- * @example
- * // wgsl string
- * sdfRect(vec2f(), vec2f(1), in.uvr);
- *
- */
-export const sdfRect: string;
-/**
  * A few signed distance functions.
  * <br>
  * <br>
@@ -91,22 +23,43 @@ export const sdfRect: string;
  * ${sdfSegment}
  * let value = sdfSegment(uv, point1, point2);
  */
-export const sdfSegment: string;
+declare const sdfSegment: string;
 /**
- * Special for letters and create an sdf version of a texture
+ * Creates a line with a pixel stroke.
  * @type {String}
- * @param {vec4f} color final color
- * @return {vec4f}
+ * @param {vec2f} p1 start of the line
+ * @param {vec2f} p2 end of the line
+ * @param {f32} pixelStroke width in pixels with an 800 base
+ * @param {vec2f} uv uv coordinates
+ * @return {f32}
  *
  * @example
  * // js
- * import { sdfSmooth } from 'points/sdf';
+ * import { sdfLine } from 'points/sdf';
  *
  * // wgsl string
- * ${sdfSmooth}
- * let value = sdfSmooth(rgba);
+ * ${sdfLine}
+ * let value = sdfLine(p1, p2, pixeStroke, uvr);
  */
-export const sdfSmooth: string;
+declare const sdfLine: string;
+/**
+ * Creates a circle
+ * @type {String}
+ * @param {vec2f} position center of the circle
+ * @param {f32} radius how big the circle is
+ * @param {f32} feather how soft the edges are
+ * @param {vec2f} uv uv coordinates
+ * @return {f32}
+ *
+ * @example
+ * // js
+ * import { sdfCircle } from 'points/sdf';
+ *
+ * // wgsl string
+ * ${sdfCircle}
+ * let value = sdfCircle(position, radius, feather, uvr);
+ */
+declare const sdfCircle: string;
 /**
  * Creates a square
  * @type {String}
@@ -125,4 +78,52 @@ export const sdfSmooth: string;
  * ${sdfSquare}
  * let value = sdfSquare(position, radius, feather, rotation, uvr);
  */
-export const sdfSquare: string;
+declare const sdfSquare: string;
+/**
+ * Create a rectangle with two coordinates.
+ * @type {String}
+ * @param {vec2f} startPoint first coordinate, one corner of the rectangle
+ * @param {vec2f} endPoint second coordinate, opposite corner of the rectangle
+ * @param {vec2f} uv
+ * @return {f32}
+ *
+ * @example
+ * // wgsl string
+ * sdfRect(vec2f(), vec2f(1), in.uvr);
+ *
+ */
+declare const sdfRect: string;
+/**
+ * Better than sdfLine to create lines
+ * @type {String}
+ * @param {vec2f} p1 start of the line
+ * @param {vec2f} p2 end of the line
+ * @param {f32} feather how soft the edges are
+ * @param {vec2f} uv uv coordinates
+ * @return {f32}
+ *
+ * @example
+ * // js
+ * import { sdfLine2 } from 'points/sdf';
+ *
+ * // wgsl string
+ * ${sdfLine2}
+ * let value = sdfLine2(p1, p2, feather, uvr);
+ */
+declare const sdfLine2: string;
+/**
+ * Special for letters and create an sdf version of a texture
+ * @type {String}
+ * @param {vec4f} color final color
+ * @return {vec4f}
+ *
+ * @example
+ * // js
+ * import { sdfSmooth } from 'points/sdf';
+ *
+ * // wgsl string
+ * ${sdfSmooth}
+ * let value = sdfSmooth(rgba);
+ */
+declare const sdfSmooth: string;
+export { sdfCircle, sdfLine, sdfLine2, sdfRect, sdfSegment, sdfSmooth, sdfSquare };

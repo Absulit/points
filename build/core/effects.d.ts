@@ -1,53 +1,4 @@
 /**
- * Applies a blur to an image
- * <br>
- * based on https://github.com/Jam3/glsl-fast-gaussian-blur/blob/master/9.glsl
- *
- * @param {texture_2d} image
- * @param {sampler} imageSampler
- * @param {vec2f} position
- * @param {vec2f} uv
- * @param {vec2f} resolution
- * @param {vec2f} direction
- *
- * @example
- * // js
- * import { blur9 } from 'points/effects';
- *
- * // wgsl string
- * ${blur9}
- * let value = blur9(image, imageSampler, position, uv, resolution, direction);
- */
-export const blur9: "fn blur9(image:texture_2d<f32>,imageSampler:sampler,position:vec2f,uv:vec2f,resolution:vec2f,direction:vec2f)->vec4f{var color=vec4(0.0);let off1=vec2(1.3846153846)*direction;let off2=vec2(3.2307692308)*direction;color+=texturePosition(image,imageSampler,position,uv,true)*0.2270270270;color+=texturePosition(image,imageSampler,position,uv+(off1 / resolution),true)*0.3162162162;color+=texturePosition(image,imageSampler,position,uv-(off1 / resolution),true)*0.3162162162;color+=texturePosition(image,imageSampler,position,uv+(off2 / resolution),true)*0.0702702703;color+=texturePosition(image,imageSampler,position,uv-(off2 / resolution),true)*0.0702702703;return color;}";
-/**
- * Takes a color and reduces its value but applied to the alpha channel.
- * @param {vec4f} currentColor
- * @param {f32} level
- *
- * @example
- * // js
- * import { clearAlpha } from 'points/effects';
- *
- * // wgsl string
- * ${clearAlpha}
- * let value = clearAlpha(color, 1.01);
- */
-export const clearAlpha: "fn clearAlpha(currentColor:vec4f,level:f32)->vec4f{var ar=currentColor.a / level;if(ar <=.09){ar=0.;}return vec4f(currentColor.rgb,ar);}";
-/**
- * Takes a color and reduces its values by a `level`
- * @param {vec4f} color
- * @param {f32} level
- *
- * @example
- * // js
- * import { clearMix } from 'points/effects';
- *
- * // wgsl string
- * ${clearMix}
- * let value = clearMix(color, 1.01);
- */
-export const clearMix: "fn clearMix(color:vec4f,level:f32)->vec4f{let rr=color.r / level;let gr=color.g / level;let br=color.b / level;var ar=color.a / level;if(ar <=.09){ar=0.;}return vec4f(rr,gr,br,ar);}";
-/**
  * These are wgsl functions, not js functions.
  * The function is enclosed in a js string constant,
  * to be appended into the code to reference it in the string shader.
@@ -69,7 +20,7 @@ export const clearMix: "fn clearMix(color:vec4f,level:f32)->vec4f{let rr=color.r
  * ${euclideanDistance}
  * let currentDistance = euclideanDistance(color, paletteColor);
  */
-export const euclideanDistance: string;
+declare const euclideanDistance: string;
 /**
  * This assumes you have declared a palette in a variable or constant called
  * `getClosestColorInPalette_palette`
@@ -96,37 +47,12 @@ export const euclideanDistance: string;
  *
  * let value = getClosestColorInPalette(rgba, numPaletteItems, distance);
  */
-export const getClosestColorInPalette: string;
+declare const getClosestColorInPalette: string;
 /**
- * From a given texture and its position, get top, botto, left and right color values
- * @param {texture_2d} texture
- * @param {vec2i} position
- * @param {i32} distance
- *
- * @example
- * // js
- * import { getColorsAround4Texture } from 'points/effects';
- *
- * // wgsl string
- * ${getColorsAround4Texture}
- * let value = getColorsAround4Texture(texture, position, distance);
+ * To be used with `orderedDithering`.<br>
+ * You can use this or create yours.
  */
-export const getColorsAround4Texture: "fn getColorsAround4Texture(texture:texture_2d<f32>,position:vec2<i32>,distance:i32)->array< vec4f,4 >{return array< vec4f,4 >(textureLoad(texture,vec2<i32>(position.x,position.y-distance),0).rgba,textureLoad(texture,vec2<i32>(position.x-distance,position.y),0).rgba,textureLoad(texture,vec2<i32>(position.x+distance,position.y),0).rgba,textureLoad(texture,vec2<i32>(position.x+distance,position.y+distance),0).rgba,);}";
-/**
- * From a given texture and its position, get the 9 color values around.
- * @param {texture_2d} texture
- * @param {vec2i} position
- * @param {i32} distance
- *
- * @example
- * // js
- * import { getColorsAroundTexture } from 'points/effects';
- *
- * // wgsl string
- * ${getColorsAroundTexture}
- * let value = getColorsAroundTexture(texture, position, distance);
- */
-export const getColorsAroundTexture: "fn getColorsAroundTexture(texture:texture_2d<f32>,position:vec2<i32>,distance:i32)->array< vec4f,8 >{return array< vec4f,8 >(textureLoad(texture,vec2<i32>(position.x-distance,position.y-distance),0).rgba,textureLoad(texture,vec2<i32>(position.x,position.y-distance),0).rgba,textureLoad(texture,vec2<i32>(position.x+distance,position.y-distance),0).rgba,textureLoad(texture,vec2<i32>(position.x-distance,position.y),0).rgba,textureLoad(texture,vec2<i32>(position.x+distance,position.y),0).rgba,textureLoad(texture,vec2<i32>(position.x-distance,position.y+distance),0).rgba,textureLoad(texture,vec2<i32>(position.x,position.y+distance),0).rgba,textureLoad(texture,vec2<i32>(position.x+distance,position.y+distance),0).rgba,);}";
+declare const orderedDithering_threshold_map = "const orderedDithering_threshold_map=array<f32,16>(1,9,3,11,13,5,15,7,4,12,2,10,16,8,14,6);";
 /**
  * Applies [Ordered Dithering](https://en.wikipedia.org/wiki/Ordered_dithering) to a color.
  * Best with the colors of an image texture.
@@ -149,12 +75,65 @@ export const getColorsAroundTexture: "fn getColorsAroundTexture(texture:texture_
  * let color = texturePosition(image, imageSampler, vec2(0.), uvr, false);
  * let value = orderedDithering(color, depth, dims, uvr);
  */
-export const orderedDithering: "fn orderedDithering(color:vec4f,depth:f32,dims:vec2<u32>,uv:vec2f)->vec4f{let t=orderedDithering_threshold_map[ i32((uv.x % 4.)+(uv.y % 4.*f32(dims.x)))];var r=(color.r+t / depth);if(r < 1){r=0;}var g=(color.g+t / depth);if(g < 1){g=0;}var b=(color.b+t / depth);if(b < 1){b=0;}let ditheredImage=vec4(r*depth,g*depth,b*depth,1,);return ditheredImage;}";
+declare const orderedDithering = "fn orderedDithering(color:vec4f,depth:f32,dims:vec2<u32>,uv:vec2f)->vec4f{let t=orderedDithering_threshold_map[ i32((uv.x % 4.)+(uv.y % 4.*f32(dims.x)))];var r=(color.r+t / depth);if(r < 1){r=0;}var g=(color.g+t / depth);if(g < 1){g=0;}var b=(color.b+t / depth);if(b < 1){b=0;}let ditheredImage=vec4(r*depth,g*depth,b*depth,1,);return ditheredImage;}";
 /**
- * To be used with `orderedDithering`.<br>
- * You can use this or create yours.
+ * Takes a color and reduces its values by a `level`
+ * @param {vec4f} color
+ * @param {f32} level
+ *
+ * @example
+ * // js
+ * import { clearMix } from 'points/effects';
+ *
+ * // wgsl string
+ * ${clearMix}
+ * let value = clearMix(color, 1.01);
  */
-export const orderedDithering_threshold_map: "const orderedDithering_threshold_map=array<f32,16>(1,9,3,11,13,5,15,7,4,12,2,10,16,8,14,6);";
+declare const clearMix = "fn clearMix(color:vec4f,level:f32)->vec4f{let rr=color.r / level;let gr=color.g / level;let br=color.b / level;var ar=color.a / level;if(ar <=.09){ar=0.;}return vec4f(rr,gr,br,ar);}";
+/**
+ * Takes a color and reduces its value but applied to the alpha channel.
+ * @param {vec4f} currentColor
+ * @param {f32} level
+ *
+ * @example
+ * // js
+ * import { clearAlpha } from 'points/effects';
+ *
+ * // wgsl string
+ * ${clearAlpha}
+ * let value = clearAlpha(color, 1.01);
+ */
+declare const clearAlpha = "fn clearAlpha(currentColor:vec4f,level:f32)->vec4f{var ar=currentColor.a / level;if(ar <=.09){ar=0.;}return vec4f(currentColor.rgb,ar);}";
+/**
+ * From a given texture and its position, get the 9 color values around.
+ * @param {texture_2d} texture
+ * @param {vec2i} position
+ * @param {i32} distance
+ *
+ * @example
+ * // js
+ * import { getColorsAroundTexture } from 'points/effects';
+ *
+ * // wgsl string
+ * ${getColorsAroundTexture}
+ * let value = getColorsAroundTexture(texture, position, distance);
+ */
+declare const getColorsAroundTexture = "fn getColorsAroundTexture(texture:texture_2d<f32>,position:vec2<i32>,distance:i32)->array< vec4f,8 >{return array< vec4f,8 >(textureLoad(texture,vec2<i32>(position.x-distance,position.y-distance),0).rgba,textureLoad(texture,vec2<i32>(position.x,position.y-distance),0).rgba,textureLoad(texture,vec2<i32>(position.x+distance,position.y-distance),0).rgba,textureLoad(texture,vec2<i32>(position.x-distance,position.y),0).rgba,textureLoad(texture,vec2<i32>(position.x+distance,position.y),0).rgba,textureLoad(texture,vec2<i32>(position.x-distance,position.y+distance),0).rgba,textureLoad(texture,vec2<i32>(position.x,position.y+distance),0).rgba,textureLoad(texture,vec2<i32>(position.x+distance,position.y+distance),0).rgba,);}";
+/**
+ * From a given texture and its position, get top, botto, left and right color values
+ * @param {texture_2d} texture
+ * @param {vec2i} position
+ * @param {i32} distance
+ *
+ * @example
+ * // js
+ * import { getColorsAround4Texture } from 'points/effects';
+ *
+ * // wgsl string
+ * ${getColorsAround4Texture}
+ * let value = getColorsAround4Texture(texture, position, distance);
+ */
+declare const getColorsAround4Texture = "fn getColorsAround4Texture(texture:texture_2d<f32>,position:vec2<i32>,distance:i32)->array< vec4f,4 >{return array< vec4f,4 >(textureLoad(texture,vec2<i32>(position.x,position.y-distance),0).rgba,textureLoad(texture,vec2<i32>(position.x-distance,position.y),0).rgba,textureLoad(texture,vec2<i32>(position.x+distance,position.y),0).rgba,textureLoad(texture,vec2<i32>(position.x+distance,position.y+distance),0).rgba,);}";
 /**
  * Softens a color based on list of colors around it or any list of 4 colors.
  * @param {vec4f} color
@@ -169,7 +148,7 @@ export const orderedDithering_threshold_map: "const orderedDithering_threshold_m
  * ${soften4}
  * let value = soften4(color, colorsAround,  colorPower);
  */
-export const soften4: "fn soften4(color:vec4f,colorsAround:array<vec4f,4>,colorPower:f32)->vec4f{var newColor:vec4f=color;for(var indexColors=0u;indexColors < 4u;indexColors++){var colorAround=colorsAround[indexColors];colorAround=(color+colorAround*colorPower)/(colorPower+1.);newColor+=colorAround;}return newColor*.2;}";
+declare const soften4 = "fn soften4(color:vec4f,colorsAround:array<vec4f,4>,colorPower:f32)->vec4f{var newColor:vec4f=color;for(var indexColors=0u;indexColors < 4u;indexColors++){var colorAround=colorsAround[indexColors];colorAround=(color+colorAround*colorPower)/(colorPower+1.);newColor+=colorAround;}return newColor*.2;}";
 /**
  * Softens a color based on list of colors around it or any list of 8 colors.
  *
@@ -185,7 +164,28 @@ export const soften4: "fn soften4(color:vec4f,colorsAround:array<vec4f,4>,colorP
  * ${soften8}
  * let value = soften8(color, colorsA);
  */
-export const soften8: "fn soften8(color:vec4f,colorsAround:array<vec4f,8>,colorPower:f32)->vec4f{var newColor:vec4f=color;for(var indexColors=0u;indexColors < 8u;indexColors++){var colorAround=colorsAround[indexColors];colorAround=(color+colorAround*colorPower)/(colorPower+1.);newColor+=colorAround;}return newColor*.2;}";
+declare const soften8 = "fn soften8(color:vec4f,colorsAround:array<vec4f,8>,colorPower:f32)->vec4f{var newColor:vec4f=color;for(var indexColors=0u;indexColors < 8u;indexColors++){var colorAround=colorsAround[indexColors];colorAround=(color+colorAround*colorPower)/(colorPower+1.);newColor+=colorAround;}return newColor*.2;}";
+/**
+ * Applies a blur to an image
+ * <br>
+ * based on https://github.com/Jam3/glsl-fast-gaussian-blur/blob/master/9.glsl
+ *
+ * @param {texture_2d} image
+ * @param {sampler} imageSampler
+ * @param {vec2f} position
+ * @param {vec2f} uv
+ * @param {vec2f} resolution
+ * @param {vec2f} direction
+ *
+ * @example
+ * // js
+ * import { blur9 } from 'points/effects';
+ *
+ * // wgsl string
+ * ${blur9}
+ * let value = blur9(image, imageSampler, position, uv, resolution, direction);
+ */
+declare const blur9 = "fn blur9(image:texture_2d<f32>,imageSampler:sampler,position:vec2f,uv:vec2f,resolution:vec2f,direction:vec2f)->vec4f{var color=vec4(0.0);let off1=vec2(1.3846153846)*direction;let off2=vec2(3.2307692308)*direction;color+=texturePosition(image,imageSampler,position,uv,true)*0.2270270270;color+=texturePosition(image,imageSampler,position,uv+(off1 / resolution),true)*0.3162162162;color+=texturePosition(image,imageSampler,position,uv-(off1 / resolution),true)*0.3162162162;color+=texturePosition(image,imageSampler,position,uv+(off2 / resolution),true)*0.0702702703;color+=texturePosition(image,imageSampler,position,uv-(off2 / resolution),true)*0.0702702703;return color;}";
 /**
  * WIP
  */
@@ -204,4 +204,5 @@ export const soften8: "fn soften8(color:vec4f,colorsAround:array<vec4f,8>,colorP
  * // fragment shader
  * return wireframe(wireframeColor, fillColor, params.thickness, in.barycentrics);
  */
-export const wireframe: string;
+declare const wireframe: string;
+export { blur9, clearAlpha, clearMix, euclideanDistance, getClosestColorInPalette, getColorsAround4Texture, getColorsAroundTexture, orderedDithering, orderedDithering_threshold_map, soften4, soften8, wireframe };

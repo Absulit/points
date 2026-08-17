@@ -1,4 +1,13 @@
 /**
+ * original: Author :  Stefan Gustavson (stefan.gustavson@liu.se)<br>
+ * https://github.com/ashima/webgl-noise/blob/master/src/classicnoise2D.glsl<br>
+ *<br>
+ * These are wgsl functions, not js functions.
+ * The function is enclosed in a js string constant,
+ * to be appended into the code to reference it in the string shader.
+ * @module points/classicnoise2d
+ */
+/**
  * Classic Perlin Noise
  * @type {String}
  * @param {vec2f} P point
@@ -12,7 +21,7 @@
  * ${cnoise}
  * let value = cnoise(uvr);
  */
-export const cnoise: string;
+declare const cnoise: string;
 /**
  * Classic Perlin Noise, periodic variant
  * @type {String}
@@ -28,4 +37,5 @@ export const cnoise: string;
  * ${pnoise}
  * let value = pnoise(uvr);
  */
-export const pnoise: string;
+declare const pnoise: string;
+export { cnoise, pnoise };

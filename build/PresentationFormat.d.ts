@@ -1,4 +1,3 @@
-export { PresentationFormat as default };
 /**
  * Class to be used to decide if the output textures can hold more data beyond
  * the range from 0..1. Useful for HDR images.
@@ -26,3 +25,4 @@ declare class PresentationFormat {
      */
     static RGBA32FLOAT: string;
 }
+export { PresentationFormat as default };

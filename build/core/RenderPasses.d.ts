@@ -1,4 +1,4 @@
-export { RenderPasses as default };
+import { RenderPass } from 'points';
 /**
  * List of predefined Render Passes for Post Processing.
  * Parameters required are shown as a warning in the JS console.
@@ -106,3 +106,4 @@ declare class RenderPasses {
      */
     static CRT: RenderPass;
 }
+export { RenderPasses as default };

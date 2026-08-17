@@ -18,4 +18,5 @@
  * ${valueNoise}
  * let value = valueNoise();
  */
-export const valueNoise: "var<private> rand_seed:vec2f;fn rand()->f32{rand_seed.x=fract(cos(dot(rand_seed,vec2f(23.14077926,232.61690225)))*136.8168);rand_seed.y=fract(cos(dot(rand_seed,vec2f(54.47856553,345.84153136)))*534.7645);return rand_seed.y;}const value_noise_cellsize=64;fn valueNoise(){let width=i32(params.screen.x);let height=i32(params.screen.y);let cellSize=64;_=value_noise_data[0];for(var index=0;index < i32(params.value_noise_data_length);index++){let x=index % width;let y=index / width;if(x % cellSize==0 && y % cellSize==0){let rx=x / cellSize;let ry=y / cellSize;let randomDataIndex=rx+(ry*width);let dataP=&value_noise_data[randomDataIndex];(*dataP)=rand();}}}";
+declare const valueNoise: string;
+export { valueNoise };

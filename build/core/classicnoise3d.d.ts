@@ -22,4 +22,5 @@
  * ${pnoise3}
  * let value = pnoise3(xyz);
  */
-export const pnoise3: string;
+declare const pnoise3: string;
+export { pnoise3 };
