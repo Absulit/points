@@ -24,7 +24,6 @@ import Points {
 
 {@link Points|Points}<br>
 {@link RenderPass|RenderPass}<br>
-{@link RenderPasses|RenderPasses}<br>
 
 {@link PrimitiveTopology|PrimitiveTopology}<br>
 {@link CullMode|CullMode}<br>
@@ -32,6 +31,8 @@ import Points {
 {@link PresentationFormat|PresentationFormat}<br>
 {@link FrontFace|FrontFace}<br>
 {@link ScaleMode|ScaleMode}<br>
+
+{@link RenderPasses|RenderPasses}<br>
 
 ## Important data buffer attributes:
 {@link Points#uniforms|uniforms}<br>
