@@ -24,11 +24,7 @@
  * ${fusin}
  * let value = fusin(2.);
  */
-const fusin = /*wgsl*/`
-fn fusin(speed: f32) -> f32{
-    return sin(params.time * speed);
-}
-`;
+const fusin = /*wgsl*/`fn fusin(speed:f32)->f32{return sin(params.time*speed);}`;
 
 /**
  * Animates `cos()` over `params.time` and a provided `speed`.
@@ -43,11 +39,7 @@ fn fusin(speed: f32) -> f32{
  * ${fucos}
  * let value = fucos(2.);
  */
-const fucos = /*wgsl*/`
-fn fucos(speed: f32) -> f32{
-    return cos(params.time * speed);
-}
-`;
+const fucos = /*wgsl*/`fn fucos(speed:f32)->f32{return cos(params.time*speed);}`;
 
 /**
  * Animates `sin()` over `params.time` and a provided `speed`.
@@ -62,10 +54,6 @@ fn fucos(speed: f32) -> f32{
  * ${fnusin}
  * let value = fnusin(2.);
  */
-const fnusin = /*wgsl*/`
-fn fnusin(speed: f32) -> f32{
-    return (sin(params.time * speed) + 1.) * .5;
-}
-`;
+const fnusin = /*wgsl*/`fn fnusin(speed:f32)->f32{return(sin(params.time*speed)+1.)*.5;}`;
 
 export { fnusin, fucos, fusin };

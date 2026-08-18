@@ -21,4 +21,5 @@
  * ${snoise}
  * let value = snoise(uv);
  */
-export const snoise: string;
+declare const snoise: string;
+export { snoise };

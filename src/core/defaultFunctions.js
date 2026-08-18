@@ -11,6 +11,9 @@
  * @module defaultFunctions
  */
 
+
+const defaultFunctions = /*wgsl*/`
+
 /**
  * The defaultVertexBody is used as a drop-in replacement of the vertex shader content.
  * <br>
@@ -30,7 +33,7 @@
  * @param {vec2f} uv
  * @return {FragmentIn}
  */
-export const defaultVertexBody = /*wgsl*/`
+
 fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) -> FragmentIn {
     var result: FragmentIn;
 
@@ -47,3 +50,5 @@ fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) ->
     return result;
 }
 `;
+
+export default defaultFunctions;

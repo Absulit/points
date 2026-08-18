@@ -20,10 +20,11 @@
  * ${audioAverage}
  * let value = audioAverage(audio); // audio is the audio Storage name set in Points#setAudio
  */
-export const audioAverage: "\nfn audioAverage(sound:Sound) -> f32 {\n    var audioAverage = 0.;\n    for (var index = 0; index < i32(params.audioLength); index++) {\n        let audioValue = sound.data[index] / 256;\n        audioAverage += audioValue;\n    }\n    return audioAverage / params.audioLength;\n}\n";
+declare const audioAverage = "fn audioAverage(sound:Sound)->f32{var audioAverage=0.;for(var index=0;index < i32(params.audioLength);index++){let audioValue=sound.data[index] / 256;audioAverage+=audioValue;}return audioAverage / params.audioLength;}";
 /**
  * WIP
  * @param {i32} segmentNum
  * @returns {f32}
  */
-export const audioAverageSegments: "\nfn audioAverageSegments(segmentNum:i32) -> f32{\n    // arrayLength(&array)\n    return .0;\n}\n";
+declare const audioAverageSegments = "fn audioAverageSegments(segmentNum:i32)->f32{return .0;}";
+export { audioAverage, audioAverageSegments };

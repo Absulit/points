@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Source: core/defaultFunctions.js | Points</title>
+    <title>Source: core/RenderPasses.js | Points</title>
     <meta name="description" content="A Generative Art library made in WebGPU"><meta name="keywords" content="javascript, webgl, crative-coding, shaders, generative-art, webgpu, genart, wgsl">
     <link rel="icon" title="dummy" href="data:image/x-icon;base64,AA">
     <script src="scripts/docolatte.min.js"></script>
@@ -23,7 +23,7 @@
         </div>
         <div class="topbar">
             <h1 class="page-title">
-                <a href="#">Source: core/defaultFunctions.js</a>
+                <a href="#">Source: core/RenderPasses.js</a>
             </h1>
             <a class="light-switch" title="Switch light/dark mode" href="#"><i class="label auto">
 <svg  class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -41,60 +41,127 @@
 
     
 <article class="src">
-    <pre class="prettyprint source linenums lang-js"><span class="_char">_</span><code>/**
- * The defaultFunctions are functions already incorporated onto the shaders you create,
- * so you can call them without import.
- * &lt;br>
- * &lt;br>
- * These are wgsl functions, not js functions.
- * The function is enclosed in a js string constant,
- * to be appended into the code to reference it in the string shader.
- *
- * Use the base example as reference: examples/base/vert.js
- * @module defaultFunctions
- */
-
-
-const defaultFunctions = /*wgsl*/`
+    <pre class="prettyprint source linenums lang-js"><span class="_char">_</span><code>import color from './RenderPasses/color/index.js';
+import grayscale from './RenderPasses/grayscale/index.js';
+import chromaticAberration from './RenderPasses/chromaticAberration/index.js';
+import pixelate from './RenderPasses/pixelate/index.js';
+import lensDistortion from './RenderPasses/lensDistortion/index.js';
+import filmgrain from './RenderPasses/filmgrain/index.js';
+import bloom from './RenderPasses/bloom/index.js';
+import blur from './RenderPasses/blur/index.js';
+import waves from './RenderPasses/waves/index.js';
+import crt from './RenderPasses/crt/index.js';
+import RenderPass from './../RenderPass.js';
 
 /**
- * The defaultVertexBody is used as a drop-in replacement of the vertex shader content.
- * &lt;br>
- * This is not required, but useful if you plan to use the default parameters of the library.
- * &lt;br>
- * All the examples in the examples directory use this function in their vert.js file.
- * &lt;br>
- * &lt;br>
- * Default function for the Vertex shader that takes charge of automating the
- * creation of a few variables that are commonly used.
+ * List of predefined Render Passes for Post Processing.
+ * Parameters required are shown as a warning in the JS console.
+ * @class
+ *
  * @example
- * // Inside the main vertex function add this
- * return defaultVertexBody(in.position, in.color, in.uv, in.normal);
- * @type {string}
- * @param {vec4f} position
- * @param {vec4f} color
- * @param {vec2f} uv
- * @return {FragmentIn}
+ * import Points, { RenderPass } from 'points';
+ * import RenderPasses from 'points/renderpasses';
+ * const points = new Points('canvas');
+ *
+ * // option 1: along with the RenderPasses pased into `Points.init()`
+ * let renderPasses = [
+ *     new RenderPass(vert1, frag1, compute1),
+ *     new RenderPass(vert2, frag2, compute2)
+ * ];
+ *
+ * // option 2: calling `points.addRenderPass()` method
+ * points.addRenderPass(RenderPasses.GRAYSCALE);
+ * points.addRenderPass(RenderPasses.CHROMATIC_ABERRATION, { distance: .02 });
+ * points.addRenderPass(RenderPasses.COLOR, { color: [.5, 1, 0, 1], blendAmount: .5 });
+ * points.addRenderPass(RenderPasses.PIXELATE);
+ * points.addRenderPass(RenderPasses.LENS_DISTORTION);
+ * points.addRenderPass(RenderPasses.FILM_GRAIN);
+ * points.addRenderPass(RenderPasses.BLOOM);
+ * points.addRenderPass(RenderPasses.BLUR, { resolution: [100, 100], direction: [.4, 0], radians: 0 });
+ * points.addRenderPass(RenderPasses.WAVES, { scale: .05 });
+ *
+ * await points.init(renderPasses);
+ *
+ * points.update(update);
+ *
+ * function update() {
+ * // update uniforms and other animation variables
+ * }
  */
-
-fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) -> FragmentIn {
-    var result: FragmentIn;
-
-    let ratio = params.ratios[RENDERPASSINDEX];
-
-    result.ratio = ratio;
-    result.position = position;
-    result.color = color;
-    result.uv = uv;
-    result.uvr = uv * ratio;
-    result.mouse = params._mouse_normalized;
-    result.normal = normal;
-
-    return result;
+class RenderPasses {
+    /**
+     * Apply a color {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.COLOR, { color: [.5, 1, 0, 1], blendAmount: .5 });
+     * @type {RenderPass}
+     */
+    static COLOR = color;
+    /**
+     * Apply a grayscale {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.GRAYSCALE);
+     * @type {RenderPass}
+     */
+    static GRAYSCALE = grayscale;
+    /**
+     * Apply a chromatic aberration {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.CHROMATIC_ABERRATION, { distance: .02 });
+     * @type {RenderPass}
+     */
+    static CHROMATIC_ABERRATION = chromaticAberration;
+    /**
+     * Apply a pixelation {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.PIXELATE);
+     * @type {RenderPass}
+     */
+    static PIXELATE = pixelate;
+    /**
+     * Apply a lens distortion {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.LENS_DISTORTION);
+     * @type {RenderPass}
+     */
+    static LENS_DISTORTION = lensDistortion;
+    /**
+     * Apply a film grain {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.FILM_GRAIN);
+     * @type {RenderPass}
+     */
+    static FILM_GRAIN = filmgrain;
+    /**
+     * Apply a bloom {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.BLOOM);
+     * @type {RenderPass}
+     */
+    static BLOOM = bloom;
+    /**
+     * Apply a blur {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.BLUR, { resolution: [100, 100], direction: [.4, 0], radians: 0 });
+     * @type {RenderPass}
+     */
+    static BLUR = blur;
+    /**
+     * Apply a waives noise {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.WAVES, { scale: .05 });
+     * @type {RenderPass}
+     */
+    static WAVES = waves;
+    /**
+     * Apply a CRT tv pixels effect {@link RenderPass}
+     * @example
+     * points.addRenderPass(RenderPasses.CRT, { scale: .05 });
+     * @type {RenderPass}
+     */
+    static CRT = crt;
 }
-`;
 
-export default defaultFunctions;
+export default RenderPasses;
 </code></pre>
 </article>
 
@@ -117,7 +184,7 @@ export default defaultFunctions;
                     Documentation generated by <a rel="external" href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a><wbr>
                     using <a rel="external" href="https://github.com/amekusa/docolatte">Docolatte</a> theme
                     
-                    <wbr>on <time datetime="2026-08-16T22:19:01.904Z">Sun, 16 Aug 2026 22:19:01 GMT</time>
+                    <wbr>on <time datetime="2026-08-16T22:19:01.889Z">Sun, 16 Aug 2026 22:19:01 GMT</time>
                     
                 </p>
                 
