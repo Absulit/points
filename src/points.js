@@ -294,7 +294,7 @@ class Points {
             this.#setRenderPassRatio(renderPass, ratioData)
         )
 
-        this.#uniforms.ratios
+        this.storages.ratios
             .setType(`array<vec2f,${this.#renderPasses.length}>`)
             .setValue(this.#ratios);
     }
@@ -1699,7 +1699,11 @@ class Points {
 
         // this uniform has to be initialized here because we need to know the size of #renderPasses
         this.#ratios = Array(this.#renderPasses.length * 2).fill(0);
-        this.setUniform(UniformKeys.RATIOS, this.#ratios, `array<vec2f, ${renderPasses.length}>`);
+
+        this.storages.ratios
+            .setType(`array<vec2f,${this.#renderPasses.length}>`)
+            .setValue(this.#ratios);
+
         this.#renderPasses.forEach(rp => rp.addEventListener(RenderPass.SCALE_MODE_UPDATED, this.#onScaleModeUpdated))
         //
 
