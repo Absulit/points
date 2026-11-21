@@ -275,7 +275,7 @@ class Points {
 
         // to avoid creating new object, we just overwrite/copy the data.
         // meaning we use the same reference of #ratios
-        const ratioIndex = index * 2;
+        const ratioIndex = index * (this.#ratios.length / this.#renderPasses.length); // since it's a vec4f
         this.#ratios[ratioIndex] = ratio[0];
         this.#ratios[ratioIndex + 1] = ratio[1];
     }
@@ -295,7 +295,6 @@ class Points {
         )
 
         this.#uniforms.ratios
-            .setType(`array<vec2f,${this.#renderPasses.length}>`)
             .setValue(this.#ratios);
     }
 
@@ -1698,8 +1697,10 @@ class Points {
         this.#renderPasses = renderPasses.concat(this.#postRenderPasses);
 
         // this uniform has to be initialized here because we need to know the size of #renderPasses
-        this.#ratios = Array(this.#renderPasses.length * 2).fill(0);
-        this.setUniform(UniformKeys.RATIOS, this.#ratios, `array<vec2f, ${renderPasses.length}>`);
+        this.#ratios = Array(this.#renderPasses.length * 4).fill(1); // it's a vec4 so it's size 4
+
+        this.setUniform(UniformKeys.RATIOS, this.#ratios, `array<vec4f, ${this.#renderPasses.length}>`);
+
         this.#renderPasses.forEach(rp => rp.addEventListener(RenderPass.SCALE_MODE_UPDATED, this.#onScaleModeUpdated))
         //
 

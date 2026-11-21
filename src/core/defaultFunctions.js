@@ -37,7 +37,7 @@ const defaultFunctions = /*wgsl*/`
 fn defaultVertexBody(position: vec4f, color: vec4f, uv: vec2f, normal: vec3f) -> FragmentIn {
     var result: FragmentIn;
 
-    let ratio = params.ratios[RENDERPASSINDEX];
+    let ratio = params.ratios[RENDERPASSINDEX].xy;
 
     result.ratio = ratio;
     result.position = position;
