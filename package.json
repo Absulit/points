@@ -58,5 +58,8 @@
     "jsr": "0.14.3",
     "rollup": "4.67.4",
     "typescript": "7.0.2"
+  },
+  "overrides": {
+    "minimatch": "11.0.8"
   }
 }
