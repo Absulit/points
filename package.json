@@ -52,11 +52,11 @@
     "@swc/cli": "0.8.2",
     "@swc/core": "1.16.22",
     "@swc/helpers": "0.5.24",
-    "@webgpu/types": "0.1.71",
+    "@webgpu/types": "0.1.74",
     "docolatte": "4.5.1",
     "jsdoc": "4.0.5",
     "jsr": "0.14.3",
-    "rollup": "4.62.4",
+    "rollup": "4.67.4",
     "typescript": "7.0.2"
   }
 }
