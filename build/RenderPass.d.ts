@@ -1,45 +1,4 @@
-/**
- * To tell the {@link RenderPass} what polygons should be discarded
- * Default `BACK`
- * @example
- *
- * renderPass.cullMode = CullMode.BACK;
- */
-export class CullMode {
-    /** @type {GPUCullMode} */
-    static NONE: GPUCullMode;
-    /** @type {GPUCullMode} */
-    static FRONT: GPUCullMode;
-    /** @type {GPUCullMode} */
-    static BACK: GPUCullMode;
-}
-/**
- * To tell the {@link RenderPass} what polygons are Front Facing
- * Default `CCW`
- * @example
- *
- * renderPass.frontFace = FrontFace.CCW;
- */
-export class FrontFace {
-    /** @type {GPUFrontFace} */
-    static CCW: GPUFrontFace;
-    /** @type {GPUFrontFace} */
-    static CW: GPUFrontFace;
-}
-/**
- * To tell the {@link RenderPass} how the data from the previous RenderPass
- * is preserved on screen or cleared.
- * Default `CLEAR`
- * @example
- *
- * renderPass.loadOp = LoadOp.LOAD;
- */
-export class LoadOp {
-    /** @type {GPULoadOp} */
-    static CLEAR: GPULoadOp;
-    /** @type {GPULoadOp} */
-    static LOAD: GPULoadOp;
-}
+import { ScaleMode } from 'points';
 /**
  * To tell the {@link RenderPass} how to display the triangles.
  * Default `TRIANGLE_LIST`
@@ -47,7 +6,7 @@ export class LoadOp {
  *
  * renderPass.topology = PrimitiveTopology.POINT_LIST;
  */
-export class PrimitiveTopology {
+declare class PrimitiveTopology {
     /** @type {GPUPrimitiveTopology} */
     static POINT_LIST: GPUPrimitiveTopology;
     /** @type {GPUPrimitiveTopology} */
@@ -58,6 +17,48 @@ export class PrimitiveTopology {
     static TRIANGLE_LIST: GPUPrimitiveTopology;
     /** @type {GPUPrimitiveTopology} */
     static TRIANGLE_STRIP: GPUPrimitiveTopology;
+}
+/**
+ * To tell the {@link RenderPass} how the data from the previous RenderPass
+ * is preserved on screen or cleared.
+ * Default `CLEAR`
+ * @example
+ *
+ * renderPass.loadOp = LoadOp.LOAD;
+ */
+declare class LoadOp {
+    /** @type {GPULoadOp} */
+    static CLEAR: GPULoadOp;
+    /** @type {GPULoadOp} */
+    static LOAD: GPULoadOp;
+}
+/**
+ * To tell the {@link RenderPass} what polygons are Front Facing
+ * Default `CCW`
+ * @example
+ *
+ * renderPass.frontFace = FrontFace.CCW;
+ */
+declare class FrontFace {
+    /** @type {GPUFrontFace} */
+    static CCW: GPUFrontFace;
+    /** @type {GPUFrontFace} */
+    static CW: GPUFrontFace;
+}
+/**
+ * To tell the {@link RenderPass} what polygons should be discarded
+ * Default `BACK`
+ * @example
+ *
+ * renderPass.cullMode = CullMode.BACK;
+ */
+declare class CullMode {
+    /** @type {GPUCullMode} */
+    static NONE: GPUCullMode;
+    /** @type {GPUCullMode} */
+    static FRONT: GPUCullMode;
+    /** @type {GPUCullMode} */
+    static BACK: GPUCullMode;
 }
 /**
  * A RenderPass is a way to have a block of shaders to pass to your application pipeline and
@@ -85,6 +86,7 @@ export class PrimitiveTopology {
  * waves.required = ['scale', 'intensity'];
  */
 declare class RenderPass extends EventTarget {
+    #private;
     static SCALE_MODE_UPDATED: string;
     /**
      * A collection of Vertex, Compute and Fragment shaders that represent a RenderPass.
@@ -101,14 +103,14 @@ declare class RenderPass extends EventTarget {
      * The method `init` will be called to initialize the buffer parameters.
      *
      */
-    constructor(vertexShader: string, fragmentShader: string, computeShader: string, workgroupCountX: string, workgroupCountY: string, workgroupCountZ: string, init: any);
-    set index(value: null);
+    constructor(vertexShader: string, fragmentShader: string, computeShader: string, workgroupCountX: string, workgroupCountY: string, workgroupCountZ: string, init: Function);
     /**
      * Get the current RenderPass index order in the pipeline.
      * When you add a RenderPass to the constructor or via
      * {@link Points#addRenderPass}, this is the order it receives.
      */
     get index(): null;
+    set index(value: null);
     /**
      * get the vertex shader content
      */
@@ -147,17 +149,13 @@ declare class RenderPass extends EventTarget {
     get hasFragmentShader(): boolean;
     get hasVertexAndFragmentShader(): boolean;
     /**
-     * @param {Number} val
-     */
-    set workgroupCountX(val: number);
-    /**
      * How many workgroups are in the X dimension.
      */
     get workgroupCountX(): number;
     /**
      * @param {Number} val
      */
-    set workgroupCountY(val: number);
+    set workgroupCountX(val: number);
     /**
      * How many workgroups are in the Y dimension.
      */
@@ -165,11 +163,15 @@ declare class RenderPass extends EventTarget {
     /**
      * @param {Number} val
      */
-    set workgroupCountZ(val: number);
+    set workgroupCountY(val: number);
     /**
      * How many workgroups are in the Z dimension.
      */
     get workgroupCountZ(): number;
+    /**
+     * @param {Number} val
+     */
+    set workgroupCountZ(val: number);
     /**
      * Function where the `init` parameter (set in the constructor) is executed
      * and this call will pass the parameters that the RenderPass
@@ -178,6 +180,7 @@ declare class RenderPass extends EventTarget {
      * like {@link Points#setUniform}  and others.
      */
     init(points: Points): void;
+    get required(): Array<string>;
     /**
      * List of buffer names that are required for this RenderPass so if it shows
      * them in the console.
@@ -186,7 +189,6 @@ declare class RenderPass extends EventTarget {
      * This is only  used for a post processing RenderPass.
      */
     set required(val: Array<string>);
-    get required(): Array<string>;
     /**
      * Number of instances that will be created of the current mesh (Vertex Buffer)
      * in this RenderPass. This means if you have a quad, it will create
@@ -194,24 +196,25 @@ declare class RenderPass extends EventTarget {
      * Useful for instanced particles driven by a Storage buffer.
      */
     get instanceCount(): number;
-    set name(val: null);
     get name(): null;
+    set name(val: null);
     get internal(): boolean;
+    /**
+     * Parameters specifically for Post RenderPass
+     */
+    get params(): Object;
     /**
      * @param {Object} val data that can be assigned to the RenderPass when
      * the {@link Points#addRenderPass} method is called.
      */
     set params(val: Object);
-    /**
-     * Parameters specifically for Post RenderPass
-     */
-    get params(): Object;
-    set vertexArray(val: Float32Array<ArrayBuffer>);
     get vertexArray(): Float32Array<ArrayBuffer>;
-    set vertexBufferInfo(val: null);
+    set vertexArray(val: Float32Array<ArrayBuffer>);
     get vertexBufferInfo(): null;
-    set vertexBuffer(val: null);
+    set vertexBufferInfo(val: null);
     get vertexBuffer(): null;
+    set vertexBuffer(val: null);
+    get depthWriteEnabled(): boolean;
     /**
      * Controls whether your fragment shader can write to the depth buffer.
      * By default `true`.
@@ -219,20 +222,25 @@ declare class RenderPass extends EventTarget {
      * @param {Boolean} val
      */
     set depthWriteEnabled(val: boolean);
-    get depthWriteEnabled(): boolean;
+    get textureDepth(): GPUTexture;
     /**
      * Holder for the depth map for this RenderPass only
      * @param {GPUTexture} val
      */
     set textureDepth(val: GPUTexture);
-    get textureDepth(): GPUTexture;
+    get loadOp(): LoadOp | GPULoadOp;
     /**
      * Controls if the last RenderPass data is preserved on screen or cleared.
      * Default {@link LoadOp#CLEAR}
      * @param {LoadOp | GPULoadOp} val
      */
     set loadOp(val: LoadOp | GPULoadOp);
-    get loadOp(): LoadOp | GPULoadOp;
+    get clearValue(): {
+        r: number;
+        g: number;
+        b: number;
+        a: number;
+    };
     /**
      * Sets the color used to clear the RenderPass before drawing.
      * (only if {@link RenderPass#loadOp | loadOp} is set to `clear`)
@@ -245,23 +253,18 @@ declare class RenderPass extends EventTarget {
         b: number;
         a: number;
     });
-    get clearValue(): {
-        r: number;
-        g: number;
-        b: number;
-        a: number;
-    };
     /**
      * @type {GPURenderPassDescriptor}
      */
     get descriptor(): GPURenderPassDescriptor;
+    get topology(): GPUPrimitiveTopology;
     /**
      * To render as Triangles, lines or points.
      * Use class {@link PrimitiveTopology}
      * @param {GPUPrimitiveTopology} val
      */
     set topology(val: GPUPrimitiveTopology);
-    get topology(): GPUPrimitiveTopology;
+    get cullMode(): CullMode | GPUCullMode;
     /**
      * Triangles to discard.
      * Default `BACK`.
@@ -269,7 +272,7 @@ declare class RenderPass extends EventTarget {
      * @param {CullMode | GPUCullMode} val
      */
     set cullMode(val: CullMode | GPUCullMode);
-    get cullMode(): CullMode | GPUCullMode;
+    get frontFace(): FrontFace | GPUFrontFace;
     /**
      * Direction of the triangles.
      * Counter Clockwise (CCW) or Clockwise (CW)
@@ -278,19 +281,19 @@ declare class RenderPass extends EventTarget {
      * @param {FrontFace | GPUFrontFace} val
      */
     set frontFace(val: FrontFace | GPUFrontFace);
-    get frontFace(): FrontFace | GPUFrontFace;
+    get bundle(): GPURenderBundle;
     /**
      * Render Bundle for performance
      * @param {GPURenderBundle} val
      */
     set bundle(val: GPURenderBundle);
-    get bundle(): GPURenderBundle;
+    get device(): GPUDevice;
     /**
      * Device reference to check if RenderBundle needs to be rebuilt
      * @param {GPUDevice} val
      */
     set device(val: GPUDevice);
-    get device(): GPUDevice;
+    get enabled(): boolean;
     /**
      * Disable the current RenderPass during runtime if the pass has
      * no other passes dependencies like sharing a texture.
@@ -303,13 +306,12 @@ declare class RenderPass extends EventTarget {
      * renderPass.enabled = false;
      */
     set enabled(val: boolean);
-    get enabled(): boolean;
+    get meshUpdated(): boolean;
     /**
      * To notify the RenderPass if a mesh has changed to update the vertexBuffer
      * @param {Boolean} val
      */
     set meshUpdated(val: boolean);
-    get meshUpdated(): boolean;
     /**
      * - **currently for internal use**<br>
      * - **might be private in the future**<br>
@@ -674,6 +676,7 @@ declare class RenderPass extends EventTarget {
      * ids and names of the meshes
      */
     get meshes(): any[];
+    get scaleMode(): ScaleMode | number;
     /**
      * Select how the content should be displayed on different
      * screen sizes.
@@ -690,8 +693,6 @@ declare class RenderPass extends EventTarget {
      * renderPass.scaleMode = ScaleMode.COVER;
      */
     set scaleMode(val: ScaleMode | number);
-    get scaleMode(): ScaleMode | number;
     destroy(): void;
-    #private;
 }
-export { RenderPass as default };
+export { CullMode, FrontFace, LoadOp, PrimitiveTopology, RenderPass as default };

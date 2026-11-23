@@ -4,7 +4,7 @@ import Coordinate from './coordinate.js';
 import RGBAColor from './color.js';
 import Clock from './clock.js';
 import defaultStructs from './core/defaultStructs.js';
-import { defaultVertexBody } from './core/defaultFunctions.js';
+import defaultFunctions from './core/defaultFunctions.js';
 import { dataSize, getArrayTypeData, isArray, typeSizes } from './data-size.js';
 import { loadImage, strToImage } from './texture-string.js';
 import LayersArray from './LayersArray.js';
@@ -21,7 +21,6 @@ import Uniforms from './Uniforms.js';
 import Storages from './Storages.js';
 import Constants from './Constants.js';
 import RenderPass, { PrimitiveTopology, LoadOp, CullMode, FrontFace } from './RenderPass.js';
-import RenderPasses from './RenderPasses.js';
 import ArrayBufferWriter from './core/ArrayBufferWriter.js';
 
 /**
@@ -276,7 +275,7 @@ class Points {
 
         // to avoid creating new object, we just overwrite/copy the data.
         // meaning we use the same reference of #ratios
-        const ratioIndex = index * 2;
+        const ratioIndex = index * (this.#ratios.length / this.#renderPasses.length); // since it's a vec4f
         this.#ratios[ratioIndex] = ratio[0];
         this.#ratios[ratioIndex + 1] = ratio[1];
     }
@@ -296,7 +295,6 @@ class Points {
         )
 
         this.#uniforms.ratios
-            .setType(`array<vec2f,${this.#renderPasses.length}>`)
             .setValue(this.#ratios);
     }
 
@@ -1640,7 +1638,7 @@ class Points {
             dynamicGroupBindingsFragment = i + dynamicGroupBindingsFragment;
         })
 
-        renderPass.hasVertexShader && (colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + dynamicStructEvents + defaultVertexBody + colorsVertWGSL);
+        renderPass.hasVertexShader && (colorsVertWGSL = dynamicGroupBindingsVertex + defaultStructs + dynamicStructEvents + defaultFunctions + colorsVertWGSL);
         renderPass.hasComputeShader && (colorsComputeWGSL = dynamicGroupBindingsCompute + defaultStructs + dynamicStructEvents + colorsComputeWGSL);
         renderPass.hasFragmentShader && (colorsFragWGSL = dynamicGroupBindingsFragment + defaultStructs + dynamicStructEvents + colorsFragWGSL);
 
@@ -1699,8 +1697,10 @@ class Points {
         this.#renderPasses = renderPasses.concat(this.#postRenderPasses);
 
         // this uniform has to be initialized here because we need to know the size of #renderPasses
-        this.#ratios = Array(this.#renderPasses.length * 2).fill(0);
-        this.setUniform(UniformKeys.RATIOS, this.#ratios, `array<vec2f, ${renderPasses.length}>`);
+        this.#ratios = Array(this.#renderPasses.length * 4).fill(1); // it's a vec4 so it's size 4
+
+        this.setUniform(UniformKeys.RATIOS, this.#ratios, `array<vec4f, ${this.#renderPasses.length}>`);
+
         this.#renderPasses.forEach(rp => rp.addEventListener(RenderPass.SCALE_MODE_UPDATED, this.#onScaleModeUpdated))
         //
 
@@ -3368,4 +3368,4 @@ class Points {
 }
 
 export default Points;
-export { RenderPass, RenderPasses, PrimitiveTopology, CullMode, LoadOp, PresentationFormat, FrontFace, ScaleMode, Uniform, Storage, Constant };
+export { RenderPass, PrimitiveTopology, CullMode, LoadOp, PresentationFormat, FrontFace, ScaleMode, Uniform, Storage, Constant };

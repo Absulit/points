@@ -1,3 +1,34 @@
+
+function minifyWGSL(rawString) {
+  return rawString
+    .replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm, '$1')
+    .replace(/\s+/g, ' ')
+    .replace(/\s*;\s*/g, ';')
+    .replace(/\s*:\s*/g, ':')
+    .replace(/\s*}\s*/g, '}')
+    .replace(/\s*{\s*/g, '{')
+    .replace(/\s*,\s*/g, ',')
+    .replace(/\s*=\s*/g, '=')
+    .replace(/\s*-\s*/g, '-')
+    .replace(/\s*\+\s*/g, '+')
+    .replace(/\s*\*\s*/g, '*')
+    .replace(/\s*\)\s*/g, ')')
+    .replace(/\s*\(\s*/g, '(')
+    .replace(/\s*->\s*/g, '->')
+    .trim();
+}
+
+function findRegexAndReplace(stringRegex, stringWhere) {
+  const match = stringWhere.match(stringRegex);
+  let result = stringWhere;
+  if (match) {
+    const rawCodeString = match[1];
+    const minified = minifyWGSL(rawCodeString);
+    result = stringWhere.replace(rawCodeString, minified);
+  }
+  return result;
+}
+
 export default [
   {
     input: 'src/RenderPass.js',
@@ -6,7 +37,8 @@ export default [
       format: 'esm',
       banner: '/* @ts-self-types="./RenderPass.d.ts" */'
     },
-    plugins: []
+    plugins: [],
+    external: ['points']
   },
   {
     input: 'src/ScaleMode.js',
@@ -27,9 +59,9 @@ export default [
     plugins: []
   },
   {
-    input: 'src/RenderPasses.js',
+    input: 'src/core/RenderPasses.js',
     output: {
-      file: 'build/RenderPasses.js',
+      file: 'build/core/RenderPasses.js',
       format: 'esm',
       banner: '/* @ts-self-types="./RenderPasses.d.ts" */'
     },
@@ -44,18 +76,38 @@ export default [
       './core/RenderPasses/blur/index.js',
       './core/RenderPasses/waves/index.js',
       './points.js',
-      './RenderPass.js',
+      './src/RenderPass.js',
+      'points',
     ],
     plugins: []
   },
   {
-    input: 'src/entries.js',
+    input: 'src/points.js',
     output: {
       file: 'build/points.js',
       format: 'esm',
       banner: '/* @ts-self-types="./points.d.ts" */'
     },
-    plugins: []
+    plugins: [
+      {
+        name: 'minify-wgsl-string',
+        transform(code, id) {
+
+          if (id.endsWith('defaultStructs.js')) {
+            const stringRegex = /const\s+defaultStructs\s*=\s*(?:\/\*wgsl\*\/)?`([\s\S]*?)`/;
+            code = findRegexAndReplace(stringRegex, code);
+          } else if (id.endsWith('defaultFunctions.js')) {
+            const stringRegex = /const\s+defaultFunctions\s*=\s*(?:\/\*wgsl\*\/)?`([\s\S]*?)`/;
+            code = findRegexAndReplace(stringRegex, code);
+          }
+          return {
+            code,
+            map: null
+          };
+        }
+      }
+    ],
+    external: ['points']
   },
   {
     input: {
@@ -84,7 +136,29 @@ export default [
       format: 'esm',
       entryFileNames: '[name].js',
       banner: chunk => `/* @ts-self-types="./${chunk.name}.d.ts" */`,
-    }
+    },
+    plugins: [
+      {
+        name: 'minify-wgsl-string',
+        async transform(code, id) {
+          const module = await import(id);
+          /**
+           * defaultFunctions.js is not being called here because it returns
+           * 'default' when it shouldn't
+           */
+          const list = Object.keys(module); // names of exports
+          list.forEach(name => {
+            const stringRegex = `const\\s+${name}\\s*=\\s*(?:\\/\\*wgsl\\*\\/)?\`([\\s\\S]*?)\``
+            code = findRegexAndReplace(stringRegex, code);
+          })
+          return {
+            code,
+            map: null
+          };
+        }
+      }
+
+    ]
   },
 ];
 

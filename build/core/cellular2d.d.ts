@@ -22,4 +22,5 @@
  * let value = cellular(uvr);
  *
  */
-export const cellular: string;
+declare const cellular: string;
+export { cellular };

@@ -1,11 +1,12 @@
-export { RenderPasses as default };
+import { RenderPass } from 'points';
 /**
  * List of predefined Render Passes for Post Processing.
  * Parameters required are shown as a warning in the JS console.
  * @class
  *
  * @example
- * import Points, { RenderPass, RenderPasses } from 'points';
+ * import Points, { RenderPass } from 'points';
+ * import RenderPasses from 'points/renderpasses';
  * const points = new Points('canvas');
  *
  * // option 1: along with the RenderPasses pased into `Points.init()`
@@ -105,3 +106,4 @@ declare class RenderPasses {
      */
     static CRT: RenderPass;
 }
+export { RenderPasses as default };

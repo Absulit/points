@@ -24,7 +24,7 @@
  * ${showDebugCross}
  * let value = showDebugCross(position, color, uvr);
  */
-export const showDebugCross: string;
+declare const showDebugCross: string;
 /**
  * Border around the screen
  * @type {String}
@@ -39,4 +39,5 @@ export const showDebugCross: string;
  * ${showDebugFrame}
  * let value = showDebugFrame(color, uvr);
  */
-export const showDebugFrame: string;
+declare const showDebugFrame: string;
+export { showDebugCross, showDebugFrame };

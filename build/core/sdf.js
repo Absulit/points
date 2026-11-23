@@ -25,14 +25,7 @@
  * ${sdfSegment}
  * let value = sdfSegment(uv, point1, point2);
  */
-const sdfSegment = /*wgsl*/`
-fn sdfSegment(p:vec2f, a:vec2f, b:vec2f) -> f32{
-    let pa = p-a;
-    let ba = b-a;
-    let h:f32 = clamp( dot(pa,ba)/dot(ba,ba), 0.0, 1.0 );
-    return length( pa - ba*h );
-}
-`;
+const sdfSegment = /*wgsl*/`fn sdfSegment(p:vec2f,a:vec2f,b:vec2f)->f32{let pa=p-a;let ba=b-a;let h:f32=clamp(dot(pa,ba)/dot(ba,ba),0.0,1.0);return length(pa-ba*h);}`;
 
 /**
  * Creates a line with a pixel stroke.
@@ -51,16 +44,7 @@ fn sdfSegment(p:vec2f, a:vec2f, b:vec2f) -> f32{
  * ${sdfLine}
  * let value = sdfLine(p1, p2, pixeStroke, uvr);
  */
-const sdfLine = /*wgsl*/`
-fn sdfLine(p1:vec2f, p2:vec2f, pixelStroke:f32, uv:vec2f)->f32{
-    let d = sdfSegment(uv, p1, p2);
-    var value = 1.0;
-    if(d > pixelStroke/800.){
-        value = 0.;
-    }
-    return value;
-}
-`;
+const sdfLine = /*wgsl*/`fn sdfLine(p1:vec2f,p2:vec2f,pixelStroke:f32,uv:vec2f)->f32{let d=sdfSegment(uv,p1,p2);var value=1.0;if(d > pixelStroke/800.){value=0.;}return value;}`;
 
 /**
  * Creates a circle
@@ -79,13 +63,7 @@ fn sdfLine(p1:vec2f, p2:vec2f, pixelStroke:f32, uv:vec2f)->f32{
  * ${sdfCircle}
  * let value = sdfCircle(position, radius, feather, uvr);
  */
-const sdfCircle = /*wgsl*/`
-fn sdfCircle(position:vec2f, radius: f32, feather: f32, uv:vec2f) -> f32 {
-    let d = distance(uv, position);
-    let st = 1. - smoothstep(radius, radius + feather, d);
-    return st;
-}
-`;
+const sdfCircle = /*wgsl*/`fn sdfCircle(position:vec2f,radius:f32,feather:f32,uv:vec2f)->f32{let d=distance(uv,position);let st=1.-smoothstep(radius,radius+feather,d);return st;}`;
 
 /**
  * Creates a square
@@ -105,20 +83,7 @@ fn sdfCircle(position:vec2f, radius: f32, feather: f32, uv:vec2f) -> f32 {
  * ${sdfSquare}
  * let value = sdfSquare(position, radius, feather, rotation, uvr);
  */
-const sdfSquare = /*wgsl*/`
-fn sdfSquare(position:vec2f, radius:f32, feather:f32, rotationRads: f32, uv:vec2f) -> f32 {
-    let positionRotated = rotateVector(position, rotationRads);
-    let uvRotated = rotateVector(uv, rotationRads);
-
-    var d = distance(uvRotated.x,  positionRotated.x );
-    var s = smoothstep(radius, radius + feather,  d);
-
-    d = distance(uvRotated.y,  positionRotated.y);
-    s += smoothstep(radius, radius + feather,  d);
-    s = clamp(0., 1., s);
-    return 1-s;
-}
-`;
+const sdfSquare = /*wgsl*/`fn sdfSquare(position:vec2f,radius:f32,feather:f32,rotationRads:f32,uv:vec2f)->f32{let positionRotated=rotateVector(position,rotationRads);let uvRotated=rotateVector(uv,rotationRads);var d=distance(uvRotated.x,positionRotated.x);var s=smoothstep(radius,radius+feather,d);d=distance(uvRotated.y,positionRotated.y);s+=smoothstep(radius,radius+feather,d);s=clamp(0.,1.,s);return 1-s;}`;
 
 /**
  * Create a rectangle with two coordinates.
@@ -133,21 +98,7 @@ fn sdfSquare(position:vec2f, radius:f32, feather:f32, rotationRads: f32, uv:vec2
  * sdfRect(vec2f(), vec2f(1), in.uvr);
  *
  */
-const sdfRect = /*wgsl*/`
-
-fn sdfRect(startPoint:vec2f, endPoint:vec2f, uv:vec2f) -> f32 {
-    let value = select(
-        0.,
-        1.,
-        (startPoint.x < uv.x) &&
-        (startPoint.y < uv.y) &&
-        (uv.x < endPoint.x) &&
-        (uv.y < endPoint.y)
-    );
-    return smoothstep(0, .5,  value);
-}
-
-`;
+const sdfRect = /*wgsl*/`fn sdfRect(startPoint:vec2f,endPoint:vec2f,uv:vec2f)->f32{let value=select(0.,1.,(startPoint.x < uv.x)&&(startPoint.y < uv.y)&&(uv.x < endPoint.x)&&(uv.y < endPoint.y));return smoothstep(0,.5,value);}`;
 
 
 /**
@@ -167,13 +118,7 @@ fn sdfRect(startPoint:vec2f, endPoint:vec2f, uv:vec2f) -> f32 {
  * ${sdfLine2}
  * let value = sdfLine2(p1, p2, feather, uvr);
  */
-const sdfLine2 = /*wgsl*/`
-fn sdfLine2(p1:vec2f, p2:vec2f, feather:f32, uv:vec2f)->f32{
-    let d = sdfSegment(uv, p1, p2);
-    var s = smoothstep(0, feather,  d);
-    return 1-s;
-}
-`;
+const sdfLine2 = /*wgsl*/`fn sdfLine2(p1:vec2f,p2:vec2f,feather:f32,uv:vec2f)->f32{let d=sdfSegment(uv,p1,p2);var s=smoothstep(0,feather,d);return 1-s;}`;
 
 /**
  * Special for letters and create an sdf version of a texture
@@ -189,18 +134,6 @@ fn sdfLine2(p1:vec2f, p2:vec2f, feather:f32, uv:vec2f)->f32{
  * ${sdfSmooth}
  * let value = sdfSmooth(rgba);
  */
-const sdfSmooth = /*wgsl*/`
-fn sdfSmooth(color:vec4f) -> vec4f {
-    var finalColor = color;
-    var spread = fwidth(finalColor.a);
-    spread = max(spread * .75, .001);
-    finalColor.a = smoothstep(.5 - spread, .5 + spread, finalColor.a);
-
-    // if(finalColor.a <= 0.){
-    //     discard;
-    // }
-    return finalColor;
-}
-`;
+const sdfSmooth = /*wgsl*/`fn sdfSmooth(color:vec4f)->vec4f{var finalColor=color;var spread=fwidth(finalColor.a);spread=max(spread*.75,.001);finalColor.a=smoothstep(.5-spread,.5+spread,finalColor.a);return finalColor;}`;
 
 export { sdfCircle, sdfLine, sdfLine2, sdfRect, sdfSegment, sdfSmooth, sdfSquare };

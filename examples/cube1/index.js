@@ -1,5 +1,5 @@
 
-import Points, { LoadOp, RenderPass, RenderPasses } from 'points';
+import Points, { LoadOp, RenderPass } from 'points';
 import { cube_renderpass } from './cube_renderpass/index.js';
 import { staticcube_renderpass } from './staticcube_renderpass/index.js';
 

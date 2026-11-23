@@ -1,5 +1,6 @@
 
-import Points, { FrontFace, RenderPass, RenderPasses } from 'points';
+import Points, { FrontFace, RenderPass } from 'points';
+import RenderPasses from 'points/renderpasses';
 import { mesh_renderpass } from './mesh_renderpass/index.js';
 import { loadAndExtract } from 'utils';
 import { structs } from './structs.js';
