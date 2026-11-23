@@ -1,7 +1,8 @@
 import vert from './vert.js';
 import compute from './compute.js';
 import frag from './frag.js';
-import Points, { RenderPass, RenderPasses, ScaleMode } from 'points';
+import Points, { RenderPass, ScaleMode } from 'points';
+import RenderPasses from 'points/renderpasses';
 import { structs } from './structs.js';
 
 const options = {

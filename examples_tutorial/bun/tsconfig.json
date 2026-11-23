@@ -28,6 +28,7 @@
     "baseUrl": ".",
     "paths": {
       "points": ["node_modules/@absulit/points/build/points.min.js"],
+      "points/renderpasses": ["node_modules/@absulit/points/build/core/RenderPass"],
       "points/animation": ["node_modules/@absulit/points/build/core/animation"],
       "points/audio": ["node_modules/@absulit/points/build/core/audio"],
       "points/color": ["node_modules/@absulit/points/build/core/color"],

@@ -1,4 +1,3 @@
-export { ScaleMode as default };
 /**
  * Class to be used to select how the content should be displayed on different
  * screen sizes.
@@ -104,3 +103,4 @@ declare class ScaleMode {
      */
     static HEIGHT: number;
 }
+export { ScaleMode as default };

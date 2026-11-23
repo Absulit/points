@@ -21,7 +21,7 @@
  * ${PI}
  * let value = PI * 3;
  */
-const PI = /*wgsl*/`const PI = 3.14159265;`;
+const PI = /*wgsl*/`const PI=3.14159265;`;
 /**
  * TAU  is the ratio of a circle's circumference to its radius.
  *
@@ -35,7 +35,7 @@ const PI = /*wgsl*/`const PI = 3.14159265;`;
  * ${TAU}
  * let value = TAU / 3.5;
  */
-const TAU = /*wgsl*/`const TAU = 6.2831853;`;
+const TAU = /*wgsl*/`const TAU=6.2831853;`;
 /**
  * PHI is the Golden Ratio
  *
@@ -49,7 +49,7 @@ const TAU = /*wgsl*/`const TAU = 6.2831853;`;
  * ${PHI }
  * let value = PHI + 3;
  */
-const PHI = /*wgsl*/`const PHI = 1.61803398;`;
+const PHI = /*wgsl*/`const PHI=1.61803398;`;
 /**
  * E is a mathematical constant approximately equal to 2.71828
  * that is the base of the natural logarithm and exponential function.
@@ -65,7 +65,7 @@ const PHI = /*wgsl*/`const PHI = 1.61803398;`;
  * ${E}
  * let value = E - 1.3;
  */
-const E = /*wgsl*/`const E = 2.71828182;`;
+const E = /*wgsl*/`const E=2.71828182;`;
 
 /**
  * Using polar coordinates, calculates the final point as `vec2f`
@@ -81,11 +81,7 @@ const E = /*wgsl*/`const E = 2.71828182;`;
  * ${polar}
  * let value = polar(distance, radians);
  */
-const polar = /*wgsl*/`
-fn polar(distance: f32, radians: f32) -> vec2f {
-    return vec2f(distance * cos(radians), distance * sin(radians));
-}
-`;
+const polar = /*wgsl*/`fn polar(distance:f32,radians:f32)->vec2f{return vec2f(distance*cos(radians),distance*sin(radians));}`;
 
 /**
  * Rotates a vector an amount of radians
@@ -101,15 +97,7 @@ fn polar(distance: f32, radians: f32) -> vec2f {
  * ${rotateVector}
  * let value = rotateVector(position, radians);
  */
-const rotateVector = /*wgsl*/`
-fn rotateVector(p:vec2f, rads:f32 ) -> vec2f {
-    let s = sin(rads);
-    let c = cos(rads);
-    let xnew = p.x * c - p.y * s;
-    let ynew = p.x * s + p.y * c;
-    return vec2(xnew, ynew);
-}
-`;
+const rotateVector = /*wgsl*/`fn rotateVector(p:vec2f,rads:f32)->vec2f{let s=sin(rads);let c=cos(rads);let xnew=p.x*c-p.y*s;let ynew=p.x*s+p.y*c;return vec2(xnew,ynew);}`;
 
 /**
  * Angle between two points.
@@ -118,13 +106,7 @@ fn rotateVector(p:vec2f, rads:f32 ) -> vec2f {
  * @param {vec2f} p2 second poin position
  * @returns {f32} angle in radians
  */
-const angle = /*wgsl*/`
-fn angle(p1:vec2f, p2:vec2f) -> f32 {
-    let delta = p2 - p1;
-    let distance = length(delta);
-    return atan2(delta.y, delta.x);
-}
-`;
+const angle = /*wgsl*/`fn angle(p1:vec2f,p2:vec2f)->f32{let delta=p2-p1;let distance=length(delta);return atan2(delta.y,delta.x);}`;
 
 /**
  * Creates a Matrix rotated in the X axis by an angle in radians.
@@ -132,16 +114,7 @@ fn angle(p1:vec2f, p2:vec2f) -> f32 {
  * @param {f32} rads angle
  * @returns {mat4x4f}
  */
-const rotXAxis = /*wgsl*/`
-fn rotXAxis(rads:f32) -> mat4x4f {
-    return mat4x4f(
-        1.0, 0.0,          0.0,         0.0,
-        0.0, cos(rads),   -sin(rads),   0.0,
-        0.0, sin(rads),    cos(rads),   0.0,
-        0.0, 0.0,          0.0,         1.0
-    );
-}
-`;
+const rotXAxis = /*wgsl*/`fn rotXAxis(rads:f32)->mat4x4f{return mat4x4f(1.0,0.0,0.0,0.0,0.0,cos(rads),-sin(rads),0.0,0.0,sin(rads),cos(rads),0.0,0.0,0.0,0.0,1.0);}`;
 
 /**
  * Creates a Matrix rotated in the Y axis by an angle in radians.
@@ -149,16 +122,7 @@ fn rotXAxis(rads:f32) -> mat4x4f {
  * @param {f32} rads angle
  * @returns {mat4x4f}
  */
-const rotYAxis = /*wgsl*/`
-fn rotYAxis(rads:f32) -> mat4x4f {
-    return mat4x4f(
-        cos(rads),   0.0, sin(rads),   0.0,
-        0.0,         1.0, 0.0,         0.0,
-       -sin(rads),   0.0, cos(rads),   0.0,
-        0.0,         0.0, 0.0,         1.0
-    );
-}
-`;
+const rotYAxis = /*wgsl*/`fn rotYAxis(rads:f32)->mat4x4f{return mat4x4f(cos(rads),0.0,sin(rads),0.0,0.0,1.0,0.0,0.0,-sin(rads),0.0,cos(rads),0.0,0.0,0.0,0.0,1.0);}`;
 
 /**
  * Creates a Matrix rotated in the Z axis by an angle in radians.
@@ -166,15 +130,6 @@ fn rotYAxis(rads:f32) -> mat4x4f {
  * @param {f32} rads angle
  * @returns {mat4x4f}
  */
-const rotZAxis = /*wgsl*/`
-fn rotZAxis(rads:f32) -> mat4x4f {
-    return mat4x4f(
-        cos(rads),   -sin(rads),   0.0, 0.0,
-        sin(rads),    cos(rads),   0.0, 0.0,
-        0.0,          0.0,         1.0, 0.0,
-        0.0,          0.0,         0.0, 1.0
-    );
-}
-`;
+const rotZAxis = /*wgsl*/`fn rotZAxis(rads:f32)->mat4x4f{return mat4x4f(cos(rads),-sin(rads),0.0,0.0,sin(rads),cos(rads),0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0);}`;
 
 export { E, PHI, PI, TAU, angle, polar, rotXAxis, rotYAxis, rotZAxis, rotateVector };
