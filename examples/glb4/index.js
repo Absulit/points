@@ -1,5 +1,5 @@
 
-import Points, { RenderPass, RenderPasses } from 'points';
+import Points, { RenderPass } from 'points';
 import { loadAndExtract, getAnimationDuration, calculateBoneMatrices, pixelTextureB64 } from 'utils';
 import vert from './cube_renderpass/vert.js';
 import frag from './cube_renderpass/frag.js';
